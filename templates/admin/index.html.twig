@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Administration</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{path('home')}}">Accueil</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card card-dark">
+              <div class="card-header">
+                <h3 class="card-title">Administrer</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="row">
+                <a href=''>
+                  <div class="col-sm-4 text-center">
+                    <div class="position-relative p-3 bg-gray" style="height: 180px">
+                      <div class="ribbon-wrapper ribbon-xl">
+                        <div class="ribbon bg-dark">
+                        usersList
+                        </div>
+                      </div>
+                      <i class="fa fa-user fa-7x p-4" ></i>
+                      <a>Utilisateurs</a>
+                    </div>
+                  </div>
+                </a>
+                <a href='{{path('parameter')}}'>
+                  <div class="col-sm-4 text-center">
+                    <div class="position-relative p-3 bg-gray" style="height: 180px">
+                      <div class="ribbon-wrapper ribbon-xl">
+                        <div class="ribbon bg-orange">
+                        Parametres
+                        </div>
+                      </div>
+                      <i class="fas fa-bezier-curve fa-7x p-4" ></i>
+                      <a>Paramétres Généraux</a>
+                    </div>
+                  </div>
+                </a>
+                <a href=''>
+                  <div class="col-sm-4 text-center">
+                    <div class="position-relative p-3 bg-gray" style="height: 180px">
+                      <div class="ribbon-wrapper ribbon-xl">
+                        <div class="ribbon bg-success">
+                        doc
+                        </div>
+                      </div>
+                      <i class="fas fa-copy fa-7x p-4" ></i>
+                      <a>Documents</a>
+                    </div>
+                  </div>
+                </a>
+                </div>
+                <div class="row mt-4">
+                <a href=''>
+                  <div class="col-sm-4 text-center">
+                    <div class="position-relative p-3 bg-gray" style="height: 180px">
+                      <div class="ribbon-wrapper ribbon-xl">
+                        <div class="ribbon bg-primary">
+                        actu
+                        </div>
+                      </div>
+                      <i class="fas fa-newspaper  fa-7x p-4" ></i>
+                      <a>Actualités</a>
+                    </div>
+                  </div>
+                </a>
+                <a href='{{path('getAnnuaire')}}'>
+                  <div class="col-sm-4 text-center">
+                    <div class="position-relative p-3 bg-gray" style="height: 180px">
+                      <div class="ribbon-wrapper ribbon-xl">
+                        <div class="ribbon bg-warning">
+                        annuaire
+                        </div>
+                      </div>
+                      <i class="fas fa-book  fa-7x p-4" ></i>
+                      <a>Annuaire</a>
+                    </div>
+                  </div>
+                </a>
+                <a href=''>
+                  <div class="col-sm-4 text-center">
+                    <div class="position-relative p-3 bg-gray" style="height: 180px">
+                      <div class="ribbon-wrapper ribbon-xl">
+                        <div class="ribbon bg-danger">
+                        droit
+                        </div>
+                      </div>
+                      <i class="fas fa-gavel fa-7x p-4" ></i>
+                      <a>Gestion des droits</a>
+                    </div>
+                  </div>
+                </a>
+                </div>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+{% endblock %}

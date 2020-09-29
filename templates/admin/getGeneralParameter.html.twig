@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="card card-dark collapsed-card">
+				<div class="card-header">
+					<h3 class="card-title">Création/Modification sociétés</h3>
+
+					<div class="card-tools">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse">
+							<i class="fas fa-plus"></i>
+						</button>
+					</div>
+					<!-- /.card-tools -->
+				</div>
+				<!-- /.card-header -->
+
+				<div class="row card-body">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header">
+								<h3 class="card-title text-center mr-auto">Création de société</h3>
+							</div>
+
+							{{ form_start(formSociete)}}
+							<div class="d-flex flex-wrap card-body">
+								<div class="form-group col-4"></div>
+								{{ form_row(formSociete.nom, {'attr' : {'placeholder' : "Nom de la société", 'class' : "form-control"}})}}
+								<button type="submit" class="btn btn-lg btn-dark mx-auto ">Créer la société</button>
+							</div>
+							{{ form_end(formSociete)}}
+							<div class="card-header">
+								<h3 class="card-title text-center mr-auto">Modification des sociétés</h3>
+							</div>
+							<!-- /.card-header -->
+							<div class="">
+								<table id="example2" class="table table-bordered table-striped">
+									<thead>
+										<tr>
+											<th class="text-center">
+												<span>id</span>
+											</th>
+											<th class="text-center">
+												<span>Nom</span>
+											</th>
+											<th class="text-center">
+												<span>Action</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for societe in societes %}
+											<tr>
+												<!--todo gérer le changement de l'id du bouton du POST -->
+												<form method="POST" action="index.php?action=modifierSociete&id={{societe.id}}">
+													<td class="text-center">
+														<a class="text-center">{{ societe.id}}</a>
+													</td>
+													<td class="text-center">
+														<input class="text-center col-6" name="societe" id="societe" value="{{societe.nom}}">
+													</td>
+													<td class="text-center">
+														<button class="btn btn-warning">
+															<i class="fas fa-edit"></i>
+														</button>
+														<a class="btn btn-danger" href="index.php?action=deleteSociete&id={{societe.id}}">
+															<i class="fas fa-trash-alt"></i>
+														</a>
+													</td>
+												</form>
+											</tr>
+										{% endfor %}
+									</tbody>
+									<tfoot>
+										<tr>
+											<th class="text-center">
+												<span>id</span>
+											</th>
+											<th class="text-center">
+												<span>Nom</span>
+											</th>
+											<th class="text-center">
+												<span>Action</span>
+											</th>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock %}

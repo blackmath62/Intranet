@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="card card-dark collapsed-card">
+				<div class="card-header">
+					<h3 class="card-title">Créer un nouveau contact dans l'annuaire</h3>
+					<div class="card-tools">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse">
+							<i class="fas fa-plus"></i>
+						</button>
+					</div>
+					<!-- /.card-tools -->
+				</div>
+				<!-- /.card-header -->
+				<div class="row card-body">
+					<div class="col-12">
+						<div class="card">
+							{{ form_start(formAnnuaire)}}
+							<div class="d-flex flex-wrap card-body">
+								<div class="form-group col-4">
+									{{ form_row(formAnnuaire.interne, {'attr' : {'placeholder' : "Numéro Interne", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(formAnnuaire.nom, {'attr' : {'placeholder' : "Nom et prénom", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(formAnnuaire.exterieur, {'attr' : {'placeholder' : "Numéro Extérieur", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(formAnnuaire.mail, {'attr' : {'placeholder' : "E-mail", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(formAnnuaire.fonction, {'attr' : {'placeholder' : "Fonction", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(formAnnuaire.portable, {'attr' : {'placeholder' : "Numéro GSM", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(formAnnuaire.Societe, {'attr' : {'class' : "form-control"}}
+									)}}
+								</div>
+
+								<div class="form-group mx-auto pt-5">
+									<button type="submit" class="btn btn-lg btn-dark mx-auto ">Créer le contact dans l'annuaire</button>
+								</div>
+							</div>
+							{{ form_end(formAnnuaire)}}
+						</div>
+					</div>
+				</div>
+				<!-- /.card-body -->
+			</div>
+			<!-- /.card -->
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-dark">
+						<div class="card-header">
+							<h3 class="card-title text-center mr-auto">Modification de l'annuaire des sociétés</h3>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<table id="example2" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th class="text-center">
+											<span>id</span>
+										</th>
+										<th class="text-center">
+											<span>interne</span>
+										</th>
+										<th class="text-center">
+											<span>Nom</span>
+										</th>
+										<th class="text-center">
+											<span>Extérieur</span>
+										</th>
+										<th class="text-center">
+											<span>mail</span>
+										</th>
+										<th class="text-center">
+											<span>Fonction</span>
+										</th>
+										<th class="text-center">
+											<span>Société</span>
+										</th>
+										<th class="text-center">
+											<span>Portable</span>
+										</th>
+										<th class="text-center">
+											<span>Action</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for annuaire in annuaires %}
+										<tr>
+											<!--todo gérer le changement de l'id du bouton du POST -->
+											<td class="text-center">
+												<form method="POST" action="index.php?action=modifierLigne&id={{ annuaire.id }}">
+													<a class="text-center">{{ annuaire.id }}</a>
+													<td class="text-center">
+														<input class="text-center" name="interne" id="interne" value="{{ annuaire.interne }}" style="max-width: 40px;">
+													</td>
+													<td class="text-center">
+														<input class="text-center" name="nom" id="nom" value="{{ annuaire.nom }}">
+													</td>
+													<td class="text-center">
+														<input class="text-center" name="exterieur" id="exterieur" value='{{ annuaire.exterieur }}' style="max-width: 110px;">
+													</td>
+													<td class="text-center">
+														<input class="text-center" name="mail" id="mail" value="{{ annuaire.mail }}">
+													</td>
+													<td class="text-center">
+														<input class="text-center" name="fonction" id="fonction" value="{{ annuaire.fonction }}">
+													</td>
+													<td class="text-center">
+
+														<select name="societe" id="societe" class="form-control select2" style="width: 100%;">
+
+
+															<option selected="selected" value="{{annuaire.societe.id}}">{{annuaire.societe.nom}}</option>
+
+															{% for societe in societes %}
+
+																<option value="{{societe.id}}">{{societe.nom}}</option>
+
+															{%  endfor %}
+														</select>
+													</td>
+													<td class="text-center">
+														<input class="text-center" name="portable" id="portable" value="{{ annuaire.portable }}" style="max-width: 110px;">
+													</td>
+													<td class="text-center">
+														<button class="btn btn-warning">
+															<i class="fas fa-edit"></i>
+														</button>
+														<a class="btn btn-danger" href="index.php?action=supprimerLigne&id=<?= $id ?>">
+															<i class="fas fa-trash-alt"></i>
+														</a>
+													</td>
+												</form>
+											</td>
+										{% endfor %}
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<th class="text-center">
+											<span>id</span>
+										</th>
+										<th class="text-center">
+											<span>interne</span>
+										</th>
+										<th class="text-center">
+											<span>Nom</span>
+										</th>
+										<th class="text-center">
+											<span>Extérieur</span>
+										</th>
+										<th class="text-center">
+											<span>mail</span>
+										</th>
+										<th class="text-center">
+											<span>Fonction</span>
+										</th>
+										<th class="text-center">
+											<span>Société</span>
+										</th>
+										<th class="text-center">
+											<span>Portable</span>
+										</th>
+										<th class="text-center">
+											<span>Action</span>
+										</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock %}
