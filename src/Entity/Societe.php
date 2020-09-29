@@ -24,7 +24,8 @@ class Societe
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", unique=true)
+     * @Assert\Length(min=3,max=255, minMessage="Le nom de la société doit être au minimum de 3 caractéres",maxMessage="Le nom de la société dépasse 255 caractéres")
      */
     private $nom;
 
@@ -43,9 +44,27 @@ class Societe
      */
     private $annuaires;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Users::class, mappedBy="societe")
+     */
+    private $users;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Documents::class, mappedBy="societe")
+     */
+    private $documents;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Tickets::class, mappedBy="societe")
+     */
+    private $tickets;
+
     public function __construct()
     {
         $this->annuaires = new ArrayCollection();
+        $this->users = new ArrayCollection();
+        $this->documents = new ArrayCollection();
+        $this->tickets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -114,6 +133,99 @@ class Societe
             // set the owning side to null (unless already changed)
             if ($annuaire->getSociete() === $this) {
                 $annuaire->setSociete(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Users[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(Users $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setSociete($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(Users $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            // set the owning side to null (unless already changed)
+            if ($user->getSociete() === $this) {
+                $user->setSociete(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Documents[]
+     */
+    public function getDocuments(): Collection
+    {
+        return $this->documents;
+    }
+
+    public function addDocument(Documents $document): self
+    {
+        if (!$this->documents->contains($document)) {
+            $this->documents[] = $document;
+            $document->setSociete($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDocument(Documents $document): self
+    {
+        if ($this->documents->contains($document)) {
+            $this->documents->removeElement($document);
+            // set the owning side to null (unless already changed)
+            if ($document->getSociete() === $this) {
+                $document->setSociete(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Tickets[]
+     */
+    public function getTickets(): Collection
+    {
+        return $this->tickets;
+    }
+
+    public function addTicket(Tickets $ticket): self
+    {
+        if (!$this->tickets->contains($ticket)) {
+            $this->tickets[] = $ticket;
+            $ticket->setSociete($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTicket(Tickets $ticket): self
+    {
+        if ($this->tickets->contains($ticket)) {
+            $this->tickets->removeElement($ticket);
+            // set the owning side to null (unless already changed)
+            if ($ticket->getSociete() === $this) {
+                $ticket->setSociete(null);
             }
         }
 

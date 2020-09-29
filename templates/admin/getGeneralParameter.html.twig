@@ -15,7 +15,6 @@
 					<!-- /.card-tools -->
 				</div>
 				<!-- /.card-header -->
-
 				<div class="row card-body">
 					<div class="col-12">
 						<div class="card">
@@ -53,7 +52,7 @@
 										{% for societe in societes %}
 											<tr>
 												<!--todo gérer le changement de l'id du bouton du POST -->
-												<form method="POST" action="index.php?action=modifierSociete&id={{societe.id}}">
+												<form method="POST" action="{{path('societe_edit',{'id': societe.id}) }}">
 													<td class="text-center">
 														<a class="text-center">{{ societe.id}}</a>
 													</td>
@@ -64,7 +63,7 @@
 														<button class="btn btn-warning">
 															<i class="fas fa-edit"></i>
 														</button>
-														<a class="btn btn-danger" href="index.php?action=deleteSociete&id={{societe.id}}">
+														<a class="btn btn-danger" href="{{path('deleteSociete',{'id': societe.id}) }}">
 															<i class="fas fa-trash-alt"></i>
 														</a>
 													</td>

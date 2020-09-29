@@ -65,16 +65,21 @@ class AdminController extends AbstractController
     }
     /**
      * @Route("/parameter", name="parameter")
+     * @Route("/parameter/{id}/edit", name="societe_edit")
      */
-    public function getGeneralParameter(Request $request, SocieteRepository $repo, EntityManagerInterface $manager)
+    public function getGeneralParameter(Societe $societe = null, Request $request, SocieteRepository $repo, EntityManagerInterface $manager)
     {
+        if(!$societe){
         $societe = new Societe();
+        }
         $form = $this->createFormBuilder($societe)
             ->add("nom")
             ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            if(!$societe){
             $societe->setCreatedAt(new \DateTime());
+            }
             $manager->persist($societe);
             $manager->flush();
         }
@@ -85,4 +90,40 @@ class AdminController extends AbstractController
             'formSociete' => $form->createView()
         ]);
     }
+
+    /**
+     * @Route("/deleteSociete/{id}",name="deleteSociete")
+     */
+    // todo
+    public function deleteSociete($id)
+    {
+        $repository = $this->getDoctrine()->getManager()->getRepository(Societe::class);
+        $societeId = $repository->find($id);
+         
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($societeId);
+        $em->flush();        
+
+        /*return $this->render('admin/getGeneralParameter.html.twig');*/
+        return $this->redirect($this->generateUrl('parameter'));
+    }
+    /**
+     * @Route("/updateSociete/{id}/{text}",name="updateSociete")
+     */
+    // todo
+    public function updateSociete($id, $nom)
+    {
+        $repository = $this->getDoctrine()->getManager()->getRepository(Societe::class);
+        $societeId = $repository->find($id);
+        if (!$societeId) {
+            throw $this->createNotFoundException('La société n\'a pas été trouvé');
+        } 
+        $em = $this->getDoctrine()->getManager();
+        $societeId->setNom($nom);
+        $em->flush();        
+
+        /*return $this->render('admin/getGeneralParameter.html.twig');*/
+        return $this->redirect($this->generateUrl('parameter'));
+    }
+
 }
