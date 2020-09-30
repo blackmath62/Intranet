@@ -17,7 +17,8 @@ class AnnuaireController extends AbstractController
         
         return $this->render('annuaire/index.html.twig', [
             'controller_name' => 'AnnuaireController',
-            'annuaires' => $annuaires
+            'annuaires' => $annuaires,
+            'title' => "Annuaire"
         ]);
     }
     /**

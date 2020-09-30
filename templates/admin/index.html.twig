@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-
+{% block title %}{{ title }}{% endblock %}
 {% block body %}
 <section class="content-header">
       <div class="container-fluid">
@@ -82,7 +82,7 @@
                     </div>
                   </div>
                 </a>
-                <a href='{{path('getAnnuaire')}}'>
+                <a href='{{path('admin_annuaire')}}'>
                   <div class="col-sm-4 text-center">
                     <div class="position-relative p-3 bg-gray" style="height: 180px">
                       <div class="ribbon-wrapper ribbon-xl">
