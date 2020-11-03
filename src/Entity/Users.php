@@ -2,15 +2,19 @@
 
 namespace App\Entity;
 
-use App\Repository\UsersRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UsersRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=UsersRepository::class)
+ * @UniqueEntity("email",message="Mail déjà utilisé !")
  */
-class Users
+class Users implements UserInterface
 {
     /**
      * @ORM\Id()
@@ -20,7 +24,9 @@ class Users
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\NotBlank(message="Veuillez remplir ce champs")
+     * @Assert\Email
      */
     private $email;
 
@@ -40,12 +46,13 @@ class Users
     private $token;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true, unique=true)
      */
     private $pseudo;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Url
      */
     private $img;
 
@@ -331,5 +338,50 @@ class Users
         }
 
         return $this;
+    }
+     /**
+     * Returns the roles granted to the user.
+     *
+     *     public function getRoles()
+     *     {
+     *         return ['ROLE_USER'];
+     *     }
+     *
+     * Alternatively, the roles might be stored on a ``roles`` property,
+     * and populated in any number of different ways when the user object
+     * is created.
+     *@see UserInterface
+     * @return string[] The user roles
+     */
+    public function getRoles(){
+        return ['ROLE_USER'];
+    }
+
+    /**
+     * Returns the salt that was originally used to encode the password.
+     * 
+     * @see UserInterface
+     */
+    public function getSalt(){
+        // pour le hashage des mdp géré automatiquement par symfony
+    }
+
+    /**
+     * Returns the username used to authenticate the user.
+     *
+     * @see UserInterface
+     */
+    public function getUsername(){
+        return $this->email;
+    }
+
+    /**
+     * Removes sensitive data from the user.
+     *
+     * This is important if, at any given point, sensitive information like
+     * the plain-text password is stored on this object.
+     */
+    public function eraseCredentials(){
+        //
     }
 }

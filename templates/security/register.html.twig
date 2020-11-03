@@ -1,0 +1,89 @@
+{% extends 'base.authentification.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block body %}
+	<div class="card">
+		<div class="card-body register-card-body">
+			<p class="login-box-msg">Créer un compte</p>
+			{{ form_start( registrationForm) }}
+
+			<div class="input-group mb-3">
+				{{ form_widget(registrationForm.pseudo, {'attr': {'class': 'form-control','placeholder': 'Votre nom'}}) }}
+				<div class="input-group-append">
+					<div class="input-group-text">
+						<span class="fas fa-user"></span>
+					</div>
+				</div>
+			</div>
+
+			<small>{{ form_errors(registrationForm.email) }}</small>
+
+			<div class="input-group mb-3">
+				{{ form_widget(registrationForm.email, {'attr': {'class': 'form-control','placeholder': 'Votre mail'}}) }}
+				<div class="input-group-append">
+					<div class="input-group-text">
+						<span class="fas fa-envelope"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="input-group mb-3">
+				{{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control','placeholder': 'Mot de passe...'}}) }}
+				<div class="input-group-append">
+					<div class="input-group-text">
+						<span class="fas fa-lock"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="input-group mb-3">
+				{{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control','placeholder': 'Confirmation du Mot de passe...'}}) }}
+				<div class="input-group-append">
+					<div class="input-group-text">
+						<span class="fas fa-lock"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="input-group mb-3">
+				{{ form_widget(registrationForm.societe, {'attr': {'class': 'form-control'}}) }}
+				<div class="input-group-append">
+					<div class="input-group-text">
+						<span class="fas fa-university"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="input-group mb-3">
+				{{ form_widget(registrationForm.img, {'attr': {'class': 'form-control','placeholder': 'votre image'}}) }}
+				<div class="input-group-append">
+					<div class="input-group-text">
+						<span class="fas fa-picture"></span>
+					</div>
+				</div>
+			</div>
+			<div
+				class="row d-flex justify-content-center">
+				<!-- /.col -->
+				<div class="col-4">
+					<button type="submit" class="btn btn-dark btn-block">S'inscrire</button>
+				</div>
+				<!-- /.col -->
+			</div>
+
+			{{ form_end(registrationForm) }}
+
+			<p class="mb-1 text-center">
+				<a href="{{path('app_login')}}">Vous avez déjà un compte? S'identifier!</a>
+			</p>
+			<p class="mb-0 text-center">
+				<a href="{{path('app_password_forgot')}}">Mot de passe oublié ?</a>
+			</p>
+		</div>
+		<!-- /.form-box -->
+	</div>
+	<!-- /.card -->
+{% endblock %}

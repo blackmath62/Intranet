@@ -3,8 +3,13 @@
 namespace App\Controller;
 
 use App\Repository\AnnuaireRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+/**
+ * @IsGranted("ROLE_USER")
+ */
 
 class AnnuaireController extends AbstractController
 {
@@ -22,7 +27,7 @@ class AnnuaireController extends AbstractController
         ]);
     }
     /**
-     * @Route("/", name="home")
+     * @Route("/", name="app_home", methods={"GET"})
      */
 
     public function home()
@@ -30,5 +35,6 @@ class AnnuaireController extends AbstractController
         return $this->render('annuaire/home.html.twig', [
             'title' => "page d'accueil"
         ]);
+
     }
 }
