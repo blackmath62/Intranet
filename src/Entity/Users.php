@@ -52,7 +52,6 @@ class Users implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\Url
      */
     private $img;
 
@@ -86,6 +85,11 @@ class Users implements UserInterface
      * @ORM\OneToMany(targetEntity=Tickets::class, mappedBy="user")
      */
     private $tickets;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $roles;
 
     public function __construct()
     {
@@ -342,20 +346,25 @@ class Users implements UserInterface
      /**
      * Returns the roles granted to the user.
      *
-     *     public function getRoles()
-     *     {
-     *         return ['ROLE_USER'];
-     *     }
-     *
+     * *@see UserInterface
+     * @return string[] The user roles
+     */
+        public function getRoles()
+         {
+
+             $roles[] = $this->roles;
+             return $roles;
+         }
+     /*
      * Alternatively, the roles might be stored on a ``roles`` property,
      * and populated in any number of different ways when the user object
      * is created.
      *@see UserInterface
      * @return string[] The user roles
      */
-    public function getRoles(){
-        return ['ROLE_USER'];
-    }
+    /*public function getRoles(){
+        return $this->roles;
+    /*}
 
     /**
      * Returns the salt that was originally used to encode the password.
@@ -384,4 +393,5 @@ class Users implements UserInterface
     public function eraseCredentials(){
         //
     }
+
 }

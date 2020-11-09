@@ -38,7 +38,10 @@ class UserRegistrationFormType extends AbstractType
                 'choice_label' => 'nom',
                 'choice_name' => 'id'
             ])
-            ->add('img')
+            ->add('img', null,[
+                'required' => false,
+                'empty_data' => 'img/no-image-icon.png',
+            ])
         ;
     }
 

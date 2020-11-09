@@ -1,4 +1,4 @@
-{% extends 'base.authentification.html.twig' %}
+{% extends 'minimum.html.twig' %}
 
 {% block title %}
 	{{ title }}
@@ -58,7 +58,7 @@
 			</div>
 
 			<div class="input-group mb-3">
-				{{ form_widget(registrationForm.img, {'attr': {'class': 'form-control','placeholder': 'votre image'}}) }}
+				{{ form_widget(registrationForm.img, {'attr': {'class': 'form-control','placeholder': 'URL de votre image'}}) }}
 				<div class="input-group-append">
 					<div class="input-group-text">
 						<span class="fas fa-picture"></span>

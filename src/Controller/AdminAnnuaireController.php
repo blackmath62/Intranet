@@ -15,7 +15,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
- * @IsGranted("ROLE_USER")
+ * @IsGranted("ROLE_ADMIN")
  */
 
 class AdminAnnuaireController extends AbstractController
@@ -25,6 +25,7 @@ class AdminAnnuaireController extends AbstractController
      */
     public function index(Request $request, AnnuaireRepository $repo, SocieteRepository $repoSociete, EntityManagerInterface $manager)
     {
+        
         $societes = $repoSociete->findAll();
         $newAnnuaire = new Annuaire();
         $form = $this->createFormBuilder($newAnnuaire)

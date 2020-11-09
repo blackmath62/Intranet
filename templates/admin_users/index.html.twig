@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block body %}
+<section class="content-header">
+		<div class="container-fluid">
+			<!-- /.card -->
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-dark">
+						<div class="card-header">
+							<h3 class="card-title text-center mr-auto">Liste des utilisateurs</h3>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<table id="example2" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th class="text-center">
+											<span>id</span>
+										</th>
+										<th class="text-center">
+											<span>societe</span>
+										</th>
+										<th class="text-center">
+											<span>email</span>
+										</th>
+										<th class="text-center">
+											<span>Date de création</span>
+										</th>
+										<th class="text-center">
+											<span>pseudo</span>
+										</th>
+										<th class="text-center">
+											<span>roles</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for user in users %}
+										<tr>
+											<!--todo gérer le changement de l'id du bouton du POST -->
+											<td class="text-center">
+												<form method="POST" action="index.php?action=modifierLigne&id={{ user.id }}">
+													<a class="text-center">{{ user.id }}</a>
+													<td class="text-center">
+														<input class="text-center" name="societe" id="societe" value="{{ user.societe.nom }}" style="max-width: 40px;">
+													</td>
+													<td class="text-center">
+														<input class="text-center" name="email" id="email" value="{{ user.email }}">
+													</td>
+													<td class="text-center">
+														<input class="text-center" name="createdAt" id="createdAt" value='{{ user.createdAt | date("d/m/Y") }}' style="max-width: 110px;">
+													</td>
+													<td class="text-center">
+														<input class="text-center" name="pseudo" id="pseudo" value="{{ user.pseudo }}">
+													</td>
+													<td class="text-center">
+														<input class="text-center" name="roles" id="roles" value="{{ user.pseudo }}">
+													</td>
+												</form>
+											</td>
+										{% endfor %}
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<th class="text-center">
+											<span>id</span>
+										</th>
+										<th class="text-center">
+											<span>societe</span>
+										</th>
+										<th class="text-center">
+											<span>email</span>
+										</th>
+										<th class="text-center">
+											<span>Date de création</span>
+										</th>
+										<th class="text-center">
+											<span>pseudo</span>
+										</th>
+										<th class="text-center">
+											<span>roles</span>
+										</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock %}

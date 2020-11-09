@@ -1,39 +1,40 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="utf-8">
+
 		{% block stylesheets %}
+			<meta
+			charset="utf-8">
 			<!-- Font Awesome -->
 			<link
-			rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+			rel="stylesheet" href="{{ asset("plugins/fontawesome-free/css/all.min.css") }}">
 			<!-- Ionicons -->
 			<link
 			rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 			<!-- Tempusdominus Bbootstrap 4 -->
 			<link
-			rel="stylesheet" href="plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+			rel="stylesheet" href="{{ asset("plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css") }}">
 			<!-- iCheck -->
 			<link
-			rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+			rel="stylesheet" href="{{ asset("plugins/icheck-bootstrap/icheck-bootstrap.min.css") }}">
 			<!-- JQVMap -->
 			<link
-			rel="stylesheet" href="plugins/jqvmap/jqvmap.min.css">
+			rel="stylesheet" href="{{ asset("plugins/jqvmap/jqvmap.min.css") }}">
 			<!-- Theme style -->
 			<link
-			rel="stylesheet" href="dist/css/adminlte.min.css">
+			rel="stylesheet" href="{{ asset("dist/css/adminlte.min.css") }}">
 			<!-- overlayScrollbars -->
 			<link
-			rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+			rel="stylesheet" href="{{ asset("plugins/overlayScrollbars/css/OverlayScrollbars.min.css") }}">
 			<!-- Daterange picker -->
 			<link
-			rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
+			rel="stylesheet" href="{{ asset("plugins/daterangepicker/daterangepicker.css") }}">
 			<!-- summernote -->
 			<link
-			rel="stylesheet" href="plugins/summernote/summernote-bs4.css">
+			rel="stylesheet" href="{{ asset("plugins/summernote/summernote-bs4.css") }}">
 			<!-- Google Font: Source Sans Pro -->
 			<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
-			<script src="https://cdn.tiny.cloud/1/zzwl9538k84ky9r4mp7zhy8zlyl4fqroicalnsvia2tkj4zy/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 		{% endblock %}
 	</head>
 	<body class="sidebar-mini" style="height: auto;">
@@ -50,7 +51,7 @@
 						</a>
 					</li>
 					<li class="nav-item d-none d-sm-inline-block">
-						<a href="{{path('app_home')}}" class="nav-link">Accueil</a>{{ app.session.get('email') }}
+						<a href="{{path('app_home')}}" class="nav-link">Accueil</a>
 					</li>
 				</ul>
 				<!-- Right navbar links -->
@@ -58,94 +59,108 @@
 					class="navbar-nav ml-auto">
 					<!-- User Dropdown Menu -->
 					<li class="nav-item dropdown">
-						<a class="nav-link" data-toggle="dropdown" href="#">
-							<i class="fas fa-user"></i>
+						<a class="nav-link" data-toggle="dropdown" href="">
+
+							<div class="user-panel d-flex">
+
+								<img class="direct-chat-img" src=" {{ app.user.img }} " alt="User Image">
+								<div class="info">
+									{{ app.user.email }}
+								</div>
+							</div>
+
 						</a>
 						<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-							<a href="{{path('admin')}}" class="dropdown-item">
-								<i class="fas fa-chalkboard-teacher mr-2"></i>
-								Administration
-								<div class="dropdown-divider"></div>
-								<a href="" class="dropdown-item">
-									<i class="fas fa-address-card mr-2"></i>
-									Mon Profil
+
+							{% if app.user.roles == ['ROLE_ADMIN'] %}
+								<a href="{{path('admin')}}" class="dropdown-item">
+									<i class="fas fa-chalkboard-teacher mr-2"></i>
+									Administration
 								</a>
-								<div class="dropdown-divider"></div>
-								<a href="" class="dropdown-item">
-									<i class="fas fa-envelope mr-2"></i>
-									Contact
-								</a>
-								<div class="dropdown-divider"></div>
-								<a href="{{ path('app_logout')}}" class="dropdown-item">
-									<i class="fas fa-sign-out-alt mr-2"></i>
-									Déconnexion
-								</a>
-							</div>
-						</li>
-						<!-- End User Dropdown Menu -->
+							{% endif %}
+
+							<div class="dropdown-divider"></div>
+							<a href="" class="dropdown-item">
+								<i class="fas fa-address-card mr-2"></i>
+								Mon Profil
+							</a>
+							<div class="dropdown-divider"></div>
+							<a href="" class="dropdown-item">
+								<i class="fas fa-envelope mr-2"></i>
+								Contact
+							</a>
+							<div class="dropdown-divider"></div>
+							<a href="{{ path('app_logout')}}" class="dropdown-item">
+								<i class="fas fa-sign-out-alt mr-2"></i>
+								Déconnexion
+							</a>
+						</div>
 					</li>
+					<!-- End User Dropdown Menu -->
 				</ul>
 			</nav>
-			<!-- fin Entête des pages -->
-			<aside
-				class="main-sidebar sidebar-dark-primary elevation-4">
-				<!-- Sidebar -->
-				<div
-					class="sidebar">
-					<!-- Brand Logo -->
-					<a class="brand-link">
-						<img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-						<span class="brand-text font-weight-light">Intranet Axis</span>
-					</a>
-					<nav class="mt-2">
-						<ul
-							class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-							<!-- Table Commune -->
-							<li class="nav-header">Général</li>
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-newspaper"></i>
-									<p>
-										Actualités
-									</p>
-									<span class="badge badge-danger right">8</span>
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-bug "></i>
-									<p>
-										Tickets
-									</p>
-									<span class="badge badge-danger right">8</span>
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-comments "></i>
-									<p>
-										Chat
-									</p>
-									<span class="badge badge-info right">4</span>
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-truck"></i>
-									<p>
-										Bourse au transport
-									</p>
-									<span class="badge badge-info right">1</span>
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="{{ path('annuaire')}}" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-phone"></i>
-									<p>
-										Annuaire
-									</p>
-								</a>
-							</li>
+		</div>
+		<!-- fin Entête des pages -->
+		<aside
+			class="main-sidebar sidebar-dark-primary elevation-4">
+			<!-- Sidebar -->
+			<div
+				class="sidebar">
+				<!-- Brand Logo -->
+				<a class="brand-link">
+					<img src="{{ asset("dist/img/AdminLTELogo.png")}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+					<span class="brand-text font-weight-light">Intranet Axis</span>
+				</a>
+				<nav class="mt-2">
+					<ul
+						class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+						<!-- Table Commune -->
+						<li class="nav-header">Général</li>
+						<li class="nav-item">
+							<a href="" class="nav-link">
+								<i class="nav-icon fas fa-newspaper"></i>
+								<p>
+									Actualités
+								</p>
+								<span class="badge badge-danger right">8</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="" class="nav-link">
+								<i class="nav-icon fas fa-fw fa-bug "></i>
+								<p>
+									Tickets
+								</p>
+								<span class="badge badge-danger right">8</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="" class="nav-link">
+								<i class="nav-icon fas fa-fw fa-comments "></i>
+								<p>
+									Chat
+								</p>
+								<span class="badge badge-info right">4</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="" class="nav-link">
+								<i class="nav-icon fas fa-fw fa-truck"></i>
+								<p>
+									Bourse au transport
+								</p>
+								<span class="badge badge-info right">1</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="{{ path('annuaire')}}" class="nav-link">
+								<i class="nav-icon fas fa-fw fa-phone"></i>
+								<p>
+									Annuaire
+								</p>
+							</a>
+						</li>
+						{% if app.user.roles == ['ROLE_ADMIN'] %}
 							<li class="nav-item">
 								<a href="{{path('admin')}}" class="nav-link">
 									<i class="nav-icon fas fa-chalkboard-teacher"></i>
@@ -154,190 +169,162 @@
 									</p>
 								</a>
 							</li>
-							<!-- Fin Table Commune -->
-							<!-- Table Menu Lhermitte-->
-							<li class="nav-header">Lhermitte</li>
-							<li class="nav-item has-treeview">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-tachometer-alt"></i>
-									<p>
-										States Lhermitte
-										<i class="fas fa-angle-left right"></i>
-									</p>
-								</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item">
-										<a href="" class="nav-link">
-											<i class="nav-icon fas fa-tree text-success"></i>
-											<p>Espaces Verts</p>
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="" class="nav-link">
-											<i class="nav-icon fas fa-seedling text-danger"></i>
-											<p>Horticulteurs / Pépiniériste</p>
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="" class="nav-link">
-											<i class="fab fa-apple nav-icon text-orange"></i>
-											<p>Maraîchage</p>
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="" class="nav-link">
-											<i class="fas fa-igloo nav-icon text-warning"></i>
-											<p>Matériel équipement</p>
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="" class="nav-link">
-											<i class="fas fa-globe nav-icon text-primary"></i>
-											<p>Lhermitte Frères</p>
-										</a>
-									</li>
-								</ul>
-							</li>
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-copy"></i>
-									<p>
-										Documents
-									</p>
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-truck"></i>
-									<p>
-										Groupage
-										<span class="badge badge-info right">2</span>
-									</p>
-								</a>
-							</li>
-							<!--Fin Table Menu Lhermitte -->
-							<!--Table Menu Roby -->
-							<li class="nav-header">Roby</li>
-							<li class="nav-item has-treeview">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-tachometer-alt"></i>
-									<p>
-										States Roby
-										<i class="fas fa-angle-left right"></i>
-									</p>
-								</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item">
-										<a href="" class="nav-link">
-											<i class="nav-icon fas fa-tree text-success"></i>
-											<p>Roby</p>
-										</a>
-									</li>
-								</ul>
-							</li>
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-plane"></i>
-									<p>
-										D.E.B
-									</p>
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="fas fa-fw fa-table nav-icon"></i>
-									<p>Planning</p>
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-copy"></i>
-									<p>
-										Documents
-									</p>
-								</a>
-							</li>
-							<!--fin Table Menu Roby -->
-						</ul>
-					</nav>
-				</div>
-				<!-- /.sidebar-menu -->
-				<!-- /.sidebar -->
-			</aside>
-
-			<section class="content-wrapper" id="content" style="min-height: 1419.6px;">
-				<section class="content-header">
-					<div class="container-fluid"> {% block body %}{% endblock %}
-						</div>
-					</section>
-				</section>
-				<footer class="main-footer fixed-bottom">
-					<strong>Contacter l'administrateur<a href="mailto:jpochet@lhermitte.fr">
-							Jpochet</a>.</strong>
-					<div class="float-right d-none d-sm-inline-block">
-						<b>Version</b>
-						1.0.0 du 17/06/2020
-					</div>
-				</footer>
+						{% endif %}
+						<!-- Fin Table Commune -->
+						<!-- Table Menu Lhermitte-->
+						<li class="nav-header">Lhermitte</li>
+						<li class="nav-item has-treeview">
+							<a href="" class="nav-link">
+								<i class="nav-icon fas fa-tachometer-alt"></i>
+								<p>
+									States Lhermitte
+									<i class="fas fa-angle-left right"></i>
+								</p>
+							</a>
+							<ul class="nav nav-treeview">
+								<li class="nav-item">
+									<a href="" class="nav-link">
+										<i class="nav-icon fas fa-tree text-success"></i>
+										<p>Espaces Verts</p>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="" class="nav-link">
+										<i class="nav-icon fas fa-seedling text-danger"></i>
+										<p>Horticulteurs / Pépiniériste</p>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="" class="nav-link">
+										<i class="fab fa-apple nav-icon text-orange"></i>
+										<p>Maraîchage</p>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="" class="nav-link">
+										<i class="fas fa-igloo nav-icon text-warning"></i>
+										<p>Matériel équipement</p>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="" class="nav-link">
+										<i class="fas fa-globe nav-icon text-primary"></i>
+										<p>Lhermitte Frères</p>
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li class="nav-item">
+							<a href="" class="nav-link">
+								<i class="nav-icon fas fa-copy"></i>
+								<p>
+									Documents
+								</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="" class="nav-link">
+								<i class="nav-icon fas fa-fw fa-truck"></i>
+								<p>
+									Groupage
+									<span class="badge badge-info right">2</span>
+								</p>
+							</a>
+						</li>
+						<!--Fin Table Menu Lhermitte -->
+						<!--Table Menu Roby -->
+						<li class="nav-header">Roby</li>
+						<li class="nav-item has-treeview">
+							<a href="" class="nav-link">
+								<i class="nav-icon fas fa-tachometer-alt"></i>
+								<p>
+									States Roby
+									<i class="fas fa-angle-left right"></i>
+								</p>
+							</a>
+							<ul class="nav nav-treeview">
+								<li class="nav-item">
+									<a href="" class="nav-link">
+										<i class="nav-icon fas fa-tree text-success"></i>
+										<p>Roby</p>
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li class="nav-item">
+							<a href="" class="nav-link">
+								<i class="nav-icon fas fa-fw fa-plane"></i>
+								<p>D.E.B</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="" class="nav-link">
+								<i class="fas fa-fw fa-table nav-icon"></i>
+								<p>Planning</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="" class="nav-link">
+								<i class="nav-icon fas fa-copy"></i>
+								<p>Documents</p>
+							</a>
+						</li>
+						<!--fin Table Menu Roby -->
+					</ul>
+				</nav>
 			</div>
+			<!-- /.sidebar-menu -->
+			<!-- /.sidebar -->
+		</aside>
+
+		<section class="content-wrapper" id="content" style="min-height: 1419.6px;">
+			<div class="content-header">
+				<div class="container-fluid"> {% block body %}{% endblock %}
+					</div>
+				</div>
+			</section>
+			<footer class="main-footer fixed-bottom">
+				<strong>Contacter l'administrateur<a href="mailto:jpochet@lhermitte.fr">
+						Jpochet</a>.</strong>
+				<div class="float-right d-none d-sm-inline-block">
+					<b>Version</b>
+					1.0.0 du 17/06/2020
+				</div>
+			</footer>
 		</body>
-	</html>
-	{% block javascripts %}
-		<!-- jQuery -->
-		<script src="plugins/jquery/jquery.min.js"></script>
-		<!-- jQuery UI 1.11.4 -->
-		<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+		{% block javascripts %}<!-- jQuery --><script src="{{ asset("plugins/jquery/jquery.min.js") }}"></script>
+		<!-- jQuery UI 1.11.4 --><script src="{{ asset("plugins/jquery-ui/jquery-ui.min.js")}}"></script>
 		<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-		<script>
-			$.widget.bridge('uibutton', $.ui.button)
-		</script>
-		<!-- Bootstrap 4 -->
-		<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-		<!-- ChartJS -->
-		<script src="plugins/chart.js/Chart.min.js"></script>
-		<!-- Sparkline -->
-		<script src="plugins/sparklines/sparkline.js"></script>
-		<!-- JQVMap -->
-		<script src="plugins/jqvmap/jquery.vmap.min.js"></script>
-		<script src="plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
-		<!-- jQuery Knob Chart -->
-		<script src="plugins/jquery-knob/jquery.knob.min.js"></script>
-		<!-- jQuery Perso -->
-		<script type="text/javascript" src="js/main.js"></script>
-
-		<!-- daterangepicker -->
-		<script src="plugins/moment/moment.min.js"></script>
-		<script src="plugins/daterangepicker/daterangepicker.js"></script>
-
-		<!-- Tempusdominus Bootstrap 4 -->
-		<script src="plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-		<!-- Summernote -->
-		<script src="plugins/summernote/summernote-bs4.min.js"></script>
-		<!-- overlayScrollbars -->
-		<script src="plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
-		<!-- AdminLTE App -->
-		<script src="dist/js/adminlte.js"></script>
-		<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-		<script src="dist/js/pages/dashboard.js"></script>
-		<!-- AdminLTE for demo purposes -->
-		<script src="dist/js/demo.js"></script>
-
-		<script src="vendor/datatables/jquery.dataTables.js"></script>
-		<script src="vendor/datatables-bs4/js/dataTables.bootstrap4.js"></script>
-
-
-		<!-- page script -->
-		<script>
-			$(function () {
-$("#example1").DataTable();
-$('#example2').DataTable({
-"paging": true,
-"lengthChange": false,
-"searching": false,
-"ordering": true,
-"info": true,
-"autoWidth": false
-});
-});
-		</script>
-	{% endblock %}
+		<script>$.widget.bridge('uibutton', $.ui.button)
+			</script><!-- Bootstrap 4 -->
+			<script src="{{ asset("plugins/bootstrap/js/bootstrap.bundle.min.js")}}"></script><!-- ChartJS -->
+			<script src="{{ asset("plugins/chart.js/Chart.min.js")}}"></script><!-- Sparkline -->
+			<script src="{{ asset("plugins/sparklines/sparkline.js")}}"></script><!-- JQVMap -->
+			<script src="{{ asset("plugins/jqvmap/jquery.vmap.min.js")}}"></script>
+			<script src="{{ asset("plugins/jqvmap/maps/jquery.vmap.usa.js")}}"></script><!-- jQuery Knob Chart -->
+			<script src="{{ asset("plugins/jquery-knob/jquery.knob.min.js")}}"></script><!-- jQuery Perso -->
+			<script type="text/javascript" src="{{ asset("js/main.js")}}"></script><!-- daterangepicker -->
+			<script src="{{ asset("plugins/moment/moment.min.js")}}"></script>
+			<script src="{{ asset("plugins/daterangepicker/daterangepicker.js")}}"></script><!-- Tempusdominus Bootstrap 4 -->
+			<script src="{{ asset("plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js")}}"></script><!-- Summernote -->
+			<script src="{{ asset("plugins/summernote/summernote-bs4.min.js")}}"></script><!-- overlayScrollbars -->
+			<script src="{{ asset("plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js")}}"></script><!-- AdminLTE App -->
+			<script src="{{ asset("dist/js/adminlte.js")}}"></script><!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+			<script src="{{ asset("dist/js/pages/dashboard.js")}}"></script><!-- AdminLTE for demo purposes -->
+			<script src="{{ asset("dist/js/demo.js")}}"></script>
+			<script src="{{ asset("vendor/datatables/jquery.dataTables.js")}}"></script>
+			<script src="{{ asset("vendor/datatables-bs4/js/dataTables.bootstrap4.js")}}"></script><!-- page script --><script>
+				<script src="https://cdn.tiny.cloud/1/zzwl9538k84ky9r4mp7zhy8zlyl4fqroicalnsvia2tkj4zy/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+				$(function () {									$("#example1").DataTable();
+																									$('#example2').DataTable({
+																									"paging": true,
+																									"lengthChange": false,
+																									"searching": false,
+																									"ordering": true,
+																									"info": true,
+																									"autoWidth": false
+																									});
+																									});
+			</script>
+		{% endblock %}
+	</html>
