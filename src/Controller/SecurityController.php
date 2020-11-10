@@ -39,7 +39,7 @@ class SecurityController extends AbstractController
             $user = $form->getData();
             $plainPassword = $form['plainPassword']->getData();
             $user->setCreatedAt(new \DateTime());
-            $user->setRole('ROLE_USER');
+            $user->setRoles(["ROLE_USER"]);
             $user->setPassword($passwordEncoder->encodePassword($user, $plainPassword));
             $em->persist($user);
             $em->flush();

@@ -9,7 +9,7 @@
 		<div class="card-body register-card-body">
 			<p class="login-box-msg">Créer un compte</p>
 			{{ form_start( registrationForm) }}
-
+			<small>{{ form_errors(registrationForm.pseudo) }}</small>
 			<div class="input-group mb-3">
 				{{ form_widget(registrationForm.pseudo, {'attr': {'class': 'form-control','placeholder': 'Votre nom'}}) }}
 				<div class="input-group-append">
@@ -29,7 +29,7 @@
 					</div>
 				</div>
 			</div>
-
+			<small>{{ form_errors(registrationForm.plainPassword.first) }}</small>
 			<div class="input-group mb-3">
 				{{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control','placeholder': 'Mot de passe...'}}) }}
 				<div class="input-group-append">

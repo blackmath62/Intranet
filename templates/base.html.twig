@@ -72,7 +72,7 @@
 						</a>
 						<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 
-							{% if app.user.roles == ['ROLE_ADMIN'] %}
+							{% if is_granted('ROLE_ADMIN') %}
 								<a href="{{path('admin')}}" class="dropdown-item">
 									<i class="fas fa-chalkboard-teacher mr-2"></i>
 									Administration
@@ -82,10 +82,10 @@
 							<div class="dropdown-divider"></div>
 							<a href="" class="dropdown-item">
 								<i class="fas fa-address-card mr-2"></i>
-								Mon Profil
+								Mon Profil à faire
 							</a>
 							<div class="dropdown-divider"></div>
-							<a href="" class="dropdown-item">
+							<a href="mailto:jpochet@lhermitte.fr" class="dropdown-item">
 								<i class="fas fa-envelope mr-2"></i>
 								Contact
 							</a>
@@ -116,42 +116,50 @@
 						class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 						<!-- Table Commune -->
 						<li class="nav-header">Général</li>
+						{% if is_granted('ROLE_ADMIN') %}
 						<li class="nav-item">
 							<a href="" class="nav-link">
 								<i class="nav-icon fas fa-newspaper"></i>
 								<p>
-									Actualités
+									Actualités à faire
 								</p>
 								<span class="badge badge-danger right">8</span>
 							</a>
 						</li>
+						{% endif %}
+						{% if is_granted('ROLE_ADMIN') %}
 						<li class="nav-item">
 							<a href="" class="nav-link">
 								<i class="nav-icon fas fa-fw fa-bug "></i>
 								<p>
-									Tickets
+									Tickets à faire
 								</p>
 								<span class="badge badge-danger right">8</span>
 							</a>
 						</li>
+						{% endif %}
+						{% if is_granted('ROLE_ADMIN') %}
 						<li class="nav-item">
 							<a href="" class="nav-link">
 								<i class="nav-icon fas fa-fw fa-comments "></i>
 								<p>
-									Chat
+									Chat à faire
 								</p>
 								<span class="badge badge-info right">4</span>
 							</a>
 						</li>
+						{% endif %}
+						{% if is_granted('ROLE_ADMIN') %}
 						<li class="nav-item">
 							<a href="" class="nav-link">
 								<i class="nav-icon fas fa-fw fa-truck"></i>
 								<p>
-									Bourse au transport
+									Bourse au transport à faire
 								</p>
 								<span class="badge badge-info right">1</span>
 							</a>
 						</li>
+						{% endif %}
 						<li class="nav-item">
 							<a href="{{ path('annuaire')}}" class="nav-link">
 								<i class="nav-icon fas fa-fw fa-phone"></i>
@@ -160,7 +168,8 @@
 								</p>
 							</a>
 						</li>
-						{% if app.user.roles == ['ROLE_ADMIN'] %}
+						
+						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
 								<a href="{{path('admin')}}" class="nav-link">
 									<i class="nav-icon fas fa-chalkboard-teacher"></i>
@@ -171,7 +180,9 @@
 							</li>
 						{% endif %}
 						<!-- Fin Table Commune -->
+						{% if is_granted('ROLE_LHERMITTE') %}
 						<!-- Table Menu Lhermitte-->
+						
 						<li class="nav-header">Lhermitte</li>
 						<li class="nav-item has-treeview">
 							<a href="" class="nav-link">
@@ -182,30 +193,38 @@
 								</p>
 							</a>
 							<ul class="nav nav-treeview">
+							{% if is_granted('ROLE_EV') %}
 								<li class="nav-item">
 									<a href="" class="nav-link">
 										<i class="nav-icon fas fa-tree text-success"></i>
 										<p>Espaces Verts</p>
 									</a>
 								</li>
+							{% endif %}
+							{% if is_granted('ROLE_HP') %}
 								<li class="nav-item">
 									<a href="" class="nav-link">
 										<i class="nav-icon fas fa-seedling text-danger"></i>
 										<p>Horticulteurs / Pépiniériste</p>
 									</a>
 								</li>
+							{% endif %}
+							{% if is_granted('ROLE_MA') %}
 								<li class="nav-item">
 									<a href="" class="nav-link">
 										<i class="fab fa-apple nav-icon text-orange"></i>
 										<p>Maraîchage</p>
 									</a>
 								</li>
+							{% endif %}
+							{% if is_granted('ROLE_ME') %}
 								<li class="nav-item">
 									<a href="" class="nav-link">
 										<i class="fas fa-igloo nav-icon text-warning"></i>
 										<p>Matériel équipement</p>
 									</a>
 								</li>
+							{% endif %}
 								<li class="nav-item">
 									<a href="" class="nav-link">
 										<i class="fas fa-globe nav-icon text-primary"></i>
@@ -232,6 +251,8 @@
 							</a>
 						</li>
 						<!--Fin Table Menu Lhermitte -->
+						{% endif %}
+						{% if is_granted('ROLE_ROBY') %}
 						<!--Table Menu Roby -->
 						<li class="nav-header">Roby</li>
 						<li class="nav-item has-treeview">
@@ -270,6 +291,7 @@
 							</a>
 						</li>
 						<!--fin Table Menu Roby -->
+						{% endif %}
 					</ul>
 				</nav>
 			</div>

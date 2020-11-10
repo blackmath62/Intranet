@@ -16,8 +16,9 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-
+/**
+* @IsGranted("ROLE_ADMIN")
+*/
 
 class AdminController extends AbstractController
 {

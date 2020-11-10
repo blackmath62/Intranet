@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UsersRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -87,9 +89,9 @@ class Users implements UserInterface
     private $tickets;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="json")
      */
-    private $roles;
+    private $roles = [];
 
     public function __construct()
     {
@@ -185,6 +187,12 @@ class Users implements UserInterface
     public function setSociete(?Societe $societe): self
     {
         $this->societe = $societe;
+
+        return $this;
+    }
+    public function setRoles(?array $roles): self
+    {
+        $this->roles = $roles;
 
         return $this;
     }
@@ -347,25 +355,14 @@ class Users implements UserInterface
      * Returns the roles granted to the user.
      *
      * *@see UserInterface
-     * @return string[] The user roles
      */
-        public function getRoles()
+        public function getRoles():array
          {
-
-             $roles[] = $this->roles;
-             return $roles;
+            $roles = $this->roles; 
+            return array_unique($roles);
+           
          }
-     /*
-     * Alternatively, the roles might be stored on a ``roles`` property,
-     * and populated in any number of different ways when the user object
-     * is created.
-     *@see UserInterface
-     * @return string[] The user roles
-     */
-    /*public function getRoles(){
-        return $this->roles;
-    /*}
-
+   
     /**
      * Returns the salt that was originally used to encode the password.
      * 

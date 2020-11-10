@@ -45,6 +45,8 @@ security:
 
     
     role_hierarchy:
-            ROLE_ADMIN:       ROLE_USER
+            ROLE_LHERMITTE: ROLE_USER
+            ROLE_ROBY: ROLE_USER
+            ROLE_ADMIN: ROLE_USER, ROLE_LHERMITTE, ROLE_ROBY, ROLE_EV, ROLE_HP, ROLE_MA, ROLE_ME
             ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 

@@ -29,7 +29,7 @@ class UserRegistrationFormType extends AbstractType
                 'second_options' => ['label' => 'Ressaisir le mot de passe'],
                 'constraints' => [
                     new NotBlank,
-                    new Length(['min' => 6, 'max'=> 4096])
+                    new Length(['min' => 6, 'max'=> 4096, 'minMessage' => 'le mot de passe doit faire au minimum {{ limit }} caractéres','maxMessage' => 'le mot de passe ne doit pas dépasser {{ limit }} caractéres'])
                 ]
             ])
             ->add('pseudo')
