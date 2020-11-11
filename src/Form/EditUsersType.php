@@ -24,7 +24,7 @@ class EditUsersType extends AbstractType
                         'message' => 'Merci de saisir une adresse Email'
                     ])
                     ],
-                    'required' => true,
+                    'disabled' => true,
                     'attr' => [
                         'class' => 'col-12 form-control'
                     ]

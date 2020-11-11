@@ -23,7 +23,7 @@ class ProfileUserType extends AbstractType
                     'message' => 'Merci de saisir une adresse Email'
                 ])
                 ],
-                'required' => true,
+                'disabled' => true,
                 'attr' => [
                     'class' => 'col-12 form-control'
                 ]
@@ -45,7 +45,9 @@ class ProfileUserType extends AbstractType
                 ]
         ])
         ->add('Modifier', SubmitType::class,[
-            'attr' => ['class' => 'btn btn-dark']
+            'attr' => [
+                'class' => 'btn btn-dark m-3'
+                ]
         ])
     ;
         ;
