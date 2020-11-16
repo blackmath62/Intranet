@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Societe;
 use App\Entity\Priorities;
 use App\Form\PrioritiesType;
@@ -19,7 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class AdminParameterController extends AbstractController
 {
     /**
-     * @Route("/adminParameter", name="admin_parameter")
+     * @Route("/admin/parameter", name="app_admin_parameter")
      */
     public function index(Societe $societe = null, Request $request, SocieteRepository $repo, EntityManagerInterface $manager)
     {
@@ -31,9 +32,7 @@ class AdminParameterController extends AbstractController
                 ->getForm();
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                if(!$societe){
-                $societe->setCreatedAt(new \DateTime());
-                }
+                $societe->setCreatedAt(new DateTime());
                 $manager->persist($societe);
                 $manager->flush();
             }
@@ -47,10 +46,9 @@ class AdminParameterController extends AbstractController
     }
 
     /**
-     * @Route("/deleteSociete/{id}",name="deleteSociete")
+     * @Route("/admin/delete/societe/{id}",name="app_delete_societe")
      */
-    // todo
-    /*public function deleteSociete($id)
+    public function deleteSociete($id)
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(Societe::class);
         $societeId = $repository->find($id);
@@ -60,13 +58,12 @@ class AdminParameterController extends AbstractController
         $em->flush();        
 
         
-        return $this->redirect($this->generateUrl('parameter'));
+        return $this->redirect($this->generateUrl('app_admin_parameter'));
     }
     /**
-     * @Route("/updateSociete/{id}/{text}",name="updateSociete")
+     * @Route("/admin/edit/societe/{id}",name="app_edit_societe")
      */
-    // todo
-    /*public function updateSociete($id, $nom)
+    public function editSociete($id, $nom)
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(Societe::class);
         $societeId = $repository->find($id);
@@ -77,6 +74,6 @@ class AdminParameterController extends AbstractController
         $societeId->setNom($nom);
         $em->flush();        
 
-        return $this->redirect($this->generateUrl('parameter'));
-    }*/
+        return $this->redirect($this->generateUrl('app_admin_parameter'));
+    }
 }

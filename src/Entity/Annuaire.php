@@ -11,6 +11,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity
  * @UniqueEntity("interne",
  *     message="Ce numéro est déjà utilisé.")
+ * @UniqueEntity("nom",
+ *     message="Ce nom est déjà utilisé.")
  */
 class Annuaire
 {
@@ -27,7 +29,7 @@ class Annuaire
     private $interne;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     private $nom;
 

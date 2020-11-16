@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block body %}
+
+	<div
+		class="col-md-12">
+		<!-- general form elements disabled -->
+		<div class="card card-dark">
+			<div class="card-header d-flex">
+				<h3 class="card-title text-white">Modification de l'annuaire</h3>
+				<a href="{{ path('app_admin_annuaire') }}" class="badge badge-success ml-auto">Retourner à la liste de l'annuaire</a>
+			</div>
+			<div class="card-body">
+				{{ form_start(annuaireEditForm) }}
+				<div class="form">
+					<div class="row">
+						<div class="form-group col-2">
+							{{ form_row(annuaireEditForm.interne, {'attr' : {'class' : "form-control"}})}}
+						</div>
+						<div class="form-group col-2">
+							{{ form_row(annuaireEditForm.nom, {'attr' : {'class' : "form-control"}})}}
+						</div>
+						<div class="form-group col-4">
+							{{ form_row(annuaireEditForm.exterieur, {'attr' : {'class' : "form-control"}})}}
+						</div>
+						<div class="form-group col-4">
+							{{ form_row(annuaireEditForm.mail, {'attr' : {'class' : "form-control"}})}}
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-4">
+							{{ form_row(annuaireEditForm.fonction, {'attr' : {'class' : "form-control"}})}}
+						</div>
+						<div class="form-group col-4">
+							{{ form_row(annuaireEditForm.portable, {'attr' : {'class' : "form-control"}})}}
+						</div>
+						<div class="form-group col-4">
+							{{ form_row(annuaireEditForm.societe, {'attr' : {'class' : "form-control"}})}}
+						</div>
+					</div>
+				</div>
+                <div class="text-center">
+				{{ form_row(annuaireEditForm.Modifier, {'attr' : {'class' : "btn btn-dark"}})}}
+                </div>
+				{{form_end(annuaireEditForm)}}
+			</div>
+		</div>
+	</div>
+</div>{% endblock %}

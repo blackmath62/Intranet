@@ -1,9 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{title}}{% endblock %}
+{% block title %}
+	{{title}}
+{% endblock %}
 
 {% block body %}
-<section class="content-header">
+	<section class="content-header">
 		<div class="container-fluid">
 			<div class="card card-dark collapsed-card">
 				<div class="card-header">
@@ -54,6 +56,7 @@
 				</div>
 				<!-- /.card-body -->
 			</div>
+
 			<!-- /.card -->
 			<div class="row">
 				<div class="col-12">
@@ -66,9 +69,6 @@
 							<table id="example2" class="table table-bordered table-striped">
 								<thead>
 									<tr>
-										<th class="text-center">
-											<span>id</span>
-										</th>
 										<th class="text-center">
 											<span>interne</span>
 										</th>
@@ -95,63 +95,45 @@
 										</th>
 									</tr>
 								</thead>
+
 								<tbody>
+									<small>{{ form_errors( formAnnuaire.nom ) }}</small>
 									{% for annuaire in annuaires %}
-										<tr>
-											<!--todo gérer le changement de l'id du bouton du POST -->
+										<tr id="<?= $id ?>">
+											<td class="text-center" id="{{ annuaire.id }}">
+												<a class="text-center" style="max-width: 40px;">{{annuaire.interne}}</a>
+											</td>
+											<td class="text-center" id="{{ annuaire.id }}">
+												<a class="text-center">{{annuaire.nom}}</a>
+											</td>
+											<td class="text-center" id="{{ annuaire.id }}">
+												<a class="text-center">{{ annuaire.exterieur}}</a>
+											</td>
+											<td class="text-center" id="{{ annuaire.id }}">
+												<a class="text-center">{{annuaire.mail}}</a>
+											</td>
+											<td class="text-center" id="{{ annuaire.id }}">
+												<a class="text-center">{{annuaire.fonction}}</a>
+											</td>
+											<td class="text-center" id="{{ annuaire.id }}">
+												<a class="text-center">{{ annuaire.societe.nom }}</a>
+											</td>
+											<td class="text-center" id="{{ annuaire.id }}">
+												<a class="text-center">{{annuaire.portable}}</a>
+											</td>
 											<td class="text-center">
-												<form method="POST" action="index.php?action=modifierLigne&id={{ annuaire.id }}">
-													<a class="text-center">{{ annuaire.id }}</a>
-													<td class="text-center">
-														<input class="text-center" name="interne" id="interne" value="{{ annuaire.interne }}" style="max-width: 40px;">
-													</td>
-													<td class="text-center">
-														<input class="text-center" name="nom" id="nom" value="{{ annuaire.nom }}">
-													</td>
-													<td class="text-center">
-														<input class="text-center" name="exterieur" id="exterieur" value='{{ annuaire.exterieur }}' style="max-width: 110px;">
-													</td>
-													<td class="text-center">
-														<input class="text-center" name="mail" id="mail" value="{{ annuaire.mail }}">
-													</td>
-													<td class="text-center">
-														<input class="text-center" name="fonction" id="fonction" value="{{ annuaire.fonction }}">
-													</td>
-													<td class="text-center">
-
-														<select name="societe" id="societe" class="form-control select2" style="width: 100%;">
-
-
-															<option selected="selected" value="{{annuaire.societe.id}}">{{annuaire.societe.nom}}</option>
-
-															{% for societe in societes %}
-
-																<option value="{{societe.id}}">{{societe.nom}}</option>
-
-															{%  endfor %}
-														</select>
-													</td>
-													<td class="text-center">
-														<input class="text-center" name="portable" id="portable" value="{{ annuaire.portable }}" style="max-width: 110px;">
-													</td>
-													<td class="text-center">
-														<button class="btn btn-warning">
-															<i class="fas fa-edit"></i>
-														</button>
-														<a class="btn btn-danger" href="index.php?action=supprimerLigne&id=<?= $id ?>">
-															<i class="fas fa-trash-alt"></i>
-														</a>
-													</td>
-												</form>
+												<a class="btn btn-warning" href="{{path('app_edit_annuaire', {'id' : annuaire.id})}}">
+													<i class="fas fa-edit"></i>
+												</a>
+												<a class="btn btn-danger" href="{{path('app_delete_annuaire', {'id' : annuaire.id})}}">
+													<i class="fas fa-trash-alt"></i>
+												</a>
 											</td>
 										{% endfor %}
 									</tr>
 								</tbody>
 								<tfoot>
 									<tr>
-										<th class="text-center">
-											<span>id</span>
-										</th>
 										<th class="text-center">
 											<span>interne</span>
 										</th>

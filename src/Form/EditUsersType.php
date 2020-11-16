@@ -46,9 +46,6 @@ class EditUsersType extends AbstractType
                     ]
             ]);
                 $builder->add('roles', ChoiceType::class,[
-                    'attr' => [
-                    'class' => ''
-                    ],
                     'choices' => [
                         'Utilisateur' => "ROLE_USER",
                         'Lhermitte' => "ROLE_LHERMITTE",
