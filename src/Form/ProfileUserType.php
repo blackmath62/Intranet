@@ -8,9 +8,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class ProfileUserType extends AbstractType
 {
@@ -44,6 +47,16 @@ class ProfileUserType extends AbstractType
                     'class' => 'col-12 form-control'
                 ]
         ])
+        ->add('bornAt', DateType::class,[
+            'placeholder' => [
+                'year' => 'Année', 'month' => 'Mois', 'day' => 'Jour',
+            ],
+            'label' => "Date de naissance",
+            'widget' => 'single_text',
+            'attr' => [
+                'class' => 'col-12 form-control js-datepicker'
+            ]
+    ])
         ->add('Modifier', SubmitType::class,[
             'attr' => [
                 'class' => 'btn btn-dark m-3'

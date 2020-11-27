@@ -93,6 +93,11 @@ class Users implements UserInterface
      */
     private $roles = [];
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $bornAt;
+
     public function __construct()
     {
         $this->documents = new ArrayCollection();
@@ -389,6 +394,18 @@ class Users implements UserInterface
      */
     public function eraseCredentials(){
         //
+    }
+
+    public function getBornAt(): ?\DateTimeInterface
+    {
+        return $this->bornAt;
+    }
+
+    public function setBornAt(?\DateTimeInterface $bornAt): self
+    {
+        $this->bornAt = $bornAt;
+
+        return $this;
     }
 
 }

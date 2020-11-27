@@ -20,12 +20,17 @@ class ContactController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-            $contact = $form->getData();
-            $email = (new Email())
-            ->from('jpochet@lhermitte.fr')
+           
+        $email = (new Email())
+            ->from('intranet@lhermitte.fr')
             ->to('jpochet@lhermitte.fr')
-            ->subject('test')
-            ->text('ceci est mon text');
+            //->cc('cc@example.com')
+            //->bcc('bcc@example.com')
+            //->replyTo('fabien@example.com')
+            //->priority(Email::PRIORITY_HIGH)
+            ->subject('ça fonctionne!')
+            ->text('Super, merci Antoine !')
+            ->html('<p>bravo; god job!</p>');
 
         $mailer->send($email);
 
