@@ -31,7 +31,7 @@ doctrine:
                         type: annotation
                         dir: '%kernel.project_dir%/src/Entity/Main'
                         prefix: 'App\Entity\Main'
-                        alias: Main
+                        alias: App
             divaltoSvg:
                 connection: divaltoSvg
                 mappings:
