@@ -32,6 +32,9 @@
 			<!-- summernote -->
 			<link
 			rel="stylesheet" href="{{ asset("plugins/summernote/summernote-bs4.css") }}">
+			<!-- Bootstrap Color Picker -->
+			<link
+			rel="stylesheet" href="{{ asset("plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css") }}">
 			<!-- Google Font: Source Sans Pro -->
 			<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
@@ -76,7 +79,7 @@
 						<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 
 							{% if is_granted('ROLE_ADMIN') %}
-								<a href="{{path('admin')}}" class="dropdown-item">
+								<a href="{{path('app_admin')}}" class="dropdown-item">
 									<i class="fas fa-chalkboard-teacher mr-2"></i>
 									Administration
 								</a>
@@ -174,7 +177,7 @@
 
 						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
-								<a href="{{path('admin')}}" class="nav-link">
+								<a href="{{path('app_admin')}}" class="nav-link">
 									<i class="nav-icon fas fa-chalkboard-teacher"></i>
 									<p>
 										Administration
@@ -349,7 +352,9 @@
 				</div>
 			</footer>
 		</body>
-		{% block javascripts %}<!-- jQuery --><script src="{{ asset("plugins/jquery/jquery.min.js") }}"></script>
+		{% block javascripts %}
+			<!-- jQuery -->
+			<script src="{{ asset("plugins/jquery/jquery.min.js") }}"></script>
 			<!-- jQuery UI 1.11.4 -->
 			<script src="{{ asset("plugins/jquery-ui/jquery-ui.min.js")}}"></script>
 			<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
@@ -385,22 +390,24 @@
 			<!-- AdminLTE for demo purposes -->
 			<script src="{{ asset("dist/js/demo.js")}}"></script>
 			<script src="{{ asset("vendor/datatables/jquery.dataTables.js")}}"></script>
-			<script src="{{ asset("vendor/datatables-bs4/js/dataTables.bootstrap4.js")}}"></script><!-- page script --><script>
+			<!-- bootstrap color picker -->
+			<script src="{{ asset("vendor/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js")}}"></script>
+
+			<script src="{{ asset("vendor/datatables-bs4/js/dataTables.bootstrap4.js")}}"></script>
 			<script src="https://cdn.tiny.cloud/1/zzwl9538k84ky9r4mp7zhy8zlyl4fqroicalnsvia2tkj4zy/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-			</script>
 			<script>
-  $(function () {
-    $("#example1").DataTable();
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-    });
-  });
-</script>
+				$(function () {
+$("#example1").DataTable();
+$('#example2').DataTable({
+"paging": true,
+"lengthChange": false,
+"searching": false,
+"ordering": true,
+"info": true,
+"autoWidth": false
+});
+});
+			</script>
 			<script>
 				jQuery(function ($) {
 
@@ -409,6 +416,14 @@ console.log(monAlert);
 if (monAlert.length > 0) {
 monAlert.hide().slideDown(500).delay(3000).slideUp();
 }
+});
+			</script>
+			<script>
+				// Colorpicker
+$('.my-colorpicker2').colorpicker()
+
+$('.my-colorpicker2').on('colorpickerChange', function (event) {
+$('.my-colorpicker2 .fa-square').css('color', event.color.toString());
 });
 			</script>
 		{% endblock %}

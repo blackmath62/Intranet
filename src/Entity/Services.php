@@ -34,6 +34,21 @@ class Services
      */
     private $tickets;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $closedAt;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $textColor;
+
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
@@ -95,6 +110,42 @@ class Services
                 $ticket->setService(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getClosedAt(): ?\DateTimeInterface
+    {
+        return $this->closedAt;
+    }
+
+    public function setClosedAt(?\DateTimeInterface $closedAt): self
+    {
+        $this->closedAt = $closedAt;
+
+        return $this;
+    }
+
+    public function getTextColor(): ?string
+    {
+        return $this->textColor;
+    }
+
+    public function setTextColor(string $textColor): self
+    {
+        $this->textColor = $textColor;
 
         return $this;
     }

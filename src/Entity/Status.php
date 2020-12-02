@@ -29,6 +29,26 @@ class Status
      */
     private $tickets;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $ClosedAt;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $backgroundColor;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $textColor;
+
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
@@ -78,6 +98,54 @@ class Status
                 $ticket->setStatu(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getClosedAt(): ?\DateTimeInterface
+    {
+        return $this->ClosedAt;
+    }
+
+    public function setClosedAt(?\DateTimeInterface $ClosedAt): self
+    {
+        $this->ClosedAt = $ClosedAt;
+
+        return $this;
+    }
+
+    public function getBackgroundColor(): ?string
+    {
+        return $this->backgroundColor;
+    }
+
+    public function setBackgroundColor(string $backgroundColor): self
+    {
+        $this->backgroundColor = $backgroundColor;
+
+        return $this;
+    }
+
+    public function getTextColor(): ?string
+    {
+        return $this->textColor;
+    }
+
+    public function setTextColor(string $textColor): self
+    {
+        $this->textColor = $textColor;
 
         return $this;
     }

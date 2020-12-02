@@ -13,7 +13,7 @@ doctrine:
                 # configure these for your database server
                 url: '%env(resolve:DATABASE_DIVALTO_SVG_URL)%'
                 driver: 'sqlsrv'
-                server_version: '5.7'
+                #server_version: '5.7'
                 charset: utf8mb4
             DivaltoReel:
                 # configure these for your database server
@@ -40,7 +40,7 @@ doctrine:
                         is_bundle: false
                         type: annotation
                         dir: '%kernel.project_dir%/src/Entity/DivaltoSvg'
-                        prefix: 'App\Entity\DivaltoSvg'
+                        prefix: 'DivaltoSvg\Entity\DivaltoSvg'
                         alias: DivaltoSvg
             DivaltoReel:
                 connection: DivaltoReel

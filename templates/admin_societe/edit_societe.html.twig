@@ -5,20 +5,17 @@
 {% endblock %}
 
 {% block body %}
-	<div
-		class="col-md-12">
+	<div class="col-md-12">
 		<!-- general form elements disabled -->
 		<div class="card card-dark">
 			<div class="card-header d-flex">
-				<h3 class="card-title text-white">Modification de mon profil</h3>
+				<h3 class="card-title text-white">Modification de Société</h3>
+				<a href="{{ path('app_admin_societe') }}" class="badge badge-success ml-auto">Retourner à la liste des Sociétés</a>
 			</div>
 			<div class="card-body">
-				{{ {% for Art in test %}
-                    {{ Art.REF}}
-                {% endfor %}}}
+				{{ form(societeEditForm)}}
 				</div>
 			</div>
 		</div>
 	</div>
 {% endblock %}
-

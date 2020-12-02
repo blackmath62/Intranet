@@ -1,0 +1,146 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block body %}
+
+<section class="content-header">
+		<div class="container-fluid">
+			<div class="card card-dark"> <!--collapsed-card-->
+				<div class="card-header d-flex">
+					<h3 class="card-title">Création/Modification Statuts</h3>
+                    <a href="{{ path('app_admin_parameter') }}" class="badge badge-success ml-auto">Retourner aux paramétres</a>
+					<div class="card-tools">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse">
+							<i class="fas fa-plus"></i>
+						</button>
+					</div>
+					<!-- /.card-tools -->
+				</div>
+				<!-- /.card-header -->
+				<div class="row card-body">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header">
+								<h3 class="card-title text-center mr-auto">Création de Statut</h3>
+							</div>
+
+							{{ form_start(formStatus)}}
+							<div class="d-flex flex-wrap card-body">
+								<div class="form-group col-12"></div>
+
+								<label>{{ form_label(formStatus.title) }}:</label>
+								{{ form_widget(formStatus.title, {'attr' : {'placeholder' : "Nom du Status", 'class' : "form-control"}})}}
+
+                                <label>{{ form_label(formStatus.backgroundColor) }}:</label>
+								<div class="input-group my-colorpicker2">
+									{{ form_widget(formStatus.backgroundColor, {'attr' : {'placeholder' : "Couleur du Status", 'class' : "form-control"}}) }}
+									<div class="input-group-append">
+										<span class="input-group-text">
+											<i class="fas fa-square"></i>
+										</span>
+									</div>
+								</div>
+                                <label>{{ form_label(formStatus.textColor) }}:</label>
+								<div class="input-group my-colorpicker2">
+									{{ form_widget(formStatus.textColor, {'attr' : {'placeholder' : "Couleur du texte Status", 'class' : "form-control"}}) }}
+									<div class="input-group-append">
+										<span class="input-group-text">
+											<i class="fas fa-square"></i>
+										</span>
+									</div>
+								</div>
+								<button type="submit" class="btn btn-lg btn-dark mx-auto m-5">Créer un Status</button>
+
+							</div>
+							{{ form_end(formStatus)}}
+							<div class="card-header">
+								<h3 class="card-title text-center mr-auto">Modification des Statuts</h3>
+							</div>
+							<!-- /.card-header -->
+							<div class="">
+								<table id="example2" class="table table-bordered table-striped">
+									<thead>
+										<tr>
+											<th class="text-center">
+												<span>id</span>
+											</th>
+											<th class="text-center">
+												<span>Nom</span>
+											</th>
+                                             <th class="text-center">
+												<span>Couleur fond</span>
+											</th>
+                                            <th class="text-center">
+												<span>Couleur Texte</span>
+											</th>
+                                            <th class="text-center">
+												<span>Rendu</span>
+											</th>
+											<th class="text-center">
+												<span>Action</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for statut in status %}
+											<tr>
+													<td class="text-center">
+														<a class="text-center">{{ statut.id}}</a>
+													</td>
+													<td class="text-center">
+														{{statut.title}}
+													</td>
+                                                      <td class="text-center">
+														{{statut.backgroundColor}}
+													</td>
+                                                    <td class="text-center">
+														{{statut.textColor}}
+													</td>
+                                                    <td class="text-center">
+														<button class="btn btn-xl" style= "background-color: {{ statut.backgroundColor }}; color: {{ statut.textColor }}";>{{ statut.title }}</button>
+													</td>
+													<td class="text-center">
+														<a href="{{ path('app_edit_status', {'id' : statut.id}) }}" type="button" class="btn btn-warning">
+															<i class="fas fa-edit"></i></a>
+														<a href="{{ path('app_delete_status', {'id' : statut.id}) }}" type="button" class="btn btn-danger">
+															<i class="fas fa-trash-alt"></i>
+														</a>
+													</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+									<tfoot>
+										<tr>
+											<th class="text-center">
+												<span>id</span>
+											</th>
+											<th class="text-center">
+												<span>Nom</span>
+											</th>
+                                             <th class="text-center">
+												<span>Couleur fond</span>
+											</th>
+                                            <th class="text-center">
+												<span>Couleur Texte</span>
+											</th>
+                                            <th class="text-center">
+												<span>Rendu</span>
+											</th>
+											<th class="text-center">
+												<span>Action</span>
+											</th>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+{% endblock %}
+
+
