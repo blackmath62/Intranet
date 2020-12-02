@@ -67,6 +67,9 @@
 								<div class="info">
 									{{ app.user.email }}
 								</div>
+								<div class="info">
+									{{ app.user.token }}
+								</div>
 							</div>
 
 						</a>
@@ -117,48 +120,48 @@
 						<!-- Table Commune -->
 						<li class="nav-header">Général</li>
 						{% if is_granted('ROLE_ADMIN') %}
-						<li class="nav-item">
-							<a href="" class="nav-link">
-								<i class="nav-icon fas fa-newspaper"></i>
-								<p>
-									Actualités à faire
-								</p>
-								<span class="badge badge-danger right">8</span>
-							</a>
-						</li>
+							<li class="nav-item">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-newspaper"></i>
+									<p>
+										Actualités à faire
+									</p>
+									<span class="badge badge-danger right">8</span>
+								</a>
+							</li>
 						{% endif %}
 						{% if is_granted('ROLE_ADMIN') %}
-						<li class="nav-item">
-							<a href="" class="nav-link">
-								<i class="nav-icon fas fa-fw fa-bug "></i>
-								<p>
-									Tickets à faire
-								</p>
-								<span class="badge badge-danger right">8</span>
-							</a>
-						</li>
+							<li class="nav-item">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-fw fa-bug "></i>
+									<p>
+										Tickets à faire
+									</p>
+									<span class="badge badge-danger right">8</span>
+								</a>
+							</li>
 						{% endif %}
 						{% if is_granted('ROLE_ADMIN') %}
-						<li class="nav-item">
-							<a href="" class="nav-link">
-								<i class="nav-icon fas fa-fw fa-comments "></i>
-								<p>
-									Chat à faire
-								</p>
-								<span class="badge badge-info right">4</span>
-							</a>
-						</li>
+							<li class="nav-item">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-fw fa-comments "></i>
+									<p>
+										Chat à faire
+									</p>
+									<span class="badge badge-info right">4</span>
+								</a>
+							</li>
 						{% endif %}
 						{% if is_granted('ROLE_ADMIN') %}
-						<li class="nav-item">
-							<a href="" class="nav-link">
-								<i class="nav-icon fas fa-fw fa-truck"></i>
-								<p>
-									Bourse au transport à faire
-								</p>
-								<span class="badge badge-info right">1</span>
-							</a>
-						</li>
+							<li class="nav-item">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-fw fa-truck"></i>
+									<p>
+										Bourse au transport à faire
+									</p>
+									<span class="badge badge-info right">1</span>
+								</a>
+							</li>
 						{% endif %}
 						<li class="nav-item">
 							<a href="{{ path('annuaire')}}" class="nav-link">
@@ -168,7 +171,7 @@
 								</p>
 							</a>
 						</li>
-						
+
 						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
 								<a href="{{path('admin')}}" class="nav-link">
@@ -181,116 +184,116 @@
 						{% endif %}
 						<!-- Fin Table Commune -->
 						{% if is_granted('ROLE_LHERMITTE') %}
-						<!-- Table Menu Lhermitte-->
-						
-						<li class="nav-header">Lhermitte</li>
-						<li class="nav-item has-treeview">
-							<a href="" class="nav-link">
-								<i class="nav-icon fas fa-tachometer-alt"></i>
-								<p>
-									States Lhermitte
-									<i class="fas fa-angle-left right"></i>
-								</p>
-							</a>
-							<ul class="nav nav-treeview">
-							{% if is_granted('ROLE_EV') %}
-								<li class="nav-item">
-									<a href="" class="nav-link">
-										<i class="nav-icon fas fa-tree text-success"></i>
-										<p>Espaces Verts</p>
-									</a>
-								</li>
-							{% endif %}
-							{% if is_granted('ROLE_HP') %}
-								<li class="nav-item">
-									<a href="" class="nav-link">
-										<i class="nav-icon fas fa-seedling text-danger"></i>
-										<p>Horticulteurs / Pépiniériste</p>
-									</a>
-								</li>
-							{% endif %}
-							{% if is_granted('ROLE_MA') %}
-								<li class="nav-item">
-									<a href="" class="nav-link">
-										<i class="fab fa-apple nav-icon text-orange"></i>
-										<p>Maraîchage</p>
-									</a>
-								</li>
-							{% endif %}
-							{% if is_granted('ROLE_ME') %}
-								<li class="nav-item">
-									<a href="" class="nav-link">
-										<i class="fas fa-igloo nav-icon text-warning"></i>
-										<p>Matériel équipement</p>
-									</a>
-								</li>
-							{% endif %}
-								<li class="nav-item">
-									<a href="" class="nav-link">
-										<i class="fas fa-globe nav-icon text-primary"></i>
-										<p>Lhermitte Frères</p>
-									</a>
-								</li>
-							</ul>
-						</li>
-						<li class="nav-item">
-							<a href="" class="nav-link">
-								<i class="nav-icon fas fa-copy"></i>
-								<p>
-									Documents
-								</p>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="" class="nav-link">
-								<i class="nav-icon fas fa-fw fa-truck"></i>
-								<p>
-									Groupage
-									<span class="badge badge-info right">2</span>
-								</p>
-							</a>
-						</li>
-						<!--Fin Table Menu Lhermitte -->
+							<!-- Table Menu Lhermitte-->
+
+							<li class="nav-header">Lhermitte</li>
+							<li class="nav-item has-treeview">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-tachometer-alt"></i>
+									<p>
+										States Lhermitte
+										<i class="fas fa-angle-left right"></i>
+									</p>
+								</a>
+								<ul class="nav nav-treeview">
+									{% if is_granted('ROLE_EV') %}
+										<li class="nav-item">
+											<a href="" class="nav-link">
+												<i class="nav-icon fas fa-tree text-success"></i>
+												<p>Espaces Verts</p>
+											</a>
+										</li>
+									{% endif %}
+									{% if is_granted('ROLE_HP') %}
+										<li class="nav-item">
+											<a href="" class="nav-link">
+												<i class="nav-icon fas fa-seedling text-danger"></i>
+												<p>Horticulteurs / Pépiniériste</p>
+											</a>
+										</li>
+									{% endif %}
+									{% if is_granted('ROLE_MA') %}
+										<li class="nav-item">
+											<a href="" class="nav-link">
+												<i class="fab fa-apple nav-icon text-orange"></i>
+												<p>Maraîchage</p>
+											</a>
+										</li>
+									{% endif %}
+									{% if is_granted('ROLE_ME') %}
+										<li class="nav-item">
+											<a href="" class="nav-link">
+												<i class="fas fa-igloo nav-icon text-warning"></i>
+												<p>Matériel équipement</p>
+											</a>
+										</li>
+									{% endif %}
+									<li class="nav-item">
+										<a href="" class="nav-link">
+											<i class="fas fa-globe nav-icon text-primary"></i>
+											<p>Lhermitte Frères</p>
+										</a>
+									</li>
+								</ul>
+							</li>
+							<li class="nav-item">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-copy"></i>
+									<p>
+										Documents
+									</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-fw fa-truck"></i>
+									<p>
+										Groupage
+										<span class="badge badge-info right">2</span>
+									</p>
+								</a>
+							</li>
+							<!--Fin Table Menu Lhermitte -->
 						{% endif %}
 						{% if is_granted('ROLE_ROBY') %}
-						<!--Table Menu Roby -->
-						<li class="nav-header">Roby</li>
-						<li class="nav-item has-treeview">
-							<a href="" class="nav-link">
-								<i class="nav-icon fas fa-tachometer-alt"></i>
-								<p>
-									States Roby
-									<i class="fas fa-angle-left right"></i>
-								</p>
-							</a>
-							<ul class="nav nav-treeview">
-								<li class="nav-item">
-									<a href="" class="nav-link">
-										<i class="nav-icon fas fa-tree text-success"></i>
-										<p>Roby</p>
-									</a>
-								</li>
-							</ul>
-						</li>
-						<li class="nav-item">
-							<a href="" class="nav-link">
-								<i class="nav-icon fas fa-fw fa-plane"></i>
-								<p>D.E.B</p>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="" class="nav-link">
-								<i class="fas fa-fw fa-table nav-icon"></i>
-								<p>Planning</p>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="" class="nav-link">
-								<i class="nav-icon fas fa-copy"></i>
-								<p>Documents</p>
-							</a>
-						</li>
-						<!--fin Table Menu Roby -->
+							<!--Table Menu Roby -->
+							<li class="nav-header">Roby</li>
+							<li class="nav-item has-treeview">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-tachometer-alt"></i>
+									<p>
+										States Roby
+										<i class="fas fa-angle-left right"></i>
+									</p>
+								</a>
+								<ul class="nav nav-treeview">
+									<li class="nav-item">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-tree text-success"></i>
+											<p>Roby</p>
+										</a>
+									</li>
+								</ul>
+							</li>
+							<li class="nav-item">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-fw fa-plane"></i>
+									<p>D.E.B</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="" class="nav-link">
+									<i class="fas fa-fw fa-table nav-icon"></i>
+									<p>Planning</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-copy"></i>
+									<p>Documents</p>
+								</a>
+							</li>
+							<!--fin Table Menu Roby -->
 						{% endif %}
 					</ul>
 				</nav>
@@ -301,6 +304,38 @@
 
 		<section class="content-wrapper" id="content" style="min-height: 1419.6px;">
 			<div class="content-header">
+				{% for message in app.flashes('message') %}
+					<div class="alert alert-success" role="alert" id="alert">
+						{{ message }}
+						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endfor %}
+				{% for message in app.flashes('info') %}
+					<div class="card alert alert-info alert-dismissible fade show text-right" role="alert" id="alert">
+						{{ message }}
+						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endfor %}
+				{% for message in app.flashes('danger') %}
+					<div class="alert alert-danger" role="alert" id="alert">
+						{{ message }}
+						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endfor %}
+				{% for message in app.flashes('warning') %}
+					<div class="alert alert-warning text-align-right" role="alert" id="alert">
+						{{ message }}
+						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endfor %}
 				<div class="container-fluid"> {% block body %}{% endblock %}
 					</div>
 				</div>
@@ -315,38 +350,66 @@
 			</footer>
 		</body>
 		{% block javascripts %}<!-- jQuery --><script src="{{ asset("plugins/jquery/jquery.min.js") }}"></script>
-		<!-- jQuery UI 1.11.4 --><script src="{{ asset("plugins/jquery-ui/jquery-ui.min.js")}}"></script>
-		<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-		<script>$.widget.bridge('uibutton', $.ui.button)
-			</script><!-- Bootstrap 4 -->
-			<script src="{{ asset("plugins/bootstrap/js/bootstrap.bundle.min.js")}}"></script><!-- ChartJS -->
-			<script src="{{ asset("plugins/chart.js/Chart.min.js")}}"></script><!-- Sparkline -->
-			<script src="{{ asset("plugins/sparklines/sparkline.js")}}"></script><!-- JQVMap -->
+			<!-- jQuery UI 1.11.4 -->
+			<script src="{{ asset("plugins/jquery-ui/jquery-ui.min.js")}}"></script>
+			<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+			<script>
+				$.widget.bridge('uibutton', $.ui.button)
+			</script>
+			<!-- Bootstrap 4 -->
+			<script src="{{ asset("plugins/bootstrap/js/bootstrap.bundle.min.js")}}"></script>
+			<!-- ChartJS -->
+			<script src="{{ asset("plugins/chart.js/Chart.min.js")}}"></script>
+			<!-- Sparkline -->
+			<script src="{{ asset("plugins/sparklines/sparkline.js")}}"></script>
+			<!-- JQVMap -->
 			<script src="{{ asset("plugins/jqvmap/jquery.vmap.min.js")}}"></script>
-			<script src="{{ asset("plugins/jqvmap/maps/jquery.vmap.usa.js")}}"></script><!-- jQuery Knob Chart -->
-			<script src="{{ asset("plugins/jquery-knob/jquery.knob.min.js")}}"></script><!-- jQuery Perso -->
-			<script type="text/javascript" src="{{ asset("js/main.js")}}"></script><!-- daterangepicker -->
+			<script src="{{ asset("plugins/jqvmap/maps/jquery.vmap.usa.js")}}"></script>
+			<!-- jQuery Knob Chart -->
+			<script src="{{ asset("plugins/jquery-knob/jquery.knob.min.js")}}"></script>
+			<!-- jQuery Perso -->
+			<script type="text/javascript" src="{{ asset("js/main.js")}}"></script>
+			<!-- daterangepicker -->
 			<script src="{{ asset("plugins/moment/moment.min.js")}}"></script>
-			<script src="{{ asset("plugins/daterangepicker/daterangepicker.js")}}"></script><!-- Tempusdominus Bootstrap 4 -->
-			<script src="{{ asset("plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js")}}"></script><!-- Summernote -->
-			<script src="{{ asset("plugins/summernote/summernote-bs4.min.js")}}"></script><!-- overlayScrollbars -->
-			<script src="{{ asset("plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js")}}"></script><!-- AdminLTE App -->
-			<script src="{{ asset("dist/js/adminlte.js")}}"></script><!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-			<script src="{{ asset("dist/js/pages/dashboard.js")}}"></script><!-- AdminLTE for demo purposes -->
+			<script src="{{ asset("plugins/daterangepicker/daterangepicker.js")}}"></script>
+			<!-- Tempusdominus Bootstrap 4 -->
+			<script src="{{ asset("plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js")}}"></script>
+			<!-- Summernote -->
+			<script src="{{ asset("plugins/summernote/summernote-bs4.min.js")}}"></script>
+			<!-- overlayScrollbars -->
+			<script src="{{ asset("plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js")}}"></script>
+			<!-- AdminLTE App -->
+			<script src="{{ asset("dist/js/adminlte.js")}}"></script>
+			<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+			<script src="{{ asset("dist/js/pages/dashboard.js")}}"></script>
+			<!-- AdminLTE for demo purposes -->
 			<script src="{{ asset("dist/js/demo.js")}}"></script>
 			<script src="{{ asset("vendor/datatables/jquery.dataTables.js")}}"></script>
 			<script src="{{ asset("vendor/datatables-bs4/js/dataTables.bootstrap4.js")}}"></script><!-- page script --><script>
-				<script src="https://cdn.tiny.cloud/1/zzwl9538k84ky9r4mp7zhy8zlyl4fqroicalnsvia2tkj4zy/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-				$(function () {									$("#example1").DataTable();
-																									$('#example2').DataTable({
-																									"paging": true,
-																									"lengthChange": false,
-																									"searching": false,
-																									"ordering": true,
-																									"info": true,
-																									"autoWidth": false
-																									});
-																									});
+			<script src="https://cdn.tiny.cloud/1/zzwl9538k84ky9r4mp7zhy8zlyl4fqroicalnsvia2tkj4zy/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+			</script>
+			<script>
+  $(function () {
+    $("#example1").DataTable();
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+    });
+  });
+</script>
+			<script>
+				jQuery(function ($) {
+
+var monAlert = $('#Alert');
+console.log(monAlert);
+if (monAlert.length > 0) {
+monAlert.hide().slideDown(500).delay(3000).slideUp();
+}
+});
 			</script>
 		{% endblock %}
 	</html>

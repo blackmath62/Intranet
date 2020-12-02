@@ -1,18 +1,53 @@
+# config/packages/doctrine.yaml
 doctrine:
     dbal:
-        url: '%env(resolve:DATABASE_URL)%'
-
-        # IMPORTANT: You MUST configure your server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '5.7'
+        default_connection: default
+        connections:
+            default:
+                # configure these for your database server
+                url: '%env(resolve:DATABASE_URL)%'
+                driver: 'pdo_mysql'
+                server_version: '5.7'
+                charset: utf8mb4
+            DivaltoSvg:
+                # configure these for your database server
+                url: '%env(resolve:DATABASE_DIVALTO_SVG_URL)%'
+                driver: 'sqlsrv'
+                server_version: '5.7'
+                charset: utf8mb4
+            DivaltoReel:
+                # configure these for your database server
+                url: '%env(resolve:DATABASE_DIVALTO_REEL_URL)%'
+                driver: 'sqlsrv'
+                #server_version: '5.7'
+                charset: utf8mb4
     orm:
-        auto_generate_proxy_classes: true
-        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
-        auto_mapping: true
-        mappings:
-            App:
-                is_bundle: false
-                type: annotation
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
-                alias: App
+        default_entity_manager: default
+        entity_managers:
+            default:
+                connection: default
+                mappings:
+                    Main:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity'
+                        prefix: 'App\Entity'
+                        alias: App
+            DivaltoSvg:
+                connection: DivaltoSvg
+                mappings:
+                    DivaltoSvg:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity/DivaltoSvg'
+                        prefix: 'App\Entity\DivaltoSvg'
+                        alias: DivaltoSvg
+            DivaltoReel:
+                connection: DivaltoReel
+                mappings:
+                    DivaltoReel:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity/DivaltoReel'
+                        prefix: 'App\Entity\DivaltoReel'
+                        alias: DivaltoReel

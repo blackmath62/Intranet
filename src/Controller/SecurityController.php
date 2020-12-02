@@ -12,8 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -27,7 +25,6 @@ class SecurityController extends AbstractController
      */
     public function login(): Response
     {
-
         return $this->render('security/login.html.twig', [
             'controller_name' => 'SecurityController',
             'title' => "connexion"
@@ -38,7 +35,6 @@ class SecurityController extends AbstractController
      */
     public function register(Request $request, EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder, MailerInterface $mailerInterface): Response
     {
-
         $form = $this->createForm(UserRegistrationFormType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -63,7 +59,7 @@ class SecurityController extends AbstractController
                 ->html($this->renderView('mails/activation.html.twig', ['token' => $user->getToken()]));
 
             $mailerInterface->send($email);
-
+            $this->addFlash('warning', 'Veuillez consulter vos mails et activer votre compte, le mail de validation peut arriver dans vos courriers indésirables');
             return $this->redirectToRoute('app_login');
         }
 
@@ -140,12 +136,11 @@ class SecurityController extends AbstractController
             $user->setPassword($passwordEncoder->encodePassword($user, $plainPassword))
             // on supprime le token
                  ->setToken(null);
-            $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
 
             // on envoie un message flash
-            $this->addFlash('message', 'Vous avez activé votre compte');
+            $this->addFlash('success', 'Vous avez activé votre compte');
             return $this->redirectToRoute('app_home');
         }
 
@@ -162,6 +157,7 @@ class SecurityController extends AbstractController
      */
     public function logout()
     {
+        $this->addFlash('warning', 'Vous avez bien été déconnecté !');
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
     /**

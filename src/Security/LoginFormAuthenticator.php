@@ -9,18 +9,25 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
-
+    
+    
 class LoginFormAuthenticator extends AbstractAuthenticator
 {
+    /**
+     * @var FlashBagInterface
+     */
+
+    private $flashBag;
 
     private $usersRepository;
     private $urlGenerator;
@@ -61,11 +68,14 @@ class LoginFormAuthenticator extends AbstractAuthenticator
     public function authenticate(Request $request): PassportInterface
     {
         $user = $this->usersRepository->findOneByEmail($request->request->get('email'));
-
         $request->getSession()->set(SecurityController:: LAST_EMAIL, $request->request->get('email'));
 
         if (!$user) {
             throw new CustomUserMessageAuthenticationException('Identification invalide !');
+        }
+
+        if ($user->getToken()){
+            throw new CustomUserMessageAuthenticationException('Validation de votre compte obligatoire !');
         }
         return new Passport($user, new PasswordCredentials($request->request->get('password')), [
 
@@ -115,8 +125,9 @@ class LoginFormAuthenticator extends AbstractAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        //$request->getSession()->getFlashBag()->add('error', 'Identification invalide');
-
+        
+        // todo mise en place du message flash 
+        $request->getSession()->getFlashBag()->add('error', 'Invalid credentials !');
         return new RedirectResponse($this->urlGenerator->generate('app_login'));
     }
 }

@@ -29,14 +29,39 @@
 			<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 		{% endblock %}
 	</head>
-	{# read and display all flash messages #}
-		{% for label, messages in app.flashes %}
-			{% for message in messages %}
-				<div class="flash-{{ label }}">
-					{{ message }}
-				</div>
-			{% endfor %}
-		{% endfor %}
+	{# read and display all flash messages #}          
+		{% for message in app.flashes('message') %}
+					<div class="alert alert-success" role="alert" id="alert">
+						{{ message }}
+						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endfor %}
+				{% for message in app.flashes('info') %}
+					<div class="card alert alert-info alert-dismissible fade show text-right" role="alert" id="alert">
+						{{ message }}
+						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endfor %}
+				{% for message in app.flashes('danger') %}
+					<div class="alert alert-danger" role="alert" id="alert">
+						{{ message }}
+						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endfor %}
+				{% for message in app.flashes('warning') %}
+					<div class="alert alert-warning text-align-right" role="alert" id="alert">
+						{{ message }}
+						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endfor %}
 	<div class="container-fluid d-flex justify-content-center">
 		<div class="register-box">
 			<div class="register-logo">

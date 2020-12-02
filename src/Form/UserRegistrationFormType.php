@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Users;
 use App\Entity\Societe;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -15,8 +16,18 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 
+
 class UserRegistrationFormType extends AbstractType
 {
+    public function index(EntityManagerInterface $entityManager)
+    {
+        // These methods also return the default entity manager, but it's preferred
+        // to get it by injecting EntityManagerInterface in the action method
+
+        $entityManager = $this->getDoctrine()->getManager('default');
+
+
+    }
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder

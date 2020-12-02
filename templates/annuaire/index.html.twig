@@ -12,7 +12,6 @@
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <th class="text-center"><span>id</span></th>
                                     <th class="text-center"><span>interne</span></th>
                                     <th class="text-center"><span>Nom</span></th>
                                     <th class="text-center"><span>Extérieur</span></th>
@@ -25,9 +24,6 @@
                             <tbody>
                                 {% for annuaire in annuaires %}
                                     <tr id="<?= $id ?>">
-                                        <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center">{{ annuaire.id }}</a>
-                                        </td>
                                         <td class="text-center" id="{{ annuaire.id }}">
                                             <a class="text-center" style="max-width: 40px;">{{annuaire.interne}}</a>
                                         </td>
@@ -55,7 +51,6 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th class="text-center"><span>id</span></th>
                                     <th class="text-center"><span>interne</span></th>
                                     <th class="text-center"><span>Nom</span></th>
                                     <th class="text-center"><span>Extérieur</span></th>
