@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-dark">
+                        <h3 class="card-title text-center">Documents valides</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>date Début</span></th>
+                                    <th class="text-center"><span>date Fin</span></th>
+                                    <th class="text-center"><span>Dépositaire</span></th>
+                                    <th class="text-center"><span>Société</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+
+                                <!-- todo alimenter cette page -->
+
+
+
+
+
+
+
+
+
+
+                                    <tr id="<?= $id ?>">
+                                        <td class="text-left" id="<?= $id ?>">
+                                            <a href="<?=$lien?>" class="text-center"><?= $nom ?></a>
+                                        </td>
+                                        <td class="text-center" id="<?= $id ?>">
+                                            <a class="text-center"><?= $dateDebut ?></a>
+                                        </td>
+                                        <td class="text-center" id="<?= $id ?>">
+                                            <a class="text-center"><?= $dateFin ?></a>
+                                        </td>
+                                        <td class="text-center" id="<?= $id ?>">
+                                            <a class="text-center"><?= $depositaire ?></a>
+                                        </td>
+                                        <td class="text-center" id="<?= $id ?>">
+                                            <a class="text-center"><?= $societe ?></a>
+                                        </td>
+                                    <?php }} ?>
+                                    </tr>
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>date Début</span></th>
+                                    <th class="text-center"><span>date Fin</span></th>
+                                    <th class="text-center"><span>Dépositaire</span></th>
+                                    <th class="text-center"><span>Société</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-danger">
+                        <h3 class="card-title text-center">Documents périmés</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>date Début</span></th>
+                                    <th class="text-center"><span>date Fin</span></th>
+                                    <th class="text-center"><span>Dépositaire</span></th>
+                                    <th class="text-center"><span>Société</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                // On récupére la liste des droits dans un tableau
+                                foreach ($docLh as $documents) {
+                                    $id = $documents->id;
+                                    $nom = $documents->nom_fichier;
+                                    $lien = $documents->lien;
+                                    $dateDebut = $documents->dateDebut;
+                                    $dateFin = $documents->dateFin;
+                                    $depositaire = $documents->Pseudo;
+                                    $societe = $documents->nom_societe;
+                                    $dateDepot = $documents->date_Depot;
+                                    if($dateFin < date("yy-m-d")){
+                                        
+                                ?>
+                                    <tr id="<?= $id ?>">
+                                        <td class="text-left" id="<?= $id ?>">
+                                            <a href="<?=$lien?>" class="text-center"><?= $nom ?></a>
+                                        </td>
+                                        <td class="text-center" id="<?= $id ?>">
+                                            <a class="text-center"><?= $dateDebut ?></a>
+                                        </td>
+                                        <td class="text-center" id="<?= $id ?>">
+                                            <a class="text-center"><?= $dateFin ?></a>
+                                        </td>
+                                        <td class="text-center" id="<?= $id ?>">
+                                            <a class="text-center"><?= $depositaire ?></a>
+                                        </td>
+                                        <td class="text-center" id="<?= $id ?>">
+                                            <a class="text-center"><?= $societe ?></a>
+                                        </td>
+                                    <?php }} ?>
+                                    </tr>
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>date Début</span></th>
+                                    <th class="text-center"><span>date Fin</span></th>
+                                    <th class="text-center"><span>Dépositaire</span></th>
+                                    <th class="text-center"><span>Société</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                </div>
+                </div>
+    </div>
+</section>
+{% endblock %}

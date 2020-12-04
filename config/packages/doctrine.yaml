@@ -9,12 +9,14 @@ doctrine:
                 driver: 'pdo_mysql'
                 server_version: '5.7'
                 charset: utf8mb4
-            DivaltoSvg:
+            divaltosvg:
                 # configure these for your database server
                 url: '%env(resolve:DATABASE_DIVALTO_SVG_URL)%'
-                driver: 'sqlsrv'
+                driver: 'pdo_sqlsrv'
+                charset: UTF-8
+                #collate: utf8mb4_unicode_ci
                 #server_version: '5.7'
-                charset: utf8mb4
+                #charset: utf8mb4
             DivaltoReel:
                 # configure these for your database server
                 url: '%env(resolve:DATABASE_DIVALTO_REEL_URL)%'
@@ -33,14 +35,14 @@ doctrine:
                         dir: '%kernel.project_dir%/src/Entity'
                         prefix: 'App\Entity'
                         alias: App
-            DivaltoSvg:
-                connection: DivaltoSvg
+            divaltosvg:
+                connection: divaltosvg
                 mappings:
                     DivaltoSvg:
                         is_bundle: false
                         type: annotation
                         dir: '%kernel.project_dir%/src/Entity/DivaltoSvg'
-                        prefix: 'DivaltoSvg\Entity\DivaltoSvg'
+                        prefix: 'App\Entity\DivaltoSvg'
                         alias: DivaltoSvg
             DivaltoReel:
                 connection: DivaltoReel
