@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello DebRobyController!
+{% endblock %}
+
+{% block body %}
+
+	<h1>C'est la page de la DEB Roby ! Super !</h1>
+
+	{% for Article in Articles %}
+		<table>
+			<tr>
+				<td>
+					{{ Article.ref }}
+				</td>
+                <td>
+					{{ Article.des }}
+				</td>
+				<td>
+					{{ Article.refun }}
+				</td>
+                <td>
+					{{ Article.cptv }}
+				</td>
+                <td>
+					{{ Article.cpta }}
+				</td>
+			</tr>
+		</table>
+
+	{% endfor %}
+
+{% endblock %}

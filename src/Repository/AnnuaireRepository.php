@@ -19,33 +19,47 @@ class AnnuaireRepository extends ServiceEntityRepository
         parent::__construct($registry, Annuaire::class);
     }
 
-    // /**
-    //  * @return Annuaire[] Returns an array of Annuaire objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->innerJoin('a.activiteEnseignements', 'acti')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
+    /**
+    * @return Annuaire[]
     */
 
-    /*
-    public function findOneBySomeField($value): ?Annuaire
+    public function findByNom(int $value):array
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT nom
+            FROM App\Entity\Annuaire nom
+            WHERE Annuaire.interne > :value'
+        )->setParameter('interne', $value);
+
+        // returns an array of Product objects
+        return $query->getResult()
         ;
     }
-    */
+
+
+    public function test()
+    {
+        echo "je suis un test </br>";
+    }
+
+    
+    public function test2($value)
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT p
+            FROM App\Entity\Annuaire p
+            WHERE p.societe = :val1 AND p.id >= :val2
+            ORDER BY p.id ASC'
+        )->setParameter('val1', $value[0])
+        ->setParameter('val2', $value[1])
+        ;
+
+        // returns an array of Product objects
+        return $query->getResult();
+    }
+    
 }

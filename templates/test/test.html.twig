@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block body %}
+				{% for Article in Articles %}
 	<div
 		class="col-md-12">
 		<!-- general form elements disabled -->
@@ -13,12 +14,13 @@
 				<h3 class="card-title text-white">Modification de mon profil</h3>
 			</div>
 			<div class="card-body">
-				{{ {% for Art in test %}
-                    {{ Art.REF}}
-                {% endfor %}}}
-				</div>
+
+					{{ Article.nom }}
+					{{ Article.mail }}
+
 			</div>
 		</div>
 	</div>
+				{% endfor %}
 {% endblock %}
 

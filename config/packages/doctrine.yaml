@@ -12,7 +12,7 @@ doctrine:
             divaltosvg:
                 # configure these for your database server
                 url: '%env(resolve:DATABASE_DIVALTO_SVG_URL)%'
-                driver: 'pdo_sqlsrv'
+                driver: 'sqlsrv'
                 charset: UTF-8
                 #collate: utf8mb4_unicode_ci
                 #server_version: '5.7'
@@ -38,18 +38,18 @@ doctrine:
             divaltosvg:
                 connection: divaltosvg
                 mappings:
-                    DivaltoSvg:
+                    divaltosvg:
                         is_bundle: false
                         type: annotation
-                        dir: '%kernel.project_dir%/src/Entity/DivaltoSvg'
-                        prefix: 'App\Entity\DivaltoSvg'
-                        alias: DivaltoSvg
+                        dir: '%kernel.project_dir%/src/Entity/Divalto'
+                        prefix: 'App\Entity\Divalto'
+                        alias: divaltosvg
             DivaltoReel:
                 connection: DivaltoReel
                 mappings:
                     DivaltoReel:
                         is_bundle: false
                         type: annotation
-                        dir: '%kernel.project_dir%/src/Entity/DivaltoReel'
+                        dir: '%kernel.project_dir%/src/Entity/Divalto'
                         prefix: 'App\Entity\DivaltoReel'
                         alias: DivaltoReel
