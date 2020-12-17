@@ -89,16 +89,18 @@ class Art
      */
     private $dos;
 
+    //JEROME j'ai ajouté la relation OneToMany ci dessous
+
     /**
      * @var string
-     *
+     * @ORM\OneToMany(targetEntity=Mouv::class, mappedBy="Art")
      * @ORM\Column(name="REF", type="string", length=25, nullable=false, options={"fixed"=true,"comment"="Référence"})
      */
     private $ref;
 
     /**
      * @var string
-     *
+     * 
      * @ORM\Column(name="USERCR", type="string", length=20, nullable=false, options={"fixed"=true,"comment"="Auteur de la création"})
      */
     private $usercr;

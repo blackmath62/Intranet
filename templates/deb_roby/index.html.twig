@@ -1,4 +1,4 @@
-
+{% extends 'base.html.twig' %}
 
 {% block body %}
 <div class="row">
@@ -19,7 +19,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-							{{ test }}
+							
                                 {% for Article in Articles %}
                                     <tr id="<?= $id ?>">
                                         <td class="text-center">

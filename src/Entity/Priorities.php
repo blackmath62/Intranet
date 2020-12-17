@@ -34,6 +34,16 @@ class Priorities
      */
     private $tickets;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $textColor;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $closedAt;
+
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
@@ -95,6 +105,30 @@ class Priorities
                 $ticket->setPriority(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTextColor(): ?string
+    {
+        return $this->textColor;
+    }
+
+    public function setTextColor(string $textColor): self
+    {
+        $this->textColor = $textColor;
+
+        return $this;
+    }
+
+    public function getClosedAt(): ?\DateTimeInterface
+    {
+        return $this->closedAt;
+    }
+
+    public function setClosedAt(\DateTimeInterface $closedAt): self
+    {
+        $this->closedAt = $closedAt;
 
         return $this;
     }

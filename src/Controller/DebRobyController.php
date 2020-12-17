@@ -43,14 +43,23 @@ class DebRobyController extends AbstractController
     {
         $fromDate = '2018-12-31';
         $toDate = '2019-12-31';
+        
+        // en findby, ça fonctionne !
         //$Articles = $this->getDoctrine()->getRepository(Mouv::class, 'divaltosvg')->findBy(['fano' => 18020319]);
         
-        $Articles = $this->getDoctrine()->getRepository(Mouv::class, 'divaltosvg')->test18($fromDate);
+        // Pour tester le répository, cela semble correct !
+        //echo get_class($repo);
+
+        // mais pas en requête personnalisé ....
+        //$Articles = $this->getDoctrine()->getRepository(Mouv::class, 'divaltosvg')->test18($fromDate);
         
+        $em = $this->getDoctrine()->getManager();
+            $Articles = $em->getRepository(MouvRepository::class, 'divaltosvg')
+                        ->findBytest18($fromDate);
+
         return $this->render('deb_roby/index.html.twig', [
             'controller_name' => 'DebRobyController',
             'Articles' => $Articles,
-            //'test' => $test
         ]);
     }
 

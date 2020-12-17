@@ -146,9 +146,11 @@ class Mouv
      */
     private $dos;
 
+    //JEROME j'ai ajouté la relation ManyToOne ci dessous
+
     /**
      * @var string
-     *
+     * @ORM\ManyToOne(targetEntity=Art::class, inversedBy="Mouv")
      * @ORM\Column(name="REF", type="string", length=25, nullable=false, options={"fixed"=true,"comment"="Référence"})
      */
     private $ref;

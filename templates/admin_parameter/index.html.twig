@@ -1,83 +1,103 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ title }}{% endblock %}
-{% block body %}
-<section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>Administration</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{path('app_home')}}">Accueil</a></li>
-            </ol>
-          </div>
-        </div>
-      </div><!-- /.container-fluid -->
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
-            <div class="card card-dark">
-              <div class="card-header d-flex">
-                <h3 class="card-title">Paramétrage</h3>
-                <a href="{{ path('app_admin') }}" class="badge badge-success ml-auto">Retourner à l'Administration générale</a>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <div class="row">
-                <a href="{{path('app_admin_societe')}}">
-                  <div class="col-sm-4 text-center">
-                    <div class="position-relative p-3 bg-gray" style="height: 180px">
-                      <div class="ribbon-wrapper ribbon-xl">
-                        <div class="ribbon bg-dark">
-                        SocieteList
-                        </div>
-                      </div>
-                      <i class="fa fa-university fa-7x p-4" ></i>
-                      <a>Sociétés</a>
-                    </div>
-                  </div>
-                </a>
-                <a href='{{path('app_admin_services')}}'>
-                  <div class="col-sm-4 text-center">
-                    <div class="position-relative p-3 bg-gray" style="height: 180px">
-                      <div class="ribbon-wrapper ribbon-xl">
-                        <div class="ribbon bg-orange">
-                        Serviceslist
-                        </div>
-                      </div>
-                      <i class="fas fa-bezier-curve fa-7x p-4" ></i>
-                      <a>Services</a>
-                    </div>
-                  </div>
-                </a>
-                <a href='{{path('app_admin_status')}}'>
-                  <div class="col-sm-4 text-center">
-                    <div class="position-relative p-3 bg-gray" style="height: 180px">
-                      <div class="ribbon-wrapper ribbon-xl">
-                        <div class="ribbon bg-success">
-                        StatusList
-                        </div>
-                      </div>
-                      <i class="fas fa-bell fa-7x p-4" ></i>
-                      <a>Statuts</a>
-                    </div>
-                  </div>
-                </a>
-                </div>
-              </div>
-              <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-          </div>
-          <!-- /.col -->
-        </div>
-        <!-- /.row -->
-      </div>
-      <!-- /.container-fluid -->
-    </section>
+{% block title %}
+	{{ title }}
 {% endblock %}
+{% block body %}
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1>Administration</h1>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item">
+							<a href="{{path('app_home')}}">Accueil</a>
+						</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+		<!-- /.container-fluid -->
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-dark">
+						<div class="card-header d-flex">
+							<h3 class="card-title">Paramétrage</h3>
+							<a href="{{ path('app_admin') }}" class="badge badge-success ml-auto">Retourner à l'Administration générale</a>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<div class="row">
+								<a href="{{path('app_admin_societe')}}">
+									<div class="col-sm-4 text-center">
+										<div class="position-relative p-3 bg-gray" style="height: 180px">
+											<div class="ribbon-wrapper ribbon-xl">
+												<div class="ribbon bg-dark">
+													SocieteList
+												</div>
+											</div>
+											<i class="fa fa-university fa-7x p-4"></i>
+											<a>Sociétés</a>
+										</div>
+									</div>
+								</a>
+								<a href='{{path('app_admin_services')}}'>
+									<div class="col-sm-4 text-center">
+										<div class="position-relative p-3 bg-gray" style="height: 180px">
+											<div class="ribbon-wrapper ribbon-xl">
+												<div class="ribbon bg-orange">
+													Serviceslist
+												</div>
+											</div>
+											<i class="fas fa-bezier-curve fa-7x p-4"></i>
+											<a>Services</a>
+										</div>
+									</div>
+								</a>
+								<a href='{{path('app_admin_status')}}'>
+									<div class="col-sm-4 text-center">
+										<div class="position-relative p-3 bg-gray" style="height: 180px">
+											<div class="ribbon-wrapper ribbon-xl">
+												<div class="ribbon bg-success">
+													StatusList
+												</div>
+											</div>
+											<i class="fas fa-bell fa-7x p-4"></i>
+											<a>Statuts</a>
+										</div>
+									</div>
+								</a>
+								<!-- /.card-body -->
+							</div>
+							<!-- /.card -->
+              <div class="row mt-4">
+								<a href='{{path('app_admin_priorities')}}'>
+									<div class="col-sm-4 text-center">
+										<div class="position-relative p-3 bg-gray" style="height: 180px">
+											<div class="ribbon-wrapper ribbon-xl">
+												<div class="ribbon bg-primary">
+													PrioritiesList
+												</div>
+											</div>
+											<i class="fas fa-thermometer-quarter  fa-7x p-4"></i>
+											<a>Priorités</a>
+										</div>
+									</div>
+								</a>
+							</div>
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.container-fluid -->
+			</section>
+			<!-- Main content -->
+
+		{% endblock %}

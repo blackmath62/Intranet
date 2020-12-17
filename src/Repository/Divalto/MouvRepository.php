@@ -22,7 +22,7 @@ class MouvRepository extends ServiceEntityRepository
         parent::__construct($registry, Mouv::class);
     }
 
-    public function test18($value)
+    public function findBytest18($value)
     {
         echo "je suis un test </br>";
         
@@ -96,7 +96,6 @@ class MouvRepository extends ServiceEntityRepository
 /*
     public function findByRepr0001($value)
     {
-        
         return $this->createQueryBuilder('a')
             ->select('a.fano , a.fadt, a.repr0001')
             ->Where('a.fadt >= :from ')
@@ -111,25 +110,8 @@ class MouvRepository extends ServiceEntityRepository
         ;
     }
 */
+
 /*
-public function rechercheCeQueJeVeux($value)
-    {
-        
-        return $this->createQueryBuilder('a')
-            ->select('a.fano , a.fadt')
-            ->andWhere('a.fadt >= :from ')
-            ->andWhere('a.fadt <= :to ')
-            #->orderBy('a.fano', 'DESC')
-            ->setParameter('from', $value[0])
-            ->setParameter('to', $value[1])
-            #->setMaxResults(100)
-            ->getQuery()
-        ;
-    }
-/*
-
-
-
 
     /*
     public function findByRepr0001( $values )
