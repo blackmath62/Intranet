@@ -101,9 +101,9 @@
 														<button class="btn btn-xl" style= "background-color: {{ prioritie.color }}; color: {{ prioritie.textColor }}";>{{ prioritie.title }}</button>
 													</td>
 													<td class="text-center">
-														<a href="{{ path('app_edit_status', {'id' : prioritie.id}) }}" type="button" class="btn btn-warning">
+														<a href="{{ path('app_edit_priorities', {'id' : prioritie.id}) }}" type="button" class="btn btn-warning">
 															<i class="fas fa-edit"></i></a>
-														<a href="{{ path('app_delete_status', {'id' : prioritie.id}) }}" type="button" class="btn btn-danger">
+														<a href="{{ path('app_delete_priorities', {'id' : prioritie.id}) }}" type="button" class="btn btn-danger">
 															<i class="fas fa-trash-alt"></i>
 														</a>
 													</td>
