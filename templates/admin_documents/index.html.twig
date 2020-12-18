@@ -7,7 +7,7 @@
 {% block body %}
 	<section class="content-header">
 		<div class="container-fluid">
-			<div class="card card-dark collapsed-card">
+			<div class="card card-dark">
 				<div class="card-header">
 					<h3 class="card-title">Ajouter un Document</h3>
 
@@ -59,7 +59,7 @@
 						<!-- /.input group -->
 					</div>
 					<div class="form-group mx-auto">
-						<label>{{ form_label(adminDocumentsForm.beginningDate) }}:</label>
+						<label>{{ form_label(adminDocumentsForm.societe) }}:</label>
 						<div class="form-group">
 							{{ form_widget(adminDocumentsForm.societe) }}
 						</div>
@@ -68,20 +68,22 @@
 						<button class="btn btn-dark">Ajouter le document</button>
 					</div>
 				</div>
-                <div class="alert alert-info alert-dismissible col-4 ml-3 mb-3">
-                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                  <h5><i class="icon fas fa-bell"></i> Memo:</h5>
-                  <ul>
-							<li>Un KBis est valable 3 Mois</li>
-							<li>Une assurance souvent pour l'année</li>
-							<li>La liste des salariés étrangers est valable 6 mois</li>
-							<li>L'attestation sociale Vigilance est valable 6 mois</li>
-							<li>L'attestaion fiscale est valable 6 mois</li>
-                        </ul>
-                </div>
+				<div class="alert alert-info alert-dismissible col-4 ml-3 mb-3">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<h5>
+						<i class="icon fas fa-bell"></i>
+						Memo:</h5>
+					<ul>
+						<li>Un KBis est valable 3 Mois</li>
+						<li>Une assurance souvent pour l'année</li>
+						<li>La liste des salariés étrangers est valable 6 mois</li>
+						<li>L'attestation sociale Vigilance est valable 6 mois</li>
+						<li>L'attestaion fiscale est valable 6 mois</li>
+					</ul>
+				</div>
 				{{ form_end(adminDocumentsForm) }}<!-- /.card-body --></div><!-- /.card --><div class="row">
 				<div class="col-12">
-					<div class="card card-dark collapsed-card">
+					<div class="card card-dark ">
 						<div class="card-header">
 							<h3 class="card-title">Modification documents</h3>
 							<div class="card-tools">
@@ -101,6 +103,9 @@
 											<span>Nom</span>
 										</th>
 										<th class="text-center">
+											<span>Nom du fichier</span>
+										</th>
+										<th class="text-center">
 											<span>date Début</span>
 										</th>
 										<th class="text-center">
@@ -114,74 +119,70 @@
 										</th>
 									</tr>
 								</thead>
+
 								<tbody>
 									{% for document in documents %}
 										<tr>
 											<td class="text-center">
-												<a href="{{ document.beginningDate}}" id="lien" name="lien" class="text-center">{{ document.title}}</a>
+											
+												<a href="{{ asset('doc/' ~ document.societe.dossier ~ '/' ~ document.url)}}" id="lien" name="lien" class="text-center">{{ document.title}}</a></br>
+													<div class="text-right">
+														<small>
+															<i>déposé par
+																{{ document.user.pseudo}}</i>
+														</small>
+													</div>
+											</td>
+											<td class="text-center">{{ document.url}}</td>
+											<td class="text-center" style="max-width: 80px">
+												<div class="text-center" ;>
+													{{ document.beginningDate|date("d/m/Y")}}
+												</div>
+											</td>
+											<td class="text-center" style="max-width: 80px">
+												<div class="text-center">
+													{{ document.endDate|date("d/m/Y")}}
+												</div>
+											</td>
+											<td class="text-center">{{ document.societe.nom}}</td>
+											<td class="text-center">
+												<a class="btn btn-warning" href="{{path('app_edit_document', {'id' : document.id})}}">
+													<i class="fas fa-edit"></i>
+												</a>
+												<a class="btn btn-danger" href="{{path('app_delete_document', {'id' : document.id})}}">
+													<i class="fas fa-trash-alt"></i>
+												</a>
 											</td>
 										</tr>
-									</br>
-									<div class="text-right">
-										<small>
-											<i>déposé par
-												{{ document.user_id.pseudo}}</i>
-										</small>
-									</div>
+									{% endfor %}
 								</tbody>
-							</td>
-							<td class="text-center align-middle" id="<?= $id ?>" style="max-width: 80px">
-								<div class="input-group" ;>
-									<div class="input-group-prepend">
-										<span class="input-group-text">
-											<i class="far fa-calendar-alt"></i>
-										</span>
-									</div>
-									{{ document.beginningDate}}
-								</div>
-							</td>
-							<td class="text-center align-middle" id="<?= $id ?>" style="max-width: 80px">
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text">
-											<i class="far fa-calendar-alt"></i>
-										</span>
-									</div>
-									{{ document.endDate}}
-								</div>
-							</td>
-							<td class="align-middle">{{ document.societe.nom}}</td>
-							<td class="text-center align-middle">
-								<button class="btn btn-warning m-1">
-									<i class="fas fa-edit"></i>
-								</button>
-							</td>
-							<a class="btn btn-danger m-1" href="index.php?action=deleteDocument&id=<?= $id ?>&lien=<?=$lien ?>">
-								<i class="fas fa-trash-alt"></i>
-							</a>
+								<tfoot>
+									<tr>
+										<th class="text-center">
+											<span>Nom</span>
+										</th>
+										<th class="text-center">
+											<span>Nom du fichier</span>
+										</th>
+										<th class="text-center">
+											<span>date Début</span>
+										</th>
+										<th class="text-center">
+											<span>date Fin</span>
+										</th>
+										<th class="text-center">
+											<span>Société</span>
+										</th>
+										<th class="text-center">
+											<span>Action</span>
+										</th>
+									</tr>
+								</tfoot>
+							</table>
 						</div>
-					</tr>
-				{% endfor %}
-			</tbody>
-			<tfoot>
-				<tr>
-					<th class="text-center">
-						<span>Nom</span>
-					</th>
-					<th class="text-center">
-						<span>date Début</span>
-					</th>
-					<th class="text-center">
-						<span>date Fin</span>
-					</th>
-					<th class="text-center">
-						<span>Société</span>
-					</th>
-					<th class="text-center">
-						<span>Action</span>
-					</th>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
-</div></div></div></div></section>{% endblock %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock %}

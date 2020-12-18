@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\DocumentsRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,21 +14,25 @@ class DocumentsController extends AbstractController
     /**
      * @Route("/lhermitte/documents", name="app_lhermitte_documents")
      */
-    public function Lhermitte_Documents()
+    public function Lhermitte_Documents(DocumentsRepository $repo)
     {
-        // findby dossier Lhermitte
+        // TODO Voir comment gérer le numéro de société ci dessous
+        $documents = $repo->findBy(['societe' => 12]);
         return $this->render('documents/index.html.twig', [
             'controller_name' => 'DocumentsController',
+            'documents' => $documents
         ]);
     }
     /**
      * @Route("/Roby/documents", name="app_Roby_documents")
      */
-    public function Roby_Documents()
+    public function Roby_Documents(DocumentsRepository $repo)
     {
-        // findby dossier Roby
+        // TODO Voir comment gérer le numéro de société ci dessous
+        $documents = $repo->findBy(['societe' => 15]);
         return $this->render('documents/index.html.twig', [
             'controller_name' => 'DocumentsController',
+            'documents' => $documents
         ]);
     }
 }

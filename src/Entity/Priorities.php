@@ -126,7 +126,7 @@ class Priorities
         return $this->closedAt;
     }
 
-    public function setClosedAt(\DateTimeInterface $closedAt): self
+    public function setClosedAt(?\DateTimeInterface $closedAt): self
     {
         $this->closedAt = $closedAt;
 

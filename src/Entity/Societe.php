@@ -58,6 +58,11 @@ class Societe
      */
     private $tickets;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $dossier;
+
     public function __construct()
     {
         $this->annuaires = new ArrayCollection();
@@ -227,6 +232,18 @@ class Societe
                 $ticket->setSociete(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDossier(): ?string
+    {
+        return $this->dossier;
+    }
+
+    public function setDossier(string $dossier): self
+    {
+        $this->dossier = $dossier;
 
         return $this;
     }

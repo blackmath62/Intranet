@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use DateTime;
 use App\Entity\Priorities;
+use App\Form\EditPrioritiesType;
 use App\Repository\PrioritiesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,7 +62,7 @@ class AdminPrioritiesController extends AbstractController
      */
     public function editSociete(priorities $priorities, Request $request)
     {
-        $form = $this->createForm(EditprioritiesType::class, $priorities);
+        $form = $this->createForm(EditPrioritiesType::class, $priorities);
             $form->handleRequest($request);
 
             if($form->isSubmitted() && $form->isValid()){

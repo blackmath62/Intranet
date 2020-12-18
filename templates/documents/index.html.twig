@@ -18,41 +18,32 @@
                                     <th class="text-center"><span>date Début</span></th>
                                     <th class="text-center"><span>date Fin</span></th>
                                     <th class="text-center"><span>Dépositaire</span></th>
-                                    <th class="text-center"><span>Société</span></th>
+                                    <th class="text-center"><span>Action</span></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 
-
-                                <!-- todo alimenter cette page -->
-
-
-
-
-
-
-
-
-
-
-                                    <tr id="<?= $id ?>">
-                                        <td class="text-left" id="<?= $id ?>">
-                                            <a href="<?=$lien?>" class="text-center"><?= $nom ?></a>
+                                {% for document in documents %}
+                                     {% if date(document.endDate) > date() %}
+                                     <tr >
+                                        <td class="text-left">
+                                            <a class="text-center">{{ document.title}}</a>
                                         </td>
-                                        <td class="text-center" id="<?= $id ?>">
-                                            <a class="text-center"><?= $dateDebut ?></a>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ document.beginningDate|date("d/m/Y")}}</a>
                                         </td>
-                                        <td class="text-center" id="<?= $id ?>">
-                                            <a class="text-center"><?= $dateFin ?></a>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ document.endDate|date("d/m/Y")}}</a>
                                         </td>
-                                        <td class="text-center" id="<?= $id ?>">
-                                            <a class="text-center"><?= $depositaire ?></a>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ document.user.pseudo}}</a>
                                         </td>
-                                        <td class="text-center" id="<?= $id ?>">
-                                            <a class="text-center"><?= $societe ?></a>
+                                        <td class="text-center">
+                                            <a href="{{ asset('doc/' ~ document.societe.dossier ~ '/' ~ document.url)}}" class="text-center btn btn-info">Télécharger le document</a>
                                         </td>
-                                    <?php }} ?>
                                     </tr>
+                                     {% endif %}
+                                {% endfor %}
 
                             </tbody>
                             <tfoot>
@@ -61,7 +52,7 @@
                                     <th class="text-center"><span>date Début</span></th>
                                     <th class="text-center"><span>date Fin</span></th>
                                     <th class="text-center"><span>Dépositaire</span></th>
-                                    <th class="text-center"><span>Société</span></th>
+                                    <th class="text-center"><span>Action</span></th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -84,43 +75,31 @@
                                     <th class="text-center"><span>date Début</span></th>
                                     <th class="text-center"><span>date Fin</span></th>
                                     <th class="text-center"><span>Dépositaire</span></th>
-                                    <th class="text-center"><span>Société</span></th>
+                                    <th class="text-center"><span>Action</span></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php
-                                // On récupére la liste des droits dans un tableau
-                                foreach ($docLh as $documents) {
-                                    $id = $documents->id;
-                                    $nom = $documents->nom_fichier;
-                                    $lien = $documents->lien;
-                                    $dateDebut = $documents->dateDebut;
-                                    $dateFin = $documents->dateFin;
-                                    $depositaire = $documents->Pseudo;
-                                    $societe = $documents->nom_societe;
-                                    $dateDepot = $documents->date_Depot;
-                                    if($dateFin < date("yy-m-d")){
-                                        
-                                ?>
-                                    <tr id="<?= $id ?>">
-                                        <td class="text-left" id="<?= $id ?>">
-                                            <a href="<?=$lien?>" class="text-center"><?= $nom ?></a>
+                              {% for document in documents %}
+                                     {% if date(document.endDate) < date() %}
+                                     <tr >
+                                        <td class="text-left">
+                                            <a class="text-center">{{ document.title}}</a>
                                         </td>
-                                        <td class="text-center" id="<?= $id ?>">
-                                            <a class="text-center"><?= $dateDebut ?></a>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ document.beginningDate|date("d/m/Y")}}</a>
                                         </td>
-                                        <td class="text-center" id="<?= $id ?>">
-                                            <a class="text-center"><?= $dateFin ?></a>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ document.endDate|date("d/m/Y")}}</a>
                                         </td>
-                                        <td class="text-center" id="<?= $id ?>">
-                                            <a class="text-center"><?= $depositaire ?></a>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ document.user.pseudo}}</a>
                                         </td>
-                                        <td class="text-center" id="<?= $id ?>">
-                                            <a class="text-center"><?= $societe ?></a>
+                                        <td class="text-center">
+                                            <a href="{{ asset('doc/' ~ document.societe.dossier ~ '/' ~ document.url)}}" class="text-center btn btn-danger">Télécharger le document</a>
                                         </td>
-                                    <?php }} ?>
                                     </tr>
-
+                                     {% endif %}
+                                {% endfor %}
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -128,7 +107,7 @@
                                     <th class="text-center"><span>date Début</span></th>
                                     <th class="text-center"><span>date Fin</span></th>
                                     <th class="text-center"><span>Dépositaire</span></th>
-                                    <th class="text-center"><span>Société</span></th>
+                                    <th class="text-center"><span>Action</span></th>
                                 </tr>
                             </tfoot>
                         </table>

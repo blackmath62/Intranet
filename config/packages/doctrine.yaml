@@ -9,20 +9,18 @@ doctrine:
                 driver: 'pdo_mysql'
                 server_version: '5.7'
                 charset: utf8mb4
-            divaltosvg:
+            #divaltosvg:
                 # configure these for your database server
-                url: '%env(resolve:DATABASE_DIVALTO_SVG_URL)%'
-                driver: 'sqlsrv'
-                charset: UTF-8
-                #collate: utf8mb4_unicode_ci
+                #url: '%env(resolve:DATABASE_DIVALTO_SVG_URL)%'
+                #driver: 'sqlsrv'
+                #charset: UTF-8
+                
+            #DivaltoReel:
+                # configure these for your database server
+                #url: '%env(resolve:DATABASE_DIVALTO_REEL_URL)%'
+                #driver: 'sqlsrv'
                 #server_version: '5.7'
                 #charset: utf8mb4
-            DivaltoReel:
-                # configure these for your database server
-                url: '%env(resolve:DATABASE_DIVALTO_REEL_URL)%'
-                driver: 'sqlsrv'
-                #server_version: '5.7'
-                charset: utf8mb4
     orm:
         default_entity_manager: default
         entity_managers:
@@ -35,21 +33,21 @@ doctrine:
                         dir: '%kernel.project_dir%/src/Entity'
                         prefix: 'App\Entity'
                         alias: App
-            divaltosvg:
-                connection: divaltosvg
-                mappings:
-                    divaltosvg:
-                        is_bundle: false
-                        type: annotation
-                        dir: '%kernel.project_dir%/src/Entity/Divalto'
-                        prefix: 'App\Entity\Divalto'
-                        alias: divaltosvg
-            DivaltoReel:
-                connection: DivaltoReel
-                mappings:
-                    DivaltoReel:
-                        is_bundle: false
-                        type: annotation
-                        dir: '%kernel.project_dir%/src/Entity/Divalto'
-                        prefix: 'App\Entity\DivaltoReel'
-                        alias: DivaltoReel
+            #divaltosvg:
+                #connection: divaltosvg
+                #mappings:
+                    #divaltosvg:
+                        #is_bundle: false
+                        #type: annotation
+                        #dir: '%kernel.project_dir%/src/Entity/Divalto'
+                        #prefix: 'App\Entity\Divalto'
+                        #alias: divaltosvg
+            #DivaltoReel:
+                #connection: DivaltoReel
+                #mappings:
+                    #DivaltoReel:
+                        #is_bundle: false
+                        #type: annotation
+                        #dir: '%kernel.project_dir%/src/Entity/Divalto'
+                        #prefix: 'App\Entity\DivaltoReel'
+                        #alias: DivaltoReel
