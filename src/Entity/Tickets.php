@@ -68,6 +68,11 @@ class Tickets
      */
     private $comments;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $closedAt;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
@@ -201,6 +206,18 @@ class Tickets
                 $comment->setTicket(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getClosedAt(): ?\DateTimeInterface
+    {
+        return $this->closedAt;
+    }
+
+    public function setClosedAt(?\DateTimeInterface $closedAt): self
+    {
+        $this->closedAt = $closedAt;
 
         return $this;
     }

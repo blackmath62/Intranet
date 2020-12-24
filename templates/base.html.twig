@@ -144,6 +144,7 @@
 								</a>
 							</li>
 						{% endif %}
+						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
 								<a href="{{ path('app_chats')}}" class="nav-link">
 									<i class="nav-icon fas fa-fw fa-comments "></i>
@@ -153,6 +154,7 @@
 									<span class="badge badge-info right">4</span>
 								</a>
 							</li>
+						{% endif %}
 						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
 								<a href="" class="nav-link">

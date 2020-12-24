@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Chats;
 use App\Form\ChatsType;
 use App\Repository\ChatsRepository;
+use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,9 +16,10 @@ class ChatsController extends AbstractController
     /**
      * @Route("/chats", name="app_chats")
      */
-    public function editUser(Request $request, EntityManagerInterface $em, ChatsRepository $repo){
+    public function editUser(Request $request, EntityManagerInterface $em, ChatsRepository $repo, UsersRepository $repoUsers){
 
         $chats = $repo->findAll();
+        $users= $repoUsers->FindAll();
         $form = $this->createForm(ChatsType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -32,7 +34,8 @@ class ChatsController extends AbstractController
         }
         return $this->render('chats/index.html.twig',[
             'ChatsForm' => $form->createView(),
-            'chats' => $chats
+            'chats' => $chats,
+            'users' => $users
         ]);
 }
 }

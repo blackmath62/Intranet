@@ -6,6 +6,7 @@ use App\Entity\Status;
 use App\Entity\Societe;
 use App\Entity\Tickets;
 use App\Entity\Services;
+use App\Entity\Priorities;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -13,6 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class TicketsType extends AbstractType
 {
@@ -26,11 +28,12 @@ class TicketsType extends AbstractType
                     ])
                     ],
                     'required' => true,
+                    'label' => 'Object de la demande',
                     'attr' => [
                         'class' => 'col-12 form-control'
                     ]
             ])
-            ->add('content', TextType::class,[
+            ->add('content', TextareaType::class,[
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Merci de saisir un Contenu détaillé'
@@ -38,26 +41,46 @@ class TicketsType extends AbstractType
                     ],
                     'required' => true,
                     'attr' => [
-                        'class' => 'col-12 form-control'
-                    ]
+                        'class' => 'col-12 form-control textarea'
+                    ],
+                    'label' => 'Détail de la demande',
             ])
             ->add('service', EntityType::class, [
                 'class' => Services::class,
-                'choice_label' => 'titre',
-                'choice_name' => 'id'
+                'choice_label' => 'title',
+                'choice_name' => 'id',
+                'attr' => [
+                    'class' => 'form-control'
+                ],
+                'label' => 'Service concerné',
             ])
             ->add('statu', EntityType::class, [
                 'class' => Status::class,
-                'choice_label' => 'titre',
-                'choice_name' => 'id'
+                'choice_label' => 'title',
+                'choice_name' => 'id',
+                'attr' => [
+                    'class' => 'form-control'
+                ]
             ])
             ->add('societe', EntityType::class, [
                 'class' => Societe::class,
                 'choice_label' => 'nom',
-                'choice_name' => 'id'
+                'choice_name' => 'id',
+                'attr' => [
+                    'class' => 'form-control'
+                ],
+                'label' => 'Société concernée',
             ])
-            ->add('priority')
-            ->add('Créer', SubmitType::class, [
+            ->add('priority', EntityType::class, [
+                'class' => Priorities::class,
+                'choice_label' => 'title',
+                'choice_name' => 'id',
+                'attr' => [
+                    'class' => 'form-control'
+                ],
+                'label' => 'Degrés d\'urgence',
+            ])
+            ->add('poster', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-dark mt-3']
             ]);
         ;

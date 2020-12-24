@@ -1,222 +1,153 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Page des Tickets{% endblock %}
+{% block title %}Page des Tickets
+{% endblock %}
 
 {% block body %}
-<section class="content-header">
+	<section class="content-header">
 
-    <div class="card card-dark collapsed-card">
-        <div class="card-header">
-            <h3 class="card-title">Créer un nouveau ticket</h3>
+		<div class="card card-dark collapsed-card">
+			<div class="card-header">
+				<h3 class="card-title">Créer un nouveau ticket</h3>
 
-            <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-        <form enctype="multipart/form-data" class="card-body" action="index.php?action=addTicket" method="POST">
-            <div class="d-flex flex-wrap">
-                <div class="form-group col-12">
-                    <label for="exampleInputEmail1">Objet</label>
-                    <input type="text" name="objet" class="form-control" id="objet" placeholder="Objet">
-                </div>
-              <div class="form-group col-12">
-              <label for="exampleInputPassword1">Détail</label>
-                <textarea class="textarea" name="detail" class="form-control" id="detail" placeholder="Détail" required></textarea>
-            </div>
-                <div class="form-group col-2">
-                    <label for="exampleInputPassword1">Service</label>
-                    <select name="service_id" id="service_id" class="form-control select2">
-                        <?php
-                        foreach ($getService as $service) {
-                        ?>
-                            <option value="<?= $service->id ?>"><?= $service->nom_service ?></option>
-                        <?php
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group col-2">
-                    <label for="exampleInputPassword1">Société</label>
-                    <select name="societe_id" id="societe_id" class="form-control select2">
-                        <?php
-                        foreach ($getSociete as $societes) {
-                        ?>
-                            <option value="<?= $societes->societe_id ?>"><?= $societes->nom_societe ?></option>
-                        <?php
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group col-2">
-                    <label for="exampleInputPassword1">Degrés d'urgence</label>
-                    <select name="urgence" id="urgence" class="form-control select2">
-                        <?php
-                        foreach ($getUrgence as $urgence) {
-                        ?>
-                            <option value="<?= $urgence->id ?>"><?= $urgence->nom ?></option>
-                        <?php
-                        }
-                        ?>
-                    </select>
-                </div>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+			</div>
+            {{ form_start(formTickets) }}
 
-                <div class="form-group">
-                    <label for="exampleInputFile">Fichier joint</label>
-                    <div class="input-group">
-                      <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="exampleInputFile">
-                        <label class="custom-file-label" for="exampleInputFile">Choisir un fichier</label>
-                      </div>
-                      <div class="input-group-append">
-                        <span class="input-group-text" id="upload">Charger</span>
-                      </div>
-                    </div>
-                  </div>
+				<div class="d-flex flex-wrap">
+					<div class="form-group col-12">
+                    <label>{{ form_label(formTickets.title) }}:</label>
+						{{ form_widget(formTickets.title)}}
+					</div>
+					<div class="form-group col-12">
+                    <label>{{ form_label(formTickets.content) }}:</label>
+						{{ form_widget(formTickets.content)}}
+					</div>
+					<div class="form-group col-2">
+                    <label>{{ form_label(formTickets.service) }}:</label>
+                        {{ form_widget(formTickets.service) }}
+					</div>
+					<div class="form-group col-2">
+                    <label>{{ form_label(formTickets.societe) }}:</label>
+						{{ form_widget(formTickets.societe) }}
+					</div>
+					<div class="form-group col-2">
+                    <label>{{ form_label(formTickets.priority) }}:</label>
+						{{ form_widget(formTickets.priority) }}
+					</div>
+                    <div class="d-none">
+                    <label>{{ form_label(formTickets.statu) }}:</label>
+						{{ form_widget(formTickets.statu) }}
+					</div>
 
-                <div class="form-group mx-auto pt-5">
-                    <button class="btn btn-dark">Créer le Ticket</button>
-                </div>
-            </div>
-        </form>
-    </div>
-  </div>
-  <!-- /.content-wrapper -->
+					<div class="form-group">
+						<label for="exampleInputFile">Fichier joint</label>
+						<div class="input-group">
+							<div class="custom-file">
+								<input type="file" class="custom-file-input" id="exampleInputFile">
+								<label class="custom-file-label" for="exampleInputFile">Choisir un fichier</label>
+							</div>
+							<div class="input-group-append">
+								<span class="input-group-text" id="upload">Charger</span>
+							</div>
+						</div>
+					</div>
 
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  <!-- /.control-sidebar -->
+					<div class="form-group mx-auto pt-5">
+						{{ form_row(formTickets.poster) }}
+					</div>
+				</div>
+
+            {{ form_end(formTickets) }}
+		</div>
+	</div>
+	<!-- /.content-wrapper -->
+
+	<!-- Control Sidebar -->
+	<aside
+		class="control-sidebar control-sidebar-dark"><!-- Control sidebar content goes here -->
+	</aside>
+	<!-- /.control-sidebar -->
 </div>
 <!-- ./wrapper -->
 
-    <!-- /.Création -->
-    <div class="card card-secondary">
-        <div class="card-header">
-            <h3 class="card-title">Tickets déposés</h3>
-        </div>
-        <div class="card-body">
-            <form role="form">
-                <!-- checkbox -->
-                <div class="form-group d-flex">
-                    <label class="mx-auto">Affichage : </label>
-                    <div class="custom-control custom-checkbox mx-auto">
-                        <input class="custom-control-input" type="checkbox" id="customCheckbox1">
-                        <label for="customCheckbox1" class="custom-control-label">Résolu</label>
-                    </div>
-                    <div class="custom-control custom-checkbox mx-auto">
-                        <input class="custom-control-input" type="checkbox" id="customCheckbox2" checked>
-                        <label for="customCheckbox2" class="custom-control-label">à traiter</label>
-                    </div>
-                    <div class="custom-control custom-checkbox mx-auto">
-                        <input class="custom-control-input" type="checkbox" id="customCheckbox3">
-                        <label for="customCheckbox3" class="custom-control-label">Doublon</label>
-                    </div>
-                    <div class="custom-control custom-checkbox mx-auto">
-                        <input class="custom-control-input" type="checkbox" id="customCheckbox4">
-                        <label for="customCheckbox4" class="custom-control-label">Tous</label>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <?php
-        // On récupére la liste des droits dans un tableau
-        foreach ($getTickets as $ticket) {
-            $id = $ticket->ticket_id;
-            $objet = $ticket->objet;
-            $detail = $ticket->detail;
-            $dateDepot = $ticket->date_depot;
-            $service = $ticket->nom_service;
-            $statut = $ticket->nom_statut;
-            $societe = $ticket->nom_societe;
-            $dateCloture = $ticket->date_cloture;
-            $depositaire = $ticket->Pseudo;
-            $urgence = $ticket->nom;
-            $couleur = $ticket->emergency_color;
-        ?>
-            <div class="card collapsed-card card-light border m-2">
-                <div class="card-header">
-                    <div class="d-flex ">
-                        <h2 class="card-title mr-auto p-2"><?= $id ?> - <?= $objet ?></h2>
-                        <div>
-                            <button class="p-2 btn btn-xs btn-<?= $couleur ?>"><?= $urgence ?></button>
-                            <h2 class="card-title p-2"><?= $statut ?> pour <?= $depositaire ?> le <?= $dateDepot ?></h2>
-                        </div>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool p-2" data-card-widget="collapse"><i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="p-2">
-                        <strong>Aperçu : </strong><?= substr($detail, 0, 300) ?> .....
-                    </div>
-                </div>
+<!-- /.Création -->
+<div class="card card-secondary">
+	<div class="card-header">
+		<h3 class="card-title">Tickets déposés</h3>
+	</div>
+	{% for ticket in tickets %}
+	<div class="card collapsed-card card-light border m-2">
+		<div class="card-header">
+			<div class="d-flex ">
+				<h2 class="card-title mr-auto p-2">{{ ticket.title}}</h2>
+                <div>
+					<a class="btn btn-sm" style= "background-color: {{ ticket.priority.color }}; color: {{ ticket.priority.textColor }}";>{{ ticket.priority.title }}</a>
+					<h2 class="card-title p-2">{{ ticket.statu.title}}
+						par
+						{{ ticket.user.pseudo}}
+						le
+						{{ ticket.createdAt|date("d/m/Y")}}</h2>
+				</div>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool p-2" data-card-widget="collapse">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+			</div>
+		</div>
 
-                <form class="card-body" action="index.php?action=addTicket" method="POST">
-                    <div class="form-group col-12">
-                        <label for="exampleInputEmail1">Objet</label>
-                        <h3 type="text" name="objet" id="objet"><?= $objet ?></h3>
-                    </div>
-                    <div class='d-flex flex-wrap'>
-                        <div class="form-group col-2">
-                            <label for="exampleInputPassword1">Date ouverture</label>
-                            <div><?= $dateDepot ?></div>
-                        </div>
-                        <div class="form-group col-2">
-                            <label for="exampleInputPassword1">Date clotûre</label>
-                            <div><?= $dateCloture ?></div>
-                        </div>
-                        <div class="form-group col-2">
-                            <label for="exampleInputPassword1">Service</label>
-                            <div><?= $service ?></div>
-                        </div>
-                        <div class="form-group col-2">
-                            <label for="exampleInputPassword1">Dépositaire</label>
-                            <div><?= $depositaire ?></div>
-                        </div>
-                        <div class="form-group col-2">
-                            <label for="exampleInputPassword1">Société</label>
-                            <div><?= $societe ?></div>
-                        </div>
-                        <div class="form-group col-2 ">
-                            <label>Degrés d'urgence</label>
-                            <div><?= $urgence ?></div>
-                        </div>
-                    </div>
-                    <div class="form-group col-12">
-                        <label for="exampleInputPassword1">Détail</label>
-                        <article type="text" name="detail" id="detail"><?= $detail ?></article>
-                    </div>
-                    <div class="form-group mx-auto align-center">
-                        <button class="btn btn-dark">Ajouter un commentaire</button>
-                    </div>
-                </form>
-            </div>
-
-        <?php } ?>
-    </div>
-    </div>
-</section>
-<script>
-    tinymce.init({
-        selector: 'textarea',
-        height: 500,
-        menubar: false,
-        plugins: [
-            'advlist autolink link lists image charmap print preview anchor textcolor',
-            'searchreplace visualblocks code fullscreen',
-            'insertdatetime media table contextmenu paste code help'
-        ],
-        toolbar: 'insert | undo redo | styleselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help'
-    });
-</script>
-<script>
-  $(function () {
-    // Summernote
-    $('.textarea').summernote()
-  })
-</script>
-</body>
-
-{% endblock %}
+		<form class="card-body" action="index.php?action=addTicket" method="POST">
+			<div class="form-group col-12">
+				<label for="exampleInputEmail1">Objet</label>
+				<h3 type="text" name="objet" id="objet">{{ ticket.title}}</h3>
+			</div>
+			<div class='d-flex flex-wrap'>
+				<div class="form-group col-2">
+					<label for="exampleInputPassword1">Date ouverture</label>
+					<div>{{ ticket.createdAt|date("d/m/Y")}}</div>
+				</div>
+				<div class="form-group col-2">
+					<label for="exampleInputPassword1">Date clotûre</label>
+					{% if  ticket.closedAt  %}
+                    <div>{{ ticket.closedAt|date("d/m/Y")}}</div>
+                    {% endif %}
+				</div>
+				<div class="form-group col-2">
+					<label for="exampleInputPassword1">Service</label>
+					<div><a class="btn btn-xl" style= "background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}";>{{ ticket.service.title }}</a></div>
+				</div>
+				<div class="form-group col-2">
+					<label for="exampleInputPassword1">Statut</label>
+					<div><a class="btn btn-xl" style= "background-color: {{ ticket.statu.backgroundColor }}; color: {{ ticket.statu.textColor }}";>{{ ticket.statu.title }}</a></div>
+				</div>
+				<div class="form-group col-2">
+					<label for="exampleInputPassword1">Société</label>
+					<div>{{ ticket.societe.nom }}</div>
+				</div>
+			</div>
+			<div class="form-group col-12">
+				<label for="exampleInputPassword1">Détail</label>
+				<article type="text" name="detail" id="detail">{{ ticket.content|raw}}</article>
+			</div>
+			<div class="form-group mx-auto align-center">
+				<button class="btn btn-dark">Ajouter un commentaire</button>
+			</div>
+		</form>
+	</div>
+    {% endfor %}
+</div></div></section><script>tinymce.init({
+selector: 'textarea',
+height: 500,
+menubar: false,
+plugins: [
+'advlist autolink link lists image charmap print preview anchor textcolor', 'searchreplace visualblocks code fullscreen', 'insertdatetime media table contextmenu paste code help'
+],
+toolbar: 'insert | undo redo | styleselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help'
+});</script><script>$(function () { // Summernote
+$('.textarea').summernote()
+})</script></body>{% endblock %}
