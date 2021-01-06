@@ -24,19 +24,16 @@ class ContactController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-           
+            $data = $form->getData();
         $email = (new Email())
-            ->from('intranet@lhermitte.fr')
+            ->from('intranet@groupe-axis.fr')
             ->to('jpochet@lhermitte.fr')
-            //->cc('cc@example.com')
-            //->bcc('bcc@example.com')
-            //->replyTo('fabien@example.com')
-            //->priority(Email::PRIORITY_HIGH)
-            ->subject('ça fonctionne!')
-            ->text('Super, merci Antoine !')
-            ->html('<p>bravo; god job!</p>');
+            ->subject($data['objet'])
+            ->html($this->renderView('mails/contact.html.twig', ['contact' => $form->getData()]));
 
         $mailer->send($email);
+        $this->addFlash('message', 'Message envoyé !');
+            return $this->redirectToRoute('app_contact');
 
         }
         

@@ -48,7 +48,7 @@ class SecurityController extends AbstractController
             $em->flush();
 
             $email = (new Email())
-                ->from('intranet@lhermitte.fr')
+                ->from('intranet@groupe-axis.fr')
                 ->to($user->getEmail())
                 //->cc('cc@example.com')
                 //->bcc('bcc@example.com')
@@ -94,7 +94,7 @@ class SecurityController extends AbstractController
             $em->flush();
 
             $email = (new Email())
-                ->from('intranet@lhermitte.fr')
+                ->from('intranet@groupe-axis.fr')
                 ->to($user->getEmail())
                 ->priority(Email::PRIORITY_HIGH)
                 ->subject('Modification de votre mot de passe !')

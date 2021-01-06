@@ -2,8 +2,41 @@
 
 {% block body %}
 
-<h1>Nous contacter</h1>
+          <div class="col-md-12">
+            <!-- general form elements disabled -->
+            <div class="card card-dark">
+              <div class="card-header">
+                <h3 class="card-title">Nous Contacter</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+              {{ form_start(contactForm)}}
+                
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <!-- text input -->
+                      <div class="form-group">
+                        <label>Objet :</label>
+                        {{ form_widget(contactForm.objet)}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <!-- textarea -->
+                      <div class="form-group">
+                        <label>Détail :</label>
+                        {{ form_widget(contactForm.message)}}
+                      </div>
+                    </div>
+                  </div>
+                {{ form_row(contactForm.envoyer)}}
+                
+                {{ form_end(contactForm)}}
+              </div>
+              <!-- /.card-body -->
+            </div>
+          </div>
 
-{{ form(contactForm)}}
 
 {% endblock %}

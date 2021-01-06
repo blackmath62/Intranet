@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -28,9 +29,9 @@ class TicketsType extends AbstractType
                     ])
                     ],
                     'required' => true,
-                    'label' => 'Object de la demande',
                     'attr' => [
-                        'class' => 'col-12 form-control'
+                        'class' => 'col-12 form-control',
+                        'placeholder' => 'L\'objet de votre ticket'
                     ]
             ])
             ->add('content', TextareaType::class,[
@@ -41,7 +42,8 @@ class TicketsType extends AbstractType
                     ],
                     'required' => true,
                     'attr' => [
-                        'class' => 'col-12 form-control textarea'
+                        'class' => 'col-12 form-control textarea',
+                        'placeholder' => 'Détail de votre probléme'
                     ],
                     'label' => 'Détail de la demande',
             ])
@@ -80,6 +82,12 @@ class TicketsType extends AbstractType
                 ],
                 'label' => 'Degrés d\'urgence',
             ])
+            ->add('file', FileType::class,[
+                'label' => "Le Fichier",
+                'attr' => [
+                    'class' => 'form-control btn btn-primary'
+                ]
+        ])
             ->add('poster', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-dark mt-3']
             ]);
