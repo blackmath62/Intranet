@@ -4,9 +4,15 @@ namespace App\Entity;
 
 use App\Repository\PrestataireRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=PrestataireRepository::class)
+ *  * @UniqueEntity("nom",
+ *     message="Ce nom est déjà utilisé.")
+ * @UniqueEntity("email",
+ *     message="Cet email est déjà utilisé.")
  */
 class Prestataire
 {
@@ -24,6 +30,7 @@ class Prestataire
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Email
      */
     private $email;
 

@@ -1,20 +1,132 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello AdminPrestataireController!{% endblock %}
+{% block title %}
+	{{title}}
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="card card-dark collapsed-card">
+				<div class="card-header">
+					<h3 class="card-title">Créer un nouveau prestataire</h3>
+					<div class="card-tools">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse">
+							<i class="fas fa-plus"></i>
+						</button>
+					</div>
+					<!-- /.card-tools -->
+				</div>
+				<!-- /.card-header -->
+				<div class="row card-body">
+					<div class="col-12">
+						<div class="card">
+							{{ form_start(formPresta)}}
+							<div class="d-flex flex-wrap card-body">
+								<div class="form-group col-4">
+									{{ form_row(formPresta.nom, {'attr' : {'placeholder' : "Nom de ma société", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(formPresta.email, {'attr' : {'placeholder' : "Email de la maintenance", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(formPresta.phone, {'attr' : {'placeholder' : "Téléphone", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(formPresta.affiliation, {'attr' : {'placeholder' : "Type d'activité", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group mx-auto pt-5">
+									<button type="submit" class="btn btn-lg btn-dark mx-auto ">Créer le prestataire</button>
+								</div>
+							</div>
+							{{ form_end(formPresta)}}
+						</div>
+					</div>
+				</div>
+				<!-- /.card-body -->
+			</div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+			<!-- /.card -->
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-dark">
+						<div class="card-header">
+							<h3 class="card-title text-center mr-auto">Modification de l'annuaire des sociétés</h3>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<table id="example2" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th class="text-center">
+											<span>Nom</span>
+										</th>
+										<th class="text-center">
+											<span>Email</span>
+										</th>
+										<th class="text-center">
+											<span>Téléphone</span>
+										</th>
+										<th class="text-center">
+											<span>Affiliation</span>
+										</th>
+										<th class="text-center">
+											<span>Action</span>
+										</th>
+									</tr>
+								</thead>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'D:/wamp64/www/Intranet/src/Controller/AdminPrestataireController.php'|file_link(0) }}">src/Controller/AdminPrestataireController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'D:/wamp64/www/Intranet/templates/admin_prestataire/index.html.twig'|file_link(0) }}">templates/admin_prestataire/index.html.twig</a></code></li>
-    </ul>
-</div>
+								<tbody>
+									<small>{{ form_errors( formPresta.nom ) }}</small>
+									{% for prestataire in prestataires %}
+										<tr id="<?= $id ?>">
+											<td class="text-center">
+												<a class="text-center" style="max-width: 40px;">{{prestataire.nom}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center">{{prestataire.email}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center">{{ prestataire.phone}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center">{{prestataire.affiliation}}</a>
+											</td>
+											<td class="text-center">
+												<a class="btn btn-warning" href="{{path('app_edit_prestataire', {'id' : prestataire.id})}}">
+													<i class="fas fa-edit"></i>
+												</a>
+												<a class="btn btn-danger" href="{{path('app_delete_prestataire', {'id' : prestataire.id})}}">
+													<i class="fas fa-trash-alt"></i>
+												</a>
+											</td>
+										{% endfor %}
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<th class="text-center">
+											<span>Nom</span>
+										</th>
+										<th class="text-center">
+											<span>Email</span>
+										</th>
+										<th class="text-center">
+											<span>Téléphone</span>
+										</th>
+										<th class="text-center">
+											<span>Affiliation</span>
+										</th>
+										<th class="text-center">
+											<span>Action</span>
+										</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 {% endblock %}
