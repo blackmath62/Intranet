@@ -34,6 +34,7 @@ class AnnuaireController extends AbstractController
 
     public function home()
     {
+        
         return $this->render('annuaire/home.html.twig', [
             'title' => "page d'accueil"
         ]);

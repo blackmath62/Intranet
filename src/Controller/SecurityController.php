@@ -78,7 +78,7 @@ class SecurityController extends AbstractController
         $form = $this->createForm(PasswordForgotType::class);
         // lecture des données
         $form->handleRequest($request);
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
             // On verifie si l'utilisateur existe
             $user = $usersRepo->findOneBy(['email' => $user->getEmail()]);
@@ -121,7 +121,7 @@ class SecurityController extends AbstractController
     {
         $form = $this->createForm(ChangepasswordType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted()&& $form->isValid()) {
             // On verifie si un utilisateur a ce token
             // Vérification du token utilisateur
             $user = $usersRepo->findOneBy(['token' => $token]);

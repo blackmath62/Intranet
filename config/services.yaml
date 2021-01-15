@@ -8,6 +8,7 @@ parameters:
     doc_roby: '%kernel.project_dir%/public/doc/Roby'
     doc_axis: '%kernel.project_dir%/public/doc/Axis'
     doc_francial: '%kernel.project_dir%/public/doc/Francial'
+    doc_tickets: '%kernel.project_dir%/public/doc/tickets'
 services:
     # default configuration for services in *this* file
     _defaults:

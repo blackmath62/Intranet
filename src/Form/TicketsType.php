@@ -10,6 +10,7 @@ use App\Entity\Priorities;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -84,8 +85,10 @@ class TicketsType extends AbstractType
             ])
             ->add('file', FileType::class,[
                 'label' => "Le Fichier",
+                'multiple' => false,
+                'required' => false,
                 'attr' => [
-                    'class' => 'form-control btn btn-primary'
+                    'class' => 'form-control btn btn-default'
                 ]
         ])
             ->add('poster', SubmitType::class, [

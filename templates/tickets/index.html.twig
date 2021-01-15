@@ -38,7 +38,7 @@
 					<label>{{ form_label(formTickets.priority) }}:</label>
 					{{ form_widget(formTickets.priority) }}
 				</div>
-                <div class="form-group col-3">
+				<div class="form-group col-3">
 					<label>{{ form_label(formTickets.file) }}:</label>
 					{{ form_widget(formTickets.file) }}
 				</div>
@@ -53,103 +53,196 @@
 			</div>
 			{{ form_end(formTickets) }}
 		</div>
+
 		<!-- Control Sidebar -->
 		<aside class="control-sidebar control-sidebar-dark"></aside>
 		<!-- /.control-sidebar -->
 		<!-- ./wrapper -->
-
-		<!-- /.Création -->
-			<div class="card card-secondary"> <div class="card-header">
-				<h3 class="card-title">Tickets déposés</h3>
-			</div>
-			{% for ticket in tickets %}
-				<div class="card collapsed-card card-light border m-2">
-					<div class="card-header">
-						<div class="d-flex ">
-							<h2 class="card-title mr-auto p-2">{{ ticket.title}}</h2>
-							<div>
-								<a class="btn btn-sm" style="background-color: {{ ticket.priority.color }}; color: {{ ticket.priority.textColor }}" ;>{{ ticket.priority.title }}</a>
-								<h2 class="card-title p-2">
-									{{ ticket.user.pseudo}}
-									le
-									{{ ticket.createdAt|date("d/m/Y")}}
-									à
-									{{ ticket.createdAt|date("H:i")}}
-								</h2>
-							</div>
-							<div class="card-tools">
-								<button type="button" class="btn btn-tool p-2" data-card-widget="collapse">
-									<i class="fas fa-plus"></i>
-								</button>
-							</div>
-						</div>
-					</div>
-
-					<div class="card-body">
-						<div class="form-group col-12">
-							<label for="exampleInputEmail1">Objet</label>
-							<h3 type="text" name="objet" id="objet">{{ ticket.title}}</h3>
-						</div>
-						<div class='d-flex flex-wrap'>
-							<div class="form-group col-2">
-								<label for="exampleInputPassword1">Date ouverture</label>
-								<div>{{ ticket.createdAt|date("d/m/Y")}}</div>
-							</div>
-							<div class="form-group col-2">
-								<label for="exampleInputPassword1">Date clotûre</label>
-								{% if  ticket.closedAt  %}
-									<div>{{ ticket.closedAt|date("d/m/Y")}}</div>
-								{% endif %}
-							</div>
-							<div class="form-group col-2">
-								<label for="exampleInputPassword1">Service</label>
-								<div>
-									<a class="btn btn-xl" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;>{{ ticket.service.title }}</a>
-								</div>
-							</div>
-							<div class="form-group col-2">
-								<label for="exampleInputPassword1">Statut</label>
-								<div>
-									<a class="btn btn-xl" style="background-color: {{ ticket.statu.backgroundColor }}; color: {{ ticket.statu.textColor }}" ;>{{ ticket.statu.title }}</a>
-								</div>
-							</div>
-							<div class="form-group col-2">
-								<img class="img-fluid col-12" src="{{ ticket.societe.img }}">
-							</div>
-						</div>
-						<div class="form-group col-12">
-							<label for="exampleInputPassword1">Détail</label>
-							<article>{{ ticket.content|raw}}</article>
-						</div>
-
-						<div class='row'>
-						{% if is_granted('ROLE_ADMIN') %}
-						<div class="form-group mx-auto align-center">
-							<a href=" {{ path('app_contact') }}" class="btn btn-danger">
-								<i class="fas fa-envelope mr-2"></i>
-								Envoyer par mail à Progiteam
-							</a>
-						</div>
-						<div class="form-group mx-auto align-center">
-							<a href=" {{ path('app_contact') }}" class="btn btn-info">
-								<i class="fas fa-envelope mr-2"></i>
-								Envoyer par mail à F-18
-							</a>
-						</div>
-						{% endif %}
-						<div class="form-group mx-auto align-center">
-							<a href=" {{ path('app_contact') }}" class="btn btn-dark">
-								<i class="fas fa-comments mr-2"></i>
-								Déposer un commentaire
-							</a>
-						</div>
-						</div>
-
-					</div>
-				</div>
+		{% for statu in status %}
+			{% set countTicketsByStatus = 0 %}
+			{% for ticket in tickets if ticket.statu == statu %}
+				{% set countTicketsByStatus = countTicketsByStatus + 1 %}
 			{% endfor %}
-		</div>
+			{% if countTicketsByStatus > 0 %}
+
+				<!-- /.Création -->
+				<div class="card">
+					<div class="card-header" style="background-color: {{ statu.backgroundColor }}; color: {{ statu.textColor }}" ;>
+						<h3 class="card-title">{{ statu.title }}</h3>
+					</div>
+
+
+					{% for ticket in tickets %}
+						{% if ticket.statu == statu %}
+							<div class="card collapsed-card card-light border m-2">
+								<div class="card-header">
+								
+									<div class="d-flex ">
+										<h2 class="card-title mr-auto p-2">
+											<a href=" {{path('app_comment', {'id' : ticket.id} ) }}">{{ ticket.title}}</a>
+										</h2>
+										<div>
+											<a class="btn btn-sm" style="background-color: {{ ticket.priority.color }}; color: {{ ticket.priority.textColor }}" ;>{{ ticket.priority.title }}</a>
+											<h2 class="card-title p-2">
+												{{ ticket.user.pseudo}}
+												le
+												{{ ticket.createdAt|date("d/m/Y")}}
+												à
+												{{ ticket.createdAt|date("H:i")}}
+											</h2>
+										</div>
+										{% set countNotEmpty = 0 %}
+										{% for comment in comments if comment.ticket.id == ticket.id %}
+											{% set countNotEmpty = countNotEmpty + 1 %}
+										{% endfor %}
+
+										{% if countNotEmpty > 0 %}
+											<a class="btn btn-sm" href=" {{path('app_comment', {'id' : ticket.id} ) }}">
+												<i class="fas fa-comments"></i>
+												<span class="badge bg-warning">{{ countNotEmpty }}</span>
+											</a>
+										{% endif %}
+
+										<div class="card-tools">
+											<button type="button" class="btn btn-tool p-2" data-card-widget="collapse">
+												<i class="fas fa-plus"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+
+								<div class="card-body">
+									<div class="form-group col-12">
+										<label for="exampleInputEmail1">Objet</label>
+										<h3 type="text" name="objet" id="objet">{{ ticket.title}}</h3>
+									</div>
+									<div class='d-flex flex-wrap'>
+										<div class="form-group col-2">
+											<label for="exampleInputPassword1">Date ouverture</label>
+											<div>{{ ticket.createdAt|date("d/m/Y")}}</div>
+										</div>
+										<div class="form-group col-2">
+											<label for="exampleInputPassword1">Date clotûre</label>
+											{% if  ticket.closedAt  %}
+												<div>{{ ticket.closedAt|date("d/m/Y")}}</div>
+											{% endif %}
+										</div>
+										<div class="form-group col-2">
+											<label for="exampleInputPassword1">Service</label>
+											<div>
+												<a class="btn btn-xl" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;>{{ ticket.service.title }}</a>
+											</div>
+										</div>
+										<div class="form-group col-2">
+											<label for="exampleInputPassword1">Statut</label>
+											<div>
+												<a class="btn btn-xl" style="background-color: {{ ticket.statu.backgroundColor }}; color: {{ ticket.statu.textColor }}" ;>{{ ticket.statu.title }}</a>
+											</div>
+										</div>
+										<div class="form-group col-2">
+											<img class="img-fluid col-12" src="{{ ticket.societe.img }}">
+										</div>
+									</div>
+									<div class="form-group col-12">
+										<label for="exampleInputPassword1">Détail :
+										</label>
+										<article>{{ ticket.content|raw}}</article>
+									</div>
+									{% if ticket.file %}
+										<div class="form-group col-12">
+											<label>Fichiers joints :
+											</label>
+											<a href="{{ asset(asset('doc/tickets/' ~ ticket.file))}}" id="lien" name="lien" class="text-center btn btn-outline-info btn-xs">{{ ticket.file}}</a>
+										</div>
+									{% endif %}
+
+									{% set countComments = 0 %}
+									{% for comment in comments %}
+										{% if comment.ticket.id == ticket.id %}
+											{% set countComments = countComments + 1 %}
+										{% endif %}
+									{% endfor %}
+									{% if countComments > 0 %}
+										<div class="form-group">
+											<h5>Commentaires :
+											</h5>
+										</div>
+										
+									{% endif %}
+
+									<section class="content">
+										<div class="container-fluid">
+											<div class="row">
+												<div class="col-md-12">
+													<div class="timeline">
+														{% for comment in comments %}
+															<div>
+																{% if comment.ticket.id == ticket.id %}
+																	<i class="fas fa-comments bg-maroon"></i>
+																	<div class="timeline-item">
+																		<span class="time">{{ comment.CreatedAt|date("d/m/Y")}}
+																			à
+																			{{ comment.CreatedAt|date("H:i")}}</span>
+																		<h3 class="timeline-header">Déposé par
+																			{{ comment.user.pseudo }}</h3>
+																		<h4 class="timeline-body">{{ comment.title|raw}}</h4>
+																		<div class="timeline-body">{{ comment.content|raw}}</div>
+																	</div>
+																{% endif %}
+															</div>
+														{% endfor %}
+
+														{% if countComments > 0 %}
+															<div>
+																<i class="fas fa-clock bg-gray"></i>
+															</div>
+														{% endif %}
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+									<div class='row'>
+										{% if is_granted('ROLE_ADMIN') %}
+
+											<div class="form-group mx-auto align-center">
+												<a href=" {{ path('app_contact') }}" class="btn btn-danger">
+													<i class="fas fa-envelope mr-2"></i>
+													Envoyer par mail à Progiteam
+												</a>
+											</div>
+											<div class="form-group mx-auto align-center">
+												<a href=" {{ path('app_contact') }}" class="btn btn-info">
+													<i class="fas fa-envelope mr-2"></i>
+													Envoyer par mail à F-18
+												</a>
+											</div>
+											<div class="form-group mx-auto align-center">
+												<a href=" {{ path('app_contact') }}" class="btn btn-warning">
+													<i class="fas fa-envelope mr-2"></i>
+													Envoyer par mail à Document Solution 62
+												</a>
+											</div>
+										{% endif %}
+										<div class="form-group mx-auto align-center">
+											<a href=" {{path('app_comment', {'id' : ticket.id} ) }}" class="btn btn-dark">
+												<i class="fas fa-comments mr-2"></i>
+												Déposer un commentaire
+											</a>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						{% endif %}
+					{% endfor %}
+				</div>
+			{% endif %}
+		{% endfor %}
+		<!-- TODO JEROME gérer l'Ajout de commentaire-->
 	</section>
+
+
 	<script>
 		tinymce.init({
 selector: 'textarea',

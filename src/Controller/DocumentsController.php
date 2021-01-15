@@ -16,7 +16,7 @@ class DocumentsController extends AbstractController
      */
     public function Lhermitte_Documents(DocumentsRepository $repo)
     {
-        // TODO Voir comment gérer le numéro de société ci dessous
+        // TODO JEROME gérer le numéro de société ci dessous
         $documents = $repo->findBy(['societe' => 12]);
         return $this->render('documents/index.html.twig', [
             'controller_name' => 'DocumentsController',
@@ -28,7 +28,7 @@ class DocumentsController extends AbstractController
      */
     public function Roby_Documents(DocumentsRepository $repo)
     {
-        // TODO Voir comment gérer le numéro de société ci dessous
+        // TODO JEROME gérer le numéro de société ci dessous
         $documents = $repo->findBy(['societe' => 15]);
         return $this->render('documents/index.html.twig', [
             'controller_name' => 'DocumentsController',

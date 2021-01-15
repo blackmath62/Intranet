@@ -28,7 +28,8 @@ class AdminDocumentsController extends AbstractController
         $document = new Documents();
         $user = $this->getUser();
         $form = $this->createForm(AdminDocumentsType::class, $document);
-            $form->handleRequest($request);
+        $form->handleRequest($request);
+        
             if($form->isSubmitted() && $form->isValid()){
                 // On récupére l'identifiant de la société
                 $fileSoc = $form->getData()->getSociete()->getId();

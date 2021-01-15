@@ -44,6 +44,11 @@ class Comments
      */
     private $ticket;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $files;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +110,18 @@ class Comments
     public function setTicket(?Tickets $ticket): self
     {
         $this->ticket = $ticket;
+
+        return $this;
+    }
+
+    public function getFiles(): ?string
+    {
+        return $this->files;
+    }
+
+    public function setFiles(?string $files): self
+    {
+        $this->files = $files;
 
         return $this;
     }
