@@ -4,8 +4,7 @@
 {% endblock %}
 
 {% block body %}
-	<section
-		class="content-header">
+	<section class="content-header">
 
 		<!-- /.Création -->
 		<div class="card card-dark">
@@ -120,76 +119,72 @@
 							</div>
 						</div>
 					</section>
-					<div class='row'>
-						{% if is_granted('ROLE_ADMIN') %}
-							<div class="form-group mx-auto align-center">
-								<a href=" {{ path('app_contact') }}" class="btn btn-danger">
-									<i class="fas fa-envelope mr-2"></i>
-									Envoyer par mail à Progiteam
-								</a>
+					{% if is_granted('ROLE_ADMIN') %}
+					<!-- Changer le statut du ticket --> 
+						<section class="content d-flex justify-content-around">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="card card-outline card-success">
+										<div class="card-header text-center">
+											<h3 class="card-title">
+												Modifier le statut
+											</h3>
+										</div>
+										<!-- /.card-header -->
+										<div class="card-body pad">
+											<div class="mb-12">
+													{{ form(formstatu) }}												
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
-							<div class="form-group mx-auto align-center">
-								<a href=" {{ path('app_contact') }}" class="btn btn-info">
-									<i class="fas fa-envelope mr-2"></i>
-									Envoyer par mail à F-18
-								</a>
+						
+							<div class="row">
+								<div class="col-md-12">
+									<div class="card card-outline card-info">
+										<div class="card-header">
+											<h3 class="card-title">
+												Envoyer par mail
+											</h3>
+										</div>
+										<!-- /.card-header -->
+										<div class="card-body pad">
+											<div class="mb-12">
+												{{ form(formSendTicket)}}
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
-							<div class="form-group mx-auto align-center">
-								<a href=" {{ path('app_contact') }}" class="btn btn-warning">
-									<i class="fas fa-envelope mr-2"></i>
-									Envoyer par mail à Document Solution 62
-								</a>
-							</div>
+						</section>
 						{% endif %}
+
 					</div>
-
 				</div>
-			</div>
 
-		</div>
-		<!-- Main content -->
-		<section class="content">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="card card-outline card-info">
-						<div class="card-header">
-							<h3 class="card-title">
-								Déposer un Commentaire
-							</h3>
-						</div>
-						<!-- /.card-header -->
-						<div class="card-body pad">
-							<div class="mb-3">
-								{% if is_granted('ROLE_ADMIN') %}
-									{{ form(formstatu)}}{% endif %}
-									{{ form(formComment)}}
+			</div>
+			<!-- Main content -->
+			<section class="content">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="card card-outline card-info">
+							<div class="card-header">
+								<h3 class="card-title">
+									Déposer un Commentaire
+								</h3>
+							</div>
+							<!-- /.card-header -->
+							<div class="card-body pad">
+								<div class="mb-3">
+								{{ form(formComment)}}
+																		
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-					<!-- /.col-->
-				</div>
-				<!-- ./row -->
-			</section>
-			<!-- /.content -->
-		</section>
-
-
-		<script>
-			tinymce.init({
-selector: 'textarea',
-height: 500,
-menubar: false,
-plugins: [
-'advlist autolink link lists image charmap print preview anchor textcolor', 'searchreplace visualblocks code fullscreen', 'insertdatetime media table contextmenu paste code help'
-],
-toolbar: 'insert | undo redo | styleselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help'
-});
-		</script>
-		<script>
-			$(function () {
-$('.textarea').summernote()
-})
-		</script>
-	{% endblock %}
+					</section>
+		</div>			<!-- /.content -->
+	</section>
+			{% endblock %}

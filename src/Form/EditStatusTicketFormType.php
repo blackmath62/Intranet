@@ -21,13 +21,13 @@ class EditStatusTicketFormType extends AbstractType
                 'attr' => [
                     'class' => 'form-control'
                 ],
-                'label' => 'Modifier le statut',
+                'label' => 'Choisir le statut',
                 'choice_name' => 'id'
             ])
-            ->add('Deplacer', SubmitType::class, [
+            ->add('deplacer', SubmitType::class, [
                 'label' => "Déplacer le ticket",
-                'attr' => ['class' => 'col-3 form-control btn btn-success mt-3']
-            ]);;
+                'attr' => ['class' => 'form-control btn btn-success mt-3']
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

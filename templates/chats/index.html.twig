@@ -37,7 +37,7 @@
 									</div>
 									<!-- /.direct-chat-infos -->
 									<img
-									class="direct-chat-img" src="{{ chat.user.img }}" alt="message user image">
+									class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
 									<!-- /.direct-chat-img -->
 									<div class="direct-chat-text">
 										{{ chat.content }}
@@ -54,7 +54,7 @@
 									</div>
 									<!-- /.direct-chat-infos -->
 									<img
-									class="direct-chat-img" src="{{ chat.user.img }}" alt="message user image">
+									class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
 									<!-- /.direct-chat-img -->
 									<div class="direct-chat-text">
 										{{ chat.content }}
@@ -104,7 +104,7 @@
 						{% for user in users %}	
 							<li>
 							<!--object-fit: cover; -->
-								<img src="{{ user.img }}" class="img-users-circle">
+								<img src="{{ asset(asset('img/profile/' ~ user.img))}}" class="img-users-circle">
 								<a class="users-list-name" >{{ user.pseudo }}</a>
 							</li>
 						{% endfor %}

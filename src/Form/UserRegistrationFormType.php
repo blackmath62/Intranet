@@ -19,15 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 
 class UserRegistrationFormType extends AbstractType
 {
-    public function index(EntityManagerInterface $entityManager)
-    {
-        // These methods also return the default entity manager, but it's preferred
-        // to get it by injecting EntityManagerInterface in the action method
-
-        $entityManager = $this->getDoctrine()->getManager('default');
-
-
-    }
+    
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder

@@ -13,7 +13,7 @@
 				<a href="{{ path('app_admin_users') }}" class="badge badge-success ml-auto">Retourner à la liste des Utilisateurs</a>
 			</div>
 			<div class="card-body">
-				<img class="img-fluid col-2" src=" {{ user.img }} " alt="User Image">
+				<img class="img-fluid col-2" src="{{ asset(asset('img/profile/' ~ user.img))}}" alt="User Image">
 				{{ form(userEditForm)}}
 				</div>
 			</div>

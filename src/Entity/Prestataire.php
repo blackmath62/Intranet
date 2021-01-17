@@ -9,10 +9,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=PrestataireRepository::class)
- *  * @UniqueEntity("nom",
- *     message="Ce nom est déjà utilisé.")
- * @UniqueEntity("email",
- *     message="Cet email est déjà utilisé.")
  */
 class Prestataire
 {
@@ -24,18 +20,18 @@ class Prestataire
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $nom;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Email
      */
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $affiliation;
 

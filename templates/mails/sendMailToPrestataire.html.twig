@@ -1,0 +1,175 @@
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
+<body>
+	<table style="width: 525.0pt;">
+		<tbody>
+			<tr>
+				<td style="background-color: #343a40; width: 1px;">
+					<p style="text-align: center;">
+						<span style="font-family: Calibri,sans-serif;">
+							<strong>
+								<span style="font-size: 18.0pt;">
+									<span style="color: white;">&nbsp; Ticket
+										{{ticket.id}}
+										:
+										{{ ticket.title}}
+										<p style="text-align: center;">
+											<span style="font-size: 11pt;">
+												<span style="font-family: Calibri,sans-serif;">
+													Bonjour, Merci de prendre en considération la demande ci dessous, ce mail se lit du haut en bas par ordre de date de publication
+												</span>
+											</span>
+										</p>
+									</span>
+								</span>
+							</strong>
+						</span>
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td style="background-color: whitesmoke;">
+
+					<table border="1" cellpadding="1" cellspacing="1">
+						<tr>
+							<td style="width: 300pt;">
+								<p>
+									<span style="font-size: 11pt;">
+										<span style="font-family: Calibri,sans-serif;">
+											<strong>
+												<span style="color: #343a40;">Titre :</span>
+											</strong>
+											{{ ticket.title}}</span>
+									</span>
+								</p>
+							</td>
+							<td style="width: 300pt;">
+								<p>
+									<span style="font-size: 11pt;">
+										<span style="font-family: Calibri,sans-serif;">
+											<strong>
+												<span style="color: #343a40;">Catégorie :
+												</span>
+											</strong>
+											{{ ticket.title}}
+										</span>
+									</span>
+								</p>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<p>
+									<span style="font-size: 11pt;">
+										<span style="font-family: Calibri,sans-serif;">
+											<strong>
+												<span style="color: #343a40;">Demandeur :
+												</span>
+											</strong>
+											{{ ticket.user.email}}</span>
+									</span>
+								</p>
+							</td>
+							<td>
+								<p>
+									<span style="font-size: 11pt;">
+										<span style="font-family: Calibri,sans-serif;">
+											<strong>
+												<span style="color: #343a40;">Service :
+												</span>
+											</strong>
+											{{ ticket.service.title}}
+										</span>
+									</span>
+								</p>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<p>
+									<span style="font-size: 11pt;">
+										<span style="font-family: Calibri,sans-serif;">
+											<strong>
+												<span style="color: #343a40;">État :
+												</span>
+											</strong>
+											{{ ticket.priority.title}}
+										</span>
+									</span>
+								</p>
+							</td>
+							<td>
+								<span style="font-size: 11pt;">
+									<span style="font-family: Calibri,sans-serif;">
+										<strong>
+											<span style="color: #343a40;">Date de la demande :
+											</span>
+										</strong>
+										<span style="color: #343a40;">
+											&nbsp;</span>
+										{{ ticket.createdAt|date("d/m/Y")}}
+										à
+										{{ ticket.createdAt|date("H:i")}}</span>
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<p>
+									<span style="font-size: 11pt;">
+										<span style="font-family: Calibri,sans-serif;">
+											<strong>
+												<span style="color: #343a40;">Description :
+												</span>
+											</strong>
+										</span>
+									</span>
+								</p>
+
+								<p>
+									<span style="font-size: 11pt;">
+										<span style="font-family: Calibri,sans-serif;">
+											<p>{{ ticket.content | raw }}</p>
+										</p>
+									</span>
+								</p>
+							</td>
+						</tr>
+						{% for comment in commentsOfTicket %}
+							<div>
+								<span style="font-size: 11pt;">
+									<span style="font-family: Calibri,sans-serif;">
+										<span style="font-family: &quot;Segoe UI Emoji&quot;,sans-serif;">
+											<span style="color: #00b5f7;"></span>
+										</span>
+									</span>
+								</span>
+								<tr>
+									<td colspan="2">
+										<p>
+											<span style="font-size: 11pt;">
+												<span style="font-family: Calibri,sans-serif;">
+													<span class="caselog_header_date">Ajout d'un commentaire le
+														{{ comment.CreatedAt|date("d/m/Y")}}
+														à
+														{{ comment.CreatedAt|date("H:i")}}
+													</span>
+													par
+													<span class="caselog_header_user">{{ comment.user.email}}
+													</span>:
+													<div class="caselog_entry_html" style="">
+														<h4>{{ comment.title}}</h4>
+														<p>{{ comment.content|raw}}</p>
+													</div>
+												</span>
+											</span>
+										</p>
+									</td>
+								</tr>
+							</div>
+						{% endfor %}
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</body>

@@ -91,6 +91,19 @@
             </div>
             <!-- /.card -->
           </div>
+
+          {% set day = "now"|date('w') %}
+          {% set weekStart = "now"|date_modify("monday this week")|date('d-m') %}
+          {% set weekEnd = "now"|date_modify("sunday this week")|date('d-m') %}
+          <p>Cette semaine va du {{ weekStart}} au {{ weekEnd }}</p> 
+                  <!--TODO JEROME Alimenter le carousel avec les anniversaires -->
+                  {% for user in users %}
+                  {% if user.bornAt|date('d-m') > weekStart %}
+                    {% if user.bornAt|date('d-m') < weekEnd %}
+                    {{ user.pseudo }} le {{ user.bornAt|date('d-m') }}
+                    {% endif %}
+                  {% endif %}
+                  {% endfor %}
           <!-- /.col -->
           <div class="col-md-6">
             <div class="">

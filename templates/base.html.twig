@@ -29,18 +29,23 @@
 			<!-- Daterange picker -->
 			<link
 			rel="stylesheet" href="{{ asset("plugins/daterangepicker/daterangepicker.css") }}">
-			<!-- summernote -->
-			<link
-			rel="stylesheet" href="{{ asset("plugins/summernote/summernote-bs4.css") }}">
+
 			<!-- Bootstrap Color Picker -->
 			<link
 			rel="stylesheet" href="{{ asset("plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css") }}">
 			<!-- Google Font: Source Sans Pro -->
 			<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
+
+			<!-- fullCalendar -->
+  <link rel="stylesheet" href="{{ asset("plugins/fullcalendar/main.min.css") }}">
+  <link rel="stylesheet" href="{{ asset("plugins/fullcalendar-interaction/main.min.css") }}">
+  <link rel="stylesheet" href="{{ asset("plugins/fullcalendar-daygrid/main.min.css") }}">
+  <link rel="stylesheet" href="{{ asset("plugins/fullcalendar-timegrid/main.min.css") }}">
+  <link rel="stylesheet" href="{{ asset("plugins/fullcalendar-bootstrap/main.min.css") }}">
 		{% endblock %}
 	</head>
-	<body class="sidebar-mini" style="height: auto;">
+	<body class="hold-transition sidebar-mini">
 		<div
 			class="wrapper">
 			<!-- début Entête des pages -->
@@ -63,10 +68,8 @@
 					<!-- User Dropdown Menu -->
 					<li class="nav-item dropdown">
 						<a class="nav-link" data-toggle="dropdown" href="">
-
 							<div class="user-panel d-flex">
-
-								<img class="direct-chat-img" src=" {{ app.user.img }} " alt="User Image">
+								<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ app.user.img))}}" alt="User Image">
 								<div class="info">
 									{{ app.user.email }}
 								</div>
@@ -105,7 +108,7 @@
 					<!-- End User Dropdown Menu -->
 				</ul>
 			</nav>
-		</div>
+		
 		<!-- fin Entête des pages -->
 		<aside
 			class="main-sidebar sidebar-dark-primary elevation-4">
@@ -129,20 +132,20 @@
 									<p>
 										Actualités à faire
 									</p>
-									<span class="badge badge-danger right">8</span>
+									<!-- <span class="badge badge-danger right">8</span> -->
 								</a>
 							</li>
 						{% endif %}
-						
-							<li class="nav-item">
-								<a href="{{ path('app_tickets')}}" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-bug "></i>
-									<p>
-										Tickets
-									</p>
-									<span class="badge badge-danger right">8</span>
-								</a>
-							</li>
+
+						<li class="nav-item">
+							<a href="{{ path('app_tickets')}}" class="nav-link">
+								<i class="nav-icon fas fa-fw fa-bug "></i>
+								<p>
+									Tickets
+								</p>
+								<!-- <span class="badge badge-danger right">8</span> -->
+							</a>
+						</li>
 
 						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
@@ -151,18 +154,18 @@
 									<p>
 										Chat
 									</p>
-									<span class="badge badge-info right">4</span>
+									<!-- <span class="badge badge-info right">4</span> -->
 								</a>
 							</li>
 						{% endif %}
 						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
-								<a href="" class="nav-link">
+								<a href="{{ path('app_bourse_transport')}}" class="nav-link">
 									<i class="nav-icon fas fa-fw fa-truck"></i>
 									<p>
 										Bourse au transport à faire
 									</p>
-									<span class="badge badge-info right">1</span>
+									<!-- <span class="badge badge-info right">1</span> -->
 								</a>
 							</li>
 						{% endif %}
@@ -252,7 +255,7 @@
 									<i class="nav-icon fas fa-fw fa-truck"></i>
 									<p>
 										Groupage
-										<span class="badge badge-info right">2</span>
+										<!-- <span class="badge badge-info right">2</span> -->
 									</p>
 								</a>
 							</li>
@@ -305,6 +308,7 @@
 			<!-- /.sidebar -->
 		</aside>
 
+			 
 		<section class="content-wrapper" id="content" style="min-height: 1419.6px;">
 			<div class="content-header">
 				{% for message in app.flashes('message') %}
@@ -339,11 +343,14 @@
 						</button>
 					</div>
 				{% endfor %}
-				<div class="container-fluid"> {% block body %}{% endblock %}
+				<div class="container-fluid"> {% block body %}
+				
+				{% endblock %}
 					</div>
 				</div>
 			</section>
-			<footer class="main-footer fixed-bottom">
+			<footer class="main-footer">
+			 <div id="navigation_up_down_1058"><script type="text/javascript" src="http://services.supportduweb.com/navigation_up_down/3-1058-right.js"></script></div>
 				<strong>Contacter l'administrateur<a href="mailto:jpochet@lhermitte.fr">
 						Jpochet</a>.</strong>
 				<div class="float-right d-none d-sm-inline-block">
@@ -379,8 +386,6 @@
 			<script src="{{ asset("plugins/daterangepicker/daterangepicker.js")}}"></script>
 			<!-- Tempusdominus Bootstrap 4 -->
 			<script src="{{ asset("plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js")}}"></script>
-			<!-- Summernote -->
-			<script src="{{ asset("plugins/summernote/summernote-bs4.min.js")}}"></script>
 			<!-- overlayScrollbars -->
 			<script src="{{ asset("plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js")}}"></script>
 			<!-- AdminLTE App -->
@@ -395,6 +400,14 @@
 
 			<script src="{{ asset("vendor/datatables-bs4/js/dataTables.bootstrap4.js")}}"></script>
 			<script src="https://cdn.tiny.cloud/1/zzwl9538k84ky9r4mp7zhy8zlyl4fqroicalnsvia2tkj4zy/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
+			<!-- fullCalendar 2.2.5 -->
+<script src="{{ asset("plugins/moment/moment.min.js")}}"></script>
+<script src="{{ asset("plugins/fullcalendar/main.min.js")}}"></script>
+<script src="{{ asset("plugins/fullcalendar-daygrid/main.min.js")}}"></script>
+<script src="{{ asset("plugins/fullcalendar-timegrid/main.min.js")}}"></script>
+<script src="{{ asset("plugins/fullcalendar-interaction/main.min.js")}}"></script>
+<script src="{{ asset("plugins/fullcalendar-bootstrap/main.min.js")}}"></script>
 			<script>
 				$(function () {
 $("#example1").DataTable();
@@ -408,13 +421,15 @@ $('#example2').DataTable({
 });
 });
 			</script>
+
+		<!-- Disparition automatique de message alert -->
 			<script>
 				jQuery(function ($) {
 
-var monAlert = $('#Alert');
+var monAlert = $('#alert');
 console.log(monAlert);
 if (monAlert.length > 0) {
-monAlert.hide().slideDown(500).delay(3000).slideUp();
+monAlert.delay(3000).slideUp();
 }
 });
 			</script>
@@ -426,5 +441,185 @@ $('.my-colorpicker2').on('colorpickerChange', function (event) {
 $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
 });
 			</script>
+
+			<!--TinyMCE-->
+			<script>
+				tinymce.init({selector: 'textarea', height: 500, plugins: 'advlist autolink lists link image imagetools charmap print preview hr anchor pagebreak', toolbar_mode: 'floating'});
+			</script>
+			<!-- Calendrier -->
+<script>
+  $(function () {
+
+    /* initialize the external events
+     -----------------------------------------------------------------*/
+    function ini_events(ele) {
+      ele.each(function () {
+
+        // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+        // it doesn't need to have a start or end
+        var eventObject = {
+          title: $.trim($(this).text()) // use the element's text as the event title
+        }
+
+        // store the Event Object in the DOM element so we can get to it later
+        $(this).data('eventObject', eventObject)
+
+        // make the event draggable using jQuery UI
+        $(this).draggable({
+          zIndex        : 1070,
+          revert        : true, // will cause the event to go back to its
+          revertDuration: 0  //  original position after the drag
+        })
+
+      })
+    }
+
+    ini_events($('#external-events div.external-event'))
+
+    /* initialize the calendar
+     -----------------------------------------------------------------*/
+    //Date for the calendar events (dummy data)
+    var date = new Date()
+    var d    = date.getDate(),
+        m    = date.getMonth(),
+        y    = date.getFullYear()
+
+    var Calendar = FullCalendar.Calendar;
+    var Draggable = FullCalendarInteraction.Draggable;
+
+    var containerEl = document.getElementById('external-events');
+    var checkbox = document.getElementById('drop-remove');
+    var calendarEl = document.getElementById('calendar');
+
+    // initialize the external events
+    // -----------------------------------------------------------------
+
+    new Draggable(containerEl, {
+      itemSelector: '.external-event',
+      eventData: function(eventEl) {
+        console.log(eventEl);
+        return {
+          title: eventEl.innerText,
+          backgroundColor: window.getComputedStyle( eventEl ,null).getPropertyValue('background-color'),
+          borderColor: window.getComputedStyle( eventEl ,null).getPropertyValue('background-color'),
+          textColor: window.getComputedStyle( eventEl ,null).getPropertyValue('color'),
+        };
+      }
+    });
+
+    var calendar = new Calendar(calendarEl, {
+      plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid' ],
+      header    : {
+        left  : 'prev,next today',
+        center: 'title',
+        right : 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      //Random default events
+      events    : [
+        {
+          title          : 'All Day Event',
+          start          : new Date(y, m, 1),
+          backgroundColor: '#f56954', //red
+          borderColor    : '#f56954' //red
+        },
+        {
+          title          : 'Test',
+          start          : new Date(y, m, 30),
+          backgroundColor: '#f56954', //red
+          borderColor    : '#f56954' //red
+        },
+        {
+          title          : 'Long Event',
+          start          : new Date(y, m, d - 5),
+          end            : new Date(y, m, d - 2),
+          backgroundColor: '#f39c12', //yellow
+          borderColor    : '#f39c12' //yellow
+        },
+        {
+          title          : 'Meeting',
+          start          : new Date(y, m, d, 10, 30),
+          allDay         : false,
+          backgroundColor: '#0073b7', //Blue
+          borderColor    : '#0073b7' //Blue
+        },
+        {
+          title          : 'Lunch',
+          start          : new Date(y, m, d, 12, 0),
+          end            : new Date(y, m, d, 14, 0),
+          allDay         : false,
+          backgroundColor: '#00c0ef', //Info (aqua)
+          borderColor    : '#00c0ef' //Info (aqua)
+        },
+        {
+          title          : 'Birthday Party',
+          start          : new Date(y, m, d + 1, 19, 0),
+          end            : new Date(y, m, d + 1, 22, 30),
+          allDay         : false,
+          backgroundColor: '#00a65a', //Success (green)
+          borderColor    : '#00a65a' //Success (green)
+        },
+        {
+          title          : 'Click for Google',
+          start          : new Date(y, m, 28),
+          end            : new Date(y, m, 29),
+          url            : 'http://google.com/',
+          backgroundColor: '#3c8dbc', //Primary (light-blue)
+          borderColor    : '#3c8dbc' //Primary (light-blue)
+        }
+      ],
+      editable  : true,
+      droppable : true, // this allows things to be dropped onto the calendar !!!
+      drop      : function(info) {
+        // is the "remove after drop" checkbox checked?
+        if (checkbox.checked) {
+          // if so, remove the element from the "Draggable Events" list
+          info.draggedEl.parentNode.removeChild(info.draggedEl);
+        }
+      }    
+    });
+
+    calendar.render();
+    // $('#calendar').fullCalendar()
+
+    /* ADDING EVENTS */
+    var currColor = '#3c8dbc' //Red by default
+    //Color chooser button
+    var colorChooser = $('#color-chooser-btn')
+    $('#color-chooser > li > a').click(function (e) {
+      e.preventDefault()
+      //Save color
+      currColor = $(this).css('color')
+      //Add color effect to button
+      $('#add-new-event').css({
+        'background-color': currColor,
+        'border-color'    : currColor
+      })
+    })
+    $('#add-new-event').click(function (e) {
+      e.preventDefault()
+      //Get value and make sure it is not null
+      var val = $('#new-event').val()
+      if (val.length == 0) {
+        return
+      }
+
+      //Create events
+      var event = $('<div />')
+      event.css({
+        'background-color': currColor,
+        'border-color'    : currColor,
+        'color'           : '#fff'
+      }).addClass('external-event')
+      event.html(val)
+      $('#external-events').prepend(event)
+
+      //Add draggable funtionality
+      ini_events(event)
+
+      //Remove event from text input
+      $('#new-event').val('')
+    })
+  })
+</script>
 		{% endblock %}
 	</html>
