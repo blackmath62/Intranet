@@ -27,7 +27,7 @@ class SendTicketType extends AbstractType
             'attr' => ['class' => 'form-control btn btn-info mt-3']
         ])
         ;
-        ;
+        
     }
 
     public function configureOptions(OptionsResolver $resolver)

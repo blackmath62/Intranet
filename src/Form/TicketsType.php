@@ -40,7 +40,7 @@ class TicketsType extends AbstractType
                         'message' => 'Merci de saisir un Contenu détaillé'
                     ])
                     ],
-                    'required' => true,
+                    'required' => false,
                     'attr' => [
                         'class' => 'col-12 form-control textarea',
                         'placeholder' => 'Détail de votre probléme'

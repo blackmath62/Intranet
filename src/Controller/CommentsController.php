@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Status;
 use App\Entity\Tickets;
 use App\Entity\Comments;
 use App\Form\SendTicketType;
 use App\Form\CommentsTicketsType;
 use Symfony\Component\Mime\Email;
+use App\Form\SendTicketAnnuaireType;
 use App\Form\SendMailPrestataireType;
 use App\Repository\TicketsRepository;
 use App\Form\EditStatusTicketFormType;
@@ -69,8 +71,8 @@ class CommentsController extends AbstractController
             return $this->redirectToRoute('app_tickets');
         }
 
-        // Envoyer par mail tous le contenu du ticket, des PJ et des commentaires 
-        // Envoyer le mail
+        // Envoyer par mail tous le contenu du ticket et des commentaires a un prestataire
+
         $formSendTicket = $this->createForm(SendTicketType::class);
         $formSendTicket->handleRequest($request);
         
@@ -81,25 +83,80 @@ class CommentsController extends AbstractController
                 $email = (new Email())
                     ->from('intranet@groupe-axis.fr')
                     ->to($data->getEmail())
-                    ->subject($ticket->getTitle())
+                    ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle())
                     ->html($this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]));
-        
                 $mailer->send($email);
-                $this->addFlash('message', 'Message envoyé !');
+
+                 // créer un commentaire pour sauvegarder les dates d'envois de mails
+                 $comment = new Comments();
+                 $dateTimeSend = new DateTime('NOW');
+                 $commentSend = "Mail envoyer le " . $dateTimeSend->format('d-m-Y-H:i:s') . " à " . $data->getEmail();
+                 $comment->setTitle($commentSend)
+                         ->setContent('')
+                         ->setTicket($repoTicket->findOneBy(['id' => $id]))
+                         ->setUser($this->getUser())
+                         ->setCreatedAt(new \DateTime());
+                         $em = $this->getDoctrine()->getManager();
+                         $em->persist($comment);
+                         $em->flush();
+
+                $this->addFlash('message', 'Message envoyé a ce prestataire!');
                     return $this->redirectToRoute('app_tickets');
             }else {
-                $this->addFlash('danger', 'Pas d\'adresse mail, Impossible d\'envoyer !');
+                $this->addFlash('danger', 'Pas d\'adresse mail, Impossible d\'envoyer a ce prestataire !');
                     return $this->redirectToRoute('app_tickets');
             }
 
         }
+
+        // Envoyer par mail tous le contenu du ticket et des commentaires a un collégue
+
+        $formSendAnnuaireTicket = $this->createForm(SendTicketAnnuaireType::class);
+        $formSendAnnuaireTicket->handleRequest($request);
+        
+        if($formSendAnnuaireTicket->isSubmitted() && $formSendAnnuaireTicket->isValid()){
+            $data = $formSendAnnuaireTicket['annuaire']->getData();
+            if ($data->getMail()) {
+                $commentsOfTicket = $repoComments->findBy(['ticket' => $id]);
+                $email = (new Email())
+                    ->from('intranet@groupe-axis.fr')
+                    ->to($data->getMail())
+                    ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle())
+                    ->html($this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendAnnuaireTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]));
+                $mailer->send($email);
+
+                // créer un commentaire pour sauvegarder les dates d'envois de mails
+                $comment = new Comments();
+                $dateTimeSend = new DateTime('NOW');
+                $commentSend = "Mail envoyer le " . $dateTimeSend->format('d-m-Y-H:i:s') . " à " . $data->getMail();
+                $comment->setTitle($commentSend)
+                        ->setContent('')
+                        ->setTicket($repoTicket->findOneBy(['id' => $id]))
+                        ->setUser($this->getUser())
+                        ->setCreatedAt(new \DateTime());
+                        $em = $this->getDoctrine()->getManager();
+                        $em->persist($comment);
+                        $em->flush();
+                $this->addFlash('warning', 'Message envoyé a ce collégue!');
+                    return $this->redirectToRoute('app_tickets');
+            }else {
+                $this->addFlash('danger', 'Pas d\'adresse mail, Impossible d\'envoyer a ce collégue !');
+                    return $this->redirectToRoute('app_tickets');
+            }
+
+        }
+
+
+
+
 
         return $this->render('comments/index.html.twig', [
             'ticket' => $ticket,
             'comments' => $comments,
             'formComment' => $formComment->createView(),
             'formstatu' => $formEditStatut->createView(),
-            'formSendTicket' => $formSendTicket->createView()
+            'formSendTicket' => $formSendTicket->createView(),
+            'formSendAnnuaireTicket' => $formSendAnnuaireTicket->createView()
         ]);
     }
 

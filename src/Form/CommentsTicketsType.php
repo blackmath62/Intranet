@@ -40,7 +40,7 @@ class CommentsTicketsType extends AbstractType
                         'message' => 'Veuillez saisir votre commentaire'
                     ])
                 ],
-                'required' => true,
+                'required' => false,
                 'attr' => [
                     'class' => 'col-12 form-control textarea',
                     'placeholder' => 'Veuillez saisir votre commentaire'
