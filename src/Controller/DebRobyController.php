@@ -39,10 +39,9 @@ class DebRobyController extends AbstractController
      * @Route("/roby/deb", name="app_deb_roby")
      */
 
-    public function test(MouvRepository $repo): Response
+    public function test()
     {
-        $fromDate = '2018-12-31';
-        $toDate = '2019-12-31';
+       
         
         // en findby, ça fonctionne !
         //$Articles = $this->getDoctrine()->getRepository(Mouv::class, 'divaltosvg')->findBy(['fano' => 18020319]);
@@ -54,7 +53,7 @@ class DebRobyController extends AbstractController
         //$Articles = $this->getDoctrine()->getRepository(Mouv::class, 'divaltosvg')->test18($fromDate);
         
         $em = $this->getDoctrine()->getManager();
-            $Articles = $em->getRepository(MouvRepository::class, 'divaltoreel');
+            $Articles = $em->getRepository(ArtRepository::class, 'divaltoreel');
 
         return $this->render('deb_roby/index.html.twig', [
             'controller_name' => 'DebRobyController',

@@ -12,10 +12,9 @@
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <th class="text-center"><span>date facture</span></th>
-                                    <th class="text-center"><span>Tiers</span></th>
-                                    <th class="text-center"><span>Facture</span></th>
-                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Fournisseur</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -23,16 +22,13 @@
                                 {% for Article in Articles %}
                                     <tr id="<?= $id ?>">
                                         <td class="text-center">
-                                            <a class="text-center" style="max-width: 40px;">{{ Article.fadt|date("d/m/Y")  }}</a>
+                                            <a class="text-center">{{ Article.ref }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ Article.des }}</a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-center">{{ Article.Tiers }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center">{{ Article.fano }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center">{{ Article.repr0001 }}</a>
                                         </td>
                                     {% endfor %}
                                     </tr>
@@ -40,10 +36,9 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th class="text-center"><span>date facture</span></th>
-                                    <th class="text-center"><span>Tiers</span></th>
-                                    <th class="text-center"><span>Facture</span></th>
-                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Fournisseur</span></th>
                                 </tr>
                             </tfoot>
                         </table>
