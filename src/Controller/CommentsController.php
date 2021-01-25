@@ -67,16 +67,31 @@ class CommentsController extends AbstractController
             $ticket = $formEditStatut->getData();
             $em->persist($ticket);
             $em->flush();
+            
+            // créer un commentaire pour sauvegarder les dates d'envois de mails
+            $comment = new Comments();
+            $dateTimeSend = new DateTime('NOW');
+            $commentSend = "Le ticket est maintenant " . $ticket->getStatu()->getTitle();
+            $comment->setTitle($commentSend)
+                    ->setContent('')
+                    ->setTicket($repoTicket->findOneBy(['id' => $id]))
+                    ->setUser($this->getUser())
+                    ->setCreatedAt(new \DateTime());
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($comment);
+                    $em->flush();
+
             $this->addFlash('message', 'Le Ticket a bien été déplacé');
             return $this->redirectToRoute('app_tickets');
         }
 
         // Envoyer par mail tous le contenu du ticket et des commentaires a un prestataire
-
+        
         $formSendTicket = $this->createForm(SendTicketType::class);
         $formSendTicket->handleRequest($request);
         
         if($formSendTicket->isSubmitted() && $formSendTicket->isValid()){
+            
             $data = $formSendTicket['prestataire']->getData();
             if ($data->getEmail()) {
                 $commentsOfTicket = $repoComments->findBy(['ticket' => $id]);
@@ -86,6 +101,15 @@ class CommentsController extends AbstractController
                     ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle())
                     ->html($this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]));
                 $mailer->send($email);
+
+                // assignation du prestataire aprés l'envoi du mail au prestataire
+
+                $ticket = $repoTicket->findOneBy(['id' => $id]);
+                $ticket->setPrestataire($data);
+                $em = $this->getDoctrine()->getManager();
+                         $em->persist($ticket);
+                         $em->flush();
+
 
                  // créer un commentaire pour sauvegarder les dates d'envois de mails
                  $comment = new Comments();

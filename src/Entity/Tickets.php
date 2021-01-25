@@ -78,6 +78,11 @@ class Tickets
      */
     private $file;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Prestataire::class, inversedBy="tickets")
+     */
+    private $prestataire;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
@@ -235,6 +240,18 @@ class Tickets
     public function setFile(?string $file): self
     {
         $this->file = $file;
+
+        return $this;
+    }
+
+    public function getPrestataire(): ?Prestataire
+    {
+        return $this->prestataire;
+    }
+
+    public function setPrestataire(?Prestataire $prestataire): self
+    {
+        $this->prestataire = $prestataire;
 
         return $this;
     }

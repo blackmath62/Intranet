@@ -79,7 +79,14 @@
 								
 									<div class="d-flex ">
 										<h2 class="card-title mr-auto p-2">
-											<a href=" {{path('app_comment', {'id' : ticket.id} ) }}">Ticket {{ ticket.id }} : {{ ticket.title}}</a>
+											<a href=" {{path('app_comment', {'id' : ticket.id} ) }}">Ticket {{ ticket.id }} : {{ ticket.title}}
+											{% if ticket.prestataire %}
+								<a class="btn btn-sm btn-info text-white">
+								assigné à
+								{{ticket.prestataire.nom}}</a>
+							{% else %}
+								<a class="btn btn-sm btn-danger text-white">pas encore assigné à un intervenant</a>
+							{% endif %}</a>
 										{% set countNotEmpty = 0 %}
 										{% for comment in comments if comment.ticket.id == ticket.id %}
 											{% set countNotEmpty = countNotEmpty + 1 %}

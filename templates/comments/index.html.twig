@@ -4,7 +4,8 @@
 {% endblock %}
 
 {% block body %}
-	<section class="content-header">
+	<section
+		class="content-header">
 
 		<!-- /.Création -->
 		<div class="card card-dark">
@@ -15,7 +16,16 @@
 			<div class="card card-light border m-2">
 				<div class="card-header">
 					<div class="d-flex ">
-						<h2 class="card-title mr-auto p-2">{{ ticket.title}}</h2>
+						<h2 class="card-title mr-auto p-2">{{ ticket.title}}
+							{% if ticket.prestataire %}
+								<a class="btn btn-sm btn-info text-white">
+								assigné à
+								{{ticket.prestataire.nom}}</a>
+								
+							{% else %}
+								<a class="btn btn-sm btn-danger text-white">pas encore assigné à un intervenant</a>
+							{% endif %}
+						</h2>
 						<div>
 							<a class="btn btn-sm" style="background-color: {{ ticket.priority.color }}; color: {{ ticket.priority.textColor }}" ;>{{ ticket.priority.title }}</a>
 							<h2 class="card-title p-2">
@@ -120,7 +130,7 @@
 						</div>
 					</section>
 					{% if is_granted('ROLE_ADMIN') %}
-					<!-- Changer le statut du ticket --> 
+						<!-- Changer le statut du ticket -->
 						<section class="content d-flex justify-content-around">
 							<div class="row">
 								<div class="col-md-12">
@@ -133,74 +143,75 @@
 										<!-- /.card-header -->
 										<div class="card-body pad">
 											<div class="mb-12">
-													{{ form(formstatu) }}												
+												{{ form(formstatu) }}
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-12">
-									<div class="card card-outline card-warning">
-										<div class="card-header">
-											<h3 class="card-title">
-												Envoyer par mail à un collégue
-											</h3>
-										</div>
-										<!-- /.card-header -->
-										<div class="card-body pad">
-											<div class="mb-12">
-												{{ form(formSendAnnuaireTicket)}}
+								<div class="row">
+									<div class="col-md-12">
+										<div class="card card-outline card-warning">
+											<div class="card-header">
+												<h3 class="card-title">
+													Envoyer par mail à un collégue
+												</h3>
+											</div>
+											<!-- /.card-header -->
+											<div class="card-body pad">
+												<div class="mb-12">
+													{{ form(formSendAnnuaireTicket)}}
+													</div>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-12">
-									<div class="card card-outline card-info">
-										<div class="card-header">
-											<h3 class="card-title">
-												Envoyer par mail à un prestataire
-											</h3>
+									<div class="row">
+										<div class="col-md-12">
+											<div class="card card-outline card-info">
+												<div class="card-header">
+													<h3 class="card-title">
+														Envoyer par mail à un prestataire
+													</h3>
+												</div>
+												<!-- /.card-header -->
+												<div class="card-body pad">
+													<div class="mb-12">
+														{{ form(formSendTicket)}}
+														</div>
+													</div>
+												</div>
+											</div>
 										</div>
-										<!-- /.card-header -->
-										<div class="card-body pad">
-											<div class="mb-12">
-												{{ form(formSendTicket)}}
+									</section>
+								{% endif %}
+
+							</div>
+						</div>
+
+					</div>
+					<!-- Main content -->
+					<section class="content">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card card-outline card-info">
+									<div class="card-header">
+										<h3 class="card-title">
+											Déposer un Commentaire
+										</h3>
+									</div>
+									<!-- /.card-header -->
+									<div class="card-body pad">
+										<div class="mb-3">
+											{{ form(formComment)}}
+
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 						</section>
-						{% endif %}
-
 					</div>
-				</div>
-
-			</div>
-			<!-- Main content -->
-			<section class="content">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="card card-outline card-info">
-							<div class="card-header">
-								<h3 class="card-title">
-									Déposer un Commentaire
-								</h3>
-							</div>
-							<!-- /.card-header -->
-							<div class="card-body pad">
-								<div class="mb-3">
-								{{ form(formComment)}}
-																		
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</section>
-		</div>			<!-- /.content -->
-	</section>
+					<!-- /.content -->
+				</section>
 			{% endblock %}
