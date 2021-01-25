@@ -7,7 +7,7 @@ use App\Repository\FouRepository;
 
 /**
  * Fou
- * @ORM\Entity(repositoryClass=FouRepository::class)
+ * @ORM\Entity
  * @ORM\Table(name="FOU", indexes={@ORM\Index(name="INDEX_B_FOU", columns={"DOS", "CE1", "NOMABR", "FOU_ID"}), @ORM\Index(name="INDEX_C_FOU", columns={"DOS", "CE1", "TIERS", "FOU_ID"}), @ORM\Index(name="INDEX_E_FOU", columns={"DOS", "CE1", "PAY", "CPOSTAL", "NOMABR", "FOU_ID"}), @ORM\Index(name="INDEX_F_FOU", columns={"CE4", "DOS", "CE1", "STAT_0001", "NOMABR", "FOU_ID"}), @ORM\Index(name="INDEX_G_FOU", columns={"CE4", "DOS", "CE1", "STAT_0001", "TIERS", "FOU_ID"}), @ORM\Index(name="INDEX_H_FOU", columns={"CE4", "DOS", "CE1", "STAT_0001", "PAY", "CPOSTAL", "FOU_ID"}), @ORM\Index(name="INDEX_I_FOU", columns={"DOS", "CE1", "TEL", "FOU_ID"}), @ORM\Index(name="INDEX_J_FOU", columns={"CE3", "DOS", "CE1", "TIERSGRP", "TIERS", "FOU_ID"}), @ORM\Index(name="INDEX_K_FOU", columns={"CE5", "DOS", "CE1", "STAT_0002", "NOMABR", "FOU_ID"}), @ORM\Index(name="INDEX_L_FOU", columns={"CE5", "DOS", "CE1", "STAT_0002", "TIERS", "FOU_ID"}), @ORM\Index(name="INDEX_M_FOU", columns={"CE5", "DOS", "CE1", "STAT_0002", "PAY", "CPOSTAL", "FOU_ID"}), @ORM\Index(name="INDEX_N_FOU", columns={"CE6", "DOS", "CE1", "STAT_0003", "NOMABR", "FOU_ID"}), @ORM\Index(name="INDEX_O_FOU", columns={"CE6", "DOS", "CE1", "STAT_0003", "TIERS", "FOU_ID"}), @ORM\Index(name="INDEX_P_FOU", columns={"CE6", "DOS", "CE1", "STAT_0003", "PAY", "CPOSTAL", "FOU_ID"}), @ORM\Index(name="INDEX_W_FOU", columns={"DOS", "CE1", "TELCLE", "FOU_ID"}), @ORM\Index(name="INDEX_X_FOU", columns={"DOS", "CE1", "EMAIL", "FOU_ID"}), @ORM\Index(name="INDEX_BMINI", columns={"DOS", "TIERSCLI", "FOU_ID"})})
  */
 class Fou

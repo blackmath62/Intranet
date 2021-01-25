@@ -16,6 +16,7 @@ use App\Form\EditStatusTicketFormType;
 use App\Repository\CommentsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PrestataireRepository;
+use App\Repository\StatusRepository;
 use Egulias\EmailValidator\Warning\Comment;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
@@ -32,7 +33,7 @@ class CommentsController extends AbstractController
      * @Route("/ticket/comment/add/{id<\d+>}", name="app_comment")
      * @ParamConverter("Comments", options={"id" = "Ticket_id"})
      */
-    public function addComment(int $id, MailerInterface $mailer,TicketsRepository $repoTicket, CommentsRepository $repoComments, Request $request, EntityManagerInterface $em, PrestataireRepository $repoPresta	)
+    public function addComment(int $id,StatusRepository $repoStatut, MailerInterface $mailer,TicketsRepository $repoTicket, CommentsRepository $repoComments, Request $request, EntityManagerInterface $em, PrestataireRepository $repoPresta	)
     {
         // Enregistrement des commentaires
         
@@ -106,6 +107,8 @@ class CommentsController extends AbstractController
 
                 $ticket = $repoTicket->findOneBy(['id' => $id]);
                 $ticket->setPrestataire($data);
+                $statuEnCours = $repoStatut->findOneBy(['id' => 16]);
+                $ticket->setStatu($statuEnCours);
                 $em = $this->getDoctrine()->getManager();
                          $em->persist($ticket);
                          $em->flush();

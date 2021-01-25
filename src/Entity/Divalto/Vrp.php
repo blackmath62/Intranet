@@ -7,7 +7,7 @@ use App\Repository\VrpRepository;
 
 /**
  * Vrp
- * @ORM\Entity(repositoryClass=VrpRepository::class)
+ * @ORM\Entity
  * @ORM\Table(name="VRP", indexes={@ORM\Index(name="INDEX_B_VRP", columns={"DOS", "CE1", "NOMABR", "VRP_ID"}), @ORM\Index(name="INDEX_C_VRP", columns={"DOS", "CE1", "TIERS", "VRP_ID"}), @ORM\Index(name="INDEX_E_VRP", columns={"DOS", "CE1", "PAY", "CPOSTAL", "NOMABR", "VRP_ID"}), @ORM\Index(name="INDEX_I_VRP", columns={"DOS", "CE1", "TEL", "VRP_ID"}), @ORM\Index(name="INDEX_T", columns={"DOS", "SALCOD", "VRP_ID"}), @ORM\Index(name="INDEX_W_VRP", columns={"DOS", "CE1", "TELCLE", "VRP_ID"}), @ORM\Index(name="INDEX_X_VRP", columns={"DOS", "CE1", "EMAIL", "VRP_ID"}), @ORM\Index(name="INDEX_Y", columns={"DOS", "CE1", "TELGSMCLE", "VRP_ID"})})
  */
 class Vrp

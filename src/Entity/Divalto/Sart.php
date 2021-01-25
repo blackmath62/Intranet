@@ -7,7 +7,7 @@ use App\Repository\SartRepository;
 
 /**
  * Sart
- * @ORM\Entity(repositoryClass=SartRepository::class)
+ * @ORM\Entity
  * @ORM\Table(name="SART", indexes={@ORM\Index(name="INDEX_H", columns={"DOS", "REF", "SREF1", "SREF2", "SART_ID"}), @ORM\Index(name="INDEX_P", columns={"DOS", "EAN", "SART_ID"})})
  */
 class Sart
