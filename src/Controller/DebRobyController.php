@@ -9,7 +9,7 @@ use App\Entity\Divalto\Ent;
 use App\Entity\Divalto\Mouv;
 use App\Repository\ArtRepository;
 use App\Repository\EntRepository;
-use App\Repository\Divalto\MouvRepository;
+use App\Repository\MouvRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Component\HttpFoundation\Response;
@@ -54,8 +54,7 @@ class DebRobyController extends AbstractController
         //$Articles = $this->getDoctrine()->getRepository(Mouv::class, 'divaltosvg')->test18($fromDate);
         
         $em = $this->getDoctrine()->getManager();
-            $Articles = $em->getRepository(MouvRepository::class, 'divaltosvg')
-                        ->findBytest18($fromDate);
+            $Articles = $em->getRepository(MouvRepository::class, 'divaltoreel');
 
         return $this->render('deb_roby/index.html.twig', [
             'controller_name' => 'DebRobyController',

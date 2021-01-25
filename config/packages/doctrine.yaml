@@ -15,12 +15,11 @@ doctrine:
                 #driver: 'sqlsrv'
                 #charset: UTF-8
                 
-            #DivaltoReel:
+            divaltoreel:
                 # configure these for your database server
-                #url: '%env(resolve:DATABASE_DIVALTO_REEL_URL)%'
-                #driver: 'sqlsrv'
-                #server_version: '5.7'
-                #charset: utf8mb4
+                url: '%env(resolve:DATABASE_DIVALTO_REEL_URL)%'
+                driver: 'sqlsrv'
+                charset: UTF-8
     orm:
         default_entity_manager: default
         entity_managers:
@@ -42,12 +41,12 @@ doctrine:
                         #dir: '%kernel.project_dir%/src/Entity/Divalto'
                         #prefix: 'App\Entity\Divalto'
                         #alias: divaltosvg
-            #DivaltoReel:
-                #connection: DivaltoReel
-                #mappings:
-                    #DivaltoReel:
-                        #is_bundle: false
-                        #type: annotation
-                        #dir: '%kernel.project_dir%/src/Entity/Divalto'
-                        #prefix: 'App\Entity\DivaltoReel'
-                        #alias: DivaltoReel
+            divaltoreel:
+                connection: divaltoreel
+                mappings:
+                    divaltoreel:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity/Divalto'
+                        prefix: 'App\Entity\Divalto'
+                        alias: divaltoreel

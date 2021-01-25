@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Divalto;
+namespace App\Repository;
 
 use DateTime;
 use App\Entity\Divalto\Mouv;

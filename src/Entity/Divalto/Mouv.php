@@ -3,7 +3,7 @@
 namespace App\Entity\Divalto;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\Divalto\MouvRepository;
+use App\Repository\MouvRepository;
 
 /**
  * Mouv
