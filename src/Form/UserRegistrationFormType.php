@@ -45,13 +45,12 @@ class UserRegistrationFormType extends AbstractType
             ])
             ->add('img', FileType::class, [
                 'required' => false,
-                'empty_data' => 'img/no-image-icon.png'
             ])
             ->add('bornAt', DateType::class,[
                 'placeholder' => [
                     'year' => 'Année', 'month' => 'Mois', 'day' => 'Jour',
                 ],
-                'label' => "Date de naissance",
+                'label' => "Date de naissance (l'année a peu d'importance)",
                 'widget' => 'single_text',
                 'attr' => [
                     'class' => 'col-12 form-control'

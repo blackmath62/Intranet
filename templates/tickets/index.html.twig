@@ -4,59 +4,64 @@
 {% endblock %}
 
 {% block body %}
-	<section class="content-header">
+	<section
+		class="content-header">
 
+		<!-- Création de Ticket -->
 		<div class="card collapsed-card card-dark">
 			<div class="card-header">
-				<h3 class="card-title">Créer un nouveau ticket</h3>
+				<h3 class="card-title">Créer un nouveau ticket .....</h3>
 
 				<div class="card-tools">
-					<button type="button" class="btn btn-tool p-2" data-card-widget="collapse">
-						<i class="fas fa-plus"></i>
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-minus"></i>
 					</button>
 				</div>
 			</div>
-			{{ form_start(formTickets) }}
+			<!-- /.card-header -->
+			<div class="card-body">
+				{{ form_start(formTickets) }}
 
-			<div class="card-body d-flex flex-wrap">
-				<div class="form-group col-12">
-					{{ form_widget(formTickets.title)}}
-				</div>
-				<div class="form-group col-12">
-					<label>{{ form_label(formTickets.content) }}:</label>
-					{{ form_widget(formTickets.content)}}
-				</div>
-				<div class="form-group col-2">
-					<label>{{ form_label(formTickets.service) }}:</label>
-					{{ form_widget(formTickets.service) }}
-				</div>
-				<div class="form-group col-2">
-					<label>{{ form_label(formTickets.societe) }}:</label>
-					{{ form_widget(formTickets.societe) }}
-				</div>
-				<div class="form-group col-2">
-					<label>{{ form_label(formTickets.priority) }}:</label>
-					{{ form_widget(formTickets.priority) }}
-				</div>
-				<div class="form-group col-3">
-					<label>{{ form_label(formTickets.file) }}:</label>
-					{{ form_widget(formTickets.file) }}
-				</div>
-				<div class="d-none">
-					<label>{{ form_label(formTickets.statu) }}:</label>
-					{{ form_widget(formTickets.statu) }}
-				</div>
+				<div class="card-body d-flex flex-wrap">
+					<div class="form-group col-12">
+						{{ form_widget(formTickets.title)}}
+					</div>
+					<div class="form-group col-12">
+						<label>{{ form_label(formTickets.content) }}:</label>
+						{{ form_widget(formTickets.content)}}
+					</div>
+					<div class="form-group col-2">
+						<label>{{ form_label(formTickets.service) }}:</label>
+						{{ form_widget(formTickets.service) }}
+					</div>
+					<div class="form-group col-2">
+						<label>{{ form_label(formTickets.societe) }}:</label>
+						{{ form_widget(formTickets.societe) }}
+					</div>
+					<div class="form-group col-2">
+						<label>{{ form_label(formTickets.priority) }}:</label>
+						{{ form_widget(formTickets.priority) }}
+					</div>
+					<div class="form-group col-3">
+						<label>{{ form_label(formTickets.file) }}:</label>
+						{{ form_widget(formTickets.file) }}
+					</div>
+					<div class="d-none">
+						<label>{{ form_label(formTickets.statu) }}:</label>
+						{{ form_widget(formTickets.statu) }}
+					</div>
 
-				<div class="form-group col-3 text-right">
-					{{ form_row(formTickets.poster) }}
+					<div class="form-group col-3 text-right">
+						{{ form_row(formTickets.poster) }}
+					</div>
 				</div>
+				{{ form_end(formTickets) }}
 			</div>
-			{{ form_end(formTickets) }}
+			<!-- /.card-footer-->
 		</div>
 
 		<!-- Control Sidebar -->
 		<aside class="control-sidebar control-sidebar-dark"></aside>
-		<a href="{{ path('app_export') }}">Export -></a>
 		<!-- /.control-sidebar -->
 		<!-- ./wrapper -->
 		{% for statu in status %}
@@ -69,7 +74,19 @@
 				<!-- /.Création -->
 				<div class="card">
 					<div class="card-header" style="background-color: {{ statu.backgroundColor }}; color: {{ statu.textColor }}" ;>
-						<h3 class="card-title">{{ statu.title }} <span class="badge badge-secondary right">{{ countTicketsByStatus }}</span></h3>
+						<div class="d-flex">
+							<div class="p-2">
+								<h3 class="card-title">{{ statu.title }}</h3>
+							</div>
+							<div class="p-2">
+								<span class="badge badge-secondary right">{{ countTicketsByStatus }}</span>
+							</div>
+							<div class="ml-auto p-2">
+							<!--	 TODO JEROME Voir pour extraire uniquement les tickets avec le statut correspondant -->
+								<a href="{{ path('app_export') }}" class='btn btn-sm btn-dark'>Export Excel</a>
+							</div>
+						</div>
+						<div></div>
 					</div>
 
 
@@ -77,33 +94,37 @@
 						{% if ticket.statu == statu %}
 							<div class="card collapsed-card card-light border m-2">
 								<div class="card-header">
-								
+
 									<div class="d-flex ">
 										<h2 class="card-title mr-auto p-2">
-											<a href=" {{path('app_comment', {'id' : ticket.id} ) }}">Ticket {{ ticket.id }} : {{ ticket.title}}
-											{% if ticket.prestataire %}
-								<a class="btn btn-sm btn-info text-white">
-								assigné à
-								{{ticket.prestataire.nom}}</a>
-							{% else %}
-								<a class="btn btn-sm btn-danger text-white">pas encore assigné à un intervenant</a>
-							{% endif %}</a>
-										{% set countNotEmpty = 0 %}
-										{% for comment in comments if comment.ticket.id == ticket.id %}
-											{% set countNotEmpty = countNotEmpty + 1 %}
-										{% endfor %}
-
-										{% if countNotEmpty > 0 %}
-											<a class="btn btn-sm" href=" {{path('app_comment', {'id' : ticket.id} ) }}">
-												<i class="fas fa-comments"></i>
-												<span class="badge bg-warning">{{ countNotEmpty }}</span>
+											<a href=" {{path('app_comment', {'id' : ticket.id} ) }}">Ticket
+												{{ ticket.id }}
+												:
+												{{ ticket.title}}
+												{% if ticket.prestataire %}
+													<a class="btn btn-sm btn-info text-white">
+														assigné à
+														{{ticket.prestataire.nom}}</a>
+												{% else %}
+													<a class="btn btn-sm btn-danger text-white">pas encore assigné à un intervenant</a>
+												{% endif %}
 											</a>
-										{% endif %}
+											{% set countNotEmpty = 0 %}
+											{% for comment in comments if comment.ticket.id == ticket.id %}
+												{% set countNotEmpty = countNotEmpty + 1 %}
+											{% endfor %}
+
+											{% if countNotEmpty > 0 %}
+												<a class="btn btn-sm" href=" {{path('app_comment', {'id' : ticket.id} ) }}">
+													<i class="fas fa-comments"></i>
+													<span class="badge bg-warning">{{ countNotEmpty }}</span>
+												</a>
+											{% endif %}
 										</h2>
-												<img class="img-fluid col-1" src="{{ ticket.societe.img }}">
+										<img class="img-fluid col-1" src="{{ ticket.societe.img }}">
 										<div>
-												<a class="btn btn-sm" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;>{{ ticket.service.title }}</a>
-												<a class="btn btn-sm" style="background-color: {{ ticket.priority.color }}; color: {{ ticket.priority.textColor }}" ;>{{ ticket.priority.title }}</a>
+											<a class="btn btn-sm" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;>{{ ticket.service.title }}</a>
+											<a class="btn btn-sm" style="background-color: {{ ticket.priority.color }}; color: {{ ticket.priority.textColor }}" ;>{{ ticket.priority.title }}</a>
 											<h2 class="card-title p-2">
 												{{ ticket.user.pseudo}}
 												le
@@ -177,7 +198,7 @@
 											<h5>Commentaires :
 											</h5>
 										</div>
-										
+
 									{% endif %}
 
 									<section class="content">

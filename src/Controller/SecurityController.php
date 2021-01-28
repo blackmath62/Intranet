@@ -51,6 +51,7 @@ class SecurityController extends AbstractController
 
 
                 if ($file) {
+                   
                     $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                     // this is needed to safely include the file name as part of the URL
                     $safeFilename = $slugger->slug($originalFilename);
