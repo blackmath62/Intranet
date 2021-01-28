@@ -64,7 +64,7 @@ class ProfileUserController extends AbstractController
 
         return $this->render('profile_user/index.html.twig',[
             'controller_name' => 'ProfileUserController',
-            'title' => 'gestion de mon compte',
+            'title' => 'gestion de compte',
             'profileUserForm' => $form->createView(),
         ]);
     }

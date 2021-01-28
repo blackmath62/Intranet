@@ -38,7 +38,7 @@ class AdminSocieteController extends AbstractController
                 'controller_name' => 'AdminSocieteController',
                 'societes' => $societes,
                 'formSociete' => $form->createView(),
-                'title' => "Paramétres_Société"
+                'title' => "Administration des Sociétés"
             ]);
     }
 
@@ -76,7 +76,8 @@ class AdminSocieteController extends AbstractController
             }
             return $this->render('admin_societe/edit_societe.html.twig',[
                 'societeEditForm' => $form->createView(),
-                'societe' => $societe
+                'societe' => $societe,
+                'title' => 'Edition des Sociétés'
             ]);
     }
 }

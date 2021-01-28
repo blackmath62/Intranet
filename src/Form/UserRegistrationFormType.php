@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Users;
 use App\Entity\Societe;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

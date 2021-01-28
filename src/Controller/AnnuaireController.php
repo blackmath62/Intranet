@@ -42,27 +42,4 @@ class AnnuaireController extends AbstractController
         ]);
 
     }
-    /**
-     * @Route("/test", name="app_test")
-     */
-
-    public function test(AnnuaireRepository $repo)
-    {
-        //$test = $repo->test();
-/*
-        $repository = $this->getDoctrine()
-                           ->getManager()
-                           ->getRepository(Annuaire::class);
-echo 'le repository est de classe '.get_class($repository);exit;
-*/
-        $fromDate = 12;
-        $toDate = 17;
-        $Articles = $repo->test2(array($fromDate, $toDate));
-        return $this->render('test/test.html.twig',[
-            //'title' => "Test",
-            //'test' => $test,
-            'Articles' => $Articles
-        ]);
-
-    }
 }

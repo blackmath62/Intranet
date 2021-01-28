@@ -40,7 +40,7 @@ class AdminStatusController extends AbstractController
                 'controller_name' => 'AdminStatusController',
                 'status' => $statut,
                 'formStatus' => $form->createView(),
-                'title' => "Paramétres_Statut"
+                'title' => "Administration des statuts"
             ]);
     }
 
@@ -78,7 +78,8 @@ class AdminStatusController extends AbstractController
             }
             return $this->render('admin_status/edit_status.html.twig',[
                 'statusEditForm' => $form->createView(),
-                'status' => $status
+                'status' => $status,
+                'title' => 'Edition des statuts'
             ]);
     }
 }

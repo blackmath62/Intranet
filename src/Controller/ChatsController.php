@@ -16,7 +16,7 @@ class ChatsController extends AbstractController
     /**
      * @Route("/chats", name="app_chats")
      */
-    public function editUser(Request $request, EntityManagerInterface $em, ChatsRepository $repo, UsersRepository $repoUsers){
+    public function chat(Request $request, EntityManagerInterface $em, ChatsRepository $repo, UsersRepository $repoUsers){
 
         $chats = $repo->findAll();
         $users= $repoUsers->FindAll();
@@ -35,7 +35,8 @@ class ChatsController extends AbstractController
         return $this->render('chats/index.html.twig',[
             'ChatsForm' => $form->createView(),
             'chats' => $chats,
-            'users' => $users
+            'users' => $users,
+            'title' => 'Chat'
         ]);
 }
 }

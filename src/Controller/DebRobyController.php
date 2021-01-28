@@ -19,18 +19,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DebRobyController extends AbstractController
 {
     /**
-     * @Route("/roby/deb/test", name="app_deb_roby_test")
-     */
-    
-    public function index(): Response
-    {   
-        $em = $this->getDoctrine()->getManager('divaltoreel');
-
-        return $this->render('deb_roby/test.html.twig', [
-            'controller_name' => 'DebRobyController',
-        ]);
-    }
-    /**
      * @Route("/roby/deb", name="app_deb_roby")
      */
 
@@ -50,7 +38,8 @@ class DebRobyController extends AbstractController
         return $this->render('deb_roby/index.html.twig', [
             'controller_name' => 'DebRobyController',
             'Articles' => $Articles,
-            'test' => $Test
+            'test' => $Test,
+            'title' => 'Deb Roby'
         ]);
     }
 

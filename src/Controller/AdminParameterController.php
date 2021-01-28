@@ -24,7 +24,7 @@ class AdminParameterController extends AbstractController
     {
         return $this->render('admin_parameter/index.html.twig', [
             'controller_name' => 'AdminParameterController',
-            'title' => "Admin_Parameter"
+            'title' => "Administration des paramétres"
         ]);
     }
 }

@@ -15,6 +15,7 @@ class TestController extends AbstractController
     {
         return $this->render('test/index.html.twig', [
             'controller_name' => 'TestController',
+            'title' => 'Page Modéle de test'
         ]);
     }
 }

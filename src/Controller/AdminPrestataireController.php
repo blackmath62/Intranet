@@ -36,7 +36,8 @@ class AdminPrestataireController extends AbstractController
         return $this->render('admin_prestataire/index.html.twig', [
             'controller_name' => 'AdminPrestataireController',
             'prestataires' => $prestataires,
-            'formPresta' => $form->createView()
+            'formPresta' => $form->createView(),
+            'title' => 'Prestataire',
         ]);
     }
 
@@ -74,7 +75,8 @@ class AdminPrestataireController extends AbstractController
             }
             return $this->render('admin_prestataire/edit_prestataire.html.twig',[
                 'prestataireEditForm' => $form->createView(),
-                'prestataire' => $prestataire
+                'prestataire' => $prestataire,
+                'title' => 'Edition des prestataires'
             ]);
     }
 }

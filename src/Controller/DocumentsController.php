@@ -20,7 +20,8 @@ class DocumentsController extends AbstractController
         $documents = $repo->findBy(['societe' => 12]);
         return $this->render('documents/index.html.twig', [
             'controller_name' => 'DocumentsController',
-            'documents' => $documents
+            'documents' => $documents,
+            'title' => 'Documents Lhermitte'
         ]);
     }
     /**
@@ -32,7 +33,8 @@ class DocumentsController extends AbstractController
         $documents = $repo->findBy(['societe' => 15]);
         return $this->render('documents/index.html.twig', [
             'controller_name' => 'DocumentsController',
-            'documents' => $documents
+            'documents' => $documents,
+            'title' => 'Documents Roby'
         ]);
     }
 }

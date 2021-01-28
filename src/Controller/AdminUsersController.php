@@ -27,7 +27,7 @@ class AdminUsersController extends AbstractController
         $users =$repo->findAll();
         return $this->render('admin_users/index.html.twig', [
             'controller_name' => 'AdminUsersController',
-            'title' => 'gestion Utilisateurs',
+            'title' => 'Administration des Utilisateurs',
             'users' => $users,
         ]);
     }
@@ -79,7 +79,8 @@ class AdminUsersController extends AbstractController
             }
             return $this->render('admin_users/edit_user.html.twig',[
                 'userEditForm' => $form->createView(),
-                'user' => $user
+                'user' => $user,
+                'title' => 'Edition des Utilisateurs'
             ]);
     }
 

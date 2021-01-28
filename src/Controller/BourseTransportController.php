@@ -15,6 +15,7 @@ class BourseTransportController extends AbstractController
     {
         return $this->render('bourse_transport/index.html.twig', [
             'controller_name' => 'BourseTransportController',
+            'title' => 'Bourse aux transports'
         ]);
     }
 }

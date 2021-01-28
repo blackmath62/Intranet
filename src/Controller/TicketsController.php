@@ -88,6 +88,7 @@ class TicketsController extends AbstractController
             'tickets' => $tickets,
             'comments' => $comments,
             'status' => $status,
+            'title' => 'Tickets',
             'formTickets' => $form->createView()
         ]);
     }

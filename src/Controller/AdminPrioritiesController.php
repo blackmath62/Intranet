@@ -43,7 +43,7 @@ class AdminPrioritiesController extends AbstractController
                 'controller_name' => 'AdminprioritiesController',
                 'priorities' => $priorities,
                 'formPriorities' => $form->createView(),
-                'title' => "Paramétres_priorities"
+                'title' => "Administration des priorités"
             ]);
     }
 
@@ -81,7 +81,8 @@ class AdminPrioritiesController extends AbstractController
             }
             return $this->render('admin_priorities/edit_priorities.html.twig',[
                 'prioritiesEditForm' => $form->createView(),
-                'priorities' => $priorities
+                'priorities' => $priorities,
+                'title' => 'Edition des priorités'
             ]);
     }
 }

@@ -173,16 +173,13 @@ class CommentsController extends AbstractController
 
         }
 
-
-
-
-
         return $this->render('comments/index.html.twig', [
             'ticket' => $ticket,
             'comments' => $comments,
             'formComment' => $formComment->createView(),
             'formstatu' => $formEditStatut->createView(),
             'formSendTicket' => $formSendTicket->createView(),
+            'title' => 'Ajout de Commentaires',
             'formSendAnnuaireTicket' => $formSendAnnuaireTicket->createView()
         ]);
     }

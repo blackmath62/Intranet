@@ -68,7 +68,7 @@ class AdminAnnuaireController extends AbstractController
             'annuaires' => $annuaires,
             'societes' => $societes,
             'formAnnuaire' => $formAddAnnuaire->createView(),
-            'title' => "Admin Annuaire"
+            'title' => "Administration de l'Annuaire"
             ]);
 
     }

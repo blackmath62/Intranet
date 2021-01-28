@@ -41,7 +41,7 @@ class AdminServicesController extends AbstractController
                 'controller_name' => 'AdminserviceController',
                 'services' => $services,
                 'formService' => $form->createView(),
-                'title' => "Paramétres_Société"
+                'title' => "Administration des services"
             ]);
     }
 
@@ -79,7 +79,8 @@ class AdminServicesController extends AbstractController
             }
             return $this->render('admin_services/edit_services.html.twig',[
                 'serviceEditForm' => $form->createView(),
-                'services' => $service
+                'services' => $service,
+                'title' => 'Edition des services'
             ]);
     }
 }

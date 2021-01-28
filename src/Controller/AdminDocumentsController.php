@@ -99,6 +99,7 @@ class AdminDocumentsController extends AbstractController
 
             }
             return $this->render('admin_documents/edit_documents.html.twig',[
+                'title' => 'Edition de Société',
                 'documentEditForm' => $form->createView(),
                 'documents' => $documents
             ]);

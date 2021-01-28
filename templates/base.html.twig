@@ -43,6 +43,7 @@
   <link rel="stylesheet" href="{{ asset("plugins/fullcalendar-daygrid/main.min.css") }}">
   <link rel="stylesheet" href="{{ asset("plugins/fullcalendar-timegrid/main.min.css") }}">
   <link rel="stylesheet" href="{{ asset("plugins/fullcalendar-bootstrap/main.min.css") }}">
+  <title>{% block title %}{% endblock %}</title>
 		{% endblock %}
 	</head>
 	<body class="hold-transition sidebar-mini">
@@ -116,7 +117,7 @@
 			<div
 				class="sidebar">
 				<!-- Brand Logo -->
-				<a class="brand-link">
+				<a class="brand-link" href="{{path('app_home')}}">
 					<img src="{{ asset("dist/img/AdminLTELogo.png")}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
 					<span class="brand-text font-weight-light">Intranet Axis</span>
 				</a>
@@ -127,7 +128,7 @@
 						<li class="nav-header">Général</li>
 						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
-								<a href="" class="nav-link">
+								<a href="{{path('app_home')}}" class="nav-link">
 									<i class="nav-icon fas fa-newspaper"></i>
 									<p>
 										Actualités à faire
