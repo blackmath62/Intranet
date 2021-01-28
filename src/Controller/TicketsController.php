@@ -2,19 +2,38 @@
 
 namespace App\Controller;
 
+use DateTime;
+use App\Entity\Tickets;
 use App\Form\TicketsType;
+use App\Repository\StatusRepository;
 use App\Repository\TicketsRepository;
 use App\Repository\CommentsRepository;
-use App\Repository\StatusRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class TicketsController extends AbstractController
 {
+    
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    public function __construct( EntityManagerInterface $entityManager)
+    {
+
+        $this->entityManager = $entityManager;
+    }
+
+    
     /**
      * @Route("/tickets", name="app_tickets")
      */
@@ -72,6 +91,61 @@ class TicketsController extends AbstractController
             'formTickets' => $form->createView()
         ]);
     }
+    // Export Excel
 
-    
+    private function getData(): array
+    {
+        /**
+         * @var $ticket Ticket[]
+         */
+        $list = [];
+        $tickets = $this->entityManager->getRepository(Tickets::class)->findAll();
+
+        foreach ($tickets as $ticket) {
+            $list[] = [
+                $ticket->getCreatedAt(),
+                'Ticket' . $ticket->getId() . ' : ' . $ticket->getTitle(),
+                $ticket->getStatu()->getTitle(),
+                $ticket->getPrestataire()->getNom(),
+                
+                
+            ];
+        }
+        return $list;
+    }
+
+    /**
+     * @Route("/export",  name="app_export")
+     */
+    public function export()
+    {
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setTitle('Tickets List');
+        // Entête de colonne
+        $sheet->getCell('A1')->setValue('Date d\'ouverture');
+        $sheet->getCell('B1')->setValue('title');
+        $sheet->getCell('C1')->setValue('Statut');
+        $sheet->getCell('D1')->setValue('Prestataire');
+
+        // Increase row cursor after header write
+            $sheet->fromArray($this->getData(),null, 'A2', true);
+        
+
+        $writer = new Xlsx($spreadsheet);
+
+        // Create a Temporary file in the system
+        $d = new DateTime('NOW');
+        $dateTime = $d->format('Ymd-His') ;
+        $fileName = 'ticket' . $dateTime . '.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+
+        $writer->save($temp_file);
+        // Return the excel file as an attachment
+        return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+  
+        //return $this->redirectToRoute('app_tickets');
+    }
 }

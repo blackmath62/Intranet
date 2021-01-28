@@ -99,7 +99,7 @@ class CommentsController extends AbstractController
                 $email = (new Email())
                     ->from('intranet@groupe-axis.fr')
                     ->to($data->getEmail())
-                    ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle())
+                    ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle() . " => " . $ticket->getStatu()->getTitle())
                     ->html($this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]));
                 $mailer->send($email);
 
@@ -148,7 +148,7 @@ class CommentsController extends AbstractController
                 $email = (new Email())
                     ->from('intranet@groupe-axis.fr')
                     ->to($data->getMail())
-                    ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle())
+                    ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle() . " => " . $ticket->getStatu()->getTitle())
                     ->html($this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendAnnuaireTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]));
                 $mailer->send($email);
 

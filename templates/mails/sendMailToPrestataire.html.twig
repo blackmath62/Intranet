@@ -93,7 +93,11 @@
 												</span>
 											</strong>
 											{{ ticket.priority.title}}
-										</span>
+											{% if ticket.prestataire %}
+											assigné à 
+											{{ ticket.prestataire.nom }}
+											{% endif %}
+											</span>
 									</span>
 								</p>
 							</td>
