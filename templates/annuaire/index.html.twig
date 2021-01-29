@@ -24,25 +24,25 @@
                             <tbody>
                                 {% for annuaire in annuaires %}
                                     <tr id="<?= $id ?>">
-                                        <td class="text-center" id="{{ annuaire.id }}">
+                                        <td class="text-center">
                                             <a class="text-center" style="max-width: 40px;">{{annuaire.interne}}</a>
                                         </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
+                                        <td class="text-center">
                                             <a class="text-center">{{annuaire.nom}}</a>
                                         </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
+                                        <td class="text-center">
                                             <a class="text-center">{{ annuaire.exterieur}}</a>
                                         </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
+                                        <td class="text-center">
                                             <a class="text-center">{{annuaire.mail}}</a>
                                         </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
+                                        <td class="text-center">
                                             <a class="text-center">{{annuaire.fonction}}</a>
                                         </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
+                                        <td class="text-center">
                                             <a class="text-center">{{ annuaire.societe.nom }}</a>
                                         </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
+                                        <td class="text-center">
                                             <a class="text-center">{{annuaire.portable}}</a>
                                         </td>
                                     {% endfor %}
