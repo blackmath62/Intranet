@@ -42,8 +42,8 @@ security:
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/roby, roles: ROLE_ROBY }
-        - { path: ^/lhermitte, roles: ROLE_LHERMITTE }
+        - { path: ^/Roby, roles: ROLE_ROBY }
+        - { path: ^/Lhermitte, roles: ROLE_LHERMITTE }
 
     
     role_hierarchy:

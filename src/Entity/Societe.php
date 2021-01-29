@@ -68,6 +68,11 @@ class Societe
      */
     private $img;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $parameter;
+
     public function __construct()
     {
         $this->annuaires = new ArrayCollection();
@@ -261,6 +266,18 @@ class Societe
     public function setImg(?string $img): self
     {
         $this->img = $img;
+
+        return $this;
+    }
+
+    public function getParameter(): ?string
+    {
+        return $this->parameter;
+    }
+
+    public function setParameter(string $parameter): self
+    {
+        $this->parameter = $parameter;
 
         return $this;
     }
