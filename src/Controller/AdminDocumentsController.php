@@ -7,13 +7,15 @@ use DateTime;
 use App\Entity\Documents;
 use App\Form\EditDocumentsType;
 use App\Form\AdminDocumentsType;
-use App\Repository\DocumentsRepository;
 use App\Repository\SocieteRepository;
+use App\Repository\DocumentsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /**
  * @IsGranted("ROLE_ADMIN")
@@ -23,7 +25,7 @@ class AdminDocumentsController extends AbstractController
     /**
      * @Route("/admin/documents", name="app_admin_documents")
      */
-    public function index(Request $request, DocumentsRepository $repo, SocieteRepository $repoSociete)
+    public function index(Request $request, DocumentsRepository $repo, SocieteRepository $repoSociete, SluggerInterface $slugger)
     {
         $document = new Documents();
         $user = $this->getUser();
@@ -31,22 +33,38 @@ class AdminDocumentsController extends AbstractController
         $form->handleRequest($request);
         
             if($form->isSubmitted() && $form->isValid()){
-                // On récupére l'identifiant de la société
+                
+            // On récupére le fichier dans le formulaire
+            
+             $file = $form->get('url')->getData();
+
+             if ($file) {
+                 // On récupére l'identifiant de la société
                 $fileSoc = $form->getData()->getSociete()->getId();
                 // On la cherche dans la BDD
                 $societe = $repoSociete->findOneBy(['id' => $fileSoc]);
-                // On récupére l'Url dans le formulaire
-                $file = $form['url']->getData();
-                // On enregistre le fichier dans le dossier de la société avec son nom d'origine
-                $file->move($this->getParameter($societe->getDossier()), $file->getClientOriginalName());
-                // on assigne la date de création
-                $document->setCreatedAt(new DateTime());
+                 $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                 // this is needed to safely include the file name as part of the URL
+                 $safeFilename = $slugger->slug($originalFilename);
+                 $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+                 // Move the file to the directory where brochures are stored
+                 try {
+                     $file->move(
+                         $this->getParameter($societe->getParameter(), $file->getClientOriginalName()),
+                         $newFilename
+                     );
+                 } catch (FileException $e) {
+                     // ... handle exception if something happens during file upload
+                 }
+                 // updates the 'Filename' property to store the PDF file name
+                 // instead of its contents
+                 $document->setUrl($newFilename)
+                 // on assigne la date de création
+                           ->setCreatedAt(new DateTime()) 
                 // On assigne l'utilisateur
-                $document->setUser($user);
-                // On assigne le nom du fichier
-                $document->setUrl($file->getClientOriginalName());
-                // On intégre dans la BDD
-                
+                           ->setUser($user);
+             }
+
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($document);
                 $em->flush();

@@ -12,12 +12,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DocumentsController extends AbstractController
 {
     /**
-     * @Route("/lhermitte/documents", name="app_lhermitte_documents")
+     * @Route("/Lh/documents", name="app_lhermitte_documents")
      */
     public function Lhermitte_Documents(DocumentsRepository $repo)
     {
         // TODO JEROME gérer le numéro de société ci dessous
-        $documents = $repo->findBy(['societe' => 12]);
+        $documents = $repo->findBy(['societe' => 1]);
         return $this->render('documents/index.html.twig', [
             'controller_name' => 'DocumentsController',
             'documents' => $documents,
@@ -25,7 +25,7 @@ class DocumentsController extends AbstractController
         ]);
     }
     /**
-     * @Route("/Roby/documents", name="app_Roby_documents")
+     * @Route("/Rb/documents", name="app_Roby_documents")
      */
     public function Roby_Documents(DocumentsRepository $repo)
     {
