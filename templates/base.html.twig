@@ -190,10 +190,11 @@
 							</li>
 						{% endif %}
 						<!-- Fin Table Commune -->
-						{% if is_granted('ROLE_LHERMITTE') %}
 							<!-- Table Menu Lhermitte-->
 
 							<li class="nav-header">Lhermitte</li>
+						{% if is_granted('ROLE_LHERMITTE') %}
+
 							<li class="nav-item has-treeview">
 								<a href="" class="nav-link">
 									<i class="nav-icon fas fa-tachometer-alt"></i>
@@ -243,6 +244,7 @@
 									</li>
 								</ul>
 							</li>
+						{% endif %}
 							<li class="nav-item">
 								<a href="{{path('app_lhermitte_documents')}}" class="nav-link">
 									<i class="nav-icon fas fa-copy"></i>
@@ -251,6 +253,7 @@
 									</p>
 								</a>
 							</li>
+						{% if is_granted('ROLE_LHERMITTE') %}
 							<li class="nav-item">
 								<a href="" class="nav-link">
 									<i class="nav-icon fas fa-fw fa-truck"></i>
@@ -262,9 +265,9 @@
 							</li>
 							<!--Fin Table Menu Lhermitte -->
 						{% endif %}
-						{% if is_granted('ROLE_ROBY') %}
 							<!--Table Menu Roby -->
 							<li class="nav-header">Roby</li>
+						{% if is_granted('ROLE_ROBY') %}
 							<li class="nav-item has-treeview">
 								<a href="" class="nav-link">
 									<i class="nav-icon fas fa-tachometer-alt"></i>
@@ -294,6 +297,7 @@
 									<p>Planning</p>
 								</a>
 							</li>
+							{% endif %}
 							<li class="nav-item">
 								<a href="{{path('app_Roby_documents')}}" class="nav-link">
 									<i class="nav-icon fas fa-copy"></i>
@@ -301,7 +305,6 @@
 								</a>
 							</li>
 							<!--fin Table Menu Roby -->
-						{% endif %}
 					</ul>
 				</nav>
 			</div>
