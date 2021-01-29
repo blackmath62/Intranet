@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ title }}{% endblock %}
 {% block body %}
-
+{% if is_granted('ROLE_ADMIN') %}
         <!-- START ACCORDION & CAROUSEL-->
         <h5 class="mt-4 mb-2">Actualités</h5>
 
@@ -146,5 +146,5 @@
         </div>
         <!-- /.row -->
         <!-- END ACCORDION & CAROUSEL-->
-
+{% endif %}
 {% endblock %}
