@@ -49,6 +49,17 @@ class EditStatusType extends AbstractType
                     'class' => 'col-12 form-control my-colorpicker2'
                 ]
             ])
+            ->add('fa', TextType::class, [
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Merci de choisir un fa-****** icone'
+                    ])
+                ],
+                'required' => true,
+                'attr' => [
+                    'class' => 'col-12 form-control'
+                ]
+            ])
             ->add('ClosedAt', DateType::class, [
                 'placeholder' => [
                     'year' => 'Année', 'month' => 'Mois', 'day' => 'Jour',

@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManager;
 
 /**
  * @method Mouv|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,32 +18,33 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  */
 class MouvRepository extends ServiceEntityRepository
 {
+
     private $connection;
     public function __construct(ManagerRegistry $registry)
     {
+        $this->connection = $registry->getManager('divaltoreel'); 
         parent::__construct($registry, Mouv::class);
-        $this->connection = $registry->getManager('divaltoreel');
     }
     /**
      * @return Mouv[]
      */
     public function test($value):array
     {
-        
-        
-        $conn = $this->connection();
-        
+        $numeroFacture = 19000100;
+        //$entityManager = $this->connection;
+        $connect = $this->getEntityManager()->getConnection();
+        $conn = $this->getEntityManager()->getConnection();
+        dd($conn);
+
         $sql = '
-        SELECT * FROM Mouv p
-        WHERE p.fano > :fano
-        ORDER BY p.fano ASC
-        ';
+            SELECT * FROM mouv p
+            WHERE p.fano > :fano
+            ORDER BY p.fano ASC
+            ';
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['fano' => $value['fano']]);
-        
-        //dd($this->connection);
+        $stmt->execute(['fano' => $value]);
+
         // returns an array of arrays (i.e. a raw data set)
-        //dd($stmt);
         return $stmt->fetchAll();
 
     }

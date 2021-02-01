@@ -31,6 +31,7 @@ class AdminPrioritiesController extends AbstractController
                 ->add("title")
                 ->add('color')
                 ->add('textColor')
+                ->add('fa')
                 ->getForm();
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {

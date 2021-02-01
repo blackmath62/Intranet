@@ -28,6 +28,7 @@ class AdminStatusController extends AbstractController
                 ->add("title")
                 ->add('backgroundColor')
                 ->add('textColor')
+                ->add('fa')
                 ->getForm();
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {

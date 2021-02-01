@@ -75,6 +75,7 @@ class EditUsersType extends AbstractType
                         'EV' => "ROLE_EV",
                         'MA' => "ROLE_MA",
                         'ME' => "ROLE_ME",
+                        'COMPTA' => "ROLE_COMPTA",
                     ],
                     'choice_attr' => [
                         'Utilisateur' => ['class' => 'm-3 text-primary'],
@@ -84,7 +85,8 @@ class EditUsersType extends AbstractType
                         'HP' => ['class' => 'm-3'],
                         'EV' => ['class' => 'm-3'],
                         'MA' => ['class' => 'm-3'],
-                        'ME' => ['class' => 'm-3']
+                        'ME' => ['class' => 'm-3'],
+                        'COMPTA' => ['class' => 'm-3'],
                     ],
                     'expanded' => true,
                     'multiple' => true,

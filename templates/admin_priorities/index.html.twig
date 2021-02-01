@@ -50,7 +50,9 @@
 										</span>
 									</div>
 								</div>
-								<button type="submit" class="btn btn-lg btn-dark mx-auto m-5">Créer un priorities</button>
+								<label>{{ form_label(formPriorities.fa) }}: <a href='https://fontawesome.com/'> www.fontawesome.com </a></label>
+								{{ form_widget(formPriorities.fa, {'attr' : {'placeholder' : "icon fa-****", 'class' : "form-control"}})}}
+								<button type="submit" class="btn btn-lg btn-dark mx-auto m-5">Créer une priorities</button>
 
 							</div>
 							{{ form_end(formPriorities)}}
@@ -75,7 +77,10 @@
 												<span>Couleur Texte</span>
 											</th>
                                             <th class="text-center">
-												<span>Rendu</span>
+												<span>Rendu Texte</span>
+											</th>
+											<th class="text-center">
+												<span>Rendu Icone</span>
 											</th>
 											<th class="text-center">
 												<span>Action</span>
@@ -98,7 +103,10 @@
 														{{prioritie.textColor}}
 													</td>
                                                     <td class="text-center">
-														<button class="btn btn-xl" style= "background-color: {{ prioritie.color }}; color: {{ prioritie.textColor }}";>{{ prioritie.title }}</button>
+														<a class="btn btn-xl" style= "background-color: {{ prioritie.color }}; color: {{ prioritie.textColor }}";><i class=" pr-1 fas {{ prioritie.fa }}"></i>{{ prioritie.title }}</a>
+													</td>
+													<td class="text-center">
+														<a class="btn btn-xl" style= "background-color: {{ prioritie.color }}; color: {{ prioritie.textColor }}";><i class=" fas {{ prioritie.fa }}"></i></a>
 													</td>
 													<td class="text-center">
 														<a href="{{ path('app_edit_priorities', {'id' : prioritie.id}) }}" type="button" class="btn btn-warning">
@@ -125,7 +133,10 @@
 												<span>Couleur Texte</span>
 											</th>
                                             <th class="text-center">
-												<span>Rendu</span>
+												<span>Rendu Texte</span>
+											</th>
+											<th class="text-center">
+												<span>Rendu Icone</span>
 											</th>
 											<th class="text-center">
 												<span>Action</span>

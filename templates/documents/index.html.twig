@@ -83,7 +83,7 @@
 				</div>
 			</div>
 
-
+{% if is_granted('ROLE_ADMIN') %}
 			<div class="card collapsed-card card-warning">
 				<div class="card-header">
 					<h3 class="card-title">Documents périmés</h3>
@@ -161,6 +161,6 @@
 					</div>
 				<!-- /.card-footer-->
 			</div>
-
+{{ endif }}
 		</section>
 	{% endblock %}

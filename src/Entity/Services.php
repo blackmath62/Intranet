@@ -49,6 +49,11 @@ class Services
      */
     private $textColor;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $fa;
+
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
@@ -146,6 +151,18 @@ class Services
     public function setTextColor(string $textColor): self
     {
         $this->textColor = $textColor;
+
+        return $this;
+    }
+
+    public function getFa(): ?string
+    {
+        return $this->fa;
+    }
+
+    public function setFa(string $fa): self
+    {
+        $this->fa = $fa;
 
         return $this;
     }

@@ -50,6 +50,9 @@
 										</span>
 									</div>
 								</div>
+									<label>{{ form_label(formStatus.fa) }}: <a href='https://fontawesome.com/'> www.fontawesome.com </a></label>
+								{{ form_widget(formStatus.fa, {'attr' : {'placeholder' : "Mettre un icone fa-*****", 'class' : "form-control"}})}}
+
 								<button type="submit" class="btn btn-lg btn-dark mx-auto m-5">Créer un Status</button>
 
 							</div>
@@ -75,7 +78,10 @@
 												<span>Couleur Texte</span>
 											</th>
                                             <th class="text-center">
-												<span>Rendu</span>
+												<span>Rendu Texte</span>
+											</th>
+											<th class="text-center">
+												<span>Rendu Icone</span>
 											</th>
 											<th class="text-center">
 												<span>Action</span>
@@ -98,7 +104,10 @@
 														{{statut.textColor}}
 													</td>
                                                     <td class="text-center">
-														<button class="btn btn-xl" style= "background-color: {{ statut.backgroundColor }}; color: {{ statut.textColor }}";>{{ statut.title }}</button>
+														<a class="btn btn-xl" style= "background-color: {{ statut.backgroundColor }}; color: {{ statut.textColor }}";><i class="pr-1 fas {{ statut.fa }}"></i>{{ statut.title }}</a>
+													</td>
+													<td class="text-center">
+														<a class="btn btn-xl" style= "background-color: {{ statut.backgroundColor }}; color: {{ statut.textColor }}";><i class="fas {{ statut.fa }}"></i></a>
 													</td>
 													<td class="text-center">
 														<a href="{{ path('app_edit_status', {'id' : statut.id}) }}" type="button" class="btn btn-warning">
@@ -125,7 +134,10 @@
 												<span>Couleur Texte</span>
 											</th>
                                             <th class="text-center">
-												<span>Rendu</span>
+												<span>Rendu Texte</span>
+											</th>
+											<th class="text-center">
+												<span>Rendu Icone</span>
 											</th>
 											<th class="text-center">
 												<span>Action</span>

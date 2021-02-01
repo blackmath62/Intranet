@@ -44,6 +44,11 @@ class Priorities
      */
     private $closedAt;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $fa;
+
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
@@ -129,6 +134,18 @@ class Priorities
     public function setClosedAt(?\DateTimeInterface $closedAt): self
     {
         $this->closedAt = $closedAt;
+
+        return $this;
+    }
+
+    public function getFa(): ?string
+    {
+        return $this->fa;
+    }
+
+    public function setFa(string $fa): self
+    {
+        $this->fa = $fa;
 
         return $this;
     }

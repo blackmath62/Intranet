@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-info">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3 class="card-title text-center">{{ title }}</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Code Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>facture</span></th>
+                                    <th class="text-center"><span>date Facture</span></th>
+                                    <th class="text-center"><span>Montant</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            
+                                {% for ent in ents %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ ent.repr0001 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ent.tiers}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center" style="max-width: 40px;">{{ent.nom}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ent.pino}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ ent.pidt}}</a>
+                                        </td>
+                                         <td class="text-center">
+                                            <a class="text-center">{{ ent.htpdtmt}}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                           
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Code Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>facture</span></th>
+                                    <th class="text-center"><span>date Facture</span></th>
+                                    <th class="text-center"><span>Montant</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+

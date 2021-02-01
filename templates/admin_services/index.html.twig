@@ -55,6 +55,10 @@
 										</span>
 									</div>
 								</div>
+								<label>{{ form_label(formService.fa) }}: <a href='https://fontawesome.com/'> www.fontawesome.com </a></label>
+								{{ form_widget(formService.fa, {'attr' : {'placeholder' : "Icone fa-*****", 'class' : "form-control"}})}}
+
+
 								<button type="submit" class="btn btn-lg btn-dark mx-auto m-5">Créer un service</button>
 
 							</div>
@@ -80,7 +84,10 @@
 												<span>Couleur Texte</span>
 											</th>
                                             <th class="text-center">
-												<span>Rendu</span>
+												<span>Rendu Texte</span>
+											</th>
+											<th class="text-center">
+												<span>Rendu Icone</span>
 											</th>
 											<th class="text-center">
 												<span>Action</span>
@@ -103,7 +110,10 @@
 														{{service.textColor}}
 													</td>
                                                     <td class="text-center">
-														<button class="btn btn-xl" style= "background-color: {{ service.color }}; color: {{ service.textColor }}";>{{ service.title }}</button>
+														<button class="btn btn-xl" style= "background-color: {{ service.color }}; color: {{ service.textColor }}";><i class="pr-1 fas {{ service.fa }}"></i>{{ service.title }}</button>
+													</td>
+													<td class="text-center">
+														<button class="btn btn-xl" style= "background-color: {{ service.color }}; color: {{ service.textColor }}";><i class="fas {{ service.fa }}"></i></button>
 													</td>
 													<td class="text-center">
 														<a href="{{ path('app_edit_service', {'id' : service.id}) }}" type="button" class="btn btn-warning">
@@ -131,7 +141,10 @@
 												<span>Couleur Texte</span>
 											</th>
                                             <th class="text-center">
-												<span>Rendu</span>
+												<span>Rendu Texte</span>
+											</th>
+											<th class="text-center">
+												<span>Rendu Icone</span>
 											</th>
 											<th class="text-center">
 												<span>Action</span>
