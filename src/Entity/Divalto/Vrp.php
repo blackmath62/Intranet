@@ -2,12 +2,14 @@
 
 namespace App\Entity\Divalto;
 
+use App\Entity\Divalto\Cli;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\VrpRepository;
+use Doctrine\Common\Collections\Collection;
+use App\Repository\Divalto\VrpRepository;
 
 /**
  * Vrp
- * @ORM\Entity
+ * @ORM\Entity //(repositoryClass="App\Repository\Divalto\VrpRepository")
  * @ORM\Table(name="VRP", indexes={@ORM\Index(name="INDEX_B_VRP", columns={"DOS", "CE1", "NOMABR", "VRP_ID"}), @ORM\Index(name="INDEX_C_VRP", columns={"DOS", "CE1", "TIERS", "VRP_ID"}), @ORM\Index(name="INDEX_E_VRP", columns={"DOS", "CE1", "PAY", "CPOSTAL", "NOMABR", "VRP_ID"}), @ORM\Index(name="INDEX_I_VRP", columns={"DOS", "CE1", "TEL", "VRP_ID"}), @ORM\Index(name="INDEX_T", columns={"DOS", "SALCOD", "VRP_ID"}), @ORM\Index(name="INDEX_W_VRP", columns={"DOS", "CE1", "TELCLE", "VRP_ID"}), @ORM\Index(name="INDEX_X_VRP", columns={"DOS", "CE1", "EMAIL", "VRP_ID"}), @ORM\Index(name="INDEX_Y", columns={"DOS", "CE1", "TELGSMCLE", "VRP_ID"})})
  */
 class Vrp
@@ -91,7 +93,7 @@ class Vrp
 
     /**
      * @var string
-     *
+     * @ORM\OneToMany(targetEntity=Cli::class, mappedBy="repr0001", orphanRemoval=true)
      * @ORM\Column(name="TIERS", type="string", length=20, nullable=false, options={"fixed"=true,"comment"="Code tiers"})
      */
     private $tiers;
@@ -1204,5 +1206,14 @@ class Vrp
         return $this->vrpId;
     }
 
+    /**
+     * @return Collection|Cli[]
+     */
+    public function getRepr0001(): Collection 
+    {
+        return $this->repr0001;
+    }
 
+
+   
 }

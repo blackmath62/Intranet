@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-info">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3 class="card-title text-center">Liste des clients</h3>
+                        {{ form_start(clientForm, { 'attr' : { 'class' : 'ml-auto' }} ) }}
+                        <div class='d-flex'>
+                        <div class="p-1 mt-2">
+                        Selectionnez le commercial : 
+                        </div>
+                        <div class="p-1">
+                             {{ form_row(clientForm.repr0001) }}
+                        </div>
+                        
+                        <div class="p-1">
+                            {{ form_row(clientForm.Modifier)}}
+                        </div>
+                        </div>
+                        {{ form_end(clientForm)}}
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Code Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>rue</span></th>
+                                    <th class="text-center"><span>CP</span></th>
+                                    <th class="text-center"><span>Ville</span></th>
+                                    <th class="text-center"><span>Téléphone</span></th>
+                                    <th class="text-center"><span>Mail</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            
+                                {% for client in clients %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center">{{client.repr0001}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center" style="max-width: 40px;">{{client.tiers}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{client.nom}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ client.rue}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{client.cpostal}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{client.vil}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ client.tel }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{client.email}}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                           
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Code Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>rue</span></th>
+                                    <th class="text-center"><span>CP</span></th>
+                                    <th class="text-center"><span>Ville</span></th>
+                                    <th class="text-center"><span>Téléphone</span></th>
+                                    <th class="text-center"><span>Mail</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

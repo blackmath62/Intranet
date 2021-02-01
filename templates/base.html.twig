@@ -199,7 +199,7 @@
 								<a href="" class="nav-link">
 									<i class="nav-icon fas fa-tachometer-alt"></i>
 									<p>
-										States Lhermitte
+										States
 										<i class="fas fa-angle-left right"></i>
 									</p>
 								</a>
@@ -244,6 +244,61 @@
 									</li>
 								</ul>
 							</li>
+							<li class="nav-item">
+								<a href="{{path('app_lhermitte_clients_secteur')}}" class="nav-link">
+									<i class="nav-icon fas fa-address-book"></i>
+									<p>
+										Clients par Secteur
+									</p>
+								</a>
+							</li>
+						{% endif %}
+
+						{% if is_granted('ROLE_COMPTA') %}
+
+							<li class="nav-item has-treeview">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-calculator"></i>
+									<p>
+										Comptabilité
+										<i class="fas fa-angle-left right"></i>
+									</p>
+								</a>
+								<ul class="nav nav-treeview">
+									{% if is_granted('ROLE_COMPTA') %}
+										<li class="nav-item">
+											<a href="" class="nav-link">
+												<i class="nav-icon fas fa-circle text-danger"></i>
+												<p>Trous Factures</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="" class="nav-link">
+												<i class="nav-icon fas fa-euro-sign text-warning"></i>
+												<p>TVA</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="" class="nav-link">
+												<i class="nav-icon fas fa-fw fa-plane text-light"></i>
+												<p>DEB</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="" class="nav-link">
+												<i class="nav-icon fas fa-fw fa-smog text-info"></i>
+												<p>Brouillard</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="" class="nav-link">
+												<i class="nav-icon fas fa-fw fa-balance-scale text-success"></i>
+												<p>Balance</p>
+											</a>
+										</li>
+									{% endif %}
+								</ul>
+							</li>
 						{% endif %}
 							<li class="nav-item">
 								<a href="{{path('app_lhermitte_documents')}}" class="nav-link">
@@ -272,7 +327,7 @@
 								<a href="" class="nav-link">
 									<i class="nav-icon fas fa-tachometer-alt"></i>
 									<p>
-										States Roby
+										States
 										<i class="fas fa-angle-left right"></i>
 									</p>
 								</a>

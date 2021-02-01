@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Divalto;
 
 use App\Entity\Divalto\Fou;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

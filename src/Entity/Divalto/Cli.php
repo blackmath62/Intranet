@@ -2,12 +2,13 @@
 
 namespace App\Entity\Divalto;
 
+use App\Entity\Divalto\Vrp;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\CliRepository;
-//* @ORM\Entity(repositoryClass=CliRepository::class)
+use App\Repository\Divalto\CliRepository;
+// 
 /**
  * Cli
- * @ORM\Entity
+ * @ORM\Entity //(repositoryClass=CliRepository::class)
  * @ORM\Table(name="CLI", indexes={@ORM\Index(name="INDEX_B_CLI", columns={"DOS", "CE1", "NOMABR", "CLI_ID"}), @ORM\Index(name="INDEX_C_CLI", columns={"DOS", "CE1", "TIERS", "CLI_ID"}), @ORM\Index(name="INDEX_E_CLI", columns={"DOS", "CE1", "PAY", "CPOSTAL", "NOMABR", "CLI_ID"}), @ORM\Index(name="INDEX_F_CLI", columns={"CE4", "DOS", "CE1", "STAT_0001", "NOMABR", "CLI_ID"}), @ORM\Index(name="INDEX_G_CLI", columns={"CE4", "DOS", "CE1", "STAT_0001", "TIERS", "CLI_ID"}), @ORM\Index(name="INDEX_H_CLI", columns={"CE4", "DOS", "CE1", "STAT_0001", "PAY", "CPOSTAL", "CLI_ID"}), @ORM\Index(name="INDEX_I_CLI", columns={"DOS", "CE1", "TEL", "CLI_ID"}), @ORM\Index(name="INDEX_J_CLI", columns={"CE3", "DOS", "CE1", "TIERSGRP", "TIERS", "CLI_ID"}), @ORM\Index(name="INDEX_K_CLI", columns={"CE5", "DOS", "CE1", "STAT_0002", "NOMABR", "CLI_ID"}), @ORM\Index(name="INDEX_L_CLI", columns={"CE5", "DOS", "CE1", "STAT_0002", "TIERS", "CLI_ID"}), @ORM\Index(name="INDEX_M_CLI", columns={"CE5", "DOS", "CE1", "STAT_0002", "PAY", "CPOSTAL", "CLI_ID"}), @ORM\Index(name="INDEX_N_CLI", columns={"CE6", "DOS", "CE1", "STAT_0003", "NOMABR", "CLI_ID"}), @ORM\Index(name="INDEX_O_CLI", columns={"CE6", "DOS", "CE1", "STAT_0003", "TIERS", "CLI_ID"}), @ORM\Index(name="INDEX_P_CLI", columns={"CE6", "DOS", "CE1", "STAT_0003", "PAY", "CPOSTAL", "CLI_ID"}), @ORM\Index(name="INDEX_W_CLI", columns={"DOS", "CE1", "TELCLE", "CLI_ID"}), @ORM\Index(name="INDEX_X_CLI", columns={"DOS", "CE1", "EMAIL", "CLI_ID"}), @ORM\Index(name="INDEX_AMINI", columns={"DOS", "TIERSFOU", "CLI_ID"})})
  */
 class Cli
@@ -826,7 +827,7 @@ class Cli
 
     /**
      * @var string
-     *
+     * @ORM\ManyToOne(targetEntity=Vrp::class, inversedBy="tiers")
      * @ORM\Column(name="REPR_0001", type="string", length=20, nullable=false, options={"fixed"=true,"comment"="Représentants"})
      */
     private $repr0001;
@@ -3558,6 +3559,11 @@ class Cli
     public function getCliId(): ?int
     {
         return $this->cliId;
+    }
+
+    public function getVrp(): ?Vrp
+    {
+        return $this->vrp;
     }
 
 

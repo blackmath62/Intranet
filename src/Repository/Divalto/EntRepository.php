@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Divalto;
 
 use App\Entity\Divalto\Ent;
 use Doctrine\ORM\Query\ResultSetMapping;

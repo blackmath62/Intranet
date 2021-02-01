@@ -1,26 +1,28 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Divalto;
 
-use App\Entity\Divalto\Vrp;
+use App\Entity\Divalto\Cli;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Vrp|null find($id, $lockMode = null, $lockVersion = null)
- * @method Vrp|null findOneBy(array $criteria, array $orderBy = null)
- * @method Vrp[]    findAll()
- * @method Vrp[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Cli|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Cli|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Cli[]    findAll()
+ * @method Cli[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class VrpRepository extends ServiceEntityRepository
+class CliRepository extends ServiceEntityRepository
 {
+    private $connection;
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Vrp::class);
+        parent::__construct($registry, Cli::class);
+        $this->connection = $registry->getManager('divaltoreel');
     }
 
     // /**
-    //  * @return Vrp[] Returns an array of Vrp objects
+    //  * @return Cli[] Returns an array of Cli objects
     //  */
     /*
     public function findByExampleField($value)
@@ -38,7 +40,7 @@ class VrpRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Vrp
+    public function findOneBySomeField($value): ?Cli
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.exampleField = :val')

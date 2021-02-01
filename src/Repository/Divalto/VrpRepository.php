@@ -1,26 +1,28 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Divalto;
 
-use App\Entity\Divalto\Art;
+use App\Entity\Divalto\Vrp;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Art|null find($id, $lockMode = null, $lockVersion = null)
- * @method Art|null findOneBy(array $criteria, array $orderBy = null)
- * @method Art[]    findAll()
- * @method Art[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Vrp|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Vrp|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Vrp[]    findAll()
+ * @method Vrp[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ArtRepository extends ServiceEntityRepository
+class VrpRepository extends ServiceEntityRepository
 {
+    private $connection;
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Art::class);
+        parent::__construct($registry, Vrp::class);
+        $this->connection = $registry->getManager('divaltoreel');
     }
 
     // /**
-    //  * @return Art[] Returns an array of Art objects
+    //  * @return Vrp[] Returns an array of Vrp objects
     //  */
     /*
     public function findByExampleField($value)
@@ -38,7 +40,7 @@ class ArtRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Art
+    public function findOneBySomeField($value): ?Vrp
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.exampleField = :val')

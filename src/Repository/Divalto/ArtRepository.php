@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Divalto;
 
-use App\Entity\Divalto\Cli;
+use App\Entity\Divalto\Art;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Cli|null find($id, $lockMode = null, $lockVersion = null)
- * @method Cli|null findOneBy(array $criteria, array $orderBy = null)
- * @method Cli[]    findAll()
- * @method Cli[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Art|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Art|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Art[]    findAll()
+ * @method Art[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CliRepository extends ServiceEntityRepository
+class ArtRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Cli::class);
+        parent::__construct($registry, Art::class);
     }
 
     // /**
-    //  * @return Cli[] Returns an array of Cli objects
+    //  * @return Art[] Returns an array of Art objects
     //  */
     /*
     public function findByExampleField($value)
@@ -38,7 +38,7 @@ class CliRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Cli
+    public function findOneBySomeField($value): ?Art
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.exampleField = :val')

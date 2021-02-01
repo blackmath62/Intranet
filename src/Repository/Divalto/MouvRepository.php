@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Divalto;
 
 use DateTime;
 use App\Entity\Divalto\Mouv;
@@ -17,27 +17,33 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  */
 class MouvRepository extends ServiceEntityRepository
 {
+    private $connection;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Mouv::class);
+        $this->connection = $registry->getManager('divaltoreel');
     }
-
-    public function findBytest18($value)
+    /**
+     * @return Mouv[]
+     */
+    public function test($value):array
     {
-        echo "je suis un test </br>";
         
-        $entityManager = $this->getEntityManager();
-
-        $query = $entityManager->createQuery(
-            'SELECT p
-            FROM App\Entity\Divalto\Mouv p
-            WHERE p.fadt = :val1
-            ORDER BY p.fano ASC'
-        )->setParameter('val1', $value[0])
-        ;
-
-        // returns an array of Product objects
-        return $query->getResult();
+        
+        $conn = $this->connection();
+        
+        $sql = '
+        SELECT * FROM Mouv p
+        WHERE p.fano > :fano
+        ORDER BY p.fano ASC
+        ';
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['fano' => $value['fano']]);
+        
+        //dd($this->connection);
+        // returns an array of arrays (i.e. a raw data set)
+        //dd($stmt);
+        return $stmt->fetchAll();
 
     }
     
