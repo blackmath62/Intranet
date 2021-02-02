@@ -1492,23 +1492,9 @@ class Mouv
         return $this->ce1;
     }
 
-    public function setCe1(string $ce1): self
-    {
-        $this->ce1 = $ce1;
-
-        return $this;
-    }
-
     public function getCe2(): ?string
     {
         return $this->ce2;
-    }
-
-    public function setCe2(string $ce2): self
-    {
-        $this->ce2 = $ce2;
-
-        return $this;
     }
 
     public function getCe3(): ?string
@@ -1516,23 +1502,9 @@ class Mouv
         return $this->ce3;
     }
 
-    public function setCe3(string $ce3): self
-    {
-        $this->ce3 = $ce3;
-
-        return $this;
-    }
-
     public function getCe4(): ?string
     {
         return $this->ce4;
-    }
-
-    public function setCe4(string $ce4): self
-    {
-        $this->ce4 = $ce4;
-
-        return $this;
     }
 
     public function getCe5(): ?string
@@ -1540,23 +1512,9 @@ class Mouv
         return $this->ce5;
     }
 
-    public function setCe5(string $ce5): self
-    {
-        $this->ce5 = $ce5;
-
-        return $this;
-    }
-
     public function getCe6(): ?string
     {
         return $this->ce6;
-    }
-
-    public function setCe6(string $ce6): self
-    {
-        $this->ce6 = $ce6;
-
-        return $this;
     }
 
     public function getCe7(): ?string
@@ -1564,23 +1522,9 @@ class Mouv
         return $this->ce7;
     }
 
-    public function setCe7(string $ce7): self
-    {
-        $this->ce7 = $ce7;
-
-        return $this;
-    }
-
     public function getCe8(): ?string
     {
         return $this->ce8;
-    }
-
-    public function setCe8(string $ce8): self
-    {
-        $this->ce8 = $ce8;
-
-        return $this;
     }
 
     public function getCe9(): ?string
@@ -1588,23 +1532,9 @@ class Mouv
         return $this->ce9;
     }
 
-    public function setCe9(string $ce9): self
-    {
-        $this->ce9 = $ce9;
-
-        return $this;
-    }
-
     public function getCea(): ?string
     {
         return $this->cea;
-    }
-
-    public function setCea(string $cea): self
-    {
-        $this->cea = $cea;
-
-        return $this;
     }
 
     public function getCeb(): ?string
@@ -1612,23 +1542,9 @@ class Mouv
         return $this->ceb;
     }
 
-    public function setCeb(string $ceb): self
-    {
-        $this->ceb = $ceb;
-
-        return $this;
-    }
-
     public function getCec(): ?string
     {
         return $this->cec;
-    }
-
-    public function setCec(string $cec): self
-    {
-        $this->cec = $cec;
-
-        return $this;
     }
 
     public function getCed(): ?string
@@ -1636,23 +1552,9 @@ class Mouv
         return $this->ced;
     }
 
-    public function setCed(string $ced): self
-    {
-        $this->ced = $ced;
-
-        return $this;
-    }
-
     public function getCee(): ?string
     {
         return $this->cee;
-    }
-
-    public function setCee(string $cee): self
-    {
-        $this->cee = $cee;
-
-        return $this;
     }
 
     public function getCef(): ?string
@@ -1660,23 +1562,9 @@ class Mouv
         return $this->cef;
     }
 
-    public function setCef(string $cef): self
-    {
-        $this->cef = $cef;
-
-        return $this;
-    }
-
     public function getDos(): ?string
     {
         return $this->dos;
-    }
-
-    public function setDos(string $dos): self
-    {
-        $this->dos = $dos;
-
-        return $this;
     }
 
     public function getRef(): ?string
@@ -1684,23 +1572,9 @@ class Mouv
         return $this->ref;
     }
 
-    public function setRef(string $ref): self
-    {
-        $this->ref = $ref;
-
-        return $this;
-    }
-
     public function getSref1(): ?string
     {
         return $this->sref1;
-    }
-
-    public function setSref1(string $sref1): self
-    {
-        $this->sref1 = $sref1;
-
-        return $this;
     }
 
     public function getSref2(): ?string
@@ -1708,23 +1582,9 @@ class Mouv
         return $this->sref2;
     }
 
-    public function setSref2(string $sref2): self
-    {
-        $this->sref2 = $sref2;
-
-        return $this;
-    }
-
     public function getTicod(): ?string
     {
         return $this->ticod;
-    }
-
-    public function setTicod(string $ticod): self
-    {
-        $this->ticod = $ticod;
-
-        return $this;
     }
 
     public function getPicod(): ?string
@@ -1732,23 +1592,9 @@ class Mouv
         return $this->picod;
     }
 
-    public function setPicod(string $picod): self
-    {
-        $this->picod = $picod;
-
-        return $this;
-    }
-
     public function getTiers(): ?string
     {
         return $this->tiers;
-    }
-
-    public function setTiers(string $tiers): self
-    {
-        $this->tiers = $tiers;
-
-        return $this;
     }
 
     public function getPrefdvno(): ?string
@@ -1756,23 +1602,9 @@ class Mouv
         return $this->prefdvno;
     }
 
-    public function setPrefdvno(string $prefdvno): self
-    {
-        $this->prefdvno = $prefdvno;
-
-        return $this;
-    }
-
     public function getDvno(): ?string
     {
         return $this->dvno;
-    }
-
-    public function setDvno(string $dvno): self
-    {
-        $this->dvno = $dvno;
-
-        return $this;
     }
 
     public function getDvdt(): ?\DateTimeInterface
@@ -1780,23 +1612,9 @@ class Mouv
         return $this->dvdt;
     }
 
-    public function setDvdt(?\DateTimeInterface $dvdt): self
-    {
-        $this->dvdt = $dvdt;
-
-        return $this;
-    }
-
     public function getDvlg(): ?string
     {
         return $this->dvlg;
-    }
-
-    public function setDvlg(string $dvlg): self
-    {
-        $this->dvlg = $dvlg;
-
-        return $this;
     }
 
     public function getDvslg(): ?string
@@ -1804,23 +1622,9 @@ class Mouv
         return $this->dvslg;
     }
 
-    public function setDvslg(string $dvslg): self
-    {
-        $this->dvslg = $dvslg;
-
-        return $this;
-    }
-
     public function getDvce4(): ?string
     {
         return $this->dvce4;
-    }
-
-    public function setDvce4(string $dvce4): self
-    {
-        $this->dvce4 = $dvce4;
-
-        return $this;
     }
 
     public function getPrefcdno(): ?string
@@ -1828,23 +1632,9 @@ class Mouv
         return $this->prefcdno;
     }
 
-    public function setPrefcdno(string $prefcdno): self
-    {
-        $this->prefcdno = $prefcdno;
-
-        return $this;
-    }
-
     public function getCdno(): ?string
     {
         return $this->cdno;
-    }
-
-    public function setCdno(string $cdno): self
-    {
-        $this->cdno = $cdno;
-
-        return $this;
     }
 
     public function getCddt(): ?\DateTimeInterface
@@ -1852,23 +1642,9 @@ class Mouv
         return $this->cddt;
     }
 
-    public function setCddt(?\DateTimeInterface $cddt): self
-    {
-        $this->cddt = $cddt;
-
-        return $this;
-    }
-
     public function getCdlg(): ?string
     {
         return $this->cdlg;
-    }
-
-    public function setCdlg(string $cdlg): self
-    {
-        $this->cdlg = $cdlg;
-
-        return $this;
     }
 
     public function getCdslg(): ?string
@@ -1876,23 +1652,9 @@ class Mouv
         return $this->cdslg;
     }
 
-    public function setCdslg(string $cdslg): self
-    {
-        $this->cdslg = $cdslg;
-
-        return $this;
-    }
-
     public function getCdce4(): ?string
     {
         return $this->cdce4;
-    }
-
-    public function setCdce4(string $cdce4): self
-    {
-        $this->cdce4 = $cdce4;
-
-        return $this;
     }
 
     public function getCdenrno(): ?string
@@ -1900,23 +1662,9 @@ class Mouv
         return $this->cdenrno;
     }
 
-    public function setCdenrno(string $cdenrno): self
-    {
-        $this->cdenrno = $cdenrno;
-
-        return $this;
-    }
-
     public function getPrefblno(): ?string
     {
         return $this->prefblno;
-    }
-
-    public function setPrefblno(string $prefblno): self
-    {
-        $this->prefblno = $prefblno;
-
-        return $this;
     }
 
     public function getBlno(): ?string
@@ -1924,23 +1672,9 @@ class Mouv
         return $this->blno;
     }
 
-    public function setBlno(string $blno): self
-    {
-        $this->blno = $blno;
-
-        return $this;
-    }
-
     public function getBldt(): ?\DateTimeInterface
     {
         return $this->bldt;
-    }
-
-    public function setBldt(?\DateTimeInterface $bldt): self
-    {
-        $this->bldt = $bldt;
-
-        return $this;
     }
 
     public function getBllg(): ?string
@@ -1948,23 +1682,9 @@ class Mouv
         return $this->bllg;
     }
 
-    public function setBllg(string $bllg): self
-    {
-        $this->bllg = $bllg;
-
-        return $this;
-    }
-
     public function getBlslg(): ?string
     {
         return $this->blslg;
-    }
-
-    public function setBlslg(string $blslg): self
-    {
-        $this->blslg = $blslg;
-
-        return $this;
     }
 
     public function getBlce4(): ?string
@@ -1972,23 +1692,9 @@ class Mouv
         return $this->blce4;
     }
 
-    public function setBlce4(string $blce4): self
-    {
-        $this->blce4 = $blce4;
-
-        return $this;
-    }
-
     public function getPreffano(): ?string
     {
         return $this->preffano;
-    }
-
-    public function setPreffano(string $preffano): self
-    {
-        $this->preffano = $preffano;
-
-        return $this;
     }
 
     public function getFano(): ?string
@@ -1996,23 +1702,9 @@ class Mouv
         return $this->fano;
     }
 
-    public function setFano(string $fano): self
-    {
-        $this->fano = $fano;
-
-        return $this;
-    }
-
     public function getFadt(): ?\DateTimeInterface
     {
         return $this->fadt;
-    }
-
-    public function setFadt(?\DateTimeInterface $fadt): self
-    {
-        $this->fadt = $fadt;
-
-        return $this;
     }
 
     public function getFalg(): ?string
@@ -2020,23 +1712,9 @@ class Mouv
         return $this->falg;
     }
 
-    public function setFalg(string $falg): self
-    {
-        $this->falg = $falg;
-
-        return $this;
-    }
-
     public function getFaslg(): ?string
     {
         return $this->faslg;
-    }
-
-    public function setFaslg(string $faslg): self
-    {
-        $this->faslg = $faslg;
-
-        return $this;
     }
 
     public function getFace4(): ?string
@@ -2044,23 +1722,9 @@ class Mouv
         return $this->face4;
     }
 
-    public function setFace4(string $face4): self
-    {
-        $this->face4 = $face4;
-
-        return $this;
-    }
-
     public function getBpno(): ?string
     {
         return $this->bpno;
-    }
-
-    public function setBpno(string $bpno): self
-    {
-        $this->bpno = $bpno;
-
-        return $this;
     }
 
     public function getBpdt(): ?\DateTimeInterface
@@ -2068,23 +1732,9 @@ class Mouv
         return $this->bpdt;
     }
 
-    public function setBpdt(?\DateTimeInterface $bpdt): self
-    {
-        $this->bpdt = $bpdt;
-
-        return $this;
-    }
-
     public function getOp(): ?string
     {
         return $this->op;
-    }
-
-    public function setOp(string $op): self
-    {
-        $this->op = $op;
-
-        return $this;
     }
 
     public function getUsercr(): ?string
@@ -2092,23 +1742,9 @@ class Mouv
         return $this->usercr;
     }
 
-    public function setUsercr(string $usercr): self
-    {
-        $this->usercr = $usercr;
-
-        return $this;
-    }
-
     public function getUsermo(): ?string
     {
         return $this->usermo;
-    }
-
-    public function setUsermo(string $usermo): self
-    {
-        $this->usermo = $usermo;
-
-        return $this;
     }
 
     public function getDepo(): ?string
@@ -2116,23 +1752,9 @@ class Mouv
         return $this->depo;
     }
 
-    public function setDepo(string $depo): self
-    {
-        $this->depo = $depo;
-
-        return $this;
-    }
-
     public function getEtb(): ?string
     {
         return $this->etb;
-    }
-
-    public function setEtb(string $etb): self
-    {
-        $this->etb = $etb;
-
-        return $this;
     }
 
     public function getProjet(): ?string
@@ -2140,23 +1762,9 @@ class Mouv
         return $this->projet;
     }
 
-    public function setProjet(string $projet): self
-    {
-        $this->projet = $projet;
-
-        return $this;
-    }
-
     public function getMarche(): ?string
     {
         return $this->marche;
-    }
-
-    public function setMarche(string $marche): self
-    {
-        $this->marche = $marche;
-
-        return $this;
     }
 
     public function getDes(): ?string
@@ -2164,23 +1772,9 @@ class Mouv
         return $this->des;
     }
 
-    public function setDes(string $des): self
-    {
-        $this->des = $des;
-
-        return $this;
-    }
-
     public function getReffo(): ?string
     {
         return $this->reffo;
-    }
-
-    public function setReffo(string $reffo): self
-    {
-        $this->reffo = $reffo;
-
-        return $this;
     }
 
     public function getRepr0001(): ?string
@@ -2188,23 +1782,9 @@ class Mouv
         return $this->repr0001;
     }
 
-    public function setRepr0001(string $repr0001): self
-    {
-        $this->repr0001 = $repr0001;
-
-        return $this;
-    }
-
     public function getRepr0002(): ?string
     {
         return $this->repr0002;
-    }
-
-    public function setRepr0002(string $repr0002): self
-    {
-        $this->repr0002 = $repr0002;
-
-        return $this;
     }
 
     public function getRepr0003(): ?string
@@ -2212,23 +1792,9 @@ class Mouv
         return $this->repr0003;
     }
 
-    public function setRepr0003(string $repr0003): self
-    {
-        $this->repr0003 = $repr0003;
-
-        return $this;
-    }
-
     public function getEnrno(): ?string
     {
         return $this->enrno;
-    }
-
-    public function setEnrno(string $enrno): self
-    {
-        $this->enrno = $enrno;
-
-        return $this;
     }
 
     public function getTacod(): ?string
@@ -2236,23 +1802,9 @@ class Mouv
         return $this->tacod;
     }
 
-    public function setTacod(string $tacod): self
-    {
-        $this->tacod = $tacod;
-
-        return $this;
-    }
-
     public function getRemcod(): ?string
     {
         return $this->remcod;
-    }
-
-    public function setRemcod(string $remcod): self
-    {
-        $this->remcod = $remcod;
-
-        return $this;
     }
 
     public function getTafamr(): ?string
@@ -2260,23 +1812,9 @@ class Mouv
         return $this->tafamr;
     }
 
-    public function setTafamr(string $tafamr): self
-    {
-        $this->tafamr = $tafamr;
-
-        return $this;
-    }
-
     public function getTafamrx(): ?string
     {
         return $this->tafamrx;
-    }
-
-    public function setTafamrx(string $tafamrx): self
-    {
-        $this->tafamrx = $tafamrx;
-
-        return $this;
     }
 
     public function getRefamr(): ?string
@@ -2284,23 +1822,9 @@ class Mouv
         return $this->refamr;
     }
 
-    public function setRefamr(string $refamr): self
-    {
-        $this->refamr = $refamr;
-
-        return $this;
-    }
-
     public function getRefamrx(): ?string
     {
         return $this->refamrx;
-    }
-
-    public function setRefamrx(string $refamrx): self
-    {
-        $this->refamrx = $refamrx;
-
-        return $this;
     }
 
     public function getCofamr(): ?string
@@ -2308,23 +1832,9 @@ class Mouv
         return $this->cofamr;
     }
 
-    public function setCofamr(string $cofamr): self
-    {
-        $this->cofamr = $cofamr;
-
-        return $this;
-    }
-
     public function getCofamv0001(): ?string
     {
         return $this->cofamv0001;
-    }
-
-    public function setCofamv0001(string $cofamv0001): self
-    {
-        $this->cofamv0001 = $cofamv0001;
-
-        return $this;
     }
 
     public function getCofamv0002(): ?string
@@ -2332,23 +1842,9 @@ class Mouv
         return $this->cofamv0002;
     }
 
-    public function setCofamv0002(string $cofamv0002): self
-    {
-        $this->cofamv0002 = $cofamv0002;
-
-        return $this;
-    }
-
     public function getCofamv0003(): ?string
     {
         return $this->cofamv0003;
-    }
-
-    public function setCofamv0003(string $cofamv0003): self
-    {
-        $this->cofamv0003 = $cofamv0003;
-
-        return $this;
     }
 
     public function getDev(): ?string
@@ -2356,23 +1852,9 @@ class Mouv
         return $this->dev;
     }
 
-    public function setDev(string $dev): self
-    {
-        $this->dev = $dev;
-
-        return $this;
-    }
-
     public function getVenun(): ?string
     {
         return $this->venun;
-    }
-
-    public function setVenun(string $venun): self
-    {
-        $this->venun = $venun;
-
-        return $this;
     }
 
     public function getRefun(): ?string
@@ -2380,23 +1862,9 @@ class Mouv
         return $this->refun;
     }
 
-    public function setRefun(string $refun): self
-    {
-        $this->refun = $refun;
-
-        return $this;
-    }
-
     public function getPubun(): ?string
     {
         return $this->pubun;
-    }
-
-    public function setPubun(string $pubun): self
-    {
-        $this->pubun = $pubun;
-
-        return $this;
     }
 
     public function getEmbun(): ?string
@@ -2404,23 +1872,9 @@ class Mouv
         return $this->embun;
     }
 
-    public function setEmbun(string $embun): self
-    {
-        $this->embun = $embun;
-
-        return $this;
-    }
-
     public function getEdcod(): ?string
     {
         return $this->edcod;
-    }
-
-    public function setEdcod(string $edcod): self
-    {
-        $this->edcod = $edcod;
-
-        return $this;
     }
 
     public function getTxtedcod(): ?string
@@ -2428,23 +1882,9 @@ class Mouv
         return $this->txtedcod;
     }
 
-    public function setTxtedcod(string $txtedcod): self
-    {
-        $this->txtedcod = $txtedcod;
-
-        return $this;
-    }
-
     public function getPagcod(): ?string
     {
         return $this->pagcod;
-    }
-
-    public function setPagcod(string $pagcod): self
-    {
-        $this->pagcod = $pagcod;
-
-        return $this;
     }
 
     public function getPriocod(): ?string
@@ -2452,23 +1892,9 @@ class Mouv
         return $this->priocod;
     }
 
-    public function setPriocod(string $priocod): self
-    {
-        $this->priocod = $priocod;
-
-        return $this;
-    }
-
     public function getAxe0001(): ?string
     {
         return $this->axe0001;
-    }
-
-    public function setAxe0001(string $axe0001): self
-    {
-        $this->axe0001 = $axe0001;
-
-        return $this;
     }
 
     public function getAxe0002(): ?string
@@ -2476,23 +1902,9 @@ class Mouv
         return $this->axe0002;
     }
 
-    public function setAxe0002(string $axe0002): self
-    {
-        $this->axe0002 = $axe0002;
-
-        return $this;
-    }
-
     public function getAxe0003(): ?string
     {
         return $this->axe0003;
-    }
-
-    public function setAxe0003(string $axe0003): self
-    {
-        $this->axe0003 = $axe0003;
-
-        return $this;
     }
 
     public function getAxe0004(): ?string
@@ -2500,23 +1912,9 @@ class Mouv
         return $this->axe0004;
     }
 
-    public function setAxe0004(string $axe0004): self
-    {
-        $this->axe0004 = $axe0004;
-
-        return $this;
-    }
-
     public function getCptv(): ?string
     {
         return $this->cptv;
-    }
-
-    public function setCptv(string $cptv): self
-    {
-        $this->cptv = $cptv;
-
-        return $this;
     }
 
     public function getPosition(): ?string
@@ -2524,23 +1922,9 @@ class Mouv
         return $this->position;
     }
 
-    public function setPosition(string $position): self
-    {
-        $this->position = $position;
-
-        return $this;
-    }
-
     public function getSens(): ?string
     {
         return $this->sens;
-    }
-
-    public function setSens(string $sens): self
-    {
-        $this->sens = $sens;
-
-        return $this;
     }
 
     public function getAvenant(): ?string
@@ -2548,23 +1932,9 @@ class Mouv
         return $this->avenant;
     }
 
-    public function setAvenant(string $avenant): self
-    {
-        $this->avenant = $avenant;
-
-        return $this;
-    }
-
     public function getRelcod0001(): ?string
     {
         return $this->relcod0001;
-    }
-
-    public function setRelcod0001(string $relcod0001): self
-    {
-        $this->relcod0001 = $relcod0001;
-
-        return $this;
     }
 
     public function getRelcod0002(): ?string
@@ -2572,23 +1942,9 @@ class Mouv
         return $this->relcod0002;
     }
 
-    public function setRelcod0002(string $relcod0002): self
-    {
-        $this->relcod0002 = $relcod0002;
-
-        return $this;
-    }
-
     public function getRelcod0003(): ?string
     {
         return $this->relcod0003;
-    }
-
-    public function setRelcod0003(string $relcod0003): self
-    {
-        $this->relcod0003 = $relcod0003;
-
-        return $this;
     }
 
     public function getGamseq(): ?string
@@ -2596,23 +1952,9 @@ class Mouv
         return $this->gamseq;
     }
 
-    public function setGamseq(string $gamseq): self
-    {
-        $this->gamseq = $gamseq;
-
-        return $this;
-    }
-
     public function getPromotacod(): ?string
     {
         return $this->promotacod;
-    }
-
-    public function setPromotacod(string $promotacod): self
-    {
-        $this->promotacod = $promotacod;
-
-        return $this;
     }
 
     public function getPromoremcod(): ?string
@@ -2620,23 +1962,9 @@ class Mouv
         return $this->promoremcod;
     }
 
-    public function setPromoremcod(string $promoremcod): self
-    {
-        $this->promoremcod = $promoremcod;
-
-        return $this;
-    }
-
     public function getPubtyp(): ?string
     {
         return $this->pubtyp;
-    }
-
-    public function setPubtyp(string $pubtyp): self
-    {
-        $this->pubtyp = $pubtyp;
-
-        return $this;
     }
 
     public function getPaforf(): ?string
@@ -2644,23 +1972,9 @@ class Mouv
         return $this->paforf;
     }
 
-    public function setPaforf(string $paforf): self
-    {
-        $this->paforf = $paforf;
-
-        return $this;
-    }
-
     public function getPrefofno(): ?string
     {
         return $this->prefofno;
-    }
-
-    public function setPrefofno(string $prefofno): self
-    {
-        $this->prefofno = $prefofno;
-
-        return $this;
     }
 
     public function getOfno(): ?string
@@ -2668,23 +1982,9 @@ class Mouv
         return $this->ofno;
     }
 
-    public function setOfno(string $ofno): self
-    {
-        $this->ofno = $ofno;
-
-        return $this;
-    }
-
     public function getPrefcdnopere(): ?string
     {
         return $this->prefcdnopere;
-    }
-
-    public function setPrefcdnopere(string $prefcdnopere): self
-    {
-        $this->prefcdnopere = $prefcdnopere;
-
-        return $this;
     }
 
     public function getCdnopere(): ?string
@@ -2692,23 +1992,9 @@ class Mouv
         return $this->cdnopere;
     }
 
-    public function setCdnopere(string $cdnopere): self
-    {
-        $this->cdnopere = $cdnopere;
-
-        return $this;
-    }
-
     public function getLigne(): ?string
     {
         return $this->ligne;
-    }
-
-    public function setLigne(string $ligne): self
-    {
-        $this->ligne = $ligne;
-
-        return $this;
     }
 
     public function getTicket(): ?string
@@ -2716,23 +2002,9 @@ class Mouv
         return $this->ticket;
     }
 
-    public function setTicket(string $ticket): self
-    {
-        $this->ticket = $ticket;
-
-        return $this;
-    }
-
     public function getAppremmt(): ?string
     {
         return $this->appremmt;
-    }
-
-    public function setAppremmt(string $appremmt): self
-    {
-        $this->appremmt = $appremmt;
-
-        return $this;
     }
 
     public function getAppremmtun(): ?string
@@ -2740,23 +2012,9 @@ class Mouv
         return $this->appremmtun;
     }
 
-    public function setAppremmtun(string $appremmtun): self
-    {
-        $this->appremmtun = $appremmtun;
-
-        return $this;
-    }
-
     public function getConfigurateurmonostatus(): ?string
     {
         return $this->configurateurmonostatus;
-    }
-
-    public function setConfigurateurmonostatus(string $configurateurmonostatus): self
-    {
-        $this->configurateurmonostatus = $configurateurmonostatus;
-
-        return $this;
     }
 
     public function getConfigurateurmultistatus(): ?string
@@ -2764,23 +2022,9 @@ class Mouv
         return $this->configurateurmultistatus;
     }
 
-    public function setConfigurateurmultistatus(string $configurateurmultistatus): self
-    {
-        $this->configurateurmultistatus = $configurateurmultistatus;
-
-        return $this;
-    }
-
     public function getConfigurateurlino(): ?string
     {
         return $this->configurateurlino;
-    }
-
-    public function setConfigurateurlino(string $configurateurlino): self
-    {
-        $this->configurateurlino = $configurateurlino;
-
-        return $this;
     }
 
     public function getConfigurateurref(): ?string
@@ -2788,23 +2032,9 @@ class Mouv
         return $this->configurateurref;
     }
 
-    public function setConfigurateurref(string $configurateurref): self
-    {
-        $this->configurateurref = $configurateurref;
-
-        return $this;
-    }
-
     public function getConfigurateursref1(): ?string
     {
         return $this->configurateursref1;
-    }
-
-    public function setConfigurateursref1(string $configurateursref1): self
-    {
-        $this->configurateursref1 = $configurateursref1;
-
-        return $this;
     }
 
     public function getConfigurateursref2(): ?string
@@ -2812,23 +2042,9 @@ class Mouv
         return $this->configurateursref2;
     }
 
-    public function setConfigurateursref2(string $configurateursref2): self
-    {
-        $this->configurateursref2 = $configurateursref2;
-
-        return $this;
-    }
-
     public function getUsercrdh(): ?\DateTimeInterface
     {
         return $this->usercrdh;
-    }
-
-    public function setUsercrdh(?\DateTimeInterface $usercrdh): self
-    {
-        $this->usercrdh = $usercrdh;
-
-        return $this;
     }
 
     public function getUsermodh(): ?\DateTimeInterface
@@ -2836,23 +2052,9 @@ class Mouv
         return $this->usermodh;
     }
 
-    public function setUsermodh(?\DateTimeInterface $usermodh): self
-    {
-        $this->usermodh = $usermodh;
-
-        return $this;
-    }
-
     public function getCenote(): ?string
     {
         return $this->cenote;
-    }
-
-    public function setCenote(string $cenote): self
-    {
-        $this->cenote = $cenote;
-
-        return $this;
     }
 
     public function getNote(): ?string
@@ -2872,23 +2074,9 @@ class Mouv
         return $this->pub;
     }
 
-    public function setPub(string $pub): self
-    {
-        $this->pub = $pub;
-
-        return $this;
-    }
-
     public function getPpar(): ?string
     {
         return $this->ppar;
-    }
-
-    public function setPpar(string $ppar): self
-    {
-        $this->ppar = $ppar;
-
-        return $this;
     }
 
     public function getRem0001(): ?string
@@ -2896,23 +2084,9 @@ class Mouv
         return $this->rem0001;
     }
 
-    public function setRem0001(string $rem0001): self
-    {
-        $this->rem0001 = $rem0001;
-
-        return $this;
-    }
-
     public function getRem0002(): ?string
     {
         return $this->rem0002;
-    }
-
-    public function setRem0002(string $rem0002): self
-    {
-        $this->rem0002 = $rem0002;
-
-        return $this;
     }
 
     public function getRem0003(): ?string
@@ -2920,23 +2094,9 @@ class Mouv
         return $this->rem0003;
     }
 
-    public function setRem0003(string $rem0003): self
-    {
-        $this->rem0003 = $rem0003;
-
-        return $this;
-    }
-
     public function getRemtyp0001(): ?string
     {
         return $this->remtyp0001;
-    }
-
-    public function setRemtyp0001(string $remtyp0001): self
-    {
-        $this->remtyp0001 = $remtyp0001;
-
-        return $this;
     }
 
     public function getRemtyp0002(): ?string
@@ -2944,23 +2104,9 @@ class Mouv
         return $this->remtyp0002;
     }
 
-    public function setRemtyp0002(string $remtyp0002): self
-    {
-        $this->remtyp0002 = $remtyp0002;
-
-        return $this;
-    }
-
     public function getRemtyp0003(): ?string
     {
         return $this->remtyp0003;
-    }
-
-    public function setRemtyp0003(string $remtyp0003): self
-    {
-        $this->remtyp0003 = $remtyp0003;
-
-        return $this;
     }
 
     public function getRemmt(): ?string
@@ -2968,23 +2114,9 @@ class Mouv
         return $this->remmt;
     }
 
-    public function setRemmt(string $remmt): self
-    {
-        $this->remmt = $remmt;
-
-        return $this;
-    }
-
     public function getPromotyp(): ?string
     {
         return $this->promotyp;
-    }
-
-    public function setPromotyp(string $promotyp): self
-    {
-        $this->promotyp = $promotyp;
-
-        return $this;
     }
 
     public function getPustat(): ?string
@@ -2992,23 +2124,9 @@ class Mouv
         return $this->pustat;
     }
 
-    public function setPustat(string $pustat): self
-    {
-        $this->pustat = $pustat;
-
-        return $this;
-    }
-
     public function getQte1(): ?string
     {
         return $this->qte1;
-    }
-
-    public function setQte1(string $qte1): self
-    {
-        $this->qte1 = $qte1;
-
-        return $this;
     }
 
     public function getQte2(): ?string
@@ -3016,23 +2134,9 @@ class Mouv
         return $this->qte2;
     }
 
-    public function setQte2(string $qte2): self
-    {
-        $this->qte2 = $qte2;
-
-        return $this;
-    }
-
     public function getQte3(): ?string
     {
         return $this->qte3;
-    }
-
-    public function setQte3(string $qte3): self
-    {
-        $this->qte3 = $qte3;
-
-        return $this;
     }
 
     public function getDvqte(): ?string
@@ -3040,23 +2144,9 @@ class Mouv
         return $this->dvqte;
     }
 
-    public function setDvqte(string $dvqte): self
-    {
-        $this->dvqte = $dvqte;
-
-        return $this;
-    }
-
     public function getCdqte(): ?string
     {
         return $this->cdqte;
-    }
-
-    public function setCdqte(string $cdqte): self
-    {
-        $this->cdqte = $cdqte;
-
-        return $this;
     }
 
     public function getBlqte(): ?string
@@ -3064,23 +2154,9 @@ class Mouv
         return $this->blqte;
     }
 
-    public function setBlqte(string $blqte): self
-    {
-        $this->blqte = $blqte;
-
-        return $this;
-    }
-
     public function getFaqte(): ?string
     {
         return $this->faqte;
-    }
-
-    public function setFaqte(string $faqte): self
-    {
-        $this->faqte = $faqte;
-
-        return $this;
     }
 
     public function getRefqte(): ?string
@@ -3088,23 +2164,9 @@ class Mouv
         return $this->refqte;
     }
 
-    public function setRefqte(string $refqte): self
-    {
-        $this->refqte = $refqte;
-
-        return $this;
-    }
-
     public function getEmbqte(): ?string
     {
         return $this->embqte;
-    }
-
-    public function setEmbqte(string $embqte): self
-    {
-        $this->embqte = $embqte;
-
-        return $this;
     }
 
     public function getComp0001(): ?string
@@ -3112,23 +2174,9 @@ class Mouv
         return $this->comp0001;
     }
 
-    public function setComp0001(string $comp0001): self
-    {
-        $this->comp0001 = $comp0001;
-
-        return $this;
-    }
-
     public function getComp0002(): ?string
     {
         return $this->comp0002;
-    }
-
-    public function setComp0002(string $comp0002): self
-    {
-        $this->comp0002 = $comp0002;
-
-        return $this;
     }
 
     public function getComp0003(): ?string
@@ -3136,23 +2184,9 @@ class Mouv
         return $this->comp0003;
     }
 
-    public function setComp0003(string $comp0003): self
-    {
-        $this->comp0003 = $comp0003;
-
-        return $this;
-    }
-
     public function getCommt0001(): ?string
     {
         return $this->commt0001;
-    }
-
-    public function setCommt0001(string $commt0001): self
-    {
-        $this->commt0001 = $commt0001;
-
-        return $this;
     }
 
     public function getCommt0002(): ?string
@@ -3160,23 +2194,9 @@ class Mouv
         return $this->commt0002;
     }
 
-    public function setCommt0002(string $commt0002): self
-    {
-        $this->commt0002 = $commt0002;
-
-        return $this;
-    }
-
     public function getCommt0003(): ?string
     {
         return $this->commt0003;
-    }
-
-    public function setCommt0003(string $commt0003): self
-    {
-        $this->commt0003 = $commt0003;
-
-        return $this;
     }
 
     public function getMont(): ?string
@@ -3184,23 +2204,9 @@ class Mouv
         return $this->mont;
     }
 
-    public function setMont(string $mont): self
-    {
-        $this->mont = $mont;
-
-        return $this;
-    }
-
     public function getFraismt(): ?string
     {
         return $this->fraismt;
-    }
-
-    public function setFraismt(string $fraismt): self
-    {
-        $this->fraismt = $fraismt;
-
-        return $this;
     }
 
     public function getDeccod(): ?string
@@ -3208,23 +2214,9 @@ class Mouv
         return $this->deccod;
     }
 
-    public function setDeccod(string $deccod): self
-    {
-        $this->deccod = $deccod;
-
-        return $this;
-    }
-
     public function getPcod0001(): ?string
     {
         return $this->pcod0001;
-    }
-
-    public function setPcod0001(string $pcod0001): self
-    {
-        $this->pcod0001 = $pcod0001;
-
-        return $this;
     }
 
     public function getPcod0002(): ?string
@@ -3232,23 +2224,9 @@ class Mouv
         return $this->pcod0002;
     }
 
-    public function setPcod0002(string $pcod0002): self
-    {
-        $this->pcod0002 = $pcod0002;
-
-        return $this;
-    }
-
     public function getPcod0003(): ?string
     {
         return $this->pcod0003;
-    }
-
-    public function setPcod0003(string $pcod0003): self
-    {
-        $this->pcod0003 = $pcod0003;
-
-        return $this;
     }
 
     public function getPcod0004(): ?string
@@ -3256,23 +2234,9 @@ class Mouv
         return $this->pcod0004;
     }
 
-    public function setPcod0004(string $pcod0004): self
-    {
-        $this->pcod0004 = $pcod0004;
-
-        return $this;
-    }
-
     public function getPcod0005(): ?string
     {
         return $this->pcod0005;
-    }
-
-    public function setPcod0005(string $pcod0005): self
-    {
-        $this->pcod0005 = $pcod0005;
-
-        return $this;
     }
 
     public function getStatus(): ?string
@@ -3280,23 +2244,9 @@ class Mouv
         return $this->status;
     }
 
-    public function setStatus(string $status): self
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
     public function getStres(): ?string
     {
         return $this->stres;
-    }
-
-    public function setStres(string $stres): self
-    {
-        $this->stres = $stres;
-
-        return $this;
     }
 
     public function getFillersens(): ?string
@@ -3304,23 +2254,9 @@ class Mouv
         return $this->fillersens;
     }
 
-    public function setFillersens(string $fillersens): self
-    {
-        $this->fillersens = $fillersens;
-
-        return $this;
-    }
-
     public function getMvcod(): ?string
     {
         return $this->mvcod;
-    }
-
-    public function setMvcod(string $mvcod): self
-    {
-        $this->mvcod = $mvcod;
-
-        return $this;
     }
 
     public function getPvcod(): ?string
@@ -3328,23 +2264,9 @@ class Mouv
         return $this->pvcod;
     }
 
-    public function setPvcod(string $pvcod): self
-    {
-        $this->pvcod = $pvcod;
-
-        return $this;
-    }
-
     public function getQtetyp(): ?string
     {
         return $this->qtetyp;
-    }
-
-    public function setQtetyp(string $qtetyp): self
-    {
-        $this->qtetyp = $qtetyp;
-
-        return $this;
     }
 
     public function getGadt(): ?\DateTimeInterface
@@ -3352,23 +2274,9 @@ class Mouv
         return $this->gadt;
     }
 
-    public function setGadt(?\DateTimeInterface $gadt): self
-    {
-        $this->gadt = $gadt;
-
-        return $this;
-    }
-
     public function getCrtotmt(): ?string
     {
         return $this->crtotmt;
-    }
-
-    public function setCrtotmt(string $crtotmt): self
-    {
-        $this->crtotmt = $crtotmt;
-
-        return $this;
     }
 
     public function getCmptotmt(): ?string
@@ -3376,23 +2284,9 @@ class Mouv
         return $this->cmptotmt;
     }
 
-    public function setCmptotmt(string $cmptotmt): self
-    {
-        $this->cmptotmt = $cmptotmt;
-
-        return $this;
-    }
-
     public function getTxtcod(): ?string
     {
         return $this->txtcod;
-    }
-
-    public function setTxtcod(string $txtcod): self
-    {
-        $this->txtcod = $txtcod;
-
-        return $this;
     }
 
     public function getTxtnote(): ?string
@@ -3400,23 +2294,9 @@ class Mouv
         return $this->txtnote;
     }
 
-    public function setTxtnote(string $txtnote): self
-    {
-        $this->txtnote = $txtnote;
-
-        return $this;
-    }
-
     public function getEnrnop0001(): ?string
     {
         return $this->enrnop0001;
-    }
-
-    public function setEnrnop0001(string $enrnop0001): self
-    {
-        $this->enrnop0001 = $enrnop0001;
-
-        return $this;
     }
 
     public function getEnrnop0002(): ?string
@@ -3424,23 +2304,9 @@ class Mouv
         return $this->enrnop0002;
     }
 
-    public function setEnrnop0002(string $enrnop0002): self
-    {
-        $this->enrnop0002 = $enrnop0002;
-
-        return $this;
-    }
-
     public function getEnrnop0003(): ?string
     {
         return $this->enrnop0003;
-    }
-
-    public function setEnrnop0003(string $enrnop0003): self
-    {
-        $this->enrnop0003 = $enrnop0003;
-
-        return $this;
     }
 
     public function getEnrnop0004(): ?string
@@ -3448,23 +2314,9 @@ class Mouv
         return $this->enrnop0004;
     }
 
-    public function setEnrnop0004(string $enrnop0004): self
-    {
-        $this->enrnop0004 = $enrnop0004;
-
-        return $this;
-    }
-
     public function getEnrnoc0001(): ?string
     {
         return $this->enrnoc0001;
-    }
-
-    public function setEnrnoc0001(string $enrnoc0001): self
-    {
-        $this->enrnoc0001 = $enrnoc0001;
-
-        return $this;
     }
 
     public function getEnrnoc0002(): ?string
@@ -3472,23 +2324,9 @@ class Mouv
         return $this->enrnoc0002;
     }
 
-    public function setEnrnoc0002(string $enrnoc0002): self
-    {
-        $this->enrnoc0002 = $enrnoc0002;
-
-        return $this;
-    }
-
     public function getEnrnoc0003(): ?string
     {
         return $this->enrnoc0003;
-    }
-
-    public function setEnrnoc0003(string $enrnoc0003): self
-    {
-        $this->enrnoc0003 = $enrnoc0003;
-
-        return $this;
     }
 
     public function getEnrnoc0004(): ?string
@@ -3496,23 +2334,9 @@ class Mouv
         return $this->enrnoc0004;
     }
 
-    public function setEnrnoc0004(string $enrnoc0004): self
-    {
-        $this->enrnoc0004 = $enrnoc0004;
-
-        return $this;
-    }
-
     public function getRempiemt0001(): ?string
     {
         return $this->rempiemt0001;
-    }
-
-    public function setRempiemt0001(string $rempiemt0001): self
-    {
-        $this->rempiemt0001 = $rempiemt0001;
-
-        return $this;
     }
 
     public function getRempiemt0002(): ?string
@@ -3520,23 +2344,9 @@ class Mouv
         return $this->rempiemt0002;
     }
 
-    public function setRempiemt0002(string $rempiemt0002): self
-    {
-        $this->rempiemt0002 = $rempiemt0002;
-
-        return $this;
-    }
-
     public function getRempiemt0003(): ?string
     {
         return $this->rempiemt0003;
-    }
-
-    public function setRempiemt0003(string $rempiemt0003): self
-    {
-        $this->rempiemt0003 = $rempiemt0003;
-
-        return $this;
     }
 
     public function getRempiemt0004(): ?string
@@ -3544,23 +2354,9 @@ class Mouv
         return $this->rempiemt0004;
     }
 
-    public function setRempiemt0004(string $rempiemt0004): self
-    {
-        $this->rempiemt0004 = $rempiemt0004;
-
-        return $this;
-    }
-
     public function getMvstat(): ?string
     {
         return $this->mvstat;
-    }
-
-    public function setMvstat(string $mvstat): self
-    {
-        $this->mvstat = $mvstat;
-
-        return $this;
     }
 
     public function getBlasenrno(): ?string
@@ -3568,23 +2364,9 @@ class Mouv
         return $this->blasenrno;
     }
 
-    public function setBlasenrno(string $blasenrno): self
-    {
-        $this->blasenrno = $blasenrno;
-
-        return $this;
-    }
-
     public function getRempiepart0001(): ?string
     {
         return $this->rempiepart0001;
-    }
-
-    public function setRempiepart0001(string $rempiepart0001): self
-    {
-        $this->rempiepart0001 = $rempiepart0001;
-
-        return $this;
     }
 
     public function getRempiepart0002(): ?string
@@ -3592,23 +2374,9 @@ class Mouv
         return $this->rempiepart0002;
     }
 
-    public function setRempiepart0002(string $rempiepart0002): self
-    {
-        $this->rempiepart0002 = $rempiepart0002;
-
-        return $this;
-    }
-
     public function getRempiepart0003(): ?string
     {
         return $this->rempiepart0003;
-    }
-
-    public function setRempiepart0003(string $rempiepart0003): self
-    {
-        $this->rempiepart0003 = $rempiepart0003;
-
-        return $this;
     }
 
     public function getRempiepart0004(): ?string
@@ -3616,23 +2384,9 @@ class Mouv
         return $this->rempiepart0004;
     }
 
-    public function setRempiepart0004(string $rempiepart0004): self
-    {
-        $this->rempiepart0004 = $rempiepart0004;
-
-        return $this;
-    }
-
     public function getRecptno(): ?string
     {
         return $this->recptno;
-    }
-
-    public function setRecptno(string $recptno): self
-    {
-        $this->recptno = $recptno;
-
-        return $this;
     }
 
     public function getPrgqte(): ?string
@@ -3640,23 +2394,9 @@ class Mouv
         return $this->prgqte;
     }
 
-    public function setPrgqte(string $prgqte): self
-    {
-        $this->prgqte = $prgqte;
-
-        return $this;
-    }
-
     public function getPrgrefqte(): ?string
     {
         return $this->prgrefqte;
-    }
-
-    public function setPrgrefqte(string $prgrefqte): self
-    {
-        $this->prgrefqte = $prgrefqte;
-
-        return $this;
     }
 
     public function getDvenrno(): ?string
@@ -3664,23 +2404,9 @@ class Mouv
         return $this->dvenrno;
     }
 
-    public function setDvenrno(string $dvenrno): self
-    {
-        $this->dvenrno = $dvenrno;
-
-        return $this;
-    }
-
     public function getBlenrno(): ?string
     {
         return $this->blenrno;
-    }
-
-    public function setBlenrno(string $blenrno): self
-    {
-        $this->blenrno = $blenrno;
-
-        return $this;
     }
 
     public function getRebucod(): ?string
@@ -3688,23 +2414,9 @@ class Mouv
         return $this->rebucod;
     }
 
-    public function setRebucod(string $rebucod): self
-    {
-        $this->rebucod = $rebucod;
-
-        return $this;
-    }
-
     public function getCtmfl(): ?string
     {
         return $this->ctmfl;
-    }
-
-    public function setCtmfl(string $ctmfl): self
-    {
-        $this->ctmfl = $ctmfl;
-
-        return $this;
     }
 
     public function getPfcno(): ?string
@@ -3712,23 +2424,9 @@ class Mouv
         return $this->pfcno;
     }
 
-    public function setPfcno(string $pfcno): self
-    {
-        $this->pfcno = $pfcno;
-
-        return $this;
-    }
-
     public function getGpafl(): ?string
     {
         return $this->gpafl;
-    }
-
-    public function setGpafl(string $gpafl): self
-    {
-        $this->gpafl = $gpafl;
-
-        return $this;
     }
 
     public function getElemno(): ?string
@@ -3736,23 +2434,9 @@ class Mouv
         return $this->elemno;
     }
 
-    public function setElemno(string $elemno): self
-    {
-        $this->elemno = $elemno;
-
-        return $this;
-    }
-
     public function getAfrindice(): ?string
     {
         return $this->afrindice;
-    }
-
-    public function setAfrindice(string $afrindice): self
-    {
-        $this->afrindice = $afrindice;
-
-        return $this;
     }
 
     public function getBesoinno(): ?string
@@ -3760,23 +2444,9 @@ class Mouv
         return $this->besoinno;
     }
 
-    public function setBesoinno(string $besoinno): self
-    {
-        $this->besoinno = $besoinno;
-
-        return $this;
-    }
-
     public function getTvaart(): ?string
     {
         return $this->tvaart;
-    }
-
-    public function setTvaart(string $tvaart): self
-    {
-        $this->tvaart = $tvaart;
-
-        return $this;
     }
 
     public function getContratcod(): ?string
@@ -3784,23 +2454,9 @@ class Mouv
         return $this->contratcod;
     }
 
-    public function setContratcod(string $contratcod): self
-    {
-        $this->contratcod = $contratcod;
-
-        return $this;
-    }
-
     public function getCadeaufl(): ?string
     {
         return $this->cadeaufl;
-    }
-
-    public function setCadeaufl(string $cadeaufl): self
-    {
-        $this->cadeaufl = $cadeaufl;
-
-        return $this;
     }
 
     public function getEnrnocad(): ?string
@@ -3808,23 +2464,9 @@ class Mouv
         return $this->enrnocad;
     }
 
-    public function setEnrnocad(string $enrnocad): self
-    {
-        $this->enrnocad = $enrnocad;
-
-        return $this;
-    }
-
     public function getFraisfl(): ?string
     {
         return $this->fraisfl;
-    }
-
-    public function setFraisfl(string $fraisfl): self
-    {
-        $this->fraisfl = $fraisfl;
-
-        return $this;
     }
 
     public function getFraisvalidtyp(): ?string
@@ -3832,23 +2474,9 @@ class Mouv
         return $this->fraisvalidtyp;
     }
 
-    public function setFraisvalidtyp(string $fraisvalidtyp): self
-    {
-        $this->fraisvalidtyp = $fraisvalidtyp;
-
-        return $this;
-    }
-
     public function getGratuitfl(): ?string
     {
         return $this->gratuitfl;
-    }
-
-    public function setGratuitfl(string $gratuitfl): self
-    {
-        $this->gratuitfl = $gratuitfl;
-
-        return $this;
     }
 
     public function getMotif(): ?string
@@ -3856,23 +2484,9 @@ class Mouv
         return $this->motif;
     }
 
-    public function setMotif(string $motif): self
-    {
-        $this->motif = $motif;
-
-        return $this;
-    }
-
     public function getOptionfl(): ?string
     {
         return $this->optionfl;
-    }
-
-    public function setOptionfl(string $optionfl): self
-    {
-        $this->optionfl = $optionfl;
-
-        return $this;
     }
 
     public function getOptionvalidefl(): ?string
@@ -3880,23 +2494,9 @@ class Mouv
         return $this->optionvalidefl;
     }
 
-    public function setOptionvalidefl(string $optionvalidefl): self
-    {
-        $this->optionvalidefl = $optionvalidefl;
-
-        return $this;
-    }
-
     public function getPanachefl(): ?string
     {
         return $this->panachefl;
-    }
-
-    public function setPanachefl(string $panachefl): self
-    {
-        $this->panachefl = $panachefl;
-
-        return $this;
     }
 
     public function getPcod0006(): ?string
@@ -3904,23 +2504,9 @@ class Mouv
         return $this->pcod0006;
     }
 
-    public function setPcod0006(string $pcod0006): self
-    {
-        $this->pcod0006 = $pcod0006;
-
-        return $this;
-    }
-
     public function getPunetori(): ?string
     {
         return $this->punetori;
-    }
-
-    public function setPunetori(string $punetori): self
-    {
-        $this->punetori = $punetori;
-
-        return $this;
     }
 
     public function getReglecod(): ?string
@@ -3928,35 +2514,14 @@ class Mouv
         return $this->reglecod;
     }
 
-    public function setReglecod(string $reglecod): self
-    {
-        $this->reglecod = $reglecod;
-
-        return $this;
-    }
-
     public function getRemcodcad(): ?string
     {
         return $this->remcodcad;
     }
 
-    public function setRemcodcad(string $remcodcad): self
-    {
-        $this->remcodcad = $remcodcad;
-
-        return $this;
-    }
-
     public function getUntyp(): ?string
     {
         return $this->untyp;
-    }
-
-    public function setUntyp(string $untyp): self
-    {
-        $this->untyp = $untyp;
-
-        return $this;
     }
 
     public function getMouvId(): ?int
