@@ -586,23 +586,9 @@ class Sart
         return $this->ce1;
     }
 
-    public function setCe1(string $ce1): self
-    {
-        $this->ce1 = $ce1;
-
-        return $this;
-    }
-
     public function getCe2(): ?string
     {
         return $this->ce2;
-    }
-
-    public function setCe2(string $ce2): self
-    {
-        $this->ce2 = $ce2;
-
-        return $this;
     }
 
     public function getCe3(): ?string
@@ -610,23 +596,9 @@ class Sart
         return $this->ce3;
     }
 
-    public function setCe3(string $ce3): self
-    {
-        $this->ce3 = $ce3;
-
-        return $this;
-    }
-
     public function getCe4(): ?string
     {
         return $this->ce4;
-    }
-
-    public function setCe4(string $ce4): self
-    {
-        $this->ce4 = $ce4;
-
-        return $this;
     }
 
     public function getCe5(): ?string
@@ -634,23 +606,9 @@ class Sart
         return $this->ce5;
     }
 
-    public function setCe5(string $ce5): self
-    {
-        $this->ce5 = $ce5;
-
-        return $this;
-    }
-
     public function getCe6(): ?string
     {
         return $this->ce6;
-    }
-
-    public function setCe6(string $ce6): self
-    {
-        $this->ce6 = $ce6;
-
-        return $this;
     }
 
     public function getCe7(): ?string
@@ -658,23 +616,9 @@ class Sart
         return $this->ce7;
     }
 
-    public function setCe7(string $ce7): self
-    {
-        $this->ce7 = $ce7;
-
-        return $this;
-    }
-
     public function getCe8(): ?string
     {
         return $this->ce8;
-    }
-
-    public function setCe8(string $ce8): self
-    {
-        $this->ce8 = $ce8;
-
-        return $this;
     }
 
     public function getCe9(): ?string
@@ -682,23 +626,9 @@ class Sart
         return $this->ce9;
     }
 
-    public function setCe9(string $ce9): self
-    {
-        $this->ce9 = $ce9;
-
-        return $this;
-    }
-
     public function getCea(): ?string
     {
         return $this->cea;
-    }
-
-    public function setCea(string $cea): self
-    {
-        $this->cea = $cea;
-
-        return $this;
     }
 
     public function getDos(): ?string
@@ -706,23 +636,9 @@ class Sart
         return $this->dos;
     }
 
-    public function setDos(string $dos): self
-    {
-        $this->dos = $dos;
-
-        return $this;
-    }
-
     public function getRef(): ?string
     {
         return $this->ref;
-    }
-
-    public function setRef(string $ref): self
-    {
-        $this->ref = $ref;
-
-        return $this;
     }
 
     public function getSref1(): ?string
@@ -730,23 +646,9 @@ class Sart
         return $this->sref1;
     }
 
-    public function setSref1(string $sref1): self
-    {
-        $this->sref1 = $sref1;
-
-        return $this;
-    }
-
     public function getSref2(): ?string
     {
         return $this->sref2;
-    }
-
-    public function setSref2(string $sref2): self
-    {
-        $this->sref2 = $sref2;
-
-        return $this;
     }
 
     public function getUsercr(): ?string
@@ -754,23 +656,9 @@ class Sart
         return $this->usercr;
     }
 
-    public function setUsercr(string $usercr): self
-    {
-        $this->usercr = $usercr;
-
-        return $this;
-    }
-
     public function getUsermo(): ?string
     {
         return $this->usermo;
-    }
-
-    public function setUsermo(string $usermo): self
-    {
-        $this->usermo = $usermo;
-
-        return $this;
     }
 
     public function getConf(): ?string
@@ -778,23 +666,9 @@ class Sart
         return $this->conf;
     }
 
-    public function setConf(string $conf): self
-    {
-        $this->conf = $conf;
-
-        return $this;
-    }
-
     public function getEan(): ?string
     {
         return $this->ean;
-    }
-
-    public function setEan(string $ean): self
-    {
-        $this->ean = $ean;
-
-        return $this;
     }
 
     public function getNomcoecod(): ?string
@@ -802,23 +676,9 @@ class Sart
         return $this->nomcoecod;
     }
 
-    public function setNomcoecod(string $nomcoecod): self
-    {
-        $this->nomcoecod = $nomcoecod;
-
-        return $this;
-    }
-
     public function getNomcstcod(): ?string
     {
         return $this->nomcstcod;
-    }
-
-    public function setNomcstcod(string $nomcstcod): self
-    {
-        $this->nomcstcod = $nomcstcod;
-
-        return $this;
     }
 
     public function getRscecoecod(): ?string
@@ -826,23 +686,9 @@ class Sart
         return $this->rscecoecod;
     }
 
-    public function setRscecoecod(string $rscecoecod): self
-    {
-        $this->rscecoecod = $rscecoecod;
-
-        return $this;
-    }
-
     public function getRscecstcod(): ?string
     {
         return $this->rscecstcod;
-    }
-
-    public function setRscecstcod(string $rscecstcod): self
-    {
-        $this->rscecstcod = $rscecstcod;
-
-        return $this;
     }
 
     public function getPostcoecod(): ?string
@@ -850,23 +696,9 @@ class Sart
         return $this->postcoecod;
     }
 
-    public function setPostcoecod(string $postcoecod): self
-    {
-        $this->postcoecod = $postcoecod;
-
-        return $this;
-    }
-
     public function getPostcstcod(): ?string
     {
         return $this->postcstcod;
-    }
-
-    public function setPostcstcod(string $postcstcod): self
-    {
-        $this->postcstcod = $postcstcod;
-
-        return $this;
     }
 
     public function getStrtcoecod(): ?string
@@ -874,23 +706,9 @@ class Sart
         return $this->strtcoecod;
     }
 
-    public function setStrtcoecod(string $strtcoecod): self
-    {
-        $this->strtcoecod = $strtcoecod;
-
-        return $this;
-    }
-
     public function getStrtcstcod(): ?string
     {
         return $this->strtcstcod;
-    }
-
-    public function setStrtcstcod(string $strtcstcod): self
-    {
-        $this->strtcstcod = $strtcstcod;
-
-        return $this;
     }
 
     public function getOuticoecod(): ?string
@@ -898,23 +716,9 @@ class Sart
         return $this->outicoecod;
     }
 
-    public function setOuticoecod(string $outicoecod): self
-    {
-        $this->outicoecod = $outicoecod;
-
-        return $this;
-    }
-
     public function getOuticstcod(): ?string
     {
         return $this->outicstcod;
-    }
-
-    public function setOuticstcod(string $outicstcod): self
-    {
-        $this->outicstcod = $outicstcod;
-
-        return $this;
     }
 
     public function getCoecod(): ?string
@@ -922,23 +726,9 @@ class Sart
         return $this->coecod;
     }
 
-    public function setCoecod(string $coecod): self
-    {
-        $this->coecod = $coecod;
-
-        return $this;
-    }
-
     public function getProdind(): ?string
     {
         return $this->prodind;
-    }
-
-    public function setProdind(string $prodind): self
-    {
-        $this->prodind = $prodind;
-
-        return $this;
     }
 
     public function getCbngescod(): ?string
@@ -946,23 +736,9 @@ class Sart
         return $this->cbngescod;
     }
 
-    public function setCbngescod(string $cbngescod): self
-    {
-        $this->cbngescod = $cbngescod;
-
-        return $this;
-    }
-
     public function getUsercrdh(): ?\DateTimeInterface
     {
         return $this->usercrdh;
-    }
-
-    public function setUsercrdh(?\DateTimeInterface $usercrdh): self
-    {
-        $this->usercrdh = $usercrdh;
-
-        return $this;
     }
 
     public function getUsermodh(): ?\DateTimeInterface
@@ -970,23 +746,9 @@ class Sart
         return $this->usermodh;
     }
 
-    public function setUsermodh(?\DateTimeInterface $usermodh): self
-    {
-        $this->usermodh = $usermodh;
-
-        return $this;
-    }
-
     public function getCenote(): ?string
     {
         return $this->cenote;
-    }
-
-    public function setCenote(string $cenote): self
-    {
-        $this->cenote = $cenote;
-
-        return $this;
     }
 
     public function getNote(): ?string
@@ -994,23 +756,9 @@ class Sart
         return $this->note;
     }
 
-    public function setNote(string $note): self
-    {
-        $this->note = $note;
-
-        return $this;
-    }
-
     public function getCr(): ?string
     {
         return $this->cr;
-    }
-
-    public function setCr(string $cr): self
-    {
-        $this->cr = $cr;
-
-        return $this;
     }
 
     public function getCordt(): ?\DateTimeInterface
@@ -1018,23 +766,9 @@ class Sart
         return $this->cordt;
     }
 
-    public function setCordt(?\DateTimeInterface $cordt): self
-    {
-        $this->cordt = $cordt;
-
-        return $this;
-    }
-
     public function getCmp(): ?string
     {
         return $this->cmp;
-    }
-
-    public function setCmp(string $cmp): self
-    {
-        $this->cmp = $cmp;
-
-        return $this;
     }
 
     public function getCmpdt(): ?\DateTimeInterface
@@ -1042,23 +776,9 @@ class Sart
         return $this->cmpdt;
     }
 
-    public function setCmpdt(?\DateTimeInterface $cmpdt): self
-    {
-        $this->cmpdt = $cmpdt;
-
-        return $this;
-    }
-
     public function getCrstd(): ?string
     {
         return $this->crstd;
-    }
-
-    public function setCrstd(string $crstd): self
-    {
-        $this->crstd = $crstd;
-
-        return $this;
     }
 
     public function getCrstddt(): ?\DateTimeInterface
@@ -1066,23 +786,9 @@ class Sart
         return $this->crstddt;
     }
 
-    public function setCrstddt(?\DateTimeInterface $crstddt): self
-    {
-        $this->crstddt = $crstddt;
-
-        return $this;
-    }
-
     public function getPa(): ?string
     {
         return $this->pa;
-    }
-
-    public function setPa(string $pa): self
-    {
-        $this->pa = $pa;
-
-        return $this;
     }
 
     public function getPadt(): ?\DateTimeInterface
@@ -1090,23 +796,9 @@ class Sart
         return $this->padt;
     }
 
-    public function setPadt(?\DateTimeInterface $padt): self
-    {
-        $this->padt = $padt;
-
-        return $this;
-    }
-
     public function getCrnom(): ?string
     {
         return $this->crnom;
-    }
-
-    public function setCrnom(string $crnom): self
-    {
-        $this->crnom = $crnom;
-
-        return $this;
     }
 
     public function getCrrsce(): ?string
@@ -1114,23 +806,9 @@ class Sart
         return $this->crrsce;
     }
 
-    public function setCrrsce(string $crrsce): self
-    {
-        $this->crrsce = $crrsce;
-
-        return $this;
-    }
-
     public function getCrposte(): ?string
     {
         return $this->crposte;
-    }
-
-    public function setCrposte(string $crposte): self
-    {
-        $this->crposte = $crposte;
-
-        return $this;
     }
 
     public function getCrstrt(): ?string
@@ -1138,23 +816,9 @@ class Sart
         return $this->crstrt;
     }
 
-    public function setCrstrt(string $crstrt): self
-    {
-        $this->crstrt = $crstrt;
-
-        return $this;
-    }
-
     public function getCroutil(): ?string
     {
         return $this->croutil;
-    }
-
-    public function setCroutil(string $croutil): self
-    {
-        $this->croutil = $croutil;
-
-        return $this;
     }
 
     public function getFabqte(): ?string
@@ -1162,23 +826,9 @@ class Sart
         return $this->fabqte;
     }
 
-    public function setFabqte(string $fabqte): self
-    {
-        $this->fabqte = $fabqte;
-
-        return $this;
-    }
-
     public function getPoib(): ?string
     {
         return $this->poib;
-    }
-
-    public function setPoib(string $poib): self
-    {
-        $this->poib = $poib;
-
-        return $this;
     }
 
     public function getPoin(): ?string
@@ -1186,23 +836,9 @@ class Sart
         return $this->poin;
     }
 
-    public function setPoin(string $poin): self
-    {
-        $this->poin = $poin;
-
-        return $this;
-    }
-
     public function getVol(): ?string
     {
         return $this->vol;
-    }
-
-    public function setVol(string $vol): self
-    {
-        $this->vol = $vol;
-
-        return $this;
     }
 
     public function getDim0001(): ?string
@@ -1210,23 +846,9 @@ class Sart
         return $this->dim0001;
     }
 
-    public function setDim0001(string $dim0001): self
-    {
-        $this->dim0001 = $dim0001;
-
-        return $this;
-    }
-
     public function getDim0002(): ?string
     {
         return $this->dim0002;
-    }
-
-    public function setDim0002(string $dim0002): self
-    {
-        $this->dim0002 = $dim0002;
-
-        return $this;
     }
 
     public function getDim0003(): ?string
@@ -1234,23 +856,9 @@ class Sart
         return $this->dim0003;
     }
 
-    public function setDim0003(string $dim0003): self
-    {
-        $this->dim0003 = $dim0003;
-
-        return $this;
-    }
-
     public function getQtemin(): ?string
     {
         return $this->qtemin;
-    }
-
-    public function setQtemin(string $qtemin): self
-    {
-        $this->qtemin = $qtemin;
-
-        return $this;
     }
 
     public function getQtepar(): ?string
@@ -1258,23 +866,9 @@ class Sart
         return $this->qtepar;
     }
 
-    public function setQtepar(string $qtepar): self
-    {
-        $this->qtepar = $qtepar;
-
-        return $this;
-    }
-
     public function getCrh(): ?string
     {
         return $this->crh;
-    }
-
-    public function setCrh(string $crh): self
-    {
-        $this->crh = $crh;
-
-        return $this;
     }
 
     public function getDelsecujr(): ?string
@@ -1282,23 +876,9 @@ class Sart
         return $this->delsecujr;
     }
 
-    public function setDelsecujr(string $delsecujr): self
-    {
-        $this->delsecujr = $delsecujr;
-
-        return $this;
-    }
-
     public function getProdqtearr(): ?string
     {
         return $this->prodqtearr;
-    }
-
-    public function setProdqtearr(string $prodqtearr): self
-    {
-        $this->prodqtearr = $prodqtearr;
-
-        return $this;
     }
 
     public function getCejoint(): ?string
@@ -1306,23 +886,9 @@ class Sart
         return $this->cejoint;
     }
 
-    public function setCejoint(string $cejoint): self
-    {
-        $this->cejoint = $cejoint;
-
-        return $this;
-    }
-
     public function getJoint(): ?string
     {
         return $this->joint;
-    }
-
-    public function setJoint(string $joint): self
-    {
-        $this->joint = $joint;
-
-        return $this;
     }
 
     public function getSurf(): ?string
@@ -1330,23 +896,9 @@ class Sart
         return $this->surf;
     }
 
-    public function setSurf(string $surf): self
-    {
-        $this->surf = $surf;
-
-        return $this;
-    }
-
     public function getLotqte(): ?string
     {
         return $this->lotqte;
-    }
-
-    public function setLotqte(string $lotqte): self
-    {
-        $this->lotqte = $lotqte;
-
-        return $this;
     }
 
     public function getLotcod(): ?string
@@ -1354,23 +906,9 @@ class Sart
         return $this->lotcod;
     }
 
-    public function setLotcod(string $lotcod): self
-    {
-        $this->lotcod = $lotcod;
-
-        return $this;
-    }
-
     public function getWmqteimp(): ?string
     {
         return $this->wmqteimp;
-    }
-
-    public function setWmqteimp(string $wmqteimp): self
-    {
-        $this->wmqteimp = $wmqteimp;
-
-        return $this;
     }
 
     public function getTiers(): ?string
@@ -1378,23 +916,9 @@ class Sart
         return $this->tiers;
     }
 
-    public function setTiers(string $tiers): self
-    {
-        $this->tiers = $tiers;
-
-        return $this;
-    }
-
     public function getPrefdvno(): ?string
     {
         return $this->prefdvno;
-    }
-
-    public function setPrefdvno(string $prefdvno): self
-    {
-        $this->prefdvno = $prefdvno;
-
-        return $this;
     }
 
     public function getDvno(): ?string
@@ -1402,23 +926,9 @@ class Sart
         return $this->dvno;
     }
 
-    public function setDvno(string $dvno): self
-    {
-        $this->dvno = $dvno;
-
-        return $this;
-    }
-
     public function getDtind(): ?string
     {
         return $this->dtind;
-    }
-
-    public function setDtind(string $dtind): self
-    {
-        $this->dtind = $dtind;
-
-        return $this;
     }
 
     public function getCoutvarcod(): ?string
@@ -1426,23 +936,9 @@ class Sart
         return $this->coutvarcod;
     }
 
-    public function setCoutvarcod(string $coutvarcod): self
-    {
-        $this->coutvarcod = $coutvarcod;
-
-        return $this;
-    }
-
     public function getCrstdmn(): ?string
     {
         return $this->crstdmn;
-    }
-
-    public function setCrstdmn(string $crstdmn): self
-    {
-        $this->crstdmn = $crstdmn;
-
-        return $this;
     }
 
     public function getCrnommn(): ?string
@@ -1450,23 +946,9 @@ class Sart
         return $this->crnommn;
     }
 
-    public function setCrnommn(string $crnommn): self
-    {
-        $this->crnommn = $crnommn;
-
-        return $this;
-    }
-
     public function getCrrscemn(): ?string
     {
         return $this->crrscemn;
-    }
-
-    public function setCrrscemn(string $crrscemn): self
-    {
-        $this->crrscemn = $crrscemn;
-
-        return $this;
     }
 
     public function getCrpostemn(): ?string
@@ -1474,23 +956,9 @@ class Sart
         return $this->crpostemn;
     }
 
-    public function setCrpostemn(string $crpostemn): self
-    {
-        $this->crpostemn = $crpostemn;
-
-        return $this;
-    }
-
     public function getCrstrtmn(): ?string
     {
         return $this->crstrtmn;
-    }
-
-    public function setCrstrtmn(string $crstrtmn): self
-    {
-        $this->crstrtmn = $crstrtmn;
-
-        return $this;
     }
 
     public function getCroutilmn(): ?string
@@ -1498,23 +966,9 @@ class Sart
         return $this->croutilmn;
     }
 
-    public function setCroutilmn(string $croutilmn): self
-    {
-        $this->croutilmn = $croutilmn;
-
-        return $this;
-    }
-
     public function getIcpfl(): ?string
     {
         return $this->icpfl;
-    }
-
-    public function setIcpfl(string $icpfl): self
-    {
-        $this->icpfl = $icpfl;
-
-        return $this;
     }
 
     public function getPrixmoy(): ?string
@@ -1522,23 +976,9 @@ class Sart
         return $this->prixmoy;
     }
 
-    public function setPrixmoy(string $prixmoy): self
-    {
-        $this->prixmoy = $prixmoy;
-
-        return $this;
-    }
-
     public function getEanautofl(): ?string
     {
         return $this->eanautofl;
-    }
-
-    public function setEanautofl(string $eanautofl): self
-    {
-        $this->eanautofl = $eanautofl;
-
-        return $this;
     }
 
     public function getSartId(): ?int

@@ -462,23 +462,9 @@ class Vrp
         return $this->ce1;
     }
 
-    public function setCe1(string $ce1): self
-    {
-        $this->ce1 = $ce1;
-
-        return $this;
-    }
-
     public function getCe2(): ?string
     {
         return $this->ce2;
-    }
-
-    public function setCe2(string $ce2): self
-    {
-        $this->ce2 = $ce2;
-
-        return $this;
     }
 
     public function getCe3(): ?string
@@ -486,23 +472,9 @@ class Vrp
         return $this->ce3;
     }
 
-    public function setCe3(string $ce3): self
-    {
-        $this->ce3 = $ce3;
-
-        return $this;
-    }
-
     public function getCe4(): ?string
     {
         return $this->ce4;
-    }
-
-    public function setCe4(string $ce4): self
-    {
-        $this->ce4 = $ce4;
-
-        return $this;
     }
 
     public function getCe5(): ?string
@@ -510,23 +482,9 @@ class Vrp
         return $this->ce5;
     }
 
-    public function setCe5(string $ce5): self
-    {
-        $this->ce5 = $ce5;
-
-        return $this;
-    }
-
     public function getCe6(): ?string
     {
         return $this->ce6;
-    }
-
-    public function setCe6(string $ce6): self
-    {
-        $this->ce6 = $ce6;
-
-        return $this;
     }
 
     public function getCe7(): ?string
@@ -534,23 +492,9 @@ class Vrp
         return $this->ce7;
     }
 
-    public function setCe7(string $ce7): self
-    {
-        $this->ce7 = $ce7;
-
-        return $this;
-    }
-
     public function getCe8(): ?string
     {
         return $this->ce8;
-    }
-
-    public function setCe8(string $ce8): self
-    {
-        $this->ce8 = $ce8;
-
-        return $this;
     }
 
     public function getCe9(): ?string
@@ -558,23 +502,9 @@ class Vrp
         return $this->ce9;
     }
 
-    public function setCe9(string $ce9): self
-    {
-        $this->ce9 = $ce9;
-
-        return $this;
-    }
-
     public function getCea(): ?string
     {
         return $this->cea;
-    }
-
-    public function setCea(string $cea): self
-    {
-        $this->cea = $cea;
-
-        return $this;
     }
 
     public function getDos(): ?string
@@ -582,23 +512,9 @@ class Vrp
         return $this->dos;
     }
 
-    public function setDos(string $dos): self
-    {
-        $this->dos = $dos;
-
-        return $this;
-    }
-
     public function getTiers(): ?string
     {
         return $this->tiers;
-    }
-
-    public function setTiers(string $tiers): self
-    {
-        $this->tiers = $tiers;
-
-        return $this;
     }
 
     public function getUsercr(): ?string
@@ -606,23 +522,9 @@ class Vrp
         return $this->usercr;
     }
 
-    public function setUsercr(string $usercr): self
-    {
-        $this->usercr = $usercr;
-
-        return $this;
-    }
-
     public function getUsermo(): ?string
     {
         return $this->usermo;
-    }
-
-    public function setUsermo(string $usermo): self
-    {
-        $this->usermo = $usermo;
-
-        return $this;
     }
 
     public function getConf(): ?string
@@ -630,23 +532,9 @@ class Vrp
         return $this->conf;
     }
 
-    public function setConf(string $conf): self
-    {
-        $this->conf = $conf;
-
-        return $this;
-    }
-
     public function getVisa(): ?string
     {
         return $this->visa;
-    }
-
-    public function setVisa(string $visa): self
-    {
-        $this->visa = $visa;
-
-        return $this;
     }
 
     public function getNomabr(): ?string
@@ -654,23 +542,9 @@ class Vrp
         return $this->nomabr;
     }
 
-    public function setNomabr(string $nomabr): self
-    {
-        $this->nomabr = $nomabr;
-
-        return $this;
-    }
-
     public function getNom(): ?string
     {
         return $this->nom;
-    }
-
-    public function setNom(string $nom): self
-    {
-        $this->nom = $nom;
-
-        return $this;
     }
 
     public function getAdrcpl1(): ?string
@@ -678,23 +552,9 @@ class Vrp
         return $this->adrcpl1;
     }
 
-    public function setAdrcpl1(string $adrcpl1): self
-    {
-        $this->adrcpl1 = $adrcpl1;
-
-        return $this;
-    }
-
     public function getAdrcpl2(): ?string
     {
         return $this->adrcpl2;
-    }
-
-    public function setAdrcpl2(string $adrcpl2): self
-    {
-        $this->adrcpl2 = $adrcpl2;
-
-        return $this;
     }
 
     public function getRue(): ?string
@@ -702,23 +562,9 @@ class Vrp
         return $this->rue;
     }
 
-    public function setRue(string $rue): self
-    {
-        $this->rue = $rue;
-
-        return $this;
-    }
-
     public function getLoc(): ?string
     {
         return $this->loc;
-    }
-
-    public function setLoc(string $loc): self
-    {
-        $this->loc = $loc;
-
-        return $this;
     }
 
     public function getVil(): ?string
@@ -726,23 +572,9 @@ class Vrp
         return $this->vil;
     }
 
-    public function setVil(string $vil): self
-    {
-        $this->vil = $vil;
-
-        return $this;
-    }
-
     public function getPay(): ?string
     {
         return $this->pay;
-    }
-
-    public function setPay(string $pay): self
-    {
-        $this->pay = $pay;
-
-        return $this;
     }
 
     public function getCpostal(): ?string
@@ -750,23 +582,9 @@ class Vrp
         return $this->cpostal;
     }
 
-    public function setCpostal(string $cpostal): self
-    {
-        $this->cpostal = $cpostal;
-
-        return $this;
-    }
-
     public function getZipcod(): ?string
     {
         return $this->zipcod;
-    }
-
-    public function setZipcod(string $zipcod): self
-    {
-        $this->zipcod = $zipcod;
-
-        return $this;
     }
 
     public function getRegioncod(): ?string
@@ -774,23 +592,9 @@ class Vrp
         return $this->regioncod;
     }
 
-    public function setRegioncod(string $regioncod): self
-    {
-        $this->regioncod = $regioncod;
-
-        return $this;
-    }
-
     public function getInseecod(): ?string
     {
         return $this->inseecod;
-    }
-
-    public function setInseecod(string $inseecod): self
-    {
-        $this->inseecod = $inseecod;
-
-        return $this;
     }
 
     public function getTel(): ?string
@@ -798,23 +602,9 @@ class Vrp
         return $this->tel;
     }
 
-    public function setTel(string $tel): self
-    {
-        $this->tel = $tel;
-
-        return $this;
-    }
-
     public function getFax(): ?string
     {
         return $this->fax;
-    }
-
-    public function setFax(string $fax): self
-    {
-        $this->fax = $fax;
-
-        return $this;
     }
 
     public function getWeb(): ?string
@@ -822,23 +612,9 @@ class Vrp
         return $this->web;
     }
 
-    public function setWeb(string $web): self
-    {
-        $this->web = $web;
-
-        return $this;
-    }
-
     public function getEmail(): ?string
     {
         return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
     }
 
     public function getNaf(): ?string
@@ -846,23 +622,9 @@ class Vrp
         return $this->naf;
     }
 
-    public function setNaf(string $naf): self
-    {
-        $this->naf = $naf;
-
-        return $this;
-    }
-
     public function getTit(): ?string
     {
         return $this->tit;
-    }
-
-    public function setTit(string $tit): self
-    {
-        $this->tit = $tit;
-
-        return $this;
     }
 
     public function getRegl(): ?string
@@ -870,23 +632,9 @@ class Vrp
         return $this->regl;
     }
 
-    public function setRegl(string $regl): self
-    {
-        $this->regl = $regl;
-
-        return $this;
-    }
-
     public function getDev(): ?string
     {
         return $this->dev;
-    }
-
-    public function setDev(string $dev): self
-    {
-        $this->dev = $dev;
-
-        return $this;
     }
 
     public function getLang(): ?string
@@ -894,23 +642,9 @@ class Vrp
         return $this->lang;
     }
 
-    public function setLang(string $lang): self
-    {
-        $this->lang = $lang;
-
-        return $this;
-    }
-
     public function getCpt(): ?string
     {
         return $this->cpt;
-    }
-
-    public function setCpt(string $cpt): self
-    {
-        $this->cpt = $cpt;
-
-        return $this;
     }
 
     public function getCptmsk(): ?string
@@ -918,23 +652,9 @@ class Vrp
         return $this->cptmsk;
     }
 
-    public function setCptmsk(string $cptmsk): self
-    {
-        $this->cptmsk = $cptmsk;
-
-        return $this;
-    }
-
     public function getSelcod(): ?string
     {
         return $this->selcod;
-    }
-
-    public function setSelcod(string $selcod): self
-    {
-        $this->selcod = $selcod;
-
-        return $this;
     }
 
     public function getSiret(): ?string
@@ -942,23 +662,9 @@ class Vrp
         return $this->siret;
     }
 
-    public function setSiret(string $siret): self
-    {
-        $this->siret = $siret;
-
-        return $this;
-    }
-
     public function getEtb(): ?string
     {
         return $this->etb;
-    }
-
-    public function setEtb(string $etb): self
-    {
-        $this->etb = $etb;
-
-        return $this;
     }
 
     public function getUsercrdh(): ?\DateTimeInterface
@@ -966,23 +672,9 @@ class Vrp
         return $this->usercrdh;
     }
 
-    public function setUsercrdh(?\DateTimeInterface $usercrdh): self
-    {
-        $this->usercrdh = $usercrdh;
-
-        return $this;
-    }
-
     public function getUsermodh(): ?\DateTimeInterface
     {
         return $this->usermodh;
-    }
-
-    public function setUsermodh(?\DateTimeInterface $usermodh): self
-    {
-        $this->usermodh = $usermodh;
-
-        return $this;
     }
 
     public function getHsdt(): ?\DateTimeInterface
@@ -990,23 +682,9 @@ class Vrp
         return $this->hsdt;
     }
 
-    public function setHsdt(?\DateTimeInterface $hsdt): self
-    {
-        $this->hsdt = $hsdt;
-
-        return $this;
-    }
-
     public function getNote(): ?string
     {
         return $this->note;
-    }
-
-    public function setNote(string $note): self
-    {
-        $this->note = $note;
-
-        return $this;
     }
 
     public function getCenote(): ?string
@@ -1014,23 +692,9 @@ class Vrp
         return $this->cenote;
     }
 
-    public function setCenote(string $cenote): self
-    {
-        $this->cenote = $cenote;
-
-        return $this;
-    }
-
     public function getJoint(): ?string
     {
         return $this->joint;
-    }
-
-    public function setJoint(string $joint): self
-    {
-        $this->joint = $joint;
-
-        return $this;
     }
 
     public function getCejoint(): ?string
@@ -1038,23 +702,9 @@ class Vrp
         return $this->cejoint;
     }
 
-    public function setCejoint(string $cejoint): self
-    {
-        $this->cejoint = $cejoint;
-
-        return $this;
-    }
-
     public function getIdconnect(): ?string
     {
         return $this->idconnect;
-    }
-
-    public function setIdconnect(string $idconnect): self
-    {
-        $this->idconnect = $idconnect;
-
-        return $this;
     }
 
     public function getCldcod(): ?string
@@ -1062,23 +712,9 @@ class Vrp
         return $this->cldcod;
     }
 
-    public function setCldcod(string $cldcod): self
-    {
-        $this->cldcod = $cldcod;
-
-        return $this;
-    }
-
     public function getGln(): ?string
     {
         return $this->gln;
-    }
-
-    public function setGln(string $gln): self
-    {
-        $this->gln = $gln;
-
-        return $this;
     }
 
     public function getTelcle(): ?string
@@ -1086,23 +722,9 @@ class Vrp
         return $this->telcle;
     }
 
-    public function setTelcle(string $telcle): self
-    {
-        $this->telcle = $telcle;
-
-        return $this;
-    }
-
     public function getIcpfl(): ?string
     {
         return $this->icpfl;
-    }
-
-    public function setIcpfl(string $icpfl): self
-    {
-        $this->icpfl = $icpfl;
-
-        return $this;
     }
 
     public function getCofamv(): ?string
@@ -1110,23 +732,9 @@ class Vrp
         return $this->cofamv;
     }
 
-    public function setCofamv(string $cofamv): self
-    {
-        $this->cofamv = $cofamv;
-
-        return $this;
-    }
-
     public function getTelgsm(): ?string
     {
         return $this->telgsm;
-    }
-
-    public function setTelgsm(string $telgsm): self
-    {
-        $this->telgsm = $telgsm;
-
-        return $this;
     }
 
     public function getSalcod(): ?string
@@ -1134,23 +742,9 @@ class Vrp
         return $this->salcod;
     }
 
-    public function setSalcod(string $salcod): self
-    {
-        $this->salcod = $salcod;
-
-        return $this;
-    }
-
     public function getComp(): ?string
     {
         return $this->comp;
-    }
-
-    public function setComp(string $comp): self
-    {
-        $this->comp = $comp;
-
-        return $this;
     }
 
     public function getComtyp(): ?string
@@ -1158,23 +752,9 @@ class Vrp
         return $this->comtyp;
     }
 
-    public function setComtyp(string $comtyp): self
-    {
-        $this->comtyp = $comtyp;
-
-        return $this;
-    }
-
     public function getCombastyp(): ?string
     {
         return $this->combastyp;
-    }
-
-    public function setCombastyp(string $combastyp): self
-    {
-        $this->combastyp = $combastyp;
-
-        return $this;
     }
 
     public function getReprtyp(): ?string
@@ -1182,23 +762,9 @@ class Vrp
         return $this->reprtyp;
     }
 
-    public function setReprtyp(string $reprtyp): self
-    {
-        $this->reprtyp = $reprtyp;
-
-        return $this;
-    }
-
     public function getTelgsmcle(): ?string
     {
         return $this->telgsmcle;
-    }
-
-    public function setTelgsmcle(string $telgsmcle): self
-    {
-        $this->telgsmcle = $telgsmcle;
-
-        return $this;
     }
 
     public function getVrpId(): ?int
