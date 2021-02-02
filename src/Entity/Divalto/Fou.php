@@ -1300,23 +1300,9 @@ class Fou
         return $this->ce1;
     }
 
-    public function setCe1(string $ce1): self
-    {
-        $this->ce1 = $ce1;
-
-        return $this;
-    }
-
     public function getCe2(): ?string
     {
         return $this->ce2;
-    }
-
-    public function setCe2(string $ce2): self
-    {
-        $this->ce2 = $ce2;
-
-        return $this;
     }
 
     public function getCe3(): ?string
@@ -1324,23 +1310,9 @@ class Fou
         return $this->ce3;
     }
 
-    public function setCe3(string $ce3): self
-    {
-        $this->ce3 = $ce3;
-
-        return $this;
-    }
-
     public function getCe4(): ?string
     {
         return $this->ce4;
-    }
-
-    public function setCe4(string $ce4): self
-    {
-        $this->ce4 = $ce4;
-
-        return $this;
     }
 
     public function getCe5(): ?string
@@ -1348,23 +1320,9 @@ class Fou
         return $this->ce5;
     }
 
-    public function setCe5(string $ce5): self
-    {
-        $this->ce5 = $ce5;
-
-        return $this;
-    }
-
     public function getCe6(): ?string
     {
         return $this->ce6;
-    }
-
-    public function setCe6(string $ce6): self
-    {
-        $this->ce6 = $ce6;
-
-        return $this;
     }
 
     public function getCe7(): ?string
@@ -1372,23 +1330,9 @@ class Fou
         return $this->ce7;
     }
 
-    public function setCe7(string $ce7): self
-    {
-        $this->ce7 = $ce7;
-
-        return $this;
-    }
-
     public function getCe8(): ?string
     {
         return $this->ce8;
-    }
-
-    public function setCe8(string $ce8): self
-    {
-        $this->ce8 = $ce8;
-
-        return $this;
     }
 
     public function getCe9(): ?string
@@ -1396,23 +1340,9 @@ class Fou
         return $this->ce9;
     }
 
-    public function setCe9(string $ce9): self
-    {
-        $this->ce9 = $ce9;
-
-        return $this;
-    }
-
     public function getCea(): ?string
     {
         return $this->cea;
-    }
-
-    public function setCea(string $cea): self
-    {
-        $this->cea = $cea;
-
-        return $this;
     }
 
     public function getDos(): ?string
@@ -1420,23 +1350,9 @@ class Fou
         return $this->dos;
     }
 
-    public function setDos(string $dos): self
-    {
-        $this->dos = $dos;
-
-        return $this;
-    }
-
     public function getTiers(): ?string
     {
         return $this->tiers;
-    }
-
-    public function setTiers(string $tiers): self
-    {
-        $this->tiers = $tiers;
-
-        return $this;
     }
 
     public function getUsercr(): ?string
@@ -1444,23 +1360,9 @@ class Fou
         return $this->usercr;
     }
 
-    public function setUsercr(string $usercr): self
-    {
-        $this->usercr = $usercr;
-
-        return $this;
-    }
-
     public function getUsermo(): ?string
     {
         return $this->usermo;
-    }
-
-    public function setUsermo(string $usermo): self
-    {
-        $this->usermo = $usermo;
-
-        return $this;
     }
 
     public function getConf(): ?string
@@ -1468,23 +1370,9 @@ class Fou
         return $this->conf;
     }
 
-    public function setConf(string $conf): self
-    {
-        $this->conf = $conf;
-
-        return $this;
-    }
-
     public function getVisa(): ?string
     {
         return $this->visa;
-    }
-
-    public function setVisa(string $visa): self
-    {
-        $this->visa = $visa;
-
-        return $this;
     }
 
     public function getNomabr(): ?string
@@ -1492,23 +1380,9 @@ class Fou
         return $this->nomabr;
     }
 
-    public function setNomabr(string $nomabr): self
-    {
-        $this->nomabr = $nomabr;
-
-        return $this;
-    }
-
     public function getNom(): ?string
     {
         return $this->nom;
-    }
-
-    public function setNom(string $nom): self
-    {
-        $this->nom = $nom;
-
-        return $this;
     }
 
     public function getAdrcpl1(): ?string
@@ -1516,23 +1390,9 @@ class Fou
         return $this->adrcpl1;
     }
 
-    public function setAdrcpl1(string $adrcpl1): self
-    {
-        $this->adrcpl1 = $adrcpl1;
-
-        return $this;
-    }
-
     public function getAdrcpl2(): ?string
     {
         return $this->adrcpl2;
-    }
-
-    public function setAdrcpl2(string $adrcpl2): self
-    {
-        $this->adrcpl2 = $adrcpl2;
-
-        return $this;
     }
 
     public function getRue(): ?string
@@ -1540,23 +1400,9 @@ class Fou
         return $this->rue;
     }
 
-    public function setRue(string $rue): self
-    {
-        $this->rue = $rue;
-
-        return $this;
-    }
-
     public function getLoc(): ?string
     {
         return $this->loc;
-    }
-
-    public function setLoc(string $loc): self
-    {
-        $this->loc = $loc;
-
-        return $this;
     }
 
     public function getVil(): ?string
@@ -1564,23 +1410,9 @@ class Fou
         return $this->vil;
     }
 
-    public function setVil(string $vil): self
-    {
-        $this->vil = $vil;
-
-        return $this;
-    }
-
     public function getPay(): ?string
     {
         return $this->pay;
-    }
-
-    public function setPay(string $pay): self
-    {
-        $this->pay = $pay;
-
-        return $this;
     }
 
     public function getCpostal(): ?string
@@ -1588,23 +1420,9 @@ class Fou
         return $this->cpostal;
     }
 
-    public function setCpostal(string $cpostal): self
-    {
-        $this->cpostal = $cpostal;
-
-        return $this;
-    }
-
     public function getZipcod(): ?string
     {
         return $this->zipcod;
-    }
-
-    public function setZipcod(string $zipcod): self
-    {
-        $this->zipcod = $zipcod;
-
-        return $this;
     }
 
     public function getRegioncod(): ?string
@@ -1612,23 +1430,9 @@ class Fou
         return $this->regioncod;
     }
 
-    public function setRegioncod(string $regioncod): self
-    {
-        $this->regioncod = $regioncod;
-
-        return $this;
-    }
-
     public function getInseecod(): ?string
     {
         return $this->inseecod;
-    }
-
-    public function setInseecod(string $inseecod): self
-    {
-        $this->inseecod = $inseecod;
-
-        return $this;
     }
 
     public function getTel(): ?string
@@ -1636,23 +1440,9 @@ class Fou
         return $this->tel;
     }
 
-    public function setTel(string $tel): self
-    {
-        $this->tel = $tel;
-
-        return $this;
-    }
-
     public function getFax(): ?string
     {
         return $this->fax;
-    }
-
-    public function setFax(string $fax): self
-    {
-        $this->fax = $fax;
-
-        return $this;
     }
 
     public function getWeb(): ?string
@@ -1660,23 +1450,9 @@ class Fou
         return $this->web;
     }
 
-    public function setWeb(string $web): self
-    {
-        $this->web = $web;
-
-        return $this;
-    }
-
     public function getEmail(): ?string
     {
         return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
     }
 
     public function getNaf(): ?string
@@ -1684,23 +1460,9 @@ class Fou
         return $this->naf;
     }
 
-    public function setNaf(string $naf): self
-    {
-        $this->naf = $naf;
-
-        return $this;
-    }
-
     public function getTit(): ?string
     {
         return $this->tit;
-    }
-
-    public function setTit(string $tit): self
-    {
-        $this->tit = $tit;
-
-        return $this;
     }
 
     public function getRegl(): ?string
@@ -1708,23 +1470,9 @@ class Fou
         return $this->regl;
     }
 
-    public function setRegl(string $regl): self
-    {
-        $this->regl = $regl;
-
-        return $this;
-    }
-
     public function getDev(): ?string
     {
         return $this->dev;
-    }
-
-    public function setDev(string $dev): self
-    {
-        $this->dev = $dev;
-
-        return $this;
     }
 
     public function getLang(): ?string
@@ -1732,23 +1480,9 @@ class Fou
         return $this->lang;
     }
 
-    public function setLang(string $lang): self
-    {
-        $this->lang = $lang;
-
-        return $this;
-    }
-
     public function getCpt(): ?string
     {
         return $this->cpt;
-    }
-
-    public function setCpt(string $cpt): self
-    {
-        $this->cpt = $cpt;
-
-        return $this;
     }
 
     public function getCptmsk(): ?string
@@ -1756,23 +1490,9 @@ class Fou
         return $this->cptmsk;
     }
 
-    public function setCptmsk(string $cptmsk): self
-    {
-        $this->cptmsk = $cptmsk;
-
-        return $this;
-    }
-
     public function getSelcod(): ?string
     {
         return $this->selcod;
-    }
-
-    public function setSelcod(string $selcod): self
-    {
-        $this->selcod = $selcod;
-
-        return $this;
     }
 
     public function getSiret(): ?string
@@ -1780,23 +1500,9 @@ class Fou
         return $this->siret;
     }
 
-    public function setSiret(string $siret): self
-    {
-        $this->siret = $siret;
-
-        return $this;
-    }
-
     public function getEtb(): ?string
     {
         return $this->etb;
-    }
-
-    public function setEtb(string $etb): self
-    {
-        $this->etb = $etb;
-
-        return $this;
     }
 
     public function getUsercrdh(): ?\DateTimeInterface
@@ -1804,23 +1510,9 @@ class Fou
         return $this->usercrdh;
     }
 
-    public function setUsercrdh(?\DateTimeInterface $usercrdh): self
-    {
-        $this->usercrdh = $usercrdh;
-
-        return $this;
-    }
-
     public function getUsermodh(): ?\DateTimeInterface
     {
         return $this->usermodh;
-    }
-
-    public function setUsermodh(?\DateTimeInterface $usermodh): self
-    {
-        $this->usermodh = $usermodh;
-
-        return $this;
     }
 
     public function getHsdt(): ?\DateTimeInterface
@@ -1828,23 +1520,9 @@ class Fou
         return $this->hsdt;
     }
 
-    public function setHsdt(?\DateTimeInterface $hsdt): self
-    {
-        $this->hsdt = $hsdt;
-
-        return $this;
-    }
-
     public function getNote(): ?string
     {
         return $this->note;
-    }
-
-    public function setNote(string $note): self
-    {
-        $this->note = $note;
-
-        return $this;
     }
 
     public function getCenote(): ?string
@@ -1852,23 +1530,9 @@ class Fou
         return $this->cenote;
     }
 
-    public function setCenote(string $cenote): self
-    {
-        $this->cenote = $cenote;
-
-        return $this;
-    }
-
     public function getJoint(): ?string
     {
         return $this->joint;
-    }
-
-    public function setJoint(string $joint): self
-    {
-        $this->joint = $joint;
-
-        return $this;
     }
 
     public function getCejoint(): ?string
@@ -1876,23 +1540,9 @@ class Fou
         return $this->cejoint;
     }
 
-    public function setCejoint(string $cejoint): self
-    {
-        $this->cejoint = $cejoint;
-
-        return $this;
-    }
-
     public function getIdconnect(): ?string
     {
         return $this->idconnect;
-    }
-
-    public function setIdconnect(string $idconnect): self
-    {
-        $this->idconnect = $idconnect;
-
-        return $this;
     }
 
     public function getCldcod(): ?string
@@ -1900,23 +1550,9 @@ class Fou
         return $this->cldcod;
     }
 
-    public function setCldcod(string $cldcod): self
-    {
-        $this->cldcod = $cldcod;
-
-        return $this;
-    }
-
     public function getGln(): ?string
     {
         return $this->gln;
-    }
-
-    public function setGln(string $gln): self
-    {
-        $this->gln = $gln;
-
-        return $this;
     }
 
     public function getTelcle(): ?string
@@ -1924,23 +1560,9 @@ class Fou
         return $this->telcle;
     }
 
-    public function setTelcle(string $telcle): self
-    {
-        $this->telcle = $telcle;
-
-        return $this;
-    }
-
     public function getIcpfl(): ?string
     {
         return $this->icpfl;
-    }
-
-    public function setIcpfl(string $icpfl): self
-    {
-        $this->icpfl = $icpfl;
-
-        return $this;
     }
 
     public function getTacod(): ?string
@@ -1948,23 +1570,9 @@ class Fou
         return $this->tacod;
     }
 
-    public function setTacod(string $tacod): self
-    {
-        $this->tacod = $tacod;
-
-        return $this;
-    }
-
     public function getRemcod(): ?string
     {
         return $this->remcod;
-    }
-
-    public function setRemcod(string $remcod): self
-    {
-        $this->remcod = $remcod;
-
-        return $this;
     }
 
     public function getPromotacod(): ?string
@@ -1972,23 +1580,9 @@ class Fou
         return $this->promotacod;
     }
 
-    public function setPromotacod(string $promotacod): self
-    {
-        $this->promotacod = $promotacod;
-
-        return $this;
-    }
-
     public function getPromoremcod(): ?string
     {
         return $this->promoremcod;
-    }
-
-    public function setPromoremcod(string $promoremcod): self
-    {
-        $this->promoremcod = $promoremcod;
-
-        return $this;
     }
 
     public function getTafam(): ?string
@@ -1996,23 +1590,9 @@ class Fou
         return $this->tafam;
     }
 
-    public function setTafam(string $tafam): self
-    {
-        $this->tafam = $tafam;
-
-        return $this;
-    }
-
     public function getTafamx(): ?string
     {
         return $this->tafamx;
-    }
-
-    public function setTafamx(string $tafamx): self
-    {
-        $this->tafamx = $tafamx;
-
-        return $this;
     }
 
     public function getRefam(): ?string
@@ -2020,23 +1600,9 @@ class Fou
         return $this->refam;
     }
 
-    public function setRefam(string $refam): self
-    {
-        $this->refam = $refam;
-
-        return $this;
-    }
-
     public function getRefamx(): ?string
     {
         return $this->refamx;
-    }
-
-    public function setRefamx(string $refamx): self
-    {
-        $this->refamx = $refamx;
-
-        return $this;
     }
 
     public function getRem0001(): ?string
@@ -2044,23 +1610,9 @@ class Fou
         return $this->rem0001;
     }
 
-    public function setRem0001(string $rem0001): self
-    {
-        $this->rem0001 = $rem0001;
-
-        return $this;
-    }
-
     public function getRem0002(): ?string
     {
         return $this->rem0002;
-    }
-
-    public function setRem0002(string $rem0002): self
-    {
-        $this->rem0002 = $rem0002;
-
-        return $this;
     }
 
     public function getRem0003(): ?string
@@ -2068,23 +1620,9 @@ class Fou
         return $this->rem0003;
     }
 
-    public function setRem0003(string $rem0003): self
-    {
-        $this->rem0003 = $rem0003;
-
-        return $this;
-    }
-
     public function getRemtyp0001(): ?string
     {
         return $this->remtyp0001;
-    }
-
-    public function setRemtyp0001(string $remtyp0001): self
-    {
-        $this->remtyp0001 = $remtyp0001;
-
-        return $this;
     }
 
     public function getRemtyp0002(): ?string
@@ -2092,23 +1630,9 @@ class Fou
         return $this->remtyp0002;
     }
 
-    public function setRemtyp0002(string $remtyp0002): self
-    {
-        $this->remtyp0002 = $remtyp0002;
-
-        return $this;
-    }
-
     public function getRemtyp0003(): ?string
     {
         return $this->remtyp0003;
-    }
-
-    public function setRemtyp0003(string $remtyp0003): self
-    {
-        $this->remtyp0003 = $remtyp0003;
-
-        return $this;
     }
 
     public function getDopdh(): ?\DateTimeInterface
@@ -2116,23 +1640,9 @@ class Fou
         return $this->dopdh;
     }
 
-    public function setDopdh(?\DateTimeInterface $dopdh): self
-    {
-        $this->dopdh = $dopdh;
-
-        return $this;
-    }
-
     public function getNbex0001(): ?string
     {
         return $this->nbex0001;
-    }
-
-    public function setNbex0001(string $nbex0001): self
-    {
-        $this->nbex0001 = $nbex0001;
-
-        return $this;
     }
 
     public function getNbex0002(): ?string
@@ -2140,23 +1650,9 @@ class Fou
         return $this->nbex0002;
     }
 
-    public function setNbex0002(string $nbex0002): self
-    {
-        $this->nbex0002 = $nbex0002;
-
-        return $this;
-    }
-
     public function getNbex0003(): ?string
     {
         return $this->nbex0003;
-    }
-
-    public function setNbex0003(string $nbex0003): self
-    {
-        $this->nbex0003 = $nbex0003;
-
-        return $this;
     }
 
     public function getNbex0004(): ?string
@@ -2164,23 +1660,9 @@ class Fou
         return $this->nbex0004;
     }
 
-    public function setNbex0004(string $nbex0004): self
-    {
-        $this->nbex0004 = $nbex0004;
-
-        return $this;
-    }
-
     public function getEdittyp0001(): ?string
     {
         return $this->edittyp0001;
-    }
-
-    public function setEdittyp0001(string $edittyp0001): self
-    {
-        $this->edittyp0001 = $edittyp0001;
-
-        return $this;
     }
 
     public function getEdittyp0002(): ?string
@@ -2188,23 +1670,9 @@ class Fou
         return $this->edittyp0002;
     }
 
-    public function setEdittyp0002(string $edittyp0002): self
-    {
-        $this->edittyp0002 = $edittyp0002;
-
-        return $this;
-    }
-
     public function getEdittyp0003(): ?string
     {
         return $this->edittyp0003;
-    }
-
-    public function setEdittyp0003(string $edittyp0003): self
-    {
-        $this->edittyp0003 = $edittyp0003;
-
-        return $this;
     }
 
     public function getEdittyp0004(): ?string
@@ -2212,23 +1680,9 @@ class Fou
         return $this->edittyp0004;
     }
 
-    public function setEdittyp0004(string $edittyp0004): self
-    {
-        $this->edittyp0004 = $edittyp0004;
-
-        return $this;
-    }
-
     public function getEtano0001(): ?string
     {
         return $this->etano0001;
-    }
-
-    public function setEtano0001(string $etano0001): self
-    {
-        $this->etano0001 = $etano0001;
-
-        return $this;
     }
 
     public function getEtano0002(): ?string
@@ -2236,23 +1690,9 @@ class Fou
         return $this->etano0002;
     }
 
-    public function setEtano0002(string $etano0002): self
-    {
-        $this->etano0002 = $etano0002;
-
-        return $this;
-    }
-
     public function getEtano0003(): ?string
     {
         return $this->etano0003;
-    }
-
-    public function setEtano0003(string $etano0003): self
-    {
-        $this->etano0003 = $etano0003;
-
-        return $this;
     }
 
     public function getEtano0004(): ?string
@@ -2260,23 +1700,9 @@ class Fou
         return $this->etano0004;
     }
 
-    public function setEtano0004(string $etano0004): self
-    {
-        $this->etano0004 = $etano0004;
-
-        return $this;
-    }
-
     public function getAxemsk(): ?string
     {
         return $this->axemsk;
-    }
-
-    public function setAxemsk(string $axemsk): self
-    {
-        $this->axemsk = $axemsk;
-
-        return $this;
     }
 
     public function getAxeno(): ?string
@@ -2284,23 +1710,9 @@ class Fou
         return $this->axeno;
     }
 
-    public function setAxeno(string $axeno): self
-    {
-        $this->axeno = $axeno;
-
-        return $this;
-    }
-
     public function getStlgtgamcod(): ?string
     {
         return $this->stlgtgamcod;
-    }
-
-    public function setStlgtgamcod(string $stlgtgamcod): self
-    {
-        $this->stlgtgamcod = $stlgtgamcod;
-
-        return $this;
     }
 
     public function getWmauditfl(): ?string
@@ -2308,23 +1720,9 @@ class Fou
         return $this->wmauditfl;
     }
 
-    public function setWmauditfl(string $wmauditfl): self
-    {
-        $this->wmauditfl = $wmauditfl;
-
-        return $this;
-    }
-
     public function getWmdocemp(): ?string
     {
         return $this->wmdocemp;
-    }
-
-    public function setWmdocemp(string $wmdocemp): self
-    {
-        $this->wmdocemp = $wmdocemp;
-
-        return $this;
     }
 
     public function getWmresaimpfl(): ?string
@@ -2332,23 +1730,9 @@ class Fou
         return $this->wmresaimpfl;
     }
 
-    public function setWmresaimpfl(string $wmresaimpfl): self
-    {
-        $this->wmresaimpfl = $wmresaimpfl;
-
-        return $this;
-    }
-
     public function getTransplancod(): ?string
     {
         return $this->transplancod;
-    }
-
-    public function setTransplancod(string $transplancod): self
-    {
-        $this->transplancod = $transplancod;
-
-        return $this;
     }
 
     public function getTexcod0001(): ?string
@@ -2356,23 +1740,9 @@ class Fou
         return $this->texcod0001;
     }
 
-    public function setTexcod0001(string $texcod0001): self
-    {
-        $this->texcod0001 = $texcod0001;
-
-        return $this;
-    }
-
     public function getTexcod0002(): ?string
     {
         return $this->texcod0002;
-    }
-
-    public function setTexcod0002(string $texcod0002): self
-    {
-        $this->texcod0002 = $texcod0002;
-
-        return $this;
     }
 
     public function getTexcod0003(): ?string
@@ -2380,23 +1750,9 @@ class Fou
         return $this->texcod0003;
     }
 
-    public function setTexcod0003(string $texcod0003): self
-    {
-        $this->texcod0003 = $texcod0003;
-
-        return $this;
-    }
-
     public function getTexcod0004(): ?string
     {
         return $this->texcod0004;
-    }
-
-    public function setTexcod0004(string $texcod0004): self
-    {
-        $this->texcod0004 = $texcod0004;
-
-        return $this;
     }
 
     public function getTexcod0005(): ?string
@@ -2404,23 +1760,9 @@ class Fou
         return $this->texcod0005;
     }
 
-    public function setTexcod0005(string $texcod0005): self
-    {
-        $this->texcod0005 = $texcod0005;
-
-        return $this;
-    }
-
     public function getTexcod0006(): ?string
     {
         return $this->texcod0006;
-    }
-
-    public function setTexcod0006(string $texcod0006): self
-    {
-        $this->texcod0006 = $texcod0006;
-
-        return $this;
     }
 
     public function getTexcod0007(): ?string
@@ -2428,23 +1770,9 @@ class Fou
         return $this->texcod0007;
     }
 
-    public function setTexcod0007(string $texcod0007): self
-    {
-        $this->texcod0007 = $texcod0007;
-
-        return $this;
-    }
-
     public function getTexcod0008(): ?string
     {
         return $this->texcod0008;
-    }
-
-    public function setTexcod0008(string $texcod0008): self
-    {
-        $this->texcod0008 = $texcod0008;
-
-        return $this;
     }
 
     public function getAffcldcod(): ?string
@@ -2452,23 +1780,9 @@ class Fou
         return $this->affcldcod;
     }
 
-    public function setAffcldcod(string $affcldcod): self
-    {
-        $this->affcldcod = $affcldcod;
-
-        return $this;
-    }
-
     public function getIdentiteext(): ?string
     {
         return $this->identiteext;
-    }
-
-    public function setIdentiteext(string $identiteext): self
-    {
-        $this->identiteext = $identiteext;
-
-        return $this;
     }
 
     public function getStat0001(): ?string
@@ -2476,23 +1790,9 @@ class Fou
         return $this->stat0001;
     }
 
-    public function setStat0001(string $stat0001): self
-    {
-        $this->stat0001 = $stat0001;
-
-        return $this;
-    }
-
     public function getStat0002(): ?string
     {
         return $this->stat0002;
-    }
-
-    public function setStat0002(string $stat0002): self
-    {
-        $this->stat0002 = $stat0002;
-
-        return $this;
     }
 
     public function getStat0003(): ?string
@@ -2500,23 +1800,9 @@ class Fou
         return $this->stat0003;
     }
 
-    public function setStat0003(string $stat0003): self
-    {
-        $this->stat0003 = $stat0003;
-
-        return $this;
-    }
-
     public function getTpft(): ?string
     {
         return $this->tpft;
-    }
-
-    public function setTpft(string $tpft): self
-    {
-        $this->tpft = $tpft;
-
-        return $this;
     }
 
     public function getTiersgrp(): ?string
@@ -2524,23 +1810,9 @@ class Fou
         return $this->tiersgrp;
     }
 
-    public function setTiersgrp(string $tiersgrp): self
-    {
-        $this->tiersgrp = $tiersgrp;
-
-        return $this;
-    }
-
     public function getZona(): ?string
     {
         return $this->zona;
-    }
-
-    public function setZona(string $zona): self
-    {
-        $this->zona = $zona;
-
-        return $this;
     }
 
     public function getCamt(): ?string
@@ -2548,23 +1820,9 @@ class Fou
         return $this->camt;
     }
 
-    public function setCamt(string $camt): self
-    {
-        $this->camt = $camt;
-
-        return $this;
-    }
-
     public function getSalnb(): ?string
     {
         return $this->salnb;
-    }
-
-    public function setSalnb(string $salnb): self
-    {
-        $this->salnb = $salnb;
-
-        return $this;
     }
 
     public function getEnmax0001(): ?string
@@ -2572,23 +1830,9 @@ class Fou
         return $this->enmax0001;
     }
 
-    public function setEnmax0001(string $enmax0001): self
-    {
-        $this->enmax0001 = $enmax0001;
-
-        return $this;
-    }
-
     public function getEnmax0002(): ?string
     {
         return $this->enmax0002;
-    }
-
-    public function setEnmax0002(string $enmax0002): self
-    {
-        $this->enmax0002 = $enmax0002;
-
-        return $this;
     }
 
     public function getEscp(): ?string
@@ -2596,23 +1840,9 @@ class Fou
         return $this->escp;
     }
 
-    public function setEscp(string $escp): self
-    {
-        $this->escp = $escp;
-
-        return $this;
-    }
-
     public function getAcp(): ?string
     {
         return $this->acp;
-    }
-
-    public function setAcp(string $acp): self
-    {
-        $this->acp = $acp;
-
-        return $this;
     }
 
     public function getZonn(): ?string
@@ -2620,23 +1850,9 @@ class Fou
         return $this->zonn;
     }
 
-    public function setZonn(string $zonn): self
-    {
-        $this->zonn = $zonn;
-
-        return $this;
-    }
-
     public function getTvatie(): ?string
     {
         return $this->tvatie;
-    }
-
-    public function setTvatie(string $tvatie): self
-    {
-        $this->tvatie = $tvatie;
-
-        return $this;
     }
 
     public function getAdrtiers0001(): ?string
@@ -2644,23 +1860,9 @@ class Fou
         return $this->adrtiers0001;
     }
 
-    public function setAdrtiers0001(string $adrtiers0001): self
-    {
-        $this->adrtiers0001 = $adrtiers0001;
-
-        return $this;
-    }
-
     public function getAdrtiers0002(): ?string
     {
         return $this->adrtiers0002;
-    }
-
-    public function setAdrtiers0002(string $adrtiers0002): self
-    {
-        $this->adrtiers0002 = $adrtiers0002;
-
-        return $this;
     }
 
     public function getAdrtiers0003(): ?string
@@ -2668,23 +1870,9 @@ class Fou
         return $this->adrtiers0003;
     }
 
-    public function setAdrtiers0003(string $adrtiers0003): self
-    {
-        $this->adrtiers0003 = $adrtiers0003;
-
-        return $this;
-    }
-
     public function getAdrtiers0004(): ?string
     {
         return $this->adrtiers0004;
-    }
-
-    public function setAdrtiers0004(string $adrtiers0004): self
-    {
-        $this->adrtiers0004 = $adrtiers0004;
-
-        return $this;
     }
 
     public function getAdrtiers0005(): ?string
@@ -2692,23 +1880,9 @@ class Fou
         return $this->adrtiers0005;
     }
 
-    public function setAdrtiers0005(string $adrtiers0005): self
-    {
-        $this->adrtiers0005 = $adrtiers0005;
-
-        return $this;
-    }
-
     public function getAdrcod0001(): ?string
     {
         return $this->adrcod0001;
-    }
-
-    public function setAdrcod0001(string $adrcod0001): self
-    {
-        $this->adrcod0001 = $adrcod0001;
-
-        return $this;
     }
 
     public function getAdrcod0002(): ?string
@@ -2716,23 +1890,9 @@ class Fou
         return $this->adrcod0002;
     }
 
-    public function setAdrcod0002(string $adrcod0002): self
-    {
-        $this->adrcod0002 = $adrcod0002;
-
-        return $this;
-    }
-
     public function getAdrcod0003(): ?string
     {
         return $this->adrcod0003;
-    }
-
-    public function setAdrcod0003(string $adrcod0003): self
-    {
-        $this->adrcod0003 = $adrcod0003;
-
-        return $this;
     }
 
     public function getAdrcod0004(): ?string
@@ -2740,23 +1900,9 @@ class Fou
         return $this->adrcod0004;
     }
 
-    public function setAdrcod0004(string $adrcod0004): self
-    {
-        $this->adrcod0004 = $adrcod0004;
-
-        return $this;
-    }
-
     public function getAdrcod0005(): ?string
     {
         return $this->adrcod0005;
-    }
-
-    public function setAdrcod0005(string $adrcod0005): self
-    {
-        $this->adrcod0005 = $adrcod0005;
-
-        return $this;
     }
 
     public function getTiersstat(): ?string
@@ -2764,23 +1910,9 @@ class Fou
         return $this->tiersstat;
     }
 
-    public function setTiersstat(string $tiersstat): self
-    {
-        $this->tiersstat = $tiersstat;
-
-        return $this;
-    }
-
     public function getTiersr3(): ?string
     {
         return $this->tiersr3;
-    }
-
-    public function setTiersr3(string $tiersr3): self
-    {
-        $this->tiersr3 = $tiersr3;
-
-        return $this;
     }
 
     public function getRelcod0001(): ?string
@@ -2788,23 +1920,9 @@ class Fou
         return $this->relcod0001;
     }
 
-    public function setRelcod0001(string $relcod0001): self
-    {
-        $this->relcod0001 = $relcod0001;
-
-        return $this;
-    }
-
     public function getRelcod0002(): ?string
     {
         return $this->relcod0002;
-    }
-
-    public function setRelcod0002(string $relcod0002): self
-    {
-        $this->relcod0002 = $relcod0002;
-
-        return $this;
     }
 
     public function getRelcod0003(): ?string
@@ -2812,23 +1930,9 @@ class Fou
         return $this->relcod0003;
     }
 
-    public function setRelcod0003(string $relcod0003): self
-    {
-        $this->relcod0003 = $relcod0003;
-
-        return $this;
-    }
-
     public function getBlmod(): ?string
     {
         return $this->blmod;
-    }
-
-    public function setBlmod(string $blmod): self
-    {
-        $this->blmod = $blmod;
-
-        return $this;
     }
 
     public function getTvano(): ?string
@@ -2836,23 +1940,9 @@ class Fou
         return $this->tvano;
     }
 
-    public function setTvano(string $tvano): self
-    {
-        $this->tvano = $tvano;
-
-        return $this;
-    }
-
     public function getTvapay(): ?string
     {
         return $this->tvapay;
-    }
-
-    public function setTvapay(string $tvapay): self
-    {
-        $this->tvapay = $tvapay;
-
-        return $this;
     }
 
     public function getTvablcoe(): ?string
@@ -2860,23 +1950,9 @@ class Fou
         return $this->tvablcoe;
     }
 
-    public function setTvablcoe(string $tvablcoe): self
-    {
-        $this->tvablcoe = $tvablcoe;
-
-        return $this;
-    }
-
     public function getTvablcd3(): ?string
     {
         return $this->tvablcd3;
-    }
-
-    public function setTvablcd3(string $tvablcd3): self
-    {
-        $this->tvablcd3 = $tvablcd3;
-
-        return $this;
     }
 
     public function getTvamaxmt(): ?string
@@ -2884,23 +1960,9 @@ class Fou
         return $this->tvamaxmt;
     }
 
-    public function setTvamaxmt(string $tvamaxmt): self
-    {
-        $this->tvamaxmt = $tvamaxmt;
-
-        return $this;
-    }
-
     public function getTransjrnb(): ?string
     {
         return $this->transjrnb;
-    }
-
-    public function setTransjrnb(string $transjrnb): self
-    {
-        $this->transjrnb = $transjrnb;
-
-        return $this;
     }
 
     public function getRfcctrcod(): ?string
@@ -2908,23 +1970,9 @@ class Fou
         return $this->rfcctrcod;
     }
 
-    public function setRfcctrcod(string $rfcctrcod): self
-    {
-        $this->rfcctrcod = $rfcctrcod;
-
-        return $this;
-    }
-
     public function getProtocol(): ?string
     {
         return $this->protocol;
-    }
-
-    public function setProtocol(string $protocol): self
-    {
-        $this->protocol = $protocol;
-
-        return $this;
     }
 
     public function getTiersexterne(): ?string
@@ -2932,23 +1980,9 @@ class Fou
         return $this->tiersexterne;
     }
 
-    public function setTiersexterne(string $tiersexterne): self
-    {
-        $this->tiersexterne = $tiersexterne;
-
-        return $this;
-    }
-
     public function getFeu(): ?string
     {
         return $this->feu;
-    }
-
-    public function setFeu(string $feu): self
-    {
-        $this->feu = $feu;
-
-        return $this;
     }
 
     public function getRelligcod(): ?string
@@ -2956,23 +1990,9 @@ class Fou
         return $this->relligcod;
     }
 
-    public function setRelligcod(string $relligcod): self
-    {
-        $this->relligcod = $relligcod;
-
-        return $this;
-    }
-
     public function getValligcod(): ?string
     {
         return $this->valligcod;
-    }
-
-    public function setValligcod(string $valligcod): self
-    {
-        $this->valligcod = $valligcod;
-
-        return $this;
     }
 
     public function getDematcod(): ?string
@@ -2980,23 +2000,9 @@ class Fou
         return $this->dematcod;
     }
 
-    public function setDematcod(string $dematcod): self
-    {
-        $this->dematcod = $dematcod;
-
-        return $this;
-    }
-
     public function getTierspayer(): ?string
     {
         return $this->tierspayer;
-    }
-
-    public function setTierspayer(string $tierspayer): self
-    {
-        $this->tierspayer = $tierspayer;
-
-        return $this;
     }
 
     public function getBapsalcod(): ?string
@@ -3004,23 +2010,9 @@ class Fou
         return $this->bapsalcod;
     }
 
-    public function setBapsalcod(string $bapsalcod): self
-    {
-        $this->bapsalcod = $bapsalcod;
-
-        return $this;
-    }
-
     public function getQuacod(): ?string
     {
         return $this->quacod;
-    }
-
-    public function setQuacod(string $quacod): self
-    {
-        $this->quacod = $quacod;
-
-        return $this;
     }
 
     public function getCdarcod(): ?string
@@ -3028,23 +2020,9 @@ class Fou
         return $this->cdarcod;
     }
 
-    public function setCdarcod(string $cdarcod): self
-    {
-        $this->cdarcod = $cdarcod;
-
-        return $this;
-    }
-
     public function getDelfo(): ?string
     {
         return $this->delfo;
-    }
-
-    public function setDelfo(string $delfo): self
-    {
-        $this->delfo = $delfo;
-
-        return $this;
     }
 
     public function getPorfrval(): ?string
@@ -3052,23 +2030,9 @@ class Fou
         return $this->porfrval;
     }
 
-    public function setPorfrval(string $porfrval): self
-    {
-        $this->porfrval = $porfrval;
-
-        return $this;
-    }
-
     public function getPorfrcod(): ?string
     {
         return $this->porfrcod;
-    }
-
-    public function setPorfrcod(string $porfrcod): self
-    {
-        $this->porfrcod = $porfrcod;
-
-        return $this;
     }
 
     public function getSalcod(): ?string
@@ -3076,23 +2040,9 @@ class Fou
         return $this->salcod;
     }
 
-    public function setSalcod(string $salcod): self
-    {
-        $this->salcod = $salcod;
-
-        return $this;
-    }
-
     public function getDelsecujr(): ?string
     {
         return $this->delsecujr;
-    }
-
-    public function setDelsecujr(string $delsecujr): self
-    {
-        $this->delsecujr = $delsecujr;
-
-        return $this;
     }
 
     public function getBqca(): ?string
@@ -3100,23 +2050,9 @@ class Fou
         return $this->bqca;
     }
 
-    public function setBqca(string $bqca): self
-    {
-        $this->bqca = $bqca;
-
-        return $this;
-    }
-
     public function getPrioreg(): ?string
     {
         return $this->prioreg;
-    }
-
-    public function setPrioreg(string $prioreg): self
-    {
-        $this->prioreg = $prioreg;
-
-        return $this;
     }
 
     public function getEsccod(): ?string
@@ -3124,23 +2060,9 @@ class Fou
         return $this->esccod;
     }
 
-    public function setEsccod(string $esccod): self
-    {
-        $this->esccod = $esccod;
-
-        return $this;
-    }
-
     public function getCtrlfaval(): ?string
     {
         return $this->ctrlfaval;
-    }
-
-    public function setCtrlfaval(string $ctrlfaval): self
-    {
-        $this->ctrlfaval = $ctrlfaval;
-
-        return $this;
     }
 
     public function getSansachatflg(): ?string
@@ -3148,23 +2070,9 @@ class Fou
         return $this->sansachatflg;
     }
 
-    public function setSansachatflg(string $sansachatflg): self
-    {
-        $this->sansachatflg = $sansachatflg;
-
-        return $this;
-    }
-
     public function getCtrltolp(): ?string
     {
         return $this->ctrltolp;
-    }
-
-    public function setCtrltolp(string $ctrltolp): self
-    {
-        $this->ctrltolp = $ctrltolp;
-
-        return $this;
     }
 
     public function getAchsalcod0001(): ?string
@@ -3172,23 +2080,9 @@ class Fou
         return $this->achsalcod0001;
     }
 
-    public function setAchsalcod0001(string $achsalcod0001): self
-    {
-        $this->achsalcod0001 = $achsalcod0001;
-
-        return $this;
-    }
-
     public function getAchsalcod0002(): ?string
     {
         return $this->achsalcod0002;
-    }
-
-    public function setAchsalcod0002(string $achsalcod0002): self
-    {
-        $this->achsalcod0002 = $achsalcod0002;
-
-        return $this;
     }
 
     public function getCatfoucod(): ?string
@@ -3196,23 +2090,9 @@ class Fou
         return $this->catfoucod;
     }
 
-    public function setCatfoucod(string $catfoucod): self
-    {
-        $this->catfoucod = $catfoucod;
-
-        return $this;
-    }
-
     public function getCdmt(): ?string
     {
         return $this->cdmt;
-    }
-
-    public function setCdmt(string $cdmt): self
-    {
-        $this->cdmt = $cdmt;
-
-        return $this;
     }
 
     public function getSeuilmt(): ?string
@@ -3220,23 +2100,9 @@ class Fou
         return $this->seuilmt;
     }
 
-    public function setSeuilmt(string $seuilmt): self
-    {
-        $this->seuilmt = $seuilmt;
-
-        return $this;
-    }
-
     public function getTierscli(): ?string
     {
         return $this->tierscli;
-    }
-
-    public function setTierscli(string $tierscli): self
-    {
-        $this->tierscli = $tierscli;
-
-        return $this;
     }
 
     public function getTrefcoefzerofl0001(): ?string
@@ -3244,23 +2110,9 @@ class Fou
         return $this->trefcoefzerofl0001;
     }
 
-    public function setTrefcoefzerofl0001(string $trefcoefzerofl0001): self
-    {
-        $this->trefcoefzerofl0001 = $trefcoefzerofl0001;
-
-        return $this;
-    }
-
     public function getTrefcoefzerofl0002(): ?string
     {
         return $this->trefcoefzerofl0002;
-    }
-
-    public function setTrefcoefzerofl0002(string $trefcoefzerofl0002): self
-    {
-        $this->trefcoefzerofl0002 = $trefcoefzerofl0002;
-
-        return $this;
     }
 
     public function getTrefcoefzerofl0003(): ?string
@@ -3268,23 +2120,9 @@ class Fou
         return $this->trefcoefzerofl0003;
     }
 
-    public function setTrefcoefzerofl0003(string $trefcoefzerofl0003): self
-    {
-        $this->trefcoefzerofl0003 = $trefcoefzerofl0003;
-
-        return $this;
-    }
-
     public function getTrefcoef0001(): ?string
     {
         return $this->trefcoef0001;
-    }
-
-    public function setTrefcoef0001(string $trefcoef0001): self
-    {
-        $this->trefcoef0001 = $trefcoef0001;
-
-        return $this;
     }
 
     public function getTrefcoef0002(): ?string
@@ -3292,23 +2130,9 @@ class Fou
         return $this->trefcoef0002;
     }
 
-    public function setTrefcoef0002(string $trefcoef0002): self
-    {
-        $this->trefcoef0002 = $trefcoef0002;
-
-        return $this;
-    }
-
     public function getTrefcoef0003(): ?string
     {
         return $this->trefcoef0003;
-    }
-
-    public function setTrefcoef0003(string $trefcoef0003): self
-    {
-        $this->trefcoef0003 = $trefcoef0003;
-
-        return $this;
     }
 
     public function getTreffraismt0001(): ?string
@@ -3316,23 +2140,9 @@ class Fou
         return $this->treffraismt0001;
     }
 
-    public function setTreffraismt0001(string $treffraismt0001): self
-    {
-        $this->treffraismt0001 = $treffraismt0001;
-
-        return $this;
-    }
-
     public function getTreffraismt0002(): ?string
     {
         return $this->treffraismt0002;
-    }
-
-    public function setTreffraismt0002(string $treffraismt0002): self
-    {
-        $this->treffraismt0002 = $treffraismt0002;
-
-        return $this;
     }
 
     public function getTreffraismt0003(): ?string
@@ -3340,23 +2150,9 @@ class Fou
         return $this->treffraismt0003;
     }
 
-    public function setTreffraismt0003(string $treffraismt0003): self
-    {
-        $this->treffraismt0003 = $treffraismt0003;
-
-        return $this;
-    }
-
     public function getTreffraistx0001(): ?string
     {
         return $this->treffraistx0001;
-    }
-
-    public function setTreffraistx0001(string $treffraistx0001): self
-    {
-        $this->treffraistx0001 = $treffraistx0001;
-
-        return $this;
     }
 
     public function getTreffraistx0002(): ?string
@@ -3364,23 +2160,9 @@ class Fou
         return $this->treffraistx0002;
     }
 
-    public function setTreffraistx0002(string $treffraistx0002): self
-    {
-        $this->treffraistx0002 = $treffraistx0002;
-
-        return $this;
-    }
-
     public function getTreffraistx0003(): ?string
     {
         return $this->treffraistx0003;
-    }
-
-    public function setTreffraistx0003(string $treffraistx0003): self
-    {
-        $this->treffraistx0003 = $treffraistx0003;
-
-        return $this;
     }
 
     public function getTreffraistyp0001(): ?string
@@ -3388,23 +2170,9 @@ class Fou
         return $this->treffraistyp0001;
     }
 
-    public function setTreffraistyp0001(string $treffraistyp0001): self
-    {
-        $this->treffraistyp0001 = $treffraistyp0001;
-
-        return $this;
-    }
-
     public function getTreffraistyp0002(): ?string
     {
         return $this->treffraistyp0002;
-    }
-
-    public function setTreffraistyp0002(string $treffraistyp0002): self
-    {
-        $this->treffraistyp0002 = $treffraistyp0002;
-
-        return $this;
     }
 
     public function getTreffraistyp0003(): ?string
@@ -3412,23 +2180,9 @@ class Fou
         return $this->treffraistyp0003;
     }
 
-    public function setTreffraistyp0003(string $treffraistyp0003): self
-    {
-        $this->treffraistyp0003 = $treffraistyp0003;
-
-        return $this;
-    }
-
     public function getTreffraiszerofl0001(): ?string
     {
         return $this->treffraiszerofl0001;
-    }
-
-    public function setTreffraiszerofl0001(string $treffraiszerofl0001): self
-    {
-        $this->treffraiszerofl0001 = $treffraiszerofl0001;
-
-        return $this;
     }
 
     public function getTreffraiszerofl0002(): ?string
@@ -3436,23 +2190,9 @@ class Fou
         return $this->treffraiszerofl0002;
     }
 
-    public function setTreffraiszerofl0002(string $treffraiszerofl0002): self
-    {
-        $this->treffraiszerofl0002 = $treffraiszerofl0002;
-
-        return $this;
-    }
-
     public function getTreffraiszerofl0003(): ?string
     {
         return $this->treffraiszerofl0003;
-    }
-
-    public function setTreffraiszerofl0003(string $treffraiszerofl0003): self
-    {
-        $this->treffraiszerofl0003 = $treffraiszerofl0003;
-
-        return $this;
     }
 
     public function getTvatransitfl(): ?string
@@ -3460,23 +2200,9 @@ class Fou
         return $this->tvatransitfl;
     }
 
-    public function setTvatransitfl(string $tvatransitfl): self
-    {
-        $this->tvatransitfl = $tvatransitfl;
-
-        return $this;
-    }
-
     public function getUntyp(): ?string
     {
         return $this->untyp;
-    }
-
-    public function setUntyp(string $untyp): self
-    {
-        $this->untyp = $untyp;
-
-        return $this;
     }
 
     public function getFouId(): ?int
