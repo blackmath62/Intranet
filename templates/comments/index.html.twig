@@ -15,18 +15,9 @@
 			<div class="card card-light border m-2">
 				<div class="card-header">
 					<div class="d-flex ">
-						<h2 class="card-title mr-auto p-2">{{ ticket.title}}
-							{% if ticket.prestataire %}
-								<a class="btn btn-sm btn-info text-white">
-								assigné à
-								{{ticket.prestataire.nom}}</a>
-								
-							{% else %}
-								<a class="btn btn-sm btn-danger text-white">pas encore assigné à un intervenant</a>
-							{% endif %}
-						</h2>
+						<h2 class="card-title mr-auto p-2">{{ ticket.title}}</h2>
 						<div>
-							<a class="btn btn-sm" style="background-color: {{ ticket.priority.color }}; color: {{ ticket.priority.textColor }}" ;>{{ ticket.priority.title }}</a>
+							<a class="btn btn-sm" style="background-color: {{ ticket.priority.color }}; color: {{ ticket.priority.textColor }}" ;><i class="pr-1 fas {{ ticket.priority.fa }}"></i>{{ ticket.priority.title }}</a>
 							<h2 class="card-title p-2">
 								{{ ticket.user.pseudo}}
 								le
@@ -49,21 +40,25 @@
 							<div>{{ ticket.createdAt|date("d/m/Y")}}</div>
 						</div>
 						<div class="form-group col-2">
-							<label for="exampleInputPassword1">Date clotûre</label>
-							{% if  ticket.closedAt  %}
-								<div>{{ ticket.closedAt|date("d/m/Y")}}</div>
-							{% endif %}
+							<label for="exampleInputPassword1">Prestataire</label>
+							<div>
+								{% if ticket.prestataire %}
+									<a class="btn btn-xl btn-info text-white">{{ticket.prestataire.nom}}</a>								
+								{% else %}
+									<a class="btn btn-sm btn-danger text-white">pas encore assigné à un intervenant</a>
+								{% endif %}
+							</div>
 						</div>
 						<div class="form-group col-2">
 							<label for="exampleInputPassword1">Service</label>
 							<div>
-								<a class="btn btn-xl" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;>{{ ticket.service.title }}</a>
+								<a class="btn btn-xl" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;><i class=" pr-1 fas {{ ticket.service.fa}}"></i>{{ ticket.service.title }}</a>
 							</div>
 						</div>
 						<div class="form-group col-2">
 							<label for="exampleInputPassword1">Statut</label>
 							<div>
-								<a class="btn btn-xl" style="background-color: {{ ticket.statu.backgroundColor }}; color: {{ ticket.statu.textColor }}" ;>{{ ticket.statu.title }}</a>
+								<a class="btn btn-xl" style="background-color: {{ ticket.statu.backgroundColor }}; color: {{ ticket.statu.textColor }}" ;><i class="pr-1 fas {{ ticket.statu.fa	}}"></i>{{ ticket.statu.title }}</a>
 							</div>
 						</div>
 						<div class="form-group col-2">
