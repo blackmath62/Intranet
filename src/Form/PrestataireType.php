@@ -16,6 +16,7 @@ class PrestataireType extends AbstractType
             ->add('email')
             ->add('affiliation')
             ->add('phone')
+            ->add('img')
         ;
     }
 

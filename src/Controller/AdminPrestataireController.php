@@ -28,6 +28,7 @@ class AdminPrestataireController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $prestataire = new Prestataire();
             $prestataire = $form->getData();
+            $prestataire->setImg('unnamed.png');
             $em = $this->getDoctrine()->getManager();
             $em->persist($prestataire);
             $em->flush();

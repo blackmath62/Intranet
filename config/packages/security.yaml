@@ -24,7 +24,7 @@ security:
                 
             remember_me:
                 secret: '%kernel.secret%'
-                lifetime: 604800 # 1 week in seconds
+                lifetime: 3600 #604800 # 1 week in seconds
                 path: /
 
             # activate different ways to authenticate

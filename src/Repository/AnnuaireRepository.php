@@ -38,25 +38,40 @@ class AnnuaireRepository extends ServiceEntityRepository
         ;
     }
 
-
-    public function test()
-    {
-        echo "je suis un test </br>";
-    }
-
+    /**
+    * @return Annuaire[]
+    */
     
-    public function test2($value)
+    public function findTest($value):array
     {
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
             'SELECT p
             FROM App\Entity\Annuaire p
-            WHERE p.societe = :val1 AND p.id >= :val2
+            WHERE p.interne >= :min AND p.interne <= :max
             ORDER BY p.id ASC'
-        )->setParameter('val1', $value[0])
-        ->setParameter('val2', $value[1])
+        )->setParameter('min', $value['min'])
+        ->setParameter('max', $value['max'])
         ;
+
+        // returns an array of Product objects
+        return $query->getResult();
+    }
+    /**
+     * @return Annuaire[]
+     */
+    
+    public function findAllGreaterThanInterne(int $interne): array
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT p
+            FROM App\Entity\Annuaire p
+            WHERE p.interne > :interne
+            ORDER BY p.interne ASC'
+        )->setParameter('interne', $interne);
 
         // returns an array of Product objects
         return $query->getResult();

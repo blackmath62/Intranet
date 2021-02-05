@@ -126,17 +126,24 @@
 						class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 						<!-- Table Commune -->
 						<li class="nav-header">Général</li>
-						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
 								<a href="{{path('app_home')}}" class="nav-link">
 									<i class="nav-icon fas fa-newspaper"></i>
 									<p>
-										Actualités à faire
+										Actualités
 									</p>
 									<!-- <span class="badge badge-danger right">8</span> -->
 								</a>
 							</li>
-						{% endif %}
+							<li class="nav-item">
+								<a href="{{path('app_video')}}" class="nav-link">
+									<i class="nav-icon fas fa-video"></i>
+									<p>
+										Vidéos
+									</p>
+									<!-- <span class="badge badge-danger right">8</span> -->
+								</a>
+							</li>
 
 						<li class="nav-item">
 							<a href="{{ path('app_tickets')}}" class="nav-link">
@@ -360,6 +367,19 @@
 								</a>
 							</li>
 							<!--fin Table Menu Roby -->
+							{% if is_granted('ROLE_ADMIN') %}
+							<li class="nav-header">Développeur</li>
+							<li class="nav-item">
+								<a href="https://adminlte.io/themes/v3/iframe.html#" class="nav-link">
+									<i class="nav-icon fas fa-atlas"></i>
+									<p>
+										Théme Utilisé
+									</p>
+									<!-- <span class="badge badge-danger right">8</span> -->
+								</a>
+							</li>
+							</li>
+							{% endif %}
 					</ul>
 				</nav>
 			</div>

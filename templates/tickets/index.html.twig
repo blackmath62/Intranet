@@ -64,7 +64,7 @@
 		<!-- /.control-sidebar -->
 		<!-- ./wrapper -->
 		{% for statu in status %}
-		{% if statu.id == 17 %}
+		{% if statu.id == 17 and not is_granted('ROLE_ADMIN') %}
 			{% else %}		
 				{% set countTicketsByStatus = 0 %}
 				{% for ticket in tickets if ticket.statu == statu %}

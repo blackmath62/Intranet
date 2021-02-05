@@ -8,6 +8,7 @@ use App\Repository\Divalto\MouvRepository;
 /**
  * Mouv
  * @ORM\Entity(repositoryClass="App\Repository\Divalto\MouvRepository")
+ * @ORM\Entity
  * @ORM\Table(name="MOUV", indexes={@ORM\Index(name="INDEX_A", columns={"CE2", "DOS", "TICOD", "TIERS", "FADT", "MOUV_ID"}), 
  * @ORM\Index(name="INDEX_B", columns={"CE6", "DOS", "CDENRNO", "MOUV_ID"}), 
  * @ORM\Index(name="INDEX_C", columns={"DOS", "PROJET", "FADT", "MOUV_ID"}), 

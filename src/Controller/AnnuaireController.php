@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use DateInterval;
 use App\Entity\Annuaire;
+use App\Entity\Divalto\Ent;
 use App\Repository\ARTRepository;
-use App\Repository\AnnuaireRepository;
 use App\Repository\UsersRepository;
+use App\Repository\AnnuaireRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,10 +37,18 @@ class AnnuaireController extends AbstractController
     public function home(UsersRepository $repo)
     {
         
+            
+        $today = new \DateTime();
+        $lastYear = new \DateTime();
+        $lastYear->sub(new DateInterval('P1Y'));
+        $CmdsToday = $this->getDoctrine()->getRepository(Ent::class, 'divaltoreel')->findBy(['pidt' => $today, 'picod' => 2]);
+        $CmdsLastYear = $this->getDoctrine()->getRepository(Ent::class, 'divaltoreel')->findBy(['pidt' => $lastYear, 'picod' => 2]);
         $users = $repo->findAll();
         return $this->render('annuaire/home.html.twig', [
             'title' => "page d'accueil",
-            'users' => $users
+            'users' => $users,
+            'CmdsToday' => $CmdsToday,
+            'CmdsLastYear' => $CmdsLastYear  
         ]);
 
     }
