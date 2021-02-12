@@ -2,8 +2,9 @@
 
 namespace App\Security;
 
-use App\Repository\UsersRepository;
+
 use App\Controller\SecurityController;
+use App\Repository\Main\UsersRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -32,10 +33,11 @@ class LoginFormAuthenticator extends AbstractAuthenticator
     private $usersRepository;
     private $urlGenerator;
 
-    public function __construct(UsersRepository $usersRepository, UrlGeneratorInterface $urlGenerator)
+    public function __construct(UsersRepository $usersRepository, UrlGeneratorInterface $urlGenerator, FlashBagInterface $flashBag)
     {
         $this->usersRepository = $usersRepository;
         $this->urlGenerator = $urlGenerator;
+        $this->flashBag = $flashBag;
     }
 
 
@@ -127,7 +129,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator
     {
         
         // todo mise en place du message flash 
-        $request->getSession()->getFlashBag()->add('error', 'Invalid credentials !');
+        $this->flashBag->add('error', 'Identifiant ou mot de passe invalide !');
         return new RedirectResponse($this->urlGenerator->generate('app_login'));
     }
 }

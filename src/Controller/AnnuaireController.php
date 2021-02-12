@@ -3,11 +3,9 @@
 namespace App\Controller;
 
 use DateInterval;
-use App\Entity\Annuaire;
 use App\Entity\Divalto\Ent;
-use App\Repository\ARTRepository;
-use App\Repository\UsersRepository;
-use App\Repository\AnnuaireRepository;
+use App\Repository\Main\UsersRepository;
+use App\Repository\Main\AnnuaireRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

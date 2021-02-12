@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use DateTime;
-use App\Entity\Status;
+use App\Entity\Main\Status;
 use App\Form\EditStatusType;
-use App\Repository\StatusRepository;
+use App\Repository\Main\StatusRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;

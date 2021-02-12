@@ -176,7 +176,25 @@
 									<!-- <span class="badge badge-info right">1</span> -->
 								</a>
 							</li>
+							<li class="nav-item">
+								<a href="{{ path('app_bourse_transport')}}" class="nav-link">
+									<i class="nav-icon fas fa-certificate"></i>
+									<p>
+										Agrément Phyto
+									</p>
+									<!-- <span class="badge badge-info right">1</span> -->
+								</a>
+							</li>
 						{% endif %}
+							<li class="nav-item">
+								<a href="{{ path('app_faq')}}" class="nav-link">
+									<i class="nav-icon fas fa-question-circle"></i>
+									<p>
+										FAQ
+									</p>
+									<!-- <span class="badge badge-info right">1</span> -->
+								</a>
+							</li>
 						<li class="nav-item">
 							<a href="{{ path('annuaire')}}" class="nav-link">
 								<i class="nav-icon fas fa-fw fa-phone"></i>
@@ -699,6 +717,14 @@ $('.my-colorpicker2 .fa-square').css('color', event.color.toString());
       $('#new-event').val('')
     })
   })
+</script>
+
+
+<script>
+// info bulle
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
 </script>
 		{% endblock %}
 	</html>

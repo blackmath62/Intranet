@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Repository\DocumentsRepository;
+use App\Repository\Main\DocumentsRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

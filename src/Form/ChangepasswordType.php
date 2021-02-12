@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Users;
+use App\Entity\Main\Users;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;

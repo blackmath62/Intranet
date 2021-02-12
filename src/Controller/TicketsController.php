@@ -3,18 +3,17 @@
 namespace App\Controller;
 
 use DateTime;
-use App\Entity\Tickets;
+use App\Entity\Main\Tickets;
 use App\Form\TicketsType;
-use App\Repository\StatusRepository;
-use App\Repository\TicketsRepository;
-use App\Repository\CommentsRepository;
+use App\Repository\Main\StatusRepository;
+use App\Repository\Main\TicketsRepository;
+use App\Repository\Main\CommentsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -106,6 +105,7 @@ class TicketsController extends AbstractController
             $list[] = [
                 $ticket->getCreatedAt(),
                 'Ticket' . $ticket->getId() . ' : ' . $ticket->getTitle(),
+                $ticket->getService()->getTitle(),
                 $ticket->getStatu()->getTitle(),
                 $ticket->getPrestataire()->getNom(),
                 
@@ -127,9 +127,10 @@ class TicketsController extends AbstractController
         $sheet->setTitle('Tickets List');
         // Entête de colonne
         $sheet->getCell('A1')->setValue('Date d\'ouverture');
-        $sheet->getCell('B1')->setValue('title');
-        $sheet->getCell('C1')->setValue('Statut');
-        $sheet->getCell('D1')->setValue('Prestataire');
+        $sheet->getCell('B1')->setValue('Titre');
+        $sheet->getCell('C1')->setValue('Service');
+        $sheet->getCell('D1')->setValue('Statut');
+        $sheet->getCell('E1')->setValue('Prestataire');
 
         // Increase row cursor after header write
             $sheet->fromArray($this->getData(),null, 'A2', true);

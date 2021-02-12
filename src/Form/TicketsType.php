@@ -2,11 +2,11 @@
 
 namespace App\Form;
 
-use App\Entity\Status;
-use App\Entity\Societe;
-use App\Entity\Tickets;
-use App\Entity\Services;
-use App\Entity\Priorities;
+use App\Entity\Main\Status;
+use App\Entity\Main\Societe;
+use App\Entity\Main\Tickets;
+use App\Entity\Main\Services;
+use App\Entity\Main\Priorities;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

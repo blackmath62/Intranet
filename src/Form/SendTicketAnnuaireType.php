@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Annuaire;
+use App\Entity\Main\Annuaire;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

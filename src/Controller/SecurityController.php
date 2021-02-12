@@ -5,8 +5,9 @@ namespace App\Controller;
 use App\Form\ChangepasswordType;
 use App\Form\PasswordForgotType;
 use Symfony\Component\Mime\Email;
-use App\Repository\UsersRepository;
+use App\Form\ModifiedPasswordType;
 use App\Form\UserRegistrationFormType;
+use App\Repository\Main\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
@@ -25,8 +26,9 @@ class SecurityController extends AbstractController
     /**
      * @Route("/login", name="app_login" , methods={"GET", "POST"})
      */
-    public function login(): Response
+    public function login(Request $request): Response
     {
+        
         return $this->render('security/login.html.twig', [
             'controller_name' => 'SecurityController',
             'title' => "connexion"
@@ -148,18 +150,20 @@ class SecurityController extends AbstractController
      */
     public function changePassword($token, Request $request, EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder, UsersRepository $usersRepo)
     {
-        $form = $this->createForm(ChangepasswordType::class);
+        $form = $this->createForm(ModifiedPasswordType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted()&& $form->isValid()) {
             // On verifie si un utilisateur a ce token
             // Vérification du token utilisateur
             $user = $usersRepo->findOneBy(['token' => $token]);
+            
             // si aucun utilisateur n'existe avec ce token
             if (!$user) {
                 // erreur 404
                 throw $this->createNotFoundException('Cet utilisateur n\'existe pas');
             }
-            $user = $form->getData();
+            //$user = $form->getData();
+            //dd($user);
             // Modification du mot de passe de l'utilisateur
             $plainPassword = $form['plainPassword']->getData();
             $user->setPassword($passwordEncoder->encodePassword($user, $plainPassword))

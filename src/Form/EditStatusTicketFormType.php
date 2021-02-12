@@ -2,8 +2,8 @@
 
 namespace App\Form;
 
-use App\Entity\Status;
-use App\Entity\Tickets;
+use App\Entity\Main\Status;
+use App\Entity\Main\Tickets;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

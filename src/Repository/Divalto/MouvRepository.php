@@ -15,77 +15,75 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  */
 class MouvRepository extends ServiceEntityRepository
 {   
-    private $connection;
-    private $em;
-    private $registry;
+
     public function __construct(ManagerRegistry $registry)
     {
-        //$this->connection = $registry->getManager('divaltoreel');
-        //$this->entityManager = $registry->getConnection('divaltoreel');
         parent::__construct($registry, Mouv::class);
-            
+          
     }
+    
     /**
      * @return Mouv[]
      */
-    public function test($entityManager, $value, $maxFano):array
+    public function getStatesMouvEv($entityManager, $minFadt, $maxFadt):array
     {
-        //echo 'je suis un test';
-        //$productManager = $this->em->getDoctrine()->getManagerForClass(Mouv::class);
-        //$entityManager = $this->getEntityManager()->getManager('divaltoreel');
-        
-       //$entityManager = $this->getEntityManager();
-       //dd($entityManager);
 
-       $query = $entityManager->createQuery(
-        "SELECT p
-        FROM App\Entity\Divalto\Mouv p
-        WHERE p.fadt > :fadt AND p.fadt <= :maxFadt AND p.picod = 4 AND p.ticod = 'C'
-        ORDER BY p.fano ASC"
-    )->setParameter('fadt', $value)
-     ->setParameter('maxFadt', $maxFano);
-    //dd($query->getResult());
-    // returns an array of Product objects
-    return $query->getResult();
-
-    }
+        $query = $entityManager->createQuery(
+            "SELECT p.tiers,
+                    p.repr0001,
+                    SUM(p.mont) AS SumMontant
+             FROM App\Entity\Divalto\Mouv p
+              WHERE p.fadt >= :minFadt 
+                AND p.fadt <= :maxFadt 
+                AND p.picod = 4 
+                AND p.ticod = 'C' 
+                AND p.dos = 1
+                AND p.repr0001 <> ''
+                GROUP BY p.tiers, p.repr0001
+                "
+              //INNER JOIN p.tiers c
+        //c.nom, 
+    )->setParameter('minFadt', $minFadt)
+    ->setParameter('maxFadt', $maxFadt);
     
-  
-    /*
-    /**
-    * @return Mouv[] Returns an array of Mouv objects
-    */
-    /*
-    // cette requête fonctionne mais ne tient pas compte du between
-    public function findByFadt($value)
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.fadt >= :from')
-            ->andWhere('a.fadt <= :to')
-            ->orderBy('a.tiers', 'DESC')
-            ->setParameter('from', $value[0] )
-            ->setParameter('to', $value[1] )
-            ->getQuery()
-        ;
-    }
-    */
-/*
-    public function findByRepr0001($value)
-    {
-        return $this->createQueryBuilder('a')
-            ->select('a.fano , a.fadt, a.repr0001')
-            ->Where('a.fadt >= :from ')
-            ->andWhere('a.fadt <= :to ')
-            ->andWhere('a.repr0001 = :vrp ')
-            #->orderBy('a.fano', 'DESC')
-            ->setParameter('from', $value[0])
-            ->setParameter('to', $value[1])
-            ->setParameter('vrp', $value[2])
-            ->setMaxResults(100)
-            ->getQuery()
-        ;
-    }
-*/
+    return $query->getResult();
+    
+}
 
+/**
+ * @return Mouv[]
+ */
+public function test($entityManager, $value, $maxFano):array
+{
 
+   $query = $entityManager->createQuery(
+    "SELECT p
+    FROM App\Entity\Divalto\Mouv p
+    WHERE p.fadt > :fadt AND p.fadt <= :maxFadt AND p.picod = 4 AND p.ticod = 'C'
+    GROUP BY p.tiers"
+)->setParameter('fadt', $value)
+ ->setParameter('maxFadt', $maxFano);
+
+return $query->getResult();
+
+}
+
+/**
+ * @return Mouv[]
+ */
+public function test2():array
+{
+
+   $entityManager = $this->getEntityManager();
+   $query = $entityManager->createQuery(
+    "SELECT p
+    FROM App\Entity\Divalto\Mouv p
+    WHERE p.fano = :fano AND p.picod = 4 AND p.ticod = 'C'
+    "
+)->setParameter('fano', 19015120);
+//INNER JOIN p.tiers c
+
+return $query->getResult();
+
+}
 }

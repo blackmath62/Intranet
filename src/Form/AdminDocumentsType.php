@@ -2,8 +2,8 @@
 
 namespace App\Form;
 
-use App\Entity\Societe;
-use App\Entity\Documents;
+use App\Entity\Main\Societe;
+use App\Entity\Main\Documents;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

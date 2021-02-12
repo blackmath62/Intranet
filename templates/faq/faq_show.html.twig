@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+{% block body %}
+	<section
+		class="content-header">
+
+		<!-- /.Création -->
+		<div class="card card-dark">
+			<div class="card-header d-flex">
+				<h3 class="card-title">{{ faq.title }}</h3>
+				<a href="{{ path('app_faq') }}" class="badge badge-success ml-auto">Retourner à la liste des FAQs</a>
+			</div>
+			<div class="card card-light border m-2">
+            <div class="card-header text-right">
+								<a class="btn btn-sm" style="background-color: {{ faq.logiciel.backgroungColor }}; color: {{ faq.logiciel.textColor }}" ;>
+									<i class=" pr-1 {{ faq.logiciel.icon }}"></i>
+									{{ faq.logiciel.nom }}</a>
+								<a class="btn btn-sm" style="background-color: {{ faq.search.backgroundColor }}; color: {{ faq.search.textColor }}" ;>
+									<i class="pr-1 {{ faq.search.fa	}}"></i>
+									{{ faq.search.nom }}</a>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                <a class="btn btn-sm btn-info text-white" href=" {{path('app_faq_edit', {'id' : faq.id} ) }}" >
+									<i class="pr-1 fa fa-edit text-white"></i>Modifier</a>
+                                {% endif %}
+            </div>
+				<div class="card-body">
+					<div class="form-group col-12">
+
+						<article>{{ faq.content|raw}}</article>
+
+                        <div>
+					<div class="text-right">
+                                par				
+								<a href="mailto:{{faq.user.email}}" >{{ faq.user.pseudo }}</a>
+								le
+								{{ faq.createdAt|date("d/m/Y")}}
+								à
+								{{ faq.createdAt|date("H:i")}}
+					</div>
+				</div>
+					</div>
+
+
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+	<!-- /.content -->
+</section>{% endblock %}

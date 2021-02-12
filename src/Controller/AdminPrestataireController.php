@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Prestataire;
+use App\Entity\Main\Prestataire;
 use App\Form\PrestataireType;
-use App\Repository\PrestataireRepository;
+use App\Repository\Main\PrestataireRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use DateTime;
-use App\Entity\Services;
+use App\Entity\Main\Services;
 use App\Form\EditServiceType;
-use App\Repository\ServicesRepository;
+use App\Repository\Main\ServicesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;

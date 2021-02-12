@@ -4,15 +4,14 @@ namespace App\Controller;
 
 
 use DateTime;
-use App\Entity\Documents;
+use App\Entity\Main\Documents;
 use App\Form\EditDocumentsType;
 use App\Form\AdminDocumentsType;
-use App\Repository\SocieteRepository;
-use App\Repository\DocumentsRepository;
+use App\Repository\Main\SocieteRepository;
+use App\Repository\Main\DocumentsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;

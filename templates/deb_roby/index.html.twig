@@ -17,6 +17,7 @@
                                     <th class="text-center"><span>Référence</span></th>
                                     <th class="text-center"><span>Désignation</span></th>
                                     <th class="text-center"><span>Client</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -36,7 +37,13 @@
                                             <a class="text-center">{{ Article.des }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ Article.tiers }}</a>
+                                            <a class="text-center">{{ Article.tiers.tiers }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ Article.tiers.nom }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center"></a>
                                         </td>
                                     {% endfor %}
                                     </tr>
@@ -49,6 +56,7 @@
                                     <th class="text-center"><span>Référence</span></th>
                                     <th class="text-center"><span>Désignation</span></th>
                                     <th class="text-center"><span>Client</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
                                 </tr>
                             </tfoot>
                         </table>

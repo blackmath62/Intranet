@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Status;
+use App\Entity\Main\Status;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;

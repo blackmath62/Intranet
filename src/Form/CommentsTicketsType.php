@@ -2,14 +2,9 @@
 
 namespace App\Form;
 
-use App\Entity\Status;
-use App\Entity\Tickets;
-use App\Entity\Comments;
-use App\Form\EditStatusTicketFormType;
-use App\Repository\TicketsRepository;
+use App\Entity\Main\Comments;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;

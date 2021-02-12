@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Services;
+use App\Entity\Main\Services;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;

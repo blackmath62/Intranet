@@ -3,11 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Divalto\Cli;
-use App\Entity\Divalto\Vrp;
-use Proxies\__CG__\App\Entity\Divalto\Vrp as DivaltoVrp;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;

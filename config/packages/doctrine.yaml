@@ -29,9 +29,9 @@ doctrine:
                     Main:
                         is_bundle: false
                         type: annotation
-                        dir: '%kernel.project_dir%/src/Entity'
-                        prefix: 'App\Entity'
-                        alias: App
+                        dir: '%kernel.project_dir%/src/Entity/Main'
+                        prefix: 'App\Entity\Main'
+                        alias: Main
             #divaltosvg:
                 #connection: divaltosvg
                 #mappings:

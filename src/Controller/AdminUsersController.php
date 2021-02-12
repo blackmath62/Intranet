@@ -2,15 +2,14 @@
 
 namespace App\Controller;
 
-use App\Entity\Users;
+use App\Entity\Main\Users;
 use App\Form\EditUsersType;
-use App\Repository\UsersRepository;
+use App\Repository\Main\UsersRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /**
  * @IsGranted("ROLE_ADMIN")

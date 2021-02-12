@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use DateTime;
-use App\Entity\Societe;
+use App\Entity\Main\Societe;
 use App\Form\EditSocieteType;
-use App\Repository\SocieteRepository;
+use App\Repository\Main\SocieteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;

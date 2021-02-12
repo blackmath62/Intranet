@@ -2,12 +2,13 @@
 
 namespace App\Entity\Divalto;
 
+use App\Entity\Divalto\Cli;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Divalto\MouvRepository;
 
 /**
  * Mouv
- * @ORM\Entity(repositoryClass="App\Repository\Divalto\MouvRepository")
+ * @ORM\Entity(repositoryClass="MouvRepository::class")
  * @ORM\Entity
  * @ORM\Table(name="MOUV", indexes={@ORM\Index(name="INDEX_A", columns={"CE2", "DOS", "TICOD", "TIERS", "FADT", "MOUV_ID"}), 
  * @ORM\Index(name="INDEX_B", columns={"CE6", "DOS", "CDENRNO", "MOUV_ID"}), 
@@ -183,13 +184,6 @@ class Mouv
      * @ORM\Column(name="PICOD", type="decimal", precision=1, scale=0, nullable=false, options={"comment"="Type de pièce"})
      */
     private $picod;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="TIERS", type="string", length=20, nullable=false, options={"fixed"=true,"comment"="Code tiers"})
-     */
-    private $tiers;
 
     /**
      * @var string
@@ -1415,70 +1409,70 @@ class Mouv
      * @ORM\Column(name="GRATUITFL", type="decimal", precision=1, scale=0, nullable=false)
      */
     private $gratuitfl;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="MOTIF", type="string", length=8, nullable=false, options={"fixed"=true})
      */
     private $motif;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="OPTIONFL", type="decimal", precision=1, scale=0, nullable=false)
      */
     private $optionfl;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="OPTIONVALIDEFL", type="decimal", precision=1, scale=0, nullable=false)
      */
     private $optionvalidefl;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="PANACHEFL", type="decimal", precision=1, scale=0, nullable=false)
      */
     private $panachefl;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="PCOD_0006", type="decimal", precision=1, scale=0, nullable=false)
      */
     private $pcod0006;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="PUNETORI", type="decimal", precision=13, scale=4, nullable=false)
      */
     private $punetori;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="REGLECOD", type="string", length=8, nullable=false, options={"fixed"=true})
      */
     private $reglecod;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="REMCODCAD", type="string", length=8, nullable=false, options={"fixed"=true})
      */
     private $remcodcad;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="UNTYP", type="string", length=8, nullable=false, options={"fixed"=true})
      */
     private $untyp;
-
+    
     /**
      * @var int
      *
@@ -1488,16 +1482,34 @@ class Mouv
      */
     private $mouvId;
 
+    /**
+     * @var string
+     * @ORM\ManyToOne(targetEntity=Cli::class, inversedBy="tiers")
+     * @ORM\JoinColumn(nullable=false, name="TIERS", referencedColumnName="TIERS")
+     * @ORM\Column(name="TIERS", type="string", length=20, nullable=false, options={"fixed"=true,"comment"="Code tiers"})
+     */
+    private $tiers;
+    
+    public function getTiers(): ?Cli
+    {
+        return $this->tiers;
+    }
+
+    public function getMouvId(): ?int
+    {
+        return $this->mouvId;
+    }
+
     public function getCe1(): ?string
     {
         return $this->ce1;
     }
-
+    
     public function getCe2(): ?string
     {
         return $this->ce2;
     }
-
+    
     public function getCe3(): ?string
     {
         return $this->ce3;
@@ -1591,11 +1603,6 @@ class Mouv
     public function getPicod(): ?string
     {
         return $this->picod;
-    }
-
-    public function getTiers(): ?string
-    {
-        return $this->tiers;
     }
 
     public function getPrefdvno(): ?string
@@ -2525,10 +2532,5 @@ class Mouv
         return $this->untyp;
     }
 
-    public function getMouvId(): ?int
-    {
-        return $this->mouvId;
-    }
-
-
+    
 }

@@ -9,7 +9,8 @@
 		<h5 class="mt-4 mb-2">Actualités</h5>
 		<!-- /.col -->
 
-
+		{% if CmdsToday|length > 0 %}
+		
 		<div class="d-flex flex-wrap">
 			<div class="d-flex">
 				<div class="col-md-4">
@@ -102,6 +103,10 @@
 				<!-- /.col -->
 			</div>
 			<!-- /.row -->
+		{% endif %}
+		
+		
+		
 			<!-- END ACCORDION & CAROUSEL-->
 			{% set day = "now"|date('w') %}
 			{% set weekStart = "now"|date_modify("monday this week")|date('d-m') %}

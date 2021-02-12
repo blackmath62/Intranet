@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Chats;
+use App\Entity\Main\Chats;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;

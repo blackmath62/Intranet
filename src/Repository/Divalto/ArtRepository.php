@@ -4,6 +4,7 @@ namespace App\Repository\Divalto;
 
 use App\Entity\Divalto\Art;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -14,9 +15,32 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ArtRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $em;
+    private $registry;
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
         parent::__construct($registry, Art::class);
+        $em = $this->getEntityManager();
+    }
+
+
+    public function entityArticles($entityManager){
+        
+        
+        //$em = $this->registry->getConnection();
+        //$config = $this->em->getConfiguration();
+        dd($this->em);
+        
+        $ref = 'CO2130';
+        $query = $this->em->createQuery(
+            'SELECT p
+            FROM App\Entity\Divalto\Art p
+            WHERE p.ref > :ref
+            ORDER BY p.ref ASC'
+        )->setParameter('ref', $ref);
+
+        // returns an array of Product objects
+        return $query->getResult();
     }
 
     // /**

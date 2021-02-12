@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<div class="col-md-12">
+		<!-- general form elements disabled -->
+		<div class="card card-dark">
+			<div class="card-header d-flex">
+				<h3 class="card-title text-white">Administration des Logiciels</h3>
+				<a href="{{ path('app_admin_parameter') }}" class="badge badge-success ml-auto">Retourner aux paramétres</a>
+			</div>
+			<div class="card-body">
+				{{ form(logicielEditForm)}}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

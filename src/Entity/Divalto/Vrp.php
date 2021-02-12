@@ -93,7 +93,7 @@ class Vrp
 
     /**
      * @var string
-     * @ORM\OneToMany(targetEntity=Cli::class, mappedBy="repr0001", orphanRemoval=true)
+     *  //@ORM\OneToMany(targetEntity=Cli::class, mappedBy="repr0001", orphanRemoval=true)
      * @ORM\Column(name="TIERS", type="string", length=20, nullable=false, options={"fixed"=true,"comment"="Code tiers"})
      */
     private $tiers;

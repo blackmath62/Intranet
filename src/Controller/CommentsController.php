@@ -3,27 +3,20 @@
 namespace App\Controller;
 
 use DateTime;
-use App\Entity\Status;
-use App\Entity\Tickets;
-use App\Entity\Comments;
+use App\Entity\Main\Comments;
 use App\Form\SendTicketType;
 use App\Form\CommentsTicketsType;
 use Symfony\Component\Mime\Email;
 use App\Form\SendTicketAnnuaireType;
-use App\Form\SendMailPrestataireType;
-use App\Repository\TicketsRepository;
+use App\Repository\Main\TicketsRepository;
 use App\Form\EditStatusTicketFormType;
-use App\Repository\CommentsRepository;
+use App\Repository\Main\CommentsRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\PrestataireRepository;
-use App\Repository\StatusRepository;
-use Egulias\EmailValidator\Warning\Comment;
+use App\Repository\Main\PrestataireRepository;
+use App\Repository\Main\StatusRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 

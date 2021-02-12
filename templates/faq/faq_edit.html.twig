@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+{% block body %}
+	<section
+		class="content-header">
+
+		<!-- /.Création -->
+		<div class="card card-dark">
+			<div class="card-header d-flex">
+				<h3 class="card-title">FAQ</h3>
+				<a href="{{ path('app_faq') }}" class="badge badge-success ml-auto">Retourner à la liste des FAQs</a>
+			</div>
+			<div class="card card-body border m-2">
+			{{ form_start(faqForm)}}
+			{{ form_row(faqForm.title)}}
+			{{ form_row(faqForm.content)}}
+			<div class="row mx-auto">
+				{{ form_row(faqForm.logiciel)}}
+				{{ form_row(faqForm.search)}}
+				<div class="form-group mx-auto pt-5">
+					<button type="submit" class="btn btn-xl btn-warning mx-auto ">Modifier</button>
+				</div>
+			</div>
+			{{ form_end(faqForm)}}
+			</div>
+		</div>
+		<section>
+
+		{% endblock %}

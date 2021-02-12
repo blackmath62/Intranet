@@ -1,0 +1,162 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+
+	<section class="content-header">
+		<div class="container-fluid">
+			<div
+				class="card card-dark">
+				<!--collapsed-card-->
+				<div class="card-header d-flex">
+					<h3 class="card-title">Création/Modification d'un mot clé de recherche</h3>
+					<a href="{{ path('app_admin_parameter') }}" class="badge badge-success ml-auto">Retourner aux paramétres</a>
+					<div class="card-tools">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse">
+							<i class="fas fa-plus"></i>
+						</button>
+					</div>
+					<!-- /.card-tools -->
+				</div>
+				<!-- /.card-header -->
+				<div class="row card-body">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header">
+								<h3 class="card-title text-center mr-auto">Création d'un mot clé de recherche</h3>
+							</div>
+
+							{{ form_start(formSectionSearch)}}
+							<div class="d-flex flex-wrap card-body">
+								<div class="form-group col-12"></div>
+
+								<label>{{ form_label(formSectionSearch.nom) }}:</label>
+								{{ form_widget(formSectionSearch.nom, {'attr' : {'placeholder' : "Nom du mot clé", 'class' : "form-control"}})}}
+
+
+								<label>{{ form_label(formSectionSearch.backgroundColor) }}:</label>
+								<div class="input-group my-colorpicker2">
+									{{ form_widget(formSectionSearch.backgroundColor, {'attr' : {'placeholder' : "Couleur du mot clé", 'class' : "form-control"}}) }}
+									<div class="input-group-append">
+										<span class="input-group-text">
+											<i class="fas fa-square"></i>
+										</span>
+									</div>
+								</div>
+                                <label>{{ form_label(formSectionSearch.textColor) }}:</label>
+								<div class="input-group my-colorpicker2">
+									{{ form_widget(formSectionSearch.textColor, {'attr' : {'placeholder' : "Couleur du texte mot clé", 'class' : "form-control"}}) }}
+									<div class="input-group-append">
+										<span class="input-group-text">
+											<i class="fas fa-square"></i>
+										</span>
+									</div>
+								</div>
+								<label>{{ form_label(formSectionSearch.fa) }}: <a href='https://fontawesome.com/'> www.fontawesome.com </a></label>
+								{{ form_widget(formSectionSearch.fa, {'attr' : {'placeholder' : "Icone fa-*****", 'class' : "form-control"}})}}
+
+
+								<button type="submit" class="btn btn-lg btn-dark mx-auto m-5">Créer un mot clé</button>
+
+							</div>
+							{{ form_end(formSectionSearch)}}
+							<div class="card-header">
+								<h3 class="card-title text-center mr-auto">Modification des Mots clés de recherche</h3>
+							</div>
+							<!-- /.card-header -->
+							<div class="">
+								<table id="example2" class="table table-bordered table-striped">
+									<thead>
+										<tr>
+											<th class="text-center">
+												<span>id</span>
+											</th>
+											<th class="text-center">
+												<span>Nom</span>
+											</th>
+                                            <th class="text-center">
+												<span>Couleur fond</span>
+											</th>
+                                            <th class="text-center">
+												<span>Couleur Texte</span>
+											</th>
+                                            <th class="text-center">
+												<span>Rendu Texte</span>
+											</th>
+											<th class="text-center">
+												<span>Rendu Icone</span>
+											</th>
+											<th class="text-center">
+												<span>Action</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for section_search in section_searchs %}
+											<tr>
+													<td class="text-center">
+														<a class="text-center">{{ section_search.id}}</a>
+													</td>
+													<td class="text-center">
+														{{section_search.nom}}
+													</td>
+                                                    <td class="text-center">
+														{{section_search.backgroundColor}}
+													</td>
+                                                    <td class="text-center">
+														{{section_search.textColor}}
+													</td>
+                                                    <td class="text-center">
+														<button class="btn btn-xl" style= "background-color: {{ section_search.backgroundColor }}; color: {{ section_search.textColor }}";><i class="pr-1 {{ section_search.fa }}"></i>{{ section_search.nom }}</button>
+													</td>
+													<td class="text-center">
+														<button class="btn btn-xl" style= "background-color: {{ section_search.backgroundColor }}; color: {{ section_search.textColor }}";><i class="{{ section_search.fa }}"></i></button>
+													</td>
+													<td class="text-center">
+														<a href="{{ path('app_edit_section_search', {'id' : section_search.id}) }}" type="button" class="btn btn-warning">
+															<i class="fas fa-edit"></i>
+														</a>
+														<a href="{{ path('app_delete_section_search', {'id' : section_search.id}) }}" type="button" class="btn btn-danger">
+															<i class="fas fa-trash-alt"></i>
+														</a>
+													</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+									<tfoot>
+										<tr>
+											<th class="text-center">
+												<span>id</span>
+											</th>
+											<th class="text-center">
+												<span>Nom</span>
+											</th>
+                                             <th class="text-center">
+												<span>Couleur fond</span>
+											</th>
+                                            <th class="text-center">
+												<span>Couleur Texte</span>
+											</th>
+                                            <th class="text-center">
+												<span>Rendu Texte</span>
+											</th>
+											<th class="text-center">
+												<span>Rendu Icone</span>
+											</th>
+											<th class="text-center">
+												<span>Action</span>
+											</th>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock %}

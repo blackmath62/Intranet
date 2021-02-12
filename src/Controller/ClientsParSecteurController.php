@@ -4,9 +4,7 @@ namespace App\Controller;
 
 use App\Form\ClientsType;
 use App\Entity\Divalto\Cli;
-use App\Entity\Divalto\Vrp;
 use App\Repository\Divalto\CliRepository;
-use App\Repository\Divalto\VrpRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

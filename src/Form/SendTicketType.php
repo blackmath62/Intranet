@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Prestataire;
+use App\Entity\Main\Prestataire;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

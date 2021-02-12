@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{title}}
+{% endblock %}
+{% block body %}
+ <!-- form collapse fermé de base -->
+                <div class="card collapsed-card card-dark">
+                  <div class="card-header">
+                    <h3 class="card-title">Créer un nouveau Tutoriel</h3>
+
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    {{ form_start(faqForm)}}
+					{{ form_row(faqForm.title)}}
+					{{ form_row(faqForm.content)}}
+					<div class="row mx-auto">
+					{{ form_row(faqForm.logiciel)}}
+					{{ form_row(faqForm.search)}}                      
+						<div class="form-group mx-auto pt-5">
+							<button type="submit" class="btn btn-xl btn-warning mx-auto ">Créer</button>
+						</div>
+						</div>
+					{{ form_end(faqForm)}}
+                  </div>
+                  <!-- /.card-footer-->
+                </div>
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-gray">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">FAQ</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Titre</span></th>
+                                    <th class="text-center"><span>Logiciel</span></th>
+                                    <th class="text-center"><span>Mot Clé</span></th>
+                                    <th class="text-center"><span>Action</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for faq in faqs %}
+                                    <tr>
+                                        <td class="">
+                                            <a class="text-center">{{faq.title}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center btn btn-sm" style="background-color: {{ faq.logiciel.backgroungColor }}; color: {{ faq.logiciel.textColor }}"><i class="pr-1 {{ faq.logiciel.icon}}"></i>{{ faq.logiciel.nom}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center btn btn-sm" style="background-color: {{ faq.search.backgroundColor }}; color: {{ faq.search.textColor }}"><i class="pr-1 {{ faq.search.fa}}"></i>{{faq.search.nom}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href=" {{path('app_faq_show', {'id' : faq.id} ) }}" class="text-center btn btn-sm btn-info text-white"><i class="pr-2 far fa-eye"></i>consulter</a>
+                                        </td>
+                                    {% endfor %}
+                                    </tr>
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                  <th class="text-center"><span>Titre</span></th>
+                                    <th class="text-center"><span>Logiciel</span></th>
+                                    <th class="text-center"><span>Mot Clé</span></th>
+                                    <th class="text-center"><span>Action</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

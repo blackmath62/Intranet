@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Societe;
-use App\Entity\Annuaire;
+use App\Entity\Main\Societe;
+use App\Entity\Main\Annuaire;
 use App\Form\AdminAnnuaireType;
-use App\Repository\SocieteRepository;
-use App\Repository\AnnuaireRepository;
+use App\Repository\Main\SocieteRepository;
+use App\Repository\Main\AnnuaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;

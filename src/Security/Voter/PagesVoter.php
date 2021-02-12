@@ -13,7 +13,7 @@ class PagesVoter extends Voter
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
         return in_array($attribute, ['EDIT', 'VIEW'])
-            && $subject instanceof \App\Entity\Annuaire;
+            && $subject instanceof \App\Entity\Main\Annuaire;
     }
 
     protected function voteOnAttribute($attribute, $annuaire, TokenInterface $token)

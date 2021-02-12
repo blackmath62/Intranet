@@ -35,7 +35,7 @@
 						<div class="card-body">
 							<div class="row">
 								<a href="{{path('app_admin_societe')}}">
-									<div class="col-sm-4 text-center">
+									<div class="col-sm-4 text-center" data-toggle="tooltip" data-placement="top" title="Liste des Sociétés">
 										<div class="position-relative p-3 bg-gray" style="height: 180px">
 											<div class="ribbon-wrapper ribbon-xl">
 												<div class="ribbon bg-dark">
@@ -48,7 +48,7 @@
 									</div>
 								</a>
 								<a href='{{path('app_admin_services')}}'>
-									<div class="col-sm-4 text-center">
+									<div class="col-sm-4 text-center"  data-toggle="tooltip" data-placement="top" title="Différents services liés aux Sociétés">
 										<div class="position-relative p-3 bg-gray" style="height: 180px">
 											<div class="ribbon-wrapper ribbon-xl">
 												<div class="ribbon bg-orange">
@@ -61,7 +61,7 @@
 									</div>
 								</a>
 								<a href='{{path('app_admin_status')}}'>
-									<div class="col-sm-4 text-center">
+									<div class="col-sm-4 text-center" data-toggle="tooltip" data-placement="top" title="Etat d'avancement des tickets">
 										<div class="position-relative p-3 bg-gray" style="height: 180px">
 											<div class="ribbon-wrapper ribbon-xl">
 												<div class="ribbon bg-success">
@@ -78,7 +78,7 @@
 							<!-- /.card -->
               <div class="row mt-4">
 								<a href='{{path('app_admin_priorities')}}'>
-									<div class="col-sm-4 text-center">
+									<div class="col-sm-4 text-center" data-toggle="tooltip" data-placement="top" title="Degrés d'urgence des tickets">
 										<div class="position-relative p-3 bg-gray" style="height: 180px">
 											<div class="ribbon-wrapper ribbon-xl">
 												<div class="ribbon bg-primary">
@@ -87,6 +87,32 @@
 											</div>
 											<i class="fas fa-thermometer-quarter  fa-7x p-4"></i>
 											<a>Priorités</a>
+										</div>
+									</div>
+								</a>
+								<a href="{{path('app_admin_logiciel')}}">
+									<div class="col-sm-4 text-center" data-toggle="tooltip" data-placement="top" title="Logiciel du FAQ">
+										<div class="position-relative p-3 bg-gray" style="height: 180px">
+											<div class="ribbon-wrapper ribbon-xl">
+												<div class="ribbon bg-warning">
+													LogicielList
+												</div>
+											</div>
+											<i class="fab fa-accusoft fa-7x p-4"></i>
+											<a>Logiciels</a>
+										</div>
+									</div>
+								</a>
+								<a href="{{path('app_admin_section_search')}}">
+									<div class="col-sm-4 text-center" data-toggle="tooltip" data-placement="top" title="Mot clé de recherche du FAQ">
+										<div class="position-relative p-3 bg-gray" style="height: 180px">
+											<div class="ribbon-wrapper ribbon-xl">
+												<div class="ribbon bg-danger">
+													SectionSearchList
+												</div>
+											</div>
+											<i class="fas fa-puzzle-piece fa-7x p-4"></i>
+											<a>Mots clés de recherche</a>
 										</div>
 									</div>
 								</a>

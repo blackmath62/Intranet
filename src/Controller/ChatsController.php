@@ -2,10 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Chats;
 use App\Form\ChatsType;
-use App\Repository\ChatsRepository;
-use App\Repository\UsersRepository;
+use App\Repository\Main\ChatsRepository;
+use App\Repository\Main\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
