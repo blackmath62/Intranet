@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edition du Calendrier{% endblock %}
+
+{% block body %}
+    <h1>Edition du Calendrier</h1>
+
+    {{ include('bourse_transport/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+
+    <a class="btn btn-xl btn-info" href="{{ path('app_bourse_transport') }}">Retourner à la liste</a>
+
+    {{ include('bourse_transport/_delete_form.html.twig') }}
+{% endblock %}

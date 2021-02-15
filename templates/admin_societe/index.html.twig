@@ -32,12 +32,13 @@
 								<button type="submit" class="btn btn-lg btn-dark mx-auto ">Créer la société</button>
 							</div>
 							{{ form_end(formSociete)}}
-							<div class="card-header">
+							<div class="card-header d-flex">
 								<h3 class="card-title text-center mr-auto">Modification des sociétés</h3>
+								<a href="{{ path('app_admin') }}" class="badge badge-success ml-auto">Retourner à l'Administration générale</a>
 							</div>
 							<!-- /.card-header -->
 							<div class="">
-								<table id="example2" class="table table-bordered table-striped">
+								<table id="example1" class="table table-bordered table-striped">
 									<thead>
 										<tr>
 											<th class="text-center">
@@ -55,7 +56,6 @@
 										{% for societe in societes %}
 											<tr>
 												<!--todo gérer le changement de l'id du bouton du POST -->
-												<form method="POST">
 													<td class="text-center">
 														<a class="text-center">{{ societe.id }}</a>
 													</td>
@@ -69,7 +69,6 @@
 															<i class="fas fa-trash-alt"></i>
 														</a>
 													</td>
-												</form>
 											</tr>
 										{% endfor %}
 									</tbody>

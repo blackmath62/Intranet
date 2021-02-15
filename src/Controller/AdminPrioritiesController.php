@@ -5,7 +5,7 @@ namespace App\Controller;
 use DateTime;
 use App\Entity\Main\Priorities;
 use App\Form\EditPrioritiesType;
-use App\Repository\PrioritiesRepository;
+use App\Repository\Main\PrioritiesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;

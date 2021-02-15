@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} New Calendar {% endblock %}
+
+{% block body %}
+    <h1>Créer un nouvel événement</h1>
+
+    {{ include('bourse_transport/_form.html.twig') }}
+
+    <a class="btn btn-xl btn-info" href="{{ path('app_bourse_transport') }}">Retourner à la liste</a>
+{% endblock %}
