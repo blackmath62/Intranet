@@ -28,6 +28,24 @@ class PDFController extends Command
     /**
      * @Route("/pdf", name="app_pdf")
      */
+
+    public function indexAction()
+    {
+        $snappy = $this->get('knp_snappy.pdf');
+        $filename = 'myFirstSnappyPDF';
+        $url = 'http://ourcodeworld.com';
+        
+
+        return new Response(
+            $snappy->getOutput($url),
+            200,
+            array(
+                'Content-Type'          => 'application/pdf',
+                'Content-Disposition'   => 'inline; filename="'.$filename.'.pdf"'
+            )
+        );
+    }
+    
     public function index(AnnuaireRepository $repo)
     {
         

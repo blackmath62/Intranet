@@ -66,11 +66,6 @@
 					<li class="nav-item d-none d-sm-inline-block">
 						<a href="{{path('app_home')}}" class="nav-link">Accueil</a>
 					</li>
-					 <li class="nav-item">
-						<a class="nav-link" data-widget="fullscreen" href="#" role="button">
-						<i class="fas fa-expand-arrows-alt"></i>
-						</a>
-					</li>
 				</ul>
 				<!-- Right navbar links -->
 				<ul
@@ -367,7 +362,7 @@
 								</a>
 								<ul class="nav nav-treeview">
 									<li class="nav-item">
-										<a href="" class="nav-link">
+										<a href="{{path('app_states_roby')}}" class="nav-link">
 											<i class="nav-icon fas fa-tree text-success"></i>
 											<p>Roby</p>
 										</a>
@@ -493,8 +488,6 @@
 			<script src="{{ asset("plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js")}}"></script>
 			<!-- overlayScrollbars -->
 			<script src="{{ asset("plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js")}}"></script>
-			<!-- AdminLTE App -->
-			<script src="../../dist/js/adminlte.min.js"></script>
 			<!-- AdminLTE App -->
 			<script src="{{ asset("dist/js/adminlte.js")}}"></script>
 			<!-- AdminLTE dashboard demo (This is only for demo purposes) -->

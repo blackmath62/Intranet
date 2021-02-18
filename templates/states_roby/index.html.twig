@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card-success">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3 class="card-title text-center">States</h3>
+  {{ form_start(DateFilterForm, { 'attr' : { 'class' : 'ml-auto' }} ) }}
+                        <div class='d-flex'>
+                        <div class="p-1 mt-2">
+                        Selectionnez les dates : 
+                        </div>
+                        <div class="p-1">
+                             {{ form_row(DateFilterForm.startDate) }}
+                        </div>
+                        <div class="p-1">
+                             {{ form_row(DateFilterForm.endDate) }}
+                        </div>
+                        <div class="p-1">
+                            {{ form_row(DateFilterForm.filtrer)}}
+                        </div>
+                        </div>
+                    {{ form_end(DateFilterForm)}}
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Code Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Montant N-1</span></th>
+                                    <th class="text-center"><span>Delta %</span></th>
+                                    <th class="text-center"><span>{{ sumAnneeSelectionnee }} € </span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stateRoby in statesRoby %}
+                                    <tr id="<?= $id ?>">
+                                        <td class="text-center">
+                                            <a class="text-center">{{ stateRoby.commercial }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ stateRoby.tiers }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ stateRoby.nom }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ SumMontantAnneePrecedente }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">Delta %</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ stateRoby.SumMontantAnneeActuelle }}</a>
+                                        </td>
+                                    {% endfor %}
+                                    </tr>
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Code Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Montant N-1</span></th>
+                                    <th class="text-center"><span>Delta %</span></th>
+                                    <th class="text-center"><span>{{ sumAnneeSelectionnee }} € </span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

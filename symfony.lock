@@ -1,4 +1,13 @@
 {
+    "almasaeed2010/adminlte": {
+        "version": "v2.4.3"
+    },
+    "beberlei/doctrineextensions": {
+        "version": "v1.3.0"
+    },
+    "composer/installers": {
+        "version": "v1.10.0"
+    },
     "composer/package-versions-deprecated": {
         "version": "1.10.99"
     },
@@ -113,6 +122,12 @@
     },
     "fzaninotto/faker": {
         "version": "v1.9.1"
+    },
+    "h4cc/wkhtmltoimage-amd64": {
+        "version": "0.12.4"
+    },
+    "h4cc/wkhtmltopdf-amd64": {
+        "version": "0.12.4"
     },
     "helios-ag/fm-elfinder-bundle": {
         "version": "10.0",

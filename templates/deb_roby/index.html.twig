@@ -3,9 +3,25 @@
 {% block body %}
 <div class="row">
             <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title text-center">Annuaire des sociétés</h3>
+                <div class="card card-info">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3 class="card-title text-center">DEB Roby</h3>
+                        {{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }} ) }}
+                        <div class='d-flex'>
+                            <div class="p-1 mt-2">
+                                Selectionnez les dates : 
+                            </div>
+                            <div class="p-1">
+                                {{ form_row(monthYear.month) }}
+                            </div>
+                            <div class="p-1">
+                                {{ form_row(monthYear.year) }}
+                            </div>
+                            <div class="p-1">
+                                {{ form_row(monthYear.filtrer)}}
+                            </div>
+                        </div>
+                    {{ form_end(monthYear)}}
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
@@ -14,49 +30,61 @@
                                 <tr>
                                     <th class="text-center"><span>Facture</span></th>
                                     <th class="text-center"><span>Date Facture</span></th>
-                                    <th class="text-center"><span>Référence</span></th>
-                                    <th class="text-center"><span>Désignation</span></th>
-                                    <th class="text-center"><span>Client</span></th>
+                                    <th class="text-center"><span>Notre Référence</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
                                     <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Pays</span></th>
+                                    <th class="text-center"><span>Volume</span></th>
+                                    <th class="text-center"><span>Poids</span></th>
+                                    <th class="text-center"><span>Montant</span></th>
                                 </tr>
                             </thead>
                             <tbody>
 							
-                                {% for Article in Articles %}
+                                {% for deb in debs %}
                                     <tr id="<?= $id ?>">
                                         <td class="text-center">
-                                            <a class="text-center">{{ Article.fano}}</a>
+                                            <a class="text-center">{{ deb.NumFact}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ Article.fadt|date("m/d/Y")}}</a>
+                                            <a class="text-center">{{ deb.DateFact|date("d/m/Y")}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ Article.ref }}</a>
+                                            <a class="text-center">{{ deb.notreRef }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ Article.des }}</a>
+                                            <a class="text-center">{{ deb.Tiers }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ Article.tiers.tiers }}</a>
+                                            <a class="text-center">{{ deb.Nom }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ Article.tiers.nom }}</a>
+                                            <a class="text-center">{{ deb.Pays }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center"></a>
+                                            <a class="text-center">{{ deb.Volume }}</a>
                                         </td>
-                                    {% endfor %}
+                                        <td class="text-center">
+                                            <a class="text-center">{{ deb.Poids }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ deb.Montant }}</a>
+                                        </td>
                                     </tr>
+                                {% endfor %}
 
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th class="text-center"><span>Facture</span></th>
+                                   <th class="text-center"><span>Facture</span></th>
                                     <th class="text-center"><span>Date Facture</span></th>
-                                    <th class="text-center"><span>Référence</span></th>
-                                    <th class="text-center"><span>Désignation</span></th>
-                                    <th class="text-center"><span>Client</span></th>
+                                    <th class="text-center"><span>Notre Référence</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
                                     <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Pays</span></th>
+                                    <th class="text-center"><span>Volume</span></th>
+                                    <th class="text-center"><span>Poids</span></th>
+                                    <th class="text-center"><span>Montant</span></th>
                                 </tr>
                             </tfoot>
                         </table>
