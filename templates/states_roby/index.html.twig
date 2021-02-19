@@ -1,77 +1,181 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ title }}{% endblock %}
 {% block body %}
-
-
-
 <div class="row">
             <div class="col-md-12">
-                <div class="card-success">
-                    <div class="card-header d-flex justify-content-between">
-                        <h3 class="card-title text-center">States</h3>
-  {{ form_start(DateFilterForm, { 'attr' : { 'class' : 'ml-auto' }} ) }}
+                <div class="card card-dark">
+                    <div class="card-header d-flex justify-content-between ">
+                        <h3 class="card-title text-center">States Roby   
+                        {% if values %}
+                            {{ mois }} - {{ annee -1}}/{{ annee}}
+                        {% endif %}
+                        </h3>
+                        {{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }} ) }}
                         <div class='d-flex'>
-                        <div class="p-1 mt-2">
-                        Selectionnez les dates : 
+                            <div class="p-1 mt-2">
+                                Selectionnez les dates : 
+                            </div>
+                            <div class="p-1">
+                                {{ form_row(monthYear.month) }}
+                            </div>
+                            <div class="p-1">
+                                {{ form_row(monthYear.year) }}
+                            </div>
+                            <div class="p-1">
+                                {{ form_row(monthYear.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }} ) }}
+                            </div>
                         </div>
-                        <div class="p-1">
-                             {{ form_row(DateFilterForm.startDate) }}
-                        </div>
-                        <div class="p-1">
-                             {{ form_row(DateFilterForm.endDate) }}
-                        </div>
-                        <div class="p-1">
-                            {{ form_row(DateFilterForm.filtrer)}}
-                        </div>
-                        </div>
-                    {{ form_end(DateFilterForm)}}
+                    {{ form_end(monthYear)}}
                     </div>
+                    {% if values %}
+                     <div class="row">
+                     {% for value in values %}
+            <!-- ./col -->
+          <div class="col-lg-3 col-6 pt-2">
+            <!-- small card -->            
+            <div class="small-box bg-{{ value.Color }}">
+              <!-- Loading (remove the following to stop the loading)-->
+              <div class="inner">
+                <i class="fas fa-3x fa-balance-scale-{{ value.Balance }}"></i>
+              </div>
+              <!-- end loading -->
+              <div class="inner">
+                <h3>{{value.Delta_montant|number_format(2) }}<sup style="font-size: 20px">%</sup></h3>
+
+                <p>{{ value.Commercial}}</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+              </div>
+              <div class="card card-{{ value.Color }} collapsed-card">
+              <div class="card-header">
+              <a data-card-widget="collapse"class="small-box-footer">
+                Plus d'info <i class="fas fa-arrow-circle-right"></i>
+              </a>
+                <!-- /.card-tools -->
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+               <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span></span></th>
+                                    <th class="text-center text-dark"><span>{{ annee -1 }}</span></th>
+                                    <th class="text-center text-dark"><span>Delta</span></th>
+                                    <th class="text-center text-dark"><span>{{ annee }}</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center"><i class="fas fa-euro-sign"></i></a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{value.AnneeN1|number_format(2)}} €</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{value.Delta_montant|number_format(2) }} %</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{value.AnneeN|number_format(2)}} €</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center"><i class="fas fa-users"></i></a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{value.Client_Annee_N1 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{value.Delta_client|number_format(2) }} % </a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{value.Client_Annee_N }}</a>
+                                        </td>
+                                    </tr>
+                          
+                            </tbody>
+                    </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            </div>
+          </div>
+          <!-- ./col -->             
+                    
+             {% endfor %}
+          </div>
+                    {% endif %}
+
                     <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th class="text-center"><span>Commercial</span></th>
-                                    <th class="text-center"><span>Code Tiers</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
                                     <th class="text-center"><span>Nom</span></th>
-                                    <th class="text-center"><span>Montant N-1</span></th>
+                                    <th class="text-center"><span>Pays</span></th>
+                                    <th class="text-center"><span>Devise</span></th>
+                                    {% if annee %}
+                                    <th class="text-center"><span>{{ mois }} - {{ annee -1 }}</span></th>
+                                    {% else %}
+                                    <th class="text-center"><span>Année N-1</span></th>  
+                                    {% endif %}
+
                                     <th class="text-center"><span>Delta %</span></th>
-                                    <th class="text-center"><span>{{ sumAnneeSelectionnee }} € </span></th>
+
+                                    {% if annee %}
+                                    <th class="text-center"><span>{{ mois }} - {{ annee }}</span></th>
+                                    {% else %}
+                                    <th class="text-center"><span>Annee Selectionnée</span></th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for stateRoby in statesRoby %}
+							
+                                {% for state in states %}
                                     <tr id="<?= $id ?>">
                                         <td class="text-center">
-                                            <a class="text-center">{{ stateRoby.commercial }}</a>
+                                            <a class="text-center">{{ state.Commercial}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ stateRoby.tiers }}</a>
+                                            <a class="text-center">{{ state.Tiers }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ stateRoby.nom }}</a>
+                                            <a class="text-center">{{ state.Nom }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ SumMontantAnneePrecedente }}</a>
+                                            <a class="text-center">{{ state.Pays }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">Delta %</a>
+                                            <a class="text-center">{{ state.Devise }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ stateRoby.SumMontantAnneeActuelle }}</a>
+                                            <a class="text-center">{{ state.AnneeN1 }}</a>
                                         </td>
-                                    {% endfor %}
+                                        <td class="text-center">
+                                            <a class="text-center">{{ state.Delta }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center">{{ state.AnneeN }}</a>
+                                        </td>
                                     </tr>
+                                {% endfor %}
 
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th class="text-center"><span>Commercial</span></th>
-                                    <th class="text-center"><span>Code Tiers</span></th>
+                                   <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
                                     <th class="text-center"><span>Nom</span></th>
-                                    <th class="text-center"><span>Montant N-1</span></th>
+                                    <th class="text-center"><span>Pays</span></th>
+                                    <th class="text-center"><span>Devise</span></th>
+                                    <th class="text-center"><span>N - 1</span></th>
                                     <th class="text-center"><span>Delta %</span></th>
-                                    <th class="text-center"><span>{{ sumAnneeSelectionnee }} € </span></th>
+                                    <th class="text-center"><span>Annee Selectionnée</span></th>
                                 </tr>
                             </tfoot>
                         </table>

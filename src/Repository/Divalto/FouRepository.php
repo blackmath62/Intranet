@@ -19,33 +19,5 @@ class FouRepository extends ServiceEntityRepository
         parent::__construct($registry, Fou::class);
     }
 
-     /**
-     * @return Fou[] Returns an array of Fou objects
-     */
-    
-    public function findByNom($value)
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.dos = :val')
-            #->innerJoin('a.activiteEnseignements', 'acti')
-            ->setParameter('val', $value)
-            ->orderBy('a.nom', 'ASC')
-            ->setMaxResults(20)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    
 
-    /*
-    public function findOneBySomeField($value): ?Fou
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
