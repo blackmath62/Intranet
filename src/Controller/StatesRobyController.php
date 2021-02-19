@@ -3,16 +3,21 @@
 namespace App\Controller;
 
 use App\Form\YearMonthType;
+use Symfony\Flex\Unpack\Result;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Divalto\StatesRobyByTiersRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Flex\Unpack\Result;
+
+/**
+ * @IsGranted("ROLE_ROBY")
+ */
 
 class StatesRobyController extends AbstractController
 {
     /**
-     * @Route("/roby/states", name="app_states_roby")
+     * @Route("/Roby/states", name="app_states_roby")
      */
     public function index(StatesRobyByTiersRepository $repo, Request $request)
     {

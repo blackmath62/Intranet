@@ -3,20 +3,25 @@
 namespace App\Controller;
 
 use DateTime;
-use App\Entity\Main\Tickets;
 use App\Form\TicketsType;
-use App\Repository\Main\StatusRepository;
-use App\Repository\Main\TicketsRepository;
-use App\Repository\Main\CommentsRepository;
+use App\Entity\Main\Tickets;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\Main\StatusRepository;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Repository\Main\TicketsRepository;
+use App\Repository\Main\CommentsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+
+/**
+ * @IsGranted("ROLE_USER")
+ */
 
 class TicketsController extends AbstractController
 {

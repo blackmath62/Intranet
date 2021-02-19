@@ -2,14 +2,19 @@
 
 namespace App\Controller;
 
-use App\Entity\Main\FAQ;
 use App\Form\FaqType;
+use App\Entity\Main\FAQ;
 use App\Repository\Main\FAQRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\SectionSearchRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+/**
+ * @IsGranted("ROLE_USER")
+ */
 
 class FaqController extends AbstractController
 {

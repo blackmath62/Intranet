@@ -5,7 +5,12 @@ namespace App\Repository\Divalto;
 
 use App\Entity\Divalto\Mouv;
 use Doctrine\Persistence\ManagerRegistry;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+
+/**
+ * @IsGranted("ROLE_ROBY")
+ */
 
 class DebRobyRepository extends ServiceEntityRepository
 {
