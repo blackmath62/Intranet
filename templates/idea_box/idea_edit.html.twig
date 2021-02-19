@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+{% block body %}
+	<section class="content-header">
+		<!-- /.Création -->
+		<div class="card card-dark">
+			<div class="card-header d-flex">
+				<h3 class="card-title">Accueil</h3>
+				<a href="{{ path('app_home') }}" class="badge badge-success ml-auto">Retourner à l'Accueil'</a>
+			</div>
+			<div class="card card-body border m-2">
+				{{ form_start(ideaForm)}}
+				{{ form_row(ideaForm.sujet)}}
+				{{ form_row(ideaForm.content)}}
+			</div>
+			<div class="card-footer">
+				<div class="text-right">
+					<button type="submit" class="btn btn-xl btn-dark mx-auto ">Modifier</button>
+				</div>
+			</div>
+			{{ form_end(ideaForm)}}
+		</div>
+	<section>
+
+		{% endblock %}

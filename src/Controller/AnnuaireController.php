@@ -36,9 +36,7 @@ class AnnuaireController extends AbstractController
             'title' => "Annuaire"
         ]);
     }
-    /**
-     * @Route("/", name="app_home", methods={"GET"})
-     */
+    
 
     public function home(UsersRepository $repo)
     {

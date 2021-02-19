@@ -8,6 +8,7 @@ use App\Repository\Main\UsersRepository;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Proxies\__CG__\App\Entity\Main\IdeaBox;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -102,9 +103,15 @@ class Users implements UserInterface
      */
     private $bornAt;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Documents::class, mappedBy="user")
+     */
+    private $ideaBoxs;
+
     public function __construct()
     {
         $this->documents = new ArrayCollection();
+        $this->ideaBoxs = new ArrayCollection();
         $this->permissions = new ArrayCollection();
         $this->chats = new ArrayCollection();
         $this->comments = new ArrayCollection();
@@ -206,6 +213,40 @@ class Users implements UserInterface
 
         return $this;
     }
+
+    
+    /**
+     * @return Collection|IdeaBox[]
+     */
+    public function getIdeaBox(): Collection
+    {
+        return $this->ideaBoxs;
+    }
+
+    public function addIdeaBox(IdeaBox $ideaBox): self
+    {
+        if (!$this->ideaBoxs->contains($ideaBox)) {
+            $this->ideaBoxs[] = $ideaBox;
+            $ideaBox->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIdeaBox(IdeaBox $ideaBox): self
+    {
+        if ($this->ideaBoxs->contains($ideaBox)) {
+            $this->ideaBoxs->removeElement($ideaBox);
+            // set the owning side to null (unless already changed)
+            if ($ideaBox->getUser() === $this) {
+                $ideaBox->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 
     /**
      * @return Collection|Documents[]

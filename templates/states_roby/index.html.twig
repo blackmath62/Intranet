@@ -154,13 +154,13 @@
                                             <a class="text-center">{{ state.Devise }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ state.AnneeN1 }}</a>
+                                            <a class="text-center">{{ state.AnneeN1|number_format(2) }} €</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ state.Delta }}</a>
+                                            <a class="text-center">{{ state.Delta|number_format(2) }} %</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ state.AnneeN }}</a>
+                                            <a class="text-center">{{ state.AnneeN|number_format(2) }} €</a>
                                         </td>
                                     </tr>
                                 {% endfor %}

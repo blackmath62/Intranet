@@ -68,7 +68,11 @@ class StatesRobyController extends AbstractController
                             if ($states[$p]['Tiers'] == $tab[$j] && $states[$p]['Annee'] == $annee -1) {
                                 $result[$j]['AnneeN1'] = $states[$p]['MontantSign']; // Année N-1
                             }
+                            if ($result[$j]['AnneeN'] <> 0 && $result[$j]['AnneeN1'] <> 0) {
+                                $result[$j]['Delta'] = (($result[$j]['AnneeN']/$result[$j]['AnneeN1']-1)*100);
+                            }
                         }
+
                 }
                 
                 // le compte rendu par commercial
