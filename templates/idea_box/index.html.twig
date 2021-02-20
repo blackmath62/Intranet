@@ -28,32 +28,6 @@
             </div>
         </div>
 
-            <div class="col-md-6">
-                <!-- USERS LIST -->
-                <div class="card">
-                  <div class="card-header">
-                    <h3 class="card-title">Utilisateurs connectés</h3>
-
-                    <div class="card-tools">
-                      <span class="badge badge-danger">8 New Members</span>
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
-                      </button>
-                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <!-- /.card-header -->
-                  <div class="card-body p-0">
-                    <ul class="users-list clearfix">
-                      <li>
-                        <img src="dist/img/user1-128x128.jpg" alt="User Image">
-                        <a class="users-list-name" href="#">Alexander Pierce</a>
-                        <span class="users-list-date">Today</span>
-                      </li>                     
-                    </ul>
-                  </div>
-                </div>
-              </div>
 
 
         <div class="col-md-7">
@@ -134,6 +108,34 @@
                     </table>
                 </div>
             </div>
+            <div class="col-md-12">
+                <!-- USERS LIST -->
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Membres</h3>
+                    <div class="card-tools">
+                      <span class="badge badge-danger">{{ users|length }} Membres</span>
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                      </button>
+                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body p-0">
+                    <ul class="users-list clearfix">
+                      {% for user in users %}
+                      <li>
+                        <img src="img/profile/{{ user.img }}" alt="User Image">
+                        <a class="users-list-name" href="mailto:{{ user.email }}">{{ user.pseudo }}</a>
+                        <!-- <span class="users-list-date">Today</span> -->
+                      </li>
+                      {% endfor %}              
+                     
+                    </ul>
+                  </div>
+                </div>
+              </div>
         </div>
                 
         
