@@ -63,6 +63,10 @@ class AdminAnnuaireController extends AbstractController
 
         // affichage du formulaire de modification de l'annuaire 1
         $annuaires = $repo->findAll();
+
+        $route = $request->attributes->get('_route');
+        $this->setTracking($route);
+
         return $this->render('admin_annuaire/index.html.twig', [
             'controller_name' => 'AdminAnnuaireController',
             'annuaires' => $annuaires,
@@ -79,10 +83,13 @@ class AdminAnnuaireController extends AbstractController
      * 
      * @Route("/admin/annuaire/delete/{id}", name="app_delete_annuaire")
      */
-    public function deleteAnnuaire(Annuaire $annuaire){
+    public function deleteAnnuaire(Annuaire $annuaire, Request $request){
         $em = $this->getDoctrine()->getManager();
                 $em->remove($annuaire);
                 $em->flush();
+        
+                $route = $request->attributes->get('_route');
+                $this->setTracking($route);
     
                 $this->addFlash('message', 'Ligne de l\'annuaire Supprimée avec succès');
                 return $this->redirectToRoute('app_admin_annuaire');
@@ -98,6 +105,10 @@ class AdminAnnuaireController extends AbstractController
         
         $formEditAnnuaire = $this->createForm(AdminAnnuaireType::class, $annuaire);
         $formEditAnnuaire->handleRequest($request);
+        
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
 
         if($formEditAnnuaire->isSubmitted() && $formEditAnnuaire->isValid()){
             $em = $this->getDoctrine()->getManager();

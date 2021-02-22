@@ -74,6 +74,10 @@ class AdminDocumentsController extends AbstractController
             }
             $documents = $repo->findAll();
 
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+            
             return $this->render('admin_documents/index.html.twig',[
                 'adminDocumentsForm' => $form->createView(),
                 'documents' => $documents,

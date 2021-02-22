@@ -4,12 +4,15 @@ namespace App\Controller;
 
 use DateInterval;
 use App\Entity\Divalto\Ent;
+use App\Entity\Main\Trackings;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\AnnuaireRepository;
+use App\Repository\Main\TrackingsRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @IsGranted("ROLE_USER")
@@ -25,11 +28,15 @@ class AnnuaireController extends AbstractController
     /**
      * @Route("/annuaire", name="annuaire")
      */
-    public function index(AnnuaireRepository $repo)
+    public function index(AnnuaireRepository $repo, Request $request)
     {
 
         $annuaires = $repo->findAll();
-            
+        
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         return $this->render('annuaire/index.html.twig', [
             'controller_name' => 'AnnuaireController',
             'annuaires' => $annuaires,
@@ -38,7 +45,7 @@ class AnnuaireController extends AbstractController
     }
     
 
-    public function home(UsersRepository $repo)
+    public function home(UsersRepository $repo, Request $request)
     {
         
             
@@ -48,6 +55,11 @@ class AnnuaireController extends AbstractController
         $CmdsToday = $this->getDoctrine()->getRepository(Ent::class, 'divaltoreel')->findBy(['pidt' => $today, 'picod' => 2]);
         $CmdsLastYear = $this->getDoctrine()->getRepository(Ent::class, 'divaltoreel')->findBy(['pidt' => $lastYear, 'picod' => 2]);
         $users = $repo->findAll();
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         return $this->render('annuaire/home.html.twig', [
             'title' => "page d'accueil",
             'users' => $users,

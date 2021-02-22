@@ -27,6 +27,10 @@ class IdeaBoxController extends AbstractController
         $form = $this->createForm(IdeaBoxType::class, $idea);
         $form->handleRequest($request);
 
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
             $idea->setCreatedAt(new \DateTime());
@@ -52,9 +56,14 @@ class IdeaBoxController extends AbstractController
      * @Route("/idea/show/{id}", name="app_idea_show")
      */
 
-    public function IdeaShow(int $id, IdeaBoxRepository $repo)
+    public function IdeaShow(int $id, IdeaBoxRepository $repo, Request $request)
     {
         $idea = $repo->findOneBy(['id' => $id]);
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         return $this->render('idea_box/idea_show.html.twig', [
             'idea' => $idea,
             'title' => 'Idea View'
@@ -69,6 +78,10 @@ class IdeaBoxController extends AbstractController
     {
         $idea = $repo->findOneBy(['id' => $id]);
 
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         $form = $this->createForm(IdeaBoxType::class, $idea);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){

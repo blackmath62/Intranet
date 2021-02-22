@@ -34,6 +34,11 @@ class SectionSearchController extends AbstractController
                 ->add('fa')
                 ->getForm();
             $form->handleRequest($request);
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
             if ($form->isSubmitted() && $form->isValid()) {
                 $section_search->setCreatedAt(new \DateTime());
                 $manager->persist($section_search);
@@ -50,7 +55,7 @@ class SectionSearchController extends AbstractController
     /**
      * @Route("/admin/section_search/delete/{id}",name="app_delete_section_search")
      */
-    public function deletesection_search($id)
+    public function deletesection_search($id, Request $request)
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(SectionSearch::class);
         $section_searchId = $repository->find($id);
@@ -59,7 +64,10 @@ class SectionSearchController extends AbstractController
         $em->remove($section_searchId);
         $em->flush();        
 
-        
+        // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
         return $this->redirect($this->generateUrl('app_admin_section_search'));
     }
     /**
@@ -70,6 +78,10 @@ class SectionSearchController extends AbstractController
         $form = $this->createForm(EditSectionSearchType::class, $section_search);
             $form->handleRequest($request);
 
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+            
             if($form->isSubmitted() && $form->isValid()){
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($section_search);

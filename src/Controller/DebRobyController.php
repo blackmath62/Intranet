@@ -32,6 +32,10 @@ class DebRobyController extends AbstractController
                     $annee = date("Y");
                     $mois = date("m")-1;
 
+                    // tracking user page for stats
+                    $tracking = $request->attributes->get('_route');
+                    $this->setTracking($tracking);
+
                     if($form->isSubmitted() && $form->isValid()){
                         $annee = $form->getData()['year'];
                         $mois = $form->getData()['month'];

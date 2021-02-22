@@ -34,6 +34,11 @@ class AdminPrestataireController extends AbstractController
             $em->flush();
         }
         $prestataires = $repo->findAll();
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         return $this->render('admin_prestataire/index.html.twig', [
             'controller_name' => 'AdminPrestataireController',
             'prestataires' => $prestataires,
@@ -45,7 +50,7 @@ class AdminPrestataireController extends AbstractController
     /**
      * @Route("/admin/prestataire/delete/{id}",name="app_delete_prestataire")
      */
-    public function deletePrestataire($id)
+    public function deletePrestataire($id, Request $request)
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(Prestataire::class);
         $prestataireId = $repository->find($id);
@@ -54,7 +59,10 @@ class AdminPrestataireController extends AbstractController
         $em->remove($prestataireId);
         $em->flush();        
 
-        
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         return $this->redirect($this->generateUrl('app_admin_prestataire'));
     }
     /**
@@ -64,6 +72,10 @@ class AdminPrestataireController extends AbstractController
     {
         $form = $this->createForm(PrestataireType::class, $prestataire);
             $form->handleRequest($request);
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
 
             if($form->isSubmitted() && $form->isValid()){
                 $em = $this->getDoctrine()->getManager();

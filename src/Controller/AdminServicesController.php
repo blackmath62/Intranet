@@ -38,6 +38,11 @@ class AdminServicesController extends AbstractController
                 $manager->flush();
             }
             $services = $repo->findAll();
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
             return $this->render('admin_services/index.html.twig', [
                 'controller_name' => 'AdminserviceController',
                 'services' => $services,
@@ -49,7 +54,7 @@ class AdminServicesController extends AbstractController
     /**
      * @Route("/admin/service/delete/{id}",name="app_delete_service")
      */
-    public function deleteservice($id)
+    public function deleteservice($id, Request $request)
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(Services::class);
         $serviceId = $repository->find($id);
@@ -58,7 +63,10 @@ class AdminServicesController extends AbstractController
         $em->remove($serviceId);
         $em->flush();        
 
-        
+        // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
         return $this->redirect($this->generateUrl('app_admin_services'));
     }
     /**
@@ -69,6 +77,11 @@ class AdminServicesController extends AbstractController
         $form = $this->createForm(EditServiceType::class, $service);
             $form->handleRequest($request);
 
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+            
             if($form->isSubmitted() && $form->isValid()){
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($service);

@@ -51,6 +51,10 @@ class TicketsController extends AbstractController
         $form = $this->createForm(TicketsType::class);
         $form->handleRequest($request);
 
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         if ($form->isSubmitted() && $form->isValid()) {
             $ticket = $form->getData();
             $ticket->setCreatedAt(new \DateTime())

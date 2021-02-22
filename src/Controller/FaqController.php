@@ -26,6 +26,11 @@ class FaqController extends AbstractController
         $faqs = $repo->findAll();
         $form = $this->createForm(FaqType::class);
         $form->handleRequest($request);
+        
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         if($form->isSubmitted() && $form->isValid()){
             $faq = $form->getData();
             $faq->setCreatedAt(new \DateTime())
@@ -49,9 +54,14 @@ class FaqController extends AbstractController
      * @Route("/faq/show/{id}", name="app_faq_show")
      */
 
-    public function faqShow(int $id, FAQRepository $repo)
+    public function faqShow(int $id, FAQRepository $repo, Request $request)
     {
         $faq = $repo->findOneBy(['id' => $id]);
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         return $this->render('faq/faq_show.html.twig', [
             'faq' => $faq,
             'title' => 'FAQ View'
@@ -68,6 +78,11 @@ class FaqController extends AbstractController
 
         $form = $this->createForm(FaqType::class, $faq);
         $form->handleRequest($request);
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         if($form->isSubmitted() && $form->isValid()){
             $faq = $form->getData();
             $em = $this->getDoctrine()->getManager();

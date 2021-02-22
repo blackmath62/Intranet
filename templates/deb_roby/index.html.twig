@@ -1,9 +1,16 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ title }}{% endblock %}
 {% block body %}
+<div class="alert alert-warning alert-dismissible col-12">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                  <h5><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h5>
+                  La DEB ne sera correcte que si toutes les factures ont bien été éditées et que les articles sont correctement créé dans Divalto (champs Coefficients et poids).</br>
+                  Nous ne pouvons être tenu responsable d'erreur lié à la création des articles.</br>
+                  Cette extraction est le reflet de ce qui est présent dans Divalto....
+                </div>
 <div class="row">
             <div class="col-md-12">
-                <div class="card card-info">
+                <div class="card card-dark">
                     <div class="card-header d-flex justify-content-between">
                         <h3 class="card-title text-center">DEB Roby</h3>
                         {{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }} ) }}
@@ -44,31 +51,31 @@
                                 {% for deb in debs %}
                                     <tr id="<?= $id ?>">
                                         <td class="text-center">
-                                            <a class="text-center">{{ deb.NumFact}}</a>
+                                            <a class="text-center text-dark">{{ deb.NumFact}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ deb.DateFact|date("d/m/Y")}}</a>
+                                            <a class="text-center text-dark">{{ deb.DateFact|date("d/m/Y")}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ deb.notreRef }}</a>
+                                            <a class="text-center text-dark">{{ deb.notreRef }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ deb.Tiers }}</a>
+                                            <a class="text-center text-dark">{{ deb.Tiers }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ deb.Nom }}</a>
+                                            <a class="text-center text-dark">{{ deb.Nom }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ deb.Pays }}</a>
+                                            <a class="text-center text-dark">{{ deb.Pays }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ deb.Volume }}</a>
+                                            <a class="text-center text-dark">{{ deb.Volume }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ deb.Poids }}</a>
+                                            <a class="text-center text-dark">{{ deb.Poids }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ deb.Montant }}</a>
+                                            <a class="text-center text-dark">{{ deb.Montant }}</a>
                                         </td>
                                     </tr>
                                 {% endfor %}

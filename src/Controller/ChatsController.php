@@ -26,6 +26,11 @@ class ChatsController extends AbstractController
         $users= $repoUsers->FindAll();
         $form = $this->createForm(ChatsType::class);
         $form->handleRequest($request);
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         if ($form->isSubmitted() && $form->isValid()) {
             $chat = $form->getData();
             $chat->setCreatedAt(new \DateTime())

@@ -34,6 +34,11 @@ class AdminSocieteController extends AbstractController
                 $manager->flush();
             }
             $societes = $repo->findAll();
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
             return $this->render('admin_societe/index.html.twig', [
                 'controller_name' => 'AdminSocieteController',
                 'societes' => $societes,
@@ -45,7 +50,7 @@ class AdminSocieteController extends AbstractController
     /**
      * @Route("/admin/societe/delete/{id}",name="app_delete_societe")
      */
-    public function deleteSociete($id)
+    public function deleteSociete($id, Request $request)
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(Societe::class);
         $societeId = $repository->find($id);
@@ -54,7 +59,10 @@ class AdminSocieteController extends AbstractController
         $em->remove($societeId);
         $em->flush();        
 
-        
+        // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
         return $this->redirect($this->generateUrl('app_admin_societe'));
     }
     /**
@@ -65,6 +73,10 @@ class AdminSocieteController extends AbstractController
         $form = $this->createForm(EditSocieteType::class, $societe);
             $form->handleRequest($request);
 
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+            
             if($form->isSubmitted() && $form->isValid()){
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($societe);

@@ -80,7 +80,10 @@ class ApiController extends AbstractController
             return new Response('Données incomplètes', 404);
         }
 
-
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         return $this->render('api/index.html.twig', [
             'controller_name' => 'ApiController',
         ]);

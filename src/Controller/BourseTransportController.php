@@ -21,8 +21,13 @@ class BourseTransportController extends AbstractController
     /**
      * @Route("/bourse_transport", name="app_bourse_transport", methods={"GET"})
      */
-    public function index(CalendarRepository $calendarRepository): Response
+    public function index(CalendarRepository $calendarRepository, Request $request): Response
     {
+        
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         return $this->render('bourse_transport/index.html.twig', [
             'calendars' => $calendarRepository->findAll(),
             'title' => 'Bourse aux transports'
@@ -37,6 +42,10 @@ class BourseTransportController extends AbstractController
         $calendar = new Calendar();
         $form = $this->createForm(CalendarType::class, $calendar);
         $form->handleRequest($request);
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
@@ -55,8 +64,13 @@ class BourseTransportController extends AbstractController
     /**
      * @Route("/calendar/{id}", name="app_calendar_show", methods={"GET"})
      */
-    public function show(Calendar $calendar): Response
+    public function show(Calendar $calendar, Request $request): Response
     {
+        
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         return $this->render('bourse_transport/show.html.twig', [
             'calendar' => $calendar,
         ]);
@@ -69,6 +83,10 @@ class BourseTransportController extends AbstractController
     {
         $form = $this->createForm(CalendarType::class, $calendar);
         $form->handleRequest($request);
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
@@ -93,6 +111,10 @@ class BourseTransportController extends AbstractController
             $entityManager->flush();
         }
 
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         return $this->redirectToRoute('app_bourse_transport');
     }
 }

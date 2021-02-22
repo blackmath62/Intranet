@@ -130,15 +130,17 @@
 						class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 						<!-- Table Commune -->
 						<li class="nav-header">Général</li>
+						
 							<li class="nav-item">
 								<a href="{{path('app_home')}}" class="nav-link">
 									<i class="nav-icon fas fa-newspaper"></i>
 									<p>
-										Actualités
+										Accueil
 									</p>
 									<!-- <span class="badge badge-danger right">8</span> -->
 								</a>
 							</li>
+						
 							<li class="nav-item">
 								<a href="{{path('app_video')}}" class="nav-link">
 									<i class="nav-icon fas fa-video"></i>
@@ -265,14 +267,17 @@
 											</a>
 										</li>
 									{% endif %}
+									{% if is_granted('ROLE_ADMIN') %}
 									<li class="nav-item">
 										<a href="{{path('app_states_lhermitte_lh')}}" class="nav-link">
 											<i class="fas fa-globe nav-icon text-primary"></i>
 											<p>Lhermitte Frères</p>
 										</a>
 									</li>
+									{% endif %}
 								</ul>
 							</li>
+							{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
 								<a href="{{path('app_lhermitte_clients_secteur')}}" class="nav-link">
 									<i class="nav-icon fas fa-address-book"></i>
@@ -281,6 +286,7 @@
 									</p>
 								</a>
 							</li>
+							{% endif %}
 						{% endif %}
 
 						{% if is_granted('ROLE_COMPTA') %}
@@ -337,7 +343,7 @@
 									</p>
 								</a>
 							</li>
-						{% if is_granted('ROLE_LHERMITTE') %}
+						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
 								<a href="" class="nav-link">
 									<i class="nav-icon fas fa-fw fa-truck"></i>
@@ -375,12 +381,14 @@
 									<p>D.E.B</p>
 								</a>
 							</li>
+							{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
 								<a href="" class="nav-link">
 									<i class="fas fa-fw fa-table nav-icon"></i>
 									<p>Planning</p>
 								</a>
 							</li>
+							{% endif %}
 							{% endif %}
 							<li class="nav-item">
 								<a href="{{path('app_Roby_documents')}}" class="nav-link">

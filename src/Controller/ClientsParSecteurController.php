@@ -25,6 +25,10 @@ class ClientsParSecteurController extends AbstractController
         $form = $this->createForm(ClientsType::class);
         $form->handleRequest($request);
         
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         if ($form->isSubmitted() && $form->isValid()) {
             //$secteur = $form->getdata()->getStat0002();
             $commercial = $form->getdata()->getRepr0001();

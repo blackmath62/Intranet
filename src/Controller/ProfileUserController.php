@@ -24,6 +24,10 @@ class ProfileUserController extends AbstractController
         $form = $this->createForm(ProfileUserType::class, $user);
         $form->handleRequest($request);
         
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         if($form->isSubmitted() && $form->isValid()){
              // On récupére le fichier dans le formulaire
              $userImg = $form->getData();

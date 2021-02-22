@@ -20,10 +20,15 @@ class AdminUsersController extends AbstractController
     /**
      * @Route("/admin/users", name="app_admin_users")
      */
-    public function index(UsersRepository $repo)
+    public function index(UsersRepository $repo, Request $request)
     {
         
         $users =$repo->findAll();
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         return $this->render('admin_users/index.html.twig', [
             'controller_name' => 'AdminUsersController',
             'title' => 'Administration des Utilisateurs',
@@ -40,7 +45,11 @@ class AdminUsersController extends AbstractController
 
             $form = $this->createForm(EditUsersType::class, $user);
             $form->handleRequest($request);
-            //dd($form);
+            
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
             if($form->isSubmitted() && $form->isValid()){
                 $user = $form->getData();
                 /*$file = $form->get('img')->getData();
@@ -89,12 +98,16 @@ class AdminUsersController extends AbstractController
      * @Route("/admin/users/delete/{id}", name="app_delete_user")
      */
 
-    public function deleteUser(Users $user)
+    public function deleteUser(Users $user, Request $request)
         {
                 $em = $this->getDoctrine()->getManager();
                 $em->remove($user);
                 $em->flush();
-    
+
+                // tracking user page for stats
+                $tracking = $request->attributes->get('_route');
+                $this->setTracking($tracking);
+
                 $this->addFlash('message', 'Utilisateur Supprimé avec succès');
                 return $this->redirectToRoute('app_admin_users');
             

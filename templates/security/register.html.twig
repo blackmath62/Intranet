@@ -11,7 +11,7 @@
 			{{ form_start( registrationForm) }}
 			<small>{{ form_errors(registrationForm.pseudo) }}</small>
 			<div class="input-group mb-3">
-				{{ form_widget(registrationForm.pseudo, {'attr': {'class': 'form-control','placeholder': 'Votre nom'}}) }}
+				{{ form_widget(registrationForm.pseudo, {'attr': {'class': 'form-control','placeholder': 'Votre pseudo'}}) }}
 				<div class="input-group-append">
 					<div class="input-group-text">
 						<span class="fas fa-user"></span>
@@ -22,7 +22,7 @@
 			<small>{{ form_errors(registrationForm.email) }}</small>
 
 			<div class="input-group mb-3">
-				{{ form_widget(registrationForm.email, {'attr': {'class': 'form-control','placeholder': 'Votre mail'}}) }}
+				{{ form_widget(registrationForm.email, {'attr': {'class': 'form-control','placeholder': 'Votre adresse mail'}}) }}
 				<div class="input-group-append">
 					<div class="input-group-text">
 						<span class="fas fa-envelope"></span>
@@ -58,7 +58,7 @@
 			</div>
 
 			<div class="input-group mb-3">
-				{{ form_widget(registrationForm.img, {'attr': {'class': 'form-control','placeholder': 'URL de votre image'}}) }}
+				{{ form_widget(registrationForm.img, {'attr': {'class': 'form-control','placeholder': 'votre image'}}) }}
 				<div class="input-group-append">
 					<div class="input-group-text">
 						<span class="fas fa-picture"></span>
@@ -66,9 +66,9 @@
 				</div>
 			</div>
 			<div class="text-center">
-				<label for="bornat">Date de naissance</label>
+				<label for="bornat">Date de naissance (l'année a peu d'importance)</label>
 				<div class="input-group mb-3">
-				{{ form_widget(registrationForm.bornAt, {'attr': {'class': 'form-control',
+				{{ form_widget(registrationForm.bornAt, {'attr': {'class': 'form-control','placeholder': 'Date de naissance (l\'année a peu d\'importance)',
 				'id':'bornat'
 				}}) }}
 				<div class="input-group-append">

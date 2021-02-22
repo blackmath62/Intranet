@@ -3,12 +3,13 @@
 namespace App\Entity\Main;
 
 use App\Entity\Main\FAQ;
+use App\Entity\Main\Trackings;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\Main\UsersRepository;
 
+use App\Repository\Main\UsersRepository;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
 use Proxies\__CG__\App\Entity\Main\IdeaBox;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -107,11 +108,16 @@ class Users implements UserInterface
      * @ORM\OneToMany(targetEntity=Documents::class, mappedBy="user")
      */
     private $ideaBoxs;
+    /**
+     * @ORM\OneToMany(targetEntity=Trackings::class, mappedBy="user")
+     */
+    private $trackings;
 
     public function __construct()
     {
         $this->documents = new ArrayCollection();
         $this->ideaBoxs = new ArrayCollection();
+        $this->trackings = new ArrayCollection();
         $this->permissions = new ArrayCollection();
         $this->chats = new ArrayCollection();
         $this->comments = new ArrayCollection();
@@ -221,6 +227,13 @@ class Users implements UserInterface
     public function getIdeaBox(): Collection
     {
         return $this->ideaBoxs;
+    }
+    /**
+     * @return Collection|Trackings[]
+     */
+    public function getTrackings(): Collection
+    {
+        return $this->trackings;
     }
 
 

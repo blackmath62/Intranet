@@ -39,6 +39,11 @@ class AdminPrioritiesController extends AbstractController
                 $manager->flush();
             }
             $priorities = $repo->findAll();
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
             return $this->render('admin_priorities/index.html.twig', [
                 'controller_name' => 'AdminprioritiesController',
                 'priorities' => $priorities,
@@ -50,7 +55,7 @@ class AdminPrioritiesController extends AbstractController
     /**
      * @Route("/admin/priorities/delete/{id}",name="app_delete_priorities")
      */
-    public function deletepriorities($id)
+    public function deletepriorities($id, Request $request)
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(priorities::class);
         $prioritiesId = $repository->find($id);
@@ -59,7 +64,10 @@ class AdminPrioritiesController extends AbstractController
         $em->remove($prioritiesId);
         $em->flush();        
 
-        
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         return $this->redirect($this->generateUrl('app_admin_priorities'));
     }
     /**
@@ -69,6 +77,10 @@ class AdminPrioritiesController extends AbstractController
     {
         $form = $this->createForm(EditPrioritiesType::class, $priorities);
             $form->handleRequest($request);
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
 
             if($form->isSubmitted() && $form->isValid()){
                 $em = $this->getDoctrine()->getManager();

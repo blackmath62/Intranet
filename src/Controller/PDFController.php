@@ -54,6 +54,8 @@ class PDFController extends Command
     {
         
         $annuaires = $repo->findAll();
+
+        
         $html = $this->twig->render('annuaire/index.html.twig', [
             'annuaires' => $annuaires,
             'title' => 'PDF'            

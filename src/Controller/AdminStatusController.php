@@ -37,6 +37,11 @@ class AdminStatusController extends AbstractController
                 $manager->flush();
             }
             $statut = $repo->findAll();
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
             return $this->render('admin_status/index.html.twig', [
                 'controller_name' => 'AdminStatusController',
                 'status' => $statut,
@@ -48,7 +53,7 @@ class AdminStatusController extends AbstractController
     /**
      * @Route("/admin/statut/delete/{id}",name="app_delete_status")
      */
-    public function deleteStatus($id)
+    public function deleteStatus($id, Request $request)
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(Status::class);
         $StatusId = $repository->find($id);
@@ -57,7 +62,10 @@ class AdminStatusController extends AbstractController
         $em->remove($StatusId);
         $em->flush();        
 
-        
+        // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
         return $this->redirect($this->generateUrl('app_admin_status'));
     }
     /**
@@ -68,6 +76,11 @@ class AdminStatusController extends AbstractController
         $form = $this->createForm(EditStatusType::class, $status);
             $form->handleRequest($request);
 
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+            
             if($form->isSubmitted() && $form->isValid()){
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($status);

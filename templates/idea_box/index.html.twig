@@ -43,14 +43,6 @@
                                 <th class="text-center">
                                     <span>Sujet</span>
                                 </th>
-                                <th class="text-center">
-                                    <span>Contenu</span>
-                                </th>
-                                <th class="text-center">
-                                    <span>date de création</span>
-                                </th>
-                                <th class="text-center">
-                                    <span>pseudo</span>
                                 </th>
                                 <th class="text-center">
                                     <span>Action</span>
@@ -62,19 +54,31 @@
                             {% for idea in ideas %}
                                 {% if idea.status == false %}
                                     <tr>
-                                        <td class="text-left">
-                                            <a class="text-center">{{ idea.sujet}}</a>
+                                        <td >
+                                            <div>
+                                            <u><strong>Titre : </strong> </u>
+                                            <a class="text-center text-dark">{{ idea.sujet}}</a>
+                                            </div>
+                                            <div>
+                                            <u><strong>Aperçu : </strong></u>
+                                            <a class="text-center text-dark">{{ idea.content|striptags|slice(0, 100)|raw }}.....</a>
+                                            </div>
+                                            <div class="text-right">
+                                            <small>
+												
+												Déposé par 
+												{{ idea.user.pseudo}}
+												le
+												{{ idea.createdAt|date("d/m/Y")}}
+												à
+												{{ idea.createdAt|date("H:i")}}
+												
+											</small>
+                                            </div>
                                         </td>
-                                        <td class="text-center">
-                                            <a class="text-center">{{ idea.content|striptags|slice(0, 55)|raw }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center">{{ idea.createdAt|date("d/m/Y")}}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center">{{ idea.user.pseudo}}</a>
-                                        </td>
-                                        <td class="text-center">
+                                    
+                                        
+                                        <td class="text-center" style="vertical-align: middle;">
                                             <a href="{{ path('app_idea_show', {'id' : idea.id}) }}" type="button" class="btn btn-info">
                                                 <i class="far fa-eye"></i></a>
                                             <a href="{{ path('app_idea_edit', {'id' : idea.id}) }}" type="button" class="btn btn-warning">
@@ -90,15 +94,6 @@
                             <tr>
                                 <th class="text-center">
                                     <span>Sujet</span>
-                                </th>
-                                <th class="text-center">
-                                    <span>Contenu</span>
-                                </th>
-                                <th class="text-center">
-                                    <span>date de création</span>
-                                </th>
-                                <th class="text-center">
-                                    <span>pseudo</span>
                                 </th>
                                 <th class="text-center">
                                     <span>Action</span>

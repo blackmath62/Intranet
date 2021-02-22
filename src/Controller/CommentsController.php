@@ -37,6 +37,11 @@ class CommentsController extends AbstractController
         $comments = $repoComments->findBy(['ticket' => $id]);
         $formComment = $this->createForm(CommentsTicketsType::class);
         $formComment->handleRequest($request);
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         if($formComment->isSubmitted() && $formComment->isValid()){
             $comment = new Comments();
             $comment = $formComment->getData();

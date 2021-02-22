@@ -90,6 +90,19 @@ class SecurityController extends AbstractController
                 ->html($this->renderView('mails/activation.html.twig', ['token' => $user->getToken()]));
 
             $mailerInterface->send($email);
+
+            $emailAdmin = (new Email())
+                ->from('intranet@groupe-axis.fr')
+                ->to('jpochet@lhermitte.fr')
+                //->cc('cc@example.com')
+                //->bcc('bcc@example.com')
+                //->replyTo('fabien@example.com')
+                ->priority(Email::PRIORITY_HIGH)
+                ->subject('Un compte doit être paramétré sur le site intranet !')
+                //->text('Sending emails is fun again!')
+                ->html('Merci de paramétrer le compte de ' . $user->getEmail());
+
+            $mailerInterface->send($emailAdmin);
             $this->addFlash('warning', 'Veuillez consulter vos mails et activer votre compte, le mail de validation peut arriver dans vos courriers indésirables');
             return $this->redirectToRoute('app_login');
         }

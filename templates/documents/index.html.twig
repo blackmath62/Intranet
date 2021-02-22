@@ -39,16 +39,16 @@
 										{% if date(document.endDate) > date() %}
 											<tr>
 												<td class="text-left">
-													<a class="text-center">{{ document.title}}</a>
+													<a class="text-center text-dark">{{ document.title}}</a>
 												</td>
 												<td class="text-center">
-													<a class="text-center">{{ document.beginningDate|date("d/m/Y")}}</a>
+													<a class="text-center text-dark">{{ document.beginningDate|date("d/m/Y")}}</a>
 												</td>
 												<td class="text-center">
-													<a class="text-center">{{ document.endDate|date("d/m/Y")}}</a>
+													<a class="text-center text-dark">{{ document.endDate|date("d/m/Y")}}</a>
 												</td>
 												<td class="text-center">
-													<a class="text-center">{{ document.user.pseudo}}</a>
+													<a class="text-center text-dark">{{ document.user.pseudo}}</a>
 												</td>
 												<td class="text-center">
 													<a href="{{ asset('doc/' ~ document.societe.dossier ~ '/' ~ document.url)}}" class="text-center btn btn-info">Télécharger le document</a>

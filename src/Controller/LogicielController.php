@@ -33,6 +33,11 @@ class LogicielController extends AbstractController
                 ->add('icon')
                 ->getForm();
             $form->handleRequest($request);
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
             if ($form->isSubmitted() && $form->isValid()) {
                 $logiciel->setCreatedAt(new \DateTime());
                 $logiciel->setClosedAt(new \DateTime());
@@ -51,11 +56,15 @@ class LogicielController extends AbstractController
     /**
      * @Route("/admin/logiciel/delete/{id}",name="app_delete_logiciel")
      */
-    public function deletelogiciel($id)
+    public function deletelogiciel($id, Request $request)
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(Logiciel::class);
         $logicielId = $repository->find($id);
-         
+        
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         $em = $this->getDoctrine()->getManager();
         $em->remove($logicielId);
         $em->flush();        
@@ -71,6 +80,10 @@ class LogicielController extends AbstractController
         $form = $this->createForm(EditLogicielType::class, $logiciel);
             $form->handleRequest($request);
 
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+            
             if($form->isSubmitted() && $form->isValid()){
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($logiciel);

@@ -6,6 +6,7 @@ use App\Repository\Main\CalendarRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @IsGranted("ROLE_ADMIN")
@@ -16,7 +17,7 @@ class MainController extends AbstractController
     /**
      * @Route("/main", name="app_main")
      */
-    public function index(CalendarRepository $calendar)
+    public function index(CalendarRepository $calendar, Request $request)
     {
         $events = $calendar->findAll();
 
@@ -37,6 +38,10 @@ class MainController extends AbstractController
         }
 
         $data = json_encode($rdvs);
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
 
         return $this->render('main/index.html.twig', compact('data'));
     }

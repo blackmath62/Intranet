@@ -23,6 +23,10 @@ class ContactController extends AbstractController
         $form = $this->createForm(ContactType::class);
         $form->handleRequest($request);
 
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
         if($form->isSubmitted() && $form->isValid()){
             $data = $form->getData();
         $email = (new Email())

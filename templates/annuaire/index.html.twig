@@ -3,7 +3,7 @@
 {% block body %}
 <div class="row">
             <div class="col-md-12">
-                <div class="card card-info">
+                <div class="card card-dark">
                     <div class="card-header">
                         <h3 class="card-title text-center">Annuaire des sociétés</h3>
                     </div>
@@ -25,25 +25,25 @@
                                 {% for annuaire in annuaires %}
                                     <tr id="<?= $id ?>">
                                         <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center" style="max-width: 40px;">{{annuaire.interne}}</a>
+                                            <a class="text-center text-dark" style="max-width: 40px;">{{annuaire.interne}}</a>
                                         </td>
                                         <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center">{{annuaire.nom}}</a>
+                                            <a class="text-center text-dark">{{annuaire.nom}}</a>
                                         </td>
                                         <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center">{{ annuaire.exterieur}}</a>
+                                            <a class="text-center text-dark">{{ annuaire.exterieur}}</a>
                                         </td>
                                         <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center">{{annuaire.mail}}</a>
+                                            <a class="text-center text-dark">{{annuaire.mail}}</a>
                                         </td>
                                         <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center">{{annuaire.fonction}}</a>
+                                            <a class="text-center text-dark">{{annuaire.fonction}}</a>
                                         </td>
                                         <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center">{{ annuaire.societe.nom }}</a>
+                                            <a class="text-center text-dark">{{ annuaire.societe.nom }}</a>
                                         </td>
                                         <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center">{{annuaire.portable}}</a>
+                                            <a class="text-center text-dark">{{annuaire.portable}}</a>
                                         </td>
                                     {% endfor %}
                                     </tr>
