@@ -19,9 +19,14 @@
                 </div>
                 <div class="card-body">
                     {{ form_start(ideaBoxForm)}}
-                    {{ form(ideaBoxForm)}}
+                    {{ form_row(ideaBoxForm.sujet)}}
+				    {{ form_row(ideaBoxForm.content)}}
                 </div>
-
+                  <div class="card-footer">
+				<div class="text-right">
+					<button type="submit" class="btn btn-xl btn-warning mx-auto "><i class="far fa-lightbulb pr-2"></i>Créer</button>
+				</div>
+			</div>
                 {{ form_end(ideaBoxForm)}}
             </div>
         </div>

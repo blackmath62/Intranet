@@ -14,23 +14,7 @@ class ClientsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-                /*->add('stat0002', ChoiceType::class,[
-                    'choices' => [
-                        'HP' => "HP",
-                        'EV' => "EV",
-                        'ME' => "ME",
-                    ],
-                    'choice_attr' => [
-                        'HP' => ['class' => 'm-3'],
-                        'EV' => ['class' => 'm-3'],
-                        'ME' => ['class' => 'm-3']
-                    ],
-                    'expanded' => true,
-                    'multiple' => false,
-                    'label' => 'Selectionnez le secteur'
-                   
-                ])*/
-                ->add('repr0001', ChoiceType::class,[
+                ->add('commercial', ChoiceType::class,[
                     'choices' => [
                         'Mr LHERMITTE JEAN MICHEL 06.16.40.36.40' => "1",
                         'DESCHODT ALEX Port: 06.20.63.40.97' => "2",
@@ -71,7 +55,7 @@ class ClientsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Cli::class,
+            
         ]);
     }
 }

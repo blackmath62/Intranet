@@ -29,10 +29,7 @@ class IdeaBoxType extends AbstractType
                 'placeholder' => 'Dans la section ******* du site intranet, je pense qu\'il serait intéréssant d\'ajouter  *******, La fonctionnalité dans la section ****** n\'est pas adaptée à nos besoins, il faudrait ******* '
                 ]
                 ])
-            ->add('Creer', SubmitType::class, [
-                    'label' => "Créer",
-                    'attr' => ['class' => 'form-control btn btn-warning mt-3']
-                ])
+           
         ;
     }
 

@@ -13,7 +13,7 @@
                         Selectionnez le commercial : 
                         </div>
                         <div class="p-1">
-                             {{ form_row(clientForm.repr0001) }}
+                             {{ form_row(clientForm.commercial) }}
                         </div>
                         
                         <div class="p-1">
@@ -42,28 +42,28 @@
                                 {% for client in clients %}
                                     <tr>
                                         <td class="text-center">
-                                            <a class="text-center">{{client.repr0001}}</a>
+                                            <a class="text-dark">{{client.Commercial}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center" style="max-width: 40px;">{{client.tiers}}</a>
+                                            <a class="text-dark" style="max-width: 40px;">{{client.Tiers}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{client.nom}}</a>
+                                            <a class="text-dark">{{client.Nom}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ client.rue}}</a>
+                                            <a class="text-dark">{{ client.Rue}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{client.cpostal}}</a>
+                                            <a class="text-dark">{{client.CP}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{client.vil}}</a>
+                                            <a class="text-dark">{{client.Ville}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{ client.tel }}</a>
+                                            <a class="text-dark">{{ client.Tel }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center">{{client.email}}</a>
+                                            <a class="text-dark">{{client.Mail}}</a>
                                         </td>
                                     </tr>
                                 {% endfor %}
