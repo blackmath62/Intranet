@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <!-- /.card-header -->
+                    <div class="card-header d-flex justify-content-between ">
+                        <h3 class="card-title text-center">Rossignols</h3>
+                    </div>
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>U.V</span></th>
+                                    <th class="text-center"><span>T1</span></th>
+                                    <th class="text-center"><span>Prix par</span></th>
+                                    <th class="text-center"><span>stock</span></th>
+                                    <th class="text-center"><span>Qté Réservée</span></th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+							 
+                              <!-- >boucle -->
+                                    <tr id="<?= $id ?>">
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">Ref</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">désignation</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">Sref1</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">Sref2</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">U.V</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">T1</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">Par par</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">stock</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">Qté Réservée</a>
+                                        </td>
+                                    </tr>
+                             <!-- >boucle -->
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>U.V</span></th>
+                                    <th class="text-center"><span>T1</span></th>
+                                    <th class="text-center"><span>Prix par</span></th>
+                                    <th class="text-center"><span>stock</span></th>
+                                    <th class="text-center"><span>Qté Réservée</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+

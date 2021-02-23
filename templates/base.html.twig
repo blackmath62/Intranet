@@ -50,7 +50,7 @@
   <title>{% block title %}{% endblock %}</title>
 		{% endblock %}
 	</head>
-	<body class="hold-transition sidebar-mini">
+	<body class="hold-transition sidebar-mini sidebar-collapse">
 		<div
 			class="wrapper">
 			<!-- début Entête des pages -->
@@ -248,6 +248,12 @@
 											<a href="{{path('app_states_lhermitte_hp')}}" class="nav-link">
 												<i class="nav-icon fas fa-seedling text-danger"></i>
 												<p>Horticulteurs / Pépiniériste</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="{{path('app_lhermitte_rossignols')}}" class="nav-link">
+												<i class="nav-icon fas fa-dove text-light"></i>
+												<p>Rossignols</p>
 											</a>
 										</li>
 									{% endif %}

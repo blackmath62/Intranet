@@ -157,7 +157,7 @@ class StatesLhermitteController extends AbstractController
                 return $this->render('states_lhermitte/index.html.twig', [
                 'states' => $result,
                 'values' => $values,
-                'title' => 'States Roby',
+                'title' => 'States Lhermitte EV',
                 'mois' => $mois,
                 'annee' => $annee,
                 'monthYear' => $form->createView()
@@ -299,7 +299,7 @@ class StatesLhermitteController extends AbstractController
                 return $this->render('states_lhermitte/index.html.twig', [
                 'states' => $result,
                 'values' => $values,
-                'title' => 'States Roby',
+                'title' => 'States Lhermitte HP',
                 'mois' => $mois,
                 'annee' => $annee,
                 'monthYear' => $form->createView()
@@ -441,7 +441,7 @@ class StatesLhermitteController extends AbstractController
                 return $this->render('states_lhermitte/index.html.twig', [
                 'states' => $result,
                 'values' => $values,
-                'title' => 'States Roby',
+                'title' => 'States Lhermitte ME',
                 'mois' => $mois,
                 'annee' => $annee,
                 'monthYear' => $form->createView()
