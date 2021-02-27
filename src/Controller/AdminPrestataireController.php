@@ -82,7 +82,7 @@ class AdminPrestataireController extends AbstractController
                 $em->persist($prestataire);
                 $em->flush();
 
-                $this->addFlash('success', 'Prestataire modifié avec succès');
+                $this->addFlash('message', 'Prestataire modifié avec succès');
                 return $this->redirectToRoute('app_admin_prestataire');
 
             }

@@ -19,6 +19,18 @@ class TrackingsRepository extends ServiceEntityRepository
         parent::__construct($registry, Trackings::class);
     }
 
+    public function getLastConnect():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT user_id, MAX(createdAt) AS createdAt 
+        FROM `trackings`
+        GROUP BY user_id";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
+
     // /**
     //  * @return Tracking[] Returns an array of Tracking objects
     //  */

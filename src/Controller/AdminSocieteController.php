@@ -82,7 +82,7 @@ class AdminSocieteController extends AbstractController
                 $em->persist($societe);
                 $em->flush();
 
-                $this->addFlash('success', 'Société modifié avec succès');
+                $this->addFlash('message', 'Société modifié avec succès');
                 return $this->redirectToRoute('app_admin_societe');
 
             }

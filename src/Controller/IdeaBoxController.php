@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Form\IdeaBoxType;
 use App\Entity\Main\IdeaBox;
 use App\Repository\Main\IdeaBoxRepository;
+use App\Repository\Main\TrackingsRepository;
 use App\Repository\Main\UsersRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +22,7 @@ class IdeaBoxController extends AbstractController
     /**
      * @Route("/", name="app_home")
      */
-    public function index(Request $request, IdeaBoxRepository $repo, UsersRepository $repoUser): Response
+    public function index(Request $request, IdeaBoxRepository $repo, UsersRepository $repoUser, TrackingsRepository $repoTracking): Response
     {
         $idea = new IdeaBox();
         $form = $this->createForm(IdeaBoxType::class, $idea);
@@ -43,12 +44,13 @@ class IdeaBoxController extends AbstractController
         }
         $ideas = $repo->findBy(['status' => false]);
         $users = $repoUser->findAll();
-
+        $track = $repoTracking->getLastConnect();
         return $this->render('idea_box/index.html.twig', [
             'ideaBoxForm' => $form->createView(),
             'title' => 'Boite à Idée !',
             'ideas' => $ideas,
-            'users' => $users
+            'users' => $users,
+            'tracks' => $track
         ]);
     }
 

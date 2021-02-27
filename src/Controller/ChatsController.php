@@ -37,7 +37,7 @@ class ChatsController extends AbstractController
                 ->setUser($this->getUser());
             $em->persist($chat);
             $em->flush();
-            $this->addFlash('success', 'Chat modifié avec succès');
+            $this->addFlash('message', 'Chat modifié avec succès');
             return $this->redirectToRoute('app_chats');
 
         }

@@ -86,7 +86,7 @@ class AdminStatusController extends AbstractController
                 $em->persist($status);
                 $em->flush();
 
-                $this->addFlash('success', 'Statut modifié avec succès');
+                $this->addFlash('message', 'Statut modifié avec succès');
                 return $this->redirectToRoute('app_admin_status');
 
             }

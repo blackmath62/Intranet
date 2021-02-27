@@ -87,7 +87,7 @@ class AdminPrioritiesController extends AbstractController
                 $em->persist($priorities);
                 $em->flush();
 
-                $this->addFlash('success', 'priorities modifié avec succès');
+                $this->addFlash('message', 'priorities modifié avec succès');
                 return $this->redirectToRoute('app_admin_priorities');
 
             }

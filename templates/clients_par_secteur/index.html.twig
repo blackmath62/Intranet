@@ -1,26 +1,18 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ title }}{% endblock %}
 {% block body %}
-
+<div class="alert alert-warning alert-dismissible col-12">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                  <h5><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h5>
+                  Si vous souhaitez demander de reprendre un client, cliquez sur le bouton coeur qui est sur sa ligne pour envoyer automatiquement un mail au commercial qui le suit. </br>
+                  Si celui ci accepte, il doit répondre à Jérôme pour la modification du compte client !</br>
+                  Pour demander la fermeture d'un client, cliquez sur le bouton porte !
+                </div>
 <div class="row">
             <div class="col-md-12">
                 <div class="card card-info">
                     <div class="card-header d-flex justify-content-between">
                         <h3 class="card-title text-center">Liste des clients</h3>
-                        {{ form_start(clientForm, { 'attr' : { 'class' : 'ml-auto' }} ) }}
-                        <div class='d-flex'>
-                        <div class="p-1 mt-2">
-                        Selectionnez le commercial : 
-                        </div>
-                        <div class="p-1">
-                             {{ form_row(clientForm.commercial) }}
-                        </div>
-                        
-                        <div class="p-1">
-                            {{ form_row(clientForm.Modifier)}}
-                        </div>
-                        </div>
-                        {{ form_end(clientForm)}}
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
@@ -35,6 +27,7 @@
                                     <th class="text-center"><span>Ville</span></th>
                                     <th class="text-center"><span>Téléphone</span></th>
                                     <th class="text-center"><span>Mail</span></th>
+                                    <th class="text-center"><span>Actions</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -42,7 +35,12 @@
                                 {% for client in clients %}
                                     <tr>
                                         <td class="text-center">
+                                        {% if client.Commercial %}
                                             <a class="text-dark">{{client.Commercial}}</a>
+                                        {% else %}
+                                            <a class="text-dark">Aie ! Pas de commercial</a>
+                                        {% endif %}
+                                        
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark" style="max-width: 40px;">{{client.Tiers}}</a>
@@ -65,7 +63,34 @@
                                         <td class="text-center">
                                             <a class="text-dark">{{client.Mail}}</a>
                                         </td>
+                                        <td class="text-center">
+                                            <a class="btn btn-danger" href="{{ path('app_lhermitte_need_clients', {'tiers' : client.Tiers} ) }}" ><i class="fas fa-heart"></i></a>
+                                            <a class="btn btn-warning" data-toggle="modal" data-target="#modal-danger" ><i class="fas fa-sign-out-alt"></i></i></a>
+                                        </td>
                                     </tr>
+
+
+                                          <div class="modal fade" id="modal-danger">
+                                            <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                <h4 class="modal-title">Attention demande de fermeture de compte client !</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                <p>Est ce que vous être sûr de vous ?&hellip;</p>
+                                                </div>
+                                                <div class="modal-footer justify-content-between">
+                                                <button type="button" class="btn btn-dark" data-dismiss="modal">Annuler</button>
+                                                <a type="submit" class="btn btn-danger" href="{{ path('app_lhermitte_close_clients', {'tiers' : client.Tiers} ) }}">Oui demander la fermeture</a>
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                            </div>
+                                            <!-- /.modal-dialog -->
+                                        </div>
+                                        <!-- /.modal -->
                                 {% endfor %}
                            
 
@@ -80,6 +105,7 @@
                                     <th class="text-center"><span>Ville</span></th>
                                     <th class="text-center"><span>Téléphone</span></th>
                                     <th class="text-center"><span>Mail</span></th>
+                                    <th class="text-center"><span>Actions</span></th>
                                 </tr>
                             </tfoot>
                         </table>

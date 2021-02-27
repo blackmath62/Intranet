@@ -126,7 +126,12 @@
                       <li>
                         <img src="img/profile/{{ user.img }}" alt="User Image">
                         <a class="users-list-name" href="mailto:{{ user.email }}">{{ user.pseudo }}</a>
-                        <!-- <span class="users-list-date">Today</span> -->
+                      {% for track in tracks %}
+                      {% if track.user_id == user.id %}
+                      <span class="users-list-date">Derniére visite : </span>
+                        <span class="users-list-date">{{ track.createdAt|date("d/m/Y-H:i")}}</span>
+                      {% endif %}
+                      {% endfor %}
                       </li>
                       {% endfor %}              
                      

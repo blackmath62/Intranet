@@ -1,6 +1,13 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ title }}{% endblock %}
 {% block body %}
+<div class="alert alert-warning alert-dismissible col-12">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                  <h5><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h5>
+                  Les Statistiques par mois sont éditées le 20 du mois suivant la statistique. </br>
+                  Exemple: les Statistiques du mois de janvier 2021 sont extraites le 20 février 2021. </br>
+                  Les Statistiques ne respectant pas cette condition ne reprendront généralement pas toutes les factures !
+                </div>
 <div class="row">
             <div class="col-md-12">
                 <div class="card card-dark">

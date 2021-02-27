@@ -81,7 +81,7 @@ class AdminUsersController extends AbstractController
                 $em->persist($user);
                 $em->flush();
 
-                $this->addFlash('success', 'Utilisateur modifié avec succès');
+                $this->addFlash('message', 'Utilisateur modifié avec succès');
                 return $this->redirectToRoute('app_admin_users');
 
             }

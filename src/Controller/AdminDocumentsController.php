@@ -68,7 +68,7 @@ class AdminDocumentsController extends AbstractController
                 $em->persist($document);
                 $em->flush();
 
-                $this->addFlash('success', 'Document ajouté avec succès');
+                $this->addFlash('message', 'Document ajouté avec succès');
                 return $this->redirectToRoute('app_admin_documents');
 
             }
@@ -115,7 +115,7 @@ class AdminDocumentsController extends AbstractController
                 $em->persist($documents);
                 $em->flush();
 
-                $this->addFlash('success', 'documents modifié avec succès');
+                $this->addFlash('message', 'documents modifié avec succès');
                 return $this->redirectToRoute('app_admin_documents');
 
             }

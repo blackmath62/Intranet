@@ -89,7 +89,7 @@ class LogicielController extends AbstractController
                 $em->persist($logiciel);
                 $em->flush();
 
-                $this->addFlash('success', 'Logiciel modifié avec succès');
+                $this->addFlash('message', 'Logiciel modifié avec succès');
                 return $this->redirectToRoute('app_admin_logiciel');
 
             }

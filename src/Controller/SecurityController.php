@@ -186,7 +186,7 @@ class SecurityController extends AbstractController
             $em->flush();
 
             // on envoie un message flash
-            $this->addFlash('success', 'Vous avez activé votre compte');
+            $this->addFlash('message', 'Vous avez activé votre compte');
             return $this->redirectToRoute('app_home');
         }
 

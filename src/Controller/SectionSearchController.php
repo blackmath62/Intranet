@@ -87,7 +87,7 @@ class SectionSearchController extends AbstractController
                 $em->persist($section_search);
                 $em->flush();
 
-                $this->addFlash('success', 'Mot clé modifié avec succès');
+                $this->addFlash('message', 'Mot clé modifié avec succès');
                 return $this->redirectToRoute('app_admin_section_search');
 
             }
