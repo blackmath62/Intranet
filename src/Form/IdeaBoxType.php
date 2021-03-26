@@ -29,7 +29,9 @@ class IdeaBoxType extends AbstractType
                 'placeholder' => 'Dans la section ******* du site intranet, je pense qu\'il serait intéréssant d\'ajouter  *******, La fonctionnalité dans la section ****** n\'est pas adaptée à nos besoins, il faudrait ******* '
                 ]
                 ])
-           
+            ->add('Envoyer', SubmitType::class,[
+                'attr' => ['class' => 'btn btn-warning']
+            ])
         ;
     }
 

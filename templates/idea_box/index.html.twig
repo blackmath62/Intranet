@@ -4,6 +4,46 @@
 {% endblock %}
 {% block body %}
 <section class="content-header">
+<div class="alert alert-info alert-dismissible col-12">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                  <h5><i class="icon fas fa-info-circle"></i> info</h5>
+                  Pour déposer une idée d'amélioration, cliquez sur tickets sur la gauche puis sur la barre à droite de Créer un nouveau ticket. </br>
+                  Dans le degrés d'urgence, selectionnez boite à idée. </br>
+</div>
+
+{% if is_granted('ROLE_ADMIN') %}
+            <!-- ./col -->
+        <div href="" class="col-lg-3 col-6 pt-2">
+        <!-- small card -->            
+            <div class="small-box bg-warning">
+            <!-- Loading (remove the following to stop the loading)-->
+            <!-- end loading -->
+                <div class="inner">
+                    <h3>Boite à idée</h3>
+                    <p>Toutes les idées sont bonnes à prendre !</p>
+                </div>
+                <div class="icon d-flex flex-column">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div class="card card-warning collapsed-card">
+                    <div class="card-header">
+                        <a data-card-widget="collapse" class="small-box-footer">
+                        Plus d'info <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    <!-- /.card-tools -->
+                    </div>
+                <!-- /.card-header -->
+                    <div class="card-body">
+                    Déposez vos idées et participez au développement du site Intranet en accord avec vos besoins ....
+                    </div>
+                <!-- /.card-body -->
+                </div>
+            </div>
+        </div>
+          <!-- ./col -->             
+
+
+
     <!-- /.Création -->
     <div class='d-flex flex-wrap'>
         <div class="col-md-5">
@@ -20,14 +60,10 @@
                 <div class="card-body">
                     {{ form_start(ideaBoxForm)}}
                     {{ form_row(ideaBoxForm.sujet)}}
-				    {{ form_row(ideaBoxForm.content)}}
+                    {{ form_row(ideaBoxForm.content)}}
+                    {{ form_widget(ideaBoxForm.Envoyer)}}
+                    {{ form_end(ideaBoxForm)}}
                 </div>
-                  <div class="card-footer">
-				<div class="text-right">
-					<button type="submit" class="btn btn-xl btn-warning mx-auto "><i class="far fa-lightbulb pr-2"></i>Créer</button>
-				</div>
-			</div>
-                {{ form_end(ideaBoxForm)}}
             </div>
         </div>
 
@@ -143,5 +179,6 @@
                 
         
     </div>
+{% endif %}
 </section>
 {% endblock %}

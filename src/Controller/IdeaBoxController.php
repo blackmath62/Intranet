@@ -22,7 +22,7 @@ class IdeaBoxController extends AbstractController
     /**
      * @Route("/", name="app_home")
      */
-    public function index(Request $request, IdeaBoxRepository $repo, UsersRepository $repoUser, TrackingsRepository $repoTracking): Response
+    public function index(Request $request, IdeaBoxRepository $repo, UsersRepository $repoUser, TrackingsRepository $repoTracking)
     {
         $idea = new IdeaBox();
         $form = $this->createForm(IdeaBoxType::class, $idea);
@@ -39,9 +39,8 @@ class IdeaBoxController extends AbstractController
             $idea->setStatus(false);
             $entityManager->persist($idea);
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_home');
         }
+        
         $ideas = $repo->findBy(['status' => false]);
         $users = $repoUser->findAll();
         $track = $repoTracking->getLastConnect();

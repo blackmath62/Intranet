@@ -57,7 +57,7 @@ class YearMonthType extends AbstractType
                 'label_attr' => ['class' => 'd-none']
             ])
             ->add('filtrer', SubmitType::class,[
-                'attr' => ['class' => 'btn btn-dark']
+                'attr' => ['class' => 'btn btn-secondary']
             ])
         ;
     }
