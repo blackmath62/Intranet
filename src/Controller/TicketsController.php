@@ -100,6 +100,7 @@ class TicketsController extends AbstractController
             'formTickets' => $form->createView()
         ]);
     }
+    
     // Export Excel
 
     private function getData(): array

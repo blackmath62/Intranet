@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+<div class="card collapsed-card card-warning">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+    Les Statistiques par mois sont éditées le 20 du mois suivant la statistique. </br>
+    Exemple: les Statistiques du mois de janvier 2021 sont extraites le 20 février 2021. </br>
+    Les Statistiques ne respectant pas cette condition ne reprendront généralement pas toutes les factures ! </br>
+    Les différences qui peuvent apparaitres dans le temps sur le CA peuvent s'expliquer par le changement de commercial assigné a un client ou par le changement de secteur d'un article. </br>
+    L'extraction des states a été tester avec un échantillon de 13 factures contenant des remises sur 2 ans. </br>
+    Par souci de lisibilité, les pourcentages sont affichés avec 2 chiffres après la virgule, cela peut générer de petit écart lors de calculs manuel.</br>
+    Si vous détectez des incohérences, merci d'en faire part au service informatique.
+    </div>
+    <!-- /.card-footer-->
+</div>
+
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header d-flex justify-content-between ">
+                        <h3 class="card-title text-center">States Lhermitte   
+                        {% if state %}
+                            {{ mois }} - {{ annee -1}}/{{ annee}}
+                        {% endif %}
+                        </h3>
+                        {{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }} ) }}
+                        <div class='d-flex'>
+                            <div class="p-1 mt-2">
+                                Selectionnez les dates : 
+                            </div>
+                            <div class="p-1">
+                                {{ form_row(monthYear.month) }}
+                            </div>
+                            <div class="p-1">
+                                {{ form_row(monthYear.year) }}
+                            </div>
+                            <div class="p-1">
+                                {{ form_row(monthYear.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }} ) }}
+                            </div>
+                        </div>
+                    {{ form_end(monthYear)}}
+                    </div>
+                    
+
+                    <div class="row">
+                        <a class="btn btn-primary" href="{{path('app_export_states_globales')}}"></a>
+                    </div>                   
+
+                    
+
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

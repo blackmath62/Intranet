@@ -1,0 +1,244 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+    <h3 class="card-title"><i class="icon fas fa-info-circle pr-2"></i>Informations utiles</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+<!-- /.card-header -->
+    <div class="card-body">
+        <img class="img-fluid col-12" src="{{ asset(asset('img/compta/regimeTVA.png')) }}" alt="User Image">
+    </div>
+<!-- /.card-footer-->
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header d-flex justify-content-between ">
+                <h3 class="card-title text-center">Contrôle Comptabilité {{ typeTiers }}
+                    {% if annee %}
+                    {{ mois }} - {{ annee}}
+                    {% endif %}
+                </h3>
+                {{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }} ) }}
+                <div class='d-flex'>
+                    <div class="p-1 mt-2">
+                    Selectionnez les dates : 
+                    </div>
+                    <div class="p-1">
+                    {{ form_row(monthYear.month) }}
+                    </div>
+                    <div class="p-1">
+                    {{ form_row(monthYear.year) }}
+                    </div>
+                    <div class="p-1">
+                    {{ form_row(monthYear.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }} ) }}
+                    </div>
+                </div>
+                {{ form_end(monthYear)}}
+            </div>
+            <div class="card-body">
+            {% if annee %}
+            
+            <h3>Contrôle Taxe Gazole</h3>
+            {% if controleTaxes %}
+            
+                <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Alerte</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Régime Article</span></th>
+                                    <th class="text-center"><span>Facture</span></th>
+                                    <th class="text-center"><span>Date Facture</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Statut</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							{% for controleTaxe in controleTaxes %}                                
+                               
+                                    <tr>
+                                         <td class="text-center">
+                                            <a class="text-center text-dark"><i class="fas fa-exclamation-circle fa-2x text-danger"></i></a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleTaxe.ref }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleTaxe.des }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleTaxe.regime }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleTaxe.facture }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleTaxe.date }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleTaxe.tiers }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleTaxe.status }}</a>
+                                        </td>
+                                    </tr>
+                               
+                            {% endfor %}
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Alerte</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Régime Article</span></th>
+                                    <th class="text-center"><span>Facture</span></th>
+                                    <th class="text-center"><span>Date Facture</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Statut</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+            {% else %}
+                        <h4 class="text-left text-dark"><i class="fas fa-check-circle pr-2 text-success"></i>Pas de probléme de Taxe Gazole !</h4>
+            {% endif %}
+            <div class="dropdown-divider p-2"></div>
+            <h3>Contrôle Régimes {{ typeTiers }} </h3>
+            {% if controleRegimesTiers %}
+            
+                <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Alerte</span></th>
+                                    <th class="text-center"><span>Type Piéce</span></th>
+                                    <th class="text-center"><span>Numéro de piéce</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Régime piéce</span></th>
+                                    <th class="text-center"><span>Régime Tiers</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							{% for controleRegimesTier in controleRegimesTiers %}                                
+                               
+                                    <tr>
+                                         <td class="text-center">
+                                            <a class="text-center text-dark"><i class="fas fa-exclamation-circle fa-2x text-danger"></i></a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTier.typePiece }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTier.numeroPiece }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTier.tiers }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTier.regimePiece }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTier.regimeTiers }}</a>
+                                        </td>
+                                    </tr>
+                            {% endfor %}
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                   <th class="text-center"><span>Alerte</span></th>
+                                    <th class="text-center"><span>Type Piéce</span></th>
+                                    <th class="text-center"><span>Numéro de piéce</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Régime piéce</span></th>
+                                    <th class="text-center"><span>Régime Tiers</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+            {% else %}
+                        <h4 class="text-left text-dark"><i class="fas fa-check-circle pr-2 text-success"></i>Pas de probléme de Régime {{ typeTiers }} sur les piéces !</h4>
+            {% endif %}
+
+                        <div class="dropdown-divider p-2"></div>
+            <h3>Contrôle Transports {{ typeTiers }} </h3>
+            {% if controleRegimesTransports %}
+            
+                <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Alerte</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Famille</span></th>
+                                    <th class="text-center"><span>Régime tranport</span></th>
+                                    <th class="text-center"><span>Facture</span></th>
+                                    <th class="text-center"><span>Date facture</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							{% for controleRegimesTransport in controleRegimesTransports %}                                
+                               
+                                    <tr>
+                                         <td class="text-center">
+                                            <a class="text-center text-dark"><i class="fas fa-exclamation-circle fa-2x text-danger"></i></a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTransport.tiers }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTransport.reference }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTransport.designation }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTransport.famille }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTransport.regimeTva }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTransport.facture }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimesTransport.dateFacture }}</a>
+                                        </td>
+                                    </tr>
+                            {% endfor %}
+
+                            </tbody>
+                            <tfoot>
+                               <tr>
+                                    <th class="text-center"><span>Alerte</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Famille</span></th>
+                                    <th class="text-center"><span>Régime tranport</span></th>
+                                    <th class="text-center"><span>Facture</span></th>
+                                    <th class="text-center"><span>Date facture</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+            {% else %}
+                        <h4 class="text-left text-dark"><i class="fas fa-check-circle pr-2 text-success"></i>Pas de probléme de Régime transport {{ typeTiers }} sur les piéces !</h4>
+            {% endif %}
+            {% else %}
+                <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez selectionner un filtre.</h4>
+            {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -46,7 +46,7 @@ class IdeaBoxController extends AbstractController
         $track = $repoTracking->getLastConnect();
         return $this->render('idea_box/index.html.twig', [
             'ideaBoxForm' => $form->createView(),
-            'title' => 'Boite à Idée !',
+            'title' => 'Accueil',
             'ideas' => $ideas,
             'users' => $users,
             'tracks' => $track

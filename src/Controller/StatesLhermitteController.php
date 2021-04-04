@@ -2,14 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\Divalto\Cli;
-use App\Entity\Divalto\Vrp;
+use DateTime;
 use App\Form\YearMonthType;
-use App\Form\StatesDateFilterType;
+use PhpParser\Node\Stmt\Else_;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Repository\Divalto\MouvRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Repository\Divalto\StatesLhermitteByTiersRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,61 +22,36 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class StatesLhermitteController extends AbstractController
 {
-    
     /**
-     * @Route("/Lhermitte/states/EV", name="app_states_lhermitte_ev")
-     */
-    public function statesEv(StatesLhermitteByTiersRepository $repo, Request $request)
-    {
-           $secteur = 'EV';
-           $themeColor = 'success';
-           $commercial = 'Commercial';
-           $view = $this->states($secteur,$themeColor,$repo,$request);         
-           return $view;
-    }
-    /**
-     * @Route("/Lhermitte/states/HP", name="app_states_lhermitte_hp")
-     */
-    public function statesHp(StatesLhermitteByTiersRepository $repo, Request $request)
-    {
-           $secteur = 'HP';
-           $themeColor = 'danger';
-           $commercial = 'Commercial';
-           $view = $this->states($secteur,$themeColor,$repo,$request);         
-           return $view;
-    }
-    /**
-     * @Route("/Lhermitte/states/ME", name="app_states_lhermitte_me")
-     */
-    public function statesMe(StatesLhermitteByTiersRepository $repo, Request $request)
-    {
-           $secteur = 'ME';
-           $themeColor = 'warning';
-           $commercial = 'Commercial2';
-           $view = $this->states($secteur,$themeColor,$repo,$request);         
-           return $view;
-    }
-    /**
-     * @Route("/Lhermitte/states/MA", name="app_states_lhermitte_ma")
-     */
-    public function statesMa(StatesLhermitteByTiersRepository $repo, Request $request)
-    {
-           $secteur = 'MA';
-           $themeColor = 'orange';
-           $view = $this->states($secteur,$themeColor,$repo,$request);         
-           return $view;
-    }
-    
-    
-    public function states($secteur,$themeColor,$repo,$request)
+     * @Route("/Lhermitte/states/{secteur}", name="app_states_lhermitte")
+     */    
+    public function states($secteur, StatesLhermitteByTiersRepository $repo, Request $request)
     {
                     
+        $secteur = $request->attributes->get('secteur');
+        $themeColor = '';
+
+        if ($secteur == 'EV') {
+            $themeColor = 'success';
+        }
+        if ($secteur == 'HP') {
+            $themeColor = 'danger';
+        }
+        if ($secteur == 'ME') {
+            $themeColor = 'warning';
+        }
+        if ($secteur == 'MA') {
+            $themeColor = 'orange';
+        }    
+
             $secteurRecherche = $secteur;
             $form = $this->createForm(YearMonthType::class);
             $form->handleRequest($request);
             // initialisation de mes variables
             $annee = '';
             $mois ='';
+            $state = array();
+            $clientFilter = array();
 
             // tracking user page for stats
             $tracking = $request->attributes->get('_route');
@@ -88,11 +65,17 @@ class StatesLhermitteController extends AbstractController
                 // States Globales du secteur
                 // Nbre de client du secteur N et N-1 ainsi que le Delta
                 for ($ligClient=0; $ligClient <count($statesGlobal) ; $ligClient++) {
-                    if ($statesGlobal[$ligClient]['SecteurMouvement'] == $secteurRecherche) {
+                    if ($secteur == 'LH') {
                         $client[$ligClient]['annee'] = $statesGlobal[$ligClient]['Annee'];
                         $client[$ligClient]['tiers'] = $statesGlobal[$ligClient]['Tiers'];
                         $client[$ligClient]['commercial'] = $statesGlobal[$ligClient]['Commercial'];
-                    } 
+                    }else {
+                        if ($statesGlobal[$ligClient]['SecteurMouvement'] == $secteurRecherche) {
+                            $client[$ligClient]['annee'] = $statesGlobal[$ligClient]['Annee'];
+                            $client[$ligClient]['tiers'] = $statesGlobal[$ligClient]['Tiers'];
+                            $client[$ligClient]['commercial'] = $statesGlobal[$ligClient]['Commercial'];
+                        } 
+                    }                    
                 }
                 $nbreclient = array_values(array_unique($client, SORT_REGULAR));
                 $state['count']['client']['anneeN'] = 0;
@@ -112,10 +95,15 @@ class StatesLhermitteController extends AbstractController
                 
                 // Nbre de BL du secteur N et N-1 ainsi que le Delta
                 for ($ligBl=0; $ligBl <count($statesGlobal) ; $ligBl++) {
-                    if ($statesGlobal[$ligBl]['SecteurMouvement'] == $secteurRecherche) {
-                        $bl[$ligBl]['annee'] = $statesGlobal[$ligBl]['Annee'];
-                        $bl[$ligBl]['bl'] = $statesGlobal[$ligBl]['Bl'];
-                    } 
+                    if ($secteur == 'LH') {
+                            $bl[$ligBl]['annee'] = $statesGlobal[$ligBl]['Annee'];
+                            $bl[$ligBl]['bl'] = $statesGlobal[$ligBl]['Bl'];
+                    }else {
+                        if ($statesGlobal[$ligBl]['SecteurMouvement'] == $secteurRecherche) {
+                            $bl[$ligBl]['annee'] = $statesGlobal[$ligBl]['Annee'];
+                            $bl[$ligBl]['bl'] = $statesGlobal[$ligBl]['Bl'];
+                        } 
+                    }
                 }
                 $nbreBl = array_values(array_unique($bl, SORT_REGULAR));
                 $state['count']['bl']['anneeN'] = 0;
@@ -135,10 +123,15 @@ class StatesLhermitteController extends AbstractController
 
                 // Nbre de Facture du secteur N et N-1 ainsi que le Delta
                 for ($ligFacture=0; $ligFacture <count($statesGlobal) ; $ligFacture++) {
-                    if ($statesGlobal[$ligFacture]['SecteurMouvement'] == $secteurRecherche) {
-                        $facture[$ligFacture]['annee'] = $statesGlobal[$ligFacture]['Annee'];
-                        $facture[$ligFacture]['facture'] = $statesGlobal[$ligFacture]['Facture'];
-                    } 
+                    if ($secteur == 'LH') {
+                            $facture[$ligFacture]['annee'] = $statesGlobal[$ligFacture]['Annee'];
+                            $facture[$ligFacture]['facture'] = $statesGlobal[$ligFacture]['Facture'];
+                    }else{
+                        if ($statesGlobal[$ligFacture]['SecteurMouvement'] == $secteurRecherche) {
+                            $facture[$ligFacture]['annee'] = $statesGlobal[$ligFacture]['Annee'];
+                            $facture[$ligFacture]['facture'] = $statesGlobal[$ligFacture]['Facture'];
+                        } 
+                    }
                 }
                 $nbreFact = array_values(array_unique($facture, SORT_REGULAR));
                 $state['count']['facture']['anneeN'] = 0;
@@ -168,27 +161,53 @@ class StatesLhermitteController extends AbstractController
                 $state['secteur']['montantN1'] = 0;
 
                 for ($ligne=0; $ligne <count($statesGlobal) ; $ligne++) { 
-                   if ($statesGlobal[$ligne]['Annee'] == $annee && $statesGlobal[$ligne]['SecteurMouvement'] == $secteurRecherche) 
-                   {
-                        if ($statesGlobal[$ligne]['OP'] == 'C' || $statesGlobal[$ligne]['OP'] == 'D') {
-                            $state['depot']['montantN'] += $statesGlobal[$ligne]['MontantSign'];
-                        } 
-                        if ($statesGlobal[$ligne]['OP'] == 'CD' || $statesGlobal[$ligne]['OP'] == 'DD') {
-                            $state['direct']['montantN'] += $statesGlobal[$ligne]['MontantSign'];
+                    // si states globales
+                    if ($secteur == 'LH') {
+                        if ($statesGlobal[$ligne]['Annee'] == $annee ) 
+                        {
+                             if ($statesGlobal[$ligne]['OP'] == 'C' || $statesGlobal[$ligne]['OP'] == 'D') {
+                                 $state['depot']['montantN'] += $statesGlobal[$ligne]['MontantSign'];
+                             } 
+                             if ($statesGlobal[$ligne]['OP'] == 'CD' || $statesGlobal[$ligne]['OP'] == 'DD') {
+                                 $state['direct']['montantN'] += $statesGlobal[$ligne]['MontantSign'];
+                             }
+                             $state['secteur']['montantN'] += $statesGlobal[$ligne]['MontantSign'];  
                         }
-                        $state['secteur']['montantN'] += $statesGlobal[$ligne]['MontantSign'];  
-                   }
-                   
-                   if ($statesGlobal[$ligne]['Annee'] == $annee -1 && $statesGlobal[$ligne]['SecteurMouvement'] == $secteurRecherche) 
-                   {
-                        if ($statesGlobal[$ligne]['OP'] == 'C' || $statesGlobal[$ligne]['OP'] == 'D') {
-                            $state['depot']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
-                        } 
-                        if ($statesGlobal[$ligne]['OP'] == 'CD' || $statesGlobal[$ligne]['OP'] == 'DD') {
-                            $state['direct']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
+                        
+                        if ($statesGlobal[$ligne]['Annee'] == $annee -1 ) 
+                        {
+                             if ($statesGlobal[$ligne]['OP'] == 'C' || $statesGlobal[$ligne]['OP'] == 'D') {
+                                 $state['depot']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
+                             } 
+                             if ($statesGlobal[$ligne]['OP'] == 'CD' || $statesGlobal[$ligne]['OP'] == 'DD') {
+                                 $state['direct']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
+                             }
+                             $state['secteur']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
                         }
-                        $state['secteur']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
-                   }
+                    // si states par secteur
+                    }else {
+                        if ($statesGlobal[$ligne]['Annee'] == $annee && $statesGlobal[$ligne]['SecteurMouvement'] == $secteurRecherche) 
+                        {
+                             if ($statesGlobal[$ligne]['OP'] == 'C' || $statesGlobal[$ligne]['OP'] == 'D') {
+                                 $state['depot']['montantN'] += $statesGlobal[$ligne]['MontantSign'];
+                             } 
+                             if ($statesGlobal[$ligne]['OP'] == 'CD' || $statesGlobal[$ligne]['OP'] == 'DD') {
+                                 $state['direct']['montantN'] += $statesGlobal[$ligne]['MontantSign'];
+                             }
+                             $state['secteur']['montantN'] += $statesGlobal[$ligne]['MontantSign'];  
+                        }
+                        
+                        if ($statesGlobal[$ligne]['Annee'] == $annee -1 && $statesGlobal[$ligne]['SecteurMouvement'] == $secteurRecherche) 
+                        {
+                             if ($statesGlobal[$ligne]['OP'] == 'C' || $statesGlobal[$ligne]['OP'] == 'D') {
+                                 $state['depot']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
+                             } 
+                             if ($statesGlobal[$ligne]['OP'] == 'CD' || $statesGlobal[$ligne]['OP'] == 'DD') {
+                                 $state['direct']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
+                             }
+                             $state['secteur']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
+                        }
+                    }
                 }
                 
                 // Delta Dépôt
@@ -210,8 +229,12 @@ class StatesLhermitteController extends AbstractController
                 // States par commercial du secteur
                 // Sum par commercial du secteur N et N-1 ainsi que le Delta
                 for ($ligCom=0; $ligCom <count($statesGlobal) ; $ligCom++) {
-                    if ($statesGlobal[$ligCom]['SecteurMouvement'] == $secteurRecherche) {
-                        $commercial[$ligCom]['commercial'] = $statesGlobal[$ligCom]['Commercial'];
+                    if ($secteur == 'LH') {
+                            $commercial[$ligCom]['commercial'] = $statesGlobal[$ligCom]['Commercial'];
+                    }else {
+                        if ($statesGlobal[$ligCom]['SecteurMouvement'] == $secteurRecherche) {
+                            $commercial[$ligCom]['commercial'] = $statesGlobal[$ligCom]['Commercial'];
+                        }
                     }
                 }
                 $listeCommercial = array_values(array_unique($commercial, SORT_REGULAR));
@@ -267,17 +290,22 @@ class StatesLhermitteController extends AbstractController
                     $state['commercial'][$ceCommercial]['flecheClient'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['clientN1'],$state['commercial'][$ceCommercial]['clientN'])['fleche']; 
                 }
                
-                
-
-
                 // Sum par client du Secteur N et N-1 ainsi que le Delta
                 for ($ListeClients=0; $ListeClients <count($statesGlobal) ; $ListeClients++) {
-                    if ($statesGlobal[$ListeClients]['SecteurMouvement'] == $secteurRecherche) {
+                    if ($secteur == 'LH') {
                         $clientFilter[$ListeClients]['commercial'] = $statesGlobal[$ListeClients]['Commercial'];
                         $clientFilter[$ListeClients]['tiers'] = $statesGlobal[$ListeClients]['Tiers'];
                         $clientFilter[$ListeClients]['nom'] = $statesGlobal[$ListeClients]['Nom'];
                         $clientFilter[$ListeClients]['montantN'] = 0;
                         $clientFilter[$ListeClients]['montantN1'] = 0;
+                    }else {
+                        if ($statesGlobal[$ListeClients]['SecteurMouvement'] == $secteurRecherche) {
+                            $clientFilter[$ListeClients]['commercial'] = $statesGlobal[$ListeClients]['Commercial'];
+                            $clientFilter[$ListeClients]['tiers'] = $statesGlobal[$ListeClients]['Tiers'];
+                            $clientFilter[$ListeClients]['nom'] = $statesGlobal[$ListeClients]['Nom'];
+                            $clientFilter[$ListeClients]['montantN'] = 0;
+                            $clientFilter[$ListeClients]['montantN1'] = 0;
+                        }
                     }
                 }
                 $clientFilter = array_values(array_unique($clientFilter, SORT_REGULAR));
@@ -285,11 +313,20 @@ class StatesLhermitteController extends AbstractController
                 for ($ligClient=0; $ligClient <count($clientFilter) ; $ligClient++) { 
                     
                     for ($statesClients=0; $statesClients<count($statesGlobal) ; $statesClients++) { 
-                        if ($statesGlobal[$statesClients]['Annee'] == $annee -1 && $statesGlobal[$statesClients]['SecteurMouvement'] == $secteurRecherche && $statesGlobal[$statesClients]['Tiers'] == $clientFilter[$ligClient]['tiers']) {
-                            $clientFilter[$ligClient]['montantN1'] += $statesGlobal[$statesClients]['MontantSign'];
-                        }
-                        if ($statesGlobal[$statesClients]['Annee'] == $annee && $statesGlobal[$statesClients]['SecteurMouvement'] == $secteurRecherche && $statesGlobal[$statesClients]['Tiers'] == $clientFilter[$ligClient]['tiers']) {
-                            $clientFilter[$ligClient]['montantN'] += $statesGlobal[$statesClients]['MontantSign'];
+                        if ($secteur == 'LH') {
+                            if ($statesGlobal[$statesClients]['Annee'] == $annee -1 && $statesGlobal[$statesClients]['Tiers'] == $clientFilter[$ligClient]['tiers']) {
+                                $clientFilter[$ligClient]['montantN1'] += $statesGlobal[$statesClients]['MontantSign'];
+                            }
+                            if ($statesGlobal[$statesClients]['Annee'] == $annee && $statesGlobal[$statesClients]['Tiers'] == $clientFilter[$ligClient]['tiers']) {
+                                $clientFilter[$ligClient]['montantN'] += $statesGlobal[$statesClients]['MontantSign'];
+                            }
+                        }else {
+                            if ($statesGlobal[$statesClients]['Annee'] == $annee -1 && $statesGlobal[$statesClients]['SecteurMouvement'] == $secteurRecherche && $statesGlobal[$statesClients]['Tiers'] == $clientFilter[$ligClient]['tiers']) {
+                                $clientFilter[$ligClient]['montantN1'] += $statesGlobal[$statesClients]['MontantSign'];
+                            }
+                            if ($statesGlobal[$statesClients]['Annee'] == $annee && $statesGlobal[$statesClients]['SecteurMouvement'] == $secteurRecherche && $statesGlobal[$statesClients]['Tiers'] == $clientFilter[$ligClient]['tiers']) {
+                                $clientFilter[$ligClient]['montantN'] += $statesGlobal[$statesClients]['MontantSign'];
+                            }
                         }
                     }
                     $clientFilter[$ligClient]['delta'] = $this->calcul_pourcentage($clientFilter[$ligClient]['montantN1'] ,$clientFilter[$ligClient]['montantN'] )['pourc'];
@@ -299,23 +336,17 @@ class StatesLhermitteController extends AbstractController
                
                 // States par article page séparé
                 // Liste des articles par client du secteur N et N-1 ainsi que le Delta
-                return $this->render('states_lhermitte/index.html.twig', [
-                    'title' => 'States Lhermitte',
-                    'mois' => $mois,
-                    'annee' => $annee,
-                    'state' => $state,
-                    'clients' => $clientFilter,
-                    'monthYear' => $form->createView()
-                    ]);
 
             }
 
-                return $this->render('states_lhermitte/index.html.twig', [
+            return $this->render('states_lhermitte/index.html.twig', [
+                'controller_name' => 'StatesLhermitteController',
                 'title' => 'States Lhermitte',
                 'mois' => $mois,
                 'annee' => $annee,
-                'state' => '',
-                'clients' => '',
+                'themeColor' => $themeColor,
+                'state' => $state,
+                'clients' => $clientFilter,
                 'monthYear' => $form->createView()
                 ]);
 
@@ -357,7 +388,78 @@ class StatesLhermitteController extends AbstractController
                 return $resultat; 
         } 
 
+    // Export Excel
 
+    private function getData(): array
+    {
+        /**
+         * @var $ticket Ticket[]
+         */
+        $list = [];
+        $tickets = $this->entityManager->getRepository(Tickets::class)->findAll();
+
+        foreach ($tickets as $ticket) {
+            $list[] = [
+                $ticket->getCreatedAt(),
+                'Ticket' . $ticket->getId() . ' : ' . $ticket->getTitle(),
+                $ticket->getService()->getTitle(),
+                $ticket->getStatu()->getTitle(),
+                $ticket->getPrestataire()->getNom(),
+                
+                
+            ];
+        }
+        return $list;
+    }
+
+    /**
+     * @Route("/export/statesGlobales",  name="app_export_states_globales")
+     */
+    public function export()
+    {
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setTitle('States_Globales');
+        // Entête de colonne
+        $sheet->getCell('A1')->setValue('Commercial');
+        $sheet->getCell('B1')->setValue('SecteurMouvement');
+        $sheet->getCell('C1')->setValue('FamClient');
+        $sheet->getCell('D1')->setValue('Tiers');
+        $sheet->getCell('E1')->setValue('Nom');
+        $sheet->getCell('F1')->setValue('TypeArticle');
+        $sheet->getCell('G1')->setValue('FamArticle');
+        $sheet->getCell('H1')->setValue('Ref');
+        $sheet->getCell('I1')->setValue('Designation');
+        $sheet->getCell('J1')->setValue('Sref1');
+        $sheet->getCell('K1')->setValue('Sref2');
+        $sheet->getCell('L1')->setValue('UV');
+        $sheet->getCell('M1')->setValue('OP');
+        $sheet->getCell('N1')->setValue('QteSignN1');
+        $sheet->getCell('O1')->setValue('MontantSignN1');
+        $sheet->getCell('P1')->setValue('QteSignN');
+        $sheet->getCell('Q1')->setValue('MontantSignN');
+
+        // Increase row cursor after header write
+            $sheet->fromArray($this->getData(),null, 'A2', true);
+        
+
+        $writer = new Xlsx($spreadsheet);
+
+        // Create a Temporary file in the system
+        $d = new DateTime('NOW');
+        $dateTime = $d->format('Ymd-His') ;
+        $fileName = 'States_Globales' . $dateTime . '.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+
+        $writer->save($temp_file);
+        // Return the excel file as an attachment
+        return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+  
+        //return $this->redirectToRoute('app_tickets');
+    }
+    
 
     /**
      * @Route("/Lhermitte/states/EV/DetailArticle/{tiers}/{annee}/{mois}", name="app_states_lhermitte_ev_par_article")
@@ -419,14 +521,4 @@ class StatesLhermitteController extends AbstractController
         ]);
     }
     
-    /**
-     * @Route("/Lhermitte/states/LH", name="app_states_lhermitte_lh")
-     */
-    public function statesLh(): Response
-    {
-        return $this->render('states_lhermitte/index.html.twig', [
-            'controller_name' => 'StatesLhermitteController',
-            'title' => 'States Lh'
-        ]);
-    }
 }
