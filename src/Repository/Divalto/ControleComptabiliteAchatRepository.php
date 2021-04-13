@@ -24,6 +24,6 @@ class ControleComptabiliteAchatRepository extends ServiceEntityRepository
         $stmt = $conn->prepare($sql);
         $stmt->execute([$annee,$mois]);
         return $stmt->fetchAll();
-    }
+    }  
     
 }

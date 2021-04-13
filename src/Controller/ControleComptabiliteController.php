@@ -29,6 +29,7 @@ class ControleComptabiliteController extends AbstractController
         $controleTaxes = "";
         $controleRegimeTiers = "";
         $controleRegimeTransport = "";
+        $controleTrousFactures = "";
             $form = $this->createForm(YearMonthType::class);
             $form->handleRequest($request);
             // initialisation de mes variables
@@ -53,6 +54,26 @@ class ControleComptabiliteController extends AbstractController
 
 
                 $controleRegimeTransport = $repo->getControleRegimeTransport($annee,$mois,$typeTiers);
+                $controleTrousFactures = $repo->getControleTrousFactures($annee,$mois,$typeTiers);
+                
+                $factureSansIndex = array();
+                for ($i=0; $i <count($controleTrousFactures) ; $i++) { 
+                    $factureSansIndex[] = $controleTrousFactures[$i]['fano'];
+                }
+                //dd($factureSansIndex);
+                for ($ligTrouFacture=0; $ligTrouFacture <count($controleTrousFactures) ; $ligTrouFacture++) {
+                    if ($ligTrouFacture !== count($controleTrousFactures)) {
+                        $facture = $controleTrousFactures[$ligTrouFacture]['fano'];
+                            $key = array_search($facture + 1, $factureSansIndex);
+                            if (empty($key)) {
+                                $factureManquante[] = $facture + 1;   
+                            }
+                    }
+                }
+                // pas si simple de déterminer les trous dans les factures, exemple trous dans les factures 19006871 => 6898
+                //dd($factureManquante);
+                
+
             }
         
         return $this->render('controle_comptabilite/index.html.twig', [
@@ -63,6 +84,7 @@ class ControleComptabiliteController extends AbstractController
             'controleTaxes' => $controleTaxes,
             'controleRegimesTiers' => $controleRegimeTiers,
             'controleRegimesTransports' => $controleRegimeTransport,
+            'controleTrousFactures' => $controleTrousFactures,
             'monthYear' => $form->createView()
         ]);
     }

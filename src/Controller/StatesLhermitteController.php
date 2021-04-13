@@ -31,11 +31,15 @@ class StatesLhermitteController extends AbstractController
         $secteur = $request->attributes->get('secteur');
         $themeColor = '';
 
+        
+        if ($secteur == 'HP') {
+            $themeColor = 'danger';
+        }
         if ($secteur == 'EV') {
             $themeColor = 'success';
         }
-        if ($secteur == 'HP') {
-            $themeColor = 'danger';
+        if ($secteur == 'EV') {
+            $themeColor = 'success';
         }
         if ($secteur == 'ME') {
             $themeColor = 'warning';
@@ -258,8 +262,8 @@ class StatesLhermitteController extends AbstractController
                             }
                         }
                     }
-                    $state['commercial'][$ceCommercial]['deltaTotalN'] = ($state['commercial'][$ceCommercial]['montantN']*100)/$state['secteur']['montantN'];
-                    $state['commercial'][$ceCommercial]['deltaTotalN1'] = ($state['commercial'][$ceCommercial]['montantN1']*100)/$state['secteur']['montantN1'];
+                    $state['commercial'][$ceCommercial]['deltaTotalN'] = $this->calcul_pourcentage_total($state['commercial'][$ceCommercial]['montantN'], $state['secteur']['montantN']);
+                    $state['commercial'][$ceCommercial]['deltaTotalN1'] = $this->calcul_pourcentage_total($state['commercial'][$ceCommercial]['montantN1'], $state['secteur']['montantN1']);
                     $state['commercial'][$ceCommercial]['deltaMontant'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['montantN1'],$state['commercial'][$ceCommercial]['montantN'])['pourc'];
                     $state['commercial'][$ceCommercial]['colorMontant'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['montantN1'],$state['commercial'][$ceCommercial]['montantN'])['color'];
                     $state['commercial'][$ceCommercial]['flecheMontant'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['montantN1'],$state['commercial'][$ceCommercial]['montantN'])['fleche']; 
@@ -283,8 +287,8 @@ class StatesLhermitteController extends AbstractController
                             }
                         }
                     }
-                    $state['commercial'][$ceCommercial]['deltaTotalClientN'] = ($state['commercial'][$ceCommercial]['clientN']*100)/$state['count']['client']['anneeN'];
-                    $state['commercial'][$ceCommercial]['deltaTotalClientN1'] = ($state['commercial'][$ceCommercial]['clientN1']*100)/$state['count']['client']['anneeN1'];
+                    $state['commercial'][$ceCommercial]['deltaTotalClientN'] = $this->calcul_pourcentage_total($state['commercial'][$ceCommercial]['clientN'], $state['count']['client']['anneeN']);
+                    $state['commercial'][$ceCommercial]['deltaTotalClientN1'] = $this->calcul_pourcentage_total($state['commercial'][$ceCommercial]['clientN1'], $state['count']['client']['anneeN1']);
                     $state['commercial'][$ceCommercial]['deltaClient'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['clientN1'],$state['commercial'][$ceCommercial]['clientN'])['pourc'];
                     $state['commercial'][$ceCommercial]['colorClient'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['clientN1'],$state['commercial'][$ceCommercial]['clientN'])['color'];
                     $state['commercial'][$ceCommercial]['flecheClient'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['clientN1'],$state['commercial'][$ceCommercial]['clientN'])['fleche']; 
@@ -352,8 +356,19 @@ class StatesLhermitteController extends AbstractController
 
         }
 
+        function calcul_pourcentage_total($nombreParCom, $nombreTotal)
+        {
+            if ($nombreParCom <> 0 && $nombreTotal <> 0) {
+               $resultat = ($nombreParCom*100)/$nombreTotal;
+            }else{
+                $resultat = 0;    
+            }
+            return $resultat;
+        }
+
         function calcul_pourcentage($nombreN1,$nombreN)
         { 
+            
             if ($nombreN1 <> 0 && $nombreN <> 0) {
                 $resultat['pourc'] = (($nombreN/$nombreN1) -1)*100;
                 if ($resultat['pourc'] < 0) {
@@ -462,7 +477,7 @@ class StatesLhermitteController extends AbstractController
     
 
     /**
-     * @Route("/Lhermitte/states/EV/DetailArticle/{tiers}/{annee}/{mois}", name="app_states_lhermitte_ev_par_article")
+     * @Route("/Lhermitte/DetailArticle/{tiers}/{annee}/{mois}", name="app_states_lhermitte_ev_par_article")
      */
     public function statesByArticleEv(StatesLhermitteByTiersRepository $repo, Request $request): Response
     {

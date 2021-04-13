@@ -45,7 +45,43 @@
             </div>
             <div class="card-body">
             {% if annee %}
+            {% if is_granted('ROLE_ADMIN') %}
+            <h3>Contrôle Trous dans les factures {{ typeTiers }} </h3>
+            {% if controleTrousFactures %}
             
+                <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Alerte</span></th>
+                                    <th class="text-center"><span>Numéro de piéce</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							{% for controleTrousFacture in controleTrousFactures %}                                
+                               
+                                    <tr>
+                                         <td class="text-center">
+                                            <a class="text-center text-dark"><i class="fas fa-exclamation-circle fa-2x text-danger"></i></a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleTrousFacture.fano }}</a>
+                                        </td>
+                                    </tr>
+                            {% endfor %}
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                   <th class="text-center"><span>Alerte</span></th>
+                                   <th class="text-center"><span>Numéro de piéce</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+            {% else %}
+                        <h4 class="text-left text-dark"><i class="fas fa-check-circle pr-2 text-success"></i>Pas de probléme dans la numérotation des factures {{ typeTiers }} !</h4>
+            {% endif %}
+            {% endif %}
+             <div class="dropdown-divider p-2"></div>
             <h3>Contrôle Taxe Gazole</h3>
             {% if controleTaxes %}
             

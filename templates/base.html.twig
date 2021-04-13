@@ -332,13 +332,7 @@
 									</p>
 								</a>
 								<ul class="nav nav-treeview">
-									{% if is_granted('ROLE_COMPTA') %}
-										<li class="nav-item">
-											<a href="" class="nav-link">
-												<i class="nav-icon fas fa-circle text-danger"></i>
-												<p>Trous Factures</p>
-											</a>
-										</li>
+									{% if is_granted('ROLE_ADMIN') %}
 										<li class="nav-item">
 											<a href="" class="nav-link">
 												<i class="nav-icon fas fa-euro-sign text-warning"></i>
@@ -351,6 +345,7 @@
 												<p>DEB</p>
 											</a>
 										</li>
+									{% endif %}
 										<li class="nav-item">
 											<a href="{{path('app_controle_comptabilite', {'slug' : 'F'}) }}" class="nav-link">
 												<i class="nav-icon fas fa-balance-scale-left text-danger"></i>
@@ -363,7 +358,6 @@
 												<p>Contrôle Vente</p>
 											</a>
 										</li>
-									{% endif %}
 								</ul>
 							</li>
 						{% endif %}

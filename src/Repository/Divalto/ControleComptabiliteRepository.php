@@ -9,7 +9,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class ControleComptabiliteRepository extends ServiceEntityRepository
 {
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Mouv::class);
@@ -44,6 +43,17 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-
+    public function getControleTrousFactures($annee,$mois,$typeTiers):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT MOUV.FANO AS fano
+        FROM MOUV
+        WHERE MOUV.DOS = 1 AND YEAR(MOUV.FADT) IN (?) AND MONTH(MOUV.FADT) IN (?) AND MOUV.TICOD = ? AND MOUV.PICOD = 4
+        GROUP BY MOUV.FANO
+        ORDER BY MOUV.FANO";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$annee,$mois,$typeTiers]);
+        return $stmt->fetchAll();
+    }
 
 }
