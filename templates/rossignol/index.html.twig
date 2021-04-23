@@ -1,6 +1,24 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ title }}{% endblock %}
 {% block body %}
+
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+    <h3 class="card-title"><i class="icon fas fa-info-circle pr-2"></i>Informations utiles</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+<!-- /.card-header -->
+    <div class="card-body">
+        <p>Pour saisir une commande de produit Rossignol dans Divalto, il faut impérativement utiliser le code OP "C 2" ( la lettre C un espace et le chiffre 2)</p>
+        <p>Le stock est sur la nature de stock O (comme Occasion), il est donc clairement distingué du reste, le service logistique peut donc alimenter ce stock Occasion avec des produits abimés, l'intranet sera mis à jour instantanément</p>
+        <p>Pour qu'une vente soit lié a un rossignol, il faut donc impérativement utiliser le code op "C 2"</p>
+    </div>
+<!-- /.card-footer-->
+</div>
+
+
 <div class="row">
             <div class="col-md-12">
                 <div class="card card-dark">
@@ -17,8 +35,8 @@
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>U.V</span></th>
-                                    <th class="text-center"><span>T1</span></th>
-                                    <th class="text-center"><span>Prix par</span></th>
+                                    <th class="text-center"><span>Dépôt</span></th>
+                                    <th class="text-center"><span>Nature</span></th>
                                     <th class="text-center"><span>stock</span></th>
                                     <th class="text-center"><span>Qté Réservée</span></th>
                                     
@@ -27,35 +45,37 @@
                             <tbody>
 							 
                               <!-- >boucle -->
-                                    <tr id="<?= $id ?>">
+                              {% for stockRossignol in stockRossignols %}
+                                    <tr>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">Ref</a>
+                                            <a class="text-center text-dark">{{ stockRossignol.Ref }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">désignation</a>
+                                            <a class="text-center text-dark">{{ stockRossignol.Designation }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">Sref1</a>
+                                            <a class="text-center text-dark">{{ stockRossignol.Sref1 }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">Sref2</a>
+                                            <a class="text-center text-dark">{{ stockRossignol.Sref2 }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">U.V</a>
+                                            <a class="text-center text-dark">{{ stockRossignol.Uv }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">T1</a>
+                                            <a class="text-center text-dark">{{ stockRossignol.Depot }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">Par par</a>
+                                            <a class="text-center text-dark">{{ stockRossignol.Nature }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">stock</a>
+                                            <a class="text-center text-dark">{{ stockRossignol.Stock }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">Qté Réservée</a>
+                                            <a class="text-center text-dark">{{ stockRossignol.CmdQte }}</a>
                                         </td>
                                     </tr>
+                              {% endfor %}
                              <!-- >boucle -->
 
                             </tbody>
@@ -66,8 +86,8 @@
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>U.V</span></th>
-                                    <th class="text-center"><span>T1</span></th>
-                                    <th class="text-center"><span>Prix par</span></th>
+                                    <th class="text-center"><span>Dépôt</span></th>
+                                    <th class="text-center"><span>Nature</span></th>
                                     <th class="text-center"><span>stock</span></th>
                                     <th class="text-center"><span>Qté Réservée</span></th>
                                 </tr>

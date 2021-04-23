@@ -9,7 +9,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Divalto\ControleComptabiliteRepository;
 use App\Repository\Divalto\ControleComptabiliteAchatRepository;
 use App\Repository\Divalto\ControleComptabiliteVenteRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+/**
+ * @IsGranted("ROLE_COMPTA")
+ */
 
 class ControleComptabiliteController extends AbstractController
 {

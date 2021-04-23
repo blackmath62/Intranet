@@ -183,7 +183,7 @@
 								</a>
 							</li>
 						{% endif %}
-
+						{% if is_granted('ROLE_INFORMATIQUE') %}
 							<li class="nav-item has-treeview">
 								<a href="" class="nav-link">
 									<i class="nav-icon fas fa-skull-crossbones"></i>
@@ -209,6 +209,27 @@
 									{% endif %}
 								</ul>
 							</li>
+						{% endif %}
+							{% if is_granted('ROLE_INFORMATIQUE') %}
+
+							<li class="nav-item has-treeview">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-laptop"></i>
+									<p>
+										Informatique
+										<i class="fas fa-angle-left right"></i>
+									</p>
+								</a>
+								<ul class="nav nav-treeview">
+										<li class="nav-item">
+											<a href="{{ path('app_controle_produit_stock_mouv_ef')}}" class="nav-link">
+												<i class="nav-icon fab fa-searchengin text-warning"></i>
+												<p>Contrôle Article</p>
+											</a>
+										</li>
+								</ul>
+							</li>
+						{% endif %}
 					
 							<li class="nav-item">
 								<a href="{{ path('app_faq')}}" class="nav-link">
@@ -244,6 +265,8 @@
 							<li class="nav-header">Lhermitte</li>
 						{% if is_granted('ROLE_LHERMITTE') %}
 
+
+							{% if is_granted('ROLE_EV') or is_granted('ROLE_HP') or is_granted('ROLE_MA') or is_granted('ROLE_ME') %}
 							<li class="nav-item has-treeview">
 								<a href="" class="nav-link">
 									<i class="nav-icon fas fa-tachometer-alt"></i>
@@ -276,14 +299,6 @@
 												<p>Horticulteurs / Pépiniériste</p>
 											</a>
 										</li>
-										{% if is_granted('ROLE_ADMIN') %}
-										<li class="nav-item">
-											<a href="{{path('app_lhermitte_rossignols')}}" class="nav-link">
-												<i class="nav-icon fas fa-dove text-light"></i>
-												<p>Rossignols</p>
-											</a>
-										</li>
-										{% endif %}
 									{% endif %}
 									{% if is_granted('ROLE_MA') %}
 										<li class="nav-item">
@@ -301,16 +316,25 @@
 											</a>
 										</li>
 									{% endif %}
-									
 									<li class="nav-item">
 										<a href="{{path('app_states_lhermitte', {'secteur' : 'LH'})}}" class="nav-link">
 											<i class="fas fa-globe nav-icon text-primary"></i>
 											<p>Lhermitte Frères</p>
 										</a>
 									</li>
-									
 								</ul>
 							</li>
+							{% endif %}
+
+
+							<li class="nav-item">
+								<a href="{{path('app_lhermitte_rossignols')}}" class="nav-link">
+									<i class="nav-icon fas fa-dove text-light"></i>
+									<p>Rossignols</p>
+								</a>
+							</li>
+
+							{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
 								<a href="{{path('app_lhermitte_clients_secteur')}}" class="nav-link">
 									<i class="nav-icon fas fa-address-book"></i>
@@ -319,8 +343,9 @@
 									</p>
 								</a>
 							</li>
-						{% endif %}
+							{% endif %}
 
+						{% endif %}
 						{% if is_granted('ROLE_COMPTA') %}
 
 							<li class="nav-item has-treeview">
@@ -506,6 +531,8 @@
 			<script src="{{ asset("plugins/bootstrap/js/bootstrap.bundle.min.js")}}"></script>
 			<!-- ChartJS -->
 			<script src="{{ asset("plugins/chart.js/Chart.min.js")}}"></script>
+			<!-- date-range-picker -->
+			<script src="{{ asset("plugins/daterangepicker/daterangepicker.js")}}"></script>
 			<!-- Sparkline -->
 			<script src="{{ asset("plugins/sparklines/sparkline.js")}}"></script>
 			<!-- JQVMap -->
@@ -577,6 +604,7 @@
     });
   });
 </script>
+<script>$('#reservation').daterangepicker()</script>
 
 		<!-- Disparition automatique de message alert -->
 			<script>

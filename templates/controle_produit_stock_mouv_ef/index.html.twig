@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+    <h3 class="card-title"><i class="icon fas fa-info-circle pr-2"></i>Informations utiles</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+<!-- /.card-header -->
+    <div class="card-body">
+        <p>Cette liste permet de contrôler s'il y a du stock, des mouvements de commandes ou Bl Fournisseurs et clients actives et les entrées forcées</p>
+        <p>A savoir qu'on ne ferme jamais un produit avec un mouvement commande ou Bl actif, une Entrées forcées, ou du stock</p>
+        <p>L'idée est d'avoir une liste facilement accessible et exploitable sous excel pour ne pas avoir à contrôle chaque article manuellement et ains avoir la possiblité d'importer des dates de fermetures en masse !</p>
+    </div>
+<!-- /.card-footer-->
+</div>
+
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <!-- /.card-header -->
+                    <div class="card-header d-flex justify-content-between ">
+                        <h3 class="card-title text-center">Contrôle des stocks, entrées forcées, mouvements avant fermeture produits</h3>
+                        {{ form_start(search, { 'attr' : { 'class' : 'ml-auto' }} ) }}
+                        <div class='d-flex'>
+                            <div class="p-1 mt-2">
+                            Recherche des références produits qui commencent par : 
+                            </div>
+                            <div class="p-1">
+                            {{ form_row(search.search) }}
+                            </div>
+                            <div class="p-1">
+                            {{ form_row(search.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }} ) }}
+                            </div>
+                        </div>
+                        {{ form_end(search)}}
+                    </div>
+                    <div class="card-body">
+                        {% if controleproduits %}    
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Fermé ?</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>Stock</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Cmd</span></th>
+                                    <th class="text-center"><span>Qte Cmd</span></th>
+                                    <th class="text-center"><span>Bl</span></th>
+                                    <th class="text-center"><span>Qte Bl</span></th>
+                                    <th class="text-center"><span>Ef</span></th>
+                                    <th class="text-center"><span>Qte Ef</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							 
+                                                        
+                              <!-- >boucle -->
+                              {% for controleproduit in controleproduits %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.ArtFerme }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.Ref }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.Designation }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.Sref1 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.Sref2 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.Stock }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.Op }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.Cmd }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.QteCmd }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.Bl }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.QteBl }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.Ef }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleproduit.EfQte }}</a>
+                                        </td>
+                                    </tr>
+                              {% endfor %}
+                             <!-- >boucle -->
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Fermé ?</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>Stock</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Cmd</span></th>
+                                    <th class="text-center"><span>Qte Cmd</span></th>
+                                    <th class="text-center"><span>Bl</span></th>
+                                    <th class="text-center"><span>Qte Bl</span></th>
+                                    <th class="text-center"><span>Ef</span></th>
+                                    <th class="text-center"><span>Qte Ef</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        {% else %}
+                            <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter le champs de recherche</h4>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+

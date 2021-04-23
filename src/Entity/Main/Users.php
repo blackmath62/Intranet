@@ -54,6 +54,11 @@ class Users implements UserInterface
     private $pseudo;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true, unique=true)
+     */
+    private $commercial;
+
+    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $img;
@@ -186,6 +191,18 @@ class Users implements UserInterface
     public function setPseudo(?string $pseudo): self
     {
         $this->pseudo = $pseudo;
+
+        return $this;
+    }
+
+    public function getCommercial(): ?string
+    {
+        return $this->commercial;
+    }
+
+    public function setCommercial(?string $commercial): self
+    {
+        $this->commercial = $commercial;
 
         return $this;
     }

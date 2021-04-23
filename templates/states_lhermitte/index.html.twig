@@ -27,27 +27,24 @@
             <div class="col-md-12">
                 <div class="card card-dark">
                     <div class="card-header d-flex justify-content-between ">
-                        <h3 class="card-title text-center">States Lhermitte   
+                        <h3 class="card-title text-center">States Lhermitte {{ titre }}   
                         {% if state %}
                             {{ mois }} - {{ annee -1}}/{{ annee}}
                         {% endif %}
                         </h3>
-                        {{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }} ) }}
-                        <div class='d-flex'>
-                            <div class="p-1 mt-2">
-                                Selectionnez les dates : 
+                        {{ form_start(dateDebutFinForm, { 'attr' : { 'class' : 'ml-auto' }} ) }}
+                            <div class='d-flex'>
+                                <div class="p-1 mt-2">
+                                    Recherche par tranche de date : 
+                                </div> 
+                                <div class="p-1">
+                                    {{ form_widget(dateDebutFinForm.dateFin, {'id' : 'reservation',  'attr' : { 'class' : 'form-control float-right' }} ) }}
+                                </div>
+                                <div class="p-1">
+                                    {{ form_row(dateDebutFinForm.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }} ) }}
+                                </div>
                             </div>
-                            <div class="p-1">
-                                {{ form_row(monthYear.month) }}
-                            </div>
-                            <div class="p-1">
-                                {{ form_row(monthYear.year) }}
-                            </div>
-                            <div class="p-1">
-                                {{ form_row(monthYear.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }} ) }}
-                            </div>
-                        </div>
-                    {{ form_end(monthYear)}}
+                        {{ form_end(dateDebutFinForm) }}
                     </div>
                     {% if state %}
 
@@ -110,13 +107,12 @@
           {% endfor %}
           </div>
 
-                    
-
-
-                            <!-- Info boxes -->
+                
+<!-- Info boxes -->
 <div class="row">
+{% if is_granted('ROLE_BOSS') %}  
     <div class="col-12 col-sm-6 col-md-2">
-
+        
         <div class="info-box">
             <span class="info-box-icon bg-info elevation-1"><i class="fas fa-fw fa-truck-loading"></i></span>
 
@@ -201,6 +197,7 @@
             </div>
         <!-- /.info-box -->
         </div>
+        {% endif %}
     <!-- /.col -->
     <div class="col-12 col-sm-6 col-md-2">
         <div class="info-box mb-3">
@@ -217,18 +214,26 @@
         <!-- /.info-box-content -->
         </div>
     <!-- /.info-box -->
-    
     </div>
     <!-- /.col -->
 </div>
 <!-- /.row -->
+
                     
 
                     {% endif %}
 
+                    {% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example1" class="table table-bordered table-striped">
+                    {% if annee %}
+                    
+                    
+                        {% if is_granted('ROLE_BOSS') %}
+                            <table id="example1" class="table table-bordered table-striped">
+                        {% else %}
+                            <table id="example2" class="table table-bordered table-striped">
+                        {% endif %}
                             <thead>
                                 <tr>
                                     <th class="text-center"><span>Commercial</span></th>
@@ -276,12 +281,11 @@
                                         </td>
                                         {% if is_granted('ROLE_ADMIN') %}
                                         <td class="text-center">
-                                            <a href="{{path('app_states_lhermitte_ev_par_article', {'tiers' : 'C0052900', 'annee' : annee , 'mois' : mois } ) }}" class="text-center btn btn-xl btn-info text-white"><i class="far fa-eye"></i></a>
+                                            <a href="" class="text-center btn btn-xl btn-info text-white"><i class="far fa-eye"></i></a>
                                         </td>
                                        {% endif %}
                                     </tr>
                                 {% endfor %}
-
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -292,12 +296,19 @@
                                     <th class="text-center"><span>Delta %</span></th>
                                     <th class="text-center"><span>Annee Selectionnée</span></th>
                                     {% if is_granted('ROLE_ADMIN') %}
-                                    <th class="text-center"><span>Détails</span></th>
+                                        <th class="text-center"><span>Détails</span></th>
                                     {% endif %}
                                 </tr>
                             </tfoot>
                         </table>
+                        
+                        {% else %}
+                            <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez selectionner le filtre à appliquer</h4>
+                        
+
+                        {% endif %}
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

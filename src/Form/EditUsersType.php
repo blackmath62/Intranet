@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 class EditUsersType extends AbstractType
 {
@@ -25,7 +26,7 @@ class EditUsersType extends AbstractType
                     ],
                     'disabled' => true,
                     'attr' => [
-                        'class' => 'col-12 form-control'
+                        'class' => 'col-2 form-control'
                     ]
             ])
             ->add('pseudo', TextType::class,[
@@ -36,7 +37,13 @@ class EditUsersType extends AbstractType
                     ],
                     'required' => true,
                     'attr' => [
-                        'class' => 'col-12 form-control'
+                        'class' => 'col-2 form-control'
+                    ]
+            ])
+            ->add('commercial', IntegerType::class,[
+                    'required' => false,    
+                    'attr' => [
+                        'class' => 'col-2 form-control'
                     ]
             ])
             /*->add('img', FileType::class,[
@@ -74,6 +81,9 @@ class EditUsersType extends AbstractType
                         'ME' => "ROLE_ME",
                         'BOSS' => "ROLE_BOSS",
                         'COMPTA' => "ROLE_COMPTA",
+                        'INFORMATIQUE' => "ROLE_INFORMATIQUE",
+                        'RESPONSABLE SECTEUR' => "ROLE_RESPONSABLE_SECTEUR",
+                        'COMMERCIAL' => "ROLE_COMMERCIAL",
                     ],
                     'choice_attr' => [
                         'Utilisateur' => ['class' => 'm-3'],
@@ -86,6 +96,9 @@ class EditUsersType extends AbstractType
                         'ME' => ['class' => 'm-3'],
                         'BOSS' => ['class' => 'm-3'],
                         'COMPTA' => ['class' => 'm-3'],
+                        'INFORMATIQUE' => ['class' => 'm-3'],
+                        'RESPONSABLE SECTEUR' => ['class' => 'm-3'],
+                        'COMMERCIAL' => ['class' => 'm-3'],
                     ],
                     'expanded' => true,
                     'multiple' => true,

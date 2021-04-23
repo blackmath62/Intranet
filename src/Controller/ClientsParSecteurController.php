@@ -14,7 +14,7 @@ use App\Repository\Main\UsersRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
- * @IsGranted("ROLE_USER")
+ * @IsGranted("ROLE_ADMIN")
  */
 
 class ClientsParSecteurController extends AbstractController

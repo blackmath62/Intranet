@@ -15,9 +15,8 @@ class StatesLhermitteByTiersRepository extends ServiceEntityRepository
         parent::__construct($registry, Mouv::class);
     }
    
-    public function getStatesLhermitteGlobalesByMonth($annee,$mois):array
+    public function getStatesLhermitteGlobalesByMonth($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1):array
     {
-        $N1 = $annee - 1;
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT YEAR(MOUV.FADT) AS Annee,MOUV.BLNO AS Bl,MOUV.FANO AS Facture,
         CASE
@@ -44,10 +43,9 @@ class StatesLhermitteByTiersRepository extends ServiceEntityRepository
         INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
         INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
         LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
-        WHERE MOUV.DOS = 1 AND YEAR(MOUV.FADT) IN (?,?) AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND MONTH(MOUV.FADT) IN (?) --AND ART.FAM_0002 IN ('EV','HP') AND CLI.STAT_0002 IN('EV','EV')
-        AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP')";
+        WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ))";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$annee,$N1,$mois]);
+        $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1]);
         return $stmt->fetchAll();
     }
 

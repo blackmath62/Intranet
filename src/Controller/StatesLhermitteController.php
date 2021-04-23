@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use DateTime;
 use App\Form\YearMonthType;
+use App\Form\DateDebutFinType;
 use PhpParser\Node\Stmt\Else_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -25,31 +26,35 @@ class StatesLhermitteController extends AbstractController
     /**
      * @Route("/Lhermitte/states/{secteur}", name="app_states_lhermitte")
      */    
-    public function states($secteur, StatesLhermitteByTiersRepository $repo, Request $request)
+    public function states(string $secteur, StatesLhermitteByTiersRepository $repo, Request $request):Response
     {
                     
         $secteur = $request->attributes->get('secteur');
         $themeColor = '';
 
-        
+        if ($secteur == 'EV') {
+            $themeColor = 'success';
+            $titre = ' Espaces Verts';
+        } 
         if ($secteur == 'HP') {
             $themeColor = 'danger';
-        }
-        if ($secteur == 'EV') {
-            $themeColor = 'success';
-        }
-        if ($secteur == 'EV') {
-            $themeColor = 'success';
+            $titre = ' Horti - Pépi';
         }
         if ($secteur == 'ME') {
             $themeColor = 'warning';
+            $titre = ' Matériel équipement';
+        }
+        if ($secteur == 'LH') {
+            $themeColor = 'info';
+            $titre = ' tous secteurs';
         }
         if ($secteur == 'MA') {
             $themeColor = 'orange';
+            $titre = 'Maraîchage';
         }    
 
             $secteurRecherche = $secteur;
-            $form = $this->createForm(YearMonthType::class);
+            $form = $this->createForm(DateDebutFinType::class);
             $form->handleRequest($request);
             // initialisation de mes variables
             $annee = '';
@@ -62,10 +67,26 @@ class StatesLhermitteController extends AbstractController
             $this->setTracking($tracking);
             
             if($form->isSubmitted() && $form->isValid()){
-                $annee = $form->getData()['year'];
-                $mois = $form->getData()['month'];
+                $dateDebutEtFin = $form->getData()['dateFin'];
+            
+                $dateDebut = substr($dateDebutEtFin, 0 , -13);
+                $anneeDebut = substr($dateDebut, 6, 4);
+                $moisDebut = substr($dateDebut, 0, 2);
+                $jourDebut = substr($dateDebut, 3, 2);
+           
+                $dateFin = substr($dateDebutEtFin, 13 , 10);
+                $anneeFin = substr($dateFin, 6, 4);
+                $moisFin = substr($dateFin, 0, 2);
+                $jourFin = substr($dateFin, 3, 2);
 
-                $statesGlobal = $repo->getStatesLhermitteGlobalesByMonth($annee,$mois);
+                $dateDebutN = $anneeDebut . '-' . $moisDebut . '-' . $jourDebut;
+                $dateDebutN1 = $anneeDebut -1 . '-' . $moisDebut . '-' . $jourDebut;
+
+                $dateFinN = $anneeFin . '-' . $moisFin . '-' . $jourFin;
+                $dateFinN1 = $anneeFin -1 . '-' . $moisFin . '-' . $jourFin;
+
+                $statesGlobal = $repo->getStatesLhermitteGlobalesByMonth($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
+                $annee = $anneeDebut;
                 // States Globales du secteur
                 // Nbre de client du secteur N et N-1 ainsi que le Delta
                 for ($ligClient=0; $ligClient <count($statesGlobal) ; $ligClient++) {
@@ -148,10 +169,12 @@ class StatesLhermitteController extends AbstractController
                         $state['count']['facture']['anneeN1']++;
                     }
                 }
-                 // Delta BL
+                 // Delta Facture
                  $state['count']['facture']['delta'] = $this->calcul_pourcentage($state['count']['facture']['anneeN1'],$state['count']['facture']['anneeN'])['pourc'];
                  $state['count']['facture']['color'] = $this->calcul_pourcentage($state['count']['facture']['anneeN1'],$state['count']['facture']['anneeN'])['color'];
                  $state['count']['facture']['fleche'] = $this->calcul_pourcentage($state['count']['facture']['anneeN1'],$state['count']['facture']['anneeN'])['fleche'];
+
+                
 
 
                 // Sum du secteur Dépôt N et N-1 ainsi que le Delta
@@ -351,11 +374,13 @@ class StatesLhermitteController extends AbstractController
                 'themeColor' => $themeColor,
                 'state' => $state,
                 'clients' => $clientFilter,
-                'monthYear' => $form->createView()
+                'titre' => $titre,
+                'dateDebutFinForm' => $form->createView()
                 ]);
 
         }
 
+        // fonction utile pour le cacul de pourcentage et éviter le calcul est impossible
         function calcul_pourcentage_total($nombreParCom, $nombreTotal)
         {
             if ($nombreParCom <> 0 && $nombreTotal <> 0) {
@@ -477,7 +502,7 @@ class StatesLhermitteController extends AbstractController
     
 
     /**
-     * @Route("/Lhermitte/DetailArticle/{tiers}/{annee}/{mois}", name="app_states_lhermitte_ev_par_article")
+     * @Route("/Lhermitte/DetailArticle/{tiers}/{annee}/{mois}", name="app_lhermitte_ev_par_article")
      */
     public function statesByArticleEv(StatesLhermitteByTiersRepository $repo, Request $request): Response
     {
