@@ -4,6 +4,7 @@ namespace App\Entity\Main;
 
 use App\Entity\Main\FAQ;
 use App\Entity\Main\Trackings;
+use App\Entity\Main\FinDeJournee;
 use Doctrine\ORM\Mapping as ORM;
 
 use App\Repository\Main\UsersRepository;
@@ -118,11 +119,13 @@ class Users implements UserInterface
      */
     private $trackings;
 
+
     public function __construct()
     {
         $this->documents = new ArrayCollection();
         $this->ideaBoxs = new ArrayCollection();
         $this->trackings = new ArrayCollection();
+        $this->finDeJournee = new ArrayCollection();
         $this->permissions = new ArrayCollection();
         $this->chats = new ArrayCollection();
         $this->comments = new ArrayCollection();
@@ -252,7 +255,6 @@ class Users implements UserInterface
     {
         return $this->trackings;
     }
-
 
     /**
      * @return Collection|Documents[]

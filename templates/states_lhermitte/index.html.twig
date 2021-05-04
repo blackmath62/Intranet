@@ -29,7 +29,7 @@
                     <div class="card-header d-flex justify-content-between ">
                         <h3 class="card-title text-center">States Lhermitte {{ titre }}   
                         {% if state %}
-                            {{ mois }} - {{ annee -1}}/{{ annee}}
+                            {{ intervalN1}} et du {{ intervalN}}
                         {% endif %}
                         </h3>
                         {{ form_start(dateDebutFinForm, { 'attr' : { 'class' : 'ml-auto' }} ) }}
@@ -49,8 +49,9 @@
                     {% if state %}
 
                      <div class="row">
+            {% if commercial %}
              
-             {% for commercial in state.commercial %}
+            {% for commercial in state.commercial %}
             <div class="card-body col-lg-3 col-6 pt-2">
                 <div class="callout callout-{{ themeColor }}">
                   
@@ -62,7 +63,7 @@
                     </div>
                     <div class="border-bottom pt-1">
                         <div class="progress-group">
-                        CA {{ annee -1 }}
+                        CA {{ intervalN1 }}
                         <span class="float-right"><b>{{commercial.montantN1|number_format(2)}} €</b>/ {{state.secteur.montantN1|number_format(2)}} </span>
                         <div class="progress progress-sm">
                             <div class="progress-bar bg-primary" style="width: {{commercial.deltaTotalN1}}%"></div>
@@ -71,7 +72,7 @@
                         <!-- /.progress-group -->
 
                         <div class="progress-group">
-                        CA {{ annee }}
+                        CA {{ intervalN }}
                         <span class="float-right"><b>{{commercial.montantN|number_format(2)}} €</b>/ {{state.secteur.montantN|number_format(2)}} </span>
                         <div class="progress progress-sm">
                             <div class="progress-bar bg-danger" style="width: {{commercial.deltaTotalN}}%"></div>
@@ -83,7 +84,7 @@
                     </div>
                     <!-- /.progress-group -->
                     <div class="progress-group">
-                      <span class="progress-text">Nbe Clients {{ annee -1 }}</span>
+                      <span class="progress-text">Nbe Clients {{ intervalN1 }}</span>
                       <span class="float-right"><b>{{commercial.clientN1 }}</b>/ {{ state.count.client.anneeN1 }} </span>
                       <div class="progress progress-sm">
                         <div class="progress-bar bg-success" style="width: {{ commercial.deltaTotalClientN1}}%"></div>
@@ -91,7 +92,7 @@
                     </div>
 
                     <!-- /.progress-group -->
-                    <div class="progress-group">Nbe Clients {{ annee }}
+                    <div class="progress-group">Nbe Clients {{ intervalN }}
                       <span class="float-right"><b>{{ commercial.clientN }}</b>/ {{ state.count.client.anneeN }} </span>
                       <div class="progress progress-sm">
                         <div class="progress-bar bg-warning" style="width: {{commercial.deltaTotalClientN}}%"></div>
@@ -102,9 +103,12 @@
                   <!-- /.col -->
                 </div>
             </div>
-             
-
-          {% endfor %}
+            {% endfor %}
+            {% else %}
+                <div>
+                    <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Pas de donnée pour cette tranche de date</h4>
+                </div>  
+            {% endif %}
           </div>
 
                 
@@ -119,8 +123,8 @@
             <div class="info-box-content">
                 <div class="description-block">
                     <span class="description-percentage text-{{ state.count.bl.color }}"><i class="fas fa-caret-{{ state.count.bl.fleche }}"></i>{{ state.count.bl.delta|number_format(2) }} %</span>
-                    <h5 class="description-header"><strong class="text-secondary">{{ annee -1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.bl.anneeN1|number_format(2, '.', ' ') }}</h5>
-                    <h5 class="description-header"><strong class="text-secondary">{{ annee }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.bl.anneeN|number_format(2, '.', ' ') }}</h5>
+                    <h5 class="description-header"><strong class="text-secondary">{{ intervalN1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.bl.anneeN1|number_format(2, '.', ' ') }}</h5>
+                    <h5 class="description-header"><strong class="text-secondary">{{ intervalN }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.bl.anneeN|number_format(2, '.', ' ') }}</h5>
                     <span class="description-text">Nbre d'expéditions</span>
                 </div>
             </div>
@@ -136,8 +140,8 @@
             <div class="info-box-content">
                 <div class="description-block">
                     <span class="description-percentage text-{{ state.count.facture.color }}"><i class="fas fa-caret-{{ state.count.facture.fleche }}"></i>{{ state.count.facture.delta|number_format(2) }} %</span>
-                    <h5 class="description-header"><strong class="text-secondary">{{ annee -1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.facture.anneeN1|number_format(2, '.', ' ') }}</h5>
-                    <h5 class="description-header"><strong class="text-secondary">{{ annee }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.facture.anneeN|number_format(2, '.', ' ') }}</h5>
+                    <h5 class="description-header"><strong class="text-secondary">{{ intervalN1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.facture.anneeN1|number_format(2, '.', ' ') }}</h5>
+                    <h5 class="description-header"><strong class="text-secondary">{{ intervalN }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.facture.anneeN|number_format(2, '.', ' ') }}</h5>
                     <span class="description-text">Nbre de Factures</span>
                 </div>
             </div>
@@ -157,8 +161,8 @@
                 <div class="info-box-content">
                     <div class="description-block">
                         <span class="description-percentage text-{{ state.count.client.color }}"><i class="fas fa-caret-{{ state.count.client.fleche }}"></i>{{ state.count.client.delta|number_format(2) }} %</span>
-                        <h5 class="description-header"><strong class="text-secondary">{{ annee -1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.client.anneeN1|number_format(2, '.', ' ') }}</h5>
-                        <h5 class="description-header"><strong class="text-secondary">{{ annee }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.client.anneeN|number_format(2, '.', ' ') }}</h5>
+                        <h5 class="description-header"><strong class="text-secondary">{{ intervalN1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.client.anneeN1|number_format(2, '.', ' ') }}</h5>
+                        <h5 class="description-header"><strong class="text-secondary">{{ intervalN }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.count.client.anneeN|number_format(2, '.', ' ') }}</h5>
                         <span class="description-text">Nbre de clients</span>
                     </div>
                 </div>
@@ -172,8 +176,8 @@
                 <div class="info-box-content">
                     <div class="description-block">
                         <span class="description-percentage text-{{ state.depot.color }}"><i class="fas fa-caret-{{ state.depot.fleche }}"></i>{{ state.depot.delta|number_format(2) }} %</span>
-                        <h5 class="description-header"><strong class="text-secondary">{{ annee -1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.depot.montantN1|number_format(2, '.', ' ') }} €</h5>
-                        <h5 class="description-header"><strong class="text-secondary">{{ annee }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.depot.montantN|number_format(2, '.', ' ') }} €</h5>
+                        <h5 class="description-header"><strong class="text-secondary">{{ intervalN1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.depot.montantN1|number_format(2, '.', ' ') }} €</h5>
+                        <h5 class="description-header"><strong class="text-secondary">{{ intervalN }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.depot.montantN|number_format(2, '.', ' ') }} €</h5>
                         <span class="description-text">CA Dépôt</span>
                     </div>
                 </div>
@@ -188,8 +192,8 @@
                 <div class="info-box-content">
                     <div class="description-block">
                         <span class="description-percentage text-{{ state.direct.color }}"><i class="fas fa-caret-{{ state.direct.fleche }}"></i> {{ state.direct.delta|number_format(2) }} %</span>
-                        <h5 class="description-header"><strong class="text-secondary">{{ annee -1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.direct.montantN1|number_format(2, '.', ' ') }} €</h5>
-                        <h5 class="description-header"><strong class="text-secondary">{{ annee }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.direct.montantN|number_format(2, '.', ' ') }} €</h5>
+                        <h5 class="description-header"><strong class="text-secondary">{{ intervalN1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.direct.montantN1|number_format(2, '.', ' ') }} €</h5>
+                        <h5 class="description-header"><strong class="text-secondary">{{ intervalN }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.direct.montantN|number_format(2, '.', ' ') }} €</h5>
                         <span class="description-text">CA Direct</span>
                     </div>
                 </div>
@@ -206,8 +210,8 @@
             <div class="info-box-content">
                 <div class="description-block">
                     <span class="description-percentage text-{{ state.secteur.color }}"><i class="fas fa-caret-{{ state.secteur.fleche }}"></i> {{ state.secteur.delta|number_format(2) }} %</span>
-                    <h5 class="description-header"><strong class="text-secondary">{{ annee -1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.secteur.montantN1|number_format(2, '.', ' ') }} €</h5>
-                    <h5 class="description-header"><strong class="text-secondary">{{ annee }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.secteur.montantN|number_format(2, '.', ' ') }} €</h5>
+                    <h5 class="description-header"><strong class="text-secondary">{{ intervalN1 }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.secteur.montantN1|number_format(2, '.', ' ') }} €</h5>
+                    <h5 class="description-header"><strong class="text-secondary">{{ intervalN }}<i class="fas fa-caret-right pr-2 pl-2"></i></strong>{{ state.secteur.montantN|number_format(2, '.', ' ') }} €</h5>
                     <span class="description-text">CA Total</span>
                 </div>
             </div>
@@ -223,11 +227,9 @@
 
                     {% endif %}
 
-                    {% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
                     <!-- /.card-header -->
                     <div class="card-body">
-                    {% if annee %}
-                    
+                    {% if intervalN %}
                     
                         {% if is_granted('ROLE_BOSS') %}
                             <table id="example1" class="table table-bordered table-striped">
@@ -239,20 +241,20 @@
                                     <th class="text-center"><span>Commercial</span></th>
                                     <th class="text-center"><span>Tiers</span></th>
                                     <th class="text-center"><span>Nom</span></th>
-                                    {% if annee %}
-                                    <th class="text-center"><span>{{ mois }} - {{ annee -1 }}</span></th>
+                                    {% if intervalN %}
+                                    <th class="text-center"><span>{{ intervalN1 }}</span></th>
                                     {% else %}
                                     <th class="text-center"><span>Année N-1</span></th>  
                                     {% endif %}
 
                                     <th class="text-center"><span>Delta %</span></th>
 
-                                    {% if annee %}
-                                    <th class="text-center"><span>{{ mois }} - {{ annee }}</span></th>
+                                    {% if intervalN %}
+                                    <th class="text-center"><span>{{ intervalN }}</span></th>
                                     {% else %}
                                     <th class="text-center"><span>Annee Selectionnée</span></th>
                                     {% endif %}
-                                    {% if is_granted('ROLE_ADMIN') %}
+                                    {% if is_granted('ADMIN') %}
                                     <th class="text-center"><span>Détails</span></th>
                                     {% endif %}
                                 </tr>
@@ -260,31 +262,34 @@
                             <tbody>
 							
                                 {% for client in clients %}
-                                    <tr id="<?= $id ?>">
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ client.commercial}}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ client.tiers }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ client.nom }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ client.montantN1|number_format(2) }} €</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center description-percentage text-{{ client.color }}"><i class="fas fa-caret-{{ client.fleche }}"></i>{{ client.delta|number_format(2) }} %</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ client.montantN|number_format(2) }} €</a>
-                                        </td>
-                                        {% if is_granted('ROLE_ADMIN') %}
-                                        <td class="text-center">
-                                            <a href="" class="text-center btn btn-xl btn-info text-white"><i class="far fa-eye"></i></a>
-                                        </td>
-                                       {% endif %}
-                                    </tr>
+                                        {% if is_granted('ROLE_RESPONSABLE_SECTEUR') or ( is_granted('ROLE_COMMERCIAL') and app.user.commercial == client.commercialId ) %}
+                                            <tr>
+                                                <td class="text-center">
+                                                    <a class="text-center text-dark">{{ client.commercial}}</a>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a class="text-center text-dark">{{ client.tiers }}</a>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a class="text-center text-dark">{{ client.nom }}</a>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a class="text-center text-dark">{{ client.montantN1|number_format(2) }} €</a>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a class="text-center description-percentage text-{{ client.color }}"><i class="fas fa-caret-{{ client.fleche }}"></i>{{ client.delta|number_format(2) }} %</a>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a class="text-center text-dark">{{ client.montantN|number_format(2) }} €</a>
+                                                </td>
+                                                {% if is_granted('ADMIN') %}
+                                                <td class="text-center">
+                                                    <a href="" class="text-center btn btn-xl btn-info text-white"><i class="far fa-eye"></i></a>
+                                                </td>
+                                                {% endif %}
+                                            </tr>
+
+                                        {% endif %}                                    
                                 {% endfor %}
                             </tbody>
                             <tfoot>
@@ -295,8 +300,8 @@
                                     <th class="text-center"><span>N - 1</span></th>
                                     <th class="text-center"><span>Delta %</span></th>
                                     <th class="text-center"><span>Annee Selectionnée</span></th>
-                                    {% if is_granted('ROLE_ADMIN') %}
-                                        <th class="text-center"><span>Détails</span></th>
+                                    {% if is_granted('ADMIN') %}
+                                    <th class="text-center"><span>Détails</span></th>
                                     {% endif %}
                                 </tr>
                             </tfoot>
@@ -304,11 +309,8 @@
                         
                         {% else %}
                             <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez selectionner le filtre à appliquer</h4>
-                        
-
                         {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>

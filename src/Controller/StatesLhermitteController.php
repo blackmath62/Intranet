@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Repository\Divalto\StatesLhermitteByTiersRepository;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -61,6 +62,8 @@ class StatesLhermitteController extends AbstractController
             $mois ='';
             $state = array();
             $clientFilter = array();
+            $intervalN = 0;
+            $intervalN1 = 0;
 
             // tracking user page for stats
             $tracking = $request->attributes->get('_route');
@@ -79,11 +82,22 @@ class StatesLhermitteController extends AbstractController
                 $moisFin = substr($dateFin, 0, 2);
                 $jourFin = substr($dateFin, 3, 2);
 
+                if ($anneeDebut != $anneeFin) {
+                    $this->addFlash('danger', 'les Années de Début et de fin doivent être identiques');
+                    return $this->redirectToRoute($tracking, ['secteur' => $secteur]);
+                }
+
                 $dateDebutN = $anneeDebut . '-' . $moisDebut . '-' . $jourDebut;
                 $dateDebutN1 = $anneeDebut -1 . '-' . $moisDebut . '-' . $jourDebut;
 
                 $dateFinN = $anneeFin . '-' . $moisFin . '-' . $jourFin;
                 $dateFinN1 = $anneeFin -1 . '-' . $moisFin . '-' . $jourFin;
+
+                $yearStartN1 = $anneeDebut - 1 ;
+                $yearEndN1 = $anneeFin - 1 ;
+
+                $intervalN = $jourDebut . '-' . $moisDebut . '-' . $anneeDebut . ' au ' . $jourFin . '-' . $moisFin . '-' . $anneeFin;
+                $intervalN1 = $jourDebut . '-' . $moisDebut . '-' . $yearStartN1 . ' au ' . $jourFin . '-' . $moisFin . '-' . $yearEndN1;
 
                 $statesGlobal = $repo->getStatesLhermitteGlobalesByMonth($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
                 $annee = $anneeDebut;
@@ -94,57 +108,78 @@ class StatesLhermitteController extends AbstractController
                         $client[$ligClient]['annee'] = $statesGlobal[$ligClient]['Annee'];
                         $client[$ligClient]['tiers'] = $statesGlobal[$ligClient]['Tiers'];
                         $client[$ligClient]['commercial'] = $statesGlobal[$ligClient]['Commercial'];
+                        $client[$ligClient]['commercialId'] = $statesGlobal[$ligClient]['CommercialId'];
                     }else {
-                        if ($statesGlobal[$ligClient]['SecteurMouvement'] == $secteurRecherche) {
-                            $client[$ligClient]['annee'] = $statesGlobal[$ligClient]['Annee'];
-                            $client[$ligClient]['tiers'] = $statesGlobal[$ligClient]['Tiers'];
-                            $client[$ligClient]['commercial'] = $statesGlobal[$ligClient]['Commercial'];
-                        } 
+                        if ($secteur == 'MA') {
+                            if ($statesGlobal[$ligClient]['SecteurMouvement'] == 'HP' && ($statesGlobal[$ligClient]['FamClient'] == 'MARAICHE' || $statesGlobal[$ligClient]['FamClient'] == 'AGRICULT' || $statesGlobal[$ligClient]['FamClient'] == 'ASSO' ) ) {
+                                $client[$ligClient]['annee'] = $statesGlobal[$ligClient]['Annee'];
+                                $client[$ligClient]['tiers'] = $statesGlobal[$ligClient]['Tiers'];
+                                $client[$ligClient]['commercial'] = $statesGlobal[$ligClient]['Commercial'];
+                                $client[$ligClient]['commercialId'] = $statesGlobal[$ligClient]['CommercialId'];
+                            }
+                        }else {
+                            if ($statesGlobal[$ligClient]['SecteurMouvement'] == $secteurRecherche) {
+                                $client[$ligClient]['annee'] = $statesGlobal[$ligClient]['Annee'];
+                                $client[$ligClient]['tiers'] = $statesGlobal[$ligClient]['Tiers'];
+                                $client[$ligClient]['commercial'] = $statesGlobal[$ligClient]['Commercial'];
+                                $client[$ligClient]['commercialId'] = $statesGlobal[$ligClient]['CommercialId'];
+                            } 
+                        }
                     }                    
                 }
-                $nbreclient = array_values(array_unique($client, SORT_REGULAR));
-                $state['count']['client']['anneeN'] = 0;
-                $state['count']['client']['anneeN1'] = 0;
-                for ($nbcli=0; $nbcli <count($nbreclient) ; $nbcli++) { 
-                    if ($nbreclient[$nbcli]['annee'] == $annee) {
-                        $state['count']['client']['anneeN']++;
+                if (isset($client)) {
+                    $nbreclient = array_values(array_unique($client, SORT_REGULAR));
+                    $state['count']['client']['anneeN'] = 0;
+                    $state['count']['client']['anneeN1'] = 0;
+                    for ($nbcli=0; $nbcli <count($nbreclient) ; $nbcli++) { 
+                        if ($nbreclient[$nbcli]['annee'] == $annee) {
+                            $state['count']['client']['anneeN']++;
+                        }
+                        if ($nbreclient[$nbcli]['annee'] == $annee -1) {
+                            $state['count']['client']['anneeN1']++;
+                        }
                     }
-                    if ($nbreclient[$nbcli]['annee'] == $annee -1) {
-                        $state['count']['client']['anneeN1']++;
-                    }
+                     // Delta client
+                     $state['count']['client']['delta'] = $this->calcul_pourcentage($state['count']['client']['anneeN1'],$state['count']['client']['anneeN'])['pourc'];
+                     $state['count']['client']['color'] = $this->calcul_pourcentage($state['count']['client']['anneeN1'],$state['count']['client']['anneeN'])['color'];
+                     $state['count']['client']['fleche'] = $this->calcul_pourcentage($state['count']['client']['anneeN1'],$state['count']['client']['anneeN'])['fleche'];      
                 }
-                 // Delta client
-                 $state['count']['client']['delta'] = $this->calcul_pourcentage($state['count']['client']['anneeN1'],$state['count']['client']['anneeN'])['pourc'];
-                 $state['count']['client']['color'] = $this->calcul_pourcentage($state['count']['client']['anneeN1'],$state['count']['client']['anneeN'])['color'];
-                 $state['count']['client']['fleche'] = $this->calcul_pourcentage($state['count']['client']['anneeN1'],$state['count']['client']['anneeN'])['fleche'];
-                
                 // Nbre de BL du secteur N et N-1 ainsi que le Delta
                 for ($ligBl=0; $ligBl <count($statesGlobal) ; $ligBl++) {
                     if ($secteur == 'LH') {
-                            $bl[$ligBl]['annee'] = $statesGlobal[$ligBl]['Annee'];
-                            $bl[$ligBl]['bl'] = $statesGlobal[$ligBl]['Bl'];
+                            $bLivraison[$ligBl]['annee'] = $statesGlobal[$ligBl]['Annee'];
+                            $bLivraison[$ligBl]['bl'] = $statesGlobal[$ligBl]['Bl'];
                     }else {
-                        if ($statesGlobal[$ligBl]['SecteurMouvement'] == $secteurRecherche) {
-                            $bl[$ligBl]['annee'] = $statesGlobal[$ligBl]['Annee'];
-                            $bl[$ligBl]['bl'] = $statesGlobal[$ligBl]['Bl'];
+                        if ($secteur == 'MA') {
+                            if ($statesGlobal[$ligBl]['SecteurMouvement'] == 'HP' && ($statesGlobal[$ligBl]['FamClient'] == 'MARAICHE' || $statesGlobal[$ligBl]['FamClient'] == 'AGRICULT' || $statesGlobal[$ligBl]['FamClient'] == 'ASSO' )) {
+                                $bLivraison[$ligBl]['annee'] = $statesGlobal[$ligBl]['Annee'];
+                                $bLivraison[$ligBl]['bl'] = $statesGlobal[$ligBl]['Bl'];
+                            }
+                        }else {
+                            if ($statesGlobal[$ligBl]['SecteurMouvement'] == $secteurRecherche) {
+                                $bLivraison[$ligBl]['annee'] = $statesGlobal[$ligBl]['Annee'];
+                                $bLivraison[$ligBl]['bl'] = $statesGlobal[$ligBl]['Bl'];
+                            }
                         } 
                     }
                 }
-                $nbreBl = array_values(array_unique($bl, SORT_REGULAR));
-                $state['count']['bl']['anneeN'] = 0;
-                $state['count']['bl']['anneeN1'] = 0;
-                for ($nbBl=0; $nbBl <count($nbreBl) ; $nbBl++) { 
-                    if ($nbreBl[$nbBl]['annee'] == $annee) {
-                        $state['count']['bl']['anneeN']++;
+                if (isset($bLivraison)) {
+                    $nbreBl = array_values(array_unique($bLivraison, SORT_REGULAR));
+                    $state['count']['bl']['anneeN'] = 0;
+                    $state['count']['bl']['anneeN1'] = 0;
+                    for ($nbBl=0; $nbBl <count($nbreBl) ; $nbBl++) { 
+                        if ($nbreBl[$nbBl]['annee'] == $annee) {
+                            $state['count']['bl']['anneeN']++;
+                        }
+                        if ($nbreBl[$nbBl]['annee'] == $annee -1) {
+                            $state['count']['bl']['anneeN1']++;
+                        }
                     }
-                    if ($nbreBl[$nbBl]['annee'] == $annee -1) {
-                        $state['count']['bl']['anneeN1']++;
-                    }
+                     // Delta BL
+                     $state['count']['bl']['delta'] = $this->calcul_pourcentage($state['count']['bl']['anneeN1'],$state['count']['bl']['anneeN'])['pourc'];
+                     $state['count']['bl']['color'] = $this->calcul_pourcentage($state['count']['bl']['anneeN1'],$state['count']['bl']['anneeN'])['color'];
+                     $state['count']['bl']['fleche'] = $this->calcul_pourcentage($state['count']['bl']['anneeN1'],$state['count']['bl']['anneeN'])['fleche'];                    
                 }
-                 // Delta BL
-                 $state['count']['bl']['delta'] = $this->calcul_pourcentage($state['count']['bl']['anneeN1'],$state['count']['bl']['anneeN'])['pourc'];
-                 $state['count']['bl']['color'] = $this->calcul_pourcentage($state['count']['bl']['anneeN1'],$state['count']['bl']['anneeN'])['color'];
-                 $state['count']['bl']['fleche'] = $this->calcul_pourcentage($state['count']['bl']['anneeN1'],$state['count']['bl']['anneeN'])['fleche'];
 
                 // Nbre de Facture du secteur N et N-1 ainsi que le Delta
                 for ($ligFacture=0; $ligFacture <count($statesGlobal) ; $ligFacture++) {
@@ -152,30 +187,36 @@ class StatesLhermitteController extends AbstractController
                             $facture[$ligFacture]['annee'] = $statesGlobal[$ligFacture]['Annee'];
                             $facture[$ligFacture]['facture'] = $statesGlobal[$ligFacture]['Facture'];
                     }else{
-                        if ($statesGlobal[$ligFacture]['SecteurMouvement'] == $secteurRecherche) {
-                            $facture[$ligFacture]['annee'] = $statesGlobal[$ligFacture]['Annee'];
-                            $facture[$ligFacture]['facture'] = $statesGlobal[$ligFacture]['Facture'];
+                        if ($secteur == 'MA') {
+                            if ($statesGlobal[$ligFacture]['SecteurMouvement'] == 'HP' && ($statesGlobal[$ligFacture]['FamClient'] == 'MARAICHE' || $statesGlobal[$ligFacture]['FamClient'] == 'AGRICULT' || $statesGlobal[$ligFacture]['FamClient'] == 'ASSO' ) ) {
+                                $facture[$ligFacture]['annee'] = $statesGlobal[$ligFacture]['Annee'];
+                                $facture[$ligFacture]['facture'] = $statesGlobal[$ligFacture]['Facture'];
+                            }
+                        }else {
+                            if ($statesGlobal[$ligFacture]['SecteurMouvement'] == $secteurRecherche) {
+                                $facture[$ligFacture]['annee'] = $statesGlobal[$ligFacture]['Annee'];
+                                $facture[$ligFacture]['facture'] = $statesGlobal[$ligFacture]['Facture'];
+                            }
                         } 
                     }
                 }
-                $nbreFact = array_values(array_unique($facture, SORT_REGULAR));
-                $state['count']['facture']['anneeN'] = 0;
-                $state['count']['facture']['anneeN1'] = 0;
-                for ($facture=0; $facture <count($nbreFact) ; $facture++) { 
-                    if ($nbreFact[$facture]['annee'] == $annee) {
-                        $state['count']['facture']['anneeN']++;
+                if (isset($facture)) {
+                    $nbreFact = array_values(array_unique($facture, SORT_REGULAR));
+                    $state['count']['facture']['anneeN'] = 0;
+                    $state['count']['facture']['anneeN1'] = 0;
+                    for ($facture=0; $facture <count($nbreFact) ; $facture++) { 
+                        if ($nbreFact[$facture]['annee'] == $annee) {
+                            $state['count']['facture']['anneeN']++;
+                        }
+                        if ($nbreFact[$facture]['annee'] == $annee -1) {
+                            $state['count']['facture']['anneeN1']++;
+                        }
                     }
-                    if ($nbreFact[$facture]['annee'] == $annee -1) {
-                        $state['count']['facture']['anneeN1']++;
-                    }
+                     // Delta Facture
+                     $state['count']['facture']['delta'] = $this->calcul_pourcentage($state['count']['facture']['anneeN1'],$state['count']['facture']['anneeN'])['pourc'];
+                     $state['count']['facture']['color'] = $this->calcul_pourcentage($state['count']['facture']['anneeN1'],$state['count']['facture']['anneeN'])['color'];
+                     $state['count']['facture']['fleche'] = $this->calcul_pourcentage($state['count']['facture']['anneeN1'],$state['count']['facture']['anneeN'])['fleche'];                    
                 }
-                 // Delta Facture
-                 $state['count']['facture']['delta'] = $this->calcul_pourcentage($state['count']['facture']['anneeN1'],$state['count']['facture']['anneeN'])['pourc'];
-                 $state['count']['facture']['color'] = $this->calcul_pourcentage($state['count']['facture']['anneeN1'],$state['count']['facture']['anneeN'])['color'];
-                 $state['count']['facture']['fleche'] = $this->calcul_pourcentage($state['count']['facture']['anneeN1'],$state['count']['facture']['anneeN'])['fleche'];
-
-                
-
 
                 // Sum du secteur Dépôt N et N-1 ainsi que le Delta
                 // Sum du secteur Direct N et N-1 ainsi que le Delta
@@ -213,6 +254,29 @@ class StatesLhermitteController extends AbstractController
                         }
                     // si states par secteur
                     }else {
+                    if ($secteur == 'MA') {
+                        if ($statesGlobal[$ligne]['Annee'] == $annee && $statesGlobal[$ligne]['SecteurMouvement'] == 'HP' && ($statesGlobal[$ligne]['FamClient'] == 'MARAICHE' || $statesGlobal[$ligne]['FamClient'] == 'AGRICULT' || $statesGlobal[$ligne]['FamClient'] == 'ASSO' )  ) 
+                        {
+                             if ($statesGlobal[$ligne]['OP'] == 'C' || $statesGlobal[$ligne]['OP'] == 'D') {
+                                 $state['depot']['montantN'] += $statesGlobal[$ligne]['MontantSign'];
+                             } 
+                             if ($statesGlobal[$ligne]['OP'] == 'CD' || $statesGlobal[$ligne]['OP'] == 'DD') {
+                                 $state['direct']['montantN'] += $statesGlobal[$ligne]['MontantSign'];
+                             }
+                             $state['secteur']['montantN'] += $statesGlobal[$ligne]['MontantSign'];  
+                        }
+                        
+                        if ($statesGlobal[$ligne]['Annee'] == $annee -1 && $statesGlobal[$ligne]['SecteurMouvement'] == 'HP' && ($statesGlobal[$ligne]['FamClient'] == 'MARAICHE' || $statesGlobal[$ligne]['FamClient'] == 'AGRICULT' || $statesGlobal[$ligne]['FamClient'] == 'ASSO' )   ) 
+                        {
+                             if ($statesGlobal[$ligne]['OP'] == 'C' || $statesGlobal[$ligne]['OP'] == 'D') {
+                                 $state['depot']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
+                             } 
+                             if ($statesGlobal[$ligne]['OP'] == 'CD' || $statesGlobal[$ligne]['OP'] == 'DD') {
+                                 $state['direct']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
+                             }
+                             $state['secteur']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
+                        }
+                    }else {
                         if ($statesGlobal[$ligne]['Annee'] == $annee && $statesGlobal[$ligne]['SecteurMouvement'] == $secteurRecherche) 
                         {
                              if ($statesGlobal[$ligne]['OP'] == 'C' || $statesGlobal[$ligne]['OP'] == 'D') {
@@ -234,6 +298,7 @@ class StatesLhermitteController extends AbstractController
                              }
                              $state['secteur']['montantN1'] += $statesGlobal[$ligne]['MontantSign'];
                         }
+                    }
                     }
                 }
                 
@@ -259,47 +324,66 @@ class StatesLhermitteController extends AbstractController
                     if ($secteur == 'LH') {
                             $commercial[$ligCom]['commercial'] = $statesGlobal[$ligCom]['Commercial'];
                     }else {
+                    if ($secteur == 'MA') {
+                        if ($statesGlobal[$ligCom]['SecteurMouvement'] == 'HP' && ($statesGlobal[$ligCom]['FamClient'] == 'MARAICHE' || $statesGlobal[$ligCom]['FamClient'] == 'AGRICULT' || $statesGlobal[$ligCom]['FamClient'] == 'ASSO' ) ) {
+                            $commercial[$ligCom]['commercial'] = $statesGlobal[$ligCom]['Commercial'];
+                        }
+                    }else {
                         if ($statesGlobal[$ligCom]['SecteurMouvement'] == $secteurRecherche) {
                             $commercial[$ligCom]['commercial'] = $statesGlobal[$ligCom]['Commercial'];
                         }
                     }
+                    }
                 }
+                if (isset($commercial)) {
                 $listeCommercial = array_values(array_unique($commercial, SORT_REGULAR));
-                // pour chaque commercial dans le tableau
-                for ($tabCommercial=0; $tabCommercial <count($listeCommercial) ; $tabCommercial++) {
-                    $ceCommercial = $listeCommercial[$tabCommercial]['commercial'];
-                    
-                    $state['commercial'][$ceCommercial] = array();
-                    $state['commercial'][$ceCommercial]['nom'] = $ceCommercial;
-                    $state['commercial'][$ceCommercial]['montantN'] = 0;
-                    $state['commercial'][$ceCommercial]['montantN1'] = 0;
-                    
-                    // pour chaque ligne des states
-                    for ($ligStatesGlobales=0; $ligStatesGlobales<count($statesGlobal) ; $ligStatesGlobales++){ 
-                        if ($statesGlobal[$ligStatesGlobales]['Commercial'] == $ceCommercial) {
-                            if ($statesGlobal[$ligStatesGlobales]['Annee'] == $annee) {
-                                $state['commercial'][$ceCommercial]['montantN'] += $statesGlobal[$ligStatesGlobales]['MontantSign'];
-                            }
-                            if ($statesGlobal[$ligStatesGlobales]['Annee'] == $annee -1) {
-                                $state['commercial'][$ceCommercial]['montantN1'] += $statesGlobal[$ligStatesGlobales]['MontantSign'];
+                    // pour chaque commercial dans le tableau
+                    for ($tabCommercial=0; $tabCommercial <count($listeCommercial) ; $tabCommercial++) {
+                        $ceCommercial = $listeCommercial[$tabCommercial]['commercial'];
+                        
+                        $state['commercial'][$ceCommercial] = array();
+                        $state['commercial'][$ceCommercial]['nom'] = $ceCommercial;
+                        $state['commercial'][$ceCommercial]['montantN'] = 0;
+                        $state['commercial'][$ceCommercial]['montantN1'] = 0;
+                        
+                        // pour chaque ligne des states
+                        for ($ligStatesGlobales=0; $ligStatesGlobales<count($statesGlobal) ; $ligStatesGlobales++){ 
+                            if ($statesGlobal[$ligStatesGlobales]['Commercial'] == $ceCommercial) {
+                                if ($secteur == 'MA') {
+                                    if ($statesGlobal[$ligStatesGlobales]['SecteurMouvement'] == 'HP' && ($statesGlobal[$ligStatesGlobales]['FamClient'] == 'MARAICHE' || $statesGlobal[$ligStatesGlobales]['FamClient'] == 'AGRICULT' || $statesGlobal[$ligStatesGlobales]['FamClient'] == 'ASSO' )) {
+                                        if ($statesGlobal[$ligStatesGlobales]['Annee'] == $annee) {
+                                            $state['commercial'][$ceCommercial]['montantN'] += $statesGlobal[$ligStatesGlobales]['MontantSign'];
+                                        }
+                                        if ($statesGlobal[$ligStatesGlobales]['Annee'] == $annee -1) {
+                                            $state['commercial'][$ceCommercial]['montantN1'] += $statesGlobal[$ligStatesGlobales]['MontantSign'];
+                                        }
+                                    }
+                                }
+                                else{
+                                    if ($statesGlobal[$ligStatesGlobales]['Annee'] == $annee) {
+                                        $state['commercial'][$ceCommercial]['montantN'] += $statesGlobal[$ligStatesGlobales]['MontantSign'];
+                                    }
+                                    if ($statesGlobal[$ligStatesGlobales]['Annee'] == $annee -1) {
+                                        $state['commercial'][$ceCommercial]['montantN1'] += $statesGlobal[$ligStatesGlobales]['MontantSign'];
+                                    }
+                                }
                             }
                         }
+                        $state['commercial'][$ceCommercial]['deltaTotalN'] = $this->calcul_pourcentage_total($state['commercial'][$ceCommercial]['montantN'], $state['secteur']['montantN']);
+                        $state['commercial'][$ceCommercial]['deltaTotalN1'] = $this->calcul_pourcentage_total($state['commercial'][$ceCommercial]['montantN1'], $state['secteur']['montantN1']);
+                        $state['commercial'][$ceCommercial]['deltaMontant'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['montantN1'],$state['commercial'][$ceCommercial]['montantN'])['pourc'];
+                        $state['commercial'][$ceCommercial]['colorMontant'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['montantN1'],$state['commercial'][$ceCommercial]['montantN'])['color'];
+                        $state['commercial'][$ceCommercial]['flecheMontant'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['montantN1'],$state['commercial'][$ceCommercial]['montantN'])['fleche']; 
                     }
-                    $state['commercial'][$ceCommercial]['deltaTotalN'] = $this->calcul_pourcentage_total($state['commercial'][$ceCommercial]['montantN'], $state['secteur']['montantN']);
-                    $state['commercial'][$ceCommercial]['deltaTotalN1'] = $this->calcul_pourcentage_total($state['commercial'][$ceCommercial]['montantN1'], $state['secteur']['montantN1']);
-                    $state['commercial'][$ceCommercial]['deltaMontant'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['montantN1'],$state['commercial'][$ceCommercial]['montantN'])['pourc'];
-                    $state['commercial'][$ceCommercial]['colorMontant'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['montantN1'],$state['commercial'][$ceCommercial]['montantN'])['color'];
-                    $state['commercial'][$ceCommercial]['flecheMontant'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['montantN1'],$state['commercial'][$ceCommercial]['montantN'])['fleche']; 
-                }
-                // Nbre de client par commercial du secteur N et N-1 ainsi que le Delta
-
-                for ($tabCommercial=0; $tabCommercial <count($listeCommercial) ; $tabCommercial++) {
-                    $ceCommercial = $listeCommercial[$tabCommercial]['commercial'];
+                    // Nbre de client par commercial du secteur N et N-1 ainsi que le Delta
                     
-                    $state['commercial'][$ceCommercial]['clientN'] = 0;
-                    $state['commercial'][$ceCommercial]['clientN1'] = 0;
-
-                    // pour chaque ligne des states
+                    for ($tabCommercial=0; $tabCommercial <count($listeCommercial) ; $tabCommercial++) {
+                        $ceCommercial = $listeCommercial[$tabCommercial]['commercial'];
+                        
+                        $state['commercial'][$ceCommercial]['clientN'] = 0;
+                        $state['commercial'][$ceCommercial]['clientN1'] = 0;
+                        
+                        // pour chaque ligne des states
                     for ($ligListeClient=0; $ligListeClient<count($nbreclient) ; $ligListeClient++){ 
                         if ($nbreclient[$ligListeClient]['commercial'] == $ceCommercial) {
                             if ($nbreclient[$ligListeClient]['annee'] == $annee) {
@@ -316,23 +400,39 @@ class StatesLhermitteController extends AbstractController
                     $state['commercial'][$ceCommercial]['colorClient'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['clientN1'],$state['commercial'][$ceCommercial]['clientN'])['color'];
                     $state['commercial'][$ceCommercial]['flecheClient'] = $this->calcul_pourcentage($state['commercial'][$ceCommercial]['clientN1'],$state['commercial'][$ceCommercial]['clientN'])['fleche']; 
                 }
+                }else{
+                    $commercial = '';
+                }
                
                 // Sum par client du Secteur N et N-1 ainsi que le Delta
                 for ($ListeClients=0; $ListeClients <count($statesGlobal) ; $ListeClients++) {
                     if ($secteur == 'LH') {
                         $clientFilter[$ListeClients]['commercial'] = $statesGlobal[$ListeClients]['Commercial'];
+                        $clientFilter[$ListeClients]['commercialId'] = $statesGlobal[$ListeClients]['CommercialId'];
                         $clientFilter[$ListeClients]['tiers'] = $statesGlobal[$ListeClients]['Tiers'];
                         $clientFilter[$ListeClients]['nom'] = $statesGlobal[$ListeClients]['Nom'];
                         $clientFilter[$ListeClients]['montantN'] = 0;
                         $clientFilter[$ListeClients]['montantN1'] = 0;
                     }else {
-                        if ($statesGlobal[$ListeClients]['SecteurMouvement'] == $secteurRecherche) {
+                    if ($secteur == 'MA') {
+                        if ($statesGlobal[$ListeClients]['SecteurMouvement'] == 'HP' && ($statesGlobal[$ListeClients]['FamClient'] == 'MARAICHE' || $statesGlobal[$ListeClients]['FamClient'] == 'AGRICULT' || $statesGlobal[$ListeClients]['FamClient'] == 'ASSO' )) {
                             $clientFilter[$ListeClients]['commercial'] = $statesGlobal[$ListeClients]['Commercial'];
+                            $clientFilter[$ListeClients]['commercialId'] = $statesGlobal[$ListeClients]['CommercialId'];
                             $clientFilter[$ListeClients]['tiers'] = $statesGlobal[$ListeClients]['Tiers'];
                             $clientFilter[$ListeClients]['nom'] = $statesGlobal[$ListeClients]['Nom'];
                             $clientFilter[$ListeClients]['montantN'] = 0;
                             $clientFilter[$ListeClients]['montantN1'] = 0;
                         }
+                    }else {
+                        if ($statesGlobal[$ListeClients]['SecteurMouvement'] == $secteurRecherche) {
+                            $clientFilter[$ListeClients]['commercial'] = $statesGlobal[$ListeClients]['Commercial'];
+                            $clientFilter[$ListeClients]['commercialId'] = $statesGlobal[$ListeClients]['CommercialId'];
+                            $clientFilter[$ListeClients]['tiers'] = $statesGlobal[$ListeClients]['Tiers'];
+                            $clientFilter[$ListeClients]['nom'] = $statesGlobal[$ListeClients]['Nom'];
+                            $clientFilter[$ListeClients]['montantN'] = 0;
+                            $clientFilter[$ListeClients]['montantN1'] = 0;
+                        }
+                    }
                     }
                 }
                 $clientFilter = array_values(array_unique($clientFilter, SORT_REGULAR));
@@ -348,12 +448,21 @@ class StatesLhermitteController extends AbstractController
                                 $clientFilter[$ligClient]['montantN'] += $statesGlobal[$statesClients]['MontantSign'];
                             }
                         }else {
+                        if ($secteur == 'MA') {
+                            if ($statesGlobal[$statesClients]['Annee'] == $annee -1 && $statesGlobal[$statesClients]['SecteurMouvement'] == 'HP'  && ($statesGlobal[$statesClients]['FamClient'] == 'MARAICHE' || $statesGlobal[$statesClients]['FamClient'] == 'AGRICULT' || $statesGlobal[$statesClients]['FamClient'] == 'ASSO' )    && $statesGlobal[$statesClients]['Tiers'] == $clientFilter[$ligClient]['tiers']) {
+                                $clientFilter[$ligClient]['montantN1'] += $statesGlobal[$statesClients]['MontantSign'];
+                            }
+                            if ($statesGlobal[$statesClients]['Annee'] == $annee && $statesGlobal[$statesClients]['SecteurMouvement'] == 'HP'    && ($statesGlobal[$statesClients]['FamClient'] == 'MARAICHE' || $statesGlobal[$statesClients]['FamClient'] == 'AGRICULT' || $statesGlobal[$statesClients]['FamClient'] == 'ASSO' )     && $statesGlobal[$statesClients]['Tiers'] == $clientFilter[$ligClient]['tiers']) {
+                                $clientFilter[$ligClient]['montantN'] += $statesGlobal[$statesClients]['MontantSign'];
+                            }
+                        }else {
                             if ($statesGlobal[$statesClients]['Annee'] == $annee -1 && $statesGlobal[$statesClients]['SecteurMouvement'] == $secteurRecherche && $statesGlobal[$statesClients]['Tiers'] == $clientFilter[$ligClient]['tiers']) {
                                 $clientFilter[$ligClient]['montantN1'] += $statesGlobal[$statesClients]['MontantSign'];
                             }
                             if ($statesGlobal[$statesClients]['Annee'] == $annee && $statesGlobal[$statesClients]['SecteurMouvement'] == $secteurRecherche && $statesGlobal[$statesClients]['Tiers'] == $clientFilter[$ligClient]['tiers']) {
                                 $clientFilter[$ligClient]['montantN'] += $statesGlobal[$statesClients]['MontantSign'];
                             }
+                        }
                         }
                     }
                     $clientFilter[$ligClient]['delta'] = $this->calcul_pourcentage($clientFilter[$ligClient]['montantN1'] ,$clientFilter[$ligClient]['montantN'] )['pourc'];
@@ -371,6 +480,9 @@ class StatesLhermitteController extends AbstractController
                 'title' => 'States Lhermitte',
                 'mois' => $mois,
                 'annee' => $annee,
+                'intervalN' => $intervalN,
+                'commercial' => $commercial,
+                'intervalN1' => $intervalN1,
                 'themeColor' => $themeColor,
                 'state' => $state,
                 'clients' => $clientFilter,

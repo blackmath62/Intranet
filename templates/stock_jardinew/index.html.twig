@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+    <h3 class="card-title"><i class="icon fas fa-info-circle pr-2"></i>Informations utiles</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+<!-- /.card-header -->
+    <div class="card-body">
+        <p>Cette liste permet de contrôler le stock présent dans Divalto, il faut la croiser avec la table achat Jardinew pour mettre à jour Prestashop</p>
+        <p>L'idée est d'avoir une liste facilement accessible et exploitable sous excel pour ne pas avoir à contrôle chaque article manuellement !</p>
+    </div>
+<!-- /.card-footer-->
+</div>
+
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <!-- /.card-header -->
+                    <div class="card-header d-flex justify-content-between ">
+                        <h3 class="card-title text-center">Stocks pour mise à jour Jardinew</h3>
+                       <a href="" class="ml-auto btn btn-secondary"><i class="fas fa-sync-alt fa-spin"></i>  Rafraichir la Page</a>
+                    </div>
+                    <div class="card-body">
+                        {% if stockProduits %}    
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Fermé ?</span></th>
+                                    <th class="text-center"><span>Fournisseurs</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>U.V</span></th>
+                                    <th class="text-center"><span>Stock</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							 
+                                                        
+                              <!-- >boucle -->
+                              {% for stockProduit in stockProduits %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockProduit.ArtFerme }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockProduit.Fournisseur }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockProduit.Ref }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockProduit.Designation }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockProduit.Sref1 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockProduit.Sref2 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockProduit.Uv }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockProduit.Stock }}</a>
+                                        </td>
+                                    </tr>
+                              {% endfor %}
+                             <!-- >boucle -->
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Fermé ?</span></th>
+                                    <th class="text-center"><span>Fournisseurs</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>U.V</span></th>
+                                    <th class="text-center"><span>Stock</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        {% else %}
+                            <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter le champs de recherche</h4>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+

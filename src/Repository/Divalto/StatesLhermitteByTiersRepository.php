@@ -29,6 +29,10 @@ class StatesLhermitteByTiersRepository extends ServiceEntityRepository
         WHEN ART.FAM_0002 IN ('EV', 'HP') THEN VRP.NOM
         WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 'DESCHODT ALEX Port: 06.20.63.40.97'
         END AS Commercial,
+        CASE
+        WHEN ART.FAM_0002 IN ('EV', 'HP') THEN VRP.TIERS
+        WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 2
+        END AS CommercialId,
         CLI.STAT_0001 AS FamClient,CLI.STAT_0002 AS SecteurClient, MOUV.TIERS AS Tiers,CLI.NOM AS Nom,
         ART.TYPEARTCOD AS TypeArticle,ART.FAM_0001 AS FamArticle,ART.FAM_0002 AS SecteurArticle, MOUV.REF AS Ref, MOUV.DES AS Designation, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,MOUV.VENUN AS UV, LTRIM(RTRIM(MOUV.OP)) AS OP,
         CASE

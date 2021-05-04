@@ -24,6 +24,10 @@
 			<link rel="stylesheet" href="{{ asset("plugins/datatables-bs4/css/dataTables.bootstrap4.min.css") }}">
 			<link rel="stylesheet" href="{{ asset("plugins/datatables-responsive/css/responsive.bootstrap4.min.css") }}">
 			<link rel="stylesheet" href="{{ asset("plugins/datatables-buttons/css/buttons.bootstrap4.min.css") }}">
+			
+			<!-- Select2 -->
+			<link rel="stylesheet" href="{{ asset("plugins/select2/css/select2.min.css") }}">
+			<link rel="stylesheet" href="{{ asset("plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css") }}">
 			<!-- Theme style -->
 			<link
 			rel="stylesheet" href="{{ asset("dist/css/adminlte.min.css") }}">
@@ -47,6 +51,8 @@
   <link rel="stylesheet" href="{{ asset("plugins/fullcalendar-daygrid/main.min.css") }}">
   <link rel="stylesheet" href="{{ asset("plugins/fullcalendar-timegrid/main.min.css") }}">
   <link rel="stylesheet" href="{{ asset("plugins/fullcalendar-bootstrap/main.min.css") }}">
+  <!-- Mon Css -->
+  <link rel="stylesheet" href="{{ asset("css/style.css") }}">
   <title>{% block title %}{% endblock %}</title>
 		{% endblock %}
 	</head>
@@ -227,6 +233,12 @@
 												<p>Contrôle Article</p>
 											</a>
 										</li>
+										<li class="nav-item">
+											<a href="{{ path('app_stock_jardinew')}}" class="nav-link">
+												<i class="nav-icon fas fa-store text-success"></i>
+												<p>Stocks Jardinew</p>
+											</a>
+										</li>
 								</ul>
 							</li>
 						{% endif %}
@@ -316,12 +328,14 @@
 											</a>
 										</li>
 									{% endif %}
+									{% if is_granted('ROLE_BOSS') %}
 									<li class="nav-item">
 										<a href="{{path('app_states_lhermitte', {'secteur' : 'LH'})}}" class="nav-link">
 											<i class="fas fa-globe nav-icon text-primary"></i>
 											<p>Lhermitte Frères</p>
 										</a>
 									</li>
+									{% endif %}
 								</ul>
 							</li>
 							{% endif %}
@@ -381,6 +395,25 @@
 											<a href="{{path('app_controle_comptabilite', {'slug' : 'C'}) }}" class="nav-link">
 												<i class="nav-icon fas fa-balance-scale-right text-success"></i>
 												<p>Contrôle Vente</p>
+											</a>
+										</li>
+								</ul>
+							</li>
+						{% endif %}
+						{% if is_granted('ROLE_ADMIN') %}
+							<li class="nav-item has-treeview">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-truck-moving"></i>
+									<p>
+										Logistique
+										<i class="fas fa-angle-left right"></i>
+									</p>
+								</a>
+								<ul class="nav nav-treeview">
+										<li class="nav-item">
+											<a href="{{path('app_fin_de_journee')}}" class="nav-link">
+												<i class="nav-icon fas fa-hourglass-end text-warning"></i>
+												<p>Fin de journée</p>
 											</a>
 										</li>
 								</ul>
@@ -586,6 +619,8 @@
 <script src="{{ asset("plugins/fullcalendar-timegrid/main.min.js")}}"></script>
 <script src="{{ asset("plugins/fullcalendar-interaction/main.min.js")}}"></script>
 <script src="{{ asset("plugins/fullcalendar-bootstrap/main.min.js")}}"></script>
+<!-- Select2 -->
+<script src="{{ asset("plugins/select2/js/select2.full.min.js")}}"></script>
 		{% block javascripts %}
 <script>
   $(function () {
@@ -604,6 +639,18 @@
     });
   });
 </script>
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2()
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    }) 
+	})
+</script>
+
 <script>$('#reservation').daterangepicker()</script>
 
 		<!-- Disparition automatique de message alert -->
