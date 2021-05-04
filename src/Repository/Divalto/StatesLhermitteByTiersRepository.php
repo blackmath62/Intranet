@@ -55,7 +55,7 @@ class StatesLhermitteByTiersRepository extends ServiceEntityRepository
 
     public function getStatesLhermitteByArticles($annee, $mois, $tiers,$sectArt1, $sectArt2,$sectCli1,$sectCli2):array
     {
-        $N1 = $annee - 1;
+        $anneeN1 = $annee - 1;
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT YEAR(fadt) AS Annee, nom, ref, des, sref1, sref2, uv,SUM(QTESIGN) AS qte, SUM(MONTANTSIGN) AS MontantSign FROM
         (SELECT MOUV.TIERS AS tiers, CLI.NOM AS nom, MOUV.REF AS ref, MOUV.DES AS des, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, 
@@ -78,7 +78,7 @@ class StatesLhermitteByTiersRepository extends ServiceEntityRepository
         GROUP BY MOUV.TIERS,CLI.NOM, MOUV.REF, MOUV.DES, MOUV.SREF1, MOUV.SREF2,MOUV.OP, MOUV.VENUN,MOUV.FADT, MOUV.FAQTE,MOUV.MONT, MOUV.REMPIEMT_0004)REPONSE
         GROUP BY YEAR(fadt),nom, ref, des, sref1, sref2, uv";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$annee,$N1,$mois,$sectArt1, $sectArt2,$sectCli1,$sectCli2, $tiers]);
+        $stmt->execute([$annee,$anneeN1,$mois,$sectArt1, $sectArt2,$sectCli1,$sectCli2, $tiers]);
         return $stmt->fetchAll();
     }
 }
