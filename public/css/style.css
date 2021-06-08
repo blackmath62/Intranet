@@ -4,13 +4,13 @@
 html { font-size: 1rem; }
 
 @media (min-width: 576px) {
-    html { font-size: 0.6rem; }
+    html { font-size: 0.5rem; }
 }
 @media (min-width: 768px) {
-    html { font-size: 0.7rem; }
+    html { font-size: 0.6rem; }
 }
 @media (min-width: 992px) {
-    html { font-size: 0.8rem; }
+    html { font-size: 0.7rem; }
 }
 @media (min-width: 1200px) {
     html { font-size: 0.9rem; }

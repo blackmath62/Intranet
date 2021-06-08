@@ -64,6 +64,7 @@ class StatesLhermitteController extends AbstractController
             $clientFilter = array();
             $intervalN = 0;
             $intervalN1 = 0;
+            $commercial = array();
 
             // tracking user page for stats
             $tracking = $request->attributes->get('_route');
