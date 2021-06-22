@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+<div class="card collapsed-card card-warning">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+    Les Statistiques par mois sont éditées le 20 du mois suivant la statistique. </br>
+    Exemple: les Statistiques du mois de janvier 2021 sont extraites le 20 février 2021. </br>
+    Les Statistiques ne respectant pas cette condition ne reprendront généralement pas toutes les factures ! </br>
+    Les différences qui peuvent apparaitres dans le temps sur le CA peuvent s'expliquer par le changement de commercial assigné a un client ou par le changement de secteur d'un article. </br>
+    L'extraction des states a été tester avec un échantillon de 13 factures contenant des remises sur 2 ans. </br>
+    Par souci de lisibilité, les pourcentages sont affichés avec 2 chiffres après la virgule, cela peut générer de petit écart lors de calculs manuel.</br>
+    Si vous détectez des incohérences, merci d'en faire part au service informatique.
+    </div>
+    <!-- /.card-footer-->
+</div>
+
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header d-flex justify-content-between ">
+                        <h3 class="card-title text-center">States Lhermitte {{ titre }}   
+                        {% if state %}
+                            {{ intervalN1}} et du {{ intervalN}}
+                        {% endif %}
+                        </h3>
+                        {{ form_start(dateDebutFinForm, { 'attr' : { 'class' : 'ml-auto' }} ) }}
+                            <div class='d-flex'>
+                                <div class="p-1 mt-2">
+                                    Recherche par tranche de date : 
+                                </div> 
+                                <div class="p-1">
+                                    {{ form_widget(dateDebutFinForm.dateFin, {'id' : 'reservation',  'attr' : { 'class' : 'form-control float-right' }} ) }}
+                                </div>
+                                <div class="p-1">
+                                    {{ form_row(dateDebutFinForm.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }} ) }}
+                                </div>
+                            </div>
+                        {{ form_end(dateDebutFinForm) }}
+                    </div>
+                    {% if stateEntete %}
+
+                     <div class="row">
+            {% if stateEntete %}
+             
+            {% for commercial in stateEntete.commercial %}
+            <div class="card-body col-lg-3 col-6 pt-2">
+                <div class="callout callout-{{ themeColor }}">
+                  
+              <!-- /.col -->
+                  <div class="">
+                        <div class="mr-auto border-bottom"><h5>{{ commercial.nom }}</h5></div>
+                    <div class="text-right">
+                        <span class="description-percentage text-{{ commercial.colorMontant }}"><i class="fas fa-caret-{{ commercial.flecheMontant }} pr-1"></i>{{commercial.deltaMontant|number_format(2) }} %</span>
+                    </div>
+                    <div class="border-bottom pt-1">
+                        <div class="progress-group">
+                        CA {{ intervalN1 }}
+                        <span class="float-right"><b>{{commercial.montantN1|number_format(2)}} €</b>/ {{state.secteur.montantN1|number_format(2)}} </span>
+                        <div class="progress progress-sm">
+                            <div class="progress-bar bg-primary" style="width: {{commercial.deltaTotalN1}}%"></div>
+                        </div>
+                        </div>
+                        <!-- /.progress-group -->
+
+                        <div class="progress-group">
+                        CA {{ intervalN }}
+                        <span class="float-right"><b>{{commercial.montantN|number_format(2)}} €</b>/ {{state.secteur.montantN|number_format(2)}} </span>
+                        <div class="progress progress-sm">
+                            <div class="progress-bar bg-danger" style="width: {{commercial.deltaTotalN}}%"></div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="text-right pt-1">
+                        <span class="description-percentage text-{{ commercial.colorClient }}"><i class="fas fa-caret-{{ commercial.flecheClient }} pr-1"></i>{{commercial.deltaClient|number_format(2) }} %</span>
+                    </div>
+                    <!-- /.progress-group -->
+                    <div class="progress-group">
+                      <span class="progress-text">Nbe Clients {{ intervalN1 }}</span>
+                      <span class="float-right"><b>{{commercial.clientN1 }}</b>/ {{ state.count.client.anneeN1 }} </span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar bg-success" style="width: {{ commercial.deltaTotalClientN1}}%"></div>
+                      </div>
+                    </div>
+
+                    <!-- /.progress-group -->
+                    <div class="progress-group">Nbe Clients {{ intervalN }}
+                      <span class="float-right"><b>{{ commercial.clientN }}</b>/ {{ state.count.client.anneeN }} </span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar bg-warning" style="width: {{commercial.deltaTotalClientN}}%"></div>
+                      </div>
+                    </div>
+                    <!-- /.progress-group -->
+                  </div>
+                  <!-- /.col -->
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+                <div>
+                    <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Pas de donnée pour cette tranche de date</h4>
+                </div>  
+            {% endif %}
+          </div>
+
+</div>
+
+                    
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

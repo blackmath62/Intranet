@@ -33,8 +33,8 @@ class StatesLhermitteByTiersRepository extends ServiceEntityRepository
         WHEN ART.FAM_0002 IN ('EV', 'HP') THEN VRP.TIERS
         WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 2
         END AS CommercialId,
-        CLI.STAT_0001 AS FamClient,CLI.STAT_0002 AS SecteurClient, MOUV.TIERS AS Tiers,CLI.NOM AS Nom,
-        ART.TYPEARTCOD AS TypeArticle,ART.FAM_0001 AS FamArticle,ART.FAM_0002 AS SecteurArticle, MOUV.REF AS Ref, MOUV.DES AS Designation, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,MOUV.VENUN AS UV, LTRIM(RTRIM(MOUV.OP)) AS OP,
+        CLI.STAT_0002 AS SecteurClient, MOUV.TIERS AS Tiers,CLI.NOM AS Nom,
+        ART.FAM_0002 AS SecteurArticle, MOUV.REF AS Ref, MOUV.DES AS Designation, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,MOUV.VENUN AS UV, LTRIM(RTRIM(MOUV.OP)) AS OP,
         CASE
         WHEN MOUV.OP IN('C','CD') THEN MOUV.FAQTE
         WHEN MOUV.OP IN('DD','D') THEN -1 * MOUV.FAQTE
@@ -47,6 +47,96 @@ class StatesLhermitteByTiersRepository extends ServiceEntityRepository
         INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
         INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
         LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
+        WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ))";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1]);
+        return $stmt->fetchAll();
+    }
+    public function getStatesLhermitteTotauxEntete($client, $article, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1):array
+    {
+        
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT Annee AS Annee,SecteurMouvement AS SecteurMouvement, Commercial AS Commercial,COUNT(DISTINCT Bl) AS NbBl,COUNT(DISTINCT Facture) AS NbFacture,COUNT(DISTINCT Tiers) AS NbTiers,
+        SUM(MontantSignDepot) As CADepot,  SUM(MontantSignDirect) As CADirect,  SUM(MontantSign) As CATotal
+        FROM(	SELECT YEAR(MOUV.FADT) AS Annee,MOUV.BLNO AS Bl,MOUV.FANO AS Facture,
+                CASE
+                WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'EV' THEN 'EV'
+                WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'HP' THEN 'HP'
+                WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 'ME'
+                ELSE 'WTF !'
+                END AS SecteurMouvement,
+                CASE
+                WHEN ART.FAM_0002 IN ('EV', 'HP') THEN VRP.NOM
+                WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 'DESCHODT ALEX Port: 06.20.63.40.97'
+                END AS Commercial,
+                CASE
+                WHEN ART.FAM_0002 IN ('EV', 'HP') THEN VRP.TIERS
+                WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 2
+                END AS CommercialId,
+                MOUV.TIERS AS Tiers,CLI.NOM AS Nom,
+                MOUV.REF AS Ref, MOUV.DES AS Designation, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,MOUV.VENUN AS UV, LTRIM(RTRIM(MOUV.OP)) AS OP,
+                CASE
+                WHEN MOUV.OP IN('C','CD') THEN MOUV.FAQTE
+                WHEN MOUV.OP IN('DD','D') THEN -1 * MOUV.FAQTE
+                END AS QteSign,
+                CASE
+                WHEN MOUV.OP IN('C') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('D') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                END AS MontantSignDepot,
+                CASE
+                WHEN MOUV.OP IN('CD') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                END AS MontantSignDirect,
+                CASE
+                WHEN MOUV.OP IN('C','CD') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                END AS MontantSign
+                FROM MOUV
+                LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+                LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
+                LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
+                WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP')
+                AND CLI.STAT_0002 IN ( $client ) AND ART.FAM_0002 IN ( $article ) 
+                AND ((MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? )))reponse
+        GROUP BY Commercial,SecteurMouvement, Annee
+        ORDER BY Commercial, Annee";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1]);
+        return $stmt->fetchAll();
+    }
+
+    public function getStatesLhermitteTest($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT YEAR(MOUV.FADT) AS Annee,MOUV.BLNO AS Bl,MOUV.FANO AS Facture,
+                CASE
+                WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'EV' THEN 'EV'
+                WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'HP' THEN 'HP'
+                WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 'ME'
+                ELSE 'WTF !'
+                END AS SecteurMouvement,
+                CASE
+                WHEN ART.FAM_0002 IN ('EV', 'HP') THEN VRP.NOM
+                WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 'DESCHODT ALEX Port: 06.20.63.40.97'
+                END AS Commercial,
+                CASE
+                WHEN ART.FAM_0002 IN ('EV', 'HP') THEN VRP.TIERS
+                WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 2
+                END AS CommercialId,
+                MOUV.TIERS AS Tiers,CLI.NOM AS Nom,
+                MOUV.REF AS Ref, MOUV.DES AS Designation, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,MOUV.VENUN AS UV, LTRIM(RTRIM(MOUV.OP)) AS OP,
+                CASE
+                WHEN MOUV.OP IN('C','CD') THEN MOUV.FAQTE
+                WHEN MOUV.OP IN('DD','D') THEN -1 * MOUV.FAQTE
+                END AS QteSign,
+                CASE
+                WHEN MOUV.OP IN('C','CD') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                END AS MontantSign
+                FROM MOUV
+                LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+                LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
+                LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
         WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ))";
         $stmt = $conn->prepare($sql);
         $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1]);
