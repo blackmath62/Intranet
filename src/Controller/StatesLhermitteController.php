@@ -6,6 +6,7 @@ use DateTime;
 use App\Form\YearMonthType;
 use App\Form\DateDebutFinType;
 use PhpParser\Node\Stmt\Else_;
+use App\Form\DateSecteurDebutFinType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Repository\Divalto\MouvRepository;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Repository\Divalto\StatesLhermitteByTiersRepository;
+use DoctrineExtensions\Query\Mysql\Year;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,133 +31,281 @@ class StatesLhermitteController extends AbstractController
      */    
     public function statesTest(StatesLhermitteByTiersRepository $repo, Request $request):Response
     {
-            $secteurRecherche = 'EV';
-            $form = $this->createForm(DateDebutFinType::class);
+            $form = $this->createForm(DateSecteurDebutFinType::class);
             $form->handleRequest($request);
             // initialisation de mes variables
-            $annee = '';
-            $mois ='';
-            $state = array();
-            $clientFilter = array();
+            $metier= '';
+            $dateDebutEtFin = '';
             $intervalN = 0;
             $intervalN1 = 0;
             $commercial = array();
-            $themeColor = 'success'; 
-            $titre = ' Espaces Verts';
-            $statesGlobal = '';
-            $statesEntete = array();
+            $stateCommerciaux = array();
+            $statesBandeau = array();
+            $statesParClient = array();
+            $statesMetiers= array();
+            $themeColor = '';
+            $titre = '';
+            $dateDebutN = "";
+            $dateFinN = "";
+            $dateDebutN1 = "";
+            $dateFinN1 = "";
 
             // tracking user page for stats
             $tracking = $request->attributes->get('_route');
             $this->setTracking($tracking);
             
             if($form->isSubmitted() && $form->isValid()){
-                $dateDebutEtFin = $form->getData()['dateFin'];
-            
-                $dateDebut = substr($dateDebutEtFin, 0 , -13);
-                $anneeDebut = substr($dateDebut, 6, 4);
-                $moisDebut = substr($dateDebut, 0, 2);
-                $jourDebut = substr($dateDebut, 3, 2);
-           
-                $dateFin = substr($dateDebutEtFin, 13 , 10);
-                $anneeFin = substr($dateFin, 6, 4);
-                $moisFin = substr($dateFin, 0, 2);
-                $jourFin = substr($dateFin, 3, 2);
+                
+                // Rechercher les paramétres du métiers
+                $metier = $form->getData()['Metiers'];
+                $secteur = $this->metierParameter($metier);
+                $metiers = $secteur['metiers'];
+                $themeColor = $secteur['themeColor'];
+                $titre = $secteur['titre'];
 
-                $dateDebutN = $anneeDebut . '-' . $moisDebut . '-' . $jourDebut;
-                $dateDebutN1 = $anneeDebut -1 . '-' . $moisDebut . '-' . $jourDebut;
+                $dateDebutEtFin = $form->getData()['Periode'];
+                //dd($dateDebutEtFin);
+                $dateParam = $this->dateParameter($form->getData()['Periode']);
+                $intervalN = $dateParam['intervalN'];
+                $intervalN1 = $dateParam['intervalN1'];
+                $dateDebutN = $dateParam['dateDebutN'];
+                $dateDebutN1 = $dateParam['dateDebutN1'];
+                $dateFinN = $dateParam['dateFinN'];
+                $dateFinN1 = $dateParam['dateFinN1'];
 
-                $dateFinN = $anneeFin . '-' . $moisFin . '-' . $jourFin;
-                $dateFinN1 = $anneeFin -1 . '-' . $moisFin . '-' . $jourFin;
+                // Juste une connerie de formatage de date ..... à voir
 
-                $yearStartN1 = $anneeDebut - 1 ;
-                $yearEndN1 = $anneeFin - 1 ;
 
-                $intervalN = $jourDebut . '-' . $moisDebut . '-' . $anneeDebut . ' au ' . $jourFin . '-' . $moisFin . '-' . $anneeFin;
-                $intervalN1 = $jourDebut . '-' . $moisDebut . '-' . $yearStartN1 . ' au ' . $jourFin . '-' . $moisFin . '-' . $yearEndN1;
+                // Début Bandeau Détaillé avec Nombre de facture, Bl, CA Dépôt, CA Direct etc ...
+                $statesTotauxParSecteur = $repo->getStatesLhermitteTotauxParSecteur($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
+                
+                $statesBandeau['CATotalBandeauN1'] = 0;
+                $statesBandeau['CADepotBandeauN1'] = 0;
+                $statesBandeau['CADirectBandeauN1'] = 0;
+                $statesBandeau['ClientBandeauN1'] = 0;
+                $statesBandeau['BlBandeauN1'] = 0;
+                $statesBandeau['FactureBandeauN1'] = 0;
+                $statesBandeau['CATotalBandeauN'] = 0;
+                $statesBandeau['CADepotBandeauN'] = 0;
+                $statesBandeau['CADirectBandeauN'] = 0;
+                $statesBandeau['ClientBandeauN'] = 0;
+                $statesBandeau['BlBandeauN'] = 0;
+                $statesBandeau['FactureBandeauN'] = 0;
+                
+                for ($ligStateDuMetier=0; $ligStateDuMetier <count($statesTotauxParSecteur) ; $ligStateDuMetier++) { 
+                    if ($statesTotauxParSecteur[$ligStateDuMetier]['Periode'] == 'PeriodeN1' ) {
+                        $statesBandeau['CATotalBandeauN1'] += $statesTotauxParSecteur[$ligStateDuMetier]['CATotal'] ;
+                        $statesBandeau['CADepotBandeauN1'] += $statesTotauxParSecteur[$ligStateDuMetier]['CADepot'] ;
+                        $statesBandeau['CADirectBandeauN1'] += $statesTotauxParSecteur[$ligStateDuMetier]['CADirect'] ;
+                        $statesBandeau['ClientBandeauN1'] += $statesTotauxParSecteur[$ligStateDuMetier]['NbTiers'] ;
+                        $statesBandeau['BlBandeauN1'] += $statesTotauxParSecteur[$ligStateDuMetier]['NbBl'] ;
+                        $statesBandeau['FactureBandeauN1'] += $statesTotauxParSecteur[$ligStateDuMetier]['NbFacture'] ;
+                    }elseif ($statesTotauxParSecteur[$ligStateDuMetier]['Periode'] == 'PeriodeN') {
+                        $statesBandeau['CATotalBandeauN'] += $statesTotauxParSecteur[$ligStateDuMetier]['CATotal'] ;
+                        $statesBandeau['CADepotBandeauN'] += $statesTotauxParSecteur[$ligStateDuMetier]['CADepot'] ;
+                        $statesBandeau['CADirectBandeauN'] += $statesTotauxParSecteur[$ligStateDuMetier]['CADirect'] ;
+                        $statesBandeau['ClientBandeauN'] += $statesTotauxParSecteur[$ligStateDuMetier]['NbTiers'] ;
+                        $statesBandeau['BlBandeauN'] += $statesTotauxParSecteur[$ligStateDuMetier]['NbBl'] ;
+                        $statesBandeau['FactureBandeauN'] += $statesTotauxParSecteur[$ligStateDuMetier]['NbFacture'] ;
+                    }
+                }
+                // Pourcentage couleur et fléche du bandeau, il est possible de faire des beaux objet là, à réfléchir et améliorer !
+                // Sur le Total
+                $statesBandeau['DeltaTotalBandeau'] = $this->calcul_pourcentage($statesBandeau['CATotalBandeauN1'],$statesBandeau['CATotalBandeauN'])['pourc'];
+                $statesBandeau['ColorTotalBandeau'] = $this->calcul_pourcentage($statesBandeau['CATotalBandeauN1'],$statesBandeau['CATotalBandeauN'])['color'];
+                $statesBandeau['FlecheTotalBandeau'] = $this->calcul_pourcentage($statesBandeau['CATotalBandeauN1'],$statesBandeau['CATotalBandeauN'])['fleche'];
 
-                $client = '\'EV\'';
-                $article = '\'EV\', \'HP\'';
-                $statesEntete = $repo->getStatesLhermitteTotauxEntete($client, $article, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
+                // Sur le Direct
+                $statesBandeau['DeltaDirectBandeau'] = $this->calcul_pourcentage($statesBandeau['CADirectBandeauN1'],$statesBandeau['CADirectBandeauN'])['pourc'];
+                $statesBandeau['ColorDirectBandeau'] = $this->calcul_pourcentage($statesBandeau['CADirectBandeauN1'],$statesBandeau['CADirectBandeauN'])['color'];
+                $statesBandeau['FlecheDirectBandeau'] = $this->calcul_pourcentage($statesBandeau['CADirectBandeauN1'],$statesBandeau['CADirectBandeauN'])['fleche'];
 
-                for ($ligCom=0; $ligCom <count($statesEntete) ; $ligCom++) {
-                            $commercial[$ligCom]['Commercial'] = $statesEntete[$ligCom]['Commercial'];
+                // Sur le Depot
+                $statesBandeau['DeltaDepotBandeau'] = $this->calcul_pourcentage($statesBandeau['CADepotBandeauN1'],$statesBandeau['CADepotBandeauN'])['pourc'];
+                $statesBandeau['ColorDepotBandeau'] = $this->calcul_pourcentage($statesBandeau['CADepotBandeauN1'],$statesBandeau['CADepotBandeauN'])['color'];
+                $statesBandeau['FlecheDepotBandeau'] = $this->calcul_pourcentage($statesBandeau['CADepotBandeauN1'],$statesBandeau['CADepotBandeauN'])['fleche'];
+
+                // Sur le Client
+                $statesBandeau['DeltaClientBandeau'] = $this->calcul_pourcentage($statesBandeau['ClientBandeauN1'],$statesBandeau['ClientBandeauN'])['pourc'];
+                $statesBandeau['ColorClientBandeau'] = $this->calcul_pourcentage($statesBandeau['ClientBandeauN1'],$statesBandeau['ClientBandeauN'])['color'];
+                $statesBandeau['FlecheClientBandeau'] = $this->calcul_pourcentage($statesBandeau['ClientBandeauN1'],$statesBandeau['ClientBandeauN'])['fleche'];
+
+                // Sur le Bl
+                $statesBandeau['DeltaBlBandeau'] = $this->calcul_pourcentage($statesBandeau['BlBandeauN1'],$statesBandeau['BlBandeauN'])['pourc'];
+                $statesBandeau['ColorBlBandeau'] = $this->calcul_pourcentage($statesBandeau['BlBandeauN1'],$statesBandeau['BlBandeauN'])['color'];
+                $statesBandeau['FlecheBlBandeau'] = $this->calcul_pourcentage($statesBandeau['BlBandeauN1'],$statesBandeau['BlBandeauN'])['fleche'];
+
+                // Sur le Facture
+                $statesBandeau['DeltaFactureBandeau'] = $this->calcul_pourcentage($statesBandeau['FactureBandeauN1'],$statesBandeau['FactureBandeauN'])['pourc'];
+                $statesBandeau['ColorFactureBandeau'] = $this->calcul_pourcentage($statesBandeau['FactureBandeauN1'],$statesBandeau['FactureBandeauN'])['color'];
+                $statesBandeau['FlecheFactureBandeau'] = $this->calcul_pourcentage($statesBandeau['FactureBandeauN1'],$statesBandeau['FactureBandeauN'])['fleche'];
+
+                // Fin Bandeau Détaillé avec Nombre de facture, Bl, CA Dépôt, CA Direct etc ...
+                
+                // Début States par commerciaux
+                $statesCommerciaux = $repo->getStatesLhermitteTotauxParCommerciaux($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
+
+                for ($ligCom=0; $ligCom <count($statesCommerciaux) ; $ligCom++) {
+                            $commercial[$ligCom]['Commercial'] = $statesCommerciaux[$ligCom]['Commercial'];
                 }
                 if (isset($commercial)) {
                 $listeCommerciaux = array_values(array_unique($commercial, SORT_REGULAR)); // faire une liste de commerciaux sans doublon
                     // pour chaque commercial dans le tableau
-                   for ($ligCommercial=0; $ligCommercial <count($listeCommerciaux) ; $ligCommercial++) {  
+
+                    
+                    for ($ligCommercial=0; $ligCommercial <count($listeCommerciaux) ; $ligCommercial++) {  
                         $Commercial = $listeCommerciaux[$ligCommercial]['Commercial'];                    
                         $stateCommerciaux[$ligCommercial]['Commercial'] = $listeCommerciaux[$ligCommercial]['Commercial'];
-                        $stateCommerciaux[$ligCommercial]['AnneeN1'] = $anneeDebut - 1;
-                        $stateCommerciaux[$ligCommercial]['AnneeN'] = $anneeDebut;
-                        for ($ligStateEntete=0; $ligStateEntete <count($statesEntete) ; $ligStateEntete++) { 
-                            if ($statesEntete[$ligStateEntete]['Annee'] == $stateCommerciaux[$ligCommercial]['AnneeN'] && $statesEntete[$ligStateEntete]['Commercial'] == $Commercial) {
-                                $stateCommerciaux[$ligCommercial]['CATotalN'] = $statesEntete[$ligStateEntete]['CATotal'];
-                                $stateCommerciaux[$ligCommercial]['CADepotN'] = $statesEntete[$ligStateEntete]['CADepot'];
-                                $stateCommerciaux[$ligCommercial]['CADirectN'] = $statesEntete[$ligStateEntete]['CADirect'];
-                                $stateCommerciaux[$ligCommercial]['ClientN'] = $statesEntete[$ligStateEntete]['NbTiers'];
-                                $stateCommerciaux[$ligCommercial]['FactureN'] = $statesEntete[$ligStateEntete]['NbFacture'];
-                                $stateCommerciaux[$ligCommercial]['BlN'] = $statesEntete[$ligStateEntete]['NbBl'];
-                            }elseif ($statesEntete[$ligStateEntete]['Annee'] == $stateCommerciaux[$ligCommercial]['AnneeN1'] && $statesEntete[$ligStateEntete]['Commercial'] == $Commercial) {
-                                $stateCommerciaux[$ligCommercial]['CATotalN1'] = $statesEntete[$ligStateEntete]['CATotal'];
-                                $stateCommerciaux[$ligCommercial]['CADepotN1'] = $statesEntete[$ligStateEntete]['CADepot'];
-                                $stateCommerciaux[$ligCommercial]['CADirectN1'] = $statesEntete[$ligStateEntete]['CADirect'];
-                                $stateCommerciaux[$ligCommercial]['ClientN1'] = $statesEntete[$ligStateEntete]['NbTiers'];
-                                $stateCommerciaux[$ligCommercial]['FactureN1'] = $statesEntete[$ligStateEntete]['NbFacture'];
-                                $stateCommerciaux[$ligCommercial]['BlN1'] = $statesEntete[$ligStateEntete]['NbBl'];
+                        //$stateCommerciaux[$ligCommercial]['Periode'] = '';
+                        $stateCommerciaux[$ligCommercial]['CATotalN'] = 0;
+                        $stateCommerciaux[$ligCommercial]['CADepotN'] = 0;
+                        $stateCommerciaux[$ligCommercial]['CADirectN'] = 0;
+                        $stateCommerciaux[$ligCommercial]['ClientN'] = 0;
+                        $stateCommerciaux[$ligCommercial]['FactureN'] = 0;
+                        $stateCommerciaux[$ligCommercial]['BlN'] = 0;
+                        $stateCommerciaux[$ligCommercial]['CATotalN1'] = 0;
+                        $stateCommerciaux[$ligCommercial]['CADepotN1'] = 0;
+                        $stateCommerciaux[$ligCommercial]['CADirectN1'] = 0;
+                        $stateCommerciaux[$ligCommercial]['ClientN1'] = 0;
+                        $stateCommerciaux[$ligCommercial]['FactureN1'] = 0;
+                        $stateCommerciaux[$ligCommercial]['BlN1'] = 0;
+                        for ($ligStateEntete=0; $ligStateEntete <count($statesCommerciaux) ; $ligStateEntete++) { 
+                            if ($statesCommerciaux[$ligStateEntete]['Periode'] == 'PeriodeN' && $statesCommerciaux[$ligStateEntete]['Commercial'] == $Commercial) {
+                                $stateCommerciaux[$ligCommercial]['CATotalN'] += $statesCommerciaux[$ligStateEntete]['CATotal'];
+                                $stateCommerciaux[$ligCommercial]['CADepotN'] += $statesCommerciaux[$ligStateEntete]['CADepot'];
+                                $stateCommerciaux[$ligCommercial]['CADirectN'] += $statesCommerciaux[$ligStateEntete]['CADirect'];
+                                $stateCommerciaux[$ligCommercial]['ClientN'] += $statesCommerciaux[$ligStateEntete]['NbTiers'];
+                                $stateCommerciaux[$ligCommercial]['FactureN'] += $statesCommerciaux[$ligStateEntete]['NbFacture'];
+                                $stateCommerciaux[$ligCommercial]['BlN'] += $statesCommerciaux[$ligStateEntete]['NbBl'];
+                            }elseif ($statesCommerciaux[$ligStateEntete]['Periode'] == 'PeriodeN1' && $statesCommerciaux[$ligStateEntete]['Commercial'] == $Commercial) {
+                                $stateCommerciaux[$ligCommercial]['CATotalN1'] += $statesCommerciaux[$ligStateEntete]['CATotal'];
+                                $stateCommerciaux[$ligCommercial]['CADepotN1'] += $statesCommerciaux[$ligStateEntete]['CADepot'];
+                                $stateCommerciaux[$ligCommercial]['CADirectN1'] += $statesCommerciaux[$ligStateEntete]['CADirect'];
+                                $stateCommerciaux[$ligCommercial]['ClientN1'] += $statesCommerciaux[$ligStateEntete]['NbTiers'];
+                                $stateCommerciaux[$ligCommercial]['FactureN1'] += $statesCommerciaux[$ligStateEntete]['NbFacture'];
+                                $stateCommerciaux[$ligCommercial]['BlN1'] += $statesCommerciaux[$ligStateEntete]['NbBl'];
                             }
+                            //dd(array_keys($statesCommerciaux[$ligCommercial]['Annee']));
                         }
                         
                         $stateCommerciaux[$ligCommercial]['DeltaTotal'] = $this->calcul_pourcentage($stateCommerciaux[$ligCommercial]['CATotalN1'],$stateCommerciaux[$ligCommercial]['CATotalN'])['pourc'];
                         $stateCommerciaux[$ligCommercial]['ColorTotal'] = $this->calcul_pourcentage($stateCommerciaux[$ligCommercial]['CATotalN1'],$stateCommerciaux[$ligCommercial]['CATotalN'])['color'];
                         $stateCommerciaux[$ligCommercial]['FlecheTotal'] = $this->calcul_pourcentage($stateCommerciaux[$ligCommercial]['CATotalN1'],$stateCommerciaux[$ligCommercial]['CATotalN'])['fleche'];
-
+                        
                         $stateCommerciaux[$ligCommercial]['DeltaClient'] = $this->calcul_pourcentage($stateCommerciaux[$ligCommercial]['ClientN1'],$stateCommerciaux[$ligCommercial]['ClientN'])['pourc'];
                         $stateCommerciaux[$ligCommercial]['ColorClient'] = $this->calcul_pourcentage($stateCommerciaux[$ligCommercial]['ClientN1'],$stateCommerciaux[$ligCommercial]['ClientN'])['color'];
                         $stateCommerciaux[$ligCommercial]['FlecheClient'] = $this->calcul_pourcentage($stateCommerciaux[$ligCommercial]['ClientN1'],$stateCommerciaux[$ligCommercial]['ClientN'])['fleche'];
                         
+                        
                         // je dois récupérer via une requête SQL les states Globales pour les comparer avec les states par commerciaux, la requête semble préte, à contrôler
 
-                        $stateCommerciaux[$ligCommercial]['deltaParTotalN'] = $this->calcul_pourcentage_total($stateCommerciaux[$ligCommercial]['CATotalN1'], $state['secteur']['montantN']);
-                        $stateCommerciaux[$ligCommercial]['deltaParTotalN1'] = $this->calcul_pourcentage_total($stateCommerciaux[$ligCommercial]['CATotalN'], $state['secteur']['montantN1']);
+                                $stateCommerciaux[$ligCommercial]['deltaParTotalN1'] = $this->calcul_pourcentage_total($stateCommerciaux[$ligCommercial]['CATotalN1'], $statesBandeau['CATotalBandeauN1']);
+                                $stateCommerciaux[$ligCommercial]['deltaParClientN1'] = $this->calcul_pourcentage_total($stateCommerciaux[$ligCommercial]['ClientN1'], $statesBandeau['ClientBandeauN1']);
+                                $stateCommerciaux[$ligCommercial]['deltaParTotalN'] = $this->calcul_pourcentage_total($stateCommerciaux[$ligCommercial]['CATotalN'], $statesBandeau['CATotalBandeauN']);
+                                $stateCommerciaux[$ligCommercial]['deltaParClientN'] = $this->calcul_pourcentage_total($stateCommerciaux[$ligCommercial]['ClientN'], $statesBandeau['ClientBandeauN']);
                         
-                    }
-                    //dd($stateCommerciaux);
-                    //dd($stateEntete);
+                    }   
+                    // Fin States par commerciaux
+
+                    // Début States par client    
+                        $statesParClient = $repo->getStatesLhermitteDetailClient($metiers,$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1); 
+                        
+                        for ($ligClient=0; $ligClient <count($statesParClient) ; $ligClient++) { 
+                            $statesParClient[$ligClient]['DeltaDetailClient'] = $this->calcul_pourcentage($statesParClient[$ligClient]['CATotalN1'],$statesParClient[$ligClient]['CATotalN'])['pourc'];
+                            $statesParClient[$ligClient]['MontDetailClient'] = $this->calcul_pourcentage($statesParClient[$ligClient]['CATotalN1'],$statesParClient[$ligClient]['CATotalN'])['mont'];
+                            $statesParClient[$ligClient]['ColorDetailClient'] = $this->calcul_pourcentage($statesParClient[$ligClient]['CATotalN1'],$statesParClient[$ligClient]['CATotalN'])['color'];
+                            $statesParClient[$ligClient]['FlecheDetailClient'] = $this->calcul_pourcentage($statesParClient[$ligClient]['CATotalN1'],$statesParClient[$ligClient]['CATotalN'])['fleche'];
+                        }
+                     
+                    // Fin States par client  
+
+                    // Début States par Métier
+                        $statesMetiers = $repo->getStatesLhermitteMetier($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
+                        
+                        for ($ligMetier=0; $ligMetier <count($statesMetiers) ; $ligMetier++) { 
+                            $statesMetiers[$ligMetier]['DeltaMetier'] = $this->calcul_pourcentage($statesMetiers[$ligMetier]['CATotalN1'],$statesMetiers[$ligMetier]['CATotalN'])['pourc'];
+                            $statesMetiers[$ligMetier]['ColorMetier'] = $this->calcul_pourcentage($statesMetiers[$ligMetier]['CATotalN1'],$statesMetiers[$ligMetier]['CATotalN'])['color'];
+                            $statesMetiers[$ligMetier]['FlecheMetier'] = $this->calcul_pourcentage($statesMetiers[$ligMetier]['CATotalN1'],$statesMetiers[$ligMetier]['CATotalN'])['fleche'];
+                        }
+                    // Fin States par Métier
                 }
-
-
-
-
-
-
-                $statesGlobal = $repo->getStatesLhermitteTest($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
-                //dd($listeCommercial);
-                $annee = $anneeDebut;
+                        
             }    
         return $this->render('states_lhermitte/indexTest.html.twig', [
             'title' => 'States Lhermitte',
-            'mois' => $mois,
-            'annee' => $annee,
             'intervalN' => $intervalN,
+            'dateDebutN' => $dateDebutN,
+            'dateFinN' => $dateFinN,
+            'dateDebutN1' => $dateDebutN1,
+            'dateFinN1' => $dateFinN1,
+            'metier' => $metier,
+            'dateDebutEtFin' => $dateDebutEtFin,
             'intervalN1' => $intervalN1,
             'themeColor' => $themeColor,
-            'stateCommerciaux' => $stateCommerciaux,          
-            'state' => $state,
-            'statesGlobal' => $statesGlobal,
-            'clients' => $clientFilter,
+            'statesMetiers' => $statesMetiers,
+            'stateCommerciaux' => $stateCommerciaux,
+            'statesBandeau' => $statesBandeau,
+            'statesParClient' => $statesParClient,          
             'titre' => $titre,
             'dateDebutFinForm' => $form->createView()
             ]);
     }
-    // à voir si ce type de requête est utile
-    function parametreMetier($FamArticle)
-        { 
-            if ($FamArticle == "ME" || $FamArticle == "MO" ) {
-                # code...
-            }
+
+    public function metierParameter(string $metier){
+        
+        if ($metier == 'EV') {
+            $secteur['metiers'] = '\'EV\'';
+            $secteur['themeColor'] = 'success'; 
+            $secteur['titre'] = ' Espaces Verts';
+        }elseif ($metier == 'HP') {
+            $secteur['metiers'] = '\'MA\', \'HP\'';
+            $secteur['themeColor'] = 'danger'; 
+            $secteur['titre'] = ' Horti - Pépi';
+        }elseif ($metier == 'MA') {
+            $secteur['metiers'] = '\'MA\'';
+            $secteur['themeColor'] = 'orange'; 
+            $secteur['titre'] = ' Maraîchage';
+        }elseif ($metier == 'ME') {
+            $secteur['metiers'] = '\'ME\'';
+            $secteur['themeColor'] = 'warning'; 
+            $secteur['titre'] = ' Matériel / Équipement';
+        }elseif ($metier == 'Tous') {
+            $secteur['metiers'] = '\'EV\', \'HP\', \'ME\', \'MA\'';
+            $secteur['themeColor'] = 'info'; 
+            $secteur['titre'] = ' Tous les métiers';
         }
+        return $secteur;
+    }
+
+    public function dateParameter($Param){
+        
+        // faire un objet avec la gestion des intervals de date
+        $dateDebut = substr($Param, 0 , -13);
+        $anneeDebut = substr($dateDebut, 6, 4);
+        $moisDebut = substr($dateDebut, 0, 2);
+        $jourDebut = substr($dateDebut, 3, 2);
+   
+        $dateFin = substr($Param, 13 , 10);
+        $anneeFin = substr($dateFin, 6, 4);
+        $moisFin = substr($dateFin, 0, 2);
+        $jourFin = substr($dateFin, 3, 2);
+
+        // Calculer correctement le comparatif de date 
+        $intervalAnnee = ($anneeFin - $anneeDebut) + 1;
+        $yearStartN1 = $anneeDebut - $intervalAnnee ;
+        $yearEndN1 = $anneeFin - $intervalAnnee ;
+
+        $dateParam['dateDebutN'] = $anneeDebut . '-' . $moisDebut . '-' . $jourDebut;
+        $dateParam['dateDebutN1'] = $anneeDebut -1 . '-' . $moisDebut . '-' . $jourDebut;
+        $dateParam['dateFinN'] = $anneeFin . '-' . $moisFin . '-' . $jourFin;
+        $dateParam['dateFinN1'] = $anneeFin -1 . '-' . $moisFin . '-' . $jourFin;
+        $dateParam['intervalN'] = $jourDebut . '-' . $moisDebut . '-' . $anneeDebut . ' - ' . $jourFin . '-' . $moisFin . '-' . $anneeFin;
+        $dateParam['intervalN1'] = $jourDebut . '-' . $moisDebut . '-' . $yearStartN1 . ' - ' . $jourFin . '-' . $moisFin . '-' . $yearEndN1;
+
+        return $dateParam;
+    }
+
+
 
     /**
      * @Route("/Lhermitte/states/{secteur}", name="app_states_lhermitte")
@@ -642,6 +792,7 @@ class StatesLhermitteController extends AbstractController
             
             if ($nombreN1 <> 0 && $nombreN <> 0) {
                 $resultat['pourc'] = (($nombreN/$nombreN1) -1)*100;
+                $resultat['mont'] = $nombreN - $nombreN1;
                 if ($resultat['pourc'] < 0) {
                     $resultat['color'] = 'danger';
                     $resultat['fleche'] = 'down';
@@ -657,16 +808,19 @@ class StatesLhermitteController extends AbstractController
                 }
             }
             else{
+                    $resultat['mont'] = 0;    
                     $resultat['pourc'] = 0;
                     $resultat['color'] = 'warning';
                     $resultat['fleche'] = 'left';
             }
             if (($nombreN1 == 0 && $nombreN > 0) || ($nombreN1 < 0 && $nombreN == 0)) {
+                    $resultat['mont'] = $nombreN;
                     $resultat['pourc'] = 100;
                     $resultat['color'] = 'success';
                     $resultat['fleche'] = 'up';
             }
             if (($nombreN1 == 0 && $nombreN < 0) || ($nombreN1 > 0 && $nombreN == 0)) {
+                    $resultat['mont'] = -1 * $nombreN1;    
                     $resultat['pourc'] = -100;
                     $resultat['color'] = 'danger';
                     $resultat['fleche'] = 'down';
@@ -748,62 +902,31 @@ class StatesLhermitteController extends AbstractController
     
 
     /**
-     * @Route("/Lhermitte/DetailArticle/{tiers}/{annee}/{mois}", name="app_lhermitte_ev_par_article")
+     * @Route("/Lhermitte/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}", name="app_lhermitte_par_article")
      */
-    public function statesByArticleEv(StatesLhermitteByTiersRepository $repo, Request $request): Response
+    public function statesByArticle(string $tiers, string $metier, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, StatesLhermitteByTiersRepository $repo, Request $request): Response
     {
-        $annee = $request->get('annee');
-        $mois = $request->get('mois');
-        $tiers = $request->get('tiers');
-        $sectArt1 = 'EV';
-        $sectArt2 = 'HP';
-        $sectCli1 = 'EV';
-        $sectCli2 = 'EV';
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
         
-        //$annee = '$form->getData()['year']';
-        //$mois = '$form->getData()['month']';
-        $statesByClientEv = $repo->getStatesLhermitteByArticles($annee, $mois, $tiers,$sectArt1, $sectArt2,$sectCli1,$sectCli2);
-        $nom = $statesByClientEv[0]['nom']; 
-        // on retire les doublons dans les clients
-         for($i=0;$i<count($statesByClientEv);$i++){
-             $tableau = $statesByClientEv[$i];    
-             $tab[$i] = $tableau['des'];
-            }
-            $tab = array_values(array_unique($tab)); // rendre une liste de tiers Unique
-            // boucler pour leurs assigner le nom, commercial, pays, Devise les montants des 2 années, on reconstruit le tableau
-            
-            for($j=0;$j<count($tab);$j++){
-                $result[$j]['des'] = $tab[$j];
-                $key = array_search($tab[$j], array_column($statesByClientEv, 'des'));
-                dd(array_column($statesByClientEv, 'des'));
-                
-                $result[$j]['ref'] = $statesByClientEv[$key]['ref'];
-                $result[$j]['sref1'] = $statesByClientEv[$key]['sref1'];
-                $result[$j]['sref2'] = $statesByClientEv[$key]['sref2'];
-                $result[$j]['uv'] = $statesByClientEv[$key]['uv'];
-                $result[$j]['Delta'] = '';
-                $result[$j]['AnneeN'] ='';
-                $result[$j]['AnneeN1'] = '';
-                for ($p=0; $p <count($statesByClientEv) ; $p++) { 
-                    if ($statesByClientEv[$p]['des'] == $tab[$j] && $statesByClientEv[$p]['Annee'] == $annee ) {
-                        $result[$j]['AnneeN'] = $statesByClientEv[$p]['MontantSign']; // Année demandée
-                    }                            
-                    if ($statesByClientEv[$p]['des'] == $tab[$j] && $statesByClientEv[$p]['Annee'] == $annee -1) {
-                        $result[$j]['AnneeN1'] = $statesByClientEv[$p]['MontantSign']; // Année N-1
-                    }
-                    if ($result[$j]['AnneeN'] <> 0 && $result[$j]['AnneeN1'] <> 0) {
-                        $result[$j]['Delta'] = (($result[$j]['AnneeN']/$result[$j]['AnneeN1']-1)*100);
-                    }
-                }
+        $tiers = $tiers; 
+        // Rechercher les paramétres du métiers
+        $secteur = $this->metierParameter($metier);
+        $metiers = $secteur['metiers'];
 
+        // Début Bandeau Détaillé avec Nombre de facture, Bl, CA Dépôt, CA Direct etc ...
+        $statesClientParArticle = $repo->getStatesLhermitteByArticles($tiers,$metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
+        for ($ligArticle=0; $ligArticle <count($statesClientParArticle) ; $ligArticle++) { 
+            $statesClientParArticle[$ligArticle]['Delta'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['pourc'];
+            $statesClientParArticle[$ligArticle]['Mont'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['mont'];
+            $statesClientParArticle[$ligArticle]['Color'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['color'];
+            $statesClientParArticle[$ligArticle]['Fleche'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['fleche'];          
         }
+        return $this->render('states_lhermitte/statesByArticle.html.twig', [
+            'title' => 'States par Articles',
+            'statesClientParArticle' => $statesClientParArticle
 
-        return $this->render('states_lhermitte/statesByArticleEv.html.twig', [
-            'title' => 'Ev par Articles',
-            'states' => $result,
-            'annee' => $annee,
-            'mois' => $mois,
-            'nom' => $nom
         ]);
     }
     

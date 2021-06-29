@@ -6,7 +6,7 @@
             <div class="col-md-12">
                 <div class="card card-dark">
                     <div class="card-header d-flex justify-content-between ">
-                        <h3 class="card-title text-center">Détail des ventes du client {{ nom }} =>  {{ mois }} - {{ annee -1}} / {{ annee }}</h3>
+                        <h3 class="card-title text-center">Détail des ventes du client {{ statesClientParArticle[0].Nom }}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
@@ -18,48 +18,50 @@
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>U.V</span></th>
-                                    {% if annee %}
-                                    <th class="text-center"><span>{{ mois }} - {{ annee -1 }}</span></th>
-                                    {% else %}
-                                    <th class="text-center"><span>Année N-1</span></th>  
-                                    {% endif %}
-
+                                    <th class="text-center"><span>Qte N - 1</span></th>
+                                    <th class="text-center"><span>N - 1</span></th>  
                                     <th class="text-center"><span>Delta %</span></th>
-
-                                    {% if annee %}
-                                    <th class="text-center"><span>{{ mois }} - {{ annee }}</span></th>
-                                    {% else %}
-                                    <th class="text-center"><span>Annee Selectionnée</span></th>
-                                    {% endif %}
+                                    <th class="text-center"><span>Delta €</span></th>
+                                    <th class="text-center"><span>Qte N</span></th>
+                                    <th class="text-center"><span>N</span></th>
                                 </tr>
                             </thead>
                             <tbody>
 							
-                                {% for state in states %}
-                                    <tr id="<?= $id ?>">
+                                {% for state in statesClientParArticle %}
+                                    <tr>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">{{ state.ref}}</a>
+                                            <a class="text-dark">{{ state.Ref}}</a>
+                                        </td>
+                                        <td class="text-left">
+                                            <a class="text-dark">{{ state.Designation }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">{{ state.des }}</a>
+                                            <a class="text-dark">{{ state.Sref1 }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">{{ state.sref1 }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ state.sref2 }}</a>
+                                            <a class="text-dark">{{ state.Sref2 }}</a>
                                         </td>
                                          <td class="text-center">
-                                            <a class="text-center text-dark">{{ state.uv }}</a>
+                                            <a class="text-dark">{{ state.Uv }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">{{ state.AnneeN1|number_format(2) }} €</a>
+                                            <a class="text-dark">{{ state.QteTotalN1|number_format(2) }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">{{ state.Delta|number_format(2) }} %</a>
+                                            <a class="text-dark">{{ state.CATotalN1 }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">{{ state.AnneeN|number_format(2) }} €</a>
+                                            <a class="description-percentage text-{{ state.Color }}"><i class="fas fa-caret-{{ state.Fleche }}"></i>{{ state.Delta|number_format(2) }} %</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="description-percentage text-{{ state.Color }}">{{ state.Mont }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ state.QteTotalN|number_format(2) }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ state.CATotalN }}</a>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -67,24 +69,17 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                  <th class="text-center"><span>Ref</span></th>
+                                    <th class="text-center"><span>Ref</span></th>
                                     <th class="text-center"><span>Désignation</span></th>
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>U.V</span></th>
-                                    {% if annee %}
-                                    <th class="text-center"><span>{{ mois }} - {{ annee -1 }}</span></th>
-                                    {% else %}
-                                    <th class="text-center"><span>Année N-1</span></th>  
-                                    {% endif %}
-
+                                    <th class="text-center"><span>Qte N - 1</span></th>
+                                    <th class="text-center"><span>N - 1</span></th>  
                                     <th class="text-center"><span>Delta %</span></th>
-
-                                    {% if annee %}
-                                    <th class="text-center"><span>{{ mois }} - {{ annee }}</span></th>
-                                    {% else %}
-                                    <th class="text-center"><span>Annee Selectionnée</span></th>
-                                    {% endif %}
+                                    <th class="text-center"><span>Delta €</span></th>
+                                    <th class="text-center"><span>Qte N</span></th>
+                                    <th class="text-center"><span>N</span></th>
                                 </tr>
                             </tfoot>
                         </table>
