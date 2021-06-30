@@ -72,7 +72,7 @@ class StatesLhermitteController extends AbstractController
                 $dateDebutN1 = $dateParam['dateDebutN1'];
                 $dateFinN = $dateParam['dateFinN'];
                 $dateFinN1 = $dateParam['dateFinN1'];
-
+                
                 // Juste une connerie de formatage de date ..... à voir
 
 
@@ -296,9 +296,9 @@ class StatesLhermitteController extends AbstractController
         $yearEndN1 = $anneeFin - $intervalAnnee ;
 
         $dateParam['dateDebutN'] = $anneeDebut . '-' . $moisDebut . '-' . $jourDebut;
-        $dateParam['dateDebutN1'] = $anneeDebut -1 . '-' . $moisDebut . '-' . $jourDebut;
+        $dateParam['dateDebutN1'] = $yearStartN1 . '-' . $moisDebut . '-' . $jourDebut;
         $dateParam['dateFinN'] = $anneeFin . '-' . $moisFin . '-' . $jourFin;
-        $dateParam['dateFinN1'] = $anneeFin -1 . '-' . $moisFin . '-' . $jourFin;
+        $dateParam['dateFinN1'] = $yearEndN1 . '-' . $moisFin . '-' . $jourFin;
         $dateParam['intervalN'] = $jourDebut . '-' . $moisDebut . '-' . $anneeDebut . ' - ' . $jourFin . '-' . $moisFin . '-' . $anneeFin;
         $dateParam['intervalN1'] = $jourDebut . '-' . $moisDebut . '-' . $yearStartN1 . ' - ' . $jourFin . '-' . $moisFin . '-' . $yearEndN1;
 

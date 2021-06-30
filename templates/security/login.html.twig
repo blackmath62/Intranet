@@ -22,14 +22,21 @@
 						</div>
 					</div>
 					<div class="input-group mb-3">
-						<input type="password" name='password' class="form-control form-control-user" id="exampleInputPassword" placeholder="Mot de passe" required>
+						<input type="password" name='password' class="form-control form-control-user" id="password" placeholder="Mot de passe" required>
 						<div class="input-group-append">
 							<div class="input-group-text">
 								<span class="fas fa-lock"></span>
 							</div>
 						</div>
 					</div>
-
+					<div class="col-12">
+						<div class="icheck-secondary">
+							<input type="checkbox" id="viewPassword" name='viewPassword' onclick="myFunction()">
+							<label for="viewPassword">
+								Voir le Mot de passe 
+							</label>
+						</div>
+					</div>
 					<div class="col-12">
 						<div class="icheck-secondary">
 							<input type="checkbox" id="remember" name='_remember_me'>
@@ -57,4 +64,15 @@
 			<!-- /.login-card-body -->
 		</div>
 	</section>
+
+<script>
+	function myFunction() {
+		var x = document.getElementById("password");
+		if (x.type === "password") {
+		x.type = "text";
+		} else {
+		x.type = "password";
+		}
+	} 
+</script>
 {% endblock %}
