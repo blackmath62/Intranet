@@ -13,6 +13,8 @@
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
+                                    <th class="text-center"><span>Mois</span></th>
+                                    <th class="text-center"><span>Famille Produit</span></th>
                                     <th class="text-center"><span>Ref</span></th>
                                     <th class="text-center"><span>Désignation</span></th>
                                     <th class="text-center"><span>Sref1</span></th>
@@ -30,6 +32,12 @@
 							
                                 {% for state in statesClientParArticle %}
                                     <tr>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ state.Mois}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ state.FamArticle}}</a>
+                                        </td>
                                         <td class="text-center">
                                             <a class="text-dark">{{ state.Ref}}</a>
                                         </td>
@@ -69,6 +77,8 @@
                             </tbody>
                             <tfoot>
                                 <tr>
+                                    <th class="text-center"><span>Mois</span></th>
+                                    <th class="text-center"><span>Famille Produit</span></th>
                                     <th class="text-center"><span>Ref</span></th>
                                     <th class="text-center"><span>Désignation</span></th>
                                     <th class="text-center"><span>Sref1</span></th>

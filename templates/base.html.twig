@@ -276,8 +276,6 @@
 
 							<li class="nav-header">Lhermitte</li>
 						{% if is_granted('ROLE_LHERMITTE') %}
-
-
 							{% if is_granted('ROLE_EV') or is_granted('ROLE_HP') or is_granted('ROLE_MA') or is_granted('ROLE_ME') %}
 							<li class="nav-item has-treeview">
 								<a href="" class="nav-link">
@@ -295,48 +293,11 @@
 												<p>States Excels globales</p>
 											</a>
 										</li>
-										<li class="nav-item">
-											<a href="{{path('app_states_lhermitte_test')}}" class="nav-link">
-												<i class="nav-icon fas fa-file-excel text-info"></i>
-												<p>States Lhermitte Test</p>
-											</a>
-										</li>
 									{% endif %}
-									{% if is_granted('ROLE_EV') %}
-										<li class="nav-item">
-											<a href="{{path('app_states_lhermitte', {'secteur' : 'EV'})}}" class="nav-link">
-												<i class="nav-icon fas fa-tree text-success"></i>
-												<p>Espaces Verts</p>
-											</a>
-										</li>
-									{% endif %}
-									{% if is_granted('ROLE_HP') %}
-										<li class="nav-item">
-											<a href="{{path('app_states_lhermitte', {'secteur' : 'HP'})}}" class="nav-link">
-												<i class="nav-icon fas fa-seedling text-danger"></i>
-												<p>Horticulteurs / Pépiniériste</p>
-											</a>
-										</li>
-									{% endif %}
-									{% if is_granted('ROLE_MA') %}
-										<li class="nav-item">
-											<a href="{{path('app_states_lhermitte', {'secteur' : 'MA'})}}" class="nav-link">
-												<i class="fas fa-carrot nav-icon text-orange"></i>
-												<p>Maraîchage</p>
-											</a>
-										</li>
-									{% endif %}
-									{% if is_granted('ROLE_ME') %}
-										<li class="nav-item">
-											<a href="{{path('app_states_lhermitte', {'secteur' : 'ME'})}}" class="nav-link">
-												<i class="fas fa-rainbow nav-icon text-warning"></i>
-												<p>Matériel équipement</p>
-											</a>
-										</li>
-									{% endif %}
-									{% if is_granted('ROLE_BOSS') %}
+									
+									{% if is_granted('ROLE_LHERMITTE') %}
 									<li class="nav-item">
-										<a href="{{path('app_states_lhermitte', {'secteur' : 'LH'})}}" class="nav-link">
+										<a href="{{ path('app_states_lhermitte') }}" class="nav-link">
 											<i class="fas fa-globe nav-icon text-primary"></i>
 											<p>Lhermitte Frères</p>
 										</a>

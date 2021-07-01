@@ -27,9 +27,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class StatesLhermitteController extends AbstractController
 {
     /**
-     * @Route("/Lhermitte/statesTest", name="app_states_lhermitte_test")
+     * @Route("/Lhermitte/states", name="app_states_lhermitte")
      */    
-    public function statesTest(StatesLhermitteByTiersRepository $repo, Request $request):Response
+    public function states(StatesLhermitteByTiersRepository $repo, Request $request):Response
     {
             $form = $this->createForm(DateSecteurDebutFinType::class);
             $form->handleRequest($request);
@@ -72,10 +72,17 @@ class StatesLhermitteController extends AbstractController
                 $dateDebutN1 = $dateParam['dateDebutN1'];
                 $dateFinN = $dateParam['dateFinN'];
                 $dateFinN1 = $dateParam['dateFinN1'];
+                //$interval = date_diff(date_create($dateDebutN), date_create($dateFinN));
+                $dateControle = date_create($dateDebutN);
+                $dateControle = date_modify($dateControle, '+1 Year');
+                $dateFin = date_create($dateFinN);
+
+                // Bloquer l'extraction sur une année compléte maximum
+                if ($dateFin >= $dateControle ) {
+                    $this->addFlash('danger', 'L\'extraction est limité à une année compléte');
+                    return $this->redirectToRoute($tracking, ['secteur' => $secteur]);
+                }
                 
-                // Juste une connerie de formatage de date ..... à voir
-
-
                 // Début Bandeau Détaillé avec Nombre de facture, Bl, CA Dépôt, CA Direct etc ...
                 $statesTotauxParSecteur = $repo->getStatesLhermitteTotauxParSecteur($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
                 
@@ -251,6 +258,14 @@ class StatesLhermitteController extends AbstractController
             ]);
     }
 
+    function cal_days_in_year($year){
+        $days=0; 
+        for($month=1;$month<=12;$month++){ 
+            $days = $days + cal_days_in_month(CAL_GREGORIAN,$month,$year);
+         }
+     return $days;
+    }
+
     public function metierParameter(string $metier){
         
         if ($metier == 'EV') {
@@ -308,9 +323,9 @@ class StatesLhermitteController extends AbstractController
 
 
     /**
-     * @Route("/Lhermitte/states/{secteur}", name="app_states_lhermitte")
+     * @Route("/Lhermitte/states/archive/inutiliser", name="app_states_lhermitte_archive")
      */    
-    public function states(string $secteur, StatesLhermitteByTiersRepository $repo, Request $request):Response
+    public function statesInutiliser(string $secteur, StatesLhermitteByTiersRepository $repo, Request $request):Response
     {
                     
         $secteur = $request->attributes->get('secteur');

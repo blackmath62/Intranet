@@ -260,8 +260,8 @@ class StatesLhermitteByTiersRepository extends ServiceEntityRepository
     {
         
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT MAX(Nom) AS Nom,Ref AS Ref, MAX(Designation) AS Designation, Sref1 AS Sref1, Sref2 AS Sref2, Uv AS Uv, SUM(QteSignN1) As QteTotalN1, SUM(MontantSignN1) As CATotalN1, SUM(QteSignN) As QteTotalN,  SUM(MontantSignN) As CATotalN
-        FROM(	SELECT MOUV.TIERS AS Tiers,CLI.NOM AS Nom,MOUV.REF AS Ref, MOUV.DES AS Designation, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2, ART.VENUN AS Uv, MONTH(MOUV.FADT) AS Mois, LTRIM(RTRIM(MOUV.OP)) AS OP,
+        $sql = "SELECT MAX(Nom) AS Nom ,Mois AS Mois ,MAX(FamArticle) AS FamArticle, Ref AS Ref, MAX(Designation) AS Designation, Sref1 AS Sref1, Sref2 AS Sref2, Uv AS Uv, SUM(QteSignN1) As QteTotalN1, SUM(MontantSignN1) As CATotalN1, SUM(QteSignN) As QteTotalN,  SUM(MontantSignN) As CATotalN
+        FROM(	SELECT MOUV.TIERS AS Tiers,CLI.NOM AS Nom, ART.FAM_0001 AS FamArticle, MOUV.REF AS Ref, MOUV.DES AS Designation, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2, ART.VENUN AS Uv, MONTH(MOUV.FADT) AS Mois, LTRIM(RTRIM(MOUV.OP)) AS OP,
                 CASE
                 WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'EV' THEN 'EV'
                 WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'HP' AND CLI.STAT_0001 NOT IN ('ASSO', 'MARAICHE', 'AGRICULT') THEN 'HP'
@@ -301,8 +301,8 @@ class StatesLhermitteByTiersRepository extends ServiceEntityRepository
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB' )
                 AND ((MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? )))reponse
                 WHERE SecteurMouvement IN( $metiers )
-        GROUP BY Ref, Sref1, Sref2,Uv
-        ORDER BY Ref";
+        GROUP BY Mois, Ref, Sref1, Sref2,Uv
+        ORDER BY Mois, Ref";
         $stmt = $conn->prepare($sql);
         $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1]);
         return $stmt->fetchAll();
