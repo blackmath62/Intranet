@@ -5,16 +5,15 @@
 {% endblock %}
 
 {% block body %}
-	<section
-		class="text-center">
+	
 		<!-- /.login-logo -->
 		<div class="card">
 			<div class="card-body login-card-body">
 				<p class="login-box-msg">Veuillez renseigner votre identifiant et mot de passe de connexion</p>
 
-				<form class="user" action='{{path('app_login')}}' method='POST'>
+				<form class="" action='{{path('app_login')}}' method='POST'>
 					<div class="input-group mb-3">
-						<input type="email" value="{{ app.session.get(constant('App\\Controller\\SecurityController::LAST_EMAIL')) }}" name='email' class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Veuillez entrer votre adresse mail..." required autofocus>
+						<input type="email" value="{{ app.session.get(constant('App\\Controller\\SecurityController::LAST_EMAIL')) }}" name='email' class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Veuillez entrer votre adresse mail..." required autofocus>
 						<div class="input-group-append">
 							<div class="input-group-text">
 								<span class="fas fa-envelope"></span>
@@ -22,7 +21,7 @@
 						</div>
 					</div>
 					<div class="input-group mb-3">
-						<input type="password" name='password' class="form-control form-control-user" id="password" placeholder="Mot de passe" required>
+						<input type="password" name='password' class="form-control" id="password" placeholder="Mot de passe" required>
 						<div class="input-group-append">
 							<div class="input-group-text">
 								<span class="fas fa-lock"></span>
@@ -63,7 +62,6 @@
 			</div>
 			<!-- /.login-card-body -->
 		</div>
-	</section>
 
 <script>
 	function myFunction() {

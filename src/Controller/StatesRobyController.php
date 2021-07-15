@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class StatesRobyController extends AbstractController
 {
     /**
-     * @Route("/Roby/states", name="app_states_roby")
+     * @Route("/Roby/states/inutile", name="app_states_roby_inutile")
      */
     public function index(StatesRobyByTiersRepository $repo, Request $request)
     {

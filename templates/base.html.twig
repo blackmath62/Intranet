@@ -3,8 +3,8 @@
 	<head>
 
 		{% block stylesheets %}
-			<meta
-			charset="utf-8">
+			<meta charset="utf-8">
+  			<meta name="viewport" content="width=device-width, initial-scale=1">
 			<!-- Font Awesome -->
 			<link
 			rel="stylesheet" href="{{ asset("plugins/fontawesome-free/css/all.min.css") }}">
@@ -276,6 +276,7 @@
 
 							<li class="nav-header">Lhermitte</li>
 						{% if is_granted('ROLE_LHERMITTE') %}
+
 							{% if is_granted('ROLE_EV') or is_granted('ROLE_HP') or is_granted('ROLE_MA') or is_granted('ROLE_ME') %}
 							<li class="nav-item has-treeview">
 								<a href="" class="nav-link">
@@ -302,6 +303,15 @@
 											<p>Lhermitte Frères</p>
 										</a>
 									</li>
+									{% endif %}
+
+									{% if is_granted('ROLE_ADMIN') %}
+										<li class="nav-item">
+											<a href="{{path('app_decisionnel')}}" class="nav-link">
+												<i class="nav-icon far fa-chart-bar text-warning"></i>
+												<p>Décisionnel</p>
+											</a>
+										</li>
 									{% endif %}
 								</ul>
 							</li>

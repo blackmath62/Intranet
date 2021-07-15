@@ -2,6 +2,128 @@
 {% block title %}{{ title }}{% endblock %}
 {% block body %}
 
+
+{% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR')  ) or ( is_granted('ROLE_COMMERCIAL') and app.user.commercial == app.request.attributes.get('commercialId') ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') ) %}
+
+<div class="card-body row">
+
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="callout callout-{{ themeColor }} shadow">
+
+        <!-- /.col -->
+        <div class="">
+            <div class="mr-auto border-bottom text-center"><h5>{{ statesClientParArticle[0].Nom }}</h5></div>
+            <div class="border-bottom pt-1">
+                <div class="progress-group">
+                    CA N -2
+                    <span class="float-right"><b>{{ CATotalClient.CATotalN2 }} / {{ statesTotauxCommercial[0].CATotalN2 }} </b></span>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-danger" style="width:{{ CATotalClient.deltaTotalClientComN2}}%"></div>
+                    </div>
+                </div>
+                <div class="text-right pt-1">
+                            <span class="description-percentage text-{{ CATotalClient.ColorN2 }}"><i class="fas fa-arrow-{{ CATotalClient.FlecheN2 }} pr-1"></i>{{ CATotalClient.DeltaN2|number_format(2) }} %</span>
+                        </div>
+                <div class="progress-group">
+                    CA N -1
+                    <span class="float-right"><b>{{ CATotalClient.CATotalN1 }} / {{ statesTotauxCommercial[0].CATotalN1 }}</b></span>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-warning" style="width:{{ CATotalClient.deltaTotalClientComN1}}%"></div>
+                    </div>
+                </div>
+                <!-- /.progress-group -->
+                <div class="text-right pt-1">
+                            <span class="description-percentage text-{{ CATotalClient.ColorN1 }}"><i class="fas fa-arrow-{{ CATotalClient.FlecheN1 }} pr-1"></i>{{ CATotalClient.DeltaN1|number_format(2) }} %</span>
+                        </div>
+                <div class="progress-group">
+                    CA N
+                    <span class="float-right"><b>{{ CATotalClient.CATotalN }} / {{ statesTotauxCommercial[0].CATotalN }}</b></span>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-info" style="width:{{ CATotalClient.deltaTotalClientComN}}%"></div>
+                    </div>
+                </div>
+            </div>          
+        </div>
+        <!-- /.col -->
+        </div>
+    </div>
+
+
+
+    <!--Total par Annee et par famille de produit --> 
+    <div class="col-md-9 col-sm-6 col-12"> 
+        <div class="card">
+            <div class="card-header">
+            <h3 class="card-title">CA par famille de produit</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body text-center d-flex justify-content-around flex-wrap">
+            {% for FamilleArticle in FamilleArticles %}
+            <div>
+            <div>      
+                {% if FamilleArticle.FamArticle == "REMISE" %}
+                <div class="progress vertical">
+                    <div class="pt-2">N -2</div>
+                    <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                        aria-valuemax="100" style="height: {{ (FamilleArticle.deltaTotalFamilleArtN2)|abs }}%">
+                    <span class="">{{ FamilleArticle.deltaTotalFamilleArtN2 }}%</span>
+                    </div>
+                </div>
+                <div class="progress vertical">
+                <div class="pt-2">N -1</div>
+                    <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                        aria-valuemax="100" style="height: {{ (FamilleArticle.deltaTotalFamilleArtN1)|abs }}%">
+                    <span class="">{{ FamilleArticle.deltaTotalFamilleArtN1 }}%</span>
+                    </div>
+                </div>
+                <div class="progress vertical">
+                <div class="pt-2">N</div>
+                    <div class="progress-bar bg-info" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                        aria-valuemax="100" style="height: {{ (FamilleArticle.deltaTotalFamilleArtN)|abs }}%">
+                    <span class="">{{ FamilleArticle.deltaTotalFamilleArtN }}%</span>
+                    </div>
+                </div>
+                {% else %} 
+                <div class="progress vertical">
+                    <div class="pt-2">N -2</div>
+                    <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                        aria-valuemax="100" style="height: {{ FamilleArticle.deltaTotalFamilleArtN2 }}%">
+                    <span class="">{{ FamilleArticle.deltaTotalFamilleArtN2|number_format(2) }}%</span>
+                    </div>
+                </div>
+                <div class="progress vertical">
+                <div class="pt-2">N -1</div>
+                    <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                        aria-valuemax="100" style="height: {{ FamilleArticle.deltaTotalFamilleArtN1 }}%">
+                    <span class="">{{ FamilleArticle.deltaTotalFamilleArtN1|number_format(2) }}%</span>
+                    </div>
+                </div>
+                <div class="progress vertical">
+                <div class="pt-2">N</div>
+                    <div class="progress-bar bg-info" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                        aria-valuemax="100" style="height: {{ FamilleArticle.deltaTotalFamilleArtN }}%">
+                    <span class="">{{ FamilleArticle.deltaTotalFamilleArtN|number_format(2) }}%</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+                <span>{{ FamilleArticle.FamArticle }}</span>
+            </div>
+            {% endfor %}
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+
+
+    </div>
+
+
+</div>
+
+
+
+
 <div class="row">
             <div class="col-md-12">
                 <div class="card card-dark">
@@ -20,6 +142,10 @@
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>U.V</span></th>
+                                    <th class="text-center"><span>Qte N - 2</span></th>
+                                    <th class="text-center"><span>N - 2</span></th>
+                                    <th class="text-center"><span>Delta %</span></th>
+                                    <th class="text-center"><span>Delta €</span></th> 
                                     <th class="text-center"><span>Qte N - 1</span></th>
                                     <th class="text-center"><span>N - 1</span></th>  
                                     <th class="text-center"><span>Delta %</span></th>
@@ -54,16 +180,28 @@
                                             <a class="text-dark">{{ state.Uv }}</a>
                                         </td>
                                         <td class="text-center">
+                                            <a class="text-dark">{{ state.QteTotalN2|number_format(2) }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ state.CATotalN2 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="description-percentage text-{{ state.ColorN2 }}"><i class="fas fa-arrow-{{ state.FlecheN2 }}"></i>{{ state.DeltaN2|number_format(2) }} %</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="description-percentage text-{{ state.ColorN2 }}">{{ state.MontN2 }}</a>
+                                        </td>
+                                        <td class="text-center">
                                             <a class="text-dark">{{ state.QteTotalN1|number_format(2) }}</a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark">{{ state.CATotalN1 }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="description-percentage text-{{ state.Color }}"><i class="fas fa-caret-{{ state.Fleche }}"></i>{{ state.Delta|number_format(2) }} %</a>
+                                            <a class="description-percentage text-{{ state.ColorN1 }}"><i class="fas fa-arrow-{{ state.FlecheN1 }}"></i>{{ state.DeltaN1|number_format(2) }} %</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="description-percentage text-{{ state.Color }}">{{ state.Mont }}</a>
+                                            <a class="description-percentage text-{{ state.ColorN1 }}">{{ state.MontN1 }}</a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark">{{ state.QteTotalN|number_format(2) }}</a>
@@ -84,6 +222,10 @@
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>U.V</span></th>
+                                    <th class="text-center"><span>Qte N - 2</span></th>
+                                    <th class="text-center"><span>N - 2</span></th>
+                                    <th class="text-center"><span>Delta %</span></th>
+                                    <th class="text-center"><span>Delta €</span></th> 
                                     <th class="text-center"><span>Qte N - 1</span></th>
                                     <th class="text-center"><span>N - 1</span></th>  
                                     <th class="text-center"><span>Delta %</span></th>
@@ -97,5 +239,5 @@
                 </div>
             </div>
         </div>
-
+{% endif %}
 {% endblock %}

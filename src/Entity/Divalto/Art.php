@@ -2,12 +2,16 @@
 
 namespace App\Entity\Divalto;
 
+use App\Entity\Main\Decisionnel;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\ArtRepository;
+use App\Repository\Divalto\ArtRepository;
 
 /**
  * Art
- * @ORM\Entity
+ * 
+ * @ORM\Entity(repositoryClass=ArtRepository::class)
  * @ORM\Table(name="ART", indexes={@ORM\Index(name="INDEX_A", columns={"DOS", "REF", "ART_ID"}), @ORM\Index(name="INDEX_A_MINI", columns={"CE9", "DOS", "REF", "ART_ID"}), @ORM\Index(name="INDEX_B", columns={"DOS", "DESABR", "ART_ID"}), @ORM\Index(name="INDEX_I", columns={"DOS", "EAN", "ART_ID"}), @ORM\Index(name="INDEX_J", columns={"DOS", "FAM_0001", "REF", "ART_ID"}), @ORM\Index(name="INDEX_K", columns={"DOS", "FAM_0002", "REF", "ART_ID"}), @ORM\Index(name="INDEX_L", columns={"DOS", "FAM_0003", "REF", "ART_ID"}), @ORM\Index(name="INDEX_M", columns={"DOS", "TIERS", "REF", "ART_ID"}), @ORM\Index(name="INDEX_Z", columns={"DOS", "PRODNAT", "REF", "ART_ID"})})
  */
 class Art
@@ -1143,6 +1147,16 @@ class Art
      */
     private $artId;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Decisionnel::class, mappedBy="articles")
+     */
+    private $decisionnels;
+
+    public function __construct()
+    {
+        $this->decisionnels = new ArrayCollection();
+    }
+
     public function getCe1(): ?string
     {
         return $this->ce1;
@@ -1946,6 +1960,33 @@ class Art
     public function getArtId(): ?int
     {
         return $this->artId;
+    }
+
+    /**
+     * @return Collection|Decisionnel[]
+     */
+    public function getDecisionnels(): Collection
+    {
+        return $this->decisionnels;
+    }
+
+    public function addDecisionnel(Decisionnel $decisionnel): self
+    {
+        if (!$this->decisionnels->contains($decisionnel)) {
+            $this->decisionnels[] = $decisionnel;
+            $decisionnel->addArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecisionnel(Decisionnel $decisionnel): self
+    {
+        if ($this->decisionnels->removeElement($decisionnel)) {
+            $decisionnel->removeArticle($this);
+        }
+
+        return $this;
     }
 
 

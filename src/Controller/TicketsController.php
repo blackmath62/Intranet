@@ -43,8 +43,8 @@ class TicketsController extends AbstractController
      */
     public function tickets_Show(TicketsRepository $repo, Request $request, SluggerInterface $slugger, CommentsRepository $repoComment, StatusRepository $repoStatus)
     {
-        $tickets = $repo->findAll();
-        $comments = $repoComment->findAll();
+        $tickets = $repo->findAllExceptStatu(17);
+        $comments = $repoComment->findAllExceptStatu(17);
         $status = $repoStatus->findAll();
         // Formulaire du Ticket
         

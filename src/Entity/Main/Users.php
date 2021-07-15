@@ -119,6 +119,11 @@ class Users implements UserInterface
      */
     private $trackings;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Decisionnel::class, mappedBy="user")
+     */
+    private $decisionnels;
+
 
     public function __construct()
     {
@@ -131,6 +136,8 @@ class Users implements UserInterface
         $this->comments = new ArrayCollection();
         $this->tickets = new ArrayCollection();
         $this->faqs = new ArrayCollection();
+        $this->decisionnelAchats = new ArrayCollection();
+        $this->decisionnels = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -255,7 +262,7 @@ class Users implements UserInterface
     {
         return $this->trackings;
     }
-
+     
     /**
      * @return Collection|Documents[]
      */
@@ -488,6 +495,36 @@ class Users implements UserInterface
     public function setBornAt(?\DateTimeInterface $bornAt): self
     {
         $this->bornAt = $bornAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Decisionnel[]
+     */
+    public function getDecisionnels(): Collection
+    {
+        return $this->decisionnels;
+    }
+
+    public function addDecisionnel(Decisionnel $decisionnel): self
+    {
+        if (!$this->decisionnels->contains($decisionnel)) {
+            $this->decisionnels[] = $decisionnel;
+            $decisionnel->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecisionnel(Decisionnel $decisionnel): self
+    {
+        if ($this->decisionnels->removeElement($decisionnel)) {
+            // set the owning side to null (unless already changed)
+            if ($decisionnel->getUser() === $this) {
+                $decisionnel->setUser(null);
+            }
+        }
 
         return $this;
     }

@@ -22,19 +22,19 @@ class CommentsRepository extends ServiceEntityRepository
     // /**
     //  * @return Comments[] Returns an array of Comments objects
     //  */
-    /*
-    public function findByExampleField($value)
+   
+    public function findAllExceptStatu($value)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT comments.ticket_id, COUNT(DISTINCT comments.title) AS nbComments
+        FROM `comments`
+        INNER JOIN tickets ON tickets.statu_id <> $value AND tickets.id = comments.ticket_id
+        GROUP BY comments.ticket_id";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
-    */
+    
 
     /*
     public function findOneBySomeField($value): ?Comments

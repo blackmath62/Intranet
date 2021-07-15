@@ -3,38 +3,47 @@
 namespace App\Controller;
 
 use DateTime;
-use App\Form\YearMonthType;
 use App\Form\DateDebutFinType;
 use PhpParser\Node\Stmt\Else_;
-use App\Form\DateSecteurDebutFinType;
+use App\Form\DateSecteurLhDebutFinType;
+use App\Form\DateSecteurRbDebutFinType;
+use DoctrineExtensions\Query\Mysql\Year;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Repository\Divalto\MouvRepository;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\Divalto\StatesByTiersRepository;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use App\Repository\Divalto\StatesLhermitteByTiersRepository;
-use DoctrineExtensions\Query\Mysql\Year;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-/**
- * @IsGranted("ROLE_LHERMITTE")
- */
-
-class StatesLhermitteController extends AbstractController
+class StatesController extends AbstractController
 {
     /**
      * @Route("/Lhermitte/states", name="app_states_lhermitte")
+     * @Route("/Roby/states", name="app_states_roby")
      */    
-    public function states(StatesLhermitteByTiersRepository $repo, Request $request):Response
+
+    public function states(StatesByTiersRepository $repo, Request $request):Response
     {
-            $form = $this->createForm(DateSecteurDebutFinType::class);
-            $form->handleRequest($request);
-            // initialisation de mes variables
-            $metier= '';
+        // initialisation de mes variables
+        if ($request->attributes->get('_route') == 'app_states_roby') {
+            $form = $this->createForm(DateSecteurRbDebutFinType::class);
+            $metier = 'RB';
+        }
+        elseif ($request->attributes->get('_route') == 'app_states_lhermitte') {
+            $form = $this->createForm(DateSecteurLhDebutFinType::class);
+            $metier = '';
+        }
+
+        $form->handleRequest($request);
             $dateDebutEtFin = '';
             $intervalN = 0;
             $intervalN1 = 0;
@@ -49,7 +58,9 @@ class StatesLhermitteController extends AbstractController
             $dateFinN = "";
             $dateDebutN1 = "";
             $dateFinN1 = "";
-
+            $dossier = "";
+            $sufixeMetier = '';
+            
             // tracking user page for stats
             $tracking = $request->attributes->get('_route');
             $this->setTracking($tracking);
@@ -57,11 +68,18 @@ class StatesLhermitteController extends AbstractController
             if($form->isSubmitted() && $form->isValid()){
                 
                 // Rechercher les paramétres du métiers
-                $metier = $form->getData()['Metiers'];
+                if ($request->attributes->get('_route') == 'app_states_roby') {
+                    $metier = 'RB';
+                }
+                elseif ($request->attributes->get('_route') == 'app_states_lhermitte') {
+                    $metier = $form->getData()['Metiers'];
+                }    
                 $secteur = $this->metierParameter($metier);
                 $metiers = $secteur['metiers'];
                 $themeColor = $secteur['themeColor'];
                 $titre = $secteur['titre'];
+                $dossier = $secteur['dossier'];
+                $sufixeMetier = $secteur['sufixeRoute'];
 
                 $dateDebutEtFin = $form->getData()['Periode'];
                 //dd($dateDebutEtFin);
@@ -84,7 +102,7 @@ class StatesLhermitteController extends AbstractController
                 }
                 
                 // Début Bandeau Détaillé avec Nombre de facture, Bl, CA Dépôt, CA Direct etc ...
-                $statesTotauxParSecteur = $repo->getStatesLhermitteTotauxParSecteur($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
+                $statesTotauxParSecteur = $repo->getStatesTotauxParSecteur($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier);
                 
                 $statesBandeau['CATotalBandeauN1'] = 0;
                 $statesBandeau['CADepotBandeauN1'] = 0;
@@ -150,10 +168,11 @@ class StatesLhermitteController extends AbstractController
                 // Fin Bandeau Détaillé avec Nombre de facture, Bl, CA Dépôt, CA Direct etc ...
                 
                 // Début States par commerciaux
-                $statesCommerciaux = $repo->getStatesLhermitteTotauxParCommerciaux($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
+                $statesCommerciaux = $repo->getStatesTotauxParCommerciaux($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier);
 
                 for ($ligCom=0; $ligCom <count($statesCommerciaux) ; $ligCom++) {
                             $commercial[$ligCom]['Commercial'] = $statesCommerciaux[$ligCom]['Commercial'];
+                            $commercial[$ligCom]['CommercialId'] = $statesCommerciaux[$ligCom]['CommercialId'];
                 }
                 if (isset($commercial)) {
                 $listeCommerciaux = array_values(array_unique($commercial, SORT_REGULAR)); // faire une liste de commerciaux sans doublon
@@ -163,6 +182,7 @@ class StatesLhermitteController extends AbstractController
                     for ($ligCommercial=0; $ligCommercial <count($listeCommerciaux) ; $ligCommercial++) {  
                         $Commercial = $listeCommerciaux[$ligCommercial]['Commercial'];                    
                         $stateCommerciaux[$ligCommercial]['Commercial'] = $listeCommerciaux[$ligCommercial]['Commercial'];
+                        $stateCommerciaux[$ligCommercial]['CommercialId'] = $listeCommerciaux[$ligCommercial]['CommercialId'];
                         //$stateCommerciaux[$ligCommercial]['Periode'] = '';
                         $stateCommerciaux[$ligCommercial]['CATotalN'] = 0;
                         $stateCommerciaux[$ligCommercial]['CADepotN'] = 0;
@@ -192,7 +212,6 @@ class StatesLhermitteController extends AbstractController
                                 $stateCommerciaux[$ligCommercial]['FactureN1'] += $statesCommerciaux[$ligStateEntete]['NbFacture'];
                                 $stateCommerciaux[$ligCommercial]['BlN1'] += $statesCommerciaux[$ligStateEntete]['NbBl'];
                             }
-                            //dd(array_keys($statesCommerciaux[$ligCommercial]['Annee']));
                         }
                         
                         $stateCommerciaux[$ligCommercial]['DeltaTotal'] = $this->calcul_pourcentage($stateCommerciaux[$ligCommercial]['CATotalN1'],$stateCommerciaux[$ligCommercial]['CATotalN'])['pourc'];
@@ -202,7 +221,6 @@ class StatesLhermitteController extends AbstractController
                         $stateCommerciaux[$ligCommercial]['DeltaClient'] = $this->calcul_pourcentage($stateCommerciaux[$ligCommercial]['ClientN1'],$stateCommerciaux[$ligCommercial]['ClientN'])['pourc'];
                         $stateCommerciaux[$ligCommercial]['ColorClient'] = $this->calcul_pourcentage($stateCommerciaux[$ligCommercial]['ClientN1'],$stateCommerciaux[$ligCommercial]['ClientN'])['color'];
                         $stateCommerciaux[$ligCommercial]['FlecheClient'] = $this->calcul_pourcentage($stateCommerciaux[$ligCommercial]['ClientN1'],$stateCommerciaux[$ligCommercial]['ClientN'])['fleche'];
-                        
                         
                         // je dois récupérer via une requête SQL les states Globales pour les comparer avec les states par commerciaux, la requête semble préte, à contrôler
 
@@ -215,7 +233,7 @@ class StatesLhermitteController extends AbstractController
                     // Fin States par commerciaux
 
                     // Début States par client    
-                        $statesParClient = $repo->getStatesLhermitteDetailClient($metiers,$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1); 
+                        $statesParClient = $repo->getStatesDetailClient($metiers,$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier); 
                         
                         for ($ligClient=0; $ligClient <count($statesParClient) ; $ligClient++) { 
                             $statesParClient[$ligClient]['DeltaDetailClient'] = $this->calcul_pourcentage($statesParClient[$ligClient]['CATotalN1'],$statesParClient[$ligClient]['CATotalN'])['pourc'];
@@ -227,7 +245,7 @@ class StatesLhermitteController extends AbstractController
                     // Fin States par client  
 
                     // Début States par Métier
-                        $statesMetiers = $repo->getStatesLhermitteMetier($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
+                        $statesMetiers = $repo->getStatesMetier($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier);
                         
                         for ($ligMetier=0; $ligMetier <count($statesMetiers) ; $ligMetier++) { 
                             $statesMetiers[$ligMetier]['DeltaMetier'] = $this->calcul_pourcentage($statesMetiers[$ligMetier]['CATotalN1'],$statesMetiers[$ligMetier]['CATotalN'])['pourc'];
@@ -235,17 +253,20 @@ class StatesLhermitteController extends AbstractController
                             $statesMetiers[$ligMetier]['FlecheMetier'] = $this->calcul_pourcentage($statesMetiers[$ligMetier]['CATotalN1'],$statesMetiers[$ligMetier]['CATotalN'])['fleche'];
                         }
                     // Fin States par Métier
+
                 }
                         
             }    
-        return $this->render('states_lhermitte/indexTest.html.twig', [
+        return $this->render('states_lhermitte/index.html.twig', [
             'title' => 'States Lhermitte',
             'intervalN' => $intervalN,
             'dateDebutN' => $dateDebutN,
+            'sufixeMetier' => $sufixeMetier,
             'dateFinN' => $dateFinN,
             'dateDebutN1' => $dateDebutN1,
             'dateFinN1' => $dateFinN1,
             'metier' => $metier,
+            'dossier' => $dossier,
             'dateDebutEtFin' => $dateDebutEtFin,
             'intervalN1' => $intervalN1,
             'themeColor' => $themeColor,
@@ -272,26 +293,410 @@ class StatesLhermitteController extends AbstractController
             $secteur['metiers'] = '\'EV\'';
             $secteur['themeColor'] = 'success'; 
             $secteur['titre'] = ' Espaces Verts';
+            $secteur['sufixeRoute'] = 'Lh';
+            $secteur['dossier'] = 1;
         }elseif ($metier == 'HP') {
             $secteur['metiers'] = '\'MA\', \'HP\'';
             $secteur['themeColor'] = 'danger'; 
             $secteur['titre'] = ' Horti - Pépi';
+            $secteur['sufixeRoute'] = 'Lh';
+            $secteur['dossier'] = 1;
         }elseif ($metier == 'MA') {
             $secteur['metiers'] = '\'MA\'';
             $secteur['themeColor'] = 'orange'; 
             $secteur['titre'] = ' Maraîchage';
+            $secteur['sufixeRoute'] = 'Lh';
+            $secteur['dossier'] = 1;
         }elseif ($metier == 'ME') {
             $secteur['metiers'] = '\'ME\'';
             $secteur['themeColor'] = 'warning'; 
             $secteur['titre'] = ' Matériel / Équipement';
+            $secteur['sufixeRoute'] = 'Lh';
+            $secteur['dossier'] = 1;
         }elseif ($metier == 'Tous') {
             $secteur['metiers'] = '\'EV\', \'HP\', \'ME\', \'MA\'';
             $secteur['themeColor'] = 'info'; 
-            $secteur['titre'] = ' Tous les métiers';
+            $secteur['titre'] = ' Tous les métiers Lhermitte';
+            $secteur['sufixeRoute'] = 'Lh';
+            $secteur['dossier'] = 1;
+        }
+        elseif ($metier == 'RB') {
+            $secteur['metiers'] = '\'RB\'';
+            $secteur['themeColor'] = 'primary'; 
+            $secteur['titre'] = ' Roby';
+            $secteur['sufixeRoute'] = 'Rb';
+            $secteur['dossier'] = 3;
         }
         return $secteur;
     }
 
+    // Export Excel par metier
+
+    public function getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo): array
+    {
+        /**
+         * @var $ticket Ticket[]
+         */
+        $list = [];
+        $donnee = [];
+        $donnees = $repo->getStatesExcelParMetier($metier, $dateDebutN, $dateFinN, $dossier);
+        
+        foreach ($donnees as $donnee) {
+            
+            $donnee['Delta'] = $this->calcul_pourcentage($donnee['MontantSignN1'],$donnee['MontantSignN'])['pourc']/100;
+            $list[] = [
+                $donnee['Commercial'],
+                $donnee['Famille_Client'],
+                $donnee['Client'],
+                $donnee['Nom'],
+                $donnee['Pays'],
+                $donnee['Fam_Art'],
+                $donnee['Ref'],
+                $donnee['Designation'],
+                $donnee['Sref1'],
+                $donnee['Sref2'],
+                $donnee['Uv'],
+                $donnee['Mois'],
+                $donnee['QteSignN1'],
+                $donnee['MontantSignN1'],
+                $donnee['Delta'],  
+                $donnee['QteSignN'],  
+                $donnee['MontantSignN'],                   
+                
+            ];
+        }
+        return $list;
+    }
+    
+    
+    /**
+     * @Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name="app_states_excel_metier_Lh")
+     * @Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name="app_states_excel_metier_Rb")
+     */  
+
+    public function get_states_excel_metier($metier, $dateDebutN, $dateFinN, $dossier, StatesByTiersRepository $repo, Request $request){
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
+        //dd($tracking);
+        
+        $secteur = $this->metierParameter($metier);
+        $metier = $secteur['metiers'];
+
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setTitle('States');
+        // Entête de colonne
+        $sheet->getCell('A5')->setValue('Commercial');
+        $sheet->getCell('B5')->setValue('Famille_client');
+        $sheet->getCell('C5')->setValue('Tiers');
+        $sheet->getCell('D5')->setValue('Nom');
+        $sheet->getCell('E5')->setValue('Pays');
+        $sheet->getCell('F5')->setValue('Famille_article');
+        $sheet->getCell('G5')->setValue('Ref');
+        $sheet->getCell('H5')->setValue('Designation');
+        $sheet->getCell('I5')->setValue('Sref1');
+        $sheet->getCell('J5')->setValue('Sref2');
+        $sheet->getCell('K5')->setValue('Uv');
+        $sheet->getCell('L5')->setValue('Mois');
+        $sheet->getCell('M5')->setValue('QteSignN1');
+        $sheet->getCell('N5')->setValue('MontantSignN1');
+        $sheet->getCell('O5')->setValue('Delta');
+        $sheet->getCell('P5')->setValue('QteSignN');
+        $sheet->getCell('Q5')->setValue('MontantSignN');
+
+        // Increase row cursor after header write
+        $sheet->fromArray($this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo),null, 'A6', true);
+        $dernLign = count($this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo)) + 5;    
+        //$NomCommercial = $repo->getCommercialName($commercialId, $dossier);
+        $d = new DateTime('NOW');
+        $dateTime = $d->format('d-m-Y') ;
+        //$commercial = $NomCommercial[0]['SELCOD'];
+        $nomFichier = 'States Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le '. $dateTime ;
+        // Titre de la feuille
+        $sheet->getCell('A1')->setValue($nomFichier);
+        $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
+        $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
+        
+        $styleArray = [
+            'font' => [
+                'bold' => false,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FFFFFFFF',
+                ],
+            ],
+        ];
+        $spreadsheet->getActiveSheet()->getStyle("A5:Q{$dernLign}")->applyFromArray($styleArray);
+        
+        $styleArrayEntete = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'F17A2B8',
+                ],
+            ],
+        ];
+        $spreadsheet->getActiveSheet()->getStyle("A5:Q5")->applyFromArray($styleArrayEntete);
+        
+        $sheet->getStyle("H1:Q{$dernLign}")
+        ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $sheet->setAutoFilter("A5:Q{$dernLign}");
+        $sheet->getColumnDimension('A')->setWidth(30, 'pt');
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->getColumnDimension('G')->setAutoSize(true);
+        $sheet->getColumnDimension('H')->setAutoSize(true);
+        $sheet->getColumnDimension('I')->setAutoSize(true);
+        $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->getColumnDimension('K')->setAutoSize(true);
+        $sheet->getColumnDimension('L')->setAutoSize(true);
+        $sheet->getColumnDimension('M')->setAutoSize(true);
+        $sheet->getColumnDimension('N')->setAutoSize(true);
+        $sheet->getColumnDimension('O')->setAutoSize(true);
+        $sheet->getColumnDimension('P')->setAutoSize(true);
+        $sheet->getColumnDimension('Q')->setAutoSize(true);
+        $sheet->setCellValue("N4", "=SUBTOTAL(9,N6:N{$dernLign})");
+        $sheet->setCellValue("Q4", "=SUBTOTAL(9,Q6:Q{$dernLign})");
+        $sheet->setCellValue("O4", "=(Q4/N4)-1");
+        $sheet->getStyle("N6:N{$dernLign}")
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+        $sheet->getStyle("Q6:Q{$dernLign}")
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+        $sheet->getStyle("N4:Q4")
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+        $sheet->getStyle('O4')
+              ->getNumberFormat()
+              ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
+        $sheet->getStyle("O6:O{$dernLign}")
+              ->getNumberFormat()
+              ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
+
+        $writer = new Xlsx($spreadsheet);
+
+        // Create a Temporary file in the system
+        $fileName = $nomFichier . '.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+
+        $writer->save($temp_file);
+        // Return the excel file as an attachment
+        return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+
+    }
+
+    // Export Excel par commercial
+
+    public function getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo): array
+    {
+        /**
+         * @var $ticket Ticket[]
+         */
+        $list = [];
+        $donnee = [];
+        $donnees = $repo->getStatesExcelParCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier);
+
+        foreach ($donnees as $donnee) {
+            $donnee['Delta'] = $this->calcul_pourcentage($donnee['MontantSignN1'],$donnee['MontantSignN'])['pourc']/100;
+            $list[] = [
+                $donnee['Famille_Client'],
+                $donnee['Client'],
+                $donnee['Nom'],
+                $donnee['Pays'],
+                $donnee['Fam_Art'],
+                $donnee['Ref'],
+                $donnee['Designation'],
+                $donnee['Sref1'],
+                $donnee['Sref2'],
+                $donnee['Uv'],
+                $donnee['Mois'],
+                $donnee['QteSignN1'],
+                $donnee['MontantSignN1'],
+                $donnee['Delta'],  
+                $donnee['QteSignN'],  
+                $donnee['MontantSignN'],                   
+                
+            ];
+        }
+        return $list;
+    }
+    
+    
+    /**
+     * @Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name="app_states_excel_commercial_Lh")
+     * @Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name="app_states_excel_commercial_Rb")
+     */  
+
+    public function get_states_excel_commercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, StatesByTiersRepository $repo, Request $request){
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
+        //dd($tracking);
+        
+        $secteur = $this->metierParameter($metier);
+        $metier = $secteur['metiers'];
+
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setTitle('States');
+        // Entête de colonne
+        $sheet->getCell('A5')->setValue('Famille_client');
+        $sheet->getCell('B5')->setValue('Tiers');
+        $sheet->getCell('C5')->setValue('Nom');
+        $sheet->getCell('D5')->setValue('Pays');
+        $sheet->getCell('E5')->setValue('Famille_article');
+        $sheet->getCell('F5')->setValue('Ref');
+        $sheet->getCell('G5')->setValue('Designation');
+        $sheet->getCell('H5')->setValue('Sref1');
+        $sheet->getCell('I5')->setValue('Sref2');
+        $sheet->getCell('J5')->setValue('Uv');
+        $sheet->getCell('K5')->setValue('Mois');
+        $sheet->getCell('L5')->setValue('QteSignN1');
+        $sheet->getCell('M5')->setValue('MontantSignN1');
+        $sheet->getCell('N5')->setValue('Delta');
+        $sheet->getCell('O5')->setValue('QteSignN');
+        $sheet->getCell('P5')->setValue('MontantSignN');
+
+        // Increase row cursor after header write
+        $sheet->fromArray($this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo),null, 'A6', true);
+        $dernLign = count($this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo)) + 5;    
+        $NomCommercial = $repo->getCommercialName($commercialId, $dossier);
+        $d = new DateTime('NOW');
+        $dateTime = $d->format('d-m-Y') ;
+        $commercial = $NomCommercial[0]['SELCOD'];
+        $nomFichier = 'States ' . $commercial  . ' Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le '. $dateTime ;
+        $sheet->getCell('A1')->setValue($nomFichier);
+        $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
+        $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
+        
+        $styleArray = [
+            'font' => [
+                'bold' => false,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FFFFFFFF',
+                ],
+            ],
+        ];
+
+        $styleArrayEntete = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'F17A2B8',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("A5:P{$dernLign}")->applyFromArray($styleArray);
+        $spreadsheet->getActiveSheet()->getStyle("A5:P5")->applyFromArray($styleArrayEntete);
+        $sheet->getStyle("H1:P{$dernLign}")
+        ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $sheet->setAutoFilter("A5:P{$dernLign}");
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->getColumnDimension('G')->setAutoSize(true);
+        $sheet->getColumnDimension('H')->setAutoSize(true);
+        $sheet->getColumnDimension('I')->setAutoSize(true);
+        $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->getColumnDimension('K')->setAutoSize(true);
+        $sheet->getColumnDimension('L')->setAutoSize(true);
+        $sheet->getColumnDimension('M')->setAutoSize(true);
+        $sheet->getColumnDimension('N')->setAutoSize(true);
+        $sheet->getColumnDimension('O')->setAutoSize(true);
+        $sheet->getColumnDimension('P')->setAutoSize(true);
+        $sheet->setCellValue("M4", "=SUBTOTAL(9,M6:M{$dernLign})");
+        $sheet->setCellValue("P4", "=SUBTOTAL(9,P6:P{$dernLign})");
+        $sheet->setCellValue("N4", "=(P4/M4)-1");
+        $sheet->getStyle("M6:M{$dernLign}")
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+        $sheet->getStyle("P6:P{$dernLign}")
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+        $sheet->getStyle("M4:P4")
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+        $sheet->getStyle('N4')
+              ->getNumberFormat()
+              ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
+        $sheet->getStyle("N6:N{$dernLign}")
+              ->getNumberFormat()
+              ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
+
+
+        $writer = new Xlsx($spreadsheet);
+
+        // Create a Temporary file in the system
+        $fileName = $nomFichier . '.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+
+        $writer->save($temp_file);
+        // Return the excel file as an attachment
+        return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+
+    }
+    
     public function dateParameter($Param){
         
         // faire un objet avec la gestion des intervals de date
@@ -325,7 +730,7 @@ class StatesLhermitteController extends AbstractController
     /**
      * @Route("/Lhermitte/states/archive/inutiliser", name="app_states_lhermitte_archive")
      */    
-    public function statesInutiliser(string $secteur, StatesLhermitteByTiersRepository $repo, Request $request):Response
+    public function statesInutiliser(string $secteur, StatesByTiersRepository $repo, Request $request):Response
     {
                     
         $secteur = $request->attributes->get('secteur');
@@ -794,7 +1199,7 @@ class StatesLhermitteController extends AbstractController
         // fonction utile pour le cacul de pourcentage et éviter le calcul est impossible
         function calcul_pourcentage_total($nombreParCom, $nombreTotal)
         {
-            if ($nombreParCom <> 0 && $nombreTotal <> 0) {
+            if ($nombreParCom > 0 && $nombreTotal > 0) {
                $resultat = ($nombreParCom*100)/$nombreTotal;
             }else{
                 $resultat = 0;    
@@ -912,35 +1317,82 @@ class StatesLhermitteController extends AbstractController
         // Return the excel file as an attachment
         return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
   
-        //return $this->redirectToRoute('app_tickets');
+        return $this->redirectToRoute('app_tickets');
     }
     
 
     /**
-     * @Route("/Lhermitte/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}", name="app_lhermitte_par_article")
+     * @Route("/Lhermitte/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}/{commercialId}/{dossier}", name="app_states_par_article_Lh")
+     * @Route("/Roby/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}/{commercialId}/{dossier}", name="app_states_par_article_Rb")
      */
-    public function statesByArticle(string $tiers, string $metier, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, StatesLhermitteByTiersRepository $repo, Request $request): Response
+    public function statesByArticle(string $tiers, string $metier, $commercialId, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier, StatesByTiersRepository $repo, Request $request, UserInterface $user): Response
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
+        //dd($user);
         
         $tiers = $tiers; 
+       
         // Rechercher les paramétres du métiers
         $secteur = $this->metierParameter($metier);
         $metiers = $secteur['metiers'];
+        $themeColor = $secteur['themeColor'];
 
+        $statesTotauxCommercial = $repo->getStatesBandeauClientCaTotalCommercial($commercialId,$metiers,$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier);
         // Début Bandeau Détaillé avec Nombre de facture, Bl, CA Dépôt, CA Direct etc ...
-        $statesClientParArticle = $repo->getStatesLhermitteByArticles($tiers,$metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1);
+        $statesClientParArticle = $repo->getStatesLhermitteByArticles($tiers,$metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier);
         for ($ligArticle=0; $ligArticle <count($statesClientParArticle) ; $ligArticle++) { 
-            $statesClientParArticle[$ligArticle]['Delta'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['pourc'];
-            $statesClientParArticle[$ligArticle]['Mont'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['mont'];
-            $statesClientParArticle[$ligArticle]['Color'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['color'];
-            $statesClientParArticle[$ligArticle]['Fleche'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['fleche'];          
+            $statesClientParArticle[$ligArticle]['DeltaN2'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN2'],$statesClientParArticle[$ligArticle]['CATotalN1'])['pourc'];
+            $statesClientParArticle[$ligArticle]['MontN2'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN2'],$statesClientParArticle[$ligArticle]['CATotalN1'])['mont'];
+            $statesClientParArticle[$ligArticle]['ColorN2'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN2'],$statesClientParArticle[$ligArticle]['CATotalN1'])['color'];
+            $statesClientParArticle[$ligArticle]['FlecheN2'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN2'],$statesClientParArticle[$ligArticle]['CATotalN1'])['fleche'];          
+            
+            $statesClientParArticle[$ligArticle]['DeltaN1'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['pourc'];
+            $statesClientParArticle[$ligArticle]['MontN1'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['mont'];
+            $statesClientParArticle[$ligArticle]['ColorN1'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['color'];
+            $statesClientParArticle[$ligArticle]['FlecheN1'] = $this->calcul_pourcentage($statesClientParArticle[$ligArticle]['CATotalN1'],$statesClientParArticle[$ligArticle]['CATotalN'])['fleche'];          
         }
+
+       $FamilleArticles = $repo->getStatesBandeauClientFamilleProduit($tiers,$metiers,$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier);
+       // Début States Globales du client
+       $CATotalClient = array();
+       $CATotalClient['CATotalN2'] = 0;
+       $CATotalClient['CATotalN1'] = 0;
+       $CATotalClient['CATotalN'] = 0;
+       for ($ligFam=0; $ligFam <count($FamilleArticles) ; $ligFam++) { 
+           $CATotalClient['CATotalN2'] += $FamilleArticles[$ligFam]['CATotalN2'];
+           $CATotalClient['CATotalN1'] += $FamilleArticles[$ligFam]['CATotalN1'];
+           $CATotalClient['CATotalN'] += $FamilleArticles[$ligFam]['CATotalN'];
+       }
+       
+       for ($ligFamArticle=0; $ligFamArticle <count($CATotalClient) ; $ligFamArticle++) { 
+        $CATotalClient['DeltaN2'] = $this->calcul_pourcentage($CATotalClient['CATotalN2'],$CATotalClient['CATotalN1'])['pourc'];
+        $CATotalClient['DeltaN1'] = $this->calcul_pourcentage($CATotalClient['CATotalN1'],$CATotalClient['CATotalN'])['pourc'];
+        $CATotalClient['ColorN2'] = $this->calcul_pourcentage($CATotalClient['CATotalN2'],$CATotalClient['CATotalN1'])['color'];
+        $CATotalClient['ColorN1'] = $this->calcul_pourcentage($CATotalClient['CATotalN1'],$CATotalClient['CATotalN'])['color'];
+        $CATotalClient['FlecheN2'] = $this->calcul_pourcentage($CATotalClient['CATotalN2'],$CATotalClient['CATotalN1'])['fleche'];
+        $CATotalClient['FlecheN1'] = $this->calcul_pourcentage($CATotalClient['CATotalN1'],$CATotalClient['CATotalN'])['fleche'];
+        $CATotalClient['deltaTotalClientComN2'] = $this->calcul_pourcentage_total($CATotalClient['CATotalN2'], $statesTotauxCommercial[0]['CATotalN2']);
+        $CATotalClient['deltaTotalClientComN1'] = $this->calcul_pourcentage_total($CATotalClient['CATotalN1'], $statesTotauxCommercial[0]['CATotalN1']);
+        $CATotalClient['deltaTotalClientComN'] = $this->calcul_pourcentage_total($CATotalClient['CATotalN'], $statesTotauxCommercial[0]['CATotalN']);
+
+       }
+       // Fin States Globales du client
+
+       for ($ligFamArt=0; $ligFamArt <count($FamilleArticles) ; $ligFamArt++) { 
+        $FamilleArticles[$ligFamArt]['deltaTotalFamilleArtN'] = $this->calcul_pourcentage_total($FamilleArticles[$ligFamArt]['CATotalN'], $CATotalClient['CATotalN']);
+        $FamilleArticles[$ligFamArt]['deltaTotalFamilleArtN1'] = $this->calcul_pourcentage_total($FamilleArticles[$ligFamArt]['CATotalN1'], $CATotalClient['CATotalN1']);
+        $FamilleArticles[$ligFamArt]['deltaTotalFamilleArtN2'] = $this->calcul_pourcentage_total($FamilleArticles[$ligFamArt]['CATotalN2'], $CATotalClient['CATotalN2']);        
+       }
+       //dd($FamilleArticles);
         return $this->render('states_lhermitte/statesByArticle.html.twig', [
             'title' => 'States par Articles',
-            'statesClientParArticle' => $statesClientParArticle
+            'statesClientParArticle' => $statesClientParArticle,
+            'FamilleArticles' => $FamilleArticles,
+            'CATotalClient' => $CATotalClient,
+            'themeColor' => $themeColor,
+            'statesTotauxCommercial' => $statesTotauxCommercial
 
         ]);
     }

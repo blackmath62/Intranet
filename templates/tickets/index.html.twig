@@ -29,19 +29,20 @@
 						<label>{{ form_label(formTickets.content) }}:</label>
 						{{ form_widget(formTickets.content)}}
 					</div>
-					<div class="form-group col-2">
+					<div class="d-flex flex-wrap col-12">
+					<div class="form-group col-12 col-sm-12 col-md-3">
 						<label>{{ form_label(formTickets.service) }}:</label>
 						{{ form_widget(formTickets.service) }}
 					</div>
-					<div class="form-group col-2">
+					<div class="form-group col-12 col-sm-12 col-md-3">
 						<label>{{ form_label(formTickets.societe) }}:</label>
 						{{ form_widget(formTickets.societe) }}
 					</div>
-					<div class="form-group col-2">
+					<div class="form-group col-12 col-sm-12 col-md-3">
 						<label>{{ form_label(formTickets.priority) }}:</label>
 						{{ form_widget(formTickets.priority) }}
 					</div>
-					<div class="form-group col-3">
+					<div class="form-group col-12 col-sm-12 col-md-3">
 						<label>{{ form_label(formTickets.file) }}:</label>
 						{{ form_widget(formTickets.file) }}
 					</div>
@@ -50,8 +51,9 @@
 						{{ form_widget(formTickets.statu) }}
 					</div>
 
-					<div class="form-group col-3 text-right">
+					<div class="form-group col-12 col-sm-12 col-md-12 text-right">
 						{{ form_row(formTickets.poster) }}
+					</div>
 					</div>
 				</div>
 				{{ form_end(formTickets) }}
@@ -104,8 +106,8 @@
 												{{ ticket.title}}
 											</a>
 											{% set countNotEmpty = 0 %}
-											{% for comment in comments if comment.ticket.id == ticket.id %}
-												{% set countNotEmpty = countNotEmpty + 1 %}
+											{% for comment in comments if comment.ticket_id == ticket.id %}
+												{% set countNotEmpty = comment.nbComments %}
 											{% endfor %}
 
 											{% if countNotEmpty > 0 %}
@@ -139,46 +141,46 @@
 								</div>
 
 								<div class="card-body">
-									<div class="form-group col-12">
+									<div class="form-group col-12 col-sm-12 col-md-3">
 										<label for="exampleInputEmail1">Objet</label>
 										<h3 type="text" name="objet" id="objet">{{ ticket.title}}</h3>
 									</div>
 									<div class='d-flex flex-wrap'>
-										<div class="form-group col-2">
+										<div class="form-group col-12 col-sm-12 col-md-3 text-center">
 											<label for="exampleInputPassword1">Date ouverture</label>
 											<div>{{ ticket.createdAt|date("d/m/Y")}}</div>
 										</div>
-										<div class="form-group col-2">
+										<div class="form-group col-12 col-sm-12 col-md-3 text-center">
 											<label for="exampleInputPassword1">Prestataire</label>
-												<div>
+												<div class="text-center">
 												{% if ticket.prestataire %}
-													<a class="btn btn-xl btn-dark text-white">
+													<a href="mailto:{{ ticket.prestataire.email }}" class="btn btn-xl btn-dark text-white text-center">
 														{{ticket.prestataire.nom}}</a>
 												{% else %}
-													<a class="btn btn-xl btn-danger text-white">pas encore assigné à un intervenant</a>
+													<a class="btn btn-xl btn-danger text-white text-center">pas encore assigné à un intervenant</a>
 												{% endif %}
 												</div>
 										</div>
-										<div class="form-group col-2">
+										<div class="form-group col-12 col-sm-12 col-md-3 text-center">
 											<label for="exampleInputPassword1">Service</label>
 											<div>
 												<a class="btn btn-xl" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;><i class="pr-1 fas {{ ticket.service.fa}}"></i>{{ ticket.service.title }}</a>
 											</div>
 										</div>
-										<div class="form-group col-2">
+										<div class="form-group col-12 col-sm-12 col-md-3 text-center">
 											<label for="exampleInputPassword1">Statut</label>
 											<div>
 												<a class="btn btn-xl" style="background-color: {{ ticket.statu.backgroundColor }}; color: {{ ticket.statu.textColor }}" ;><i class="pr-1 fas {{ ticket.statu.fa}}"></i>{{ ticket.statu.title }}</a>
 											</div>
 										</div>
 									</div>
-									<div class="form-group col-12">
+									<div class="form-group col-12 col-sm-12 col-md-3">
 										<label for="exampleInputPassword1">Détail :
 										</label>
 										<article>{{ ticket.content|raw}}</article>
 									</div>
 									{% if ticket.file %}
-										<div class="form-group col-12">
+										<div class="form-group col-12 col-sm-12 col-md-3 text-center">
 											<label>Fichiers joints :
 											</label>
 											<a href="{{ asset(asset('doc/tickets/' ~ ticket.file))}}" id="lien" name="lien" class="text-center btn btn-outline-info btn-xs">{{ ticket.file}}</a>

@@ -1,6 +1,9 @@
 .callout-orange {
     border-left-color: orange;
 }
+.select2-container--default .select2-selection--single{
+    background-color: #000;
+}
 html { font-size: 1rem; }
 
 @media (min-width: 576px) {

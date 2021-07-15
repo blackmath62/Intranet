@@ -15,7 +15,7 @@ class DateDebutFinType extends AbstractType
     {
         $builder
             
-            ->add('dateFin')
+            ->add('dates')
             ->add('filtrer', SubmitType::class,[
                 'attr' => ['class' => 'btn btn-secondary']
             ])

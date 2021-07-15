@@ -2,8 +2,11 @@
 
 namespace App\Entity\Divalto;
 
+use App\Entity\Main\DecisionnelAchat;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\FouRepository;
+use App\Repository\Divalto\FouRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Fou
@@ -1295,6 +1298,11 @@ class Fou
      */
     private $fouId;
 
+    public function __construct()
+    {
+        $this->decisionnelAchats = new ArrayCollection();
+    }
+
     public function getCe1(): ?string
     {
         return $this->ce1;
@@ -2209,6 +2217,5 @@ class Fou
     {
         return $this->fouId;
     }
-
 
 }
