@@ -12,7 +12,7 @@
 				<h3 class="card-title text-white">Administration des paramétres de l'Utilisateur</h3>
 				<a href="{{ path('app_admin_users') }}" class="badge badge-success ml-auto">Retourner à la liste des Utilisateurs</a>
 			</div>
-			<div class="card-body">
+			<div class="card-body row">
 				<img class="img-fluid col-2" src="{{ asset(asset('img/profile/' ~ user.img))}}" alt="User Image">
 				{{ form(userEditForm)}}
 				</div>

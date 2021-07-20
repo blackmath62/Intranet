@@ -54,9 +54,15 @@ class Services
      */
     private $fa;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Users::class, mappedBy="service")
+     */
+    private $users;
+
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,6 +169,36 @@ class Services
     public function setFa(string $fa): self
     {
         $this->fa = $fa;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Users[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(Users $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setService($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(Users $user): self
+    {
+        if ($this->users->removeElement($user)) {
+            // set the owning side to null (unless already changed)
+            if ($user->getService() === $this) {
+                $user->setService(null);
+            }
+        }
 
         return $this;
     }

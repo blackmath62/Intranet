@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block body %}
+
+<section class="content-header">
+		<div class="container-fluid">
+			<div class="card card-dark"> <!--collapsed-card-->
+				<div class="card-header d-flex">
+					<h3 class="card-title">Création/Modification des status de congés</h3>
+                    <a href="{{ path('app_admin_parameter') }}" class="badge badge-success ml-auto">Retourner aux paramétres</a>
+					<div class="card-tools">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse">
+							<i class="fas fa-plus"></i>
+						</button>
+					</div>
+					<!-- /.card-tools -->
+				</div>
+				<!-- /.card-header -->
+				<div class="row card-body">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header">
+								<h3 class="card-title text-center mr-auto">Création d'un status de congés</h3>
+							</div>
+
+							{{ form_start(formholidayStatus)}}
+							<div class="d-flex flex-wrap card-body">
+								<div class="form-group col-4"></div>
+								{{ form_row(formholidayStatus.name, {'attr' : {'placeholder' : "Status de congés", 'class' : "form-control"}} ) }}
+								<button type="submit" class="btn btn-lg btn-dark mx-auto ">Créer un nouveau status de congés</button>
+							</div>
+							{{ form_end(formholidayStatus)}}
+							<div class="card-header d-flex">
+								<h3 class="card-title text-center mr-auto">Modification des status de congés</h3>
+								<a href="{{ path('app_admin') }}" class="badge badge-success ml-auto">Retourner à l'Administration générale</a>
+							</div>
+							<!-- /.card-header -->
+							<div class="">
+								<table id="example1" class="table table-bordered table-striped">
+									<thead>
+										<tr>
+											<th class="text-center">
+												<span class="text-dark">id</span>
+											</th>
+											<th class="text-center">
+												<spanclass="text-dark">Nom</span>
+											</th>
+											<th class="text-center">
+												<span>Action</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for holidayStatu in holidayStatus %}
+											<tr>
+												<!--todo gérer le changement de l'id du bouton du POST -->
+													<td class="text-center">
+														<a class="text-center text-dark">{{ holidayStatu.id }}</a>
+													</td>
+													<td class="text-center">
+														{{holidayStatu.name}}
+													</td>
+													<td class="text-center">
+														<a href="{{ path('app_edit_status_holiday', {'id' : holidayStatu.id}) }}" type="button" class="btn btn-warning">
+															<i class="fas fa-edit"></i></a>
+														<a type="button" class="btn btn-danger" data-toggle="modal" data-target={{"#modal-sm#{holidayStatu.id}"}} >
+															<i class="fas fa-trash-alt"></i>
+														</a>
+													</td>
+											</tr>
+                                                    <div class="modal fade" id={{"modal-sm#{holidayStatu.id}"}}>
+                                                        <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                            <h4 class="modal-title">Suppression d'un status de congés</h4>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                            <p>Vous vous apprétez à supprimer le status de congés <u>{{ holidayStatu.name }}</u> &hellip;</p>
+                                                            </div>
+                                                            <div class="modal-footer justify-content-between">
+                                                            <button type="button" class="btn btn-success" data-dismiss="modal">Sortez moi de là !</button>
+                                                            <a href="{{ path('app_delete_status_holiday', {'id' : holidayStatu.id}) }}" type="button" class="btn btn-danger">Supprimer définitivement</a>
+                                                            </div>
+                                                        </div>
+                                                        <!-- /.modal-content -->
+                                                        </div>
+                                                        <!-- /.modal-dialog -->
+                                                    </div>
+                                                    <!-- /.modal -->
+										{% endfor %}
+									</tbody>
+									<tfoot>
+										<tr>
+											<th class="text-center">
+												<span>id</span>
+											</th>
+											<th class="text-center">
+												<span>Nom</span>
+											</th>
+											<th class="text-center">
+												<span>Action</span>
+											</th>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+{% endblock %}
+
+
+

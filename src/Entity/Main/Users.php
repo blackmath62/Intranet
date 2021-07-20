@@ -120,9 +120,19 @@ class Users implements UserInterface
     private $trackings;
 
     /**
-     * @ORM\OneToMany(targetEntity=Decisionnel::class, mappedBy="user")
+     * @ORM\ManyToMany(targetEntity=Holiday::class, mappedBy="user")
      */
-    private $decisionnels;
+    private $holidays;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Holiday::class, mappedBy="treatmentedBy")
+     */
+    private $UserTreatmentholidays;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Services::class, inversedBy="users")
+     */
+    private $service;
 
 
     public function __construct()
@@ -136,8 +146,8 @@ class Users implements UserInterface
         $this->comments = new ArrayCollection();
         $this->tickets = new ArrayCollection();
         $this->faqs = new ArrayCollection();
-        $this->decisionnelAchats = new ArrayCollection();
-        $this->decisionnels = new ArrayCollection();
+        $this->holidays = new ArrayCollection();
+        $this->UserTreatmentholidays = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -500,31 +510,70 @@ class Users implements UserInterface
     }
 
     /**
-     * @return Collection|Decisionnel[]
+     * @return Collection|Holiday[]
      */
-    public function getDecisionnels(): Collection
+    public function getHolidays(): Collection
     {
-        return $this->decisionnels;
+        return $this->holidays;
     }
 
-    public function addDecisionnel(Decisionnel $decisionnel): self
+    public function addHoliday(Holiday $holiday): self
     {
-        if (!$this->decisionnels->contains($decisionnel)) {
-            $this->decisionnels[] = $decisionnel;
-            $decisionnel->setUser($this);
+        if (!$this->holidays->contains($holiday)) {
+            $this->holidays[] = $holiday;
+            $holiday->addUser($this);
         }
 
         return $this;
     }
 
-    public function removeDecisionnel(Decisionnel $decisionnel): self
+    public function removeHoliday(Holiday $holiday): self
     {
-        if ($this->decisionnels->removeElement($decisionnel)) {
+        if ($this->holidays->removeElement($holiday)) {
+            $holiday->removeUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Holiday[]
+     */
+    public function getUserTreatmentholidays(): Collection
+    {
+        return $this->UserTreatmentholidays;
+    }
+
+    public function addUserTreatmentholiday(Holiday $userTreatmentholiday): self
+    {
+        if (!$this->UserTreatmentholidays->contains($userTreatmentholiday)) {
+            $this->UserTreatmentholidays[] = $userTreatmentholiday;
+            $userTreatmentholiday->setTreatmentedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserTreatmentholiday(Holiday $userTreatmentholiday): self
+    {
+        if ($this->UserTreatmentholidays->removeElement($userTreatmentholiday)) {
             // set the owning side to null (unless already changed)
-            if ($decisionnel->getUser() === $this) {
-                $decisionnel->setUser(null);
+            if ($userTreatmentholiday->getTreatmentedBy() === $this) {
+                $userTreatmentholiday->setTreatmentedBy(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getService(): ?Services
+    {
+        return $this->service;
+    }
+
+    public function setService(?Services $service): self
+    {
+        $this->service = $service;
 
         return $this;
     }

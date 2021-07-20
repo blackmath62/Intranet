@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20210709150123 extends AbstractMigration
+final class Version20210716123333 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -20,12 +20,14 @@ final class Version20210709150123 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE copyfou ADD updatedAt DATETIME DEFAULT NULL');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_BE1352AE86CA693C ON holidaytypes (createdAt)');
+        $this->addSql('ALTER TABLE statusholiday ADD createdAt DATETIME NOT NULL');
     }
 
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE CopyFou DROP updatedAt');
+        $this->addSql('DROP INDEX UNIQ_BE1352AE86CA693C ON HolidayTypes');
+        $this->addSql('ALTER TABLE statusHoliday DROP createdAt');
     }
 }

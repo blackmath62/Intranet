@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des congés{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header">
+                <h3 class="card-title text-center">Liste des congés</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr class="text-center">
+                            <th>Statuts</th>
+                            <th>Utilisateur</th>
+                            <th>Services</th>
+                            <th>Date de Début</th>
+                            <th>Date de Fin</th>
+                            <th>Date de la demande</th>
+                            <th>Date de traitement</th>
+                            <th>Traité par</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                    {% for holiday in data %}
+                        <tr>
+                            <td>
+                            {% if holiday.holidayStatus.id == 1 %}
+                                <a class="btn btn-light btn-xl text-dark" data-toggle="dropdown">
+                                <i class="far fa-hourglass"></i>
+                                <span class="badge badge-success navbar-badge">0</span>
+                            </a>
+                            {% endif %}
+                            {% if holiday.holidayStatus.id == 2 %}
+                            <a class="btn btn-light btn-xl text-dark" data-toggle="dropdown">
+                                <i class="far fa-hourglass"></i>
+                                <span class="badge badge-warning navbar-badge">!</span>
+                            </a>
+                            {% endif %}
+                            {% if holiday.holidayStatus.id == 3 %}
+                                <div class='btn btn-success'><i class="far fa-check"></i></div>
+                            {% endif %}
+                            {% if holiday.holidayStatus.id == 4 %}
+                                <div class='btn btn-danger'><i class="far fa-times"></i></div>
+                            {% endif %}
+                            </td>
+                            {% for user in holiday.user %} 
+                                <td>{{ user.pseudo }}</td>
+                                <td><div class="btn" style="background-color: {{ user.service.color }}; color: {{ user.service.textColor }}">{{ user.service.title }}</div></td>
+                            {% endfor %}
+                            <td>{{ holiday.start ? holiday.start|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ holiday.end ? holiday.end|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ holiday.createdAt ? holiday.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ holiday.treatmentedAt ? holiday.treatmentedAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>
+                                {{ holiday.treatmentedBy }}
+                            </td>
+                            <td>
+                                <a class='btn btn-info' title="Voir" href="{{ path('app_holiday_show', {'id': holiday.id}) }}"><i class="fas fa-eye"></i></a>
+                                <a class='btn btn-warning' title="Modifier" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}"><i class="fas fa-edit"></i></a>
+                                <a class='btn btn-success' title="Accepter" href="{{ path('app_holiday_show', {'id': holiday.id}) }}"><i class="fas fa-check"></i></a>
+                                <a class='btn btn-danger' title="Refuser" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}"><i class="fas fa-times"></i></a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7">Pas de données à afficher</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <a class='btn btn-dark float-right mt-3' href="{{ path('app_holiday_new') }}">Déposer une demande de congés</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

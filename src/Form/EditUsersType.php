@@ -2,9 +2,12 @@
 
 namespace App\Form;
 
+use App\Entity\Main\Services;
 use App\Entity\Main\Users;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -46,29 +49,25 @@ class EditUsersType extends AbstractType
                         'class' => 'col-2 form-control'
                     ]
             ])
-            /*->add('img', FileType::class,[
+            ->add('service', EntityType::class,[
+                'class' => Services::class,
+                'required' => true,
+                'choice_label' => 'title',
+                'multiple' => false,
+                'expanded'=>false,
                 'attr' => [
-                    'class' => 'col-12 form-control'
+                    'class' => 'form-control col-2 mt-2 mb-2',
+                    'data-placeholder' => 'Selectionnez le service'
                 ],
+                'query_builder' => function(EntityRepository $er){
+                    return $er->createQueryBuilder('s')
+                            ->where('s.id <> 12')
+                            ->andWhere('s.id <> 8')
+                            ->orderBy('s.title', 'ASC');
+                },
 
-                // make it optional so you don't have to re-upload the PDF file
-                // every time you edit the Product details
-                'required' => false,
-                'data_class' => null,
-                // unmapped fields can't define their validation using annotations
-                // in the associated entity, so you can use the PHP constraint classes
-                'constraints' => [
-                    new File([
-                        'maxSize' => '2000k',
-                        'mimeTypes' => [
-                            'image/png',
-                            'image/jpg',
-                            'image/jpeg',
-                        ],
-                        'mimeTypesMessage' => 'Merci de selectionner un Fichier JPG ou PNG',
-                    ])
-                ],
-        ])*/
+                
+            ])
                 ->add('roles', ChoiceType::class,[
                     'choices' => [
                         'Utilisateur' => "ROLE_USER",
@@ -108,7 +107,7 @@ class EditUsersType extends AbstractType
                 ])
             
             ->add('Modifier', SubmitType::class,[
-                'attr' => ['class' => 'btn btn-dark']
+                'attr' => ['class' => 'btn btn-dark float-right']
             ])
         ;
     }

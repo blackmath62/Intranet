@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Congés{% endblock %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header d-flex">
+                <h3 class="card-title text-center">Demande de Congés</h3>
+                <a href="{{ path('app_holiday_list') }}" class="badge badge-success ml-auto">Retourner à la liste</a>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th>Statut</th>
+                            <td>{{ holiday.holidayStatus.name }}</td>
+                        </tr>
+                            {% for user in holiday.user %}
+                        <tr>
+                            <th>Demandeur</th>
+                            <td>{{ user.pseudo }}</td> 
+                        </tr>
+                        <tr>
+                            <th>Mail</th>
+                            <td><a href="mailto:"{{ user.email }}>{{ user.email }}</a></td>
+                        </tr>
+                        <tr>
+                            <th>Service</th>
+                            <td><div class="btn" style="background-color: {{ user.service.color }}; color: {{ user.service.textColor }}"><i class="mr-2 fas {{ user.service.fa }}"></i>{{ user.service.title }}</div></td>
+                        </tr>  
+                            {% endfor %}
+                        <tr>
+                            <th>Date Début</th>
+                            <td>{{ holiday.start ? holiday.start|date('d-m-Y H:i:s') : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date Fin</th>
+                            <td>{{ holiday.end ? holiday.end|date('d-m-Y H:i:s') : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date de la demande</th>
+                            <td>{{ holiday.createdAt ? holiday.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Précisions</th>
+                            <td>{{ holiday.details|raw }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date de traitement</th>
+                            <td>{{ holiday.treatmentedAt ? holiday.treatmentedAt|date('d-m-Y H:i:s') : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Traité par</th>
+                            <td>{{ holiday.treatmentedBy }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <a class="btn btn-dark ml-3 float-right" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}">Modifier</a>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock %}

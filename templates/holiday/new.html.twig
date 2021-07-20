@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Demande de congés{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header d-flex">
+                <h3 class="card-title text-center">Déposer une demande de congés</h3>
+                <a href="{{ path('app_holiday_list') }}" class="badge badge-success ml-auto">Retourner à la liste</a>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                {{ form_start(form) }}
+                <div class="d-flex">
+                {{ form_label(form.start) }}
+                {{ form_widget(form.start) }}
+                {{ form_label(form.end) }}
+                {{ form_widget(form.end) }}
+                {{ form_label(form.holidayType) }}
+                {{ form_widget(form.holidayType) }}
+                </div>
+                {{ form_label(form.details) }}
+                {{ form_widget(form.details) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

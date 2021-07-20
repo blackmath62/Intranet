@@ -1147,16 +1147,6 @@ class Art
      */
     private $artId;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Decisionnel::class, mappedBy="articles")
-     */
-    private $decisionnels;
-
-    public function __construct()
-    {
-        $this->decisionnels = new ArrayCollection();
-    }
-
     public function getCe1(): ?string
     {
         return $this->ce1;
@@ -1961,33 +1951,4 @@ class Art
     {
         return $this->artId;
     }
-
-    /**
-     * @return Collection|Decisionnel[]
-     */
-    public function getDecisionnels(): Collection
-    {
-        return $this->decisionnels;
-    }
-
-    public function addDecisionnel(Decisionnel $decisionnel): self
-    {
-        if (!$this->decisionnels->contains($decisionnel)) {
-            $this->decisionnels[] = $decisionnel;
-            $decisionnel->addArticle($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDecisionnel(Decisionnel $decisionnel): self
-    {
-        if ($this->decisionnels->removeElement($decisionnel)) {
-            $decisionnel->removeArticle($this);
-        }
-
-        return $this;
-    }
-
-
 }

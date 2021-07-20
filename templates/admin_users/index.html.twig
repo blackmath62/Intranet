@@ -34,6 +34,9 @@
 											<span>pseudo</span>
 										</th>
 										<th class="text-center">
+											<span>Service</span>
+										</th>
+										<th class="text-center">
 											<span>roles</span>
 										</th>
 										<th class="text-center">
@@ -56,6 +59,11 @@
 												</td>
 												<td class="text-center">
 													{{ user.pseudo }}
+												</td>
+												<td class="text-center">
+												{% if user.service %}
+													{{ user.service.title }}
+												{% endif %}
 												</td>
 												<td class="text-center">
 													{% for role in user.roles %}
@@ -107,6 +115,9 @@
 										</th>
 										<th class="text-center">
 											<span>pseudo</span>
+										</th>
+										<th class="text-center">
+											<span>Service</span>
 										</th>
 										<th class="text-center">
 											<span>roles</span>

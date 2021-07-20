@@ -1,0 +1,5 @@
+<form method="post" action="{{ path('holiday_delete', {'id': holiday.id}) }}" onsubmit="return confirm('êtes vous sûr de vouloir supprimer ce congés?');">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ holiday.id) }}">
+    <button class="btn btn-primary float-right">Delete</button>
+</form>

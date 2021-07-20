@@ -66,7 +66,6 @@ class BourseTransportController extends AbstractController
      */
     public function show(Calendar $calendar, Request $request): Response
     {
-        
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);

@@ -65,18 +65,18 @@
 										<div class="position-relative p-3 bg-gray" style="height: 180px">
 											<div class="ribbon-wrapper ribbon-xl">
 												<div class="ribbon bg-success">
-													StatusList
+													StatusTicketsList
 												</div>
 											</div>
 											<i class="fas fa-bell fa-7x p-4"></i>
-											<a>Statuts</a>
+											<a>Statuts des tickets</a>
 										</div>
 									</div>
 								</a>
 								<!-- /.card-body -->
 							</div>
 							<!-- /.card -->
-              <div class="row mt-4">
+              				<div class="row mt-4">
 								<a href='{{path('app_admin_priorities')}}'>
 									<div class="col-sm-4 text-center" data-toggle="tooltip" data-placement="top" title="Degrés d'urgence des tickets">
 										<div class="position-relative p-3 bg-gray" style="height: 180px">
@@ -117,6 +117,61 @@
 									</div>
 								</a>
 							</div>
+							<!--  3 eme ligne -->
+							<div class="row mt-4">
+								<a href='{{path('app_admin_types_holiday')}}'>
+									<div class="col-sm-4 text-center" data-toggle="tooltip" data-placement="top" title="Ajouter des Types de congés à la liste">
+										<div class="position-relative p-3 bg-gray" style="height: 180px">
+											<div class="ribbon-wrapper ribbon-xl">
+												<div class="ribbon bg-info">
+													TypeCongésList
+												</div>
+											</div>
+											<i class="fas fa-sleigh  fa-7x p-4"></i>
+											<a>Type de congés</a>
+										</div>
+									</div>
+								</a>
+								<a href="{{path('app_admin_status_holiday')}}">
+									<div class="col-sm-4 text-center" data-toggle="tooltip" data-placement="top" title="Ajouter des status de congés à la liste">
+										<div class="position-relative p-3 bg-gray" style="height: 180px">
+											<div class="ribbon-wrapper ribbon-xl">
+												<div class="ribbon bg-purple">
+													StatusCongesList
+												</div>
+											</div>
+											<i class="fas fa-mug-hot fa-7x p-4"></i>
+											<a>Status des congés</a>
+										</div>
+									</div>
+								</a>
+								<!--
+								<a href="">
+									<div class="col-sm-4 text-center" data-toggle="tooltip" data-placement="top" title="Mot clé de recherche du FAQ">
+										<div class="position-relative p-3 bg-gray" style="height: 180px">
+											<div class="ribbon-wrapper ribbon-xl">
+												<div class="ribbon bg-danger">
+													SectionSearchList
+												</div>
+											</div>
+											<i class="fas fa-puzzle-piece fa-7x p-4"></i>
+											<a>Mots clés de recherche</a>
+										</div>
+									</div>
+								</a>
+								-->
+							</div>
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.container-fluid -->
+
+
+
+
+
 						</div>
 						<!-- /.col -->
 					</div>
