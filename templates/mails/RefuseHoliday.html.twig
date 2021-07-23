@@ -1,0 +1,7 @@
+<p>Bonjour 
+{% for user in holiday.user %}
+    {{ user.pseudo }}     
+{% endfor %}
+</p></br>
+<p>Nous sommes au regret de vous annoncer que vos congés du {{ holiday.start|date('d-m-Y H:i:s') }} au {{ holiday.end|date('d-m-Y H:i:s') }} n'ont pas été acceptées.</p></br>
+<p>La Direction</p>

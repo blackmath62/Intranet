@@ -7,6 +7,7 @@ use App\Entity\Divalto\Ent;
 use App\Entity\Main\Trackings;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\AnnuaireRepository;
+use App\Repository\Main\HolidayRepository;
 use App\Repository\Main\TrackingsRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -45,15 +46,10 @@ class AnnuaireController extends AbstractController
     }
     
 
-    public function home(UsersRepository $repo, Request $request)
+    public function home(UsersRepository $repo, Request $request, HolidayRepository $holidayRepo)
     {
         
             
-        $today = new \DateTime();
-        $lastYear = new \DateTime();
-        $lastYear->sub(new DateInterval('P1Y'));
-        $CmdsToday = $this->getDoctrine()->getRepository(Ent::class, 'divaltoreel')->findBy(['pidt' => $today, 'picod' => 2]);
-        $CmdsLastYear = $this->getDoctrine()->getRepository(Ent::class, 'divaltoreel')->findBy(['pidt' => $lastYear, 'picod' => 2]);
         $users = $repo->findAll();
 
         // tracking user page for stats
@@ -63,8 +59,7 @@ class AnnuaireController extends AbstractController
         return $this->render('annuaire/home.html.twig', [
             'title' => "page d'accueil",
             'users' => $users,
-            'CmdsToday' => $CmdsToday,
-            'CmdsLastYear' => $CmdsLastYear  
+              
         ]);
 
     }

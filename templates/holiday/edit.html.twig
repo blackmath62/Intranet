@@ -3,11 +3,38 @@
 {% block title %}Modification des congés{% endblock %}
 
 {% block body %}
-    <h1>Modifier les congés</h1>
-
-    {{ include('holiday/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a class="btn btn-primary float-right" href="{{ path('app_holiday_list') }}">Revenir à la liste</a>
-
-    {{ include('holiday/_delete_form.html.twig') }}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header d-flex">
+                <h3 class="card-title text-center">Modifier les congés</h3>
+                <a href="{{ path('app_holiday_list') }}" class="badge badge-success ml-auto">Retourner à la liste</a>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                {{ form_start(form) }}
+                <div class="d-flex">
+                {{ form_label(form.start) }}
+                {{ form_widget(form.start) }}
+                {{ form_label(form.end) }}
+                {{ form_widget(form.end) }}
+                {{ form_label(form.holidayType) }}
+                {{ form_widget(form.holidayType) }}
+                <div class="ml-3"><strong>Statut: </strong>{{ holiday.holidayStatus.name }}</div>
+                </div>
+                {{ form_label(form.details) }}
+                {{ form_widget(form.details) }}
+                    {% for user in holiday.user %}
+                        {% if user.id == app.user.id %}
+                        {{ form_widget(form.Envoyer, {'label': 'Modifier'} ) }}
+                        <a class='btn btn-danger m-3' title="supprimer" href="{{ path('app_holiday_delete', {'id': holiday.id}) }}"></i>Supprimer cette demande de congés</a>
+                        {% else %}
+                        {{ form_row(form.Envoyer, {'attr' : {'class' : "d-none"}} ) }}   
+                        {% endif %}
+                    {% endfor %}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

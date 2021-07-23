@@ -47,6 +47,10 @@
                             <td>{{ holiday.createdAt ? holiday.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                         </tr>
                         <tr>
+                            <th>Type de congés</th>
+                            <td>{{ holiday.holidayType.name }}</td>
+                        </tr>
+                        <tr>
                             <th>Précisions</th>
                             <td>{{ holiday.details|raw }}</td>
                         </tr>
@@ -56,11 +60,19 @@
                         </tr>
                         <tr>
                             <th>Traité par</th>
-                            <td>{{ holiday.treatmentedBy }}</td>
+                            <td>
+                            {% if holiday.treatmentedBy %}
+                                {{ holiday.treatmentedBy.pseudo }}
+                            {% endif %}                            
+                            </td>
                         </tr>
                     </tbody>
                 </table>
-                <a class="btn btn-dark ml-3 float-right" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}">Modifier</a>
+                {% for user in holiday.user %}
+                        {% if user.id == app.user.id %}
+                        <a class="btn btn-dark ml-3 float-right" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}">Modifier</a>
+                        {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>

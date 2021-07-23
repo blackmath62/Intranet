@@ -11,10 +11,10 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-
                 <table id="example1" class="table table-bordered table-striped">
                     <thead>
                         <tr class="text-center">
+                            <th>Id</th>
                             <th>Statuts</th>
                             <th>Utilisateur</th>
                             <th>Services</th>
@@ -29,6 +29,7 @@
                     <tbody class="text-center">
                     {% for holiday in data %}
                         <tr>
+                            <td>{{ holiday.id }}</td>
                             <td>
                             {% if holiday.holidayStatus.id == 1 %}
                                 <a class="btn btn-light btn-xl text-dark" data-toggle="dropdown">
@@ -39,14 +40,14 @@
                             {% if holiday.holidayStatus.id == 2 %}
                             <a class="btn btn-light btn-xl text-dark" data-toggle="dropdown">
                                 <i class="far fa-hourglass"></i>
-                                <span class="badge badge-warning navbar-badge">!</span>
+                                <span class="badge badge-warning navbar-badge">10</span>
                             </a>
                             {% endif %}
                             {% if holiday.holidayStatus.id == 3 %}
-                                <div class='btn btn-success'><i class="far fa-check"></i></div>
+                                <div><i class="fas fa-check fa-2x text-success"></i></div>
                             {% endif %}
                             {% if holiday.holidayStatus.id == 4 %}
-                                <div class='btn btn-danger'><i class="far fa-times"></i></div>
+                                <div><i class="fas fa-times fa-2x text-danger"></i></div>
                             {% endif %}
                             </td>
                             {% for user in holiday.user %} 
@@ -58,13 +59,25 @@
                             <td>{{ holiday.createdAt ? holiday.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>{{ holiday.treatmentedAt ? holiday.treatmentedAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>
-                                {{ holiday.treatmentedBy }}
+                                {% if holiday.treatmentedBy %}
+                                    {{ holiday.treatmentedBy.pseudo }}
+                                {% endif %}
                             </td>
                             <td>
+                            {% for user in holiday.user %}
+                              {% if user.id == app.user.id or is_granted('ROLE_CONGES') %}
                                 <a class='btn btn-info' title="Voir" href="{{ path('app_holiday_show', {'id': holiday.id}) }}"><i class="fas fa-eye"></i></a>
-                                <a class='btn btn-warning' title="Modifier" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}"><i class="fas fa-edit"></i></a>
-                                <a class='btn btn-success' title="Accepter" href="{{ path('app_holiday_show', {'id': holiday.id}) }}"><i class="fas fa-check"></i></a>
-                                <a class='btn btn-danger' title="Refuser" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}"><i class="fas fa-times"></i></a>
+                              {% endif %}
+                            {% endfor %}
+                            {% for user in holiday.user %}
+                                {% if user.id == app.user.id %}
+                                    <a class='btn btn-warning' title="Modifier" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}"><i class="fas fa-edit"></i></a>
+                                {% endif %}
+                            {% endfor %}
+                            {% if is_granted('ROLE_CONGES') %}
+                                <a class='btn btn-success' title="Accepter" href="{{ path('app_holiday_accept', {'id': holiday.id}) }}"><i class="fas fa-check"></i></a>
+                                <a class='btn btn-danger' title="Refuser" href="{{ path('app_holiday_refuse', {'id': holiday.id}) }}"><i class="fas fa-times"></i></a>
+                            {% endif %}
                             </td>
                         </tr>
                     {% else %}

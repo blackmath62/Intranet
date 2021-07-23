@@ -43,7 +43,7 @@ class EditUsersType extends AbstractType
                         'class' => 'col-2 form-control'
                     ]
             ])
-            ->add('commercial', IntegerType::class,[
+            ->add('commercial', TextType::class,[
                     'required' => false,    
                     'attr' => [
                         'class' => 'col-2 form-control'
@@ -81,6 +81,7 @@ class EditUsersType extends AbstractType
                         'RB' => "ROLE_RB",
                         'BOSS' => "ROLE_BOSS",
                         'COMPTA' => "ROLE_COMPTA",
+                        'CONGES' => "ROLE_CONGES",
                         'INFORMATIQUE' => "ROLE_INFORMATIQUE",
                         'RESPONSABLE SECTEUR' => "ROLE_RESPONSABLE_SECTEUR",
                         'COMMERCIAL' => "ROLE_COMMERCIAL",
@@ -97,6 +98,7 @@ class EditUsersType extends AbstractType
                         'RB' => ['class' => 'm-3'],
                         'BOSS' => ['class' => 'm-3'],
                         'COMPTA' => ['class' => 'm-3'],
+                        'CONGES' => ['class' => 'm-3'],
                         'INFORMATIQUE' => ['class' => 'm-3'],
                         'RESPONSABLE SECTEUR' => ['class' => 'm-3'],
                         'COMMERCIAL' => ['class' => 'm-3'],
