@@ -20,7 +20,7 @@
                             <th>Services</th>
                             <th>Date de Début</th>
                             <th>Date de Fin</th>
-                            <th>Date de la demande</th>
+                            <th>Demande déposé</th>
                             <th>Date de traitement</th>
                             <th>Traité par</th>
                             <th>Action</th>
@@ -56,7 +56,7 @@
                             {% endfor %}
                             <td>{{ holiday.start ? holiday.start|date('d-m-Y H:i:s') : '' }}</td>
                             <td>{{ holiday.end ? holiday.end|date('d-m-Y H:i:s') : '' }}</td>
-                            <td>{{ holiday.createdAt ? holiday.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                            <td>{{ holiday.createdAt|time_diff }}</td>
                             <td>{{ holiday.treatmentedAt ? holiday.treatmentedAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>
                                 {% if holiday.treatmentedBy %}

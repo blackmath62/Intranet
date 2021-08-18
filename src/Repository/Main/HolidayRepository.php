@@ -28,7 +28,36 @@ class HolidayRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetch();
     }
+    // Pour contrôler si l'utilisateur n'a pas déjà posé durant cet interval
+    public function getAlreadyInHolidayInThisPeriod($start, $end, $user){
+        $start = date_format($start,"Y-m-d H:i:s");
+        $end = date_format($end,"Y-m-d H:i:s");
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * 
+        FROM holiday 
+        INNER JOIN holiday_users ON holiday_users.holiday_id = holiday.id 
+        WHERE holiday_users.users_id = $user
+        AND holiday.start BETWEEN '$start' AND '$end' -- la date début est comprise entre les dates saisies
+        OR holiday.end BETWEEN '$start' AND '$end'  -- la date fin est comprise entre les dates saisies
+        OR '$start' BETWEEN holiday.start AND holiday.end  -- la date début saisie est comprise entre les dates début et fin
+        OR '$end' BETWEEN holiday.start AND holiday.end -- la date fin saisie est comprise entre les dates début et fin
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
+    public function getUserActuallyHoliday($user)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT DISTINCT users_id FROM holiday_users, holiday WHERE holiday.start <= NOW() AND holiday.end >= NOW() AND users_id = $user AND holiday.holidayStatus_id = 3 ORDER BY users_id";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+        
+    }
+
+    // Chevauchement de congés d'un même service
     public function getOverlapHoliday($start, $end, $service)
     {
 

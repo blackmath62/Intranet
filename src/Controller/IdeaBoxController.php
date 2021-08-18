@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Form\IdeaBoxType;
 use App\Entity\Main\IdeaBox;
+use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
 use App\Repository\Main\IdeaBoxRepository;
 use App\Repository\Main\TrackingsRepository;
-use App\Repository\Main\UsersRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,6 +22,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class IdeaBoxController extends AbstractController
 {
     /**
+     * @Route("/php_info", name="app_php_info")
+     */
+    public function getPhpInfo()
+    {
+        return new Response('<html><body>'.phpinfo().'</body></html>');
+    }
+    /**
      * @Route("/", name="app_home")
      */
     public function index(Request $request, IdeaBoxRepository $repo, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo)
@@ -32,9 +40,20 @@ class IdeaBoxController extends AbstractController
 
         $users = $repoUser->findAll();
         $track = $repoTracking->getLastConnect();
-
+        // balayer chaque utilisateur
+        
+        for ($ligTrack=0; $ligTrack <count($track) ; $ligTrack++) { 
+            // vérifier s'il est actuellement en congés
+            $inHoliday = $holidayRepo->getUserActuallyHoliday($track[$ligTrack]['user_id']);
+            if ($inHoliday) {
+                $track[$ligTrack]['inHoliday'] = 'En congés';
+            }else {
+                $track[$ligTrack]['inHoliday'] = '';
+            }
+            $track[$ligTrack]['ago'] = $this->time_elapsed_string($track[$ligTrack]['createdAt']);
+        }
          // Calendrier des congés
-         $events = $holidayRepo->findAll();
+         $events = $holidayRepo->findBy(['holidayStatus' => 3]);
          $rdvs = [];
  
          foreach($events as $event){
@@ -50,6 +69,7 @@ class IdeaBoxController extends AbstractController
                 'end' => $event->getEnd()->format('Y-m-d H:i:s'),
                 'title' => 'Congés ' . $pseudo,
                 'backgroundColor' => $color,
+                'borderColor' => '#FFFFFF',
                 'textColor' => $textColor,
             ];
          }
@@ -110,5 +130,39 @@ class IdeaBoxController extends AbstractController
             'ideaForm' => $form->createView(),
             'title' => 'Idea Edit'
         ]);
+    }
+
+    function time_elapsed_string($datetime, $full = false) {
+        $now = new DateTime;
+        $ago = new DateTime($datetime);
+        $diff = $now->diff($ago);
+    
+        $diff->w = floor($diff->d / 7);
+        $diff->d -= $diff->w * 7;
+        
+        $string = array(
+            'y' => 'année',
+            'm' => 'mois',
+            'w' => 'semaine',
+            'd' => 'jour',
+            'h' => 'heure',
+            'i' => 'minute',
+            's' => 'seconde',
+        );
+
+        foreach ($string as $k => &$v) {
+            if ($diff->$k ) {
+                    if ($v == 'mois') {
+                        $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? '' : '');
+                    }else {
+                        $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+                    }
+            } else {
+                unset($string[$k]);
+            }
+        }
+                
+        if (!$full) $string = array_slice($string, 0, 1);
+        return $string ? ' il y a ' . implode(', ', $string) : 'en ligne';
     }
 }

@@ -4,16 +4,17 @@
 {% endblock %}
 {% block body %}
 <section class="content-header">
-<div class="alert alert-info alert-dismissible col-12">
-                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                  <h5><i class="icon fas fa-info-circle"></i> info</h5>
-                  Pour déposer une idée d'amélioration, cliquez sur tickets sur la gauche puis sur la barre à droite de Créer un nouveau ticket. </br>
-                  Dans le degrés d'urgence, selectionnez boite à idée. </br>
-</div>
+  <div class="alert alert-info alert-dismissible col-12" role="alert" id="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h5><i class="icon fas fa-info-circle"></i> info</h5>
+    Pour déposer une idée d'amélioration, cliquez sur tickets sur la gauche puis sur la barre à droite de Créer un nouveau ticket. </br>
+    Dans le degrés d'urgence, selectionnez boite à idée. </br>
+  </div>
+
 <div class='d-flex justify-content-between'>
 {% if is_granted('ROLE_ADMIN') %}
     <!-- /.col -->
-          <div class="col-md-8">
+          <div class="col-md-9">
             <div class="card card-primary">
               <div class="card-body p-0">
                 <!-- THE CALENDAR -->
@@ -44,10 +45,18 @@
                     <li>
                     <img src="img/profile/{{ user.img }}" alt="User Image">
                     <a class="users-list-name" href="mailto:{{ user.email }}">{{ user.pseudo }}</a>
+                    
                         {% for track in tracks %}
                             {% if track.user_id == user.id %}
-                                <span class="users-list-date">Derniére visite : </span>
-                                <span class="users-list-date">{{ track.createdAt|date("d/m/Y-H:i")}}</span>
+                              {% if track.inHoliday %}
+                                  <small class="badge badge-warning"><i class="fas fa-sun text-white mr-1"></i> {{ track.inHoliday }}</small>
+                              {% else %}
+                                  {% if track.ago == 'en ligne' or track.ago ends with 'secondes' %}
+                                  <small class="badge badge-success"><i class="far fa-clock text-white mr-1"></i> en ligne</small>
+                                  {% else %}
+                                  <small class="badge badge-secondary"><i class="far fa-clock text-white mr-1"></i> {{ track.ago }}</small>  
+                                  {% endif %}                                
+                              {% endif %}
                             {% endif %}
                         {% endfor %}
                     </li>

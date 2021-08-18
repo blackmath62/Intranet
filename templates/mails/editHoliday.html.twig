@@ -23,7 +23,7 @@
         <thead>
             <tr class="text-center">
             <th>Demandeur</th>
-            <th>Date de demande</th>
+            <th>Demandé depuis</th>
             <th>Date Début</th>
             <th>Date fin</th>
             <th>Statut de la demande</th>
@@ -32,7 +32,7 @@
             {% for overlap in overlaps %}
             <tr>
                 <td>{{ overlap.pseudo }}</td>
-                <td>{{ overlap.createdAt|date('d-m-Y H:i:s') }}</td>
+                <td>{{ overlap.createdAt|time_diff }}</td>
                 <td>{{ overlap.start|date('d-m-Y H:i:s') }}</td>
                 <td>{{ overlap.end|date('d-m-Y H:i:s') }}</td>
                 <td>{{ overlap.statut }}</td>

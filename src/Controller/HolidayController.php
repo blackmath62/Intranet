@@ -10,12 +10,14 @@ use App\Entity\Main\statusHoliday;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
 use App\Repository\Main\CalendarRepository;
+use Twig\Extensions\DateExtension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\statusHolidayRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @IsGranted("ROLE_INFORMATIQUE")
@@ -26,10 +28,14 @@ class HolidayController extends AbstractController
     /**
      * @Route("/holiday", name="app_holiday_list")
      */
-    public function index(HolidayRepository $repo, Request $request, statusHolidayRepository $statuts)
+    public function index(HolidayRepository $repo, Request $request, statusHolidayRepository $statuts, IdeaBoxController $ideaBoxController, TranslatorInterface $translator)
     {
         // liste des congés avec les services
-        $holidayList = $repo->getListeCongesEtServices();
+        $holidayList = $repo->getListeCongesEtServices();        
+        
+        
+
+        // mettre à jour les en attente de validation chevauchement et Libre
         /*$stat = 0;
         // on balaye la liste
         for ($ligHolidayList=0; $ligHolidayList <count($holidayList) ; $ligHolidayList++) {
@@ -65,7 +71,11 @@ class HolidayController extends AbstractController
         }*/
         
         
-        $data = $repo->findAll();
+        $data = $repo->findBy([], ['id' => 'DESC']);
+        
+        /*for ($ligData=0; $ligData <count($data) ; $ligData++) { 
+            $data[$ligData]['ago'] = $ideaBoxController->time_elapsed_string($data[$ligData]['createdAt']);
+        }*/
 
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
@@ -79,6 +89,8 @@ class HolidayController extends AbstractController
      /**
      * @Route("/holiday/new", name="app_holiday_new", methods={"GET","POST"})
      */
+
+     // Dépôt d'un nouveau congés
     public function newHoliday(Request $request, statusHolidayRepository $statuts, MailerInterface $mailerInterface, UsersRepository $repoUser, HolidayRepository $repoHoliday)
     {
         $holiday = new Holiday;
@@ -90,6 +102,12 @@ class HolidayController extends AbstractController
         $this->setTracking($tracking);
         
         if($form->isSubmitted() && $form->isValid() ){
+            // vérifier si cette utilisateur n'a pas déjà déposé durant cette période
+            $result = $repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $this->getUser()->getId());
+            if ($result) {
+                $this->addFlash('danger', 'Vous avez déjà posé du ' . $result[0]['start'] . ' au ' . $result[0]['end'] );
+                return $this->redirectToRoute('app_holiday_list');
+            }
             // Liste de congés dans le même interval de date d'un service
             $overlaps = $repoHoliday->getOverlapHoliday($holiday->getStart(), $holiday->getEnd(),$this->getUser()->getService()->getId());
             // On bascule les statuts des congés pour les mettres en chevauchement
@@ -160,13 +178,15 @@ class HolidayController extends AbstractController
     /**
      * @Route("/holiday/show/{id}", name="app_holiday_show", methods={"GET"})
      */
-    public function showHoliday($id, Request $request, HolidayRepository $repo)
+    // Voir un congés
+    public function showHoliday($id, Request $request, HolidayRepository $repo, IdeaBoxController $ideaBoxController)
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
 
         $holiday = $repo->findOneBy(['id' => $id]);
+        //$holiday[0]['ago'] = $ideaBoxController->time_elapsed_string($holiday[0]['createdAt']);
         // Si on est pas le dépositaire ou le décideur pas accés
         $userHoliday = $repo->getUserIdHoliday($id);
         if ($userHoliday['users_id'] != $this->getUser()->getId() and !$this->isGranted('ROLE_CONGES') ){
@@ -181,6 +201,7 @@ class HolidayController extends AbstractController
     /**
      * @Route("/holiday/edit/{id}", name="app_holiday_edit", methods={"GET","POST"})
      */
+    // modifier un congés
     public function editHoliday($id, Request $request, HolidayRepository $repo, MailerInterface $mailerInterface, UsersRepository $repoUser, statusHolidayRepository $statuts)
     {
         // tracking user page for stats
@@ -265,6 +286,7 @@ class HolidayController extends AbstractController
     /**
      * @Route("/holiday/delete/{id}", name="app_holiday_delete")
      */
+    // supprimer un congés
     public function deleteHoliday($id, Request $request, Holiday $holiday, HolidayRepository $repo)
     {
         
@@ -291,6 +313,7 @@ class HolidayController extends AbstractController
      * @Route("/holiday/accept/{id}", name="app_holiday_accept", methods={"GET"})
      * @IsGranted("ROLE_CONGES")
      */
+    // accepter un congés
     public function acceptHoliday($id, Request $request, HolidayRepository $repo, statusHolidayRepository $statuts, MailerInterface $mailerInterface, UsersRepository $repoUser)
     {
         // tracking user page for stats
@@ -328,6 +351,7 @@ class HolidayController extends AbstractController
      * @Route("/holiday/refuse/{id}", name="app_holiday_refuse", methods={"GET"})
      * @IsGranted("ROLE_CONGES")
      */
+    // refuser un congés
     public function refuseHoliday($id, Request $request, HolidayRepository $repo, statusHolidayRepository $statuts, MailerInterface $mailerInterface, UsersRepository $repoUser)
     {
         // tracking user page for stats

@@ -32,7 +32,7 @@ class HolidayType extends AbstractType
                 'time_label' => 'Heure de début',
                 'time_widget' => 'single_text',
                 'required' => true,
-                'data' => new \DateTime("now"),
+                'data' =>  date_time_set(new \DateTime("now"), 00, 00),
                 'label' => "Date début",
                 'attr' => ['class' => 'col-3 ml-3'],
             ])
@@ -44,7 +44,7 @@ class HolidayType extends AbstractType
                 'time_label' => 'Heure de début',
                 'time_widget' => 'single_text',
                 'required' => true,
-                'data' => new \DateTime("now"),
+                'data' => date_time_set(new \DateTime("now"), 23, 59),
                 'label' => "Date fin",
                 'attr' => ['class' => 'col-3 ml-3'],
         ])

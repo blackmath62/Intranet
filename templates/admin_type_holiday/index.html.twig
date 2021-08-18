@@ -67,7 +67,7 @@
 														{{holidayType.name}}
 													</td>
 													<td class="text-center">
-														{{holidayType.Color}}
+														<button class="btn text-white" style="background-color:{{holidayType.Color}};">{{holidayType.Color}}</button>
 													</td>
 													<td class="text-center">
 														<a href="{{ path('app_edit_types_holiday', {'id' : holidayType.id}) }}" type="button" class="btn btn-warning">
