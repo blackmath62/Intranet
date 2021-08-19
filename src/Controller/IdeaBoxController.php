@@ -4,7 +4,10 @@ namespace App\Controller;
 
 use DateTime;
 use App\Form\IdeaBoxType;
+use App\Entity\Main\Users;
+use RecursiveArrayIterator;
 use App\Entity\Main\IdeaBox;
+use RecursiveIteratorIterator;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
 use App\Repository\Main\IdeaBoxRepository;
@@ -55,80 +58,71 @@ class IdeaBoxController extends AbstractController
          // Calendrier des congés
          $events = $holidayRepo->findBy(['holidayStatus' => 3]);
          $rdvs = [];
- 
+         
          foreach($events as $event){
-            $id = $event->getId();
-            $userId = $holidayRepo->getUserIdHoliday($id);
-            $user = $userRepo->findOneBy(['id' => $userId]);
-            $pseudo = $user->getPseudo();
-            $color = $user->getService()->getColor();
-            $textColor = $user->getService()->getTextColor();
+             $id = $event->getId();
+             $userId = $holidayRepo->getUserIdHoliday($id);
+             $user = $userRepo->findOneBy(['id' => $userId]);
+             $pseudo = $user->getPseudo();
+             $color = $user->getService()->getColor();
+             $textColor = $user->getService()->getTextColor();
+             
+             $rdvs[] = [
+                 'id' => $event->getId(),
+                 'start' => $event->getStart()->format('Y-m-d H:i:s'),
+                 'end' => $event->getEnd()->format('Y-m-d H:i:s'),
+                 'title' => 'Congés ' . $pseudo,
+                 'backgroundColor' => $color,
+                 'borderColor' => '#FFFFFF',
+                 'textColor' => $textColor,
+                ];
+            }
+            
+        // récupérer les fériers en JSON sur le site etalab
+        $ferierJson = file_get_contents("https://etalab.github.io/jours-feries-france-data/json/metropole.json");
+        // On ajoute les fériers au calendrier des congés
+        $jsonIterator = new RecursiveIteratorIterator(
+            new RecursiveArrayIterator(json_decode($ferierJson, TRUE)),
+            RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($jsonIterator as $key => $val) {
             $rdvs[] = [
-                'id' => $event->getId(),
-                'start' => $event->getStart()->format('Y-m-d H:i:s'),
-                'end' => $event->getEnd()->format('Y-m-d H:i:s'),
-                'title' => 'Congés ' . $pseudo,
-                'backgroundColor' => $color,
+                'id' => '',
+                'start' => $key,
+                'end' => $key,
+                'title' => $val,
+                'backgroundColor' => '#404040',
                 'borderColor' => '#FFFFFF',
-                'textColor' => $textColor,
+                'textColor' => '#FFFFFF',
             ];
-         }
+        }
+        // Les anniversaires des utilisateurs
+        $users = $userRepo->findAll();
+        foreach ($users as $key => $value) {
+            $annif = $value->getBornAt()->format('m-d');
+            $annee = date("Y") - 1;
+            $annee2 = date("Y") + 3;
+            for ($ligAnnee=$annee; $ligAnnee <$annee2 ; $ligAnnee++) { 
+                $anniversaire = $ligAnnee . '-' . $annif;
+                
+                $rdvs[] = [
+                    'id' => '',
+                    'start' => $anniversaire,
+                    'end' => $anniversaire,
+                    'title' => 'Anniversaire ' . $value->getPseudo(),
+                    'backgroundColor' => '#FF9BFF',
+                    'borderColor' => '#D7D7D7',
+                    'textColor' => '#FFFFFF',
+                ];
+            }
+        }
+        
          $data = json_encode($rdvs);
- 
-
 
         return $this->render('idea_box/index.html.twig', [
             'title' => 'Accueil',
             'users' => $users,
             'tracks' => $track,
             'data' => $data
-        ]);
-    }
-
-    /**
-     * @Route("/idea/show/{id}", name="app_idea_show")
-     */
-
-    public function IdeaShow(int $id, IdeaBoxRepository $repo, Request $request)
-    {
-        $idea = $repo->findOneBy(['id' => $id]);
-
-        // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
-
-        return $this->render('idea_box/idea_show.html.twig', [
-            'idea' => $idea,
-            'title' => 'Idea View'
-        ]);
-    }
-
-    /**
-     * @Route("/idea/edit/{id}", name="app_idea_edit")
-     */
-
-    public function IdeaEdit(int $id, IdeaBoxRepository $repo, Request $request)
-    {
-        $idea = $repo->findOneBy(['id' => $id]);
-
-        // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
-        
-        $form = $this->createForm(IdeaBoxType::class, $idea);
-        $form->handleRequest($request);
-        if($form->isSubmitted() && $form->isValid()){
-            $idea = $form->getData();
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($idea);
-            $em->flush();
-            
-            $this->addFlash('message', 'Idée Modifiée avec succés');
-            return $this->redirectToRoute('app_idea_show', ['id' => $id ]);
-        }
-        return $this->render('idea_box/idea_edit.html.twig', [
-            'ideaForm' => $form->createView(),
-            'title' => 'Idea Edit'
         ]);
     }
 
@@ -165,4 +159,5 @@ class IdeaBoxController extends AbstractController
         if (!$full) $string = array_slice($string, 0, 1);
         return $string ? ' il y a ' . implode(', ', $string) : 'en ligne';
     }
+
 }

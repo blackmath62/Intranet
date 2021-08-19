@@ -37,10 +37,10 @@ class HolidayRepository extends ServiceEntityRepository
         FROM holiday 
         INNER JOIN holiday_users ON holiday_users.holiday_id = holiday.id 
         WHERE holiday_users.users_id = $user
-        AND holiday.start BETWEEN '$start' AND '$end' -- la date début est comprise entre les dates saisies
+        AND (holiday.start BETWEEN '$start' AND '$end' -- la date début est comprise entre les dates saisies
         OR holiday.end BETWEEN '$start' AND '$end'  -- la date fin est comprise entre les dates saisies
         OR '$start' BETWEEN holiday.start AND holiday.end  -- la date début saisie est comprise entre les dates début et fin
-        OR '$end' BETWEEN holiday.start AND holiday.end -- la date fin saisie est comprise entre les dates début et fin
+        OR '$end' BETWEEN holiday.start AND holiday.end) -- la date fin saisie est comprise entre les dates début et fin
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();

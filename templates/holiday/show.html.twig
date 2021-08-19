@@ -43,6 +43,17 @@
                             <td>{{ holiday.end ? holiday.end|date('d-m-Y H:i:s') : '' }}</td>
                         </tr>
                         <tr>
+                            <th>Nombre de jour</th>
+                            <td>{{ nbConges }} 
+                                {% if nbConges < 2 %}
+                                    jour
+                                {% else %}
+                                    jours
+                                {% endif %}
+                            </td>   
+                            
+                        </tr>
+                        <tr>
                             <th>Date de la demande</th>
                             <td>{{ holiday.createdAt ? holiday.createdAt|date('d-m-Y H:i:s') : '' }}</td>
                         </tr>

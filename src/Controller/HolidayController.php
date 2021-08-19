@@ -3,21 +3,24 @@
 namespace App\Controller;
 
 use DateTime;
+use ArrayObject;
 use App\Form\HolidayType;
+use RecursiveArrayIterator;
 use App\Entity\Main\Holiday;
+use RecursiveIteratorIterator;
 use Symfony\Component\Mime\Email;
 use App\Entity\Main\statusHoliday;
+use Twig\Extensions\DateExtension;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
 use App\Repository\Main\CalendarRepository;
-use Twig\Extensions\DateExtension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\statusHolidayRepository;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @IsGranted("ROLE_INFORMATIQUE")
@@ -106,6 +109,7 @@ class HolidayController extends AbstractController
             $result = $repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $this->getUser()->getId());
             if ($result) {
                 $this->addFlash('danger', 'Vous avez déjà posé du ' . $result[0]['start'] . ' au ' . $result[0]['end'] );
+                unset($result);
                 return $this->redirectToRoute('app_holiday_list');
             }
             // Liste de congés dans le même interval de date d'un service
@@ -120,7 +124,7 @@ class HolidayController extends AbstractController
                     $em->flush();
                 }
             }
-            // dd($overlaps);
+            //dd($overlaps);
             // Nombre de personne dans un service
             $countService['totalUsersService'] = count($repoUser->findBy(['service' =>$this->getUser()->getService()->getId() ]));
 
@@ -193,9 +197,71 @@ class HolidayController extends AbstractController
             $this->addFlash('danger', 'Vous n\'avez pas accés à ces données');
             return $this->redirectToRoute('app_holiday_list');  
         }
+                   
+        // récupérer les fériers en JSON sur le site etalab
+        $ferierJson = file_get_contents("https://etalab.github.io/jours-feries-france-data/json/metropole.json");
+        // On ajoute les fériers au calendrier des congés
+        $jsonIterator = new RecursiveIteratorIterator(
+            new RecursiveArrayIterator(json_decode($ferierJson, TRUE)),
+            RecursiveIteratorIterator::SELF_FIRST);
+        $ferierDurantConges = array();
+        foreach ($jsonIterator as $key => $val) {
+            //dd($holiday->getStart()->format('Y-m-d'));
+            if ($key >= $holiday->getStart()->format('Y-m-d') AND $key <= $holiday->getEnd()->format('Y-m-d') ) {
+                $ferierDurantConges[] = $key;
+            }
+        }    
+        
+        $debut_jour = $holiday->getStart()->format('d');
+        $debut_mois = $holiday->getStart()->format('m');
+        $debut_annee = $holiday->getStart()->format('Y');
+        $debut_heure = $holiday->getStart()->format('H');
+        $debut_minute = $holiday->getStart()->format('i');
+        $debut_seconde = $holiday->getStart()->format('s');
+
+        $fin_jour = $holiday->getEnd()->format('d');
+        $fin_mois = $holiday->getEnd()->format('m');
+        $fin_annee = $holiday->getEnd()->format('Y');
+        $fin_heure = $holiday->getEnd()->format('H');
+        $fin_minute = $holiday->getEnd()->format('i');
+        $fin_seconde = $holiday->getEnd()->format('s');
+
+        $debut_date = mktime($debut_heure, $debut_minute, $debut_seconde, $debut_mois, $debut_jour, $debut_annee);
+        $fin_date = mktime($fin_heure, $fin_minute, $fin_seconde, $fin_mois, $fin_jour, $fin_annee);
+        $nbConges = 0;
+        for($i = $debut_date; $i <= $fin_date; $i+=86400)
+        {
+            // compter le nombre de jour de congés déposé hors weekend
+            if (date("N",$i) != 6 AND date("N",$i) != 7 ) {
+                //compter le nombre d'heure
+                // si le nombre d'heure entre 08h00 et 18h00 est supérieurs à 4 heures et que les jours de début et de fin ne sont pas identiques
+                $hf = new DateTime($holiday->getStart()->format('Y-m-d') . '18:00:00');
+                $hd = $holiday->getStart();
+                $diff = $hf->diff($hd);
+                if ($diff->h > 8) {
+                    $nbConges++;
+                }elseif ($diff->h <= 4 ) {
+                    $nbConges = $nbConges + 0.5 ;
+                }
+                if ($ferierDurantConges) {
+                    foreach ($ferierDurantConges as $key => $value) {
+                        if (date("Y-m-d",$i) == $value ) {
+                            $nbConges = $nbConges - 1;
+                        }
+                    }
+                }
+            }
+        }
+        
         return $this->render('holiday/show.html.twig',[
-            'holiday' => $holiday
+            'holiday' => $holiday,
+            'nbConges' => $nbConges,
         ]);
+    }
+
+    public function nbJoursConges()
+    {
+
     }
 
     /**
