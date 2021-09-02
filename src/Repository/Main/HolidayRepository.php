@@ -23,20 +23,23 @@ class HolidayRepository extends ServiceEntityRepository
     public function getLastHoliday()
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT holiday.id FROM holiday ORDER BY id DESC LIMIT 0,1";
+        $sql = "SELECT * FROM holiday
+        INNER JOIN holiday_users ON holiday_users.holiday_id = holiday.id
+        INNER JOIN users ON holiday_users.users_id = users.id
+        ORDER BY holiday.id DESC LIMIT 0,1";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetch();
     }
     // Pour contrôler si l'utilisateur n'a pas déjà posé durant cet interval
-    public function getAlreadyInHolidayInThisPeriod($start, $end, $user){
+    public function getAlreadyInHolidayInThisPeriod($start, $end, $user, $id = 0){
         $start = date_format($start,"Y-m-d H:i:s");
         $end = date_format($end,"Y-m-d H:i:s");
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * 
         FROM holiday 
         INNER JOIN holiday_users ON holiday_users.holiday_id = holiday.id 
-        WHERE holiday_users.users_id = $user
+        WHERE holiday_users.users_id = $user AND holiday.id <> '$id'
         AND (holiday.start BETWEEN '$start' AND '$end' -- la date début est comprise entre les dates saisies
         OR holiday.end BETWEEN '$start' AND '$end'  -- la date fin est comprise entre les dates saisies
         OR '$start' BETWEEN holiday.start AND holiday.end  -- la date début saisie est comprise entre les dates début et fin
@@ -98,7 +101,7 @@ class HolidayRepository extends ServiceEntityRepository
     {
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT users.email FROM users WHERE users.roles LIKE '%ROLE_CONGES%'
+        $sql = "SELECT DISTINCT users.email FROM users WHERE users.roles LIKE '%ROLE_CONGES%'
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();

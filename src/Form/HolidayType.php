@@ -5,10 +5,12 @@ namespace App\Form;
 use DateTime;
 use App\Entity\Main\Holiday;
 use App\Entity\Main\Calendar;
+use App\Entity\Main\Services;
 use App\Entity\Main\HolidayTypes;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -32,7 +34,7 @@ class HolidayType extends AbstractType
                 'time_label' => 'Heure de début',
                 'time_widget' => 'single_text',
                 'required' => true,
-                'data' =>  date_time_set(new \DateTime("now"), 00, 00),
+                //'data' =>  date_time_set(new \DateTime("now"), 00, 00),
                 'label' => "Date début",
                 'attr' => ['class' => 'col-3 ml-3'],
             ])
@@ -44,7 +46,7 @@ class HolidayType extends AbstractType
                 'time_label' => 'Heure de début',
                 'time_widget' => 'single_text',
                 'required' => true,
-                'data' => date_time_set(new \DateTime("now"), 23, 59),
+                //'data' => date_time_set(new \DateTime("now"), 23, 59),
                 'label' => "Date fin",
                 'attr' => ['class' => 'col-3 ml-3'],
         ])

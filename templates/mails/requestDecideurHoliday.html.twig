@@ -1,21 +1,20 @@
-<p>Bonjour {% for user in holiday.user %}{{ user.pseudo }}{% endfor %},</p>
-<p>Nous avons bien modifié ces congés du <strong>{{ holiday.start|date('d-m-Y H:i:s') }}</strong> au <strong>{{ holiday.end|date('d-m-Y H:i:s') }}</strong></p>
+<p>Bonjour</p>
+<p>Une demande de congés a été déposé par {% for user in holiday.user %}<strong>{{ user.pseudo }}</strong> du service <strong>{{ user.service.title }}</strong> {% endfor %}pour des congés du <strong>{{ holiday.start|date('d-m-Y H:i:s') }}</strong> au <strong>{{ holiday.end|date('d-m-Y H:i:s') }}</strong></p>
 <p>Type de demande: <strong>{{ holiday.holidayType.name }}</strong></p>
 <p>Son Statut est : <strong>{{ holiday.holidayStatus.name }}</strong></p>
-
 {% if holiday.details %}
     <p><u>Détails:</u></p>
     <p><strong>{{ holiday.details|raw }}</strong></p>
 {% endif %}
-        <p><u>Informations complémentaires : </u></p>
+    <p><u>Informations complémentaires : </u></p>
     <p>Nombre total de personne totale dans ce service: {{ countService['totalUsersService'] }}</p> 
     <p>Nombre de demande de congés du service durant la même période: {{ countService['totalUsersServiceInTime'] }}</p>
     <p>Nombre de personne du service présentent en entreprise durant cette même période: {{ countService['nbPersonPresent'] }}</p>
 
     <p><u>Actions:</u></p>
-    <p><a href="192.168.50.244/holiday/show/{{ holiday.id }}">Pour voir ce congés vous pouvez cliquez Ici</a></p>
-    <p><a href="192.168.50.244/holiday/edit/{{ holiday.id }}">Pour modifier cette demande de congés vous pouvez cliquez Ici</a></p>
-    <p><a href="192.168.50.244/holiday/delete/{{ holiday.id }}">Pour supprimer cette demande de congés vous pouvez cliquez Ici</a></p>
+    <p><a href="192.168.50.244/holiday/show/{{ holiday.id }}">Pour voir ce congés</a></p>
+    <p><a href="192.168.50.244/holiday/accept/{{ holiday.id }}">Accepter ce congés</a></p>
+    <p><a href="192.168.50.244/holiday/refuse/{{ holiday.id }}">Refuser ce congés</a></p>
 
 {% if overlaps %}
     <p><u>Autres demandes pour ce service durant cette même période : </u></p>
@@ -23,19 +22,27 @@
         <thead>
             <tr class="text-center">
             <th>Demandeur</th>
+            <th>Type de demande</th>
             <th>Demandé depuis</th>
             <th>Date Début</th>
             <th>Date fin</th>
             <th>Statut de la demande</th>
+            <th>Actions</th>
         </thead>
         <tbody>
             {% for overlap in overlaps %}
             <tr>
                 <td>{{ overlap.pseudo }}</td>
+                <td>{{ overlap.type }}</td>
                 <td>{{ overlap.createdAt|time_diff }}</td>
                 <td>{{ overlap.start|date('d-m-Y H:i:s') }}</td>
                 <td>{{ overlap.end|date('d-m-Y H:i:s') }}</td>
                 <td>{{ overlap.statut }}</td>
+                <td>
+                    <a href="192.168.50.244/holiday/show/{{ overlap.id }}">Voir</a>
+                    <a href="192.168.50.244/holiday/accept/{{ overlap.id }}">Accepter</a>
+                    <a href="192.168.50.244/holiday/refuse/{{ overlap.id }}">Refuser</a>
+                </td>
             </tr>
             {% endfor %}  
         </tbody>

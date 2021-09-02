@@ -403,8 +403,8 @@ class StatesController extends AbstractController
         $sheet->getCell('J5')->setValue('Sref2');
         $sheet->getCell('K5')->setValue('Uv');
         $sheet->getCell('L5')->setValue('Mois');
-        $sheet->getCell('M5')->setValue('QteSignN1');
-        $sheet->getCell('N5')->setValue('MontantSignN1');
+        $sheet->getCell('M5')->setValue('QteSignN-1');
+        $sheet->getCell('N5')->setValue('MontantSignN-1');
         $sheet->getCell('O5')->setValue('Delta');
         $sheet->getCell('P5')->setValue('QteSignN');
         $sheet->getCell('Q5')->setValue('MontantSignN');

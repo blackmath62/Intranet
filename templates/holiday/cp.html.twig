@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Demande de congés{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header d-flex">
+                <h3 class="card-title text-center">Déposer une demande de congés</h3>
+                <a href="{{ path('app_holiday_list') }}" class="badge badge-success ml-auto">Retourner à la liste</a>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                {{ form_start(form) }}
+                <div class="d-flex">
+                {{ form_label(form.start) }}
+                {{ form_widget(form.start) }}
+                {{ form_label(form.end) }}
+                {{ form_widget(form.end) }}
+                {{ form_label(form.holidayType) }}
+                {{ form_widget(form.holidayType) }}
+                </div>
+                {{ form_label(form.details) }}
+                {{ form_widget(form.details) }}
+                {% if app.request.attributes.get('_route') == 'app_holiday_edit' %}
+                {{ form_widget(form.Envoyer, {'label': 'Modifier'} ) }}
+                <a class='btn btn-danger m-3' title="supprimer" data-toggle="modal" data-target="#modal-default"></i>Supprimer cette demande de congés</a>
+                 <div class="modal fade" id="modal-default">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h4 class="modal-title">Voulez vous vraiment supprimer ce congés ?</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                        <p>Cette action est irréversible !&hellip;</p>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                        <a type="button" href="{{ path( 'app_holiday_delete', {'id': app.request.get('id')} ) }}" class="btn btn-danger">Supprimer</a>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                </div>
+                <!-- /.modal -->
+                {% endif %}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

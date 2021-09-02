@@ -19,19 +19,13 @@
                 {{ form_label(form.end) }}
                 {{ form_widget(form.end) }}
                 {{ form_label(form.holidayType) }}
-                {{ form_widget(form.holidayType) }}
+                {{ form_widget(form.holidayType, {'selected': holiday.holidayType.name}) }}
                 <div class="ml-3"><strong>Statut: </strong>{{ holiday.holidayStatus.name }}</div>
                 </div>
                 {{ form_label(form.details) }}
-                {{ form_widget(form.details) }}
-                    {% for user in holiday.user %}
-                        {% if user.id == app.user.id %}
-                        {{ form_widget(form.Envoyer, {'label': 'Modifier'} ) }}
-                        <a class='btn btn-danger m-3' title="supprimer" href="{{ path('app_holiday_delete', {'id': holiday.id}) }}"></i>Supprimer cette demande de congés</a>
-                        {% else %}
-                        {{ form_row(form.Envoyer, {'attr' : {'class' : "d-none"}} ) }}   
-                        {% endif %}
-                    {% endfor %}
+                {{ form_widget(form.details) }}    
+                {{ form_widget(form.Envoyer, {'label': 'Modifier'} ) }}
+                <a class='btn btn-danger m-3' title="supprimer" href="{{ path('app_holiday_delete', {'id': holiday.id}) }}"></i>Supprimer cette demande de congés</a>
                 {{ form_end(form) }}
             </div>
         </div>

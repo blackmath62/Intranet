@@ -44,7 +44,7 @@
                             <!-- radio -->
                             {% for choice in dateDebutFinForm.Metiers %}
                             <div class="form-group">
-                                {% if ( is_granted("ROLE_#{choice.vars.value}") or is_granted('ROLE_BOSS') ) %}                                
+                                {% if ( is_granted("ROLE_#{choice.vars.value}") or is_granted('ROLE_BOSS') or is_granted('ROLE_RESPONSABLE_SECTEUR') ) %}                                
                                     
                                     {{ form_widget(choice) }}
                                     {{ form_label(choice) }}

@@ -20,40 +20,18 @@ class UsersRepository extends ServiceEntityRepository
         parent::__construct($registry, Users::class);
     }
 
-    // /**
-    //  * @return Users[] Returns an array of Users objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        SELECT users.email FROM `holiday_users`
-        INNER JOIN users ON holiday_users.users_id = users.id
-        INNER JOIN holiday ON holiday.id = holiday_users.holiday_id
-        WHERE holiday.id = 2
-    }
-    */
-
+    // trouver le mail d'un utilisateur en congés
     public function getFindEmail($id)
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT users.email FROM `holiday_users`
+        $sql = "SELECT users.email AS email FROM holiday_users
         INNER JOIN users ON holiday_users.users_id = users.id
         INNER JOIN holiday ON holiday.id = holiday_users.holiday_id
-        WHERE holiday.id = $id";
+        WHERE holiday.id = ?
+        ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([$id]);
         return $stmt->fetch();
     }
 
-    /*
-    public function findOneBySomeField($value): ?Users
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

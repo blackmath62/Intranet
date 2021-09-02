@@ -5,6 +5,25 @@
 {% endblock %}
 
 {% block body %}
+
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-info-circle"></i> Informations paramétrages</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+                  L'accés a l'entreprise est indispensable pour utiliser celle ci, un utilisateur de la société Lhermitte devra donc avoir le droit Lhermitte.</br>
+				  Le numéro de commercial n'est indispensable que si l'utilisateur est commercial, il faut reprendre celui qui lui est assigné dans Divalto, cela ne lui permet de consulter que ses chiffres.</br>
+				  il ne faut débloqué que le secteur propre à l'utilisateur, exemple un Espace vert sera débloqué en EV uniquement, mais pas en HP, ME ou RB, (Roby = RB), donc uniquement pour les commerciaux et responsables de secteur </br>
+                  Les Utilisateurs ne peuvent consulter que les chiffres liés à leurs secteurs, un responsable de secteur verra les chiffres de ses collégues de secteur </br>
+				  Le droit BOSS ne sert qu'au patron, celui COMPTA pour débloquer les exports comptables, INFORMATIQUE pour le service informatique, CONGES pour les décisionnaires des congés (acceptation et refus) </br>
+                  Le service est indispensable pour la gestion des congés
+    <!-- /.card-footer-->
+    </div>
+</div>
 	<div class="col-md-12">
 		<!-- general form elements disabled -->
 		<div class="card card-dark">
