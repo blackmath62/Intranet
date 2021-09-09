@@ -82,7 +82,6 @@ class StatesController extends AbstractController
                 $sufixeMetier = $secteur['sufixeRoute'];
 
                 $dateDebutEtFin = $form->getData()['Periode'];
-                //dd($dateDebutEtFin);
                 $dateParam = $this->dateParameter($form->getData()['Periode']);
                 $intervalN = $dateParam['intervalN'];
                 $intervalN1 = $dateParam['intervalN1'];
@@ -183,7 +182,6 @@ class StatesController extends AbstractController
                         $Commercial = $listeCommerciaux[$ligCommercial]['Commercial'];                    
                         $stateCommerciaux[$ligCommercial]['Commercial'] = $listeCommerciaux[$ligCommercial]['Commercial'];
                         $stateCommerciaux[$ligCommercial]['CommercialId'] = $listeCommerciaux[$ligCommercial]['CommercialId'];
-                        //$stateCommerciaux[$ligCommercial]['Periode'] = '';
                         $stateCommerciaux[$ligCommercial]['CATotalN'] = 0;
                         $stateCommerciaux[$ligCommercial]['CADepotN'] = 0;
                         $stateCommerciaux[$ligCommercial]['CADirectN'] = 0;
@@ -337,13 +335,23 @@ class StatesController extends AbstractController
         /**
          * @var $ticket Ticket[]
          */
+        ini_set('memory_limit', '1024M');
+        ini_set('max_execution_time', 0);
         $list = [];
         $donnee = [];
+        $i = 0;
         $donnees = $repo->getStatesExcelParMetier($metier, $dateDebutN, $dateFinN, $dossier);
         
         foreach ($donnees as $donnee) {
             
-            $donnee['Delta'] = $this->calcul_pourcentage($donnee['MontantSignN1'],$donnee['MontantSignN'])['pourc']/100;
+            $donnee['Delta_N-1_N'] = $this->calcul_pourcentage($donnee['MontantSignN1'],$donnee['MontantSignN'])['pourc']/100;
+            $donnee['Delta_N-2_N-1'] = $this->calcul_pourcentage($donnee['MontantSignN2'],$donnee['MontantSignN1'])['pourc']/100;
+            $donnee['Pu_N'] = "";
+            $donnee['Pu_N-1'] = "";
+            $donnee['Pu_N-2'] = "";
+            if ($donnee['MontantSignN'] <> 0 &&  $donnee['QteSignN'] <> 0){$donnee['Pu_N'] = $donnee['MontantSignN']/$donnee['QteSignN'];}
+            if ($donnee['MontantSignN1'] <> 0 &&  $donnee['QteSignN1'] <> 0){$donnee['Pu_N-1'] = $donnee['MontantSignN1']/$donnee['QteSignN1'];} 
+            if ($donnee['MontantSignN2'] <> 0 &&  $donnee['QteSignN2'] <> 0){$donnee['Pu_N-2'] = $donnee['MontantSignN2']/$donnee['QteSignN2'];} 
             $list[] = [
                 $donnee['Commercial'],
                 $donnee['Famille_Client'],
@@ -357,14 +365,21 @@ class StatesController extends AbstractController
                 $donnee['Sref2'],
                 $donnee['Uv'],
                 $donnee['Mois'],
+                $donnee['QteSignN'],
+                $donnee['Pu_N'],
+                $donnee['MontantSignN'],
+                $donnee['Delta_N-1_N'],  
                 $donnee['QteSignN1'],
+                $donnee['Pu_N-1'],  
                 $donnee['MontantSignN1'],
-                $donnee['Delta'],  
-                $donnee['QteSignN'],  
-                $donnee['MontantSignN'],                   
+                $donnee['Delta_N-2_N-1'],  
+                $donnee['QteSignN2'],
+                $donnee['Pu_N-2'],  
+                $donnee['MontantSignN2'],                    
                 
             ];
         }
+        
         return $list;
     }
     
@@ -375,6 +390,247 @@ class StatesController extends AbstractController
      */  
 
     public function get_states_excel_metier($metier, $dateDebutN, $dateFinN, $dossier, StatesByTiersRepository $repo, Request $request){
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        
+        $secteur = $this->metierParameter($metier);
+        $metier = $secteur['metiers'];
+
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setTitle('States');
+        // Entête de colonne
+        $sheet->getCell('A5')->setValue('Commercial');
+        $sheet->getCell('B5')->setValue('Famille_client');
+        $sheet->getCell('C5')->setValue('Tiers');
+        $sheet->getCell('D5')->setValue('Nom');
+        $sheet->getCell('E5')->setValue('Pays');
+        $sheet->getCell('F5')->setValue('Famille_article');
+        $sheet->getCell('G5')->setValue('Ref');
+        $sheet->getCell('H5')->setValue('Designation');
+        $sheet->getCell('I5')->setValue('Sref1');
+        $sheet->getCell('J5')->setValue('Sref2');
+        $sheet->getCell('K5')->setValue('Uv');
+        $sheet->getCell('L5')->setValue('Mois');
+        $sheet->getCell('M5')->setValue('QteSignN');
+        $sheet->getCell('N5')->setValue('Pu_N');
+        $sheet->getCell('O5')->setValue('MontantSignN');
+        $sheet->getCell('P5')->setValue('Delta_N-1_N');
+        $sheet->getCell('Q5')->setValue('QteSignN-1');
+        $sheet->getCell('R5')->setValue('Pu_N-1');
+        $sheet->getCell('S5')->setValue('MontantSignN-1');
+        $sheet->getCell('T5')->setValue('Delta_N-2_N-1');
+        $sheet->getCell('U5')->setValue('QteSignN-2');
+        $sheet->getCell('V5')->setValue('Pu_N-2');
+        $sheet->getCell('W5')->setValue('MontantSignN-2');
+
+        // Increase row cursor after header write
+        $sheet->fromArray($this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo),null, 'A6', true);
+        $dernLign = count($this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo)) + 5;    
+        
+        $d = new DateTime('NOW');
+        $dateTime = $d->format('d-m-Y') ;
+        $nomFichier = 'States Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le '. $dateTime ;
+        // Titre de la feuille
+        $sheet->getCell('A1')->setValue($nomFichier);
+        $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
+        $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
+        // Le style du tableau
+        $styleArray = [
+            'font' => [
+                'bold' => false,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FFFFFFFF',
+                ],
+            ],
+        ];
+        $spreadsheet->getActiveSheet()->getStyle("A5:W{$dernLign}")->applyFromArray($styleArray);
+         // Le style N en vert
+        $spreadsheet->getActiveSheet()->getStyle("M1:O{$dernLign}")->getFill()
+        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('F92D050');
+        // Le style N-1 en orange
+        $spreadsheet->getActiveSheet()->getStyle("Q1:S{$dernLign}")->getFill()
+        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('FFFC000');
+        // Le style N-2 en jaune
+        $spreadsheet->getActiveSheet()->getStyle("U1:W{$dernLign}")->getFill()
+        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('FFFFF00');
+        
+        // Le style de l'entête
+        $styleEntete = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'F17A2B8',
+                ],
+            ],
+        ];
+        $spreadsheet->getActiveSheet()->getStyle("A5:W5")->applyFromArray($styleEntete);
+        
+        $sheet->getStyle("H1:W{$dernLign}")
+        ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        // Espacement automatique sur toutes les colonnes sauf la A
+        $sheet->setAutoFilter("A5:W{$dernLign}");
+        $sheet->getColumnDimension('A')->setWidth(30, 'pt');
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->getColumnDimension('G')->setAutoSize(true);
+        $sheet->getColumnDimension('H')->setAutoSize(true);
+        $sheet->getColumnDimension('I')->setAutoSize(true);
+        $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->getColumnDimension('K')->setAutoSize(true);
+        $sheet->getColumnDimension('L')->setAutoSize(true);
+        $sheet->getColumnDimension('M')->setAutoSize(true);
+        $sheet->getColumnDimension('N')->setAutoSize(true);
+        $sheet->getColumnDimension('O')->setAutoSize(true);
+        $sheet->getColumnDimension('P')->setAutoSize(true);
+        $sheet->getColumnDimension('Q')->setAutoSize(true);
+        $sheet->getColumnDimension('R')->setAutoSize(true);
+        $sheet->getColumnDimension('S')->setAutoSize(true);
+        $sheet->getColumnDimension('T')->setAutoSize(true);
+        $sheet->getColumnDimension('U')->setAutoSize(true);
+        $sheet->getColumnDimension('V')->setAutoSize(true);
+        $sheet->getColumnDimension('W')->setAutoSize(true);
+        // Sous Total des colonnes pour les colonnes Quantités et montants de chaque années
+        $sheet->setCellValue("M4", "=SUBTOTAL(9,M6:M{$dernLign})"); // Quantité N
+        $sheet->setCellValue("O4", "=SUBTOTAL(9,O6:O{$dernLign})"); // Montant N
+        $sheet->setCellValue("Q4", "=SUBTOTAL(9,Q6:Q{$dernLign})"); // Quantité N-1
+        $sheet->setCellValue("S4", "=SUBTOTAL(9,S6:S{$dernLign})"); // Montant N-1
+        $sheet->setCellValue("U4", "=SUBTOTAL(9,U6:U{$dernLign})"); // Quantité N-2
+        $sheet->setCellValue("W4", "=SUBTOTAL(9,W6:W{$dernLign})"); // Montant N-2
+        $sheet->setCellValue("P4", "=(O4/S4)-1"); // Delta n-1 / n
+        $sheet->setCellValue("T4", "=(S4/W4)-1"); // Delta n-2 / n-1
+        // Format nombre € colonne PU et montant N
+        $sheet->getStyle("N1:O{$dernLign}")
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+        // Format nombre € colonne PU et montant N-1
+        $sheet->getStyle("R1:S{$dernLign}")
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+        // Format nombre € colonne PU et montant N-2
+        $sheet->getStyle("V1:W{$dernLign}")
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+        // Format Pourcentage CELLULE montant N-1/ montant N
+        $sheet->getStyle('P4')
+              ->getNumberFormat()
+              ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
+        // Format Pourcentage colonne montant N-1/ montant N
+        $sheet->getStyle("P6:P{$dernLign}")
+              ->getNumberFormat()
+              ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
+        // Format Pourcentage CELLULE montant N-2/ montant N-1
+        $sheet->getStyle('T4')
+              ->getNumberFormat()
+              ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
+        // Format Pourcentage colonne montant N-2/ montant N-1
+        $sheet->getStyle("T6:T{$dernLign}")
+              ->getNumberFormat()
+              ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
+
+        $writer = new Xlsx($spreadsheet);
+
+        // Create a Temporary file in the system
+        $fileName = $nomFichier . '.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+
+        $writer->save($temp_file);
+        // Return the excel file as an attachment
+        return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+
+    }
+
+    // Export Excel par commercial
+
+    public function getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo): array
+    {
+        /**
+         * @var $ticket Ticket[]
+         */
+        ini_set('memory_limit', '1024M');
+        ini_set('max_execution_time', 0);
+        $list = [];
+        $donnee = [];
+        $donnees = $repo->getStatesExcelParCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier);
+        foreach ($donnees as $donnee) {
+            $donnee['Delta_N-1_N'] = $this->calcul_pourcentage($donnee['MontantSignN1'],$donnee['MontantSignN'])['pourc']/100;
+            $donnee['Delta_N-2_N-1'] = $this->calcul_pourcentage($donnee['MontantSignN2'],$donnee['MontantSignN1'])['pourc']/100;
+            $donnee['Pu_N'] = "";
+            $donnee['Pu_N-1'] = "";
+            $donnee['Pu_N-2'] = "";
+            if ($donnee['MontantSignN'] <> 0 &&  $donnee['QteSignN'] <> 0){$donnee['Pu_N'] = $donnee['MontantSignN']/$donnee['QteSignN'];}
+            if ($donnee['MontantSignN1'] <> 0 &&  $donnee['QteSignN1'] <> 0){$donnee['Pu_N-1'] = $donnee['MontantSignN1']/$donnee['QteSignN1'];} 
+            if ($donnee['MontantSignN2'] <> 0 &&  $donnee['QteSignN2'] <> 0){$donnee['Pu_N-2'] = $donnee['MontantSignN2']/$donnee['QteSignN2'];} 
+            $list[] = [
+                $donnee['Commercial'],
+                $donnee['Famille_Client'],
+                $donnee['Client'],
+                $donnee['Nom'],
+                $donnee['Pays'],
+                $donnee['Fam_Art'],
+                $donnee['Ref'],
+                $donnee['Designation'],
+                $donnee['Sref1'],
+                $donnee['Sref2'],
+                $donnee['Uv'],
+                $donnee['Mois'],
+                $donnee['QteSignN'],
+                $donnee['Pu_N'],
+                $donnee['MontantSignN'],
+                $donnee['Delta_N-1_N'],  
+                $donnee['QteSignN1'],
+                $donnee['Pu_N-1'],  
+                $donnee['MontantSignN1'],
+                $donnee['Delta_N-2_N-1'],  
+                $donnee['QteSignN2'],
+                $donnee['Pu_N-2'],  
+                $donnee['MontantSignN2']                   
+                
+            ];
+        }
+        echo memory_get_usage();
+        return $list;
+    }
+    
+    
+    /**
+     * @Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name="app_states_excel_commercial_Lh")
+     * @Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name="app_states_excel_commercial_Rb")
+     */  
+
+    public function get_states_excel_commercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, StatesByTiersRepository $repo, Request $request){
 
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
@@ -403,25 +659,30 @@ class StatesController extends AbstractController
         $sheet->getCell('J5')->setValue('Sref2');
         $sheet->getCell('K5')->setValue('Uv');
         $sheet->getCell('L5')->setValue('Mois');
-        $sheet->getCell('M5')->setValue('QteSignN-1');
-        $sheet->getCell('N5')->setValue('MontantSignN-1');
-        $sheet->getCell('O5')->setValue('Delta');
-        $sheet->getCell('P5')->setValue('QteSignN');
-        $sheet->getCell('Q5')->setValue('MontantSignN');
+        $sheet->getCell('M5')->setValue('QteSignN');
+        $sheet->getCell('N5')->setValue('Pu_N');
+        $sheet->getCell('O5')->setValue('MontantSignN');
+        $sheet->getCell('P5')->setValue('Delta_N-1_N');
+        $sheet->getCell('Q5')->setValue('QteSignN-1');
+        $sheet->getCell('R5')->setValue('Pu_N-1');
+        $sheet->getCell('S5')->setValue('MontantSignN-1');
+        $sheet->getCell('T5')->setValue('Delta_N-2_N-1');
+        $sheet->getCell('U5')->setValue('QteSignN-2');
+        $sheet->getCell('V5')->setValue('Pu_N-2');
+        $sheet->getCell('W5')->setValue('MontantSignN-2');
 
         // Increase row cursor after header write
-        $sheet->fromArray($this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo),null, 'A6', true);
-        $dernLign = count($this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo)) + 5;    
-        //$NomCommercial = $repo->getCommercialName($commercialId, $dossier);
+        $sheet->fromArray($this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo),null, 'A6', true);
+        $dernLign = count($this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo)) + 5;    
+        
         $d = new DateTime('NOW');
         $dateTime = $d->format('d-m-Y') ;
-        //$commercial = $NomCommercial[0]['SELCOD'];
         $nomFichier = 'States Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le '. $dateTime ;
         // Titre de la feuille
         $sheet->getCell('A1')->setValue($nomFichier);
         $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
         $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
-        
+        // Le style du tableau
         $styleArray = [
             'font' => [
                 'bold' => false,
@@ -441,9 +702,22 @@ class StatesController extends AbstractController
                 ],
             ],
         ];
-        $spreadsheet->getActiveSheet()->getStyle("A5:Q{$dernLign}")->applyFromArray($styleArray);
+        $spreadsheet->getActiveSheet()->getStyle("A5:W{$dernLign}")->applyFromArray($styleArray);
+         // Le style N en vert
+        $spreadsheet->getActiveSheet()->getStyle("M1:O{$dernLign}")->getFill()
+        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('F92D050');
+        // Le style N-1 en orange
+        $spreadsheet->getActiveSheet()->getStyle("Q1:S{$dernLign}")->getFill()
+        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('FFFC000');
+        // Le style N-2 en jaune
+        $spreadsheet->getActiveSheet()->getStyle("U1:W{$dernLign}")->getFill()
+        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('FFFFF00');
         
-        $styleArrayEntete = [
+        // Le style de l'entête
+        $styleEntete = [
             'font' => [
                 'bold' => true,
             ],
@@ -462,12 +736,12 @@ class StatesController extends AbstractController
                 ],
             ],
         ];
-        $spreadsheet->getActiveSheet()->getStyle("A5:Q5")->applyFromArray($styleArrayEntete);
+        $spreadsheet->getActiveSheet()->getStyle("A5:W5")->applyFromArray($styleEntete);
         
-        $sheet->getStyle("H1:Q{$dernLign}")
+        $sheet->getStyle("H1:W{$dernLign}")
         ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
-        $sheet->setAutoFilter("A5:Q{$dernLign}");
+        // Espacement automatique sur toutes les colonnes sauf la A
+        $sheet->setAutoFilter("A5:W{$dernLign}");
         $sheet->getColumnDimension('A')->setWidth(30, 'pt');
         $sheet->getColumnDimension('B')->setAutoSize(true);
         $sheet->getColumnDimension('C')->setAutoSize(true);
@@ -485,205 +759,49 @@ class StatesController extends AbstractController
         $sheet->getColumnDimension('O')->setAutoSize(true);
         $sheet->getColumnDimension('P')->setAutoSize(true);
         $sheet->getColumnDimension('Q')->setAutoSize(true);
-        $sheet->setCellValue("N4", "=SUBTOTAL(9,N6:N{$dernLign})");
-        $sheet->setCellValue("Q4", "=SUBTOTAL(9,Q6:Q{$dernLign})");
-        $sheet->setCellValue("O4", "=(Q4/N4)-1");
-        $sheet->getStyle("N6:N{$dernLign}")
+        $sheet->getColumnDimension('R')->setAutoSize(true);
+        $sheet->getColumnDimension('S')->setAutoSize(true);
+        $sheet->getColumnDimension('T')->setAutoSize(true);
+        $sheet->getColumnDimension('U')->setAutoSize(true);
+        $sheet->getColumnDimension('V')->setAutoSize(true);
+        $sheet->getColumnDimension('W')->setAutoSize(true);
+        // Sous Total des colonnes pour les colonnes Quantités et montants de chaque années
+        $sheet->setCellValue("M4", "=SUBTOTAL(9,M6:M{$dernLign})"); // Quantité N
+        $sheet->setCellValue("O4", "=SUBTOTAL(9,O6:O{$dernLign})"); // Montant N
+        $sheet->setCellValue("Q4", "=SUBTOTAL(9,Q6:Q{$dernLign})"); // Quantité N-1
+        $sheet->setCellValue("S4", "=SUBTOTAL(9,S6:S{$dernLign})"); // Montant N-1
+        $sheet->setCellValue("U4", "=SUBTOTAL(9,U6:U{$dernLign})"); // Quantité N-2
+        $sheet->setCellValue("W4", "=SUBTOTAL(9,W6:W{$dernLign})"); // Montant N-2
+        $sheet->setCellValue("P4", "=(O4/S4)-1"); // Delta n-1 / n
+        $sheet->setCellValue("T4", "=(S4/W4)-1"); // Delta n-2 / n-1
+        // Format nombre € colonne PU et montant N
+        $sheet->getStyle("N1:O{$dernLign}")
         ->getNumberFormat()
         ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
-        $sheet->getStyle("Q6:Q{$dernLign}")
+        // Format nombre € colonne PU et montant N-1
+        $sheet->getStyle("R1:S{$dernLign}")
         ->getNumberFormat()
         ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
-        $sheet->getStyle("N4:Q4")
+        // Format nombre € colonne PU et montant N-2
+        $sheet->getStyle("V1:W{$dernLign}")
         ->getNumberFormat()
         ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
-        $sheet->getStyle('O4')
+        // Format Pourcentage CELLULE montant N-1/ montant N
+        $sheet->getStyle('P4')
               ->getNumberFormat()
               ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
-        $sheet->getStyle("O6:O{$dernLign}")
-              ->getNumberFormat()
-              ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
-
-        $writer = new Xlsx($spreadsheet);
-
-        // Create a Temporary file in the system
-        $fileName = $nomFichier . '.xlsx';
-        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
-
-        $writer->save($temp_file);
-        // Return the excel file as an attachment
-        return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
-
-    }
-
-    // Export Excel par commercial
-
-    public function getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo): array
-    {
-        /**
-         * @var $ticket Ticket[]
-         */
-        $list = [];
-        $donnee = [];
-        $donnees = $repo->getStatesExcelParCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier);
-
-        foreach ($donnees as $donnee) {
-            $donnee['Delta'] = $this->calcul_pourcentage($donnee['MontantSignN1'],$donnee['MontantSignN'])['pourc']/100;
-            $list[] = [
-                $donnee['Famille_Client'],
-                $donnee['Client'],
-                $donnee['Nom'],
-                $donnee['Pays'],
-                $donnee['Fam_Art'],
-                $donnee['Ref'],
-                $donnee['Designation'],
-                $donnee['Sref1'],
-                $donnee['Sref2'],
-                $donnee['Uv'],
-                $donnee['Mois'],
-                $donnee['QteSignN1'],
-                $donnee['MontantSignN1'],
-                $donnee['Delta'],  
-                $donnee['QteSignN'],  
-                $donnee['MontantSignN'],                   
-                
-            ];
-        }
-        return $list;
-    }
-    
-    
-    /**
-     * @Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name="app_states_excel_commercial_Lh")
-     * @Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name="app_states_excel_commercial_Rb")
-     */  
-
-    public function get_states_excel_commercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, StatesByTiersRepository $repo, Request $request){
-
-        // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
-
-        //dd($tracking);
-        
-        $secteur = $this->metierParameter($metier);
-        $metier = $secteur['metiers'];
-
-        $spreadsheet = new Spreadsheet();
-
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $sheet->setTitle('States');
-        // Entête de colonne
-        $sheet->getCell('A5')->setValue('Famille_client');
-        $sheet->getCell('B5')->setValue('Tiers');
-        $sheet->getCell('C5')->setValue('Nom');
-        $sheet->getCell('D5')->setValue('Pays');
-        $sheet->getCell('E5')->setValue('Famille_article');
-        $sheet->getCell('F5')->setValue('Ref');
-        $sheet->getCell('G5')->setValue('Designation');
-        $sheet->getCell('H5')->setValue('Sref1');
-        $sheet->getCell('I5')->setValue('Sref2');
-        $sheet->getCell('J5')->setValue('Uv');
-        $sheet->getCell('K5')->setValue('Mois');
-        $sheet->getCell('L5')->setValue('QteSignN1');
-        $sheet->getCell('M5')->setValue('MontantSignN1');
-        $sheet->getCell('N5')->setValue('Delta');
-        $sheet->getCell('O5')->setValue('QteSignN');
-        $sheet->getCell('P5')->setValue('MontantSignN');
-
-        // Increase row cursor after header write
-        $sheet->fromArray($this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo),null, 'A6', true);
-        $dernLign = count($this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo)) + 5;    
-        $NomCommercial = $repo->getCommercialName($commercialId, $dossier);
-        $d = new DateTime('NOW');
-        $dateTime = $d->format('d-m-Y') ;
-        $commercial = $NomCommercial[0]['SELCOD'];
-        $nomFichier = 'States ' . $commercial  . ' Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le '. $dateTime ;
-        $sheet->getCell('A1')->setValue($nomFichier);
-        $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
-        $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
-        
-        $styleArray = [
-            'font' => [
-                'bold' => false,
-            ],
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
-            ],
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                ],
-            ],
-            'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => [
-                    'argb' => 'FFFFFFFF',
-                ],
-            ],
-        ];
-
-        $styleArrayEntete = [
-            'font' => [
-                'bold' => true,
-            ],
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-            ],
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                ],
-            ],
-            'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => [
-                    'argb' => 'F17A2B8',
-                ],
-            ],
-        ];
-        
-        $spreadsheet->getActiveSheet()->getStyle("A5:P{$dernLign}")->applyFromArray($styleArray);
-        $spreadsheet->getActiveSheet()->getStyle("A5:P5")->applyFromArray($styleArrayEntete);
-        $sheet->getStyle("H1:P{$dernLign}")
-        ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
-        $sheet->setAutoFilter("A5:P{$dernLign}");
-        $sheet->getColumnDimension('B')->setAutoSize(true);
-        $sheet->getColumnDimension('C')->setAutoSize(true);
-        $sheet->getColumnDimension('D')->setAutoSize(true);
-        $sheet->getColumnDimension('E')->setAutoSize(true);
-        $sheet->getColumnDimension('F')->setAutoSize(true);
-        $sheet->getColumnDimension('G')->setAutoSize(true);
-        $sheet->getColumnDimension('H')->setAutoSize(true);
-        $sheet->getColumnDimension('I')->setAutoSize(true);
-        $sheet->getColumnDimension('J')->setAutoSize(true);
-        $sheet->getColumnDimension('K')->setAutoSize(true);
-        $sheet->getColumnDimension('L')->setAutoSize(true);
-        $sheet->getColumnDimension('M')->setAutoSize(true);
-        $sheet->getColumnDimension('N')->setAutoSize(true);
-        $sheet->getColumnDimension('O')->setAutoSize(true);
-        $sheet->getColumnDimension('P')->setAutoSize(true);
-        $sheet->setCellValue("M4", "=SUBTOTAL(9,M6:M{$dernLign})");
-        $sheet->setCellValue("P4", "=SUBTOTAL(9,P6:P{$dernLign})");
-        $sheet->setCellValue("N4", "=(P4/M4)-1");
-        $sheet->getStyle("M6:M{$dernLign}")
-        ->getNumberFormat()
-        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+        // Format Pourcentage colonne montant N-1/ montant N
         $sheet->getStyle("P6:P{$dernLign}")
-        ->getNumberFormat()
-        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
-        $sheet->getStyle("M4:P4")
-        ->getNumberFormat()
-        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
-        $sheet->getStyle('N4')
-              ->getNumberFormat()
-              ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
-        $sheet->getStyle("N6:N{$dernLign}")
               ->getNumberFormat()
               ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
-
+        // Format Pourcentage CELLULE montant N-2/ montant N-1
+        $sheet->getStyle('T4')
+              ->getNumberFormat()
+              ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
+        // Format Pourcentage colonne montant N-2/ montant N-1
+        $sheet->getStyle("T6:T{$dernLign}")
+              ->getNumberFormat()
+              ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
 
         $writer = new Xlsx($spreadsheet);
 

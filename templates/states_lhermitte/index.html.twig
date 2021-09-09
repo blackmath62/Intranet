@@ -44,7 +44,7 @@
                             <!-- radio -->
                             {% for choice in dateDebutFinForm.Metiers %}
                             <div class="form-group">
-                                {% if ( is_granted("ROLE_#{choice.vars.value}") or is_granted('ROLE_BOSS') or is_granted('ROLE_RESPONSABLE_SECTEUR') ) %}                                
+                                {% if ( is_granted("ROLE_#{choice.vars.value}") or is_granted('ROLE_BOSS')) %}                                
                                     
                                     {{ form_widget(choice) }}
                                     {{ form_label(choice) }}
@@ -81,7 +81,7 @@
             <div class="row card-body">
             {% for Metier in statesMetiers %}
                 
-                <div class="col-md-3 col-sm-6 col-12">
+                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-12">
                     <div class="info-box shadow">
                     <span class="info-box-icon bg-{{ Metier.Color }} "><i class="text-white {{ Metier.Icon }}"></i></span>
 
@@ -151,7 +151,7 @@
                             
                 {% for state in stateCommerciaux %}
                 
-                <div class="col-md-3 col-sm-6 col-12">
+                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-12">
                     <div class="callout callout-{{ themeColor }} shadow">
                     
                 <!-- /.col -->
@@ -213,7 +213,7 @@
             <!-- Début ligne détail du métier -->
             <div class="card-body row">
                 {% if is_granted('ROLE_BOSS') %}  
-                    <div class="col-12 col-sm-6 col-md-2">
+                    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 col-12">
                         
                         <div class="info-box shadow">
                             <span class="info-box-icon bg-info elevation-1"><i class="fas fa-fw fa-truck-loading"></i></span>
@@ -231,7 +231,7 @@
                     <!-- /.info-box -->
                     </div>
                     <!-- /.col -->
-                    <div class="col-12 col-sm-6 col-md-2">
+                    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 col-12">
                         <div class="info-box mb-3 shadow">
                             <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-file-invoice-dollar"></i></span>
 
@@ -248,7 +248,7 @@
                     <!-- /.info-box -->
                     </div>
                     <!-- /.col -->
-                    <div class="col-12 col-sm-6 col-md-2">
+                    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 col-12">
                         <div class="info-box mb-3 shadow">
                             <span class="info-box-icon bg-success elevation-1"><i class="fas fa-users"></i></span>
 
@@ -264,7 +264,7 @@
                         </div>
                     <!-- /.info-box -->
                     </div>
-                    <div class="col-12 col-sm-6 col-md-2">
+                    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 col-12">
                         <div class="info-box mb-3 shadow">
                             <span class="info-box-icon bg-secondary elevation-1"><i class="fas fa-warehouse"></i></span>
                             <div class="info-box-content">
@@ -279,7 +279,7 @@
                         </div>
                     <!-- /.info-box -->
                     </div>
-                    <div class="col-12 col-sm-6 col-md-2">
+                    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 col-12">
                         <div class="info-box mb-3 shadow">
                             <span class="info-box-icon bg-purple elevation-1"><i class="fas fa-route"></i></span>
 
@@ -297,7 +297,7 @@
                     </div>
                     {% endif %}
                     <!-- /.col -->
-                    <div class="col-12 col-sm-6 col-md-2">
+                    <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 col-12">
                         <div class="info-box mb-3 shadow">
                             <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-euro-sign"></i></span>
 

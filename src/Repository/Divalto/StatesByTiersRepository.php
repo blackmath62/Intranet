@@ -91,11 +91,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $dateFinN2= $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
         
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT LTRIM(RTRIM(Famille_Client)) AS Famille_Client, LTRIM(RTRIM(Client)) AS Client, LTRIM(RTRIM(nom)) as Nom,LTRIM(RTRIM(Pays)) as Pays,
+        $sql = "SELECT LTRIM(RTRIM(Commercial)) AS Commercial, LTRIM(RTRIM(Famille_Client)) AS Famille_Client, LTRIM(RTRIM(Client)) AS Client, LTRIM(RTRIM(nom)) as Nom,LTRIM(RTRIM(Pays)) as Pays,
         LTRIM(RTRIM(Famille_Article)) AS Fam_Art, LTRIM(RTRIM(Ref)) AS Ref,LTRIM(RTRIM(Designation)) AS Designation,
         LTRIM(RTRIM(Sref1)) AS Sref1,LTRIM(RTRIM(Sref2)) AS Sref2, LTRIM(RTRIM(UV)) AS Uv,Mois,
         LTRIM(RTRIM(SUM(QteSignN1))) AS QteSignN1, LTRIM(RTRIM(SUM(MontantSignN1))) AS MontantSignN1,
-        LTRIM(RTRIM(SUM(QteSignN))) AS QteSignN, LTRIM(RTRIM(SUM(MontantSignN))) AS MontantSignN
+        LTRIM(RTRIM(SUM(QteSignN))) AS QteSignN, LTRIM(RTRIM(SUM(MontantSignN))) AS MontantSignN,
+        LTRIM(RTRIM(SUM(QteSignN2))) AS QteSignN2, LTRIM(RTRIM(SUM(MontantSignN2))) AS MontantSignN2
         FROM -- imbrication d'une requête pour extraire les données à calculer
         (SELECT CLI.STAT_0001 AS Famille_Client, MOUV.TIERS as Client, CLI.NOM AS nom, CLI.PAY AS Pays, MOUV.DEV AS Devise,MONTH(MOUV.FADT) AS Mois, MOUV.OP,MOUV.REF AS Ref, MOUV.DES AS Designation, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,MOUV.VENUN AS UV, MOUV.FAQTE AS Qte,MOUV.MONT AS Montant,
         MOUV.REMPIEMT_0004 AS Remise,MOUV.FADT AS DateFacture,MOUV.FANO AS Facture, ART.FAM_0001 AS Famille_Article,
@@ -134,16 +135,26 @@ class StatesByTiersRepository extends ServiceEntityRepository
             WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN MOUV.FAQTE
             WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN -1*MOUV.FAQTE
             ELSE 0
-        END AS QteSignN1
+        END AS QteSignN1,
+        CASE -- Signature du montant
+                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                ELSE 0
+        END AS MontantSignN2,
+        CASE
+            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN -1*MOUV.FAQTE
+            ELSE 0
+        END AS QteSignN2
         FROM MOUV
         INNER JOIN ART ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
         INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND CLI.DOS = MOUV.DOS
         LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
-        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ))
+        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ))
         AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
         AND MOUV.OP IN('C','CD','DD','D')) Reponse
         WHERE SecteurMouvement IN( $metiers ) AND CommercialId IN ($commercial)
-        GROUP BY Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
+        GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
         ORDER BY Client";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -172,7 +183,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         LTRIM(RTRIM(Famille_Article)) AS Fam_Art, LTRIM(RTRIM(Ref)) AS Ref,LTRIM(RTRIM(Designation)) AS Designation,
         LTRIM(RTRIM(Sref1)) AS Sref1,LTRIM(RTRIM(Sref2)) AS Sref2, LTRIM(RTRIM(UV)) AS Uv,Mois,
         LTRIM(RTRIM(SUM(QteSignN1))) AS QteSignN1, LTRIM(RTRIM(SUM(MontantSignN1))) AS MontantSignN1,
-        LTRIM(RTRIM(SUM(QteSignN))) AS QteSignN, LTRIM(RTRIM(SUM(MontantSignN))) AS MontantSignN
+        LTRIM(RTRIM(SUM(QteSignN))) AS QteSignN, LTRIM(RTRIM(SUM(MontantSignN))) AS MontantSignN,
+        LTRIM(RTRIM(SUM(QteSignN2))) AS QteSignN2, LTRIM(RTRIM(SUM(MontantSignN2))) AS MontantSignN2
         FROM -- imbrication d'une requête pour extraire les données à calculer
         (SELECT CLI.STAT_0001 AS Famille_Client, MOUV.TIERS as Client, CLI.NOM AS nom, CLI.PAY AS Pays, MOUV.DEV AS Devise,MONTH(MOUV.FADT) AS Mois, MOUV.OP,MOUV.REF AS Ref, MOUV.DES AS Designation, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,MOUV.VENUN AS UV, MOUV.FAQTE AS Qte,MOUV.MONT AS Montant,
         MOUV.REMPIEMT_0004 AS Remise,MOUV.FADT AS DateFacture,MOUV.FANO AS Facture, ART.FAM_0001 AS Famille_Article,
@@ -211,12 +223,22 @@ class StatesByTiersRepository extends ServiceEntityRepository
             WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN MOUV.FAQTE
             WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN -1*MOUV.FAQTE
             ELSE 0
-        END AS QteSignN1
+        END AS QteSignN1,
+        CASE -- Signature du montant
+                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                ELSE 0
+        END AS MontantSignN2,
+        CASE
+            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN -1*MOUV.FAQTE
+            ELSE 0
+        END AS QteSignN2
         FROM MOUV
         INNER JOIN ART ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
         INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND CLI.DOS = MOUV.DOS
         LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
-        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ))
+        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ) )
         AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
         AND MOUV.OP IN('C','CD','DD','D')) Reponse
         WHERE SecteurMouvement IN( $metiers )
