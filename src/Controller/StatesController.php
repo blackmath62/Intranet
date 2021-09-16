@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Divalto\StatesByTiersRepository;
+use DoctrineExtensions\Query\Mysql\Round;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -97,6 +98,13 @@ class StatesController extends AbstractController
                 // Bloquer l'extraction sur une année compléte maximum
                 if ($dateFin >= $dateControle ) {
                     $this->addFlash('danger', 'L\'extraction est limité à une année compléte');
+                    return $this->redirectToRoute($tracking, ['secteur' => $secteur]);
+                }
+                // Bloquer l'extraction pour que l'année début et de fin soit la même
+                $anneeD = date("Y", strtotime($dateDebutN));
+                $anneeF = date("Y", strtotime($dateFinN));
+                if ($anneeD != $anneeF ) {
+                    $this->addFlash('danger', 'Les Années de début et de fin doivent être identiques, l\'extration sort 3 années automatiquement');
                     return $this->redirectToRoute($tracking, ['secteur' => $secteur]);
                 }
                 
@@ -252,6 +260,29 @@ class StatesController extends AbstractController
                         }
                     // Fin States par Métier
 
+                    // Début Top 10 Familles produits
+                    // TODO à voir dés que possible
+                    if ($dateDebutN) {
+                        $Top10 = $repo->getTop10FamillesProduits($dateDebutN, $dateFinN, $dossier);
+                        $Top10Famille = [];    
+                        $Top10N = [];
+                        $Top10N1 = [];
+    
+                        for ($topLig=0; $topLig < count($Top10) ; $topLig++) { 
+                            $Top10Famille[] = $Top10[$topLig]['Fam_Article'];    
+                            $Top10N[] = $Top10[$topLig]['MontantSignN'];
+                            $Top10N1[] = $Top10[$topLig]['MontantSignN1'];
+                        }
+                        $Top10Famille = json_encode($Top10Famille);
+                        $Top10N = json_encode($Top10N);
+                        $Top10N1 = json_encode($Top10N1);
+                    }else {
+                        $Top10Famille = "";    
+                        $Top10N = "";
+                        $Top10N1 = "";
+                    }
+                    // Fin Top 10 Familles produits 
+
                 }
                         
             }    
@@ -335,23 +366,36 @@ class StatesController extends AbstractController
         /**
          * @var $ticket Ticket[]
          */
-        ini_set('memory_limit', '1024M');
+        ini_set('memory_limit', '-1');
         ini_set('max_execution_time', 0);
+        $file = 'progress.txt';
+        $fileText = 'progress-text.txt';
         $list = [];
-        $donnee = [];
-        $i = 0;
-        $donnees = $repo->getStatesExcelParMetier($metier, $dateDebutN, $dateFinN, $dossier);
+        $donnees = [];
         
-        foreach ($donnees as $donnee) {
-            
-            $donnee['Delta_N-1_N'] = $this->calcul_pourcentage($donnee['MontantSignN1'],$donnee['MontantSignN'])['pourc']/100;
-            $donnee['Delta_N-2_N-1'] = $this->calcul_pourcentage($donnee['MontantSignN2'],$donnee['MontantSignN1'])['pourc']/100;
+        $donnees = $repo->getStatesExcelParMetier($metier, $dateDebutN, $dateFinN, $dossier);
+        // désactiver le Garbage Collector
+        gc_disable();
+        file_put_contents($file, 0);       
+        for ($d=0; $d < count($donnees); $d++) {
+                
+            $donnee = $donnees[$d];
             $donnee['Pu_N'] = "";
             $donnee['Pu_N-1'] = "";
             $donnee['Pu_N-2'] = "";
-            if ($donnee['MontantSignN'] <> 0 &&  $donnee['QteSignN'] <> 0){$donnee['Pu_N'] = $donnee['MontantSignN']/$donnee['QteSignN'];}
-            if ($donnee['MontantSignN1'] <> 0 &&  $donnee['QteSignN1'] <> 0){$donnee['Pu_N-1'] = $donnee['MontantSignN1']/$donnee['QteSignN1'];} 
-            if ($donnee['MontantSignN2'] <> 0 &&  $donnee['QteSignN2'] <> 0){$donnee['Pu_N-2'] = $donnee['MontantSignN2']/$donnee['QteSignN2'];} 
+            $donnee['Delta_N-1_N'] = "";
+            $donnee['Delta_N-2_N-1'] = "";
+       
+            if (isset($donnee['MontantSignN']) && $donnee['MontantSignN'] <> 0 &&  isset($donnee['QteSignN']) && $donnee['QteSignN'] <> 0 ){$donnee['Pu_N'] = $donnee['MontantSignN']/$donnee['QteSignN'];}
+            if (isset($donnee['MontantSignN1']) && $donnee['MontantSignN1'] <> 0 &&  isset($donnee['QteSignN1']) && $donnee['QteSignN1'] <> 0 ){$donnee['Pu_N-1'] = $donnee['MontantSignN1']/$donnee['QteSignN1'];} 
+            if (isset($donnee['MontantSignN2']) && $donnee['MontantSignN2'] <> 0 &&  isset($donnee['QteSignN2']) && $donnee['QteSignN2'] <> 0 ){$donnee['Pu_N-2'] = $donnee['MontantSignN2']/$donnee['QteSignN2'];} 
+            if (isset($donnee['MontantSignN']) && isset($donnee['MontantSignN1'])) {
+                $donnee['Delta_N-1_N'] = $this->calcul_pourcentage($donnee['MontantSignN1'],$donnee['MontantSignN'])['pourc']/100;
+            }
+            if (isset($donnee['MontantSignN2']) && isset($donnee['MontantSignN1'])) {
+            $donnee['Delta_N-2_N-1'] = $this->calcul_pourcentage($donnee['MontantSignN2'],$donnee['MontantSignN1'])['pourc']/100;
+            }
+
             $list[] = [
                 $donnee['Commercial'],
                 $donnee['Famille_Client'],
@@ -375,11 +419,12 @@ class StatesController extends AbstractController
                 $donnee['Delta_N-2_N-1'],  
                 $donnee['QteSignN2'],
                 $donnee['Pu_N-2'],  
-                $donnee['MontantSignN2'],                    
-                
+                $donnee['MontantSignN2'],                       
             ];
-        }
-        
+            // lancement manuel du Garbage Collector pour libérer de la mémoire
+            gc_collect_cycles();
+        } 
+        file_put_contents($file,20);
         return $list;
     }
     
@@ -395,13 +440,17 @@ class StatesController extends AbstractController
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
         
+        ini_set('memory_limit', '1024M');
+        ini_set('max_execution_time', 0);
+
         $secteur = $this->metierParameter($metier);
+        $file = 'progress.txt';
+        $fileText = 'progress-text.txt';
         $metier = $secteur['metiers'];
-
         $spreadsheet = new Spreadsheet();
-
+        
         $sheet = $spreadsheet->getActiveSheet();
-
+        
         $sheet->setTitle('States');
         // Entête de colonne
         $sheet->getCell('A5')->setValue('Commercial');
@@ -427,11 +476,14 @@ class StatesController extends AbstractController
         $sheet->getCell('U5')->setValue('QteSignN-2');
         $sheet->getCell('V5')->setValue('Pu_N-2');
         $sheet->getCell('W5')->setValue('MontantSignN-2');
-
+        file_put_contents($file, 10 );
+        file_put_contents($fileText, 'Extraction des données de Divalto' );
         // Increase row cursor after header write
         $sheet->fromArray($this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo),null, 'A6', true);
         $dernLign = count($this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo)) + 5;    
         
+        file_put_contents($file, 30 );
+        file_put_contents($fileText, 'Cosmétique des colonnes années du fichier excel' );
         $d = new DateTime('NOW');
         $dateTime = $d->format('d-m-Y') ;
         $nomFichier = 'States Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le '. $dateTime ;
@@ -460,7 +512,7 @@ class StatesController extends AbstractController
             ],
         ];
         $spreadsheet->getActiveSheet()->getStyle("A5:W{$dernLign}")->applyFromArray($styleArray);
-         // Le style N en vert
+        // Le style N en vert
         $spreadsheet->getActiveSheet()->getStyle("M1:O{$dernLign}")->getFill()
         ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
         ->getStartColor()->setARGB('F92D050');
@@ -472,7 +524,8 @@ class StatesController extends AbstractController
         $spreadsheet->getActiveSheet()->getStyle("U1:W{$dernLign}")->getFill()
         ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
         ->getStartColor()->setARGB('FFFFF00');
-        
+        file_put_contents($file, 40 );
+        file_put_contents($fileText, 'Alignement des données dans les cellules' );
         // Le style de l'entête
         $styleEntete = [
             'font' => [
@@ -493,6 +546,8 @@ class StatesController extends AbstractController
                 ],
             ],
         ];
+        
+        file_put_contents($file, 50 );
         $spreadsheet->getActiveSheet()->getStyle("A5:W5")->applyFromArray($styleEntete);
         
         $sheet->getStyle("H1:W{$dernLign}")
@@ -522,6 +577,8 @@ class StatesController extends AbstractController
         $sheet->getColumnDimension('U')->setAutoSize(true);
         $sheet->getColumnDimension('V')->setAutoSize(true);
         $sheet->getColumnDimension('W')->setAutoSize(true);
+        file_put_contents($file, 60 );
+        file_put_contents($fileText, 'Mise en place des formules dans l\'entête' );
         // Sous Total des colonnes pour les colonnes Quantités et montants de chaque années
         $sheet->setCellValue("M4", "=SUBTOTAL(9,M6:M{$dernLign})"); // Quantité N
         $sheet->setCellValue("O4", "=SUBTOTAL(9,O6:O{$dernLign})"); // Montant N
@@ -531,6 +588,8 @@ class StatesController extends AbstractController
         $sheet->setCellValue("W4", "=SUBTOTAL(9,W6:W{$dernLign})"); // Montant N-2
         $sheet->setCellValue("P4", "=(O4/S4)-1"); // Delta n-1 / n
         $sheet->setCellValue("T4", "=(S4/W4)-1"); // Delta n-2 / n-1
+        file_put_contents($file, 70 );
+        file_put_contents($fileText, 'Mise en place des formats de données de pourcentages et monétaires' );
         // Format nombre € colonne PU et montant N
         $sheet->getStyle("N1:O{$dernLign}")
         ->getNumberFormat()
@@ -545,30 +604,36 @@ class StatesController extends AbstractController
         ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
         // Format Pourcentage CELLULE montant N-1/ montant N
         $sheet->getStyle('P4')
-              ->getNumberFormat()
-              ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
         // Format Pourcentage colonne montant N-1/ montant N
         $sheet->getStyle("P6:P{$dernLign}")
-              ->getNumberFormat()
-              ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
+        ->getNumberFormat()
+        ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
         // Format Pourcentage CELLULE montant N-2/ montant N-1
         $sheet->getStyle('T4')
-              ->getNumberFormat()
-              ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
+        ->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
         // Format Pourcentage colonne montant N-2/ montant N-1
         $sheet->getStyle("T6:T{$dernLign}")
-              ->getNumberFormat()
-              ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
-
-        $writer = new Xlsx($spreadsheet);
-
-        // Create a Temporary file in the system
-        $fileName = $nomFichier . '.xlsx';
-        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
-
+        ->getNumberFormat()
+        ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
+        
+        file_put_contents($file, 80 );
+        file_put_contents($fileText, 'Création d\'un classeur excel' );
+              $writer = new Xlsx($spreadsheet);
+              // Create a Temporary file in the system
+              $fileName = $nomFichier . '.xlsx';
+              $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+              
+        file_put_contents($file, 90 );
+        file_put_contents($fileText, 'Enregistrement du fichier Excel' );
         $writer->save($temp_file);
+        file_put_contents($fileText, 'Traitement terminé ! votre fichier est dans vos Téléchargements' );
+        file_put_contents($file, 100 );
         // Return the excel file as an attachment
         return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+        die();
 
     }
 
@@ -581,6 +646,9 @@ class StatesController extends AbstractController
          */
         ini_set('memory_limit', '1024M');
         ini_set('max_execution_time', 0);
+        $file = 'progress.txt';
+        $fileText = 'progress-text.txt';
+
         $list = [];
         $donnee = [];
         $donnees = $repo->getStatesExcelParCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier);
@@ -620,7 +688,7 @@ class StatesController extends AbstractController
                 
             ];
         }
-        echo memory_get_usage();
+        file_put_contents($file,20);
         return $list;
     }
     
@@ -636,8 +704,12 @@ class StatesController extends AbstractController
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
 
-        //dd($tracking);
+        ini_set('memory_limit', '1024M');
+        ini_set('max_execution_time', 0);
         
+        $file = 'progress.txt';
+        $fileText = 'progress-text.txt';
+
         $secteur = $this->metierParameter($metier);
         $metier = $secteur['metiers'];
 
@@ -670,11 +742,13 @@ class StatesController extends AbstractController
         $sheet->getCell('U5')->setValue('QteSignN-2');
         $sheet->getCell('V5')->setValue('Pu_N-2');
         $sheet->getCell('W5')->setValue('MontantSignN-2');
-
+        file_put_contents($file, 10 );
+        file_put_contents($fileText, 'Extraction des données de Divalto' );
         // Increase row cursor after header write
         $sheet->fromArray($this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo),null, 'A6', true);
         $dernLign = count($this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo)) + 5;    
-        
+        file_put_contents($file, 30 );
+        file_put_contents($fileText, 'Cosmétique des colonnes années du fichier excel' );
         $d = new DateTime('NOW');
         $dateTime = $d->format('d-m-Y') ;
         $nomFichier = 'States Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le '. $dateTime ;
@@ -683,6 +757,8 @@ class StatesController extends AbstractController
         $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
         $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
         // Le style du tableau
+        file_put_contents($file, 40 );
+        file_put_contents($fileText, 'Alignement des données dans les cellules' );
         $styleArray = [
             'font' => [
                 'bold' => false,
@@ -702,6 +778,7 @@ class StatesController extends AbstractController
                 ],
             ],
         ];
+        file_put_contents($file, 50 );
         $spreadsheet->getActiveSheet()->getStyle("A5:W{$dernLign}")->applyFromArray($styleArray);
          // Le style N en vert
         $spreadsheet->getActiveSheet()->getStyle("M1:O{$dernLign}")->getFill()
@@ -766,6 +843,8 @@ class StatesController extends AbstractController
         $sheet->getColumnDimension('V')->setAutoSize(true);
         $sheet->getColumnDimension('W')->setAutoSize(true);
         // Sous Total des colonnes pour les colonnes Quantités et montants de chaque années
+        file_put_contents($file, 60 );
+        file_put_contents($fileText, 'Mise en place des formules dans l\'entête' );
         $sheet->setCellValue("M4", "=SUBTOTAL(9,M6:M{$dernLign})"); // Quantité N
         $sheet->setCellValue("O4", "=SUBTOTAL(9,O6:O{$dernLign})"); // Montant N
         $sheet->setCellValue("Q4", "=SUBTOTAL(9,Q6:Q{$dernLign})"); // Quantité N-1
@@ -775,6 +854,8 @@ class StatesController extends AbstractController
         $sheet->setCellValue("P4", "=(O4/S4)-1"); // Delta n-1 / n
         $sheet->setCellValue("T4", "=(S4/W4)-1"); // Delta n-2 / n-1
         // Format nombre € colonne PU et montant N
+        file_put_contents($file, 70 );
+        file_put_contents($fileText, 'Mise en place des formats de données de pourcentages et monétaires' );
         $sheet->getStyle("N1:O{$dernLign}")
         ->getNumberFormat()
         ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
@@ -802,14 +883,20 @@ class StatesController extends AbstractController
         $sheet->getStyle("T6:T{$dernLign}")
               ->getNumberFormat()
               ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
-
+        
+        file_put_contents($file, 80 );
+        file_put_contents($fileText, 'Création d\'un classeur excel' );
         $writer = new Xlsx($spreadsheet);
 
         // Create a Temporary file in the system
         $fileName = $nomFichier . '.xlsx';
         $temp_file = tempnam(sys_get_temp_dir(), $fileName);
 
+        file_put_contents($file, 90 );
+        file_put_contents($fileText, 'Enregistrement du fichier Excel' );
         $writer->save($temp_file);
+        file_put_contents($fileText, 'Traitement terminé ! votre fichier est dans vos Téléchargements' );
+        file_put_contents($file, 100 );
         // Return the excel file as an attachment
         return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
 

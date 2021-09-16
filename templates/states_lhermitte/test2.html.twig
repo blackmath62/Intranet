@@ -3,39 +3,54 @@
 {% block body %}
 
 
-
-{% block choice_widget_options %}
-{% spaceless %}
-    {% for choice in dateDebutFinForm.Metiers %}
-    
-        {% if choice.vars.value == 'EV' %}
-            <option value="{{ choice.vars.value }}"{% if is_granted('ROLE_EV') %}checked{% else %}disabled{% endif %}>
-            <i class="nav-icon fas fa-tree text-success"></i>
-            </option>
-        {% endif %}
-        {% if choice.vars.value == 'HP' %}
-            <option value="{{ choice.vars.value }}"{% if is_granted('ROLE_HP') %}checked{% else %}disabled{% endif %}>
-            <i class="nav-icon fas fa-seedling text-danger"></i>
-            </option>
-        {% endif %}
-        {% if choice.vars.value == 'ME' %}
-            <option value="{{ choice.vars.value }}"{% if is_granted('ROLE_ME') %}checked{% else %}disabled{% endif %}>
-            <i class="fas fa-rainbow nav-icon text-warning"></i>
-            </option>
-        {% endif %}
-        {% if choice.vars.value == 'MA' %}
-            <option value="{{ choice.vars.value }}"{% if is_granted('ROLE_MA') %}checked{% else %}disabled{% endif %}>
-            <i class="fas fa-carrot nav-icon text-orange"></i>
-            </option>
-        {% endif %}                            
-        {% if choice.vars.value == 'Tous' %}
-            <option value="{{ choice.vars.value }}" disabled="disabled">
-            <i class="fas fa-globe nav-icon text-primary"></i>
-            </option>
-        {% endif %}
-    {% endfor %}
-{% endspaceless %}
-{% endblock choice_widget_options %}
+<!--
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{top10Famille|raw}},
+        datasets: [{
+            label: 'Top 10 des Familles produit N ',
+            data: {{ top10N|raw }},
+            backgroundColor: [
+                'rgba(0, 123, 255, 1)', // PRIMARY
+                'rgba(23, 162, 184, 1)', // INFO
+                'rgba(40, 167, 69, 1)', // SUCCESS
+                'rgba(255, 193, 7, 1)', // WARNING
+                'rgba(220, 53, 69, 1)', // DANGER
+                'rgba(255, 133, 27, 1)', // ORANGE
+                'rgba(96, 92, 168, 1)', // VIOLET
+                'rgba(232, 62, 140, 1)', // ROSE
+                'rgba(240, 18, 190, 1)', // FUSHIA
+                'rgba(60, 141, 188, 1)', // BLEU CLAIR
+            ],
+            borderColor: [
+                'rgba(255, 255, 255, 1)',
+                'rgba(255, 255, 255, 1)',
+                'rgba(255, 255, 255, 1)',
+                'rgba(255, 255, 255, 1)',
+                'rgba(255, 255, 255, 1)',
+                'rgba(255, 255, 255, 1)',
+                'rgba(255, 255, 255, 1)',
+                'rgba(255, 255, 255, 1)',
+                'rgba(255, 255, 255, 1)',
+                'rgba(255, 255, 255, 1)',
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+-->
+{% endblock body %}
 
 
 

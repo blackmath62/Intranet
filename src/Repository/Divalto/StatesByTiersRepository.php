@@ -263,6 +263,45 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    // States TOP 10 Familles produits
+    public function getTop10FamillesProduits($dateDebutN, $dateFinN, $dossier)
+    {
+        $dateDebutN1 = date_create($dateDebutN); 
+        $dateDebutN1 = date_modify($dateDebutN1, '-1 Year');
+        $dateDebutN1= $dateDebutN1->format('Y') . '-' . $dateDebutN1->format('m') . '-' . $dateDebutN1->format('d');
+        $dateFinN1 = date_create($dateFinN);
+        $dateFinN1 = date_modify($dateFinN1, '-1 Year');
+        $dateFinN1= $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT TOP 5 LTRIM(RTRIM(Famille_Article)) AS Fam_Article,
+		LTRIM(RTRIM(SUM(MontantSignN1))) AS MontantSignN1,
+        LTRIM(RTRIM(SUM(MontantSignN))) AS MontantSignN
+        FROM -- imbrication d'une requête pour extraire les données à calculer
+        (SELECT MOUV.MONT AS Montant,
+        MOUV.REMPIEMT_0004 AS Remise, ART.FAM_0001 AS Famille_Article,
+        CASE -- Signature du montant
+                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                ELSE 0
+        END AS MontantSignN,
+        CASE -- Signature du montant
+                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                ELSE 0
+        END AS MontantSignN1
+        FROM MOUV
+        INNER JOIN ART ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
+        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) )
+        AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL') AND ART.FAM_0001 NOT IN ('REMISE')
+        AND MOUV.OP IN('C','CD','DD','D')) Reponse
+        GROUP BY Famille_Article
+        ORDER BY SUM(MontantSignN) DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
     
 
     // Bandeau avec CA du secteur d'extraction

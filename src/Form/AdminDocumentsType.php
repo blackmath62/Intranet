@@ -7,6 +7,7 @@ use App\Entity\Main\Documents;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -33,6 +34,28 @@ class AdminDocumentsType extends AbstractType
             ])
             ->add('url', FileType::class,[
                 'label' => "Le Fichier",
+                'required'  => true,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '6M',
+                        'mimeTypes' => [
+                            "image/png",
+                            "image/jpeg",
+                            "image/jpg",
+                            "image/gif",
+                            "image/x-citrix-jpeg",
+                            "image/x-citrix-png",
+                            "image/x-png",
+                            "application/pdf",
+                            "application/x-pdf",
+                            "application/vnd.ms-excel",
+                            "application/msword",
+                            "text/plain",
+                            "application/zip"
+                        ],
+                        'mimeTypesMessage' => 'Les formats autorisés sont PDF, TXT, DOC, XLS, JPG, PNG, GIF, ZIP',
+                    ])
+                    ],
                 'attr' => [
                     'class' => 'col-12 form-control btn btn-primary'
                 ]

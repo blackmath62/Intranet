@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ title }}{% endblock %}
+
 {% block body %}
 
 <!-- début card avertissement -->
@@ -78,7 +79,14 @@
 
 
             <!-- Début bandeau CA de tous les métiers-->
+            {% set MontantN = 0 %}
+            {% set MontantN1 = 0 %}
+            <div class="progress">
+                <div class="progress-bar progress-bar-primary progress-bar-striped active" role="progressbar" id='progress' style="width: 0%;">0%</div>
+            </div>
+                <span class="badge badge-light" id='progress-text'></span>
             <div class="row card-body">
+            
             {% for Metier in statesMetiers %}
                 
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-12">
@@ -89,7 +97,7 @@
                         <div class="d-flex justify-content-around">
                         <h2 class="info-box-text">{{ Metier.SecteurMouvement }}</h2>
                         {% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted("ROLE_#{Metier.SecteurMouvement}") ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') ) %}
-                            <a class="btn btn-success mb-1" href="{{path('app_states_excel_metier_' ~ sufixeMetier , {'metier' : Metier.SecteurMouvement, 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'dossier' : dossier  }  ) }}"><i class="fas fa-file-excel text-white"></i></a>
+                            <a class="btn btn-success mb-1" onclick='begin(event)' href="{{path('app_states_excel_metier_' ~ sufixeMetier , {'metier' : Metier.SecteurMouvement, 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'dossier' : dossier  }  ) }}"><i class="fas fa-file-excel text-white"></i></a>
                         {% endif %}
                         </div>
                         <div class="row">
@@ -136,15 +144,94 @@
                     <!-- /.info-box-content -->
                     </div>
                     <!-- /.info-box -->
-                </div> 
+                </div>
+                {% set MontantN1 = MontantN1 + Metier.CATotalN1 %} 
+                {% set MontantN = MontantN + Metier.CATotalN %} 
 
             {% endfor %}
             </div>
+
+            {% if sufixeMetier == 'Lh' %}
+            
             <!-- /.row -->
+            <!-- Bandeau global des métiers --> 
+            {% set Delta = ((MontantN / MontantN1) - 1) * 100 %}
+            <!-- row -->
+            <div class="row card-body">                
+                <div class="col-md-6 col-sm-6 col-12"> 
+                    <div class="info-box shadow">
+                    <span class="info-box-icon bg-primary "><i class="text-white fas fa-globe nav-icon"></i></span>
+
+                    <div class="info-box-content text-center">
+                        <div class="d-flex justify-content-around">
+                        <h2 class="info-box-text">Global</h2>
+                        {% if ((is_granted('ROLE_RESPONSABLE_SECTEUR')) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS')) %}
+                            <a class="btn btn-success mb-1 float-right" id='start' onclick='begin(event)' href="{{path('app_states_excel_metier_' ~ sufixeMetier , {'metier' : 'Tous', 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'dossier' : dossier  }  ) }}"><i class="fas fa-file-excel text-white"></i></a>
+                        {% endif %}
+                        </div>
+                        <div class="row">
+                  <div class="col-sm-4 border-right">
+                    <div class="description-block">
+                      <h5 class="description-header">N -1</h5>
+                      <h3 class="description-text">{{ MontantN1|number_format(2, '.', ' ') }} €</h3>
+                    </div>
+                    <!-- /.description-block -->
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-4 border-right">
+                    <div class="description-block">
+                      <h5 class="description-header">Delta</h5>
+
+                        {% if Delta > 0 %}
+                        <h3 class="description-text text-success">
+                            <i class="fas fa-arrow-up pr-1"></i>{{ Delta|number_format(3, '.', ' ') }} %
+                        </h3>
+                        {% elseif Delta == 0 %}
+                        <h3 class="description-text text-warning">
+                            <i class="fas fa-arrow-left pr-1"></i>{{ Delta|number_format(3, '.', ' ') }} %
+                        </h3>
+                        {% elseif Delta < 0 %}
+                        <h3 class="description-text text-danger">
+                            <i class="fas fa-arrow-down pr-1"></i>{{ Delta|number_format(3, '.', ' ') }} %
+                        </h3>
+                        {% endif %}
+    
+                    </div>
+                    <!-- /.description-block -->
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-4">
+                    <div class="description-block">
+                      <h5 class="description-header">N </h5>
+                      <h3 class="description-text">{{ MontantN|number_format(2, '.', ' ') }} €</h3>
+                    </div>
+                    <!-- /.description-block -->
+                  </div>
+                  <!-- /.col -->
+                </div>
+
+                    </div>
+                    <!-- /.info-box-content -->
+                    </div>
+                <!-- /.info-box -->
+                </div>
+
+
+                <!-- TODO Voir pour l'encart Statistique
+                <div class="col-md-6 col-sm-6 col-12"> 
+                    <canvas id="myChart" width="700" height="150"></canvas>
+                </div>
+                -->
+                
+
+
+
+
+            </div>
+            <!-- /Bandeau global des métiers --> 
+            <!-- /.row -->
+            {% endif %}
             <!-- Fin bandeau CA de tous les métiers-->
-
-
-
 
             <div class="card-body row">
             {% if stateCommerciaux %}
@@ -157,10 +244,13 @@
                 <!-- /.col -->
                     <div class="">
                         <div class="mr-auto border-bottom text-center d-flex justify-content-between align-items-center"><h5> 
-                        {{ state.Commercial }} </h5> 
-                        {% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted("ROLE_#{metier}") ) or ( is_granted('ROLE_COMMERCIAL') and app.user.commercial == state.CommercialId ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') ) %}
-                            <a class="btn btn-success mb-1" href="{{path('app_states_excel_commercial_' ~ sufixeMetier , {'metier' : metier, 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'commercialId' : state.CommercialId, 'dossier' : dossier  }  ) }}"><i class="fas fa-file-excel text-white"></i></a>
+                        {{ state.Commercial }} </h5>
+                        {% if metier == 'Tous' %}
+                        {% else %}
+                        {% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted("ROLE_#{metier}")  ) or ( is_granted('ROLE_COMMERCIAL') and app.user.commercial == state.CommercialId ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') ) %}
+                            <a class="btn btn-success mb-1" onclick='begin(event)' href="{{path('app_states_excel_commercial_' ~ sufixeMetier , {'metier' : metier, 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'commercialId' : state.CommercialId, 'dossier' : dossier  }  ) }}"><i class="fas fa-file-excel text-white"></i></a>
                         {% endif %}
+                        {% endif %} 
                     </div>
                         <div class="text-right">
                             <span class="description-percentage text-{{ state.ColorTotal}}"><i class="fas fa-arrow-{{ state.FlecheTotal}} pr-1"></i>{{ state.DeltaTotal|number_format(2) }} %</span>
@@ -320,11 +410,7 @@
             <div class="card-body">
                 {% if intervalN %}
                 
-                    {% if is_granted('ROLE_BOSS') %}
                         <table id="example1" class="table table-bordered table-striped">
-                    {% else %}
-                        <table id="example1" class="table table-bordered table-striped">
-                    {% endif %}
                         <thead>
                             <tr>
                                 <th class="text-center"><span>Commercial</span></th>
@@ -400,4 +486,88 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" 
+integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg==" 
+crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+var prog = document.getElementById('progress');
+var progText = document.getElementById('progress-text');
+var button = document.getElementById('start');
+
+var start = new Date();
+
+function begin(event){
+    //  initialisation d'un objet XMLHttpRequest
+    xhr = new XMLHttpRequest();
+    // initialise la requête
+    xhr.open("POST", "StatesController.php", true);
+    // déclencher la fonction
+    xhr.onload = function(){
+        // statut de la réponse à la requête
+        if (xhr.status === 200) {
+
+            prog.style.width = '100%';
+            prog.innerHTML = '100%';
+            progText.innerHTML = 'Traitement terminé';
+            
+        alert(xhr.responseText);
+        clearInterval(timer);
+        
+        }
+         
+    }
+    xhr.send();
+    timer = setInterval(checkProgress,500);
+}
+function checkProgress(event){
+    //  initialisation d'un objet XMLHttpRequest
+    xhr2 = new XMLHttpRequest();
+    // initialise la requête
+    xhr2.open("POST", "../checkProgress.php", true);
+    // déclencher la fonction
+    xhr2.onload = function(){
+        // statut de la réponse à la requête
+        if (xhr2.status === 200 ) {
+            // augmenter la longueur de la barre et le texte %
+        prog.style.width = xhr2.responseText + '%';
+        prog.innerHTML = xhr2.responseText + '%';
+        }
+        
+       
+    }
+    xhr2.send();
+
+    xhr3 = new XMLHttpRequest();
+    // initialise la requête
+    xhr3.open("POST", "../checkProgressText.php", true);
+    // déclencher la fonction
+    xhr3.onload = function(){
+        // statut de la réponse à la requête
+        if (xhr3.status === 200 ) {
+            // modification du texte informatif
+        progText.innerHTML = xhr3.responseText ;
+        
+        }
+    }
+    xhr3.send();
+}
+
+</script>
+
+<!-- Disparition automatique de message alert -->
+<script>
+    jQuery(function ($) {
+    var monAlert = $('#alert');
+    console.log(monAlert);
+        if (monAlert.length > 0) {
+        monAlert.delay(3000).slideUp();
+        }
+    });
+</script>
+
+<script>$('#reservation').daterangepicker()</script>
+
 {% endblock %}
