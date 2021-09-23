@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use DateTime;
+use Knp\Snappy\Pdf;
 use App\Form\SendTicketType;
 use App\Entity\Main\Comments;
 use App\Form\CommentsTicketsType;
@@ -30,7 +31,7 @@ class CommentsController extends AbstractController
      * @Route("/ticket/comment/add/{id<\d+>}", name="app_comment")
      * @ParamConverter("Comments", options={"id" = "Ticket_id"})
      */
-    public function addComment(int $id,StatusRepository $repoStatut, MailerInterface $mailer,TicketsRepository $repoTicket, CommentsRepository $repoComments, Request $request, EntityManagerInterface $em, PrestataireRepository $repoPresta	)
+    public function addComment(int $id, Pdf $pdf,StatusRepository $repoStatut, MailerInterface $mailer,TicketsRepository $repoTicket, CommentsRepository $repoComments, Request $request, EntityManagerInterface $em, PrestataireRepository $repoPresta	)
     {
         // Enregistrement des commentaires
         
@@ -98,11 +99,14 @@ class CommentsController extends AbstractController
             $data = $formSendTicket['prestataire']->getData();
             if ($data->getEmail()) {
                 $commentsOfTicket = $repoComments->findBy(['ticket' => $id]);
+                $html = $this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]);
+                $pdf = $pdf->getOutputFromHtml($html);
                 $email = (new Email())
                     ->from('intranet@groupe-axis.fr')
                     ->to($data->getEmail())
                     ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle() . " => " . $ticket->getStatu()->getTitle())
-                    ->html($this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]));
+                    ->html($html)
+                    ->attach($pdf, 'Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle() . '.pdf');
                 $mailer->send($email);
 
                 // assignation du prestataire aprés l'envoi du mail au prestataire
@@ -147,11 +151,14 @@ class CommentsController extends AbstractController
             $data = $formSendAnnuaireTicket['annuaire']->getData();
             if ($data->getMail()) {
                 $commentsOfTicket = $repoComments->findBy(['ticket' => $id]);
+                $html = $this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendAnnuaireTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]);
+                $pdf = $pdf->getOutputFromHtml($html);
                 $email = (new Email())
                     ->from('intranet@groupe-axis.fr')
                     ->to($data->getMail())
                     ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle() . " => " . $ticket->getStatu()->getTitle())
-                    ->html($this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendAnnuaireTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]));
+                    ->html($html)
+                    ->attach($pdf, 'Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle() . '.pdf');
                 $mailer->send($email);
 
                 // créer un commentaire pour sauvegarder les dates d'envois de mails

@@ -60,7 +60,8 @@
                                             <a class="text-center btn btn-sm" style="background-color: {{ faq.search.backgroundColor }}; color: {{ faq.search.textColor }}"><i class="pr-1 {{ faq.search.fa}}"></i>{{faq.search.nom}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a href=" {{path('app_faq_show', {'id' : faq.id} ) }}" class="text-center btn btn-sm btn-info text-white"><i class="pr-2 far fa-eye"></i>consulter</a>
+                                            <a href=" {{path('app_send_pdf_faq', {'id' : faq.id} ) }}" class="text-center btn btn-sm btn-danger text-white"><i class="pr-2 fas fa-file-pdf"></i>Recevoir par mail en PDF</a>
+                                            <a href=" {{path('app_faq_show', {'id' : faq.id} ) }}" class="text-center btn btn-sm btn-info text-white"><i class="pr-2 far fa-eye"></i>Consulter en ligne</a>
                                         </td>
                                     {% endfor %}
                                     </tr>

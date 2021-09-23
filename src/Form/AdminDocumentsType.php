@@ -42,18 +42,10 @@ class AdminDocumentsType extends AbstractType
                             "image/png",
                             "image/jpeg",
                             "image/jpg",
-                            "image/gif",
-                            "image/x-citrix-jpeg",
-                            "image/x-citrix-png",
-                            "image/x-png",
                             "application/pdf",
                             "application/x-pdf",
-                            "application/vnd.ms-excel",
-                            "application/msword",
-                            "text/plain",
-                            "application/zip"
                         ],
-                        'mimeTypesMessage' => 'Les formats autorisés sont PDF, TXT, DOC, XLS, JPG, PNG, GIF, ZIP',
+                        'mimeTypesMessage' => 'Les formats autorisés sont PDF, JPG, PNG',
                     ])
                     ],
                 'attr' => [

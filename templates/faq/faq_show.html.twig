@@ -21,6 +21,7 @@
 								<a class="btn btn-sm" style="background-color: {{ faq.search.backgroundColor }}; color: {{ faq.search.textColor }}" ;>
 									<i class="pr-1 {{ faq.search.fa	}}"></i>
 									{{ faq.search.nom }}</a>
+								<a href=" {{path('app_send_pdf_faq', {'id' : faq.id} ) }}" class="text-center btn btn-sm btn-danger text-white"><i class="pr-2 fas fa-file-pdf"></i>Recevoir par mail en PDF</a>
                                 {% if is_granted('ROLE_ADMIN') %}
                                 <a class="btn btn-sm btn-info text-white" href=" {{path('app_faq_edit', {'id' : faq.id} ) }}" >
 									<i class="pr-1 fa fa-edit text-white"></i>Modifier</a>
