@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{titre}}{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="col-md-8">
+{% if usager %}
+<h1 class='text-center pb-4'><b>Statistiques du trafic du site intranet de {{ usager|raw }} </b></h1>
+{% else %}
+<h1 class='text-center pb-4'><b>Statistiques du trafic du site intranet de tous les utilisateurs</b></h1>
+{% endif %}
+<canvas id="myChart" width="400" height="180"></canvas>
+</div>
+<div class="col-md-4">
+    <!-- USERS LIST -->
+    <div class="card">
+        <div class="card-header">
+        <h3 class="card-title">Liste des menbres</h3>
+
+        <div class="card-tools">
+            <span class="badge badge-info">{{ users|length }} Menbres</span>
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+            </button>
+        </div>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body p-0">
+        <ul class="users-list clearfix">
+            {% for user in users %}
+            <li>
+                <img src="{{ asset(asset('img/profile/' ~ user.img)) }}" alt="User Image">
+                <a class="users-list-name" href="{{path('app_admin_statistiques_user', {'id' : user.id} ) }}">{{ user.pseudo }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <!-- /.users-list -->
+        </div>
+        <!-- /.card-body -->
+        <!-- /.card-footer -->
+    </div>
+    <!--/.card -->
+    </div>
+    <!-- /.col -->
+</div>
+<!-- /.row -->
+<!-- tableau -->
+<div class="card">
+<div class="card-header">
+{% if usager %}
+    <h3 class="card-title text-center mr-auto">Liste des visualisations de pages par {{ usager|raw }}</h3>
+{% else %}
+    <h3 class="card-title text-center mr-auto">Liste des visualisations de pages</h3>
+{% endif %}
+</div>
+<!-- /.card-header -->
+<div class="card-body">
+    <table id="example1" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">
+                    <span>Nom de la page</span>
+                </th>
+                <th class="text-center">
+                    <span>Nombre de visite</span>
+                </th>
+                {% if usager %}
+                <th class="text-center">
+                    <span>Derniére visite</span>
+                </th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in datas %}
+                <tr>
+                        <td class="text-center">
+                            {{ data.Page }}
+                        </td>
+                        <td class="text-center">
+                            {{data.CountPage}}
+                        </td>
+                        {% if usager %}
+                        <th class="text-center">
+                            <span>{{ data.LastView|date("d/m/Y") }}</span>
+                        </th>
+                        {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="text-center">
+                    <span>Nom de la page</span>
+                </th>
+                <th class="text-center">
+                    <span>Nombre de visite</span>
+                </th>
+                {% if usager %}
+                <th class="text-center">
+                    <span>Derniére visite</span>
+                </th>
+                {% endif %}
+            </tr>
+        </tfoot>
+    </table>
+</div>
+</div>
+<!-- /tableau -->
+{% endblock %}
+{% block javascripts %}
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      "responsive": true, "lengthChange": false, "autoWidth": false,"order": [[ 0, "desc" ]],
+      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": false,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+</script>
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{page|raw}},
+        datasets: [{
+            label: '# of Votes',
+            data: {{count|raw}},
+            backgroundColor: {{color|raw}},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                display: true,
+                labels: {
+                    color: 'rgb(100, 99, 132)'
+                }                
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}

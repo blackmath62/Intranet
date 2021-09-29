@@ -29,8 +29,36 @@ class TrackingsRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    
 
+    public function getStatesIntranet():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(trackings.page) AS CountPage,trackings.page AS Page
+        FROM trackings
+        INNER JOIN users ON users.id = trackings.user_id
+        WHERE users.id NOT IN (1, 3)
+        GROUP BY trackings.page  
+        ORDER BY CountPage DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getUserStatesIntranet($id):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(trackings.page) AS CountPage,trackings.page AS Page, MAX(trackings.createdAt) AS LastView
+        FROM trackings
+        INNER JOIN users ON users.id = trackings.user_id
+        WHERE users.id = $id
+        GROUP BY trackings.page  
+        ORDER BY LastView DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
+    
     // /**
     //  * @return Tracking[] Returns an array of Tracking objects
     //  */
