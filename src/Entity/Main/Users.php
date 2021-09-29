@@ -134,7 +134,13 @@ class Users implements UserInterface
      */
     private $service;
 
+    /**
+     * @ORM\OneToMany(targetEntity=News::class, mappedBy="user")
+     */
+    private $news;
 
+
+   
     public function __construct()
     {
         $this->documents = new ArrayCollection();
@@ -148,6 +154,7 @@ class Users implements UserInterface
         $this->faqs = new ArrayCollection();
         $this->holidays = new ArrayCollection();
         $this->UserTreatmentholidays = new ArrayCollection();
+        $this->news = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -574,6 +581,36 @@ class Users implements UserInterface
     public function setService(?Services $service): self
     {
         $this->service = $service;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|News[]
+     */
+    public function getNews(): Collection
+    {
+        return $this->news;
+    }
+
+    public function addNews(News $news): self
+    {
+        if (!$this->news->contains($news)) {
+            $this->news[] = $news;
+            $news->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNews(News $news): self
+    {
+        if ($this->news->removeElement($news)) {
+            // set the owning side to null (unless already changed)
+            if ($news->getUser() === $this) {
+                $news->setUser(null);
+            }
+        }
 
         return $this;
     }

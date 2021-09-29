@@ -12,20 +12,57 @@
   </div>
 
 <div class='d-flex justify-content-between'>
-{% if is_granted('ROLE_ADMIN') %}
-    <!-- /.col -->
-          <div class="col-md-9">
-            <div class="card card-primary">
-              <div class="card-body p-0">
-                <!-- THE CALENDAR -->
-                <div id="external-events"></div>
-                <div id="calendar"></div>
-              </div>
-              <!-- /.card-body -->
+
+<div class="col-12 col-sm-9">
+  <div class="card card-dark card-tabs">
+    <div class="card-header p-0 pt-1">
+      <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="actuality" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Actualités</a>
+        </li>
+        {% if is_granted('ROLE_ADMIN') %}
+        <li class="nav-item">
+          <a class="nav-link" id="custom-tabs-one-calendar-tab" data-toggle="pill" href="#calendrier" role="tab" aria-controls="custom-tabs-one-calendar" aria-selected="false">Calendrier</a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+    <div class="card-body">
+      <div class="tab-content" id="custom-tabs-one-tabContent">
+        <div class="tab-pane fade show active" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="actuality">
+          <!-- TODO ajouter les 5 derniéres actualités sous forme de caroussel--> 
+
+<div id="carousel" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+  {% set myVal = 1 %}
+
+    {% for new in news %}
+    {% if myVal == 1 %}
+    <div class="carousel-item active">
+    {% else %}
+    <div class="carousel-item">
+    {% endif %}
+      <h2 class="d-block w-100 text-center text-dark">{{ new.title }} </h2>
+      <p class="d-block w-100">{{ new.content|raw }} </p>
+     {% set myVal = myVal + 1 %}
+    </div>
+    {% endfor %}
+  </div>        
+</div>
+
+        </div>
+        <div class="tab-pane fade" id="calendrier" role="tabpanel" aria-labelledby="custom-tabs-one-calendar-tab">
+            <div >
+            <!-- THE CALENDAR -->
+            <div id="external-events"></div>
+            <div id="calendar"></div>
             </div>
-            <!-- /.card -->
-          </div>
-{% endif %}
+        </div>
+      </div>
+    </div>
+    <!-- /.card -->
+  </div>
+</div>
 
 <div class="col-md-3 float-right">
 <!-- USERS LIST -->
@@ -69,6 +106,15 @@
 </section>
 {% endblock %}
 {% block javascripts %}
+
+<script>
+var myCarousel = document.querySelector('#carousel')
+var carousel = new bootstrap.Carousel(myCarousel, {
+  interval: 2000
+})
+
+</script>
+
 <!-- fullCalendar 2.2.5 -->
 <script>
   $(function () {
@@ -147,7 +193,7 @@
 	  },
       //Random default events
       events    : {{ data|raw }},
-      editable  : true,
+      editable  : false,
       droppable : true, // this allows things to be dropped onto the calendar !!!
       drop      : function(info) {
         // is the "remove after drop" checkbox checked?
@@ -202,4 +248,5 @@
   })
 </script>
 <!-- End Calendrier -->
+
 {% endblock %}

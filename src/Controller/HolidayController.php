@@ -10,6 +10,7 @@ use RecursiveArrayIterator;
 use App\Entity\Main\Holiday;
 use RecursiveIteratorIterator;
 use Symfony\Component\Mime\Email;
+use App\Controller\HomeController;
 use App\Entity\Main\statusHoliday;
 use Twig\Extensions\DateExtension;
 use App\Repository\Main\UsersRepository;
@@ -163,7 +164,7 @@ class HolidayController extends AbstractController
      * @Route("/holiday/show/{id}", name="app_holiday_show", methods={"GET"})
      */
     // Voir un congés
-    public function showHoliday($id, Request $request, HolidayRepository $repo, IdeaBoxController $ideaBoxController)
+    public function showHoliday($id, Request $request, HolidayRepository $repo, HomeController $HomeController)
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');

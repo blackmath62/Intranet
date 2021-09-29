@@ -3,14 +3,13 @@
 namespace App\Controller;
 
 use DateTime;
-use App\Form\IdeaBoxType;
-use App\Entity\Main\Users;
 use RecursiveArrayIterator;
-use App\Entity\Main\IdeaBox;
+use App\Form\CommentNewsType;
 use RecursiveIteratorIterator;
+use App\Entity\Main\CommentsNews;
+use App\Repository\Main\NewsRepository;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
-use App\Repository\Main\IdeaBoxRepository;
 use App\Repository\Main\TrackingsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  * @IsGranted("ROLE_USER")
  */
 
-class IdeaBoxController extends AbstractController
+class HomeController extends AbstractController
 {
     /**
      * @Route("/php_info", name="app_php_info")
@@ -34,7 +33,7 @@ class IdeaBoxController extends AbstractController
     /**
      * @Route("/", name="app_home")
      */
-    public function index(Request $request, IdeaBoxRepository $repo, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo)
+    public function index(Request $request, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews)
     {
 
         // tracking user page for stats
@@ -118,11 +117,14 @@ class IdeaBoxController extends AbstractController
         
          $data = json_encode($rdvs);
 
-        return $this->render('idea_box/index.html.twig', [
+        $news = $repoNews->findBy([],['id'=>'DESC'],5);
+
+        return $this->render('home/index.html.twig', [
             'title' => 'Accueil',
             'users' => $users,
             'tracks' => $track,
-            'data' => $data
+            'data' => $data,
+            'news' => $news,
         ]);
     }
 
