@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @IsGranted("ROLE_ADMIN")
@@ -14,19 +17,28 @@ use Symfony\Component\HttpFoundation\Request;
 
 class TestController extends AbstractController
 {
+    private $mailer;
+    public function __construct(MailerInterface $mailer)
+    {
+        $this->mailer = $mailer;
+        //parent::__construct();
+    }   
     /**
      * @Route("/test", name="app_test")
      */
-    public function index(Request $request): Response
+    public function index()
     {
         
-        // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
-
-        return $this->render('test/index.html.twig', [
-            'controller_name' => 'TestController',
-            'title' => 'Page Modéle de test'
-        ]);
+        return $this->sendMail();
+        
+    }
+    public function sendMail(){
+                
+                $email = (new Email())
+                    ->from('intranet@groupe-axis.fr')
+                    ->to('jpochet@lhermitte.fr')
+                    ->subject('Je suis en train de tester les commandes')
+                    ->html('<p>Bonjour Jérôme, est ce que tu a bien reçu ce mail ?</p>');
+                $this->mailer->send($email);
     }
 }
