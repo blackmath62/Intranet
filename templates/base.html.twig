@@ -230,13 +230,12 @@
 								</ul>
 							</li>
 						{% endif %}
-							{% if is_granted('ROLE_INFORMATIQUE') %}
 
 							<li class="nav-item has-treeview">
 								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-laptop"></i>
+									<i class="nav-icon fas fa-box-open"></i>
 									<p>
-										Informatique
+										Stocks
 										<i class="fas fa-angle-left right"></i>
 									</p>
 								</a>
@@ -244,18 +243,17 @@
 										<li class="nav-item">
 											<a href="{{ path('app_controle_produit_stock_mouv_ef')}}" class="nav-link">
 												<i class="nav-icon fab fa-searchengin text-warning"></i>
-												<p>Contrôle Article</p>
+												<p>Article impossible à fermer</p>
 											</a>
 										</li>
 										<li class="nav-item">
 											<a href="{{ path('app_stock_jardinew')}}" class="nav-link">
 												<i class="nav-icon fas fa-store text-success"></i>
-												<p>Stocks Jardinew</p>
+												<p>MAJ Stocks Jardinew</p>
 											</a>
 										</li>
 								</ul>
 							</li>
-						{% endif %}
 					
 							<li class="nav-item">
 								<a href="{{ path('app_faq')}}" class="nav-link">

@@ -2,11 +2,16 @@
 
 namespace App\Controller;
 
-use App\Repository\Main\TrackingsRepository;
 use App\Repository\Main\UsersRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\Main\TrackingsRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+/**
+ * @IsGranted("ROLE_ADMIN")
+ */
 
 class StatistiquesIntranetController extends AbstractController
 {
