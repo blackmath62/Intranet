@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3 class="card-title text-center">Contacts du client . {{client.Nom }}</h3>
+                         <p class="card-text">Code client : {{ client.Tiers}}</p>
+                         <p class="card-text">Commercial : 
+                                        {% if client.Commercial %}
+                                            <a class="text-dark">{{client.Commercial}}</a>
+                                        {% else %}
+                                            <a class="text-dark">Aie ! Pas de commercial</a>
+                                        {% endif %}</p>
+                         <p class="card-text">Famille du client : {{ client.Famille }}</p>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Id</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Prénom</span></th>
+                                    <th class="text-center"><span>Téléphone</span></th>
+                                    <th class="text-center"><span>Portable</span></th>
+                                    <th class="text-center"><span>Fonction</span></th>
+                                    <th class="text-center"><span>Mail</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            
+                                {% for contact in contacts %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{contact.Id}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{contact.Nom}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ contact.Prenom}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{contact.Telephone}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{contact.Portable}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ contact.Fonction }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{contact.Email}}</a>
+                                        </td>
+                                    </tr>
+
+                                {% endfor %}
+                           
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Id</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Prénom</span></th>
+                                    <th class="text-center"><span>Téléphone</span></th>
+                                    <th class="text-center"><span>Portable</span></th>
+                                    <th class="text-center"><span>Fonction</span></th>
+                                    <th class="text-center"><span>Mail</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

@@ -40,20 +40,28 @@ class TicketsController extends AbstractController
     
     /**
      * @Route("/tickets", name="app_tickets")
+     * @Route("/tickets/resolus", name="app_tickets_resolus")
      */
-    public function tickets_Show(TicketsRepository $repo, Request $request, SluggerInterface $slugger, CommentsRepository $repoComment, StatusRepository $repoStatus)
+    public function getListTickets(TicketsRepository $repo, Request $request, SluggerInterface $slugger, CommentsRepository $repoComment, StatusRepository $repoStatus)
     {
-        $tickets = $repo->findAllExceptStatu(17);
-        $comments = $repoComment->findAllExceptStatu(17);
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+        if ($tracking == 'app_tickets') {
+            $tickets = $repo->findAllExceptStatu(17);
+            $comments = $repoComment->findAllExceptStatu(17);
+        }
+        if ($tracking == 'app_tickets_resolus'){
+            $tickets = $repo->findBy(['statu'=>17]);
+            
+            $comments = $repoComment->findAllExceptStatu(14,16,18,19);
+        }
         $status = $repoStatus->findAll();
         // Formulaire du Ticket
         
         $form = $this->createForm(TicketsType::class);
         $form->handleRequest($request);
 
-        // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
         
         if ($form->isSubmitted() && $form->isValid()) {
             $ticket = $form->getData();

@@ -14,7 +14,7 @@ use App\Repository\Main\UsersRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
- * @IsGranted("ROLE_ADMIN")
+ * @IsGranted("ROLE_RESPONSABLE_SECTEUR")
  */
 
 class ClientsParSecteurController extends AbstractController
@@ -34,6 +34,23 @@ class ClientsParSecteurController extends AbstractController
         return $this->render('clients_par_secteur/index.html.twig', [
             'title' => 'Clients',
             'clients' => $clients,
+        ]);
+    }
+
+    /**
+     * @Route("/Lhermitte/contacts/client/{tiers}", name="app_lhermitte_contact_client")
+     */
+    public function getContactsClient($tiers, Request $request, ClientLhermitteByCommercialRepository $client): Response
+    {
+                
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+            //dd($client->getThisClient($tiers));
+        return $this->render('clients_par_secteur/contact.html.twig', [
+            'title' => 'Contacts Client',
+            'client' => $client->getThisClient($tiers),
+            'contacts' => $client->getContactsClient($tiers)
         ]);
     }
 

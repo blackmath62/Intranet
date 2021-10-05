@@ -28,6 +28,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Famille</span></th>
                                     <th class="text-center"><span>Code Tiers</span></th>
                                     <th class="text-center"><span>Nom</span></th>
                                     <th class="text-center"><span>rue</span></th>
@@ -54,6 +55,9 @@
                                             <a class="text-dark" style="max-width: 40px;">{{client.Tiers}}</a>
                                         </td>
                                         <td class="text-center">
+                                            <a class="text-dark">{{client.Famille}}</a>
+                                        </td>
+                                        <td class="text-center">
                                             <a class="text-dark">{{client.Nom}}</a>
                                         </td>
                                         <td class="text-center">
@@ -74,6 +78,7 @@
                                         <td class="text-center">
                                             <a class="btn btn-danger" href="{{ path('app_lhermitte_need_clients', {'tiers' : client.Tiers} ) }}" ><i class="fas fa-heart"></i></a>
                                             <a class="btn btn-warning" data-toggle="modal" data-target="#modal-danger" ><i class="fas fa-sign-out-alt"></i></i></a>
+                                            <a class="btn btn-info" href="{{ path('app_lhermitte_contact_client', {'tiers' : client.Tiers} ) }}" ><i class="fas fa-users"></i></a>
                                         </td>
                                     </tr>
 
@@ -106,6 +111,7 @@
                             <tfoot>
                                 <tr>
                                     <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Famille</span></th>
                                     <th class="text-center"><span>Code Tiers</span></th>
                                     <th class="text-center"><span>Nom</span></th>
                                     <th class="text-center"><span>rue</span></th>

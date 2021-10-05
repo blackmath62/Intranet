@@ -3,14 +3,12 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-	<section
-		class="content-header">
-
+	<section class="content-header">
 		<!-- Création de Ticket -->
 		<div class="card collapsed-card card-dark">
-			<div class="card-header">
+			<div class="card-header d-flex">
 				<h3 class="card-title">Créer un nouveau ticket .....</h3>
-
+				<a href="{{ path('app_tickets_resolus') }}" class="badge badge-success ml-auto">Afficher les tickets résolus</a>
 				<div class="card-tools">
 					<button type="button" class="btn btn-tool" data-card-widget="collapse">
 						<i class="fas fa-minus"></i>
@@ -60,14 +58,13 @@
 			</div>
 			<!-- /.card-footer-->
 		</div>
-
+		
 		<!-- Control Sidebar -->
 		<aside class="control-sidebar control-sidebar-dark"></aside>
 		<!-- /.control-sidebar -->
 		<!-- ./wrapper -->
 		{% for statu in status %}
-		{% if statu.id == 17 and not is_granted('ROLE_ADMIN') %}
-			{% else %}		
+		{% if statu.id %}		
 				{% set countTicketsByStatus = 0 %}
 				{% for ticket in tickets if ticket.statu == statu %}
 					{% set countTicketsByStatus = countTicketsByStatus + 1 %}
