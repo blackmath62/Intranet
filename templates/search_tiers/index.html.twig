@@ -1,20 +1,113 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Hello SearchTiersController!{% endblock %}
-
+{% block title %}{{ title }}{% endblock %}
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/wamp64/www/Intranet/src/Controller/SearchTiersController.php'|file_link(0) }}">src/Controller/SearchTiersController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/wamp64/www/Intranet/templates/search_tiers/index.html.twig'|file_link(0) }}">templates/search_tiers/index.html.twig</a></code></li>
-    </ul>
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+    <h3 class="card-title"><i class="icon fas fa-info-circle pr-2"></i>Informations utiles</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+<!-- /.card-header -->
+    <div class="card-body">
+        <p>Vous pouvez retrouver un client à partir d'un nom de famille et du dossier selectionné</p>
+    </div>
+<!-- /.card-footer-->
 </div>
+
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <!-- /.card-header -->
+                    <div class="card-header d-flex justify-content-between ">
+                        <h3 class="card-title text-center">Rechercher un client grâce a un nom de contact</h3>
+                        {{ form_start(search, { 'attr' : { 'class' : 'ml-auto' }} ) }}
+                        <div class='d-flex'>
+                            <div class="p-1 mt-2">
+                            Recherche les clients qui ont un nom de contact contenant : 
+                            </div>
+                            <div class="p-1">
+                            {{ form_row(search.search) }}
+                            </div>
+                            <div class="p-1">
+                            {{ form_row(search.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }} ) }}
+                            </div>
+                        </div>
+                        {{ form_end(search)}}
+                    </div>
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Raison Sociale</span></th>
+                                    <th class="text-center"><span>Titre</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Prénom</span></th>
+                                    <th class="text-center"><span>Téléphone</span></th>
+                                    <th class="text-center"><span>Portable</span></th>
+                                    <th class="text-center"><span>Mail</span></th>                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+							 
+                              <!-- >boucle -->
+                              {% if clients %}
+                              {% for client in clients %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ client.Tiers }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ client.RaisonSociale }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ client.Titre }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ client.Nom }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ client.Prenom }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ client.Telephone }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ client.Portable }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ client.Email }}</a>
+                                        </td>
+                                    </tr>
+                              {% endfor %}
+                              {% else %}
+                                     <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter le champs de recherche</h4>
+                              {% endif %}
+                                  
+                             <!-- >boucle -->
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                   <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Raison Sociale</span></th>
+                                    <th class="text-center"><span>Titre</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Prénom</span></th>
+                                    <th class="text-center"><span>Téléphone</span></th>
+                                    <th class="text-center"><span>Portable</span></th>
+                                    <th class="text-center"><span>Mail</span></th>                                    
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 {% endblock %}
+
+

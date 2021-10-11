@@ -14,7 +14,18 @@ class ClientLhermitteByCommercialRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Mouv::class);
     }
-   
+       
+    public function getClientByContactName($nom, $dossier):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT CLI.TIERS AS Tiers, CLI.NOM AS RaisonSociale,T2.TIT AS Titre, T2.NOM AS Nom, T2.PRENOM AS Prenom, T2.TEL AS Telephone, T2.TELGSM AS Portable, T2.EMAIL AS Email  
+        FROM T2
+        INNER JOIN CLI ON CLI.TIERS = T2.TIERS AND CLI.DOS = T2.DOS
+        WHERE T2.NOM LIKE '%$nom%' AND T2.DOS IN($dossier)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
     public function getClientLhermitteByCommercial():array
     {

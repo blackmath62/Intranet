@@ -46,7 +46,7 @@ class ClientsParSecteurController extends AbstractController
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
-            //dd($client->getThisClient($tiers));
+        
         return $this->render('clients_par_secteur/contact.html.twig', [
             'title' => 'Contacts Client',
             'client' => $client->getThisClient($tiers),

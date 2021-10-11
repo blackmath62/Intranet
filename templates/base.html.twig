@@ -171,15 +171,25 @@
 								</a>
 							</li>
 
-						<li class="nav-item">
-							<a href="{{ path('app_tickets')}}" class="nav-link">
-								<i class="nav-icon fas fa-fw fa-bug "></i>
-								<p>
-									Tickets
-								</p>
-								<!-- <span class="badge badge-danger right">8</span> -->
-							</a>
-						</li>
+							<li class="nav-item">
+								<a href="{{ path('app_tickets')}}" class="nav-link">
+									<i class="nav-icon fas fa-fw fa-bug "></i>
+									<p>
+										Tickets
+									</p>
+									<!-- <span class="badge badge-danger right">8</span> -->
+								</a>
+							</li>
+
+							<li class="nav-item">
+								<a href="{{path('app_search_tiers')}}" class="nav-link">
+									<i class="nav-icon fas fa-search-location"></i>
+									<p>
+										Chercher client par contact
+									</p>
+									<!-- <span class="badge badge-danger right">8</span> -->
+								</a>
+							</li>
 
 						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
@@ -244,6 +254,12 @@
 											<a href="{{ path('app_controle_produit_stock_mouv_ef')}}" class="nav-link">
 												<i class="nav-icon fab fa-searchengin text-warning"></i>
 												<p>Article impossible à fermer</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="{{ path('app_anomalies_produits_fermes')}}" class="nav-link">
+												<i class="nav-icon fas fa-bullhorn text-danger"></i>
+												<p>Anomalies (Articles fermés)</p>
 											</a>
 										</li>
 										<li class="nav-item">
