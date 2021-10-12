@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Controller\TestController;
 use Symfony\Component\Console\Command\Command;
+use App\Controller\ControleAnomaliesController;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,7 +17,7 @@ class HelloWorldCommand extends Command
     protected static $defaultDescription = 'Je souhaite juste créer une commande pour ensuite faire des tâches CRON';
     private $controller;
 
-    public function __construct(TestController $controller)
+    public function __construct(ControleAnomaliesController $controller)
     {
         $this->controller = $controller;
         parent::__construct();
@@ -36,7 +37,7 @@ class HelloWorldCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $arg1 = $input->getArgument('arg1');
         
-        $this->controller->index();
+        $this->controller->ControlRegimeFournisseur();
         if ($arg1) {
             $io->note(sprintf('You passed an argument: %s', $arg1));
         }

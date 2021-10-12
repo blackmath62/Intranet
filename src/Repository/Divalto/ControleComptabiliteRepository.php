@@ -56,4 +56,23 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    public function getSendMailErreurRegimeFournisseur():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ENT.ENT_ID AS identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece, ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, FOU.TVATIE AS regimeTiers, ENT.USERCR AS UserCr, MUSER.EMAIL,
+        CASE
+        WHEN ENT.PICOD = 2 THEN 'Commande Fournisseur'
+        WHEN ENT.PICOD = 3 THEN 'BL Fournisseur'
+        WHEN ENT.PICOD = 4 THEN 'Facture Fournisseur'
+        END AS LibelleTypePiece
+        FROM ENT
+        INNER JOIN FOU ON ENT.DOS = FOU.DOS AND ENT.TIERS = FOU.TIERS
+        INNER JOIN MUSER ON MUSER.USERX = ENT.USERCR AND MUSER.DOS = ENT.DOS
+        WHERE ENT.DOS = 1 AND YEAR(ENT.PIDT) >= 2021 AND MONTH(ENT.PIDT) >= 9 AND ENT.TVATIE <> FOU.TVATIE AND ENT.CE4 = 1 
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
 }

@@ -39,8 +39,10 @@
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>Stock</span></th>
                                     <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>date Cmd</span></th>
                                     <th class="text-center"><span>Cmd</span></th>
                                     <th class="text-center"><span>Qte Cmd</span></th>
+                                    <th class="text-center"><span>Date Bl</span></th>
                                     <th class="text-center"><span>Bl</span></th>
                                     <th class="text-center"><span>Qte Bl</span></th>
                                     <th class="text-center"><span>Ef</span></th>
@@ -48,6 +50,8 @@
                                     <th class="text-center"><span>Métier</span></th>
                                     <th class="text-center"><span>Créateur</span></th>
                                     <th class="text-center"><span>Dernier Modificateur</span></th>
+                                    <th class="text-center"><span>Date fermeture</span></th>
+                                    <th class="text-center"><span>Date fermeture sref</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -78,10 +82,20 @@
                                             <a class="text-center text-dark">{{ controleproduit.Op }}</a>
                                         </td>
                                         <td class="text-center">
+                                            {% if controleproduit.CmdDate %}
+                                                <a class="text-center text-dark">{{ controleproduit.CmdDate|date("d/m/Y") }}</a>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
                                             <a class="text-center text-dark">{{ controleproduit.Cmd }}</a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-center text-dark">{{ controleproduit.QteCmd }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if controleproduit.BlDate %}
+                                                <a class="text-center text-dark">{{ controleproduit.BlDate|date("d/m/Y") }}</a>
+                                            {% endif %}
                                         </td>
                                         <td class="text-center">
                                             <a class="text-center text-dark">{{ controleproduit.Bl }}</a>
@@ -104,6 +118,16 @@
                                         <td class="text-center">
                                             <a class="text-center text-dark">{{ controleproduit.UserMo }}</a>
                                         </td>
+                                        <td class="text-center">
+                                            {% if controleproduit.ArtDateFermeture %}
+                                                <a class="text-center text-dark">{{ controleproduit.ArtDateFermeture|date("d/m/Y") }}</a>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if controleproduit.UserModh %}
+                                                <a class="text-center text-dark">{{ controleproduit.UserModh|date("d/m/Y") }}</a>
+                                            {% endif %}
+                                        </td>
                                     </tr>
                               {% endfor %}
                              <!-- >boucle -->
@@ -111,15 +135,17 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th class="text-center"><span>Fermé ?</span></th>
+                                    <th class="text-center"><span>Type probléme</span></th>
                                     <th class="text-center"><span>Référence</span></th>
                                     <th class="text-center"><span>Désignation</span></th>
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>Stock</span></th>
                                     <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>date Cmd</span></th>
                                     <th class="text-center"><span>Cmd</span></th>
                                     <th class="text-center"><span>Qte Cmd</span></th>
+                                    <th class="text-center"><span>Date Bl</span></th>
                                     <th class="text-center"><span>Bl</span></th>
                                     <th class="text-center"><span>Qte Bl</span></th>
                                     <th class="text-center"><span>Ef</span></th>
@@ -127,6 +153,8 @@
                                     <th class="text-center"><span>Métier</span></th>
                                     <th class="text-center"><span>Créateur</span></th>
                                     <th class="text-center"><span>Dernier Modificateur</span></th>
+                                    <th class="text-center"><span>Date fermeture</span></th>
+                                    <th class="text-center"><span>Date fermeture sref</span></th>
                                 </tr>
                             </tfoot>
                         </table>

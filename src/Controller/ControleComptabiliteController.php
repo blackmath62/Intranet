@@ -57,7 +57,6 @@ class ControleComptabiliteController extends AbstractController
                     $controleRegimeTiers = $repoVente->getControleRegimeTiersVente($annee,$mois);
                 }
 
-
                 $controleRegimeTransport = $repo->getControleRegimeTransport($annee,$mois,$typeTiers);
                 $controleTrousFactures = $repo->getControleTrousFactures($annee,$mois,$typeTiers);
                 
@@ -65,7 +64,6 @@ class ControleComptabiliteController extends AbstractController
                 for ($i=0; $i <count($controleTrousFactures) ; $i++) { 
                     $factureSansIndex[] = $controleTrousFactures[$i]['fano'];
                 }
-                //dd($factureSansIndex);
                 for ($ligTrouFacture=0; $ligTrouFacture <count($controleTrousFactures) ; $ligTrouFacture++) {
                     if ($ligTrouFacture !== count($controleTrousFactures)) {
                         $facture = $controleTrousFactures[$ligTrouFacture]['fano'];
@@ -76,7 +74,7 @@ class ControleComptabiliteController extends AbstractController
                     }
                 }
                 // pas si simple de déterminer les trous dans les factures, exemple trous dans les factures 19006871 => 6898
-                //dd($factureManquante);
+                
                 
 
             }
@@ -92,5 +90,10 @@ class ControleComptabiliteController extends AbstractController
             'controleTrousFactures' => $controleTrousFactures,
             'monthYear' => $form->createView()
         ]);
+    }
+
+    public function getSendMailForCorrection()
+    {
+        
     }
 }

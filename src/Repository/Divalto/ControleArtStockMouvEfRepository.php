@@ -70,8 +70,8 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
     public function getControleAnomaliesArticlesFermes($dossier):array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT ArtFerme,Ref, Sref1, Sref2, Designation, Sum(Stock) AS Stock,Op, Cmd,QteCmd, Bl, QteBl, Ef, EfQte, ArtFam, UserCr, UserMo
-        FROM(SELECT SART.REF AS Ref, SART.SREF1 AS Sref1, SART.SREF2 AS Sref2, ART.DES AS Designation,ART.FAM_0002 as ArtFam, MOUV.USERCR as UserCr, MOUV.USERMO as UserMo,
+        $sql = "SELECT ArtFerme,Ref, Sref1, Sref2, Designation, Sum(Stock) AS Stock,Op,CmdDate, Cmd,QteCmd, BlDate, Bl, QteBl, Ef, EfQte, ArtFam, UserCr, UserMo, ArtDateFermeture, UserModh
+        FROM(SELECT SART.REF AS Ref, SART.SREF1 AS Sref1, SART.SREF2 AS Sref2, ART.DES AS Designation,ART.FAM_0002 as ArtFam, MOUV.USERCR as UserCr, MOUV.USERMO as UserMo, ART.HSDT AS ArtDateFermeture, SART.USERMODH AS UserModh,
         CASE
             WHEN SART.REF = MVTL_STOCK_V.REFERENCE AND SART.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND SART.SREF2 = MVTL_STOCK_V.SREFERENCE2 THEN MVTL_STOCK_V.QTETJSENSTOCK
         END AS Stock,
@@ -85,12 +85,22 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         CASE
             WHEN (MOUV.CDCE4 IN (1) OR MOUV.BLCE4 IN (1)) AND MOUV.TICOD IN ('C','F') THEN MOUV.OP
         END AS  Op,
+		
+		CASE
+            WHEN MOUV.CDCE4 IN (1) AND MOUV.TICOD IN ('C','F') THEN MOUV.CDDT
+			ELSE NULL
+        END AS  CmdDate,
         CASE
             WHEN MOUV.CDCE4 IN (1) AND MOUV.TICOD IN ('C','F') THEN MOUV.CDNO
         END AS  Cmd,
         CASE
             WHEN MOUV.CDCE4 IN (1) AND MOUV.TICOD IN ('C','F') THEN MOUV.CDQTE
         END AS  QteCmd,
+		
+		CASE
+            WHEN MOUV.BLCE4 IN (1) AND MOUV.TICOD IN ('C','F') THEN MOUV.BLDT
+			ELSE NULL
+        END AS  BlDate,
         CASE
             WHEN MOUV.BLCE4 IN (1) AND MOUV.TICOD IN ('C','F') THEN MOUV.BLNO
         END AS  Bl,
@@ -111,7 +121,7 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         WHERE SART.DOS IN ($dossier) 
         ) reponse
         WHERE (Stock IS NOT NULL OR Op IS NOT NULL OR Cmd IS NOT NULL OR QteCmd IS NOT NULL OR Bl IS NOT NULL OR QteBl IS NOT NULL OR Ef IS NOT NULL OR EfQte IS NOT NULL) AND ArtFerme IS NOT NULL
-        GROUP BY Ref, Sref1, Sref2, Designation,ArtFerme,Op, Cmd,QteCmd, Bl, QteBl, Ef, EfQte, ArtFam, UserCr, UserMo
+        GROUP BY Ref, Sref1, Sref2, Designation,ArtFerme,Op, Cmd,QteCmd, Bl, QteBl, Ef, EfQte, ArtFam, UserCr, UserMo,ArtDateFermeture, UserModh, CmdDate, BlDate
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
