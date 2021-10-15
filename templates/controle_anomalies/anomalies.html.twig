@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="card collapsed-card card-warning">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+                  <p>Cette liste d'anomalies ce mets à jours à 00h45 et à 12h45 par le biais d'une tâche automatique, celle-ci supprime les anomalies qui n'apparaissent plus dans le systéme durant plus de 2 jours</p>
+    <!-- /.card-footer-->
+    </div>
+</div>
+
+                
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header d-flex justify-content-between">
+                        <h2 class="card-title">Liste des anomalies</h2>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+							{% if anomalies %}
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Id</span></th>
+                                    <th class="text-center"><span>IdAnomalie</span></th>
+                                    <th class="text-center"><span>Type</span></th>
+                                    <th class="text-center"><span>Date de création</span></th>
+                                    <th class="text-center"><span>diff date créa/date Modif</span></th>
+                                    <th class="text-center"><span>Date de modification</span></th>
+                                    <th class="text-center"><span>diff date update/date créa</span></th>
+                                    <th class="text-center"><span>Date de mise à jours</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            
+                                {% for anomalie in anomalies %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ anomalie.id }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ anomalie.idAnomalie}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ anomalie.type }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ anomalie.createdAt|date("d/m/Y h:i") }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                        {% set differenceMod = date(anomalie.modifiedAt).diff(date(anomalie.createdAt)) %}
+                                            <a class="text-dark">{{ differenceMod.days }} jours</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ anomalie.modifiedAt|date("d/m/Y h:i") }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                        {% set differenceUp = date(anomalie.updatedAt).diff(date(anomalie.createdAt)) %}
+                                            <a class="text-dark">{{ differenceUp.days }} jours</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ anomalie.updatedAt|date("d/m/Y h:i") }}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Id</span></th>
+                                    <th class="text-center"><span>IdAnomalie</span></th>
+                                    <th class="text-center"><span>Type</span></th>
+                                    <th class="text-center"><span>Date de création</span></th>
+                                    <th class="text-center"><span>diff date créa/date Modif</span></th>
+                                    <th class="text-center"><span>Date de modification</span></th>
+                                    <th class="text-center"><span>diff date update/date créa</span></th>
+                                    <th class="text-center"><span>Date de mise à jours</span></th>
+                                </tr>
+                                </tr>
+                            </tfoot>
+                        </table>
+                                {% else %}
+                                     <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Aucunes anomalies actuellement, Félicitation !</h4>
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+
+

@@ -2,17 +2,9 @@
 
 </p></br>
 <p>Vous avez créé une piéce {{ anomalie.LibelleTypePiece }} : <strong>{{ anomalie.numeroPiece }}</strong> 
-pour le fournisseur <strong>{{anomalie.tiers}}</strong> et le régime TVA de celle ci est 
-<strong>{{ anomalie.regimePiece }} = 
-{% if anomalie.regimePiece == 0 %} Régime Tiers France 
-{% elseif anomalie.regimePiece == 1 %} Régime Tiers CEE 
-{% elseif anomalie.regimePiece == 2 %} Régime Tiers Hors UE
-{% endif %}</strong> 
-ne correspond pas à celui présent dans la fiche fournisseur qui est <strong>{{ anomalie.regimeTiers }} = 
-{% if anomalie.regimeTiers == 0 %} Régime Tiers France 
-{% elseif anomalie.regimeTiers == 1 %} Régime Tiers CEE 
-{% elseif anomalie.regimeTiers == 2 %} Régime Tiers Hors UE
-{% endif %}</strong></p></br>
+pour le tiers <strong>{{anomalie.tiers}}</strong> et le régime TVA de celle ci est 
+<strong>{{ anomalie.regimePiece }} = {{anomalie.LibelleRegimePiece}}</strong> 
+ne correspond pas à celui présent dans la fiche tiers qui est <strong>{{ anomalie.regimeTiers }} = {{anomalie.LibelleRegimeTiers }}</strong></p></br>
 <p>Le régime qui doit apparaitre dans l'entête de la piéce doit être le même que le régime du Tiers soit <strong>{{ anomalie.regimeTiers }}</strong>, Merci de corriger ce probléme<p>
 <p>Pour savoir plus précisément comment changer le régime TVA de l'entête, vous pouvez consulter <a href='http://192.168.50.244/faq/show/29'>Modification du régime TVA d'une piéce</a>
 <p>Pour éviter de reproduire ce probléme à l'avenir, lors de la création d'une piéce, si Divalto vous propose de modifier le régime TVA, il faut cliquez non</p>

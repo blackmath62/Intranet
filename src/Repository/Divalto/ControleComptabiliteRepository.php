@@ -59,16 +59,60 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
     public function getSendMailErreurRegimeFournisseur():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT ENT.ENT_ID AS identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece, ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, FOU.TVATIE AS regimeTiers, ENT.USERCR AS UserCr, MUSER.EMAIL,
+        $sql = "SELECT ENT.ENT_ID AS identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece,
+        ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, FOU.TVATIE AS regimeTiers, ENT.USERCR AS UserCr, MUSER.EMAIL,
         CASE
         WHEN ENT.PICOD = 2 THEN 'Commande Fournisseur'
         WHEN ENT.PICOD = 3 THEN 'BL Fournisseur'
         WHEN ENT.PICOD = 4 THEN 'Facture Fournisseur'
-        END AS LibelleTypePiece
+        END AS LibelleTypePiece,
+        CASE
+        WHEN ENT.TVATIE = '0' THEN 'Régime TVA France'
+        WHEN ENT.TVATIE = '01' THEN 'Régime TVA France Autoliquidation'
+        WHEN ENT.TVATIE = '1' THEN 'Régime TVA CEE'
+        WHEN ENT.TVATIE = '2' THEN 'Régime TVA Hors UE'
+        END AS LibelleRegimePiece,
+        CASE
+        WHEN FOU.TVATIE = '0' THEN 'Régime TVA France'
+        WHEN FOU.TVATIE = '01' THEN 'Régime TVA France Autoliquidation'
+        WHEN FOU.TVATIE = '1' THEN 'Régime TVA CEE'
+        WHEN FOU.TVATIE = '2' THEN 'Régime TVA Hors UE'
+        END AS LibelleRegimeTiers
         FROM ENT
         INNER JOIN FOU ON ENT.DOS = FOU.DOS AND ENT.TIERS = FOU.TIERS
         INNER JOIN MUSER ON MUSER.USERX = ENT.USERCR AND MUSER.DOS = ENT.DOS
-        WHERE ENT.DOS = 1 AND YEAR(ENT.PIDT) >= 2021 AND MONTH(ENT.PIDT) >= 9 AND ENT.TVATIE <> FOU.TVATIE AND ENT.CE4 = 1 
+        WHERE YEAR(ENT.PIDT) >= 2021 AND MONTH(ENT.PIDT) >= 9 AND ENT.TVATIE <> FOU.TVATIE AND ENT.CE4 = 1 
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    public function getSendMailErreurRegimeClient():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ENT.ENT_ID AS identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece, 
+        ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, CLI.TVATIE AS regimeTiers, ENT.USERCR AS UserCr, MUSER.EMAIL,
+        CASE
+        WHEN ENT.PICOD = 2 THEN 'Commande Client'
+        WHEN ENT.PICOD = 3 THEN 'BL Client'
+        WHEN ENT.PICOD = 4 THEN 'Facture Client'
+        END AS LibelleTypePiece,
+        CASE
+        WHEN ENT.TVATIE = '0' THEN 'Régime TVA France'
+        WHEN ENT.TVATIE = '01' THEN 'Régime TVA France Autoliquidation'
+        WHEN ENT.TVATIE = '1' THEN 'Régime TVA CEE'
+        WHEN ENT.TVATIE = '2' THEN 'Régime TVA Hors UE'
+        END AS LibelleRegimePiece,
+        CASE
+        WHEN CLI.TVATIE = '0' THEN 'Régime TVA France'
+        WHEN CLI.TVATIE = '01' THEN 'Régime TVA France Autoliquidation'
+        WHEN CLI.TVATIE = '1' THEN 'Régime TVA CEE'
+        WHEN CLI.TVATIE = '2' THEN 'Régime TVA Hors UE'
+        END AS LibelleRegimeTiers
+        FROM ENT
+        INNER JOIN CLI ON ENT.DOS = CLI.DOS AND ENT.TIERS = CLI.TIERS
+        INNER JOIN MUSER ON MUSER.USERX = ENT.USERCR AND MUSER.DOS = ENT.DOS
+        WHERE YEAR(ENT.PIDT) >= 2021 AND MONTH(ENT.PIDT) >= 9 AND ENT.TVATIE <> CLI.TVATIE AND ENT.CE4 = 1 AND ENT.PICOD IN (2,3)
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();

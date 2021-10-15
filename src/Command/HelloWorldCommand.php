@@ -2,7 +2,6 @@
 
 namespace App\Command;
 
-use App\Controller\TestController;
 use Symfony\Component\Console\Command\Command;
 use App\Controller\ControleAnomaliesController;
 use Symfony\Component\Console\Input\InputOption;
@@ -37,7 +36,8 @@ class HelloWorldCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $arg1 = $input->getArgument('arg1');
         
-        $this->controller->ControlRegimeFournisseur();
+        $this->controller->Run_Cron();
+
         if ($arg1) {
             $io->note(sprintf('You passed an argument: %s', $arg1));
         }
@@ -46,7 +46,7 @@ class HelloWorldCommand extends Command
             // ...
         }
 
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $io->success('La requête a été effectué avec succés ! Pass --help to see your options.');
 
         return Command::SUCCESS;
     }

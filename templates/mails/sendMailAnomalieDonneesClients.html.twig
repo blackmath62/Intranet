@@ -1,0 +1,15 @@
+<p>Bonjour {{ anomalie.UserCr }},</p>
+<p>Une anomalie a été dectecté sur le client <strong>{{ anomalie.TIERS }}</strong> : <strong>{{ anomalie.NOM }}</strong> </p>
+{% if anomalie.REGL == '' %}<p>Vous n'avez pas indiqué de <strong>mode de Réglement</strong> sur le tiers</p>{% endif %}
+{% if anomalie.STAT_0001 == '' %}<p>Vous n'avez pas indiqué de <strong>famille statistique (stat(1))</strong> sur le tiers</p>{% endif %}
+{% if anomalie.STAT_0002 == '' %}<p>Vous n'avez pas indiqué de <strong>secteur (stat(2))</strong> sur le tiers</p>{% endif %}
+{% if anomalie.STAT_0003 == '' %}<p>Vous n'avez pas indiqué de <strong>nature (stat(3))</strong> sur le tiers</p>{% endif %}
+{% if anomalie.REPR_0001 == '' %}<p>Vous n'avez pas indiqué de <strong>commercial 1</strong> sur le tiers</p>{% endif %}
+{% if anomalie.BLMOD == '' %}<p>Vous n'avez pas indiqué de <strong>mode de transport</strong> sur le tiers</p>{% endif %}
+{% if anomalie.VISA != '2' %}<p>Vous devez <strong>cocher la case Visa administratif</strong> sur le tiers</p>{% endif %}
+{% if anomalie.TVATIE == '' %}<p>Vous n'avez pas indiqué de <strong>Régime TVA</strong> sur le tiers</p>{% endif %}
+{% if anomalie.PAY == '' %}<p>Vous n'avez pas indiqué de <strong>Pays</strong> sur le tiers</p>{% endif %}
+
+<p>Pour éviter de reproduire ce probléme à l'avenir, prenez le temps de renseigner les champs en orange</p>
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Repository\Divalto\CliRepository;
+use DateTime;
+use DateTimeZone;
 use Symfony\Component\Mime\Email;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,49 +20,51 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  * @IsGranted("ROLE_ADMIN")
  */
 
-class TestController extends AbstractScheduledTask
+class TestController extends AbstractController
 {
     private $mailer;
     public function __construct(MailerInterface $mailer)
     {
         $this->mailer = $mailer;
         //parent::__construct();
-    }
-    
-   
-        protected function initialize(Schedule $schedule) {
-          $schedule
-            ->minutes(1)
-            ->everyHours(0); // Perform the task every 5 hours on minute 0
-            
-          // Or if you want to perform your task at midnight every day
-          // $schedule->minutes(0)->hours(0)->daily();
-          
-          // Or schedule your task to run once at 9AM daily (this is effectively the same as daily() above)
-          // $schedule->minutes(0)->hours(9);
-        }
-      
-        public function run() {
-            return $this->sendMail();
-        }
-      
+    }      
 
     /**
      * @Route("/test", name="app_test")
      */
-    public function index()
+    public function test_tiers_mal_renseigne(CliRepository $client)
     {
+        $client->SurveillanceClientLhermitteReglStatVrpTransVisaTvaPay();
         
-        return $this->sendMail();
+
+        return $this->render('test/index.html.twig',[
+            'title' => 'page de test'
+        ]);
         
     }
-    public function sendMail(){
+
+    public function test_de_date()
+    {
+        $dateDuJour = new DateTime();
                 
-                $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
-                    ->to('jpochet@lhermitte.fr')
-                    ->subject('Je suis en train de tester les commandes')
-                    ->html('<p>Bonjour Jérôme, est ce que tu a bien reçu ce mail ?</p>');
-                $this->mailer->send($email);
+        //$dateDuJour = date_modify($dateDuJour, '+1 day');
+        $dateDuJour  = $dateDuJour->format('d-m-Y');
+
+        if ($this->isWeekend($dateDuJour) == false) {
+            $texte = 'Nous ne sommes pas le Week-end, au boulot ! le ' . $dateDuJour;
+        }else {
+            $texte = 'Nous sommes le Week-end, youpi ! le ' . $dateDuJour;
+        } 
+        return $this->render('test/index.html.twig',[
+            'title' => 'page de test',
+            'texte' => $texte,
+        ]);
+        
     }
+
+    function isWeekend($date) {
+        $weekDay = date('w', strtotime($date));
+        return ($weekDay == 0 || $weekDay == 6);
+    }
+    
 }
