@@ -2,8 +2,8 @@
 <p>Une anomalie a été dectecté sur le Fournisseur <strong>{{ anomalie.TIERS }}</strong> : <strong>{{ anomalie.Nom }}</strong> pour le dossier <strong>{{ anomalie.Dos }}</strong></p>
 {% if anomalie.VISA != '2' %}<p>Vous devez <strong>cocher la case Visa administratif</strong> sur le tiers</p>{% endif %}
 {% if anomalie.RFCCTRCOD != '1' %}<p>Vous devez décocher la case <strong>contrôler le référencement fournisseur</strong> sur le tiers, si elle est déjà décoché, c'est qu'elle ne doit pas être initialisé, il faut cocher puis décocher</p>{% endif %}
-{% if anomalie.RegimeTVA == '' %}<p>Vous n'avez pas indiqué de <strong>Régime TVA</strong> sur le tiers</p>{% endif %}
-{% if anomalie.Pays == '' %}<p>Vous n'avez pas indiqué de <strong>Pays</strong> sur le tiers</p>{% endif %}
+{% if not anomalie.RegimeTVA %}<p>Vous n'avez pas indiqué de <strong>Régime TVA</strong> sur le tiers</p>{% endif %}
+{% if not anomalie.Pays %}<p>Vous n'avez pas indiqué de <strong>Pays</strong> sur le tiers</p>{% endif %}
 
 <p>Ce mail sera renouvellé chaque jour jusqu'a résolution du probléme</p>
 <p>Pour éviter de reproduire ce probléme à l'avenir, prenez le temps de renseigner les champs en orange</p>
