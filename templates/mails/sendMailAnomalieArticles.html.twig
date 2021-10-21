@@ -1,0 +1,12 @@
+<p>Bonjour {{ anomalie.Utilisateur }},</p>
+<p>Un article de Divalto a un ou plusieurs problémes <strong>{{ anomalie.Ref }}</strong> : <strong>{{ anomalie.Designation }}</strong> </p>
+{% if REFUM != ACHUN %}L'unité d'achat n'est pas la même que l'unité de référence de l'article{% endif %}
+{% if REFUM != VENUN %}L'unité de vente n'est pas la même que l'unité de référence de l'article{% endif %}
+{% if REFUM != STUN %}L'unité de stockage n'est pas la même que l'unité de référence de l'article{% endif %}
+{% if FAM_0001 = '' %}Il n'y a pas de famille Ancienne sur l'article{% endif %}
+{% if FAM_0002 = '' %}Il n'y a pas de GAMME sur l'article{% endif %}
+{% if FAM_0002 = '' %}Il n'y a pas de d'ANALYTIQUE sur l'article{% endif %}
+<p>Vous êtes la derniére personne à avoir modifié l'article, Merci de Corriger le probléme, <strong>ne pas oublier d'adapter la table achat au besoin</strong></p>
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

@@ -19,6 +19,21 @@ class ControlesAnomaliesRepository extends ServiceEntityRepository
         parent::__construct($registry, ControlesAnomalies::class);
     }
 
+    public function getCountAnomalies():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT controlesanomalies.type AS Type,
+        CASE
+        WHEN COUNT(controlesanomalies.type)> 0 THEN COUNT(controlesanomalies.type)
+        END AS Nombre
+        FROM controlesanomalies
+        GROUP BY controlesanomalies.type
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
     // /**
     //  * @return ControlesAnomalies[] Returns an array of ControlesAnomalies objects
     //  */

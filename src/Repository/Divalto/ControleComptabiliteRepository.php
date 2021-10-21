@@ -59,8 +59,8 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
     public function getSendMailErreurRegimeFournisseur():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT ENT.ENT_ID AS identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece,
-        ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, FOU.TVATIE AS regimeTiers, ENT.USERCR AS UserCr, MUSER.EMAIL,
+        $sql = "SELECT ENT.ENT_ID AS Identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece,
+        ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, FOU.TVATIE AS regimeTiers, ENT.USERCR AS UserCr, MUSER.EMAIL AS Email,
         CASE
         WHEN ENT.PICOD = 2 THEN 'Commande Fournisseur'
         WHEN ENT.PICOD = 3 THEN 'BL Fournisseur'
@@ -90,8 +90,8 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
     public function getSendMailErreurRegimeClient():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT ENT.ENT_ID AS identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece, 
-        ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, CLI.TVATIE AS regimeTiers, ENT.USERCR AS UserCr, MUSER.EMAIL,
+        $sql = "SELECT ENT.ENT_ID AS Identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece, 
+        ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, CLI.TVATIE AS regimeTiers, ENT.USERCR AS UserCr, MUSER.EMAIL AS Email,
         CASE
         WHEN ENT.PICOD = 2 THEN 'Commande Client'
         WHEN ENT.PICOD = 3 THEN 'BL Client'

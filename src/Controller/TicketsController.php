@@ -166,6 +166,5 @@ class TicketsController extends AbstractController
         // Return the excel file as an attachment
         return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
   
-        //return $this->redirectToRoute('app_tickets');
     }
 }

@@ -1,0 +1,22 @@
+<p>Bonjour,</p>
+<p>Nous avons détecté dans Divalto du stock Direct, celui ci n'a pas lieu d'être et vient polluer les stocks</p>
+<p>S'il est encore possible de modifier directement le BL fournisseur ou le bon interne qui est en rapport avec ce stock direct, il est préférable de procéder ainsi pour éviter une cascade de piéces liées à un simple mouvement fautif</p>
+<p>Exemples qui doivent couvrir les cas de figures les plus courants :</p>
+<ul>
+<li>1 - Vous avez une commande client, celle-ci devra être passé en <strong>BL client CD dépôt 1</strong> en même temps que  la commande fournisseur passera en <strong>BL fournisseur FD dépôt 1</strong>.  (les BLs alimentent le stock) <strong>=> la contrepartie existe !</strong></li>
+
+<li>2 - le <strong>Bl client</strong> a été créé en <strong>C</strong> (départ du dépôt) <strong>dépôt 1</strong> et le <strong>Bl fournisseur en FD</strong> (direct)<strong>dépôt 1</strong> <strong>=> la contrepartie au mouvement n’existe pas</strong>, car les codes OP ne sont pas complémentaires, s’il est encore temps de la corriger, il faut évidement le faire en modifiant le(s) BL(s) fautif(s) !</li>
+
+<li>3 - Il existe un <strong>BL client en CD (direct) sur le Dépôt 1</strong> et un <strong>BL fournisseur en FD (direct) sur le Dépôt THE</strong> <strong>=> la contrepartie au mouvement n’existe pas</strong>  car le dépôt n’est pas le même.</li>
+
+<li>4 – <strong>Bl Client CD Dépôt 1</strong> et <strong>BL Fournisseur F Dépôt THE</strong> => la contrepartie au mouvement n’existe pas  car les dépôts ne sont pas les mêmes et les codes OP pas complémentaires</li>
+
+
+<p>La manière de corriger le problème va donc dépendre des pièces qui ont été faites et du fait qu’elles soient encore modifiable ou pas, l’idéal est évidement de corriger directement la pièce fautive si cela est encore possible, sans quoi un bon de régularisation interne fera l’affaire</p>
+<p><u>Rappel des codes OP de régularisation interne :</u></p>
+<p><strong>JID</strong> => régularisation en entrée de stock Direct</p>
+<p><strong>IID</strong> => régularisation en sortie de stock Direct</p>
+<p><strong>JI</strong> => régularisation en entrée de stock Dépôt</p>
+<p><strong>II</strong> => régularisation en sortie de stock Dépôt</p>
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

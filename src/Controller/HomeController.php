@@ -7,6 +7,7 @@ use RecursiveArrayIterator;
 use App\Form\CommentNewsType;
 use RecursiveIteratorIterator;
 use App\Entity\Main\CommentsNews;
+use App\Repository\Main\ControlesAnomaliesRepository;
 use App\Repository\Main\NewsRepository;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
@@ -30,12 +31,15 @@ class HomeController extends AbstractController
     {
         return new Response('<html><body>'.phpinfo().'</body></html>');
     }
+
     /**
      * @Route("/", name="app_home")
      */
-    public function index(Request $request, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews)
+    public function index(Request $request, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews, ControlesAnomaliesRepository $anomalies)
     {
 
+        //dd($anomalies->findAll());
+        
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
@@ -118,6 +122,7 @@ class HomeController extends AbstractController
          $data = json_encode($rdvs);
 
         $news = $repoNews->findBy([],['id'=>'DESC'],5);
+        $anomalies = $anomalies->getCountAnomalies();
 
         return $this->render('home/index.html.twig', [
             'title' => 'Accueil',
@@ -125,6 +130,7 @@ class HomeController extends AbstractController
             'tracks' => $track,
             'data' => $data,
             'news' => $news,
+            'anomalies' => $anomalies,
         ]);
     }
 

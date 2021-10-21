@@ -20,7 +20,8 @@
             <div class="col-md-12">
                 <div class="card card-dark">
                     <div class="card-header d-flex justify-content-between">
-                        <h2 class="card-title">Liste des anomalies</h2>
+                        <h2 class="card-title">Liste des anomalies<span class="badge badge-info ml-2">{{ anomalies|length }} détectées</span></h2>
+                        <a href="{{ path('app_controle_anomalies_run') }}" class="badge badge-success ml-auto pr-2 pl-2">Lancer les scripts</a>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">

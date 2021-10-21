@@ -64,4 +64,42 @@ class CliRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    public function SendMailMajCertiphytoClient():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT CLI_ID AS Identification, CLI.TIERS AS Tiers, CLI.NOM AS Nom, VRP.EMAIL AS Email, VRP.SELCOD AS UserName  
+        FROM CLI
+        LEFT JOIN VRP ON VRP.DOS = CLI.DOS AND VRP.TIERS = CLI.REPR_0001
+        WHERE CLI.HSDT IS NULL AND CLI.DOS = 1 AND CLI.UP_PH_AUTORISE = 2 AND CLI.UP_PH_DECID_OBLIG = 1 AND CLI.TIERS NOT IN ('C0218400')
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function SendMailProblemePaysRegimeClients():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT Identification,Tiers, Nom, Pays, RegimeTiers, Dos, Utilisateur, MUSER.EMAIL AS Email
+        FROM(
+        SELECT CLI.CLI_ID AS Identification, CLI.TIERS AS Tiers, CLI.NOM AS Nom, CLI.PAY AS Pays, CLI.TVATIE AS RegimeTiers, CLI.DOS AS Dos,
+        CASE
+        WHEN USERMO IS NOT NULL THEN USERMO
+        ELSE USERCR
+        END AS Utilisateur
+        FROM CLI 
+        WHERE 
+        CLI.HSDT IS NULL AND CLI.DOS IN (1,3) AND(
+        CLI.PAY = 'FR' AND CLI.TVATIE NOT IN ('0','01')
+        OR CLI.PAY IN('AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','GR','HR','HU','IRL','IT','IE','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK') AND CLI.TVATIE NOT IN ('1','5')
+        OR CLI.PAY NOT IN('AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','GR','HR','HU','IRL', 'IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK','FR') AND CLI.TVATIE NOT IN ('2')
+        ))reponse
+        INNER JOIN MUSER ON MUSER.DOS = Dos AND MUSER.USERX = Utilisateur
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    
 }
