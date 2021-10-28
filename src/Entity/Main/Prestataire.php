@@ -51,6 +51,11 @@ class Prestataire
      */
     private $img;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $color;
+
     public function __construct()
     {
         $this->tickets = new ArrayCollection();
@@ -146,6 +151,18 @@ class Prestataire
                 $ticket->setPrestataire(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): self
+    {
+        $this->color = $color;
 
         return $this;
     }

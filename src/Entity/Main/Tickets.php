@@ -83,6 +83,11 @@ class Tickets
      */
     private $prestataire;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $modifiedAt;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
@@ -252,6 +257,18 @@ class Tickets
     public function setPrestataire(?Prestataire $prestataire): self
     {
         $this->prestataire = $prestataire;
+
+        return $this;
+    }
+
+    public function getModifiedAt(): ?\DateTimeInterface
+    {
+        return $this->modifiedAt;
+    }
+
+    public function setModifiedAt(?\DateTimeInterface $modifiedAt): self
+    {
+        $this->modifiedAt = $modifiedAt;
 
         return $this;
     }

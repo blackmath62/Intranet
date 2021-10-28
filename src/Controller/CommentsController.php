@@ -55,7 +55,13 @@ class CommentsController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($comment);
             $em->flush();
-            
+
+            $ticket = $repoTicket->findOneBy(['id' => $id]);
+            $ticket->setModifiedAt(new \DateTime());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($ticket);
+            $em->flush();
+
             $this->addFlash('message', 'Votre commentaire a bien été déposé');
             return $this->redirectToRoute('app_comment', ['id' => $id ]);
         }
@@ -69,6 +75,7 @@ class CommentsController extends AbstractController
         if($formEditStatut->isSubmitted() && $formEditStatut->isValid()){
             
             $ticket = $formEditStatut->getData();
+            $ticket->setModifiedAt(new \DateTime());
             $em->persist($ticket);
             $em->flush();
             
@@ -113,6 +120,7 @@ class CommentsController extends AbstractController
 
                 $ticket = $repoTicket->findOneBy(['id' => $id]);
                 $ticket->setPrestataire($data);
+                $ticket->setModifiedAt(new \DateTime());
                 $statuEnCours = $repoStatut->findOneBy(['id' => 16]);
                 $ticket->setStatu($statuEnCours);
                 $em = $this->getDoctrine()->getManager();

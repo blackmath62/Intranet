@@ -75,6 +75,9 @@
 											<span>Affiliation</span>
 										</th>
 										<th class="text-center">
+											<span>Couleur</span>
+										</th>
+										<th class="text-center">
 											<span>Action</span>
 										</th>
 									</tr>
@@ -95,6 +98,9 @@
 											</td>
 											<td class="text-center">
 												<a class="text-center">{{prestataire.affiliation}}</a>
+											</td>
+											<td class="text-center">
+												<a class="btn btn-xl" style= "background-color: {{ prestataire.color }}";></a>
 											</td>
 											<td class="text-center">
 												<a class="btn btn-warning" href="{{path('app_edit_prestataire', {'id' : prestataire.id})}}">
@@ -120,6 +126,9 @@
 										</th>
 										<th class="text-center">
 											<span>Affiliation</span>
+										</th>
+										<th class="text-center">
+											<span>Couleur</span>
 										</th>
 										<th class="text-center">
 											<span>Action</span>
