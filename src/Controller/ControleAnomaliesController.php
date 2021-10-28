@@ -115,12 +115,21 @@ class ControleAnomaliesController extends AbstractController
         $this->Execute($donnees, $libelle, $template, $subject);
 
         // Contrôle la présence d'article ou de sous référence fermée
-        $dossier = 1;
-        $donnees = $this->articleSrefFermes->getControleSaisieArticlesSrefFermes($dossier);
+        $donnees = $this->articleSrefFermes->getControleSaisieArticlesSrefFermes();
         $libelle = 'ArticleSrefFerme';
         $template = 'mails/sendMailSaisieArticlesSrefFermes.html.twig';
         $subject = 'Saisie sur un article ou une sous référence article fermé';
         $this->Execute($donnees, $libelle, $template, $subject);
+
+        // Contrôle que toutes les sous références ne sont pas fermées sur un article
+        $donnees = $this->article->ControleToutesSrefFermeesArticle();
+        $libelle = 'ToutesSrefFermeesArticleOuvert';
+        $template = 'mails/sendMailControleToutesSrefFermeesArticle.html.twig';
+        $subject = 'Toutes les sous références sont fermées un article ouvert';
+        $this->Execute($donnees, $libelle, $template, $subject);
+
+        $this->ControlArticleAFermer();
+        $this->ControlSrefArticleAFermer();
     }
     
     public function ControleClient()
@@ -221,9 +230,6 @@ class ControleAnomaliesController extends AbstractController
     }
 
     // suppression des anomalies trop vieilles
-    /**
-     * @Route("/controle/anomalies/TEST", name="app_controle_anomalies_test")
-     */ 
     public function run_auto_wash(){
         $dateDuJour = new DateTime();
         $controleAno = $this->anomalies->findAll();
@@ -239,13 +245,389 @@ class ControleAnomaliesController extends AbstractController
         }
     }
     
+    /**
+     * @Route("/controle/anomalies/TEST", name="app_controle_anomalies_test")
+     */ 
+    ///////////////////////////////////// SOUS REFERENCES ARTICLES
+
+    public function ControlSrefArticleAFermer(){
+        
+        $ano = $this->anomalies->findOneBy(['idAnomalie' => '999999999996', 'type' => 'SrefArticleAFermer']);
+        $dateDuJour = new DateTime();
+        $dateModif = $ano->getModifiedAt();
+                $datediff = $dateModif->diff($dateDuJour)->format("%a");
+                if ($datediff > 0) {
+                $srefAFermer = $this->exportSrefArticleAFermer();
+                if (!empty($srefAFermer)) {
+                    $ano->setUpdatedAt($dateDuJour);
+                    $ano->setModifiedAt($dateDuJour);
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($ano);
+                    $em->flush();
+                }
+                }else {
+                    $ano->setUpdatedAt($dateDuJour);
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($ano);
+                    $em->flush();
+                }
+                // Envoyer un mail aux utilisateurs pour les avertirs des fermetures    
+            
+            $produits = $this->article->getControleArticleAFermer();
+            $Srefs = $this->article->getControleSousRefArticleAFermer();
+            if (!empty($produits) | !empty($Srefs)) {
+                
+                $MailsList = [
+                    'dlouchart@lhermitte.fr',
+                    new Address('clerat@lhermitte.fr'),
+                    new Address('ctrannin@lhermitte.fr'),
+                    new Address('bgovaere@lhermitte.fr'),
+                    new Address('twrazidlo@lhermitte.fr'),
+                    new Address('ymalmonte@lhermitte.fr'),
+                    new Address('xdupire@lhermitte.fr'),
+                    new Address('lleleu@lhermitte.fr'),
+                    new Address('rvasset@lhermitte.fr'),
+                    new Address('adeschodt@lhermitte.fr'),
+                    new Address('crichard@lhermitte.fr'),
+                    new Address('vlesenne@lhermitte.fr')
+                ];
+                $html = $this->renderView('mails/sendMailForUsersArticleAFermer.html.twig', ['produits' => $produits, 'Srefs' => $Srefs ]);
+                $email = (new Email())
+                ->from('intranet@groupe-axis.fr')
+                ->to(...$MailsList)
+                ->cc('jpochet@lhermitte.fr')
+                ->subject('INFORMATION Articles qui vont être fermés Divalto')
+                ->html($html);
+                $this->mailer->send($email);        
+            }
+             
+    }
+
+    private function getDataSrefArticleAFermer($donnees): array
+    {
+        
+        $list = [];
+        for ($d=0; $d < count($donnees); $d++) {
+                
+                $donnee = $donnees[$d];
+                
+                $list[] = [
+                    $donnee['Dos'],
+                    $donnee['Ref'],
+                    $donnee['Sref1'],
+                    $donnee['Sref2'],
+                    'Usrd'          
+                ];
+
+            }
+        return $list;
+    }
+    
+    public function exportSrefArticleAFermer()
+    {
+        $donnees = $this->article->getControleSousRefArticleAFermer();
+        
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setTitle('Article_Sous_Reference');
+        // Entête de colonne
+        $sheet->getCell('A6')->setValue('DOSSIER');
+        $sheet->getCell('B6')->setValue('REFERENCE');
+        $sheet->getCell('C6')->setValue('SREFERENCE1');
+        $sheet->getCell('D6')->setValue('SREFERENCE2');
+        $sheet->getCell('E6')->setValue('CONF');
+        $sheet->getCell('F6')->setValue('Anomalies');
+        $sheet->getCell('G6')->setValue('Alertes');
+
+        $sheet->getCell('A4')->setValue('Données');
+
+        $spreadsheet->getActiveSheet()->getStyle('A6:G6')
+                    ->getNumberFormat()
+                    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+                    // Le style de l'entête
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->getColumnDimension('G')->setAutoSize(true);
+        $sheet->getCell('A1')->getStyle()->getFont()->setSize(16);
+        $sheet->getCell('A1')->getStyle()->getFont()->setBold(true);
+        // Couleur de DOS, REF, SREF1, SREF2
+        $styleEntete = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FF6600',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("A6:D6")->applyFromArray($styleEntete);
+        // Couleur de CONF
+        $styleEntete = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FFCC00',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("E6")->applyFromArray($styleEntete);
+        // Couleur d'Anomalies
+        $styleEntete = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FF0000',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("F6")->applyFromArray($styleEntete);
+        // Couleur d'Alertes
+        $styleEntete = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FFFF00',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("G6")->applyFromArray($styleEntete);
+        
+        $styleEntete = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => '969696',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("A4")->applyFromArray($styleEntete);
+        
+        
+        // Increase row cursor after header write
+        $sheet->fromArray($this->getDataSrefArticleAFermer($donnees),null, 'A7', true);
+        $nomFichier = 'Article_Sous_Reference - Article Sous-référence ( SART )' ;
+        // Titre de la feuille
+        $sheet->getCell('A1')->setValue($nomFichier);
+
+        $writer = new Xlsx($spreadsheet);
+
+        // Create a Temporary file in the system
+        $fileName = $nomFichier . '.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+        
+        $writer->save($temp_file);
+        // Return the excel file as an attachment
+        $produits = [];
+        for ($i=0; $i <count($donnees) ; $i++) { 
+            //dd($donnees);
+            if ($donnees[$i]['Alerte'] <> NULL | $donnees[$i]['Cmd'] <> NULL | $donnees[$i]['Bl'] <> NULL ) {
+                $produits[$i]['Ref'] = $donnees[$i]['Ref'];
+                $produits[$i]['Sref1'] = $donnees[$i]['Sref1'];
+                $produits[$i]['Sref2'] = $donnees[$i]['Sref2'];
+                $produits[$i]['Alerte'] = $donnees[$i]['Alerte'];
+                $produits[$i]['Cmd'] = $donnees[$i]['Cmd'];
+                $produits[$i]['Bl'] = $donnees[$i]['Bl'];
+            }
+        }
+
+                $html = $this->renderView('mails/sendMailArticleAFermer.html.twig', ['produits' => $produits ]);
+                $email = (new Email())
+                    ->from('intranet@groupe-axis.fr')
+                    ->to('jpochet@lhermitte.fr')
+                    ->subject('Sous références Article Divalto à fermer')
+                    ->html($html)
+                    ->attachFromPath($temp_file, $fileName, 'application/msexcel');
+                $this->mailer->send($email);  
+    }
+
+
+
+
+
+    //////////////////////////////////// ARTICLES 
+    public function ControlArticleAFermer(){
+        
+        $ano = $this->anomalies->findOneBy(['idAnomalie' => '999999999997', 'type' => 'ArticleAFermer']);
+        $dateDuJour = new DateTime();
+        $dateModif = $ano->getModifiedAt();
+                $datediff = $dateModif->diff($dateDuJour)->format("%a");
+                if ($datediff > 0) {
+                $articleAFermer = $this->exportArticleAFermer();
+                if (!empty($articleAFermer)) {
+                    $ano->setUpdatedAt($dateDuJour);
+                    $ano->setModifiedAt($dateDuJour);
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($ano);
+                    $em->flush();
+                }
+                }else {
+                    $ano->setUpdatedAt($dateDuJour);
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($ano);
+                    $em->flush();
+                }        
+    }
+
+    private function getDataArticleAFermer($donnees): array
+    {
+        $dateDuJour = new DateTime();
+        $date_1 = date_modify($dateDuJour, '-1 Day');
+
+        $list = [];
+        for ($d=0; $d < count($donnees); $d++) {
+                
+                $donnee = $donnees[$d];
+                
+                $list[] = [
+                    $donnee['Dos'],
+                    $donnee['Ref'],
+                    $date_1->format('d-m-Y')          
+                ];
+
+            }
+        return $list;
+    }
+    
+    public function exportArticleAFermer()
+    {
+        $donnees = $this->article->getControleArticleAFermer();
+        
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setTitle('Article');
+        // Entête de colonne
+        $sheet->getCell('A6')->setValue('DOSSIER');
+        $sheet->getCell('B6')->setValue('REFERENCE');
+        $sheet->getCell('C6')->setValue('DATEFINVALID');
+        $sheet->getCell('D6')->setValue('Anomalies');
+        $sheet->getCell('E6')->setValue('Alertes');
+
+        $sheet->getCell('A4')->setValue('Données');
+
+        $spreadsheet->getActiveSheet()->getStyle('A6:E6')
+                    ->getNumberFormat()
+                    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+                    // Le style de l'entête
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->getCell('A1')->getStyle()->getFont()->setSize(16);
+        $sheet->getCell('A1')->getStyle()->getFont()->setBold(true);
+        $styleEntete = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FF6600',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("A6:B6")->applyFromArray($styleEntete);
+
+        $styleEntete = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FFCC00',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("C6")->applyFromArray($styleEntete);
+
+        $styleEntete = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FF0000',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("D6")->applyFromArray($styleEntete);
+
+        $styleEntete = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FFFF00',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("E6")->applyFromArray($styleEntete);
+
+        $styleEntete = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => '969696',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getActiveSheet()->getStyle("A4")->applyFromArray($styleEntete);
+        
+        
+        // Increase row cursor after header write
+        $sheet->fromArray($this->getDataArticleAFermer($donnees),null, 'A7', true);
+        $nomFichier = 'Article - Article ( ART )' ;
+        // Titre de la feuille
+        $sheet->getCell('A1')->setValue($nomFichier);
+
+        $writer = new Xlsx($spreadsheet);
+
+        // Create a Temporary file in the system
+        $fileName = $nomFichier . '.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+        
+        $writer->save($temp_file);
+        // Return the excel file as an attachment
+        $produits = [];
+        for ($i=0; $i <count($donnees) ; $i++) { 
+            //dd($donnees);
+            if ($donnees[$i]['Alerte'] <> NULL | $donnees[$i]['Cmd'] <> NULL | $donnees[$i]['Bl'] <> NULL ) {
+                $produits[$i]['Ref'] = $donnees[$i]['Ref'];
+                $produits[$i]['Sref1'] = $donnees[$i]['Sref1'];
+                $produits[$i]['Sref2'] = $donnees[$i]['Sref2'];
+                $produits[$i]['Alerte'] = $donnees[$i]['Alerte'];
+                $produits[$i]['Cmd'] = $donnees[$i]['Cmd'];
+                $produits[$i]['Bl'] = $donnees[$i]['Bl'];
+            }
+        }
+
+                $html = $this->renderView('mails/sendMailArticleAFermer.html.twig', ['produits' => $produits ]);
+                $email = (new Email())
+                    ->from('intranet@groupe-axis.fr')
+                    ->to('jpochet@lhermitte.fr')
+                    ->subject('Article Divalto à fermer')
+                    ->html($html)
+                    ->attachFromPath($temp_file, $fileName, 'application/msexcel');
+                $this->mailer->send($email);  
+    }
+
+
     public function ControlStockDirect(){
         
         $ano = $this->anomalies->findOneBy(['idAnomalie' => '999999999999', 'type' => 'StockDirect']);
         $dateDuJour = new DateTime();
         $dateModif = $ano->getModifiedAt();
                 $datediff = $dateModif->diff($dateDuJour)->format("%a");
-                if ($datediff > 29) {
+                if ($datediff > 14) {
                 $this->exportStockDirect();
                 $ano->setUpdatedAt($dateDuJour);
                 $ano->setModifiedAt($dateDuJour);
@@ -262,7 +644,7 @@ class ControleAnomaliesController extends AbstractController
 
     // Export Excel par metier
 
-    private function getData($mail, $donnees): array
+    private function getDataStockDirect($mail, $donnees): array
     {
         $list = [];
         for ($d=0; $d < count($donnees); $d++) {
@@ -308,8 +690,8 @@ class ControleAnomaliesController extends AbstractController
         $sheet->getCell('E5')->setValue('Stock Direct');
         
         // Increase row cursor after header write
-        $sheet->fromArray($this->getData($mail, $donnees),null, 'A6', true);
-        $dernLign = count($this->getData($mail, $donnees)) + 5;
+        $sheet->fromArray($this->getDataStockDirect($mail, $donnees),null, 'A6', true);
+        $dernLign = count($this->getDataStockDirect($mail, $donnees)) + 5;
 
         $d = new DateTime('NOW');
         $dateTime = $d->format('d-m-Y') ;

@@ -21,7 +21,7 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
 
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT ArtFerme,Ref, Sref1, Sref2, Designation, Sum(Stock) AS Stock,Op, Cmd,QteCmd, Bl, QteBl, Ef, EfQte
-        FROM(SELECT SART.REF AS Ref, SART.SREF1 AS Sref1, SART.SREF2 AS Sref2, ART.DES AS Designation,
+        FROM(SELECT RTRIM(LTRIM(SART.REF)) AS Ref, RTRIM(LTRIM(SART.SREF1)) AS Sref1, RTRIM(LTRIM(SART.SREF2)) AS Sref2, RTRIM(LTRIM(ART.DES)) AS Designation,
         CASE
             WHEN SART.REF = MVTL_STOCK_V.REFERENCE AND SART.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND SART.SREF2 = MVTL_STOCK_V.SREFERENCE2 THEN MVTL_STOCK_V.QTETJSENSTOCK
         END AS Stock,
@@ -67,11 +67,64 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         $stmt->execute([$search]);
         return $stmt->fetchAll();
     }
+
+    public function getControleOneArtStockMouvEf($ref, $sref1,$sref2):array
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT Identification, ArtFerme,Ref, Sref1, Sref2, Designation, Sum(Stock) AS Stock,SUM(QteCmd) AS Cmd,SUM(QteBl) AS Bl, SUM(EfQte) AS Ef
+        FROM(SELECT RTRIM(LTRIM(SART.SART_ID)) AS Identification, RTRIM(LTRIM(SART.REF)) AS Ref, RTRIM(LTRIM(SART.SREF1)) AS Sref1, RTRIM(LTRIM(SART.SREF2)) AS Sref2, RTRIM(LTRIM(ART.DES)) AS Designation,
+        CASE
+            WHEN SART.REF = MVTL_STOCK_V.REFERENCE AND SART.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND SART.SREF2 = MVTL_STOCK_V.SREFERENCE2 THEN MVTL_STOCK_V.QTETJSENSTOCK
+        END AS Stock,
+        CASE
+            WHEN (SART.SREF1 <> '' OR SART.SREF2 <> '') AND SART.CONF IN ('Usrd') AND ART.HSDT IS NULL THEN 'SREF FERME'
+            WHEN (SART.SREF1 <> '' OR SART.SREF2 <> '') AND SART.CONF IN ('Usrd') AND ART.HSDT IS NOT NULL THEN 'ART & SREF FERME'
+            WHEN (SART.SREF1 <> '' OR SART.SREF2 <> '') AND SART.CONF IS NULL AND ART.HSDT IS NOT NULL THEN 'ART FERME'
+            WHEN (SART.SREF1 = '' AND SART.SREF2 = '') AND ART.HSDT IS NOT NULL THEN 'ARTICLE FERME'
+            ELSE ''
+        END AS  ArtFerme,
+        CASE
+            WHEN (MOUV.CDCE4 IN (1) OR MOUV.BLCE4 IN (1)) AND MOUV.TICOD IN ('C','F') THEN MOUV.OP
+        END AS  Op,
+        CASE
+            WHEN MOUV.CDCE4 IN (1) AND MOUV.TICOD IN ('C','F') THEN MOUV.CDNO
+        END AS  Cmd,
+        CASE
+            WHEN MOUV.CDCE4 IN (1) AND MOUV.TICOD IN ('C','F') THEN MOUV.CDQTE
+        END AS  QteCmd,
+        CASE
+            WHEN MOUV.BLCE4 IN (1) AND MOUV.TICOD IN ('C','F') THEN MOUV.BLNO
+        END AS  Bl,
+        CASE
+            WHEN MOUV.BLCE4 IN (1) AND MOUV.TICOD IN ('C','F') THEN MOUV.BLQTE
+        END AS  QteBl,
+        CASE
+            WHEN MVTL.QTE IS NOT NULL THEN MVTL.OP
+        END AS  Ef,
+        CASE
+            WHEN MVTL.QTE IS NOT NULL THEN MVTL.QTE
+        END AS  EfQte
+        FROM SART
+        INNER JOIN ART ON SART.REF = ART.REF AND SART.DOS = ART.DOS
+        LEFT JOIN MVTL_STOCK_V ON SART.DOS = MVTL_STOCK_V.DOSSIER AND SART.REF = MVTL_STOCK_V.REFERENCE AND SART.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND SART.SREF2 = MVTL_STOCK_V.SREFERENCE2 AND MVTL_STOCK_V.QTETJSENSTOCK IS NOT NULL
+        LEFT JOIN MOUV ON SART.DOS = MOUV.DOS AND SART.REF = MOUV.REF AND SART.SREF1 = MOUV.SREF1 AND SART.SREF2 = MOUV.SREF2 AND (MOUV.CDCE4 IN (1) OR MOUV.BLCE4 IN (1) ) AND MOUV.TICOD IN ('C','F') AND (MOUV.CDNO > 0 OR MOUV.BLNO > 0)
+        LEFT JOIN MVTL ON SART.REF = MVTL.REF AND SART.DOS = MVTL.DOS AND MVTL.OP IN ('999') AND MVTL.CE2 = 1 AND SART.SREF1 = MVTL.SREF1 AND SART.SREF2 =  MVTL.SREF2
+        WHERE SART.DOS = 1 AND SART.REF IN (?) AND SART.SREF1 IN (?) AND SART.SREF2 IN (?)
+        ) reponse
+        WHERE Stock IS NOT NULL OR Op IS NOT NULL OR Cmd IS NOT NULL OR QteCmd IS NOT NULL OR Bl IS NOT NULL OR QteBl IS NOT NULL OR Ef IS NOT NULL OR EfQte IS NOT NULL
+        GROUP BY Identification, Ref, Sref1, Sref2, Designation,ArtFerme
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$ref, $sref1,$sref2]);
+        return $stmt->fetchAll();
+    }
     public function getControleAnomaliesArticlesFermes($dossier):array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT ArtFerme,Ref, Sref1, Sref2, Designation, Sum(Stock) AS Stock,Op,CmdDate, Cmd,QteCmd, BlDate, Bl, QteBl, Ef, EfQte, ArtFam, UserCr, UserMo, ArtDateFermeture, UserModh
-        FROM(SELECT SART.REF AS Ref, SART.SREF1 AS Sref1, SART.SREF2 AS Sref2, ART.DES AS Designation,ART.FAM_0002 as ArtFam, MOUV.USERCR as UserCr, MOUV.USERMO as UserMo, ART.HSDT AS ArtDateFermeture, SART.USERMODH AS UserModh,
+        FROM(SELECT RTRIM(LTRIM(SART.REF)) AS Ref, RTRIM(LTRIM(SART.SREF1)) AS Sref1, RTRIM(LTRIM(SART.SREF2)) AS Sref2, RTRIM(LTRIM(ART.DES)) AS Designation,
+        RTRIM(LTRIM(ART.FAM_0002)) as ArtFam, RTRIM(LTRIM(MOUV.USERCR)) as UserCr, RTRIM(LTRIM(MOUV.USERMO)) as UserMo, RTRIM(LTRIM(ART.HSDT)) AS ArtDateFermeture, RTRIM(LTRIM(SART.USERMODH)) AS UserModh,
         CASE
             WHEN SART.REF = MVTL_STOCK_V.REFERENCE AND SART.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND SART.SREF2 = MVTL_STOCK_V.SREFERENCE2 THEN MVTL_STOCK_V.QTETJSENSTOCK
         END AS Stock,
@@ -85,7 +138,6 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         CASE
             WHEN (MOUV.CDCE4 IN (1) OR MOUV.BLCE4 IN (1)) AND MOUV.TICOD IN ('C','F') THEN MOUV.OP
         END AS  Op,
-		
 		CASE
             WHEN MOUV.CDCE4 IN (1) AND MOUV.TICOD IN ('C','F') THEN MOUV.CDDT
 			ELSE NULL
@@ -128,11 +180,13 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    public function getControleSaisieArticlesSrefFermes($dossier):array
+    public function getControleSaisieArticlesSrefFermes():array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Commercial, Identification, ArtFerme,Ref, Sref1, Sref2, Designation, Sum(Stock) AS Stock,Op,CmdDate, Cmd,QteCmd, BlDate, Bl, QteBl, ArtFam, UserCr, UserMo, ArtDateFermeture, UserModh, Email
-        FROM(SELECT MOUV.MOUV_ID AS Identification, SART.REF AS Ref, SART.SREF1 AS Sref1, SART.SREF2 AS Sref2, ART.DES AS Designation,ART.FAM_0002 as ArtFam, MOUV.USERCR as UserCr, MUSER.EMAIL AS Email, MOUV.USERMO as UserMo, ART.HSDT AS ArtDateFermeture, SART.USERMODH AS UserModh,
+        FROM(SELECT RTRIM(LTRIM(MOUV.MOUV_ID)) AS Identification, RTRIM(LTRIM(SART.REF)) AS Ref, RTRIM(LTRIM(SART.SREF1)) AS Sref1, RTRIM(LTRIM(SART.SREF2)) AS Sref2,
+        RTRIM(LTRIM(ART.DES)) AS Designation,RTRIM(LTRIM(ART.FAM_0002)) as ArtFam, RTRIM(LTRIM(MOUV.USERCR)) as UserCr, RTRIM(LTRIM(MUSER.EMAIL)) AS Email, 
+        RTRIM(LTRIM(MOUV.USERMO)) as UserMo, RTRIM(LTRIM(ART.HSDT)) AS ArtDateFermeture, RTRIM(LTRIM(SART.USERMODH)) AS UserModh,
         CASE
             WHEN SART.REF = MVTL_STOCK_V.REFERENCE AND SART.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND SART.SREF2 = MVTL_STOCK_V.SREFERENCE2 THEN MVTL_STOCK_V.QTETJSENSTOCK
         END AS Stock,

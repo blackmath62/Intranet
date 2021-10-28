@@ -1,0 +1,34 @@
+<p>Bonjour,</p>
+<p>Il y a des <strong>produits à fermer !</strong></p>
+<p>Merci de fermer ces produits, <strong>ne pas oublier de mettre à jour la table achat !</strong></p>
+{% if produits %}
+<p><u><strong>Articles sur lesquels il faut avoir une attention particuliére : </strong></u></p>
+<p>Si les quantités sont à Zéro, c'est sans doute qu'il y a une piéce ou une alerte de créer mais avec quantité à 0, il est préférable de supprimer cette donnée fautive si possible</p>
+<p>Si une quantité est supérieur ou inférieur à Zéro, il ne faut pas fermer l'article avant la régularisation de celui ci ! </p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Ref</th>
+            <th>Sref1</th>
+            <th>Sref2</th>
+            <th>Alerte</th>
+            <th>Cmd</th>
+            <th>Bl</th>
+        </thead>
+        <tbody>
+{% for produit in produits %}
+        <tr>
+            <td>{{ produit.Ref }}</td>
+            <td>{{ produit.Sref1 }}</td>
+            <td>{{ produit.Sref2 }}</td>
+            <td>{{ produit.Alerte }}</td>
+            <td>{{ produit.Cmd }}</td>
+            <td>{{ produit.Bl }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

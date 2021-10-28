@@ -1,11 +1,45 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}{{ title }}{% endblock %}
-
 {% block body %}
-
-<div class="example-wrapper">
-    <h1>{{ texte }}</h1>
+<div class="row">
+    <div class="col-md-12">
+        <div id="vmap" style="width: 680px; height: 520px;"></div>
+    </div>
 </div>
 
+{% endblock %}
+{% block javascripts %}
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="{{ asset("dist/js/jquery.vmap.js") }}"></script>
+<script type="text/javascript" src="{{ asset("dist/js/jquery.vmap.france.js") }}" charset="utf-8"></script>
+
+<script>
+      jQuery(document).ready(function () {
+        jQuery('#vmap').vectorMap({
+        map: 'france_fr',
+        backgroundColor: '#a5bfdd',
+        borderColor: '#818181',
+        borderOpacity: 0.25,
+        borderWidth: 1,
+        color: '#f4f3f0',
+        enableZoom: true,
+        hoverColor: '#c9dfaf',
+        hoverOpacity: null,
+        normalizeFunction: 'linear',
+        scaleColors: ['#b6d6ff', '#005ace'],
+        selectedColor: '#c9dfaf',
+        selectedRegions: null,
+        showTooltip: true,
+        onRegionClick: function(element, code, region)
+        {
+            var message = 'You clicked "'
+                + region
+                + '" which has the code: '
+                + code.toUpperCase();
+
+            alert(message);
+        }
+        });
+      });
+    </script>
 {% endblock %}

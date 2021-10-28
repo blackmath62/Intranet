@@ -410,7 +410,7 @@
             <div class="card-body">
                 {% if intervalN %}
                 
-                        <table id="example1" class="table table-bordered table-striped">
+                    <table id="example1" class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th class="text-center"><span>Commercial</span></th>
@@ -569,5 +569,23 @@ function checkProgress(event){
 </script>
 
 <script>$('#reservation').daterangepicker()</script>
+
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      "responsive": true, "lengthChange": false, "autoWidth": false,"order": [[ 0, "desc" ]],
+      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": false,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+</script>
 
 {% endblock %}

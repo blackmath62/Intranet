@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Repository\Divalto\ArtRepository;
 use App\Repository\Divalto\CliRepository;
+use App\Repository\Divalto\ControleArtStockMouvEfRepository;
 use DateTime;
 use DateTimeZone;
 use Symfony\Component\Mime\Email;
@@ -32,13 +34,12 @@ class TestController extends AbstractController
     /**
      * @Route("/test", name="app_test")
      */
-    public function test_tiers_mal_renseigne(CliRepository $client)
+    public function test_tiers_mal_renseigne()
     {
-        $client->SurveillanceClientLhermitteReglStatVrpTransVisaTvaPay();
         
-
+                
         return $this->render('test/index.html.twig',[
-            'title' => 'page de test'
+            'title' => 'page de test',
         ]);
         
     }

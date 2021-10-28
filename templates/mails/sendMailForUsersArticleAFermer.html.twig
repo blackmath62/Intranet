@@ -1,0 +1,71 @@
+<p>Bonjour,</p>
+<p>Les produits ci dessous vont être fermés car ceux ci remplissent les conditions suivantes:</p>
+<ul>
+    <li>Il y a un texte concernant sa fermeture sur le produit</li>
+    <li>Il n'y a plus de mouvements Clients/Fournisseurs en Commandes/Bls avec des quantités supérieures à 0</li>
+    <li>Il n'y a plus de stock sur ces produits</li>
+    <li>Il n'y a pas d'entrées forcées sur ces produits</li>
+</ul>
+<p>Si ces produits ont des réappros (stock alerte) de paramétrées, vous serez peut-être solicités pour connaitre le produit de remplacement</p>
+<p>Si les quantités sont à Zéro, c'est sans doute qu'il y a une pièce ou une alerte de créer mais avec quantité à 0, il est préférable de supprimer au lieu de les mettre à Zéro</p>
+<p>Si une quantité est supérieure ou inférieure à Zéro, L'article ne sera pas fermé avant étude ! </p>
+{% if produits %}
+<p><u><strong>Les articles qui vont être fermés : </strong></u></p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Ref</th>
+            <th>Sref1</th>
+            <th>Sref2</th>
+            <th>Designation</th>
+            <th>Alerte</th>
+            <th>Cmd</th>
+            <th>Bl</th>
+        </thead>
+        <tbody>
+{% for produit in produits %}
+        <tr>
+            <td>{{ produit.Ref }}</td>
+            <td>{{ produit.Sref1 }}</td>
+            <td>{{ produit.Sref2 }}</td>
+            <td>{{ produit.Designation }}</td>
+            <td>{{ produit.Alerte }}</td>
+            <td>{{ produit.Cmd }}</td>
+            <td>{{ produit.Bl }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+{% if Srefs %}
+<p><u><strong>Les sous références articles qui vont être fermées : </strong></u></p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Ref</th>
+            <th>Sref1</th>
+            <th>Sref2</th>
+            <th>Designation</th>
+            <th>Alerte</th>
+            <th>Cmd</th>
+            <th>Bl</th>
+        </thead>
+        <tbody>
+{% for Sref in Srefs %}
+        <tr>
+            <td>{{ Sref.Ref }}</td>
+            <td>{{ Sref.Sref1 }}</td>
+            <td>{{ Sref.Sref2 }}</td>
+            <td>{{ Sref.Designation }}</td>
+            <td>{{ Sref.Alerte }}</td>
+            <td>{{ Sref.Cmd }}</td>
+            <td>{{ Sref.Bl }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>
