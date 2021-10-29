@@ -1,4 +1,4 @@
-<p>Bonjour {{ holiday.pseudo }},
+<p>Bonjour {% for user in holiday.user %}{{ user.pseudo }}{% endfor %},
 
 </p></br>
 <p>Nous avons bien reçu votre demande de congés pour la période du {{ holiday.start|date('d-m-Y H:i:s') }} au {{ holiday.end|date('d-m-Y H:i:s') }}</p></br>

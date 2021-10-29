@@ -13,6 +13,7 @@ use Symfony\Component\Mime\Email;
 use App\Controller\HomeController;
 use App\Entity\Main\statusHoliday;
 use Twig\Extensions\DateExtension;
+use Symfony\Component\Mime\Address;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
 use App\Repository\Main\CalendarRepository;
@@ -32,18 +33,24 @@ class HolidayController extends AbstractController
 {
 
     private $mailerInterface;
+    private $repoHoliday;
+    private $repoStatuts;
+    private $repoUser;
 
-    public function __construct(MailerInterface $mailerInterface)
+    public function __construct(MailerInterface $mailerInterface, HolidayRepository $repoHoliday,statusHolidayRepository $repoStatuts, UsersRepository $repoUser)
     {
         $this->mailerInterface = $mailerInterface;
+        $this->repoHoliday = $repoHoliday;
+        $this->repoStatuts = $repoStatuts;
+        $this->repoUser = $repoUser;
     }
 
     /**
      * @Route("/holiday", name="app_holiday_list")
      */
-    public function index(HolidayRepository $repo, Request $request)
+    public function index(Request $request)
     {              
-        $data = $repo->findBy([], ['id' => 'DESC']);
+        $data = $this->repoHoliday->findBy([], ['id' => 'DESC']);
         
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
@@ -59,8 +66,12 @@ class HolidayController extends AbstractController
      * @Route("/holiday/edit/{id}", name="app_holiday_edit", methods={"GET","POST"})
      */
 
-    public function Holiday($id=null, Holiday $holiday = null, Request $request, statusHolidayRepository $statuts, MailerInterface $mailerInterface, UsersRepository $repoUser, HolidayRepository $repoHoliday)
+    public function Holiday($id=null, Holiday $holiday = null, Request $request)
     {
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         if ($id) {
             // Si on est pas le dépositaire ou le décideur pas accés à la modification
             if ($this->holiday_access($id) == false) {return $this->redirectToRoute('app_holiday_list');};
@@ -72,27 +83,21 @@ class HolidayController extends AbstractController
         }
 
         $form = $this->createForm(HolidayType::class, $holiday);
-        $form->handleRequest($request);
-        
-        // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
-        
+        $form->handleRequest($request);        
         if($form->isSubmitted() && $form->isValid() ){
             // vérifier si cette utilisateur n'a pas déjà déposé durant cette période
-            $result = $repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $this->getUser()->getId(), $holiday->getId());
+            $result = $this->repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $this->getUser()->getId(), $holiday->getId());
             if ($result) {
                 $this->addFlash('danger', 'Vous avez déjà posé du ' . $result[0]['start'] . ' au ' . $result[0]['end'] );
-                unset($result);
-                return $this->redirectToRoute('app_holiday_list');
+                return $this->redirectToRoute('app_holiday_edit', ['id' => $id]);
+                dd('On ne va pas plus loin que ça');
             }
-            
             // Liste de congés dans le même interval de date d'un service
-            $overlaps = $repoHoliday->getOverlapHoliday($holiday->getStart(), $holiday->getEnd(),$this->getUser()->getService()->getId());
+            $overlaps = $this->repoHoliday->getOverlapHoliday($holiday->getStart(), $holiday->getEnd(),$this->getUser()->getService()->getId());
             // On bascule les statuts des congés pour les mettres en chevauchement
             for ($ligOverlaps=0; $ligOverlaps <count($overlaps) ; $ligOverlaps++) { 
                 if ($overlaps[$ligOverlaps]['statutId'] == 2 ) {
-                    $statut = $statuts->findOneBy(['id' => 1]);
+                    $statut = $this->repoStatuts->findOneBy(['id' => 1]);
                     $holiday->setHolidayStatus($statut);
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($holiday);
@@ -100,7 +105,7 @@ class HolidayController extends AbstractController
                 }
             }
             // Nombre de personne dans un service
-            $countService['totalUsersService'] = count($repoUser->findBy(['service' =>$this->getUser()->getService()->getId() ]));
+            $countService['totalUsersService'] = count($this->repoUser->findBy(['service' =>$this->getUser()->getService()->getId() ]));
 
             // Nombre de personne unique en congés durant cette période
             $personService = array();
@@ -115,9 +120,9 @@ class HolidayController extends AbstractController
 
             // création d'une demande de congés
             if ($countService['totalUsersServiceInTime'] > 1) {
-                $statut = $statuts->findOneBy(['id' => 1]);
+                $statut = $this->repoStatuts->findOneBy(['id' => 1]);
             }else {
-                $statut = $statuts->findOneBy(['id' => 2]);
+                $statut = $this->repoStatuts->findOneBy(['id' => 2]);
             }
             $holiday->setCreatedAt(new DateTime())
             ->setHolidayStatus($statut)
@@ -127,29 +132,31 @@ class HolidayController extends AbstractController
             $em->flush();
 
             // récupérer le dernier id de congés
-            $holiday = $repoHoliday->getLastHoliday();
-
+            $lastHoliday = $this->repoHoliday->getLastHoliday();
+            $holiday = $this->repoHoliday->findOneBy(['id' => $lastHoliday['holiday_id']]);
             // envoie d'un email au dépositaire
             $role = 'depositaire';
             if (!$id) {
                 $object = 'Votre demande de congés a bien été prise en compte !';
                 $message_flash = 'Demande de congés déposé avec succès';
+                $id = $holiday->getId();
             }else{
                 $object = 'Votre modification de congés a bien été prise en compte !';
                 $message_flash = 'Modification de congés effectué avec succès';
             }
             $html = $this->renderView('mails/requestHoliday.html.twig', ['holiday' => $holiday]);
-            $mail = $this->holiday_send_mail($role, $id,$object,$html);
+            $this->holiday_send_mail($role, $id,$object,$html);
 
             // envoie d'un email aux décisionnaires
             $role = 'decisionnaire';
             if (!$id) {
                 $object = 'Une nouvelle demande de congés a été déposé !';
+                $id = $holiday->getId();
             }else{
                 $object = 'Une modification de congés a été effectuée !';
             }
             $html = $this->renderView('mails/requestDecideurHoliday.html.twig', ['holiday' => $holiday, 'overlaps' => $overlaps,'countService' => $countService ]);
-            $mail = $this->holiday_send_mail($role, $id,$object,$html);
+            $this->holiday_send_mail($role, $id,$object,$html);
 
             $this->addFlash('message', $message_flash);
             return $this->redirectToRoute('app_holiday_list');
@@ -164,13 +171,13 @@ class HolidayController extends AbstractController
      * @Route("/holiday/show/{id}", name="app_holiday_show", methods={"GET"})
      */
     // Voir un congés
-    public function showHoliday($id, Request $request, HolidayRepository $repo, HomeController $HomeController)
+    public function showHoliday($id, Request $request)
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
 
-        $holiday = $repo->findOneBy(['id' => $id]);
+        $holiday = $this->repoHoliday->findOneBy(['id' => $id]);
 
         // Si on est pas le dépositaire ou le décideur pas accés à la modification
         if ($this->holiday_access($id) == false) {return $this->redirectToRoute('app_holiday_list');};
@@ -235,9 +242,13 @@ class HolidayController extends AbstractController
      * @Route("/holiday/delete/{id}", name="app_holiday_delete")
      */
     // supprimer un congés
-    public function deleteHoliday($id, Request $request, Holiday $holiday, HolidayRepository $repo)
+    public function deleteHoliday($id, Request $request, Holiday $holiday)
     {
-        $holiday = $repo->findOneBy(['id' => $id]);
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
+        $holiday = $this->repoHoliday->findOneBy(['id' => $id]);
         
         // Si on est pas le dépositaire ou le décideur pas accés à la modification
         if ($this->holiday_access($id) == false) {return $this->redirectToRoute('app_holiday_list');};
@@ -271,14 +282,14 @@ class HolidayController extends AbstractController
      * @IsGranted("ROLE_CONGES")
      */
     // accepter un congés
-    public function acceptHoliday($id, Request $request, HolidayRepository $repo, statusHolidayRepository $statuts, MailerInterface $mailerInterface, UsersRepository $repoUser)
+    public function acceptHoliday($id, Request $request)
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
 
-        $holiday = $repo->findOneBy(['id' => $id]);
-        $statut = $statuts->findOneBy(['id' => 3]);
+        $holiday = $this->repoHoliday->findOneBy(['id' => $id]);
+        $statut = $this->repoStatuts->findOneBy(['id' => 3]);
         
         
         $holiday->setTreatmentedAt(new DateTime())
@@ -310,18 +321,17 @@ class HolidayController extends AbstractController
      * @IsGranted("ROLE_CONGES")
      */
     // refuser un congés
-    public function refuseHoliday($id, Request $request, HolidayRepository $repo, statusHolidayRepository $statuts)
+    public function refuseHoliday($id, Request $request)
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
         
-        $holiday = $repo->findOneBy(['id' => $id]);
-        $statut = $statuts->findOneBy(['id' => 4]);
+        $holiday = $this->repoHoliday->findOneBy(['id' => $id]);
             
         $holiday->setTreatmentedAt(new DateTime())
                 ->setTreatmentedBy($this->getUser())
-                ->setHolidayStatus($statut);
+                ->setHolidayStatus($this->repoStatuts->findOneBy(['id' => 4]));
             $em = $this->getDoctrine()->getManager();
             $em->persist($holiday);
             $em->flush();
@@ -331,13 +341,13 @@ class HolidayController extends AbstractController
         $role = 'depositaire';
         $object = 'Votre demande de congés n\'a pas été acceptée';
         $html = $this->renderView('mails/RefuseHoliday.html.twig', ['holiday' => $holiday]);
-        $mail = $this->holiday_send_mail($role, $id,$object,$html);
+        $this->holiday_send_mail($role, $id,$object,$html);
 
         // envoie d'un email aux décisionnaires
         $role = 'decisionnaire';
         $object = 'Le refus de congés a bien été pris en compte !';
         $html = $this->renderView('mails/RefuseDecideurHoliday.html.twig', ['holiday' => $holiday]);
-        $mail = $this->holiday_send_mail($role, $id,$object,$html);
+        $this->holiday_send_mail($role, $id,$object,$html);
 
         $this->addFlash('danger', 'Le congés a été Refusé');
         return $this->redirectToRoute('app_holiday_list');
@@ -347,8 +357,7 @@ class HolidayController extends AbstractController
     public function holiday_access($holidayId)
     {
         $access = true;
-        $repo = $this->getDoctrine()->getRepository(Holiday::class);
-        $holiday = $repo->getUserIdHoliday($holidayId);
+        $holiday = $this->repoHoliday->getUserIdHoliday($holidayId);
         
         if ( ($holiday['users_id'] != $this->getUser()->getId() ) and !$this->isGranted('ROLE_CONGES') ){
             $this->addFlash('danger', 'Vous n\'avez pas accés à ces données');
@@ -380,7 +389,6 @@ class HolidayController extends AbstractController
             $this->addFlash('danger', 'Vous ne pouvez plus modifier ce congés celui ci a été traité');
             $lock = true;
         } 
-        //dd($lock);
         return $lock;
     }
 
@@ -393,28 +401,30 @@ class HolidayController extends AbstractController
     // envoie de mail 
     public function holiday_send_mail($role, $id,$object,$html)
     {
-        $repoHoliday = $this->getDoctrine()->getRepository(Holiday::class);
-        $repoUser = $this->getDoctrine()->getRepository(Users::class);
         // initialiser le mail utilisateur
         $userMail = '';
         // envoyer un mail à tous les décideurs
         if ($role == 'decisionnaire'){
-            $decisionnairesMails = $repoHoliday->getMailDecideurConges();
+            $decisionnairesMails = $this->repoHoliday->getMailDecideurConges();
+            
             for ($i=0; $i <count($decisionnairesMails) ; $i++) { 
-                $userMail = $decisionnairesMails[$i]['email'];
+                $MailsList = [
+                    new Address($decisionnairesMails[$i]['email']),
+                ];
+            }    
                 $email = (new Email())
                 ->from('intranet@groupe-axis.fr')
-                ->to($userMail)
+                ->to(...$MailsList)
                 ->priority(Email::PRIORITY_HIGH)
                 ->subject($object)
                 ->html($html);
         
                 $this->mailerInterface->send($email);
-            }    
         }
         // envoyer un mail au dépositaire
         if ($role == 'depositaire'){
-            $userMail = $repoUser->getFindEmail($id)['email'] ;
+            // Chercher le mail du dépositaire du congés
+            $userMail = $this->repoUser->getFindEmail($id)['email'] ;   
             $email = (new Email())
             ->from('intranet@groupe-axis.fr')
             ->to($userMail)

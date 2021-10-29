@@ -33,9 +33,9 @@
                                     <th class="text-center"><span>IdAnomalie</span></th>
                                     <th class="text-center"><span>Type</span></th>
                                     <th class="text-center"><span>Date de création</span></th>
-                                    <th class="text-center"><span>diff date créa/date Modif</span></th>
+                                    <th class="text-center"><span>Dernier Email rappel en jour</span></th>
                                     <th class="text-center"><span>Date de modification</span></th>
-                                    <th class="text-center"><span>diff date update/date créa</span></th>
+                                    <th class="text-center"><span>Nbe Jour depuis création</span></th>
                                     <th class="text-center"><span>Date de mise à jours</span></th>
                                 </tr>
                             </thead>
@@ -56,15 +56,15 @@
                                             <a class="text-dark">{{ anomalie.createdAt|date("d/m/Y h:i") }}</a>
                                         </td>
                                         <td class="text-center">
-                                        {% set differenceMod = date(anomalie.modifiedAt).diff(date(anomalie.createdAt)) %}
-                                            <a class="text-dark">{{ differenceMod.days }} jours</a>
+                                        {% set differenceMod = date(anomalie.modifiedAt).diff(date("now")) %}
+                                            <a class="text-dark">{{ differenceMod.days }}</a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark">{{ anomalie.modifiedAt|date("d/m/Y h:i") }}</a>
                                         </td>
                                         <td class="text-center">
                                         {% set differenceUp = date(anomalie.updatedAt).diff(date(anomalie.createdAt)) %}
-                                            <a class="text-dark">{{ differenceUp.days }} jours</a>
+                                            <a class="text-dark">{{ differenceUp.days }}</a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark">{{ anomalie.updatedAt|date("d/m/Y h:i") }}</a>
@@ -78,9 +78,9 @@
                                     <th class="text-center"><span>IdAnomalie</span></th>
                                     <th class="text-center"><span>Type</span></th>
                                     <th class="text-center"><span>Date de création</span></th>
-                                    <th class="text-center"><span>diff date créa/date Modif</span></th>
+                                    <th class="text-center"><span>Dernier Email rappel en jour</span></th>
                                     <th class="text-center"><span>Date de modification</span></th>
-                                    <th class="text-center"><span>diff date update/date créa</span></th>
+                                    <th class="text-center"><span>Nbe Jour depuis création</span></th>
                                     <th class="text-center"><span>Date de mise à jours</span></th>
                                 </tr>
                                 </tr>

@@ -237,7 +237,12 @@ class ControleAnomaliesController extends AbstractController
             $dateModif = $key->getModifiedAt();
             $datediff = $dateModif->diff($dateDuJour)->format("%a");
             // si l'écart de date entre date début et modif est supérieur à 2 jours on supprime, c'est que le probléme est résolu
-            if ($datediff > 1 && $key->getIdAnomalie() != '999999999999' && $key->getType() != 'StockDirect' ) {
+            if ($datediff > 1 && $key->getIdAnomalie() != '999999999999' 
+                              && $key->getIdAnomalie() != '999999999997' 
+                              && $key->getIdAnomalie() != '999999999996' 
+                              && $key->getType() != 'StockDirect'
+                              && $key->getType() != 'SrefArticleAFermer'
+                              && $key->getType() != 'ArticleAFermer' ) {
                 $em = $this->getDoctrine()->getManager();
                 $em->remove($key);
                 $em->flush(); 
@@ -256,9 +261,11 @@ class ControleAnomaliesController extends AbstractController
         $dateDuJour = new DateTime();
         $dateModif = $ano->getModifiedAt();
                 $datediff = $dateModif->diff($dateDuJour)->format("%a");
+                $produits = $this->article->getControleArticleAFermer();
+                $Srefs = $this->article->getControleSousRefArticleAFermer();
                 if ($datediff > 0) {
-                $srefAFermer = $this->exportSrefArticleAFermer();
-                if (!empty($srefAFermer)) {
+                if (!empty($Srefs)) {
+                    $this->exportSrefArticleAFermer();
                     $ano->setUpdatedAt($dateDuJour);
                     $ano->setModifiedAt($dateDuJour);
                     $em = $this->getDoctrine()->getManager();
@@ -273,8 +280,6 @@ class ControleAnomaliesController extends AbstractController
                 }
                 // Envoyer un mail aux utilisateurs pour les avertirs des fermetures    
             
-            $produits = $this->article->getControleArticleAFermer();
-            $Srefs = $this->article->getControleSousRefArticleAFermer();
             if (!empty($produits) | !empty($Srefs)) {
                 
                 $MailsList = [
@@ -458,12 +463,14 @@ class ControleAnomaliesController extends AbstractController
     public function ControlArticleAFermer(){
         
         $ano = $this->anomalies->findOneBy(['idAnomalie' => '999999999997', 'type' => 'ArticleAFermer']);
+       
         $dateDuJour = new DateTime();
         $dateModif = $ano->getModifiedAt();
                 $datediff = $dateModif->diff($dateDuJour)->format("%a");
+                $produits = $this->article->getControleArticleAFermer();
                 if ($datediff > 0) {
-                $articleAFermer = $this->exportArticleAFermer();
-                if (!empty($articleAFermer)) {
+                if (!empty($produits)) {
+                    $this->exportArticleAFermer();
                     $ano->setUpdatedAt($dateDuJour);
                     $ano->setModifiedAt($dateDuJour);
                     $em = $this->getDoctrine()->getManager();
@@ -627,7 +634,7 @@ class ControleAnomaliesController extends AbstractController
         $dateDuJour = new DateTime();
         $dateModif = $ano->getModifiedAt();
                 $datediff = $dateModif->diff($dateDuJour)->format("%a");
-                if ($datediff > 14) {
+                if ($datediff > 7) {
                 $this->exportStockDirect();
                 $ano->setUpdatedAt($dateDuJour);
                 $ano->setModifiedAt($dateDuJour);
@@ -650,13 +657,14 @@ class ControleAnomaliesController extends AbstractController
         for ($d=0; $d < count($donnees); $d++) {
                 
             $donnee = $donnees[$d];
+            //dd($donnee);
             if ($donnee['Email'] == $mail) {
                 
                 $list[] = [
-                    $donnee['REFERENCE'],
-                    $donnee['SREFERENCE1'],
-                    $donnee['SREFERENCE2'],
-                    $donnee['ARTICLE_DESIGNATION'],
+                    $donnee['Ref'],
+                    $donnee['Sref1'],
+                    $donnee['Sref2'],
+                    $donnee['Designation'],
                     $donnee['StockDirect'],                
                 ];
             }
