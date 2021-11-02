@@ -3,25 +3,20 @@
 namespace App\Controller;
 
 use DateTime;
-use ArrayObject;
 use App\Form\HolidayType;
-use App\Entity\Main\Users;
 use RecursiveArrayIterator;
 use App\Entity\Main\Holiday;
 use RecursiveIteratorIterator;
+use App\Form\ClosingSocityType;
+use App\Form\ImposeVacationType;
 use Symfony\Component\Mime\Email;
-use App\Controller\HomeController;
-use App\Entity\Main\statusHoliday;
-use Twig\Extensions\DateExtension;
 use Symfony\Component\Mime\Address;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
-use App\Repository\Main\CalendarRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\statusHolidayRepository;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -61,7 +56,32 @@ class HolidayController extends AbstractController
         ]);
     }
 
-     /**
+    
+    /**
+     * @Route("/holiday/fermeture", name="app_holiday_new_closing", methods={"GET","POST"})
+     */
+    public function newClosing(Request $request, Holiday $holiday = null)
+    {
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
+        $holiday = new Holiday;
+
+        $form = $this->createForm(ImposeVacationType::class, $holiday);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid() ){
+
+        }
+
+        return $this->render('holiday/closing.html.twig',[
+            'form' => $form->createView()
+            ]);
+    }
+    
+    
+    /**
      * @Route("/holiday/new", name="app_holiday_new", methods={"GET","POST"})
      * @Route("/holiday/edit/{id}", name="app_holiday_edit", methods={"GET","POST"})
      */
@@ -242,7 +262,7 @@ class HolidayController extends AbstractController
      * @Route("/holiday/delete/{id}", name="app_holiday_delete")
      */
     // supprimer un congés
-    public function deleteHoliday($id, Request $request, Holiday $holiday)
+    public function deleteHoliday($id, Holiday $holiday, Request $request)
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Main\Users;
 use App\Form\EditUsersType;
 use App\Repository\Main\UsersRepository;
@@ -93,23 +94,66 @@ class AdminUsersController extends AbstractController
     }
 
     /**
-     * Supprimer l'utilisateur
+     * Supprimer l'utilisateur, ne sert pas
      * 
      * @Route("/admin/users/delete/{id}", name="app_delete_user")
      */
 
     public function deleteUser(Users $user, Request $request)
-        {
-                $em = $this->getDoctrine()->getManager();
-                $em->remove($user);
-                $em->flush();
+    {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($user);
+            $em->flush();
 
-                // tracking user page for stats
-                $tracking = $request->attributes->get('_route');
-                $this->setTracking($tracking);
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
 
-                $this->addFlash('message', 'Utilisateur Supprimé avec succès');
-                return $this->redirectToRoute('app_admin_users');
-            
-        }
+            $this->addFlash('message', 'Utilisateur Supprimé avec succès');
+            return $this->redirectToRoute('app_admin_users');
+        
+    }
+
+    /**
+     * Fermer l'utilisateur
+     * 
+     * @Route("/admin/users/close/{id}", name="app_close_user")
+     */
+
+    public function closeUser(Users $user, Request $request)
+    {
+            $user->setClosedAt(new DateTime());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
+            $this->addFlash('message', 'L\'utilisateur a été fermé avec succès');
+            return $this->redirectToRoute('app_admin_users');
+        
+    }
+    /**
+     * Ouvrir l'utilisateur
+     * 
+     * @Route("/admin/users/open/{id}", name="app_open_user")
+     */
+
+    public function openUser(Users $user, Request $request)
+    {
+            $user->setClosedAt(null);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+
+            // tracking user page for stats
+            $tracking = $request->attributes->get('_route');
+            $this->setTracking($tracking);
+
+            $this->addFlash('message', 'L\'utilisateur a été ouvert avec succès');
+            return $this->redirectToRoute('app_admin_users');
+        
+    }
 }

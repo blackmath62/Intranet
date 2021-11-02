@@ -139,6 +139,11 @@ class Users implements UserInterface
      */
     private $news;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $closedAt;
+
 
    
     public function __construct()
@@ -611,6 +616,18 @@ class Users implements UserInterface
                 $news->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getClosedAt(): ?\DateTimeInterface
+    {
+        return $this->closedAt;
+    }
+
+    public function setClosedAt(?\DateTimeInterface $closedAt): self
+    {
+        $this->closedAt = $closedAt;
 
         return $this;
     }

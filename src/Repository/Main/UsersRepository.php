@@ -34,4 +34,17 @@ class UsersRepository extends ServiceEntityRepository
         return $stmt->fetch();
     }
 
+    // Liste des utilisateurs non fermés
+    public function getFindAllUsers()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT users.pseudo, users.email, services.title
+        FROM users
+        LEFT JOIN services ON users.service_id = services.id
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
 }
