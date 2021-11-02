@@ -6,7 +6,9 @@ namespace App\Security;
 use App\Controller\SecurityController;
 use App\Repository\Main\UsersRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -69,11 +71,11 @@ class LoginFormAuthenticator extends AbstractAuthenticator
      */
     public function authenticate(Request $request): PassportInterface
     {
-        $user = $this->usersRepository->findOneByEmail($request->request->get('email'));
+        $user = $this->usersRepository->findOneBy(['email' => $request->request->get('email') , 'closedAt' => NULL]);
         $request->getSession()->set(SecurityController:: LAST_EMAIL, $request->request->get('email'));
 
         if (!$user) {
-            throw new CustomUserMessageAuthenticationException('Identification invalide !');
+            throw new CustomUserMessageAuthenticationException('Connexion impossible !');
         }
 
         if ($user->getToken()){
@@ -127,7 +129,6 @@ class LoginFormAuthenticator extends AbstractAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        
         // todo mise en place du message flash 
         $this->flashBag->add('error', 'Identifiant ou mot de passe invalide !');
         return new RedirectResponse($this->urlGenerator->generate('app_login'));

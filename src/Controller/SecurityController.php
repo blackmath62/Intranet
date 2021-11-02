@@ -26,9 +26,8 @@ class SecurityController extends AbstractController
     /**
      * @Route("/login", name="app_login" , methods={"GET", "POST"})
      */
-    public function login(Request $request): Response
+    public function login(): Response
     {
-        
         return $this->render('security/login.html.twig', [
             'controller_name' => 'SecurityController',
             'title' => "connexion"
@@ -124,8 +123,8 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
-            // On verifie si l'utilisateur existe
-            $user = $usersRepo->findOneBy(['email' => $user->getEmail()]);
+            // On verifie si l'utilisateur existe et qu'il n'est pas fermé
+            $user = $usersRepo->findOneBy(['email' => $user->getEmail(), 'closedAt' => NULL ]);
             // si l'utilisateur n'existe pas        
             if (!$user) {
                 // erreur 404
@@ -167,8 +166,8 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted()&& $form->isValid()) {
             // On verifie si un utilisateur a ce token
-            // Vérification du token utilisateur
-            $user = $usersRepo->findOneBy(['token' => $token]);
+            // Vérification du token utilisateur  et qu'il n'est pas fermé
+            $user = $usersRepo->findOneBy(['token' => $token, 'closedAt' => NULL]);
             
             // si aucun utilisateur n'existe avec ce token
             if (!$user) {

@@ -94,7 +94,7 @@ class AdminUsersController extends AbstractController
     }
 
     /**
-     * Supprimer l'utilisateur, ne sert pas
+     * Supprimer l'utilisateur, ne sert pas, nous fermons ou ouvrons les utilisateurs
      * 
      * @Route("/admin/users/delete/{id}", name="app_delete_user")
      */
