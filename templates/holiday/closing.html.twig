@@ -13,32 +13,20 @@
             <!-- /.card-header -->
             <div class="card-body">
                 {{ form_start(form) }}
-                <div class="row">
-                
+                <div class="d-flex flex-wrap">
+                {{ form_label(form.start) }}
                 {{ form_widget(form.start) }}
-                
+                {{ form_widget(form.sliceStart) }}
+                {{ form_label(form.end) }}
                 {{ form_widget(form.end) }}
-                
+                {{ form_widget(form.sliceEnd) }}
+                {{ form_label(form.holidayType) }}
                 {{ form_widget(form.holidayType) }}
-                
-               
+
                 </div>
-                {{ form_widget(form.Envoyer) }}
                 
-
-
-                        <!-- /.col -->
-        <div class="col-md-6 mt-5">
-          <div class="card card-dark card-outline">
-            <div class="card-header">
-              <h3 class="card-title">Liste des salariés</h3>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body p-0">
               <div class="mailbox-controls float-right">
-                <!-- Check all button -->
-                <button type="button" id="selectAll" class="btn btn-default btn-sm checkbox-toggle">Selectionner/déselectionner tout<i class="ml-4 far fa-square"></i>
-                </button>
+                <button type="button" id="selectAll" class="btn btn-default btn-sm checkbox-toggle">Selectionner/déselectionner tout<i class="ml-4 far fa-square"></i></button>
               </div>
               <div class="table-responsive mailbox-messages">
                 <table class="table table-hover table-striped">
@@ -59,38 +47,60 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for user in form.user.vars.choices %}
+
+                    {% block form_row %}
+                    {% spaceless %}
+
                         <tr>
-                            <td class="mailbox-name text-center"><a>{{ user.data.pseudo }}</a></td>
-                            <td class="mailbox-subject text-center" href=''><b>{{ user.data.email }}</b></td>
-                            <td class="mailbox-date text-center"></td>
-                            <td>
-                                <div class="icheck-dark text-center">
-                                    <input type="checkbox" value="" id="{{ user.data.id }}">
-                                    <label for="{{ user.data.id }}"></label>
-                                </div>
-                            </td>
+                            <td>{{form_label(form.user)}}</td>
+                            <td> {{form_widget(form.user) }} </td>
+                            
                         </tr>
-                        {% endfor %}
+
+                    {% endspaceless %}
+                    {% endblock %}
+
                     </tbody>
                 </table>
                 <!-- /.table -->
               </div>
               <!-- /.mail-box-messages -->
             </div>
-          </div>
-          <!-- /.card -->
-        </div>
-        <!-- /.col -->
-                
-               
-                {{ form_end(form) }}
 
+
+                {% if app.request.attributes.get('_route') == 'app_holiday_edit' %}
+                {{ form_widget(form.Envoyer, {'label': 'Modifier'} ) }}
+                <a class='btn btn-danger m-3' title="supprimer" data-toggle="modal" data-target="#modal-default"></i>Supprimer cette demande de congés</a>
+                 <div class="modal fade" id="modal-default">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h4 class="modal-title">Voulez vous vraiment supprimer ce congés ?</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                        <p>Cette action est irréversible !&hellip;</p>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                        <a type="button" href="{{ path( 'app_holiday_delete', {'id': app.request.get('id')} ) }}" class="btn btn-danger">Supprimer</a>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                </div>
+                <!-- /.modal -->
+                {% endif %}
+                {{ form_end(form) }}
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
+
 {% block javascripts %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script>

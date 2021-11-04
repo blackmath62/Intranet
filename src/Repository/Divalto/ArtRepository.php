@@ -80,6 +80,36 @@ class ArtRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    public function getControleStockDirectFiltre($metier, $dos):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM(SELECT RTRIM(LTRIM(ART.FAM_0002)) AS Metier, RTRIM(LTRIM(MVTL_STOCK_V.REFERENCE)) AS Ref,RTRIM(LTRIM(MVTL_STOCK_V.DOSSIER)) AS Dos, RTRIM(LTRIM(MVTL_STOCK_V.SREFERENCE1))  AS Sref1
+        ,RTRIM(LTRIM(MVTL_STOCK_V.SREFERENCE2)) AS Sref2,RTRIM(LTRIM(MVTL_STOCK_V.ARTICLE_DESIGNATION)) AS Designation,SUM(MVTL_STOCK_V.QTETJSENSTOCK) AS StockDirect
+        , MIN(MVTL_STOCK_V.UTILISATEURCREATION) AS Utilisateur,
+        CASE
+        WHEN ART.FAM_0002 IN ('ME','MO') THEN 'crichard@lhermitte.fr'
+        WHEN ART.FAM_0002 IN ('HP', 'EV') THEN 'dlouchart@lhermitte.fr'
+        WHEN ART.FAM_0002 NOT IN ('ME', 'MO', 'HP', 'EV') THEN 'ndegorre@roby-fr.com'
+        END AS Email,
+        CASE
+        WHEN ART.FAM_0002 IN ('ME','MO') THEN 'adeschodt@lhermitte.fr'
+        WHEN ART.FAM_0002 IN ('HP', 'EV') THEN 'clerat@lhermitte.fr'
+        WHEN ART.FAM_0002 NOT IN ('ME', 'MO', 'HP', 'EV') THEN 'obue@roby-fr.com'
+        END AS Email2,
+        CASE
+        WHEN ART.FAM_0002 NOT IN ('ME', 'MO', 'HP', 'EV') THEN 'marina@roby-fr.com'
+        END AS Email3
+        FROM MVTL_STOCK_V
+        INNER JOIN ART ON ART.DOS = MVTL_STOCK_V.DOSSIER AND ART.REF = MVTL_STOCK_V.REFERENCE
+        WHERE MVTL_STOCK_V.QTETJSENSTOCK IS NOT NULL AND MVTL_STOCK_V.NATURESTOCK NOT IN ('N', 'O')
+        GROUP BY ART.FAM_0002, MVTL_STOCK_V.REFERENCE,MVTL_STOCK_V.DOSSIER, MVTL_STOCK_V.SREFERENCE1 ,MVTL_STOCK_V.SREFERENCE2,MVTL_STOCK_V.ARTICLE_DESIGNATION)reponse
+        WHERE Metier IN( $metier ) AND Dos = $dos
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     // Controle des articles à fermés tenant compte des réappro
     public function getControleArticleAFermer():array
     {
@@ -194,6 +224,30 @@ class ArtRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    public function ControleCreationVivienArticle():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ART.REF AS Ref,SART.SREF1 AS Sref1,SART.SREF2 AS Sref2,
+        ART.DES AS Designation, ART.REFUN AS Uv, ART.TIERS AS Fournisseur, 
+        ART.USERCR AS ArtUserCreation, ART.USERCRDH AS ArtUserDateCreation, 
+        ART.USERMO AS ArtUserModification, ART.USERMODH AS ArtUserDateModification, 
+        SART.USERCR AS SartUserCreation, SART.USERCRDH AS SartUserDateCreation, 
+        SART.USERMO AS SartUserModification, SART.USERMODH AS SartUserDateModification
+        FROM ART
+        LEFT JOIN SART ON ART.DOS = SART.DOS AND ART.REF = SART.REF
+        WHERE ART.DOS = 1 
+        AND (
+        (ART.USERCR = 'JEROME' AND ART.USERCRDH = GETDATE()) 
+        OR (ART.USERMO = 'JEROME' AND ART.USERMODH = GETDATE()) 
+        OR (SART.USERCR = 'JEROME' AND SART.USERCRDH = GETDATE()) 
+        OR (SART.USERMO = 'JEROME' AND SART.USERMODH = GETDATE())
+        )
+        ORDER BY ART.REF
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
     
 
 }

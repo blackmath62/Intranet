@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+    <h3 class="card-title"><i class="icon fas fa-info-circle pr-2"></i>Informations utiles</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+<!-- /.card-header -->
+    <div class="card-body">
+        <p>Selectionnez le métier concerné puis cliquez sur rechercher</p>
+    </div>
+<!-- /.card-footer-->
+</div>
+
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <!-- /.card-header -->
+                    <div class="card-header d-flex justify-content-between flex-wrap">
+                        <h3 class="card-title text-center">Stocks Directs</h3>
+                        {{ form_start(form, { 'attr' : { 'class' : 'ml-auto' }} )  }}                   
+                        <div class='d-flex flex-wrap row'>                        
+                        <div class="mr-5">{{ form_widget(form.metier) }}</div>
+                        <div class="text-center">{{ form_widget(form.filtrer) }}</div>
+                        </div>
+                        {{ form_end(form) }}
+                    </div>
+                    <div class="card-body">
+                        {% if stocks %}
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Métier</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Stock Direct</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							 
+                              <!-- >boucle -->
+                              {% for stock in stocks %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stock.Metier }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stock.Ref }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stock.Sref1 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stock.Sref2 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stock.Designation }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stock.StockDirect }}</a>
+                                        </td>
+                                    </tr>
+                              {% endfor %}
+                             <!-- >boucle -->
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Métier</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Stock Direct</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        {% else %}
+                            <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez selectionner le filtre à appliquer</h4>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+
+

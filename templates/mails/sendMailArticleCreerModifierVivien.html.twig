@@ -1,0 +1,40 @@
+<p>Bonjour,</p>
+
+{% if articles %}
+<p><u><strong>Les articles qui vont être fermés : </strong></u></p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Ref</th>
+            <th>Sref1</th>
+            <th>Sref2</th>
+            <th>Designation</th>
+            <th>Uv</th>
+            <th>Fournisseur</th>
+            <th>Art Création</th>
+            <th>Art Modification</th>
+            <th>Sart Création</th>
+            <th>Sart Modification</th>
+        </thead>
+        <tbody>
+{% for article in articles %}
+        <tr>
+            <td>{{ article.Ref }}</td>
+            <td>{{ article.Sref1 }}</td>
+            <td>{{ article.Sref2 }}</td>
+            <td>{{ article.Designation }}</td>
+            <td>{{ article.Uv }}</td>
+            <td>{{ article.Fournisseur }}</td>
+            <td>{{ article.ArtUserCreation }}</td>
+            <td>{{ article.ArtUserModification }}</td>
+            <td>{{ article.SartUserCreation }}</td>
+            <td>{{ article.SartUserModification }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+<p>Merci de contrôler ces créations</p>
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

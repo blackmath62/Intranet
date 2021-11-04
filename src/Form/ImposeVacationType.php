@@ -10,6 +10,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -20,57 +22,67 @@ class ImposeVacationType extends AbstractType
     {
         $builder
             
-            ->add('start', DateTimeType::class, [
-                'placeholder' => [
-                    'year' => 'Année', 'month' => 'Mois', 'day' => 'Jour',
-                    'hour' => 'Heure', 'minute' => 'Minute', 'second' => 'Seconde'],
-                'date_widget' => 'single_text',
-                'time_label' => 'Heure de début',
-                'time_widget' => 'single_text',
-                'required' => true,
-                //'data' =>  date_time_set(new \DateTime("now"), 00, 00),
-                'label' => "Date début",
-                'attr' => ['class' => 'col-3 ml-3'],
-            ])
-            ->add('end', DateTimeType::class,[
-                'placeholder' => [
-                    'year' => 'Année', 'month' => 'Mois', 'day' => 'Jour',
-                    'hour' => 'Heure', 'minute' => 'Minute', 'second' => 'Seconde'],
-                'date_widget' => 'single_text',
-                'time_label' => 'Heure de début',
-                'time_widget' => 'single_text',
-                'required' => true,
-                //'data' => date_time_set(new \DateTime("now"), 23, 59),
-                'label' => "Date fin",
-                'attr' => ['class' => 'col-3 ml-3'],
+        ->add('start', DateType::class, [
+            'widget' => 'single_text',
+            'required' => true,
+            'label' => "Date début",
+            'attr' => ['class' => 'form-control col-6 col-sm-1 text-center'],
+            'label_attr' => ['class' => 'col-12 col-sm-2 mt-3 text-center']
         ])
-            ->add('holidayType',EntityType::class,[
-                'class' => HolidayTypes::class,
-                'choice_label' => 'name',
-                'label' => 'Type de demande',
-                'attr' => ['class' => 'ml-3 ']
-            ])
+        ->add('sliceStart', ChoiceType::class,[
+            'choices' => [
+                'Journée' => "DAY",
+                'Matin' => "AM",
+                'Aprés-midi' => "PM",
+            ],
+            'expanded' => false,
+            'multiple' => false,
+            'label' => 'Tranche début',
+            'attr' => ['class' => 'form-control col-6 col-sm-1 text-center'],
+        ])
+        ->add('end', DateType::class,[
+            'widget' => 'single_text',
+            'required' => true,
+            //'data' => date_time_set(new \DateTime("now"), 23, 59),
+            'label' => "Date fin",
+            'attr' => ['class' => 'form-control col-6 col-sm-1 text-center'],
+            'label_attr' => ['class' => 'col-12 col-sm-2 text-center mt-3']
+        ])
+        ->add('sliceEnd', ChoiceType::class,[
+            'choices' => [
+                'Journée' => "DAY",
+                'Matin' => "AM",
+                'Aprés-midi' => "PM",
+            ],
+            'expanded' => false,
+            'multiple' => false,
+            'label' => 'Tranche fin',
+            'attr' => ['class' => 'form-control col-6 col-sm-1 text-center'],
+        ])
+        ->add('holidayType',EntityType::class,[
+            'class' => HolidayTypes::class,
+            'choice_label' => 'name',
+            'label' => 'Type',
+            'attr' => ['class' => 'mr-3 form-control col-12 col-sm-2 text-center'],
+            'label_attr' => ['class' => 'col-12 col-sm-1 text-center mt-3']
+        ])
             ->add('user', EntityType::class, [
                 // looks for choices from this entity
                 'class' => Users::class,
                 'choice_label' => 'email',
+                'label' => 'Salarié(e)s',
                 'expanded' => true,
                 'multiple' => true,
                 'query_builder' => function(EntityRepository $er){
                     return $er->createQueryBuilder('u')
-                            ->orderBy('u.email', 'ASC');
-                }
+                              ->where('u.closedAt IS NULL ')
+                              ->orderBy('u.email', 'ASC');
+                },
+                'attr' => ['class' => 'mr-3 form-control col-12 text-center'],
             ])
-            ->add('details', HiddenType::class, [
-                'required' => false,
-                'attr' => [
-                    'class' => 'col-12 form-control textarea',
-                    'placeholder' => 'Vous pouvez saisir les précisions sur votre demande de congés si cela est nécéssaire'
-                ],
-                'label' => 'Détail de la demande',
-            ])
+            ->add('details', HiddenType::class)
             ->add('Envoyer', SubmitType::class,[
-                'attr' => ['class' => 'col-1 form-control btn btn-dark m-3 float-right']
+                'attr' => ['class' => 'col-12 col-sm-1 form-control btn btn-dark mt-3 float-right']
             ])
         ;
     }

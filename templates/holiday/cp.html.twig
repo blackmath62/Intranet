@@ -13,11 +13,13 @@
             <!-- /.card-header -->
             <div class="card-body">
                 {{ form_start(form) }}
-                <div class="d-flex">
+                <div class="d-flex flex-wrap">
                 {{ form_label(form.start) }}
                 {{ form_widget(form.start) }}
+                {{ form_widget(form.sliceStart) }}
                 {{ form_label(form.end) }}
                 {{ form_widget(form.end) }}
+                {{ form_widget(form.sliceEnd) }}
                 {{ form_label(form.holidayType) }}
                 {{ form_widget(form.holidayType) }}
                 </div>

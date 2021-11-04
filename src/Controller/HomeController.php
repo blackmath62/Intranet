@@ -4,9 +4,7 @@ namespace App\Controller;
 
 use DateTime;
 use RecursiveArrayIterator;
-use App\Form\CommentNewsType;
 use RecursiveIteratorIterator;
-use App\Entity\Main\CommentsNews;
 use App\Repository\Main\ControlesAnomaliesRepository;
 use App\Repository\Main\NewsRepository;
 use App\Repository\Main\UsersRepository;

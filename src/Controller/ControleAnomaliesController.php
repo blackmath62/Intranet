@@ -250,9 +250,7 @@ class ControleAnomaliesController extends AbstractController
         }
     }
     
-    /**
-     * @Route("/controle/anomalies/TEST", name="app_controle_anomalies_test")
-     */ 
+    
     ///////////////////////////////////// SOUS REFERENCES ARTICLES
 
     public function ControlSrefArticleAFermer(){
@@ -766,5 +764,20 @@ class ControleAnomaliesController extends AbstractController
   
     }
 
+    /**
+     * @Route("/controle/anomalies/TEST", name="app_controle_anomalies_test")
+     */ 
+    public function getCreationArticleVivien()
+    {
+        $html = $this->renderView('mails/sendMailArticleCreerModifierVivien.html.twig', ['articles' => $this->article->ControleCreationVivienArticle() ]);
+                $email = (new Email())
+                    ->from('intranet@groupe-axis.fr')
+                    ->to('jpochet@lhermitte.fr')
+                    ->subject('Article et sous références créér par Vivien')
+                    ->html($html);
+                $this->mailer->send($email);
+
+        return $this->render('test/pageVide.html.twig');
+    }
 
 }
