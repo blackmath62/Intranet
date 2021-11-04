@@ -66,7 +66,7 @@ class ImposeVacationType extends AbstractType
             'attr' => ['class' => 'mr-3 form-control col-12 col-sm-2 text-center'],
             'label_attr' => ['class' => 'col-12 col-sm-1 text-center mt-3']
         ])
-            ->add('user', EntityType::class, [
+            ->add('user', EntityType::class, array(
                 // looks for choices from this entity
                 'class' => Users::class,
                 'choice_label' => 'email',
@@ -79,7 +79,7 @@ class ImposeVacationType extends AbstractType
                               ->orderBy('u.email', 'ASC');
                 },
                 'attr' => ['class' => 'mr-3 form-control col-12 text-center'],
-            ])
+            ))
             ->add('details', HiddenType::class)
             ->add('Envoyer', SubmitType::class,[
                 'attr' => ['class' => 'col-12 col-sm-1 form-control btn btn-dark mt-3 float-right']

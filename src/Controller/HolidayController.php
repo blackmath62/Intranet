@@ -72,9 +72,8 @@ class HolidayController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid() ){
-
+            dd($form->getData());
         }
-
         return $this->render('holiday/closing.html.twig',[
             'form' => $form->createView()
             ]);

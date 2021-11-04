@@ -14,15 +14,14 @@
             <div class="card-body">
                 {{ form_start(form) }}
                 <div class="d-flex flex-wrap">
-                {{ form_label(form.start) }}
-                {{ form_widget(form.start) }}
-                {{ form_widget(form.sliceStart) }}
-                {{ form_label(form.end) }}
-                {{ form_widget(form.end) }}
-                {{ form_widget(form.sliceEnd) }}
-                {{ form_label(form.holidayType) }}
-                {{ form_widget(form.holidayType) }}
-
+                    {{ form_label(form.start) }}
+                    {{ form_widget(form.start) }}
+                    {{ form_widget(form.sliceStart) }}
+                    {{ form_label(form.end) }}
+                    {{ form_widget(form.end) }}
+                    {{ form_widget(form.sliceEnd) }}
+                    {{ form_label(form.holidayType) }}
+                    {{ form_widget(form.holidayType) }}
                 </div>
                 
               <div class="mailbox-controls float-right">
@@ -48,17 +47,16 @@
                     </thead>
                     <tbody>
 
-                    {% block form_row %}
-                    {% spaceless %}
-
-                        <tr>
-                            <td>{{form_label(form.user)}}</td>
-                            <td> {{form_widget(form.user) }} </td>
-                            
-                        </tr>
-
-                    {% endspaceless %}
-                    {% endblock %}
+                       {% for user in form.user %}
+                       <tr>
+                       
+                            <td class="text-center"> {{ user.vars.label }}</td>
+                            <td class="text-center">{{ user.vars.label }}</td>
+                            <td class="text-center">{{ user.vars.label }}</td>
+                            <td class="text-center">{{ form_widget( user ) }}</td>
+                       
+                       </tr>
+                        {% endfor %}
 
                     </tbody>
                 </table>
@@ -68,32 +66,7 @@
             </div>
 
 
-                {% if app.request.attributes.get('_route') == 'app_holiday_edit' %}
-                {{ form_widget(form.Envoyer, {'label': 'Modifier'} ) }}
-                <a class='btn btn-danger m-3' title="supprimer" data-toggle="modal" data-target="#modal-default"></i>Supprimer cette demande de congés</a>
-                 <div class="modal fade" id="modal-default">
-                    <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                        <h4 class="modal-title">Voulez vous vraiment supprimer ce congés ?</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        </div>
-                        <div class="modal-body">
-                        <p>Cette action est irréversible !&hellip;</p>
-                        </div>
-                        <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                        <a type="button" href="{{ path( 'app_holiday_delete', {'id': app.request.get('id')} ) }}" class="btn btn-danger">Supprimer</a>
-                        </div>
-                    </div>
-                    <!-- /.modal-content -->
-                    </div>
-                    <!-- /.modal-dialog -->
-                </div>
-                <!-- /.modal -->
-                {% endif %}
+                {{ form_widget(form.Envoyer) }}
                 {{ form_end(form) }}
             </div>
         </div>
