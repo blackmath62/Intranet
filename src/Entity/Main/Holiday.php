@@ -77,6 +77,11 @@ class Holiday
      */
     private $end;
 
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=1)
+     */
+    private $nbJours;
+
     
     public function __construct()
     {
@@ -228,6 +233,18 @@ class Holiday
     public function setEnd(\DateTimeInterface $end): self
     {
         $this->end = $end;
+
+        return $this;
+    }
+
+    public function getNbJours(): ?string
+    {
+        return $this->nbJours;
+    }
+
+    public function setNbJours(string $nbJours): self
+    {
+        $this->nbJours = $nbJours;
 
         return $this;
     }

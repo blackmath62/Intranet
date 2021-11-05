@@ -35,8 +35,6 @@ class HomeController extends AbstractController
      */
     public function index(Request $request, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews, ControlesAnomaliesRepository $anomalies)
     {
-
-        //dd($anomalies->findAll());
         
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
@@ -131,7 +129,7 @@ class HomeController extends AbstractController
             'anomalies' => $anomalies,
         ]);
     }
-
+    // déterminer depuis combien de temps un utilisateur est connecté
     function time_elapsed_string($datetime, $full = false) {
         $now = new DateTime;
         $ago = new DateTime($datetime);

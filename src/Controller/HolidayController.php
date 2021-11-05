@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use DateTime;
+use DatePeriod;
+use DateInterval;
 use App\Form\HolidayType;
 use RecursiveArrayIterator;
 use App\Entity\Main\Holiday;
@@ -108,7 +110,7 @@ class HolidayController extends AbstractController
             $result = $this->repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $this->getUser()->getId(), $holiday->getId());
             if ($result) {
                 $this->addFlash('danger', 'Vous avez déjà posé du ' . $result[0]['start'] . ' au ' . $result[0]['end'] );
-                return $this->redirectToRoute('app_holiday_edit', ['id' => $id]);
+                return $this->redirectToRoute('app_holiday_list');
                 dd('On ne va pas plus loin que ça');
             }
             // Liste de congés dans le même interval de date d'un service
@@ -143,9 +145,32 @@ class HolidayController extends AbstractController
             }else {
                 $statut = $this->repoStatuts->findOneBy(['id' => 2]);
             }
+            // adapter l'heure de start à la tranche de journée selectionnée
+            $sliceStart = $form->getData()->getSliceStart();
+            $start = $form->getData()->getStart();
+            if ($sliceStart == 'PM') {
+                $start = $start->modify("+14 hours");
+            }
+            // adapter l'heure de End à la tranche de journée selectionnée
+            $sliceEnd = $form->getData()->getSliceEnd();
+            $end = $form->getData()->getEnd();
+            if ($sliceEnd == 'AM') {
+                $end = $end->modify("+12 hours");
+            }elseif ($sliceEnd == 'PM') {
+                $end = $end->modify("+18 hours");
+            }elseif ($sliceEnd == 'DAY') {
+                $end = $end->modify("+23 hours");
+            }
+            $nbJours = $this->countHolidayDay($holiday);
+            //dd($nbJours);
+            $nbJ = $nbJours['nbjours'];
+            dd($nbJours);
             $holiday->setCreatedAt(new DateTime())
-            ->setHolidayStatus($statut)
-            ->addUser($this->getUser());
+                    ->setStart($start)
+                    ->setEnd($end)
+                    ->setNbJours($nbJ)
+                    ->setHolidayStatus($statut)
+                    ->addUser($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($holiday);
             $em->flush();
@@ -200,8 +225,23 @@ class HolidayController extends AbstractController
 
         // Si on est pas le dépositaire ou le décideur pas accés à la modification
         if ($this->holiday_access($id) == false) {return $this->redirectToRoute('app_holiday_list');};
-                   
-        // compter le nombre de jour déposer pour cette période , il est surement préférable de faire une page séparé pour compter les congés
+        
+        return $this->render('holiday/show.html.twig',[
+            'holiday' => $holiday
+        ]);
+    }
+    // compter le nombre de jour de congés déposés 
+    public function countHolidayDay($holiday){
+
+        // déclaration des variables
+        $dateStart = $holiday->getStart()->format('Y-m-d');
+        $dateEnd = $holiday->getEnd()->format('Y-m-d');
+        $dateTimeStart = new DateTime($holiday->getStart()->format('Y-m-d'));
+        $dateTimeEnd = new DateTime($holiday->getEnd()->format('Y-m-d'));
+        $sliceStart = $holiday->getSliceStart();
+        $sliceEnd = $holiday->getSliceEnd();    
+
+        // compter le nombre de jour déposer pour cette période
         // récupérer les fériers en JSON sur le site etalab
         $ferierJson = file_get_contents("https://etalab.github.io/jours-feries-france-data/json/metropole.json");
         
@@ -211,50 +251,70 @@ class HolidayController extends AbstractController
             RecursiveIteratorIterator::SELF_FIRST);
         $ferierDurantConges = array();
         foreach ($jsonIterator as $key => $val) {
-            if ($key >= $holiday->getStart()->format('Y-m-d') AND $key <= $holiday->getEnd()->format('Y-m-d') ) {
+            if ($key >= $dateStart AND $key <= $dateEnd ) {
                 $ferierDurantConges[] = $key;
-            }
-        }    
-        
-        $debut_jour = $holiday->getStart()->format('d');
-        $debut_mois = $holiday->getStart()->format('m');
-        $debut_annee = $holiday->getStart()->format('Y');
-        $debut_heure = $holiday->getStart()->format('H');
-        $debut_minute = $holiday->getStart()->format('i');
-        $debut_seconde = $holiday->getStart()->format('s');
-
-        $fin_jour = $holiday->getEnd()->format('d');
-        $fin_mois = $holiday->getEnd()->format('m');
-        $fin_annee = $holiday->getEnd()->format('Y');
-        $fin_heure = $holiday->getEnd()->format('H');
-        $fin_minute = $holiday->getEnd()->format('i');
-        $fin_seconde = $holiday->getEnd()->format('s');
-
-        $debut_date = mktime($debut_heure, $debut_minute, $debut_seconde, $debut_mois, $debut_jour, $debut_annee);
-        $fin_date = mktime($fin_heure, $fin_minute, $fin_seconde, $fin_mois, $fin_jour, $fin_annee);
-        $nbConges = 0;
-        for($i = $debut_date; $i <= $fin_date; $i+=86400)
-        {  
-            // essayer de voir pour compter le nombre de CP via le nombre de seconde
-            // compter le nombre de jour de congés déposé hors weekend
-            if (date("N",$i) != 6 AND date("N",$i) != 7 ) {
-                        $nbConges++;
-                        echo 'je passe par là';
-                // déduire les jours fériers durant la période              
-                if ($ferierDurantConges) {
-                    foreach ($ferierDurantConges as $key => $value) {
-                        if (date("Y-m-d",$i) == $value ) {
-                            $nbConges = $nbConges - 1;
-                        }
-                    }
-                }
             }
         }
         
-        return $this->render('holiday/show.html.twig',[
-            'holiday' => $holiday,
-            'nbConges' => $nbConges,
-        ]);
+        $nbConges = 0;
+        $return= [];
+        $texte1 = '';
+        $texte3 = '';
+        $texte4 = '';
+        $texte5 = '';
+        $texte2 = '';
+        $texte6 = '';
+        $texte7 = '';
+            // le probléme vient de cette boucle, apparement il ne prendre pas en compte le dernier jour, c'est bizarre .... à voir si le probléme ne vient pas de modify qui modifie surement sur la variable de maniére permanente
+            foreach (new DatePeriod($dateTimeStart, new DateInterval('P1D') /* pas d'un jour */, $dateTimeEnd->modify('+1 day')) as $dt) {
+            // le jour qui est actuellement dans la boucle
+            // compter le nombre de jour de congés déposé hors weekend
+            if ($dt->format('N') != 6 AND $dt->format('N') != 7 ) 
+            {
+                $ymd = $dt->format('Y-m-d');
+                $texte1 = $ymd . " n\'est pas un jour du weekend" . "</br>";
+                $searchFerier = in_array($ymd, $ferierDurantConges,true);
+                // Ne pas tenir compte des jours fériers
+                if ($searchFerier == false) 
+                {
+                    $texte2 = $ymd . " n\'est pas un jour ferier";
+                    // si le jour start et le jour end sont identiques    
+                    if ($dateTimeStart->format('Y-m-d') == $dateTimeEnd->format('Y-m-d')) 
+                    {
+                        // s'ils sont tous les 2 le matin ou l'aprés midi, on ne compte qu'une demi journée
+                        if ($sliceStart != 'AM' && $sliceEnd != 'AM' | $sliceStart != 'PM' && $sliceEnd != 'PM') {
+                            $nbConges = 0.5;
+                            $texte3 = $ymd . ' j\'ajoute 0.5 jour, dans jour identique tous les 2 matins ou aprés midi';
+                            // S'ils sont tous les 2 Journée ou l'un matin l'autre aprés midi on ajoute un jour
+                        }elseif ($sliceStart == 'DAY' && $sliceEnd == 'DAY' | $sliceStart == 'AM' && $sliceEnd == 'PM') {
+                            $nbConges = 1;
+                            $texte4 = $ymd . ' j\'ajoute 1 jour, dans jour identique journée compléte';
+                        }
+                    }else 
+                    {
+                        // si le jour start est différent du jour end
+                        // si on est sur le jour de start ou le jour end et qu'il ne s'agit pas de journée compléte
+                        if ($ymd == $dateTimeStart->format('Y-m-d') && $sliceStart != 'DAY'  | $ymd == $dateTimeEnd->format('Y-m-d') && $sliceEnd != 'DAY' ) {
+                            $nbConges = $nbConges + 0.5;
+                            $texte5 = $ymd . ' j\'ajoute 0.5 jour, dans jours différentes  et différents de journée compléte';
+                        }elseif ($ymd == $dateTimeStart->format('Y-m-d') && $sliceStart == 'DAY'  | $ymd == $dateTimeEnd->format('Y-m-d') && $sliceEnd == 'DAY' ) {
+                        // Si il s'agit de journée compléte dans les 2 cas on ajoute 1 journée
+                            $nbConges++;
+                            $texte6 = $ymd . ' j\'ajoute 1 jour, dans jours différentes  demi journée';
+                        }
+                        // si les jours sont intermédiaires aux jours start et end, on ajoute un jour
+                        if ($ymd != $dateTimeStart->format('Y-m-d') && $ymd != $dateTimeEnd->format('Y-m-d')) {
+                            
+                            $nbConges++;
+                            $texte7 = $ymd . ' est différent de ' . $dateTimeEnd->format('Y-m-d') . ' j\'ajoute 1 jour, dans jours différents  interval';
+                        }    
+                    }      
+                }
+            }
+        }
+        $return['texte'] = $texte1 . ', ' . $texte2 . ', ' . $texte3 . ', ' . $texte4 . ', ' . $texte5 . ', ' . $texte6 . ', ' . $texte7;
+        $return['nbjours'] = $nbConges;
+        return $return;
     }
 
     /**

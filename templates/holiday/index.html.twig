@@ -20,6 +20,7 @@
                             <th>Services</th>
                             <th>Date de Début</th>
                             <th>Date de Fin</th>
+                            <th>Nb Jour(s)</th>
                             <th>Demande déposé</th>
                             <th>Date de traitement</th>
                             <th>Traité par</th>
@@ -54,8 +55,11 @@
                                 <td>{{ user.pseudo }}</td>
                                 <td><div class="btn" style="background-color: {{ user.service.color }}; color: {{ user.service.textColor }}">{{ user.service.title }}</div></td>
                             {% endfor %}
-                            <td>{{ holiday.start ? holiday.start|date('d-m-Y H:i:s') : '' }}</td>
-                            <td>{{ holiday.end ? holiday.end|date('d-m-Y H:i:s') : '' }}</td>
+                            {% if holiday.sliceStart == 'AM' %}{% set trancheStart = 'Matin' %}{% elseif holiday.sliceStart == 'PM' %}{% set trancheStart = 'Aprés midi' %}{% else %}{% set trancheStart = 'Journée' %}{% endif %}
+                            <td>{{ holiday.start ? holiday.start|date('d-m-Y') : '' }} {{ trancheStart }}</td>
+                            {% if holiday.sliceEnd == 'AM' %}{% set trancheEnd = 'Matin' %}{% elseif holiday.sliceEnd == 'PM' %}{% set trancheEnd = 'Aprés midi' %}{% else %}{% set trancheEnd = 'Journée' %}{% endif %}
+                            <td>{{ holiday.end ? holiday.end|date('d-m-Y') : '' }} {{ trancheEnd }}</td>
+                            <td>{{ holiday.nbJours }}</td>
                             <td>{{ holiday.createdAt|time_diff }}</td>
                             <td>{{ holiday.treatmentedAt ? holiday.treatmentedAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>
