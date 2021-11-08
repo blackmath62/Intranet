@@ -21,19 +21,30 @@
             <li>CO => Vente Occasion (les caractéres CO sont tous des lettres, le O signifie Occasion)</li>
             <li>DO => Avoir Occasion (DO sont des lettres, comme la note de musique DO en majuscule, le O signifie Occasion)</li>
         </ul>
+        <p>Le <strong>Code Tarif</strong> pour les produits rossignols est TO (en lettre) comme Tarif Occasion</p>
     </div>
 <!-- /.card-footer-->
 </div>
 
-
 <div class="row">
-            <div class="col-md-12">
-                <div class="card card-dark">
-                    <!-- /.card-header -->
-                    <div class="card-header d-flex justify-content-between ">
-                        <h3 class="card-title text-center">Rossignols</h3>
-                    </div>
-                    <div class="card-body">
+
+<div class="col-12 col-sm-12">
+            <div class="card card-dark card-tabs">
+              <div class="card-header p-0 pt-1">
+                <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                  <li class="nav-item">
+                    <a class="nav-link active" id="custom-tabs-one-home-tab" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Stock Rossignols</a>
+                  </li>
+                  {% if ((is_granted('ROLE_HP')) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS')) %}
+                  <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-one-profile-tab" data-toggle="pill" href="#custom-tabs-one-profile" role="tab" aria-controls="custom-tabs-one-profile" aria-selected="false">Ventes Rossignols</a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+              <div class="card-body">
+                <div class="tab-content" id="custom-tabs-one-tabContent">
+                  <div class="tab-pane fade show active" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="custom-tabs-one-home-tab">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
@@ -42,11 +53,14 @@
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>U.V</span></th>
+                                    <th class="text-center"><span>Date du Tarif</span></th>
+                                    <th class="text-center"><span>Code Tarif</span></th>
+                                    <th class="text-center"><span>Prix de vente</span></th>
+                                    <th class="text-center"><span>Prix Par</span></th>
                                     <th class="text-center"><span>Dépôt</span></th>
                                     <th class="text-center"><span>Nature</span></th>
                                     <th class="text-center"><span>stock</span></th>
                                     <th class="text-center"><span>Qté Réservée</span></th>
-                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,6 +82,18 @@
                                         </td>
                                         <td class="text-center">
                                             <a class="text-center text-dark">{{ stockRossignol.Uv }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockRossignol.DateTarif }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockRossignol.CodeTarif }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockRossignol.Tarif|number_format(2, '.', ' ') }} €</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ stockRossignol.PrixPar }}</a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-center text-dark">{{ stockRossignol.Depot }}</a>
@@ -93,6 +119,10 @@
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>U.V</span></th>
+                                    <th class="text-center"><span>Date du Tarif</span></th>
+                                    <th class="text-center"><span>Code Tarif</span></th>
+                                    <th class="text-center"><span>Prix de vente</span></th>
+                                    <th class="text-center"><span>Prix Par</span></th>
                                     <th class="text-center"><span>Dépôt</span></th>
                                     <th class="text-center"><span>Nature</span></th>
                                     <th class="text-center"><span>stock</span></th>
@@ -100,9 +130,118 @@
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
+                  </div>
+                  <!-- Second onglet vente rossignol -->
+                  <div class="tab-pane fade" id="custom-tabs-one-profile" role="tabpanel" aria-labelledby="custom-tabs-one-profile-tab">
+                       <table id="example3" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>U.V</span></th>
+                                    <th class="text-center"><span>Code Tarif</span></th>
+                                    <th class="text-center"><span>Prix Tarif TO</span></th>
+                                    <th class="text-center"><span>Prix par Tarif TO</span></th>
+                                    <th class="text-center"><span>Delta</span></th>
+                                    <th class="text-center"><span>Qté Vendus</span></th>
+                                    <th class="text-center"><span>Prix unitaire</span></th>
+                                    <th class="text-center"><span>Prix par facture</span></th>
+                                    <th class="text-center"><span>Montant facture</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							 
+                              <!-- >boucle -->
+                              {% for venteRossignol in venteRossignols %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Tiers }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Nom }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Commercial }}</a>
+                                        </td>                                        
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Ref }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Designation }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Sref1 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Sref2 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Uv }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.CodeTarif }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Prix|number_format(2, '.', ' ') }} €</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.PrixParTO }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">Delta à calculer</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Qte|number_format(2, '.', ' ') }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Pu|number_format(2, '.', ' ') }} €</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.PrixPar }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ venteRossignol.Montant|number_format(2, '.', ' ') }} €</a>
+                                        </td>
+                                    </tr>
+                              {% endfor %}
+                             <!-- >boucle -->
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>U.V</span></th>
+                                    <th class="text-center"><span>Code Tarif</span></th>
+                                    <th class="text-center"><span>Prix Tarif TO</span></th>
+                                    <th class="text-center"><span>Prix par Tarif TO</span></th>
+                                    <th class="text-center"><span>Delta</span></th>
+                                    <th class="text-center"><span>Qté Vendus</span></th>
+                                    <th class="text-center"><span>Prix unitaire</span></th>
+                                    <th class="text-center"><span>Prix par facture</span></th>
+                                    <th class="text-center"><span>Montant facture</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                  </div>
                 </div>
+              </div>
+              <!-- /.card -->
             </div>
+          </div>
+
+                
+            
         </div>
 
 {% endblock %}

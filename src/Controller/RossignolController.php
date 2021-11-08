@@ -27,10 +27,12 @@ class RossignolController extends AbstractController
 
         // édition des stocks des produits rossignols
         $stockRossignol = $repo->getRossignolStockList();
+        $venteRossignol = $repo->getRossignolVenteList();
 
         return $this->render('rossignol/index.html.twig', [
             'title' => 'Rossignol',
-            'stockRossignols' => $stockRossignol
+            'stockRossignols' => $stockRossignol,
+            'venteRossignols' => $venteRossignol
         ]);
     }
 }
