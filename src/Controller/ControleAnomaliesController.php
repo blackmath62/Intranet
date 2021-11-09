@@ -122,6 +122,7 @@ class ControleAnomaliesController extends AbstractController
         $this->Execute($donnees, $libelle, $template, $subject);
 
         // Contrôle que toutes les sous références ne sont pas fermées sur un article
+        // TODO Pas trés logique plutôt envoyer un fichier Excel comme pour les fermetures produits et sref
         $donnees = $this->article->ControleToutesSrefFermeesArticle();
         $libelle = 'ToutesSrefFermeesArticleOuvert';
         $template = 'mails/sendMailControleToutesSrefFermeesArticle.html.twig';
@@ -167,6 +168,8 @@ class ControleAnomaliesController extends AbstractController
         
         $dateDuJour = new DateTime();
         //dd($donnees);
+        // TODO il existe un cas de figure ou ma macro ne mets rien à jour, même pas l'update, 
+        //c'est quand $donnees est vide ! donc je peux encore attendre d'avoir une mise à jour de la updatedAt, car elle n'arrivera jamais
         for ($lig=0; $lig <count($donnees) ; $lig++) { 
             $id = $donnees[$lig]['Identification'];
             $ano = $this->anomalies->findOneBy(['idAnomalie' => $id, 'type' => $libelle]);
@@ -199,7 +202,6 @@ class ControleAnomaliesController extends AbstractController
                 // si elle existe on envoit un mail et on mets à jours la date
             }elseif(!is_null($ano)){
                 // mettre la date de modification à jour si ça fait plus de 0 jours que le mail à été envoyé
-                
                 $dateModif = $ano->getModifiedAt();
                 $datediff = $dateModif->diff($dateDuJour)->format("%a");
                 if ($datediff > 0) {
@@ -237,12 +239,14 @@ class ControleAnomaliesController extends AbstractController
             $dateModif = $key->getModifiedAt();
             $datediff = $dateModif->diff($dateDuJour)->format("%a");
             // si l'écart de date entre date début et modif est supérieur à 2 jours on supprime, c'est que le probléme est résolu
-            if ($datediff > 1 && $key->getIdAnomalie() != '999999999999' 
+            if ($datediff > 1 && $key->getIdAnomalie() != '999999999999'
+                              && $key->getIdAnomalie() != '999999999998' 
                               && $key->getIdAnomalie() != '999999999997' 
                               && $key->getIdAnomalie() != '999999999996' 
                               && $key->getType() != 'StockDirect'
                               && $key->getType() != 'SrefArticleAFermer'
-                              && $key->getType() != 'ArticleAFermer' ) {
+                              && $key->getType() != 'ArticleAFermer'
+                              && $key->getType() != 'ToutesSrefFermeesArticleOuvert' ) {
                 $em = $this->getDoctrine()->getManager();
                 $em->remove($key);
                 $em->flush(); 
@@ -261,15 +265,13 @@ class ControleAnomaliesController extends AbstractController
                 $datediff = $dateModif->diff($dateDuJour)->format("%a");
                 $produits = $this->article->getControleArticleAFermer();
                 $Srefs = $this->article->getControleSousRefArticleAFermer();
-                if ($datediff > 0) {
-                if (!empty($Srefs)) {
+                if ($datediff > 0 && !empty($Srefs) ) {
                     $this->exportSrefArticleAFermer();
                     $ano->setUpdatedAt($dateDuJour);
                     $ano->setModifiedAt($dateDuJour);
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($ano);
                     $em->flush();
-                }
                 }else {
                     $ano->setUpdatedAt($dateDuJour);
                     $em = $this->getDoctrine()->getManager();
@@ -278,22 +280,45 @@ class ControleAnomaliesController extends AbstractController
                 }
                 // Envoyer un mail aux utilisateurs pour les avertirs des fermetures    
             
-            if (!empty($produits) | !empty($Srefs)) {
+            if ((!empty($produits) | !empty($Srefs) && $datediff > 0)) {
                 
-                $MailsList = [
-                    'dlouchart@lhermitte.fr',
-                    new Address('clerat@lhermitte.fr'),
-                    new Address('ctrannin@lhermitte.fr'),
-                    new Address('bgovaere@lhermitte.fr'),
-                    new Address('twrazidlo@lhermitte.fr'),
-                    new Address('ymalmonte@lhermitte.fr'),
-                    new Address('xdupire@lhermitte.fr'),
-                    new Address('lleleu@lhermitte.fr'),
-                    new Address('rvasset@lhermitte.fr'),
-                    new Address('adeschodt@lhermitte.fr'),
-                    new Address('crichard@lhermitte.fr'),
-                    new Address('vlesenne@lhermitte.fr')
-                ];
+                // On verifie les métiers des articles à fermer pour n'envoyer qu'aux personnes pertinentes
+                
+                for ($i=0; $i <count($Srefs) ; $i++) { 
+                    $metiers[] = $Srefs[$i]['Metier']; 
+                }
+                $metier = array_values(array_unique($metiers, SORT_REGULAR));
+                $EV = in_array('EV',$metier);
+                $HP = in_array('HP',$metier);
+                $ME = in_array('ME',$metier);
+                if ($EV == true | $HP == true) {
+                    $MailsList = [
+                        new Address('dlouchart@lhermitte.fr'),
+                        new Address('clerat@lhermitte.fr'),
+                        new Address('ctrannin@lhermitte.fr'),
+                        new Address('bgovaere@lhermitte.fr'),
+                        new Address('twrazidlo@lhermitte.fr'),
+                        new Address('ymalmonte@lhermitte.fr'),
+                        new Address('xdupire@lhermitte.fr'),
+                        new Address('lleleu@lhermitte.fr'),
+                        new Address('rvasset@lhermitte.fr'),
+                    ];
+                }
+                if ($ME == true) {
+                    if ($EV == true | $HP == true) {
+                        array_push($MailsList, new Address('adeschodt@lhermitte.fr'),
+                                               new Address('crichard@lhermitte.fr'),);
+                    }else {
+                        $MailsList = [
+                            new Address('adeschodt@lhermitte.fr'),
+                            new Address('crichard@lhermitte.fr')
+                        ];
+                    }
+                }
+                
+                /*$MailsList = [
+                    new Address('jpochet@lhermitte.fr')];*/
+                
                 $html = $this->renderView('mails/sendMailForUsersArticleAFermer.html.twig', ['produits' => $produits, 'Srefs' => $Srefs ]);
                 $email = (new Email())
                 ->from('intranet@groupe-axis.fr')
@@ -302,8 +327,7 @@ class ControleAnomaliesController extends AbstractController
                 ->subject('INFORMATION Articles qui vont être fermés Divalto')
                 ->html($html);
                 $this->mailer->send($email);        
-            }
-             
+            }       
     }
 
     private function getDataSrefArticleAFermer($donnees): array
@@ -321,7 +345,6 @@ class ControleAnomaliesController extends AbstractController
                     $donnee['Sref2'],
                     'Usrd'          
                 ];
-
             }
         return $list;
     }
@@ -464,18 +487,16 @@ class ControleAnomaliesController extends AbstractController
        
         $dateDuJour = new DateTime();
         $dateModif = $ano->getModifiedAt();
-                $datediff = $dateModif->diff($dateDuJour)->format("%a");
-                $produits = $this->article->getControleArticleAFermer();
-                if ($datediff > 0) {
-                if (!empty($produits)) {
-                    $this->exportArticleAFermer();
-                    $ano->setUpdatedAt($dateDuJour);
-                    $ano->setModifiedAt($dateDuJour);
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($ano);
-                    $em->flush();
-                }
-                }else {
+        $datediff = $dateModif->diff($dateDuJour)->format("%a");
+        $produits = $this->article->getControleArticleAFermer();
+        if ($datediff > 0 && !empty($produits) ) {
+                $this->exportArticleAFermer($produits);
+                $ano->setUpdatedAt($dateDuJour)
+                ->setModifiedAt($dateDuJour);
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($ano);
+                $em->flush();
+            }else{
                     $ano->setUpdatedAt($dateDuJour);
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($ano);
@@ -503,10 +524,8 @@ class ControleAnomaliesController extends AbstractController
         return $list;
     }
     
-    public function exportArticleAFermer()
-    {
-        $donnees = $this->article->getControleArticleAFermer();
-        
+    public function exportArticleAFermer($donnees)
+    {        
         $spreadsheet = new Spreadsheet();
 
         $sheet = $spreadsheet->getActiveSheet();

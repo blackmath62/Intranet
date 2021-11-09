@@ -32,19 +32,30 @@
             <div class="card card-dark card-tabs">
               <div class="card-header p-0 pt-1">
                 <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                  {% if app.request.attributes.get('annee') %}
+                        {% set stocks = '' %}
+                        {% set ariaStocks = false %}
+                        {% set ventes = 'show active' %}
+                        {% set ariaVentes = true %}
+                        {% else %}
+                        {% set stocks = 'show active' %}
+                        {% set ariaStocks = true %}
+                        {% set ventes = '' %}
+                        {% set ariaVentes = false %}   
+                        {% endif %}
                   <li class="nav-item">
-                    <a class="nav-link active" id="custom-tabs-one-home-tab" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Stock Rossignols</a>
+                    <a class="nav-link {{stocks}}" id="custom-tabs-one-home-tab" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home">Stock Rossignols</a>
                   </li>
                   {% if ((is_granted('ROLE_HP')) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS')) %}
                   <li class="nav-item">
-                    <a class="nav-link" id="custom-tabs-one-profile-tab" data-toggle="pill" href="#custom-tabs-one-profile" role="tab" aria-controls="custom-tabs-one-profile" aria-selected="false">Ventes Rossignols</a>
+                    <a class="nav-link {{ventes}}" id="custom-tabs-one-profile-tab" data-toggle="pill" href="#custom-tabs-one-profile" role="tab" aria-controls="custom-tabs-one-profile">Ventes Rossignols</a>
                   </li>
                   {% endif %}
                 </ul>
               </div>
               <div class="card-body">
                 <div class="tab-content" id="custom-tabs-one-tabContent">
-                  <div class="tab-pane fade show active" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="custom-tabs-one-home-tab">
+                  <div class="tab-pane fade {{stocks}}" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="custom-tabs-one-home-tab">
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
@@ -132,7 +143,22 @@
                         </table>
                   </div>
                   <!-- Second onglet vente rossignol -->
-                  <div class="tab-pane fade" id="custom-tabs-one-profile" role="tabpanel" aria-labelledby="custom-tabs-one-profile-tab">
+                  <div class="tab-pane fade {{ventes}}" id="custom-tabs-one-profile" role="tabpanel" aria-labelledby="custom-tabs-one-profile-tab">
+                        {% set annee = 'now' | date('Y') %}
+                        {% set anneeN1 = annee - 1 %}
+                        {% set anneeN2 = annee - 2 %}
+                        <h3>Ventes Rossignols client HP Année 
+                        {% if app.request.attributes.get('annee') %}
+                        {{ app.request.attributes.get('annee') }}
+                        {% else %}
+                        {{ annee }}    
+                        {% endif %}
+                        </h3>
+                       <div class='d-flex justify-content-end'>
+                            <a class='btn btn-info m-3' href='{{path('app_lhermitte_rossignols', {'annee' : anneeN2 } ) }}' title="Résultats figés">Année {{ anneeN2 }}</a>
+                            <a class='btn btn-success m-3' href='{{path('app_lhermitte_rossignols', {'annee' : anneeN1 } ) }}' title="Résultats figés aprés le 20 janvier {{ annee }}">Année {{ anneeN1 }}</a>
+                            <a class='btn btn-secondary m-3' href='{{path('app_lhermitte_rossignols', {'annee' : annee } ) }}' title="Attention cette année n'est pas compléte">Année {{ annee }}</a>
+                        </div>
                        <table id="example3" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
@@ -190,19 +216,35 @@
                                             <a class="text-center text-dark">{{ venteRossignol.Prix|number_format(2, '.', ' ') }} €</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.PrixParTO }}</a>
+                                            {% if venteRossignol.PrixParTO > 0 %}
+                                                <a class="text-center text-dark">{{ venteRossignol.PrixParTO }}</a>
+                                            {% endif %}
                                         </td>
+                                        {% set Delta = (((venteRossignol.Pu / venteRossignol.Prix)-1)*100)|number_format(2, '.', ' ') %}
+                                        {% if Delta > 0 %}
+                                            <td class="text-center">
+                                                <a class="description-text text-success"><i class="fas fa-arrow-up pr-1"></i>{{ Delta }} %</a>
+                                            </td>
+                                        {% elseif Delta == 0 %}
+                                            <td class="text-center">
+                                                <a class="description-text text-warning"><i class="fas fa-arrow-left pr-1"></i>{{ Delta }} %</a>
+                                            </td>
+                                        {% elseif Delta < 0 %}
+                                            <td class="text-center">
+                                                <a class="description-text text-danger"><i class="fas fa-arrow-down pr-1"></i>{{ Delta }} %</a>
+                                            </td>
+                                        {% endif %}
+
                                         <td class="text-center">
-                                            <a class="text-center text-dark">Delta à calculer</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Qte|number_format(2, '.', ' ') }}</a>
+                                            <a class="text-center text-dark">{{ venteRossignol.Qte|number_format(2, '.', ' ')}}</a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-center text-dark">{{ venteRossignol.Pu|number_format(2, '.', ' ') }} €</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.PrixPar }}</a>
+                                            {% if venteRossignol.PrixPar > 0 %}
+                                                <a class="text-center text-dark">{{ venteRossignol.PrixPar }}</a>
+                                            {% endif %}
                                         </td>
                                         <td class="text-center">
                                             <a class="text-center text-dark">{{ venteRossignol.Montant|number_format(2, '.', ' ') }} €</a>

@@ -39,14 +39,17 @@ class RossignolRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    public function getRossignolVenteList():array
+    public function getRossignolVenteList($annee):array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Tiers, Nom, Commercial, Ref, Sref1, Sref2, Designation, Uv, TAR.TACOD AS CodeTarif, TAR.PUB AS Prix, TAR.PPAR AS PrixParTO, 
         SUM(QteSign) AS Qte, (SUM(MontantSign) / SUM(QteSign)) AS Pu, PrixPar,  SUM(MontantSign) AS Montant 
         FROM(
-        SELECT MOUV.DOS AS Dos, CLI.TIERS AS Tiers, CLI.NOM AS Nom, VRP.SELCOD AS Commercial,  MOUV.REF AS Ref,  MOUV.SREF1 AS Sref1,MOUV.SREF2 AS Sref2, 
-        MOUV.DES AS Designation, ART.VENUN AS Uv,MOUV.OP AS Op, MOUV.MONT AS Montant, MOUV.REMPIEMT_0004 AS Remise, MOUV.FADT AS DateFacture, MOUV.FAQTE AS QuantiteFacture,
+        SELECT RTRIM(LTRIM(MOUV.DOS)) AS Dos, RTRIM(LTRIM(CLI.TIERS)) AS Tiers, RTRIM(LTRIM(CLI.NOM)) AS Nom, RTRIM(LTRIM(VRP.SELCOD)) AS Commercial,  
+        RTRIM(LTRIM(MOUV.REF)) AS Ref,  RTRIM(LTRIM(MOUV.SREF1)) AS Sref1,RTRIM(LTRIM(MOUV.SREF2)) AS Sref2, 
+        RTRIM(LTRIM(MOUV.DES)) AS Designation, RTRIM(LTRIM(ART.VENUN)) AS Uv,RTRIM(LTRIM(MOUV.OP)) AS Op, 
+        RTRIM(LTRIM(MOUV.MONT)) AS Montant, RTRIM(LTRIM(MOUV.REMPIEMT_0004)) AS Remise, RTRIM(LTRIM(MOUV.FADT)) AS DateFacture, 
+        RTRIM(LTRIM(MOUV.FAQTE)) AS QuantiteFacture,
         CASE -- Signature du montant
             WHEN MOUV.OP IN('C 2','CO') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
             WHEN MOUV.OP IN('D 2','DO') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
@@ -65,7 +68,7 @@ class RossignolRepository extends ServiceEntityRepository
         INNER JOIN ART ON ART.REF = MOUV.REF AND ART.DOS = MOUV.DOS
         INNER JOIN CLI ON MOUV.DOS = CLI.DOS AND MOUV.TIERS = CLI.TIERS
         INNER JOIN VRP ON CLI.DOS = VRP.DOS AND CLI.REPR_0001 = VRP.TIERS
-        WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND MOUV.OP IN('C 2', 'CO') AND CLI.STAT_0002 = 'HP' AND YEAR(MOUV.FADT) IN(2021)
+        WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND MOUV.OP IN('C 2', 'CO') AND CLI.STAT_0002 = 'HP' AND YEAR(MOUV.FADT) IN($annee)
         GROUP BY MOUV.DOS, CLI.TIERS, CLI.NOM, VRP.SELCOD, MOUV.REF,  MOUV.SREF1, MOUV.SREF2,MOUV.DES,ART.VENUN,MOUV.OP, MOUV.PPAR, MOUV.FADT, MOUV.FAQTE, MOUV.MONT, MOUV.REMPIEMT_0004)reponse
         LEFT JOIN TAR ON Dos = TAR.DOS AND Ref = TAR.REF AND Sref1 = TAR.SREF1 AND Sref2 = TAR.SREF2 AND TAR.TACOD = 'TO'
         GROUP BY Tiers, Nom, Commercial, Ref, Sref1, Sref2, Designation, Uv, TAR.TACOD, TAR.PUB, TAR.PPAR, PrixPar

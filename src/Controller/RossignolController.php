@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\Divalto\RossignolRepository;
+use DateTime;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,18 +17,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class RossignolController extends AbstractController
 {
     /**
-     * @Route("/Lhermitte/rossignol", name="app_lhermitte_rossignols")
+     * @Route("/Lhermitte/rossignol/{annee}", name="app_lhermitte_rossignols")
      */
-    public function index(Request $request, RossignolRepository $repo): Response
+    public function index($annee = null, Request $request, RossignolRepository $repo): Response
     {
 
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
+        if (!$annee) {
+            $annee = new DateTime();
+            $annee = $annee->format('Y');
+        }
 
         // édition des stocks des produits rossignols
         $stockRossignol = $repo->getRossignolStockList();
-        $venteRossignol = $repo->getRossignolVenteList();
+        $venteRossignol = $repo->getRossignolVenteList($annee);
 
         return $this->render('rossignol/index.html.twig', [
             'title' => 'Rossignol',
