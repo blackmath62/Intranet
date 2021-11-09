@@ -307,11 +307,12 @@ class ControleAnomaliesController extends AbstractController
                 if ($ME == true) {
                     if ($EV == true | $HP == true) {
                         array_push($MailsList, new Address('adeschodt@lhermitte.fr'),
-                                               new Address('crichard@lhermitte.fr'),);
+                                               new Address('crichard@lhermitte.fr')
+                        );
                     }else {
                         $MailsList = [
                             new Address('adeschodt@lhermitte.fr'),
-                            new Address('crichard@lhermitte.fr')
+                            new Address('crichard@lhermitte.fr'),
                         ];
                     }
                 }
