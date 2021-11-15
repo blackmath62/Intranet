@@ -33,14 +33,14 @@ class HomeController extends AbstractController
     /**
      * @Route("/", name="app_home")
      */
-    public function index(Request $request, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews, ControlesAnomaliesRepository $anomalies)
+    public function index(Request $request, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews)
     {
         
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
 
-        $users = $repoUser->findAll();
+        $users = $repoUser->findBy(['closedAt' => NULL]);
         $track = $repoTracking->getLastConnect();
         // balayer chaque utilisateur
         
@@ -95,7 +95,7 @@ class HomeController extends AbstractController
             ];
         }
         // Les anniversaires des utilisateurs
-        $users = $userRepo->findAll();
+        
         foreach ($users as $key => $value) {
             $annif = $value->getBornAt()->format('m-d');
             $annee = date("Y") - 1;
@@ -118,15 +118,13 @@ class HomeController extends AbstractController
          $data = json_encode($rdvs);
 
         $news = $repoNews->findBy([],['id'=>'DESC'],5);
-        $anomalies = $anomalies->getCountAnomalies();
 
         return $this->render('home/index.html.twig', [
             'title' => 'Accueil',
             'users' => $users,
             'tracks' => $track,
             'data' => $data,
-            'news' => $news,
-            'anomalies' => $anomalies,
+            'news' => $news
         ]);
     }
     // déterminer depuis combien de temps un utilisateur est connecté

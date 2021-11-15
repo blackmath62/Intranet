@@ -11,32 +11,6 @@
     Dans le degrés d'urgence, selectionnez boite à idée. </br>
   </div>
 
-<div class="row">
-
-{% for anomalie in anomalies %}
-  
-  <!-- /.col -->
-          <div class="col-md-3 col-sm-6 col-12">
-            <div class="info-box shadow-lg">
-              <span class="info-box-icon bg-danger"><i class="fas fa-exclamation-triangle"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">{{ anomalie.Type }}</span>
-                <span class="info-box-number">Actuellement {{ anomalie.Nombre }} problèmes non résolus</span>
-              </div>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-          <!-- /.col -->
-{% endfor %}
-
-</div>
-<!-- /.row -->
-
-
-
-
 <div class='d-flex justify-content-between'>
 
 <div class="col-12 col-sm-9">

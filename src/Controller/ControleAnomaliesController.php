@@ -53,9 +53,11 @@ class ControleAnomaliesController extends AbstractController
      */
     public function Show_Anomalies()
     {   
+        $anomaliesCount = $this->anomalies->getCountAnomalies();
         return $this->render('controle_anomalies/anomalies.html.twig',[
             'title' => 'Liste des anomalies',
             'anomalies' => $this->anomalies->findAll(),
+            'anomaliesCount' => $anomaliesCount,
         ]);
     }
     
