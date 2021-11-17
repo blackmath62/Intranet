@@ -204,7 +204,7 @@ class ArtRepository extends ServiceEntityRepository
             WHEN SART.REF <> '' THEN 999999999998
             END AS Identification,
             CASE
-            WHEN SART.REF <> '' THEN 'Jérôme'
+            WHEN SART.REF <> '' THEN 'JEROME'
             END AS Utilisateur,
             CASE
             WHEN SART.REF <> '' THEN 'jpochet@lhermitte.fr'

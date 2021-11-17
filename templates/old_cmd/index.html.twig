@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="card collapsed-card card-warning">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+                  <p>Cette liste contient les commandes qui datent de plus de 10 mois, il n'est pas trés logique que ces commandes existent toujours, une commande client va réserver le stock et générer des entrées forcées et des générations de réappro fautives</p>
+    <!-- /.card-footer-->
+    </div>
+</div>
+                
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header d-flex justify-content-between">
+                        <h2 class="card-title">Liste des commandes actives de plus de 10 mois</h2>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+							{% if oldCmds %}
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Dossier</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Numéro commande</span></th>
+                                    <th class="text-center"><span>Date commande</span></th>
+                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Dernier intervenant</span></th>
+                                    <th class="text-center"><span>Email</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            
+                                {% for oldCmd in oldCmds %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ oldCmd.Dos }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ oldCmd.Tiers}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ oldCmd.Nom }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ oldCmd.Cmd }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ oldCmd.DateCmd|date("d/m/Y") }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ oldCmd.Commercial }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ oldCmd.Utilisateur }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ oldCmd.Email }}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Dossier</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Numéro commande</span></th>
+                                    <th class="text-center"><span>Date commande</span></th>
+                                    <th class="text-center"><span>Commercial</span></th>
+                                    <th class="text-center"><span>Dernier intervenant</span></th>
+                                    <th class="text-center"><span>Email</span></th>
+                                </tr>
+                                </tr>
+                            </tfoot>
+                        </table>
+                                {% else %}
+                                     <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Aucunes vieilles commandes actuellement, Félicitation !</h4>
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+
+
+

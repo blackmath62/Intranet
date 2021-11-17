@@ -2,15 +2,20 @@
 
 namespace App\Controller;
 
-use App\Entity\Main\Users;
-use App\Repository\Main\FAQRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Knp\Snappy\Pdf;
+use App\Entity\Main\Users;
 use Symfony\Component\Mime\Email;
+use App\Repository\Main\FAQRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+/**
+ * @IsGranted("ROLE_USER")
+ */
 
 class PdfController extends AbstractController
 {

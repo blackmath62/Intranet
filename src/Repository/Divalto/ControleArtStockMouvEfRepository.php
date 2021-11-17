@@ -183,9 +183,9 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
     public function getControleSaisieArticlesSrefFermes():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT Commercial, Identification, ArtFerme,Ref, Sref1, Sref2, Designation, Sum(Stock) AS Stock,Op,CmdDate, Cmd,QteCmd, BlDate, Bl, QteBl, ArtFam, UserCr, UserMo, ArtDateFermeture, UserModh, Email
+        $sql = "SELECT Commercial, Identification, ArtFerme,Ref, Sref1, Sref2, Designation, Sum(Stock) AS Stock,Op,CmdDate, Cmd,QteCmd, BlDate, Bl, QteBl, ArtFam, Utilisateur, UserMo, ArtDateFermeture, UserModh, Email
         FROM(SELECT RTRIM(LTRIM(MOUV.MOUV_ID)) AS Identification, RTRIM(LTRIM(SART.REF)) AS Ref, RTRIM(LTRIM(SART.SREF1)) AS Sref1, RTRIM(LTRIM(SART.SREF2)) AS Sref2,
-        RTRIM(LTRIM(ART.DES)) AS Designation,RTRIM(LTRIM(ART.FAM_0002)) as ArtFam, RTRIM(LTRIM(MOUV.USERCR)) as UserCr, RTRIM(LTRIM(MUSER.EMAIL)) AS Email, 
+        RTRIM(LTRIM(ART.DES)) AS Designation,RTRIM(LTRIM(ART.FAM_0002)) as ArtFam, RTRIM(LTRIM(MOUV.USERCR)) as Utilisateur, RTRIM(LTRIM(MUSER.EMAIL)) AS Email, 
         RTRIM(LTRIM(MOUV.USERMO)) as UserMo, RTRIM(LTRIM(ART.HSDT)) AS ArtDateFermeture, RTRIM(LTRIM(SART.USERMODH)) AS UserModh,
         CASE
             WHEN SART.REF = MVTL_STOCK_V.REFERENCE AND SART.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND SART.SREF2 = MVTL_STOCK_V.SREFERENCE2 THEN MVTL_STOCK_V.QTETJSENSTOCK
@@ -237,7 +237,7 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         WHERE SART.DOS IN (1) AND (MOUV.BLCE4 = 1 OR MOUV.CDCE4 = 1) AND MOUV.USERCR NOT IN ('G3S') AND MOUV.USERMO NOT IN ('G3S') AND (YEAR(MOUV.CDDT) >=2021 OR YEAR(MOUV.BLDT) >=2021)
         ) reponse
         WHERE (Stock IS NOT NULL OR Op IS NOT NULL OR Cmd IS NOT NULL OR QteCmd IS NOT NULL OR Bl IS NOT NULL OR QteBl IS NOT NULL) AND ArtFerme IS NOT NULL 
-        GROUP BY Commercial, Identification, Ref, Sref1, Sref2, Designation,ArtFerme,Op, Cmd,QteCmd, Bl, QteBl, ArtFam, UserCr, UserMo,ArtDateFermeture, UserModh, CmdDate, BlDate, Email
+        GROUP BY Commercial, Identification, Ref, Sref1, Sref2, Designation,ArtFerme,Op, Cmd,QteCmd, Bl, QteBl, ArtFam, Utilisateur, UserMo,ArtDateFermeture, UserModh, CmdDate, BlDate, Email
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();

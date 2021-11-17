@@ -19,7 +19,12 @@ use App\Repository\Main\ControlesAnomaliesRepository;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Repository\Divalto\ControleComptabiliteRepository;
 use App\Repository\Divalto\ControleArtStockMouvEfRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+/**
+ * @IsGranted("ROLE_USER")
+ */
 
 class ControleAnomaliesController extends AbstractController
 {
@@ -54,6 +59,7 @@ class ControleAnomaliesController extends AbstractController
     public function Show_Anomalies()
     {   
         $anomaliesCount = $this->anomalies->getCountAnomalies();
+
         return $this->render('controle_anomalies/anomalies.html.twig',[
             'title' => 'Liste des anomalies',
             'anomalies' => $this->anomalies->findAll(),
@@ -72,7 +78,7 @@ class ControleAnomaliesController extends AbstractController
             $this->ControleClient();
             $this->ControleFournisseur();
             $this->ControleArticle();
-            $this->ControlStockDirect();
+            $this->ControlStockDirect(); // j'ai mis Utilisateur
             $this->run_auto_wash();
         }
         $this->addFlash('message', 'Les scripts ont bien été lancés !');
@@ -87,21 +93,21 @@ class ControleAnomaliesController extends AbstractController
     public function ControleFournisseur()
     {
         // Contrôle régime fournisseur sur les piéces        
-        $donnees = $this->compta->getSendMailErreurRegimeFournisseur();
+        $donnees = $this->compta->getSendMailErreurRegimeFournisseur(); // j'ai mis Utilisateur
         $libelle = 'RegimeFournisseur';
         $template = 'mails/sendMailAnomalieRegimeTiers.html.twig';
         $subject = 'Probléme Régime TVA sur l\'entête d\'une piéce que vous avez saisie';
         $this->Execute($donnees, $libelle, $template, $subject);
 
         // Contrôle régime fournisseur en fonction du Pays
-        $donnees = $this->fournisseur->getControleRegimeFournisseur();
+        $donnees = $this->fournisseur->getControleRegimeFournisseur(); // j'ai mis Utilisateur
         $libelle = 'RegimeFournisseurPays';
         $template = 'mails/sendMailAnomalieRegimePaysFournisseur.html.twig';
         $subject = 'Probléme Régime TVA sur un fournisseur, incohérence avec le pays';
         $this->Execute($donnees, $libelle, $template, $subject);
 
         // Contrôle données générales du fournisseur
-        $donnees = $this->fournisseur->SurveillanceFournisseurLhermitteReglStatVrpTransVisaTvaPay();
+        $donnees = $this->fournisseur->SurveillanceFournisseurLhermitteReglStatVrpTransVisaTvaPay(); // j'ai mis Utilisateur
         $libelle = 'DonneeFournisseur';
         $template = 'mails/sendMailAnomalieDonneesFournisseurs.html.twig';
         $subject = 'Erreur ou manquement sur une fiche Fournisseur';
@@ -110,56 +116,56 @@ class ControleAnomaliesController extends AbstractController
 
     public function ControleArticle(){
         // Anomalies Unité et famille 
-        $donnees = $this->article->getControleArt();
+        $donnees = $this->article->getControleArt(); // j'ai mis Utilisateur
         $libelle = 'ProblémeArticle';
         $template = 'mails/sendMailAnomalieArticles.html.twig';
         $subject = 'Probléme Article à corriger';
         $this->Execute($donnees, $libelle, $template, $subject);
 
         // Contrôle la présence d'article ou de sous référence fermée
-        $donnees = $this->articleSrefFermes->getControleSaisieArticlesSrefFermes();
+        $donnees = $this->articleSrefFermes->getControleSaisieArticlesSrefFermes(); // j'ai mis Utilisateur
         $libelle = 'ArticleSrefFerme';
         $template = 'mails/sendMailSaisieArticlesSrefFermes.html.twig';
         $subject = 'Saisie sur un article ou une sous référence article fermé';
         $this->Execute($donnees, $libelle, $template, $subject);
 
         // Contrôle que toutes les sous références ne sont pas fermées sur un article
-        // TODO Pas trés logique plutôt envoyer un fichier Excel comme pour les fermetures produits et sref
-        $donnees = $this->article->ControleToutesSrefFermeesArticle();
+        // TODO Pas trés logique plutôt envoyer un fichier Excel comme pour les fermetures qui regroupe produits et sref
+        $donnees = $this->article->ControleToutesSrefFermeesArticle(); // j'ai mis Utilisateur
         $libelle = 'ToutesSrefFermeesArticleOuvert';
         $template = 'mails/sendMailControleToutesSrefFermeesArticle.html.twig';
         $subject = 'Toutes les sous références sont fermées un article ouvert';
         $this->Execute($donnees, $libelle, $template, $subject);
 
-        $this->ControlArticleAFermer();
-        $this->ControlSrefArticleAFermer();
+        $this->ControlArticleAFermer(); // j'ai mis Utilisateur
+        $this->ControlSrefArticleAFermer(); // j'ai mis Utilisateur
     }
     
     public function ControleClient()
     {
         // Contrôle Régime piéce avec régime Client
-        $donnees = $this->compta->getSendMailErreurRegimeClient();
+        $donnees = $this->compta->getSendMailErreurRegimeClient(); // j'ai mis Utilisateur
         $libelle = 'RegimeClient';
         $template = 'mails/sendMailAnomalieRegimeTiers.html.twig';
         $subject = 'Probléme Régime TVA sur l\'entête d\'une piéce que vous avez saisie';
         $this->Execute($donnees, $libelle, $template, $subject);
         
         // Contrôle cohérence pays régime client
-        $donnees = $this->client->SendMailProblemePaysRegimeClients();
+        $donnees = $this->client->SendMailProblemePaysRegimeClients(); // j'ai mis Utilisateur
         $libelle = 'RegimeClientPays';
         $template = 'mails/sendMailAnomalieRegimePaysClient.html.twig';
         $subject = 'Probléme Régime TVA sur un client, incohérence avec le pays';
         $this->Execute($donnees, $libelle, $template, $subject);
         
         // Contrôle mise à jour client Phyto
-        $donnees = $this->client->SendMailMajCertiphytoClient();
+        $donnees = $this->client->SendMailMajCertiphytoClient(); // j'ai mis Utilisateur
         $libelle = 'CertiphytoClient';
         $template = 'mails/sendMailAnomalieMajPhytoClients.html.twig';
         $subject = 'Mise à jour d\'un certiphyto client';
         $this->Execute($donnees, $libelle, $template, $subject);
 
         // Contrôle données générales du client
-        $donnees = $this->client->SurveillanceClientLhermitteReglStatVrpTransVisaTvaPay();
+        $donnees = $this->client->SurveillanceClientLhermitteReglStatVrpTransVisaTvaPay(); // j'ai mis Utilisateur
         $libelle = 'DonneeClient';
         $template = 'mails/sendMailAnomalieDonneesClients.html.twig';
         $subject = 'Erreur ou manquement sur une fiche client';
@@ -183,6 +189,7 @@ class ControleAnomaliesController extends AbstractController
                 $createAnomalie = new ControlesAnomalies();
 
                 $createAnomalie->setIdAnomalie($id)
+                               ->setUser($donnees[$lig]['Utilisateur'])
                                ->setUpdatedAt($dateDuJour)
                                ->setCreatedAt($dateDuJour)
                                ->setModifiedAt($dateDuJour)
@@ -217,12 +224,14 @@ class ControleAnomaliesController extends AbstractController
                     ->html($html);
                     $this->mailer->send($email);
 
+                    $ano->setUser($donnees[$lig]['Utilisateur']);
                     $ano->setUpdatedAt($dateDuJour);
                     $ano->setModifiedAt($dateDuJour);
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($ano);
                     $em->flush();
                 }else{
+                    $ano->setUser($donnees[$lig]['Utilisateur']);
                     $ano->setUpdatedAt($dateDuJour);
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($ano);
@@ -242,13 +251,11 @@ class ControleAnomaliesController extends AbstractController
             $datediff = $dateModif->diff($dateDuJour)->format("%a");
             // si l'écart de date entre date début et modif est supérieur à 2 jours on supprime, c'est que le probléme est résolu
             if ($datediff > 1 && $key->getIdAnomalie() != '999999999999'
-                              && $key->getIdAnomalie() != '999999999998' 
                               && $key->getIdAnomalie() != '999999999997' 
                               && $key->getIdAnomalie() != '999999999996' 
                               && $key->getType() != 'StockDirect'
                               && $key->getType() != 'SrefArticleAFermer'
-                              && $key->getType() != 'ArticleAFermer'
-                              && $key->getType() != 'ToutesSrefFermeesArticleOuvert' ) {
+                              && $key->getType() != 'ArticleAFermer' ) {
                 $em = $this->getDoctrine()->getManager();
                 $em->remove($key);
                 $em->flush(); 
@@ -269,13 +276,15 @@ class ControleAnomaliesController extends AbstractController
                 $Srefs = $this->article->getControleSousRefArticleAFermer();
                 if ($datediff > 0 && !empty($Srefs) ) {
                     $this->exportSrefArticleAFermer();
-                    $ano->setUpdatedAt($dateDuJour);
-                    $ano->setModifiedAt($dateDuJour);
+                    $ano->setUpdatedAt($dateDuJour)
+                        ->setUser('JEROME')
+                        ->setModifiedAt($dateDuJour);
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($ano);
                     $em->flush();
                 }else {
-                    $ano->setUpdatedAt($dateDuJour);
+                    $ano->setUpdatedAt($dateDuJour)
+                        ->setUser('JEROME');
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($ano);
                     $em->flush();
@@ -495,12 +504,14 @@ class ControleAnomaliesController extends AbstractController
         if ($datediff > 0 && !empty($produits) ) {
                 $this->exportArticleAFermer($produits);
                 $ano->setUpdatedAt($dateDuJour)
-                ->setModifiedAt($dateDuJour);
+                    ->setUser('JEROME')
+                    ->setModifiedAt($dateDuJour);
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($ano);
                 $em->flush();
             }else{
                     $ano->setUpdatedAt($dateDuJour);
+                    $ano->setUser('JEROME');
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($ano);
                     $em->flush();

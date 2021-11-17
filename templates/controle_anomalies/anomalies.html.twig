@@ -56,7 +56,8 @@
                                     <th class="text-center"><span>Type</span></th>
                                     <th class="text-center"><span>Date de création</span></th>
                                     <th class="text-center"><span>Dernier Email rappel en jour</span></th>
-                                    <th class="text-center"><span>Date de modification</span></th>
+                                    <th class="text-center"><span>Date dernier mail</span></th>
+                                    <th class="text-center"><span>Utilisateur</span></th>
                                     <th class="text-center"><span>Nbe Jour depuis création</span></th>
                                     <th class="text-center"><span>Date de mise à jours</span></th>
                                 </tr>
@@ -85,6 +86,9 @@
                                             <a class="text-dark">{{ anomalie.modifiedAt|date("d/m/Y h:i") }}</a>
                                         </td>
                                         <td class="text-center">
+                                            <a class="text-dark">{{ anomalie.User }}</a>
+                                        </td>
+                                        <td class="text-center">
                                         {% set differenceUp = date(anomalie.updatedAt).diff(date(anomalie.createdAt)) %}
                                             <a class="text-dark">{{ differenceUp.days }}</a>
                                         </td>
@@ -101,7 +105,8 @@
                                     <th class="text-center"><span>Type</span></th>
                                     <th class="text-center"><span>Date de création</span></th>
                                     <th class="text-center"><span>Dernier Email rappel en jour</span></th>
-                                    <th class="text-center"><span>Date de modification</span></th>
+                                    <th class="text-center"><span>Date dernier mail</span></th>
+                                    <th class="text-center"><span>Utilisateur</span></th>
                                     <th class="text-center"><span>Nbe Jour depuis création</span></th>
                                     <th class="text-center"><span>Date de mise à jours</span></th>
                                 </tr>

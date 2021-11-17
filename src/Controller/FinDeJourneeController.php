@@ -2,10 +2,15 @@
 
 namespace App\Controller;
 
-use App\Repository\Divalto\FinDeJourneeRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\Divalto\FinDeJourneeRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+/**
+ * @IsGranted("ROLE_ADMIN")
+ */
 
 class FinDeJourneeController extends AbstractController
 {

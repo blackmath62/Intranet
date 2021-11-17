@@ -60,7 +60,7 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT ENT.ENT_ID AS Identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece,
-        ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, FOU.TVATIE AS regimeTiers, ENT.USERCR AS UserCr, MUSER.EMAIL AS Email,
+        ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, FOU.TVATIE AS regimeTiers, ENT.USERCR AS Utilisateur, MUSER.EMAIL AS Email,
         CASE
         WHEN ENT.PICOD = 2 THEN 'Commande Fournisseur'
         WHEN ENT.PICOD = 3 THEN 'BL Fournisseur'
@@ -81,7 +81,7 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
         FROM ENT
         INNER JOIN FOU ON ENT.DOS = FOU.DOS AND ENT.TIERS = FOU.TIERS
         INNER JOIN MUSER ON MUSER.USERX = ENT.USERCR AND MUSER.DOS = ENT.DOS
-        WHERE YEAR(ENT.PIDT) >= 2021 AND MONTH(ENT.PIDT) >= 9 AND ENT.TVATIE <> FOU.TVATIE AND ENT.CE4 = 1 
+        WHERE YEAR(ENT.PIDT) >= 2021 AND MONTH(ENT.PIDT) >= 9 AND ENT.TVATIE <> FOU.TVATIE AND ENT.CE4 = 1 AND ENT.PICOD IN (2,3)
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -91,7 +91,7 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT ENT.ENT_ID AS Identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece, 
-        ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, CLI.TVATIE AS regimeTiers, ENT.USERCR AS UserCr, MUSER.EMAIL AS Email,
+        ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, CLI.TVATIE AS regimeTiers, ENT.USERCR AS Utilisateur, MUSER.EMAIL AS Email,
         CASE
         WHEN ENT.PICOD = 2 THEN 'Commande Client'
         WHEN ENT.PICOD = 3 THEN 'BL Client'

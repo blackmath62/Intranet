@@ -29,7 +29,7 @@ class CliRepository extends ServiceEntityRepository
         WHEN CLI.USERMO IS NOT NULL AND USERMO = 'VIVIEN' THEN 'VIVIEN'
         WHEN CLI.USERMO IS NULL AND CLI.USERCR = 'VIVIEN' THEN 'VIVIEN'
         ELSE 'JEROME'
-        END AS UserCr,
+        END AS Utilisateur,
         CASE
         WHEN CLI.USERMO IS NOT NULL AND USERMO = 'VIVIEN' THEN 'vlesenne@lhermitte.fr'
         WHEN CLI.USERMO IS NULL AND CLI.USERCR = 'VIVIEN' THEN 'vlesenne@lhermitte.fr'
@@ -67,7 +67,7 @@ class CliRepository extends ServiceEntityRepository
     public function SendMailMajCertiphytoClient():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT CLI_ID AS Identification, CLI.TIERS AS Tiers, CLI.NOM AS Nom, VRP.EMAIL AS Email, VRP.SELCOD AS UserName  
+        $sql = "SELECT CLI_ID AS Identification, CLI.TIERS AS Tiers, CLI.NOM AS Nom, VRP.EMAIL AS Email, VRP.SELCOD AS Utilisateur 
         FROM CLI
         LEFT JOIN VRP ON VRP.DOS = CLI.DOS AND VRP.TIERS = CLI.REPR_0001
         WHERE CLI.HSDT IS NULL AND CLI.DOS = 1 AND CLI.UP_PH_AUTORISE = 2 AND CLI.UP_PH_DECID_OBLIG = 1 AND CLI.TIERS NOT IN ('C0218400')

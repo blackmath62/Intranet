@@ -279,12 +279,38 @@
 										</li>
 								</ul>
 							</li>
-							<li class="nav-item">
-								<a href="{{ path('app_controle_anomalies')}}" class="nav-link">
-									<i class="nav-icon fas fa-exclamation-triangle"></i>
-									<p>Anomalies Divalto</p>
+							<li class="nav-item has-treeview">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-broadcast-tower"></i>
+									<p>
+										Probléme
+										<i class="fas fa-angle-left right"></i>
+									</p>
 								</a>
+								<ul class="nav nav-treeview">
+										<li class="nav-item">
+											<a href="{{ path('app_controle_anomalies')}}" class="nav-link">
+												<i class="nav-icon fas fa-exclamation-triangle text-warning"></i>
+												<p>Anomalies Divalto</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="{{ path('app_old_cmd')}}" class="nav-link">
+												<i class="nav-icon fas fa-blind text-info"></i>
+												<p>Vieilles commandes</p>
+											</a>
+										</li>
+										{% if is_granted('ROLE_ADMIN') %}
+										<li class="nav-item">
+											<a href="{{ path('app_old_cmd')}}" class="nav-link">
+												<i class="nav-icon fas fa-blind text-success"></i>
+												<p>Vieux Bls</p>
+											</a>
+										</li>
+										{% endif %}
+								</ul>
 							</li>
+
 					
 							<li class="nav-item">
 								<a href="{{ path('app_faq')}}" class="nav-link">
