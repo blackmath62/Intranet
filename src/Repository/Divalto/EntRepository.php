@@ -19,11 +19,11 @@ class EntRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Ent::class);
     }
-    // Controle des Sous références articles à fermées tenant compte des réappro
-    public function getOldCmds($dos):array
+    // Controle des vielles commandes actives dans le systéme
+    public function getOldCmds($dos, $numeros):array
     {
         $d = new DateTime();
-        $d->modify('-10 month');
+        $d->modify('-12 month');
         $d = $d->format('Y/m/d');
     
         $conn = $this->getEntityManager()->getConnection();
@@ -48,9 +48,9 @@ class EntRepository extends ServiceEntityRepository
             FROM ENT
             INNER JOIN CLI ON ENT.TIERS = CLI.TIERS AND ENT.DOS = CLI.DOS
             INNER JOIN VRP ON VRP.DOS = ENT.DOS AND VRP.TIERS = CLI.REPR_0001
-            INNER JOIN MOUV ON MOUV.DOS = ENT.DOS AND MOUV.CDNO = ENT.PINO
+            INNER JOIN MOUV ON MOUV.DOS = ENT.DOS AND MOUV.CDNO = ENT.PINO AND MOUV.CDCE4 = 1
             INNER JOIN ART ON ART.DOS = ENT.DOS AND ART.REF = MOUV.REF
-            WHERE ENT.PICOD = 2 AND ENT.CE4 = 1 AND PIDT <= '$d' AND ENT.TICOD = 'C' AND ENT.DOS IN($dos)
+            WHERE ENT.PICOD = 2 AND ENT.CE4 = 1 AND PIDT <= '$d' AND ENT.TICOD = 'C' AND ENT.DOS IN($dos) AND ENT.PINO NOT IN ($numeros)
             GROUP BY ENT.DOS, ENT.ENT_ID, ENT.TIERS, CLI.NOM, ENT.PINO, ENT.PIDT, ART.FAM_0002, VRP.SELCOD, ENT.USERCR, ENT.USERMO)reponse
             INNER JOIN MUSER ON MUSER.DOS = Dos AND MUSER.USERX = Utilisateur
             GROUP BY Dos, Identification, Tiers,Nom, Cmd, DateCmd, Commercial, Utilisateur, MUSER.EMAIL
@@ -60,4 +60,45 @@ class EntRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
+    public function getOldCmdsMouv($dos, $numeros):array
+    {
+        $d = new DateTime();
+        $d->modify('-12 month');
+        $d = $d->format('Y/m/d');
+    
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT Dos, Tiers,Nom, Cmd, DateCmd,Famille, Ref, Sref1, Sref2, Designation, Qte, Utilisateur, MUSER.EMAIL AS Email FROM(
+            SELECT ENT.DOS AS Dos, ENT.ENT_ID AS Identification, ENT.TIERS AS Tiers, CLI.NOM AS Nom, ENT.PINO AS Cmd, ENT.PIDT AS DateCmd, MOUV.REF AS Ref, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2, MOUV.DES AS Designation,MOUV.CDQTE AS Qte, ART.FAM_0002 AS Famille, VRP.SELCOD, ENT.USERCR, ENT.USERMO,
+            CASE
+                WHEN ART.FAM_0002 IN ('ME', 'MO') AND ENT.DOS = 1 THEN 1
+            END AS CompteurMe,
+            CASE
+                WHEN ART.FAM_0002 IN ('EV', 'HP') AND ENT.DOS = 1 THEN 1
+            END AS CompteurEvHp,
+            CASE
+                WHEN ART.FAM_0002 IN ('EV', 'HP') AND ENT.DOS = 1 THEN VRP.SELCOD
+                WHEN ART.FAM_0002 IN ('ME', 'MO') AND ENT.DOS = 1 THEN 'Alexandre Deschodt'
+                WHEN ENT.DOS = 3 THEN VRP.SELCOD
+                ELSE VRP.SELCOD
+            END AS Commercial,
+            CASE
+                WHEN ENT.USERMO IS NOT NULL THEN ENT.USERMO
+                ELSE ENT.USERCR
+            END AS Utilisateur
+            FROM ENT
+            INNER JOIN CLI ON ENT.TIERS = CLI.TIERS AND ENT.DOS = CLI.DOS
+            INNER JOIN VRP ON VRP.DOS = ENT.DOS AND VRP.TIERS = CLI.REPR_0001
+            INNER JOIN MOUV ON MOUV.DOS = ENT.DOS AND MOUV.CDNO = ENT.PINO AND MOUV.CDCE4 = 1
+            INNER JOIN ART ON ART.DOS = ENT.DOS AND ART.REF = MOUV.REF
+            WHERE ENT.PICOD = 2 AND ENT.CE4 = 1 AND PIDT <= '2020/11/17' AND ENT.TICOD = 'C' AND ENT.DOS IN($dos) AND ENT.PINO NOT IN ($numeros)
+            GROUP BY ENT.DOS, ENT.ENT_ID, ENT.TIERS, CLI.NOM, ENT.PINO, ENT.PIDT,MOUV.REF, MOUV.SREF1, MOUV.SREF2, MOUV.DES, MOUV.CDQTE, ART.FAM_0002, VRP.SELCOD, ENT.USERCR, ENT.USERMO)reponse
+            INNER JOIN MUSER ON MUSER.DOS = Dos AND MUSER.USERX = Utilisateur
+            GROUP BY Dos, Identification, Tiers,Nom,Famille, Ref, Sref1, Sref2, Designation, Qte, Cmd, DateCmd, Commercial, Utilisateur, MUSER.EMAIL
+            ORDER BY DateCmd
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
 }

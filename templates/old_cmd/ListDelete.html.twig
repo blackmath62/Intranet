@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="card collapsed-card card-warning">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+                  <p>Cette liste contient demandes de suppression qui ont été faites et la personne à l'initiative de cette demande avec date de demande</p>
+    <!-- /.card-footer-->
+    </div>
+</div>
+                
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header d-flex justify-content-between">
+                        <h2 class="card-title">Liste des demandes de suppression de commandes</h2>
+                        <a href="{{ path('app_old_cmd') }}" class="badge badge-success ml-auto">Revenir aux commandes non traitées</a>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+							{% if commandesTraites %}
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Dossier</span></th>
+                                    <th class="text-center"><span>Numéro</span></th>
+                                    <th class="text-center"><span>demandeur</span></th>
+                                    <th class="text-center"><span>date de demande</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            
+                                {% for commandesTraite in commandesTraites %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ commandesTraite.dossier }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ commandesTraite.numero}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ commandesTraite.treatedBy.pseudo }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ commandesTraite.createdAt|date("d/m/Y") }}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Dossier</span></th>
+                                    <th class="text-center"><span>Numéro</span></th>
+                                    <th class="text-center"><span>demandeur</span></th>
+                                    <th class="text-center"><span>date de demande</span></th>
+                                </tr>
+                                </tr>
+                            </tfoot>
+                        </table>
+                                {% else %}
+                                     <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>La liste est vide !</h4>
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+
+
+

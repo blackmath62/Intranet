@@ -144,6 +144,11 @@ class Users implements UserInterface
      */
     private $closedAt;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ListCmdTraite::class, mappedBy="treatedBy")
+     */
+    private $listCmdTraites;
+
 
    
     public function __construct()
@@ -160,6 +165,7 @@ class Users implements UserInterface
         $this->holidays = new ArrayCollection();
         $this->UserTreatmentholidays = new ArrayCollection();
         $this->news = new ArrayCollection();
+        $this->listCmdTraites = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -628,6 +634,36 @@ class Users implements UserInterface
     public function setClosedAt(?\DateTimeInterface $closedAt): self
     {
         $this->closedAt = $closedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ListCmdTraite[]
+     */
+    public function getListCmdTraites(): Collection
+    {
+        return $this->listCmdTraites;
+    }
+
+    public function addListCmdTraite(ListCmdTraite $listCmdTraite): self
+    {
+        if (!$this->listCmdTraites->contains($listCmdTraite)) {
+            $this->listCmdTraites[] = $listCmdTraite;
+            $listCmdTraite->setTreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeListCmdTraite(ListCmdTraite $listCmdTraite): self
+    {
+        if ($this->listCmdTraites->removeElement($listCmdTraite)) {
+            // set the owning side to null (unless already changed)
+            if ($listCmdTraite->getTreatedBy() === $this) {
+                $listCmdTraite->setTreatedBy(null);
+            }
+        }
 
         return $this;
     }
