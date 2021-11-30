@@ -149,6 +149,10 @@ class Users implements UserInterface
      */
     private $listCmdTraites;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Note::class, mappedBy="user")
+     */
+    private $notes;
 
    
     public function __construct()
@@ -166,6 +170,7 @@ class Users implements UserInterface
         $this->UserTreatmentholidays = new ArrayCollection();
         $this->news = new ArrayCollection();
         $this->listCmdTraites = new ArrayCollection();
+        $this->notes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -662,6 +667,36 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($listCmdTraite->getTreatedBy() === $this) {
                 $listCmdTraite->setTreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Note[]
+     */
+    public function getNotes(): Collection
+    {
+        return $this->notes;
+    }
+
+    public function addNote(Note $note): self
+    {
+        if (!$this->notes->contains($note)) {
+            $this->notes[] = $note;
+            $note->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(Note $note): self
+    {
+        if ($this->notes->removeElement($note)) {
+            // set the owning side to null (unless already changed)
+            if ($note->getUser() === $this) {
+                $note->setUser(null);
             }
         }
 

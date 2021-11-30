@@ -1,0 +1,98 @@
+<p>Bonjour,</p>
+<p>Veuillez trouver ci dessous la liste des commandes et leurs délais acceptées et reportées:</p>
+
+{% if commandesAvecDelais %}
+<p><u><strong>Les commandes qui ont un délai acceptées ou reportées inférieurs ou égale à 10 jours et qui ne sont pas en terminées sont les suivantes : </strong></u></p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Tiers</th>
+            <th>Nom</th>
+            <th>Cmd</th>
+            <th>date Cmd</th>
+            <th>Notre Ref</th>
+            <th>Délai accepté</th>
+            <th>Délai reporté</th>
+            <th>Commentaires</th>
+        </thead>
+        <tbody>
+{% for commandesAvecDelai in commandesAvecDelais %}
+        <tr>
+            <td>{{ commandesAvecDelai.Tiers }}</td>
+            <td>{{ commandesAvecDelai.Nom }}</td>
+            <td>{{ commandesAvecDelai.Cmd }}</td>
+            <td>{{ commandesAvecDelai.DateCmd|date('d-m-Y') }}</td>
+            <td>{{ commandesAvecDelai.NotreRef }}</td>
+            <td>{% if commandesAvecDelai.DelaiAccepte %}{{ commandesAvecDelai.DelaiAccepte|date('d-m-Y') }}{% endif %}</td>
+            <td>{% if commandesAvecDelai.DelaiReporte %}{{ commandesAvecDelai.DelaiReporte|date('d-m-Y') }}{% endif %}</td>
+            <td>{{ commandesAvecDelai.Commentaire }}, pensez à la passer ne terminée</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+{% if commandesSansDelais %}
+<p><u><strong>Les commandes qui n'ont pas de délai acceptées ou reportées et qui ne sont pas terminées sont les suivantes : </strong></u></p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Tiers</th>
+            <th>Nom</th>
+            <th>Cmd</th>
+            <th>date Cmd</th>
+            <th>Notre Ref</th>
+            <th>Délai accepté</th>
+            <th>Délai reporté</th>
+            <th>Commentaires</th>
+        </thead>
+        <tbody>
+{% for commandesSansDelai in commandesSansDelais %}
+        <tr>
+            <td>{{ commandesSansDelai.Tiers }}</td>
+            <td>{{ commandesSansDelai.Nom }}</td>
+            <td>{{ commandesSansDelai.Cmd }}</td>
+            <td>{{ commandesSansDelai.DateCmd|date('d-m-Y') }}</td>
+            <td>{{ commandesSansDelai.NotreRef }}</td>
+            <td>{% if commandesSansDelai.DelaiAccepte %}{{ commandesSansDelai.DelaiAccepte|date('d-m-Y') }}{% endif %}</td>
+            <td>{% if commandesSansDelai.DelaiReporte %}{{ commandesSansDelai.DelaiReporte|date('d-m-Y') }}{% endif %}</td>
+            <td>{{ commandesSansDelai.Commentaire }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+{% if commandesDelaiDepasses %}
+<p><u><strong>Les commandes qui ont dépassées le délai et qui ne sont pas terminées sont les suivantes : </strong></u></p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Tiers</th>
+            <th>Nom</th>
+            <th>Cmd</th>
+            <th>date Cmd</th>
+            <th>Notre Ref</th>
+            <th>Délai accepté</th>
+            <th>Délai reporté</th>
+            <th>Commentaires</th>
+        </thead>
+        <tbody>
+{% for commandesDelaiDepasse in commandesDelaiDepasses %}
+        <tr>
+            <td>{{ commandesDelaiDepasse.Tiers }}</td>
+            <td>{{ commandesDelaiDepasse.Nom }}</td>
+            <td>{{ commandesDelaiDepasse.Cmd }}</td>
+            <td>{{ commandesDelaiDepasse.DateCmd|date('d-m-Y') }}</td>
+            <td>{{ commandesDelaiDepasse.NotreRef }}</td>
+            <td>{% if commandesDelaiDepasse.DelaiAccepte %}{{ commandesDelaiDepasse.DelaiAccepte|date('d-m-Y') }}{% endif %}</td>
+            <td>{% if commandesDelaiDepasse.DelaiReporte %}{{ commandesDelaiDepasse.DelaiReporte|date('d-m-Y') }}{% endif %}</td>
+            <td>{{ commandesDelaiDepasse.Commentaire }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

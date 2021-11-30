@@ -56,6 +56,18 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    public function getFacture($facture,$typeTiers)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ENT.PINO AS fano
+        FROM ENT
+        WHERE ENT.DOS = 1 AND ENT.PINO = ? AND ENT.PICOD = 4 AND ENT.TICOD = ?
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$facture,$typeTiers]);
+        return $stmt->fetch();
+    }
+
     public function getSendMailErreurRegimeFournisseur():array
     {
         $conn = $this->getEntityManager()->getConnection();

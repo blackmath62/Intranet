@@ -24,6 +24,9 @@ class ControleComptabiliteController extends AbstractController
     public function controleComptabilite($slug, Request $request, ControleComptabiliteRepository $repo, ControleComptabiliteAchatRepository $repoAchat, ControleComptabiliteVenteRepository $repoVente): Response
     {
         
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 0);
+
         $typeTiers = $slug;
         if ($slug == 'F') {
             $tiers = 'Fournisseurs';
@@ -58,23 +61,31 @@ class ControleComptabiliteController extends AbstractController
                 }
 
                 $controleRegimeTransport = $repo->getControleRegimeTransport($annee,$mois,$typeTiers);
+
                 $controleTrousFactures = $repo->getControleTrousFactures($annee,$mois,$typeTiers);
-                
-                $factureSansIndex = array();
+                $factures = [];
                 for ($i=0; $i <count($controleTrousFactures) ; $i++) { 
-                    $factureSansIndex[] = $controleTrousFactures[$i]['fano'];
+                    array_push($factures, $controleTrousFactures[$i]['fano']);
                 }
-                for ($ligTrouFacture=0; $ligTrouFacture <count($controleTrousFactures) ; $ligTrouFacture++) {
-                    if ($ligTrouFacture !== count($controleTrousFactures)) {
-                        $facture = $controleTrousFactures[$ligTrouFacture]['fano'];
-                            $key = array_search($facture + 1, $factureSansIndex);
-                            if (empty($key)) {
-                                $factureManquante[] = $facture + 1;   
-                            }
+                $number = current($factures);
+                $lastNumber = end($factures);
+                $facturesManquantes = [];
+
+                for ($ligFact=$number; $ligFact <$lastNumber ; $ligFact++) { 
+                                  
+                    if (in_array($ligFact, $factures)) {
+                    }else {
+                        $dateFact = $repo->getFacture($ligFact,$typeTiers);
+                        if (!$dateFact) {
+                            //$facturesManquantes = $ligFact;
+                            //dd($facturesManquantes);
+                            array_push($facturesManquantes, $ligFact);
+                        }
+                        
                     }
                 }
-                // pas si simple de déterminer les trous dans les factures, exemple trous dans les factures 19006871 => 6898
-                
+                //dd($facturesManquantes);
+                // il faudra récupérer la derniére facture du mois précédent pour voir s'il n'y a pas de trous
                 
 
             }
@@ -87,13 +98,9 @@ class ControleComptabiliteController extends AbstractController
             'controleTaxes' => $controleTaxes,
             'controleRegimesTiers' => $controleRegimeTiers,
             'controleRegimesTransports' => $controleRegimeTransport,
-            'controleTrousFactures' => $controleTrousFactures,
+            'controleTrousFactures' => $facturesManquantes,
             'monthYear' => $form->createView()
         ]);
     }
 
-    public function getSendMailForCorrection()
-    {
-        
-    }
 }

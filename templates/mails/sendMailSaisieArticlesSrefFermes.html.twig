@@ -4,7 +4,7 @@
 <p>Vous avez créé une piéce {% if anomalie.Cmd %} Commande {% elseif anomalie.Bl %} BL {% endif %}
  numéro <strong>{% if anomalie.Cmd %} {{ anomalie.Cmd }} {% elseif anomalie.Bl %} {{ anomalie.Bl }} {% endif %}</strong> sur le code OP : <strong>{{anomalie.Op}}</strong> 
 avec le produit <strong>{{anomalie.Ref}}  {% if anomalie.Sref1 %} - {% endif %}{{ anomalie.Sref1}} {% if anomalie.Sref2 %} - {% endif %}{{ anomalie.Sref2 }} </strong> Celui ci est signalé : <strong>{{ anomalie.ArtFerme }}</strong> </br>
-{% if anomalie.Commercial %} Le commercial qui est lié à cette affaire est {{anomalie.Commercial}} {% endif %}
+{% if anomalie.Commercial %} Le commercial qui est lié à ce client est {{anomalie.Commercial}} {% endif %}
 <p>Merci de corriger ce probléme, ce message sera renouvellé chaque jour jusqu'a correction du probléme<p>
 
 <p><strong>Intranet Axis</strong></p>

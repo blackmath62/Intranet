@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Main\CmdRobyDelaiAccepteReporte;
 use DateTime;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
@@ -19,6 +20,8 @@ use App\Repository\Main\ControlesAnomaliesRepository;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Repository\Divalto\ControleComptabiliteRepository;
 use App\Repository\Divalto\ControleArtStockMouvEfRepository;
+use App\Repository\Divalto\EntRepository;
+use App\Repository\Main\CmdRobyDelaiAccepteReporteRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -35,8 +38,11 @@ class ControleAnomaliesController extends AbstractController
     private $client;
     private $article;
     private $fournisseur;
+    private $entete;
+    private $cmdRoby;
+    private $cmdRobyController;
 
-    public function __construct(FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -45,6 +51,9 @@ class ControleAnomaliesController extends AbstractController
         $this->client = $client;
         $this->article = $article;
         $this->fournisseur = $fournisseur;
+        $this->entete = $entete;
+        $this->cmdRoby = $cmdRoby;
+        $this->cmdRobyController = $cmdRobyController;
         //parent::__construct();
     }
     
@@ -59,6 +68,7 @@ class ControleAnomaliesController extends AbstractController
     public function Show_Anomalies()
     {   
         $anomaliesCount = $this->anomalies->getCountAnomalies();
+        $this->MajCmdRobyAccepteReporte();
 
         return $this->render('controle_anomalies/anomalies.html.twig',[
             'title' => 'Liste des anomalies',
@@ -79,6 +89,8 @@ class ControleAnomaliesController extends AbstractController
             $this->ControleFournisseur();
             $this->ControleArticle();
             $this->ControlStockDirect(); // j'ai mis Utilisateur
+            $this->MajCmdRobyAccepteReporte();
+            $this->cmdRobyController->sendMail();
             $this->run_auto_wash();
         }
         $this->addFlash('message', 'Les scripts ont bien été lancés !');
@@ -88,6 +100,57 @@ class ControleAnomaliesController extends AbstractController
     function isWeekend($date) {
         $weekDay = date('w', strtotime($date));
         return ($weekDay == 0 || $weekDay == 6);
+    }
+
+    public function MajCmdRobyAccepteReporte(){
+        $donnees = $this->entete->majCmdsRobyDelaiAccepteReporte();
+        for ($lig=0; $lig <count($donnees) ; $lig++) { 
+            $id = $donnees[$lig]['Identification'];
+            $search = $this->cmdRoby->findOneBy(['identification' => $id]);
+            // si elle n'existe pas, on la créér
+            if ( empty($search)) {
+                $listCmd = new CmdRobyDelaiAccepteReporte();
+                $listCmd->setIdentification($donnees[$lig]['Identification']);
+                $listCmd->setStatut('en cours ...');
+                $listCmd->setCreatedAt(new DateTime);
+                $listCmd->setTiers($donnees[$lig]['Tiers']);
+                $listCmd->setNom($donnees[$lig]['Nom']);
+                $listCmd->setCmd($donnees[$lig]['Cmd']);
+                $listCmd->setTel($donnees[$lig]['Tel']);
+                $listCmd->setDateCmd(new DateTime($donnees[$lig]['DateCmd']));
+                $listCmd->setNotreRef($donnees[$lig]['NotreRef']);
+                if ($donnees[$lig]['DelaiAccepte']) {
+                    $listCmd->setDelaiAccepte(new DateTime($donnees[$lig]['DelaiAccepte']));
+                }else {
+                    $listCmd->setDelaiAccepte(null);
+                }
+                if ($donnees[$lig]['DelaiReporte']) {
+                    $listCmd->setDelaiReporte(new DateTime($donnees[$lig]['DelaiReporte']));
+                }else {
+                    $listCmd->setDelaiReporte(null);
+                }
+            }elseif(!is_null($search)){
+                $listCmd = $search;
+                $listCmd->setNotreRef($donnees[$lig]['NotreRef']);
+                $listCmd->setTel($donnees[$lig]['Tel']);
+                if ($donnees[$lig]['DelaiAccepte']) {
+                    $listCmd->setDelaiAccepte(new DateTime($donnees[$lig]['DelaiAccepte']));
+                }else {
+                    $listCmd->setDelaiAccepte(null);
+                }
+                if ($donnees[$lig]['DelaiReporte']) {
+                    $listCmd->setDelaiReporte(new DateTime($donnees[$lig]['DelaiReporte']));
+                }else {
+                    $listCmd->setDelaiReporte(null);
+                }
+            }
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($listCmd);
+            $em->flush();
+        }
+       
+       
+
     }
         
     public function ControleFournisseur()

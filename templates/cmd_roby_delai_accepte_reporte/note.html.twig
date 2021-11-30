@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="card collapsed-card card-warning">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+                  <p>Note concernant la commande</p>
+    <!-- /.card-footer-->
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header d-flex justify-content-between">
+                <h2 class="card-title">Note concernant la commande {{ commande.cmd}}</h2>
+                <div class='ml-auto'>
+                <a title='Liste des commandes en cours...' href="{{ path('app_cmd_roby_delai_accepte_reporte_active') }}" class="btn btn-success"><i class="fas fa-lock-open"></i></a>
+                <a title='Liste des commandes terminées' href="{{ path('app_cmd_roby_delai_accepte_reporte_close') }}" class="btn btn-danger"><i class="fas fa-lock"></i></a>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+            
+
+            {% if notes %}
+               <!-- DIRECT CHAT -->
+            <div class="card direct-chat direct-chat-primary">
+              <div class="card-header">
+                <h3 class="card-title">Liste des notes</h3>
+
+                <div class="card-tools">
+                  <span title="{{ notes|length }} Notes" class="badge badge-primary">{{ notes|length }}</span>
+                  <button type="button" class="btn btn-tool text-secondary" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <!-- Conversations are loaded here 
+                <div class="direct-chat-messages">
+                -->
+                <div class="p-5">
+                  <!-- Message. Default to the left -->
+                  {% for note in notes %}
+                  {% if app.user.id == note.user.id %}    
+                  <!-- Message to the right -->
+                  <div class="direct-chat-msg right">
+                    <div class="direct-chat-infos clearfix">
+                      <span class="direct-chat-name float-right">{{ note.user.pseudo }}</span>
+                      <span class="direct-chat-timestamp float-left">{{ note.createdAt|date("d/m/Y H:i")}}</span>
+                    </div>
+                    <!-- /.direct-chat-infos -->
+                    <img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ note.user.img))}}" alt="message user image">
+                    <!-- /.direct-chat-img -->
+                    <div class="direct-chat-text">
+                      {{ note.content|raw }}
+                    </div>
+                    <!-- /.direct-chat-text -->
+                  </div>
+                {% else %}
+                <div class="direct-chat-msg">
+                <div class="direct-chat-infos clearfix">
+                    <span class="direct-chat-name float-left">{{ note.user.pseudo }}</span>
+                    <span class="direct-chat-timestamp float-right">{{ note.createdAt|date("d/m/Y H:i")}}</span>
+                </div>
+                <!-- /.direct-chat-infos -->
+                <img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ note.user.img))}}" alt="message user image">
+                <!-- /.direct-chat-img -->
+                <div class="direct-chat-text">
+                    {{ note.content|raw }}
+                </div>
+                <!-- /.direct-chat-text -->
+                </div>
+                  <!-- /.direct-chat-msg -->
+                  {% endif %}
+                  {% endfor %}
+                  <!-- /.direct-chat-msg -->
+                </div>
+                <!--/.direct-chat-messages-->
+                <!-- /.direct-chat-pane -->
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!--/.direct-chat -->               
+                   
+               
+            {% else %}
+                <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Aucunes notes actuellement !</h4>
+            {% endif %}
+                {{ form_start(form)}}
+                {{ form_widget(form.content)}}
+                {{ form_row(form.publier)}}
+                {{ form_end(form)}}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
