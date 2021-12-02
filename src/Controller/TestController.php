@@ -37,7 +37,11 @@ class TestController extends AbstractController
     public function test_tiers_mal_renseigne()
     {
         
-                
+        $d = new DateTime();
+        $heure = $d->format('H');
+        
+        echo $heure;        
+        
         return $this->render('test/index.html.twig',[
             'title' => 'page de test',
         ]);

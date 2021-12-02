@@ -82,15 +82,20 @@ class ControleAnomaliesController extends AbstractController
      */
     Public function Run_Cron(){
         $dateDuJour = new DateTime();
+        $jour = $dateDuJour->format('w');
+        $heure = $dateDuJour->format('H');
         $dateDuJour  = $dateDuJour->format('d-m-Y');
-
         if ($this->isWeekend($dateDuJour) == false) {
             $this->ControleClient();
             $this->ControleFournisseur();
             $this->ControleArticle();
             $this->ControlStockDirect(); // j'ai mis Utilisateur
-            $this->MajCmdRobyAccepteReporte();
-            $this->cmdRobyController->sendMail();
+            if ($jour == 5 || $jour == 1) {
+                if ($heure >= 10 && $heure < 20) {
+                    $this->MajCmdRobyAccepteReporte();
+                    $this->cmdRobyController->sendMail();
+                }
+            }
             $this->run_auto_wash();
         }
         $this->addFlash('message', 'Les scripts ont bien été lancés !');
