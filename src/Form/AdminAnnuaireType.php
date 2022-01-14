@@ -19,7 +19,9 @@ class AdminAnnuaireType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('interne',IntegerType::class)
+            ->add('interne',IntegerType::class,[
+                'required' =>false
+                ])
             ->add('nom', TextType::class,[
                 'constraints' => [
                     new NotBlank([

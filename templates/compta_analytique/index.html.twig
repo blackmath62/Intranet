@@ -10,8 +10,7 @@
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-                  La DEB ne sera correcte que si toutes les factures ont bien été éditées et que les articles sont correctement créé dans Divalto (champs Coefficients et poids).</br>
-                  Nous ne pouvons être tenu responsable d'erreur lié à la création des articles.</br>
+                  Export en cours d'affinage, il est impératif de procéder a des comntrôles manuels pour détecter d'éventuelles incohérences.</br>
                   Cette extraction est le reflet de ce qui est présent dans Divalto....
     <!-- /.card-footer-->
     </div>
@@ -42,96 +41,181 @@
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-							{% if comptaAnalytiques %}
+							{% if ventes %}
                         <table id="example1" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <th class="text-center"><span>Date Facture</span></th>
                                     <th class="text-center"><span>Facture</span></th>
-                                    <th class="text-center"><span>Etat</span></th>
-                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Ref</span></th>
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
-                                    <th class="text-center"><span>Désignation</span></th>
-                                    <th class="text-center"><span>Qté</span></th>
-                                    <th class="text-center"><span>CR Unitaire</span></th>
-                                    <th class="text-center"><span>CR Total</span></th>
-                                    <th class="text-center"><span>Op</span></th>
+                                    <th class="text-center"><span>Designation</span></th>
+                                    <th class="text-center"><span>Uv</span></th>
+                                    <th class="text-center"><span>OP</span></th>
+                                    <th class="text-center"><span>CR</span></th>
+                                    <th class="text-center"><span>CMP</span></th>
+                                    <th class="text-center"><span>CMA</span></th>
                                     <th class="text-center"><span>Article</span></th>
                                     <th class="text-center"><span>Client</span></th>
                                     <th class="text-center"><span>Compte Achat</span></th>
-                                    <th class="text-center"><span>TVA Achat</span></th>
+                                    <th class="text-center"><span>Qte Vendu</span></th>
+                                    <th class="text-center"><span>Total CR</span></th>
+                                    <th class="text-center"><span>Total CMP</span></th>
+                                    <th class="text-center"><span>Total CMA</span></th>
+                                    <th class="text-center"><span>Détail</span></th>
                                 </tr>
                             </thead>
                             <tbody>
                             
-                                {% for comptaAnalytique in comptaAnalytiques %}
+                                {% for vente in ventes %}
                                     <tr>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.DateFacture|date("d/m/Y")}}</a>
+                                            <a class="text-dark">{{ vente.Facture }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.Facture}}</a>
+                                            <a class="text-dark">{{ vente.Ref}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">Etat</a>
+                                            <a class="text-dark">{{ vente.Sref1}}</a>
                                         </td>
                                         <td class="text-left">
-                                            <a class="text-dark">{{ comptaAnalytique.Ref }}</a>
+                                            <a class="text-dark">{{ vente.Sref2 }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.Sref1 }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.Sref2 }}</a>
+                                            <a class="text-dark">{{ vente.Designation }}</a>
                                         </td>
                                         <td class="text-left">
-                                            <a class="text-dark">{{ comptaAnalytique.Designation }}</a>
+                                            <a class="text-dark">{{ vente.Uv }}</a>
+                                        </td>
+                                        <td class="text-left">
+                                            <a class="text-dark">{{ vente.Op }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.Qte }}</a>
+                                            <a class="text-dark">{{ vente.CoutRevient|number_format(4) }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.CoutRevient|number_format(4) }}</a>
+                                            <a class="text-dark">{{ vente.CoutMoyenPondere|number_format(4) }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.CrTotal|number_format(4) }}</a>
+                                            <a class="text-dark">{{ vente.Cma|number_format(4) }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.Op }}</a>
+                                            <a class="text-dark">{{ vente.Article }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.Article }}</a>
+                                            <a class="text-dark">{{ vente.Client }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.Client }}</a>
+                                            <a class="text-dark">{{ vente.CompteAchat }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.CompteAchat }}</a>
+                                            <a class="text-dark">{{ vente.QteSign }}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{{ comptaAnalytique.TvaArticle }}</a>
+                                            <a class="text-dark">{% if vente.TotalCoutRevient %}{{ vente.TotalCoutRevient|number_format(4) }}{% endif %}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{% if vente.TotalCoutMoyenPondere %}{{ vente.TotalCoutMoyenPondere|number_format(4) }}{% endif %}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{% if vente.TotalCoutCma %}{{ vente.TotalCoutCma|number_format(4) }}{% endif %}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if vente.DetailFacture %}<button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-xl-{{ vente.Facture }}"><i class="fas fa-eye"></i></button>{% endif %}
+                                        {% if vente.DetailFacture %}
+                                        <!-- modal -->
+                                                <div class="modal fade" id="modal-xl-{{ vente.Facture }}">
+                                                    <div class="modal-dialog modal-xl">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                        <div class='d-flex flex-column'>
+                                                        <h3 class="modal-title">Détail des factures achats</h3>
+                                                        <span class="modal-title text-left">Le produit concerné : ref: {{ vente.Ref }} Des:{{ vente.Designation }} Sref1: {{ vente.Sref1 }} Sref2: {{ vente.Sref2 }}</span>
+                                                        </div>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                        <table class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="text-center"><span>Facture</span></th>
+                                                                    <th class="text-center"><span>Référence</span></th>
+                                                                    <th class="text-center"><span>Sref1</span></th>
+                                                                    <th class="text-center"><span>Sref2</span></th>
+                                                                    <th class="text-center"><span>Désignation</span></th>
+                                                                    <th class="text-center"><span>Qte</span></th>
+                                                                    <th class="text-center"><span>Op</span></th>
+                                                                    <th class="text-center"><span>Montant Signé</span></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {% for detail in vente.DetailFacture %}
+                                                                    <tr>
+                                                                        <td class="text-center">
+                                                                            <a class="text-dark">{{ detail.Facture }}</a>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a class="text-dark">{{ detail.Ref }}</a>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a class="text-dark">{{ detail.Sref1 }}</a>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a class="text-dark">{{ detail.Sref2 }}</a>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a class="text-dark">{{ detail.Designation }}</a>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a class="text-dark">{{ detail.Qte }}</a>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a class="text-dark">{{ detail.Op }}</a>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a class="text-dark">{{ detail.MontantSign }}</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                        </div>
+                                                        <div class="modal-footer d-flex justify-content-between">
+                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                                                        </div>
+                                                    </div>
+                                                    <!-- /.modal-content -->
+                                                    </div>
+                                                    <!-- /.modal-dialog -->
+                                                </div>
+                                                <!-- /.modal -->
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th class="text-center"><span>Date Facture</span></th>
                                     <th class="text-center"><span>Facture</span></th>
-                                    <th class="text-center"><span>Etat</span></th>
-                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Ref</span></th>
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
-                                    <th class="text-center"><span>Désignation</span></th>
-                                    <th class="text-center"><span>Qté</span></th>
-                                    <th class="text-center"><span>CR Unitaire</span></th>
-                                    <th class="text-center"><span>CR Total</span></th>
-                                    <th class="text-center"><span>Op</span></th>
+                                    <th class="text-center"><span>Designation</span></th>
+                                    <th class="text-center"><span>Uv</span></th>
+                                    <th class="text-center"><span>OP</span></th>
+                                    <th class="text-center"><span>CR</span></th>
+                                    <th class="text-center"><span>CMP</span></th>
+                                    <th class="text-center"><span>CMA</span></th>
                                     <th class="text-center"><span>Article</span></th>
                                     <th class="text-center"><span>Client</span></th>
                                     <th class="text-center"><span>Compte Achat</span></th>
-                                    <th class="text-center"><span>TVA Achat</span></th>
+                                    <th class="text-center"><span>Qte Vendu</span></th>
+                                    <th class="text-center"><span>Total CR</span></th>
+                                    <th class="text-center"><span>Total CMP</span></th>
+                                    <th class="text-center"><span>Total CMA</span></th>
+                                    <th class="text-center"><span>Détail</span></th>
                                 </tr>
                             </tfoot>
                         </table>

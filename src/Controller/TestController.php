@@ -37,10 +37,18 @@ class TestController extends AbstractController
     public function test_tiers_mal_renseigne()
     {
         
-        $d = new DateTime();
-        $heure = $d->format('H');
-        
-        echo $heure;        
+        $dateDuJour = new DateTime();
+        $jour = $dateDuJour->format('w');
+        $heure = $dateDuJour->format('H');
+        $dateDuJour  = $dateDuJour->format('d-m-Y');
+
+        if ($heure >= 8 && $heure < 20) {
+            if ($jour == 2 || $jour == 1) {
+                    echo $jour;
+            }else {
+                echo $heure;
+            }
+            }
         
         return $this->render('test/index.html.twig',[
             'title' => 'page de test',

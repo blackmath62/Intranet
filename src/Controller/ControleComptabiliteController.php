@@ -47,7 +47,7 @@ class ControleComptabiliteController extends AbstractController
             // tracking user page for stats
             $tracking = $request->attributes->get('_route');
             $this->setTracking($tracking);
-            
+            $facturesManquantes = [];
             if($form->isSubmitted() && $form->isValid()){
                 $annee = $form->getData()['year'];
                 $mois = $form->getData()['month'];
@@ -69,7 +69,7 @@ class ControleComptabiliteController extends AbstractController
                 }
                 $number = current($factures);
                 $lastNumber = end($factures);
-                $facturesManquantes = [];
+                
 
                 for ($ligFact=$number; $ligFact <$lastNumber ; $ligFact++) { 
                                   

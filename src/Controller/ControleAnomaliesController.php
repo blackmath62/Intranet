@@ -90,11 +90,11 @@ class ControleAnomaliesController extends AbstractController
             $this->ControleFournisseur();
             $this->ControleArticle();
             $this->ControlStockDirect(); // j'ai mis Utilisateur
+            if ($heure >= 8 && $heure < 20) {
             if ($jour == 5 || $jour == 1) {
-                if ($heure >= 10 && $heure < 20) {
                     $this->MajCmdRobyAccepteReporte();
                     $this->cmdRobyController->sendMail();
-                }
+            }
             }
             $this->run_auto_wash();
         }
@@ -338,6 +338,8 @@ class ControleAnomaliesController extends AbstractController
         
         $ano = $this->anomalies->findOneBy(['idAnomalie' => '999999999996', 'type' => 'SrefArticleAFermer']);
         $dateDuJour = new DateTime();
+        $metiers = [];
+        $MailsList = [];
         $dateModif = $ano->getModifiedAt();
                 $datediff = $dateModif->diff($dateDuJour)->format("%a");
                 $produits = $this->article->getControleArticleAFermer();
@@ -398,15 +400,18 @@ class ControleAnomaliesController extends AbstractController
                 
                 /*$MailsList = [
                     new Address('jpochet@lhermitte.fr')];*/
-                
-                $html = $this->renderView('mails/sendMailForUsersArticleAFermer.html.twig', ['produits' => $produits, 'Srefs' => $Srefs ]);
-                $email = (new Email())
-                ->from('intranet@groupe-axis.fr')
-                ->to(...$MailsList)
-                ->cc('jpochet@lhermitte.fr')
-                ->subject('INFORMATION Articles qui vont être fermés Divalto')
-                ->html($html);
-                $this->mailer->send($email);        
+                if ($MailsList) {
+                    # code...
+                    //dd($MailsList);
+                    $html = $this->renderView('mails/sendMailForUsersArticleAFermer.html.twig', ['produits' => $produits, 'Srefs' => $Srefs ]);
+                    $email = (new Email())
+                    ->from('intranet@groupe-axis.fr')
+                    ->to(...$MailsList)
+                    ->cc('jpochet@lhermitte.fr')
+                    ->subject('INFORMATION Articles qui vont être fermés Divalto')
+                    ->html($html);
+                    $this->mailer->send($email);        
+                }
             }       
     }
 

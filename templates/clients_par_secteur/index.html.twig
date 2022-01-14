@@ -76,9 +76,9 @@
                                             <a class="text-dark">{{client.Mail}}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="btn btn-danger" href="{{ path('app_lhermitte_need_clients', {'tiers' : client.Tiers} ) }}" ><i class="fas fa-heart"></i></a>
-                                            <a class="btn btn-warning" data-toggle="modal" data-target="#modal-danger" ><i class="fas fa-sign-out-alt"></i></i></a>
-                                            <a class="btn btn-info" href="{{ path('app_lhermitte_contact_client', {'tiers' : client.Tiers} ) }}" ><i class="fas fa-users"></i></a>
+                                            <a class="btn btn-danger" title='Je veux suivre ce client' href="{{ path('app_lhermitte_need_clients', {'tiers' : client.Tiers} ) }}" ><i class="fas fa-heart"></i></a>
+                                            <a class="btn btn-warning" title='Je veux fermer ce client' data-toggle="modal" data-target="#modal-danger" ><i class="fas fa-sign-out-alt"></i></i></a>
+                                            <a class="btn btn-info" title='Voir les contacts de ce client' href="{{ path('app_lhermitte_contact_client', {'tiers' : client.Tiers} ) }}" ><i class="fas fa-users"></i></a>
                                         </td>
                                     </tr>
 

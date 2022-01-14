@@ -34,6 +34,7 @@
                                     <th class="text-center"><span>Numéro commande</span></th>
                                     <th class="text-center"><span>Date Commande</span></th>
                                     <th class="text-center"><span>Notre Ref</span></th>
+                                    <th class="text-center"><span>Echéance en jours</span></th>
                                     <th class="text-center"><span>Délai accepté</span></th>
                                     <th class="text-center"><span>Délai reporté</span></th>
                                     <th class="text-center"><span>Terminée par</span></th>
@@ -62,6 +63,33 @@
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark">{{ commande.notreRef }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                        {% set sign = '' %}
+                                        {% set color = 'secondary' %}
+                                        {% set d = '' %}  
+                                        {% if commande.delaiReporte %}
+                                        {% set d = commande.delaiReporte %}
+                                            {% if commande.delaiReporte|date("d/m/Y") < date("now")|date("d/m/Y") %}
+                                                {% set sign = '-' %}
+                                                {% set color = 'danger' %}
+                                            {% else %}
+                                                {% set color = 'success' %}   
+                                            {% endif %}
+                                        {% elseif commande.delaiAccepte %}   
+                                        {% set d = commande.delaiAccepte %}
+                                            {% if commande.delaiAccepte|date("d/m/Y") < date("now")|date("d/m/Y") %}
+                                                {% set sign = '-' %}
+                                                {% set color = 'danger' %}
+                                            {% else %}
+                                                {% set color = 'success' %}      
+                                            {% endif %}
+                                        {% endif %}
+                                        {% if d %}
+                                            {% set differenceMod = date(d).diff(date("now")) %}
+                                        {% endif %}
+
+                                            <a class="text-light btn btn-{{color}}">{% if d %}{{sign}}{{ differenceMod.days }} {% else %}Pas de date{% endif %}</a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark">{% if commande.delaiAccepte %}{{ commande.delaiAccepte|date("d/m/Y") }}{% endif %}</a>
@@ -130,6 +158,7 @@
                                     <th class="text-center"><span>Numéro commande</span></th>
                                     <th class="text-center"><span>Date Commande</span></th>
                                     <th class="text-center"><span>Notre Ref</span></th>
+                                    <th class="text-center"><span>Echéance en jours</span></th>
                                     <th class="text-center"><span>Délai accepté</span></th>
                                     <th class="text-center"><span>Délai reporté</span></th>
                                     <th class="text-center"><span>Terminée par</span></th>
@@ -149,22 +178,3 @@
 
 {% endblock %}
 
-{% block javascripts %}
-<script>
-  $(function () {
-    $("#example1").DataTable({
-      "responsive": true, "lengthChange": false, "autoWidth": false,"order": [[ 0, "desc" ]],
-      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": false,
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
-    });
-  });
-</script>
-{% endblock %}
