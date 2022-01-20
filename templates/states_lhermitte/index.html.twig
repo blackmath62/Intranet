@@ -96,7 +96,7 @@
                     <div class="info-box-content text-center">
                         <div class="d-flex justify-content-around">
                         <h2 class="info-box-text">{{ Metier.SecteurMouvement }}</h2>
-                        {% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted("ROLE_#{Metier.SecteurMouvement}") ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') ) %}
+                        {% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted("ROLE_#{Metier.SecteurMouvement}") ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') or is_granted('ROLE_BUREAU_RB') ) %}
                             <a class="btn btn-success mb-1" onclick='begin(event)' href="{{path('app_states_excel_metier_' ~ sufixeMetier , {'metier' : Metier.SecteurMouvement, 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'dossier' : dossier  }  ) }}"><i class="fas fa-file-excel text-white"></i></a>
                         {% endif %}
                         </div>
@@ -232,10 +232,11 @@
             <!-- /.row -->
             {% endif %}
             <!-- Fin bandeau CA de tous les métiers-->
-
+            <!-- Début Fenêtre commerciaux -->
+            
             <div class="card-body row">
             {% if stateCommerciaux %}
-                            
+                {% if is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL') %}         
                 {% for state in stateCommerciaux %}
                 
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6 col-12">
@@ -298,9 +299,12 @@
                     </div>
                 </div>
                 {% endfor %}
+                {% endif %}   
             </div>
+            
             <!-- Fin Fenêtre commerciaux -->
             <!-- Début ligne détail du métier -->
+            {% if is_granted('ROLE_COMMERCIAL') or is_granted('ROLE_RESPONSABLE_SECTEUR') %}
             <div class="card-body row">
                 {% if is_granted('ROLE_BOSS') %}  
                     <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 col-12">
@@ -405,6 +409,7 @@
                     </div>
                     <!-- /.col -->
             </div>
+            {% endif %}
             <!-- Fin ligne détail du métier -->
             <!-- Début tableau avec le détail client-->
             <div class="card-body">
@@ -413,7 +418,9 @@
                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
                             <tr>
+                                {% if is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL') %}
                                 <th class="text-center"><span>Commercial</span></th>
+                                {% endif %}  
                                 <th class="text-center"><span>Tiers</span></th>
                                 <th class="text-center"><span>Nom</span></th>
                                 <th class="text-center"><span>N-1</span></th>  
@@ -425,11 +432,13 @@
                         </thead>
                         <tbody>
                             {% for client in statesParClient %}
-                                    {% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted("ROLE_#{metier}") ) or ( is_granted('ROLE_COMMERCIAL') and app.user.commercial == client.commercialId ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') ) %}
+                                    {% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted("ROLE_#{metier}") ) or ( is_granted('ROLE_COMMERCIAL') and app.user.commercial == client.commercialId ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') or is_granted('ROLE_BUREAU_RB') ) %}
                                         <tr>
+                                            {% if is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL') %}
                                             <td class="text-center">
                                                 <a class="text-center text-dark">{{ client.Commercial}}</a>
                                             </td>
+                                            {% endif %} 
                                             <td class="text-center">
                                                 <a class="text-center text-dark">{{ client.Tiers }}</a>
                                             </td>
@@ -457,7 +466,9 @@
                         </tbody>
                         <tfoot>
                             <tr>
+                                {% if is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL') %}
                                 <th class="text-center"><span>Commercial</span></th>
+                                {% endif %}  
                                 <th class="text-center"><span>Tiers</span></th>
                                 <th class="text-center"><span>Nom</span></th>
                                 <th class="text-center"><span>N-1</span></th>  

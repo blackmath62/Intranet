@@ -3,13 +3,12 @@
 {% block body %}
 
 
-{% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR')  ) or ( is_granted('ROLE_COMMERCIAL') and app.user.commercial == app.request.attributes.get('commercialId') ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') ) %}
+{% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR')  ) or ( is_granted('ROLE_COMMERCIAL') and app.user.commercial == app.request.attributes.get('commercialId') ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') or is_granted('ROLE_BUREAU_RB') ) %}
 
 <div class="card-body row">
 
     <div class="col-md-3 col-sm-6 col-12">
         <div class="callout callout-{{ themeColor }} shadow">
-
         <!-- /.col -->
         <div class="">
             <div class="mr-auto border-bottom text-center"><h5>{{ statesClientParArticle[0].Nom }}</h5></div>
