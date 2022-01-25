@@ -55,7 +55,7 @@ class ControleAnomaliesController extends AbstractController
         $this->entete = $entete;
         $this->cmdRoby = $cmdRoby;
         $this->cmdRobyController = $cmdRobyController;
-        $this->$fscAttachedFileController = $fscAttachedFileController;
+        $this->fscAttachedFileController = $fscAttachedFileController;
         //parent::__construct();
     }
     

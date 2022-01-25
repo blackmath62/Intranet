@@ -15,13 +15,18 @@ use Symfony\Component\Mailer\MailerInterface;
 use Container8AgRG4X\getMouvRepositoryService;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\Main\documentsFscRepository;
+use phpDocumentor\Reflection\PseudoTypes\True_;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\fscListMovementRepository;
-use phpDocumentor\Reflection\PseudoTypes\True_;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+/**
+ * @IsGranted("ROLE_USER")
+ */
 
 class FscAttachedFileController extends AbstractController
 {
@@ -315,7 +320,7 @@ class FscAttachedFileController extends AbstractController
        $html = $this->renderView('mails/listePieceFscSansPj.html.twig', ['piecesAnormales' => $piecesAnormales ]);
        $email = (new Email())
        ->from('intranet@groupe-axis.fr')
-       ->to('jpochet@groupe-axis.fr')
+       ->to('marina@roby-fr.com')
        ->cc('jpochet@groupe-axis.fr')
        ->subject('Liste des piéces sur lesquels il manque les piéces jointes Fsc')
        ->html($html);
