@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20211117101635 extends AbstractMigration
+final class Version20220124100532 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -20,12 +20,12 @@ final class Version20211117101635 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE listcmdtraite ADD dossier VARCHAR(255) NOT NULL');
+        $this->addSql('ALTER TABLE fsclistmovement DROP CreatedAt, DROP Tiers, DROP CodePiece');
     }
 
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE ListCmdTraite DROP dossier');
+        $this->addSql('ALTER TABLE fscListMovement ADD CreatedAt DATETIME NOT NULL, ADD Tiers VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, ADD CodePiece INT NOT NULL');
     }
 }

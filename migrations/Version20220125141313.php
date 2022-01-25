@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20211105104957 extends AbstractMigration
+final class Version20220125141313 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -20,12 +20,12 @@ final class Version20211105104957 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE holiday ADD nbJours NUMERIC(10, 1) NOT NULL');
+        $this->addSql('ALTER TABLE fsclistmovement ADD status TINYINT(1) NOT NULL');
     }
 
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE Holiday DROP nbJours');
+        $this->addSql('ALTER TABLE fscListMovement DROP status');
     }
 }

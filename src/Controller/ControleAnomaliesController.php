@@ -41,8 +41,9 @@ class ControleAnomaliesController extends AbstractController
     private $entete;
     private $cmdRoby;
     private $cmdRobyController;
+    private $fscAttachedFileController;
 
-    public function __construct(CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -54,6 +55,7 @@ class ControleAnomaliesController extends AbstractController
         $this->entete = $entete;
         $this->cmdRoby = $cmdRoby;
         $this->cmdRobyController = $cmdRobyController;
+        $this->$fscAttachedFileController = $fscAttachedFileController;
         //parent::__construct();
     }
     
@@ -95,6 +97,9 @@ class ControleAnomaliesController extends AbstractController
                     $this->MajCmdRobyAccepteReporte();
                     $this->cmdRobyController->sendMail();
             }
+            }
+            if ($heure >= 21 && $heure < 4) {
+            $this->fscAttachedFileController->majFscOrderListFromDivalto();
             }
             $this->run_auto_wash();
         }

@@ -510,6 +510,14 @@
 									<p>Commandes</p>
 								</a>
 							</li>
+							{% if is_granted('ROLE_ADMIN') %}
+							<li class="nav-item">
+								<a href="{{path('app_fsc_attached_file')}}" class="nav-link">
+									<i class="nav-icon fas fa-sort-alpha-down"></i>
+									<p>Documents FSC</p>
+								</a>
+							</li>
+							{% endif %}
 							<li class="nav-item">
 								<a href="{{path('app_deb_roby')}}" class="nav-link">
 									<i class="nav-icon fas fa-fw fa-plane"></i>

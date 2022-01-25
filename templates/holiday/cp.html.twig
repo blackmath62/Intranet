@@ -28,7 +28,7 @@
                 {% if app.request.attributes.get('_route') == 'app_holiday_edit' %}
                 {{ form_widget(form.Envoyer, {'label': 'Modifier'} ) }}
                 <a class='btn btn-danger m-3' title="supprimer" data-toggle="modal" data-target="#modal-default"></i>Supprimer cette demande de congés</a>
-                 <div class="modal fade" id="modal-default">
+                <div class="modal fade" id="modal-default">
                     <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">

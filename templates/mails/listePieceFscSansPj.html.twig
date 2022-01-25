@@ -1,0 +1,37 @@
+<p>Bonjour,</p>
+
+{% if piecesAnormales %}
+<p><u><strong>Veuillez trouver ci dessous la liste des pièces qui n'ont pas de piéces jointes pour le FSC: </strong></u></p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Tiers</th>
+            <th>Notre Ref</th>
+            <th>Cmd</th>
+            <th>date Cmd</th>
+            <th>Bl</th>
+            <th>date Bl</th>
+            <th>Facture</th>
+            <th>date Fact</th>
+            <th>Nbre docs</th>
+        </thead>
+        <tbody>
+{% for piecesAnormale in piecesAnormales %}
+        <tr>
+            <td>{{ piecesAnormale.tiers }}</td>
+            <td>{{ piecesAnormale.notreRef }}</td>
+            <td>{{ piecesAnormale.numCmd }}</td>
+            <td>{% if piecesAnormale.numCmd %}{{ piecesAnormale.dateCmd|date('d-m-Y') }}{% endif %}</td>
+            <td>{% if piecesAnormale.numBl %}{{ piecesAnormale.numBl }}{% endif %}</td>
+            <td>{% if piecesAnormale.numBl %}{{ piecesAnormale.dateBl|date('d-m-Y') }}{% endif %}</td>
+            <td>{% if piecesAnormale.numFact %}{{ piecesAnormale.numFact }}{% endif %}</td>
+            <td>{% if piecesAnormale.numFact %}{{ piecesAnormale.dateFact|date('d-m-Y') }}{% endif %}</td>
+            <td>{{ piecesAnormale.count }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>
