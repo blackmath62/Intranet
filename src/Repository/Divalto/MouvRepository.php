@@ -26,14 +26,24 @@ class MouvRepository extends ServiceEntityRepository
     public function getFscOrderList($listpieceOk):array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT DISTINCT RTRIM(LTRIM(MOUV.TIERS)) AS tiers, RTRIM(LTRIM(ENT.PIREF)) AS notreRef, RTRIM(LTRIM(MOUV.PICOD)) AS codePiece, RTRIM(LTRIM(MOUV.CDNO)) AS numCmd,MOUV.CDDT AS dateCmd,RTRIM(LTRIM(MOUV.BLNO)) AS numBl, MOUV.BLDT AS dateBl,RTRIM(LTRIM(MOUV.FANO)) AS numFact, MOUV.FADT AS dateFact,
+        $sql = "SELECT RTRIM(LTRIM(ENT.PIREF)) AS notreRef, tiers AS tiers, codePiece AS codePiece, numCmd AS numCmd, dateCmd AS dateCmd, numBl AS numBl, dateBl AS dateBl, numFact AS numFact, dateFact AS dateFact, utilisateur AS utilisateur
+        FROM(
+        SELECT DISTINCT MOUV.DOS AS dos, RTRIM(LTRIM(MOUV.TIERS)) AS tiers, RTRIM(LTRIM(MOUV.PICOD)) AS codePiece, 
+        RTRIM(LTRIM(MOUV.CDNO)) AS numCmd,MOUV.CDDT AS dateCmd,RTRIM(LTRIM(MOUV.BLNO)) AS numBl, MOUV.BLDT AS dateBl,
+        RTRIM(LTRIM(MOUV.FANO)) AS numFact, MOUV.FADT AS dateFact,
+        CASE
+        WHEN MOUV.PICOD = 2 THEN  MOUV.CDNO
+        WHEN MOUV.PICOD = 3 THEN  MOUV.BLNO
+        WHEN MOUV.PICOD = 4 THEN  MOUV.FANO
+        END AS numPiece,
         CASE
         WHEN MOUV.TIERS IS NULL THEN 'MARINA'
         ELSE 'MARINA'
         END AS utilisateur
         FROM MOUV
-        INNER JOIN ENT ON ENT.DOS = MOUV.DOS AND ENT.TIERS = MOUV.TIERS AND ENT.PICOD = MOUV.PICOD
-        WHERE MOUV.DOS = 3 AND MOUV.REF LIKE 'FSC%' AND MOUV.TICOD IN ('C','F') AND MOUV.CDNO NOT IN($listpieceOk) AND MOUV.PICOD IN (2,3,4) AND (MOUV.CDDT >= '2022/01/01' OR MOUV.BLDT >= '2022/01/01' OR MOUV.FADT >= '2022/01/01')
+        WHERE MOUV.DOS = 3 AND MOUV.REF LIKE 'FSC%' AND MOUV.TICOD IN ('F') AND MOUV.CDNO NOT IN($listpieceOk) AND MOUV.PICOD IN (2,3,4) 
+        AND (MOUV.CDDT >= '2021/01/01' OR MOUV.BLDT >= '2021/01/01' OR MOUV.FADT >= '2021/01/01'))reponse
+        INNER JOIN ENT ON dos = ENT.DOS AND tiers = ENT.TIERS AND ENT.PINO = numPiece
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -44,14 +54,24 @@ class MouvRepository extends ServiceEntityRepository
     public function getFscOrderListRun():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT DISTINCT RTRIM(LTRIM(MOUV.TIERS)) AS tiers, RTRIM(LTRIM(ENT.PIREF)) AS notreRef, RTRIM(LTRIM(MOUV.PICOD)) AS codePiece, RTRIM(LTRIM(MOUV.CDNO)) AS numCmd,MOUV.CDDT AS dateCmd,RTRIM(LTRIM(MOUV.BLNO)) AS numBl, MOUV.BLDT AS dateBl,RTRIM(LTRIM(MOUV.FANO)) AS numFact, MOUV.FADT AS dateFact,
+        $sql = "SELECT RTRIM(LTRIM(ENT.PIREF)) AS notreRef, tiers AS tiers, codePiece AS codePiece, numCmd AS numCmd, dateCmd AS dateCmd, numBl AS numBl, dateBl AS dateBl, numFact AS numFact, dateFact AS dateFact, utilisateur AS utilisateur
+        FROM(
+        SELECT DISTINCT MOUV.DOS AS dos, RTRIM(LTRIM(MOUV.TIERS)) AS tiers, RTRIM(LTRIM(MOUV.PICOD)) AS codePiece, 
+        RTRIM(LTRIM(MOUV.CDNO)) AS numCmd,MOUV.CDDT AS dateCmd,RTRIM(LTRIM(MOUV.BLNO)) AS numBl, MOUV.BLDT AS dateBl,
+        RTRIM(LTRIM(MOUV.FANO)) AS numFact, MOUV.FADT AS dateFact,
+        CASE
+        WHEN MOUV.PICOD = 2 THEN  MOUV.CDNO
+        WHEN MOUV.PICOD = 3 THEN  MOUV.BLNO
+        WHEN MOUV.PICOD = 4 THEN  MOUV.FANO
+        END AS numPiece,
         CASE
         WHEN MOUV.TIERS IS NULL THEN 'MARINA'
         ELSE 'MARINA'
         END AS utilisateur
         FROM MOUV
-        INNER JOIN ENT ON ENT.DOS = MOUV.DOS AND ENT.TIERS = MOUV.TIERS AND ENT.PICOD = MOUV.PICOD
-        WHERE MOUV.DOS = 3 AND MOUV.REF LIKE 'FSC%' AND MOUV.TICOD IN ('C','F') AND MOUV.PICOD IN (2,3,4) AND (MOUV.CDDT >= '2022/01/01' OR MOUV.BLDT >= '2022/01/01' OR MOUV.FADT >= '2022/01/01')
+        WHERE MOUV.DOS = 3 AND MOUV.REF LIKE 'FSC%' AND MOUV.TICOD IN ('F') AND MOUV.PICOD IN (2,3,4) 
+        AND (MOUV.CDDT >= '2021/01/01' OR MOUV.BLDT >= '2021/01/01' OR MOUV.FADT >= '2021/01/01'))reponse
+        INNER JOIN ENT ON dos = ENT.DOS AND tiers = ENT.TIERS AND ENT.PINO = numPiece
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -84,15 +104,33 @@ class MouvRepository extends ServiceEntityRepository
     }
 
     // Mouvements sur la piéce
-    public function getMouvByOrder($num, $tiers, $codePiece)
+    public function getMouvByOrder($num, $tiers)
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT DISTINCT RTRIM(LTRIM(MOUV.CDNO)) AS numCmd, RTRIM(LTRIM(MOUV.PICOD)) AS codePiece, MOUV.TIERS AS tiers,RTRIM(LTRIM(MOUV.BLNO)) AS numBl, MOUV.BLDT AS dateBl,RTRIM(LTRIM(MOUV.FANO)) AS numFact, MOUV.FADT AS dateFact
         FROM MOUV
-        WHERE MOUV.DOS = 3 AND MOUV.PICOD = $codePiece AND MOUV.TIERS = '$tiers' AND MOUV.REF LIKE 'FSC%' AND MOUV.CDNO = $num
+        WHERE MOUV.DOS = 3 AND MOUV.TIERS = '$tiers' AND MOUV.REF LIKE 'FSC%' AND MOUV.CDNO = $num
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetch();
+    }
+
+    // Mouvements sur la piéce
+    public function getLastMouvCli()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT tiers AS tiers, nom AS nom, MAX(MOUV.CDDT) AS dernCmd, MAX(MOUV.BLDT) AS dernBl, MAX(MOUV.FADT) AS dernFact
+        FROM(
+        SELECT CLI.DOS AS dos, RTRIM(LTRIM(CLI.TIERS)) AS tiers, RTRIM(LTRIM(CLI.NOM)) AS nom
+        FROM CLI
+        WHERE CLI.DOS = 3 AND CLI.HSDT IS NULL)reponse
+        LEFT JOIN MOUV ON tiers = MOUV.TIERS AND dos = MOUV.DOS
+        GROUP BY tiers, nom
+        ORDER BY tiers
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
 }

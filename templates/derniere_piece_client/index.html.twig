@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="card collapsed-card card-warning">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+                  <p>Extraction simple des derniéres dates de piéces liées à un client ouvert.</p>
+                  <p>Vous pouvez fermer en masse les clients via le fichier excel téléchargeable dans la barre de titre, vous n'avez plus qu'a alimenter avec les clients concernés dans le tableau ci dessous</p>
+                  <p>3 colonnes importantes, le dossier, le code Tiers, et la date de fermeture qui doit être antérieur au jour actuel</p>
+                  <p>Dans Divalto vous trouverez le menu d'import Tiers en tapant Import - Export Tiers</p>
+    </div>
+</div>
+
+                
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3 class="card-title text-center">Derniéres date de piéces par client ouvert</h3>
+                        <a href="{{ asset('/doc/Roby/import-export_tiers_fermeture_en_masse.xlsx') }}" class="badge badge-success ml-auto pr-2 pl-2">Télécharger l'excel pour fermer les clients en masse</a>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Derniére Commande</span></th>
+                                    <th class="text-center"><span>Dernier Bon de livraison</span></th>
+                                    <th class="text-center"><span>Derniére Facture</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							
+                                {% for lastOrder in lastOrders %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ lastOrder.tiers }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ lastOrder.nom }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                        {% if lastOrder.dernCmd %}
+                                            <a class="text-center text-dark">{{ lastOrder.dernCmd|date("d/m/Y") }}</a>
+                                        {% endif %}
+                                        </td>
+                                         <td class="text-center">
+                                         {% if lastOrder.dernBl %}
+                                            <a class="text-center text-dark">{{ lastOrder.dernBl|date("d/m/Y") }}</a>
+                                         {% endif %}
+                                        </td>
+                                         <td class="text-center">
+                                         {% if lastOrder.dernFact %}
+                                            <a class="text-center text-dark">{{ lastOrder.dernFact|date("d/m/Y") }}</a>
+                                         {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Derniére Commande</span></th>
+                                    <th class="text-center"><span>Dernier Bon de livraison</span></th>
+                                    <th class="text-center"><span>Derniére Facture</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

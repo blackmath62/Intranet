@@ -316,16 +316,18 @@ class FscAttachedFileController extends AbstractController
             $piecesAnormales[$i]['count'] = $count;
            }
        }
-       // envoyer un mail
-       $html = $this->renderView('mails/listePieceFscSansPj.html.twig', ['piecesAnormales' => $piecesAnormales ]);
-       $email = (new Email())
-       ->from('intranet@groupe-axis.fr')
-       ->to('marina@roby-fr.com')
-       ->cc('jpochet@groupe-axis.fr')
-       ->subject('Liste des piéces sur lesquels il manque les piéces jointes Fsc')
-       ->html($html);
-       $this->mailer->send($email);
-       
+       // envoyer un mail si il y a des infos à envoyer
+       if (count($piecesAnormales) > 0) {
+           // envoyer un mail
+           $html = $this->renderView('mails/listePieceFscSansPj.html.twig', ['piecesAnormales' => $piecesAnormales ]);
+           $email = (new Email())
+           ->from('intranet@groupe-axis.fr')
+           ->to('marina@roby-fr.com')
+           ->cc('jpochet@groupe-axis.fr')
+           ->subject('Liste des piéces sur lesquels il manque les piéces jointes Fsc')
+           ->html($html);
+           $this->mailer->send($email);
+        }
     }
 
 
