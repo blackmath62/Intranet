@@ -195,6 +195,13 @@ class ControleAnomaliesController extends AbstractController
         $subject = 'Probléme Article à corriger';
         $this->Execute($donnees, $libelle, $template, $subject);
 
+        // Anomalies Régime article sur piéce
+        $donnees = $this->articleSrefFermes->getControleRegimeArtOnOrder(); // j'ai mis Utilisateur
+        $libelle = 'ProblémeRegimeArticle';
+        $template = 'mails/sendMailAnomalieRegimeArticle.html.twig';
+        $subject = 'Probléme Régime TVA Article sur piéce à corriger ( CECI EST UN TEST :) )';
+        $this->Execute($donnees, $libelle, $template, $subject);
+
         // Contrôle la présence d'article ou de sous référence fermée
         $donnees = $this->articleSrefFermes->getControleSaisieArticlesSrefFermes(); // j'ai mis Utilisateur
         $libelle = 'ArticleSrefFerme';

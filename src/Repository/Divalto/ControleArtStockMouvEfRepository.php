@@ -243,8 +243,39 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    
-    
+
+    // contrôle du régime TVA d'un article sur piéce
+    public function getControleRegimeArtOnOrder():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT Identification, Dos, TypePiece, TypeTiers, DevisDt, CmdDt, BlDt, FactDt, Tiers,Ref, Sref1, Sref2, Designation, Uv, TvaMouv, TvaArt, Piece, DatePiece, ENT.USERCR AS Utilisateur, MUSER.EMAIL AS Email
+        FROM(
+        SELECT MOUV.DOS AS Dos, MOUV.MOUV_ID AS Identification, MOUV.PICOD AS TypePiece, MOUV.TICOD AS TypeTiers,MOUV.DVDT AS DevisDt, MOUV.CDDT AS CmdDt, MOUV.BLDT AS BlDt, MOUV.FADT AS FactDt, MOUV.TIERS AS Tiers, MOUV.REF AS Ref, MOUV.SREF1 AS Sref1,
+        MOUV.SREF2 AS Sref2, MOUV.DES AS Designation, MOUV.VENUN AS Uv, MOUV.TVAART AS TvaMouv, ART.TVAART AS TvaArt,
+        CASE
+        WHEN MOUV.PICOD = 1 THEN MOUV.DVNO
+        WHEN MOUV.PICOD = 2 THEN MOUV.CDNO
+        WHEN MOUV.PICOD = 3 THEN MOUV.BLNO
+        WHEN MOUV.PICOD = 4 THEN MOUV.FANO
+        END AS Piece,
+        CASE
+        WHEN MOUV.PICOD = 1 THEN MOUV.DVDT
+        WHEN MOUV.PICOD = 2 THEN MOUV.CDDT
+        WHEN MOUV.PICOD = 3 THEN MOUV.BLDT
+        WHEN MOUV.PICOD = 4 THEN MOUV.FADT
+        END AS DatePiece
+        FROM MOUV
+        INNER JOIN ART ON MOUV.DOS = ART.DOS AND MOUV.REF = ART.REF
+        WHERE MOUV.DOS = 1 AND MOUV.TVAART <> ART.TVAART AND MOUV.REF NOT IN ('DIVERS_') AND MOUV.PICOD NOT IN (4) ) reponse
+        INNER JOIN ENT ON ENT.DOS = Dos AND ENT.PICOD = TypePiece AND ENT.TICOD = TypeTiers AND ENT.TIERS = Tiers AND Piece = ENT.PINO
+        LEFT JOIN MUSER ON ENT.USERCR = MUSER.USERX AND MUSER.DOS = Dos
+        WHERE ENT.PIDT > '2022-01-01'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+        
 
 }
 

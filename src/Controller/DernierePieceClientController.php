@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DernierePieceClientController extends AbstractController
 {
     /**
-     * @Route("/dernieres/pieces/client", name="app_dernieres_pieces_ par_client")
+     * @Route("/Roby/dernieres/pieces/client", name="app_dernieres_pieces_ par_client")
      */
     public function index(MouvRepository $repo): Response
     {

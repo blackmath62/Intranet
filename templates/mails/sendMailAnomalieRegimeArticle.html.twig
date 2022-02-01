@@ -1,0 +1,11 @@
+<p>Bonjour {{ anomalie.Utilisateur }},</p>
+<p>Un article de Divalto <strong>{{ anomalie.Ref }}</strong> - <strong>{{ anomalie.Designation }}</strong> - <strong>{{ anomalie.Sref1 }}</strong> - <strong>{{ anomalie.Sref2 }}</strong>
+ sur {% if anomalie.TypePiece == 1 %}un devis {% elseif anomalie.TypePiece == 2 %}une commande {% elseif anomalie.TypePiece == 3 %}un bon de livraison {% elseif anomalie.TypePiece == 4 %}une facture {% endif %} <strong>
+{% if anomalie.TypeTiers == 'F' %} fournisseur {% elseif anomalie.TypeTiers == 'C' %} client {% endif %}</strong> numéro <strong>{{ anomalie.Piece }}</strong> que vous avez créé.</p>
+<p>Le régime TVA de l'article est différent sur la piéce de celui de la fiche article, ce qui impacte directement le taux de TVA présent sur la piéce. Ce probléme est généralement lié a une fausse manipulation involontaire.</p>
+<p>Pour Corriger ce probléme, merci de resaisir la ligne article sur cette piéce et de supprimer l'ancienne ligne</p>
+
+<p>ce mail vous sera envoyé chaque jour jusqu'a résolution du probléme.</p>
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>
