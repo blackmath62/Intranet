@@ -67,6 +67,35 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
         $stmt->execute([$facture,$typeTiers]);
         return $stmt->fetch();
     }
+    public function getRegimeArticleFromOrder($annee, $mois,$typeTiers)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT dos, Op, typePiece, typeTiers, tiers,ref, sref1, sref2, designation, uv, tvaMouv, tvaArt, piece, datePiece
+        FROM(
+        SELECT MOUV.DOS AS dos, MOUV.OP AS Op, MOUV.PICOD AS typePiece, MOUV.TICOD AS typeTiers,MOUV.TIERS AS tiers, MOUV.REF AS ref, MOUV.SREF1 AS sref1,
+        MOUV.SREF2 AS sref2, MOUV.DES AS designation, MOUV.VENUN AS uv, MOUV.TVAART AS tvaMouv, ART.TVAART AS tvaArt,
+        CASE
+        WHEN MOUV.PICOD = 1 THEN MOUV.DVNO
+        WHEN MOUV.PICOD = 2 THEN MOUV.CDNO
+        WHEN MOUV.PICOD = 3 THEN MOUV.BLNO
+        WHEN MOUV.PICOD = 4 THEN MOUV.FANO
+        END AS piece,
+        CASE
+        WHEN MOUV.PICOD = 1 THEN MOUV.DVDT
+        WHEN MOUV.PICOD = 2 THEN MOUV.CDDT
+        WHEN MOUV.PICOD = 3 THEN MOUV.BLDT
+        WHEN MOUV.PICOD = 4 THEN MOUV.FADT
+        END AS datePiece
+        FROM MOUV
+        INNER JOIN ART ON MOUV.DOS = ART.DOS AND MOUV.REF = ART.REF
+        WHERE MOUV.DOS = 1 AND MOUV.TVAART <> ART.TVAART AND MOUV.TICOD = '$typeTiers') reponse
+        INNER JOIN ENT ON ENT.DOS = dos AND ENT.PICOD = typePiece AND ENT.TICOD = typeTiers AND ENT.TIERS = tiers AND piece = ENT.PINO
+        WHERE YEAR(ENT.PIDT) IN ($annee) AND MONTH(ENT.PIDT) IN ($mois)
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
     public function getSendMailErreurRegimeFournisseur():array
     {

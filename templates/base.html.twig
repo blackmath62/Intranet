@@ -193,6 +193,12 @@
 									<!-- <span class="badge badge-danger right">8</span> -->
 								</a>
 							</li>
+							<li class="nav-item">
+								<a href="{{path('app_dernieres_pieces_ par_client')}}" class="nav-link">
+									<i class="nav-icon fab fa-audible"></i>
+									<p>Derniéres intéractions client</p>
+								</a>
+							</li>	
 
 						{% if is_granted('ROLE_ADMIN') %}
 							<li class="nav-item">
@@ -365,14 +371,12 @@
 										</li>
 									{% endif %}
 									
-									{% if is_granted('ROLE_LHERMITTE') %}
 									<li class="nav-item">
 										<a href="{{ path('app_states_lhermitte') }}" class="nav-link">
 											<i class="fas fa-globe nav-icon text-primary"></i>
 											<p>Lhermitte Frères</p>
 										</a>
 									</li>
-									{% endif %}
 								</ul>
 							</li>
 							{% endif %}
@@ -382,6 +386,12 @@
 								<a href="{{path('app_lhermitte_rossignols')}}" class="nav-link">
 									<i class="nav-icon fas fa-dove text-light"></i>
 									<p>Rossignols</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="{{ path('app_contrat_commissionnaire') }}" class="nav-link">
+									<i class="fas fa-file-signature nav-icon text-light"></i>
+									<p>Contrats Commissionnaires</p>
 								</a>
 							</li>
 
@@ -509,13 +519,7 @@
 									<i class="nav-icon fas fa-hourglass-half"></i>
 									<p>Commandes</p>
 								</a>
-							</li>
-							<li class="nav-item">
-								<a href="{{path('app_dernieres_pieces_ par_client')}}" class="nav-link">
-									<i class="nav-icon fab fa-audible"></i>
-									<p>Derniéres intéractions client</p>
-								</a>
-							</li>							
+							</li>						
 							<li class="nav-item">
 								<a href="{{path('app_fsc_attached_file')}}" class="nav-link">
 									<i class="nav-icon fas fa-sort-alpha-down"></i>

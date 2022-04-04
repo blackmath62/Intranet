@@ -42,8 +42,9 @@ class ControleAnomaliesController extends AbstractController
     private $cmdRoby;
     private $cmdRobyController;
     private $fscAttachedFileController;
+    private $contratCommissionnaireController;
 
-    public function __construct(FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -56,6 +57,7 @@ class ControleAnomaliesController extends AbstractController
         $this->cmdRoby = $cmdRoby;
         $this->cmdRobyController = $cmdRobyController;
         $this->fscAttachedFileController = $fscAttachedFileController;
+        $this->contratCommissionnaireController = $contratCommissionnaireController;
         //parent::__construct();
     }
     
@@ -85,21 +87,26 @@ class ControleAnomaliesController extends AbstractController
     Public function Run_Cron(){
         $dateDuJour = new DateTime();
         $jour = $dateDuJour->format('w');
+        $d = $dateDuJour->format('d');
         $heure = $dateDuJour->format('H');
         $dateDuJour  = $dateDuJour->format('d-m-Y');
+        // envoie d'un mail le 5 de chaque mois
+        if ($d == 20) {
+            if ($heure >= 8 && $heure < 20) {
+                $this->contratCommissionnaireController->sendMail();
+            }
+        }
         if ($this->isWeekend($dateDuJour) == false) {
             $this->ControleClient();
             $this->ControleFournisseur();
             $this->ControleArticle();
             $this->ControlStockDirect(); // j'ai mis Utilisateur
             if ($heure >= 8 && $heure < 20) {
+                $this->fscAttachedFileController->majFscOrderListFromDivalto();
             if ($jour == 5 || $jour == 1) {
                     $this->MajCmdRobyAccepteReporte();
                     $this->cmdRobyController->sendMail();
             }
-            }
-            if ($heure >= 21 && $heure < 4) {
-            $this->fscAttachedFileController->majFscOrderListFromDivalto();
             }
             $this->run_auto_wash();
         }
@@ -199,7 +206,7 @@ class ControleAnomaliesController extends AbstractController
         $donnees = $this->articleSrefFermes->getControleRegimeArtOnOrder(); // j'ai mis Utilisateur
         $libelle = 'ProblémeRegimeArticle';
         $template = 'mails/sendMailAnomalieRegimeArticle.html.twig';
-        $subject = 'Probléme Régime TVA Article sur piéce à corriger ( CECI EST UN TEST :) )';
+        $subject = 'Probléme Régime TVA Article sur piéce à corriger';
         $this->Execute($donnees, $libelle, $template, $subject);
 
         // Contrôle la présence d'article ou de sous référence fermée

@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="card card-dark collapsed-card">
+				<div class="card-header">
+					<h3 class="card-title">Créer un nouveau Type de document FSC</h3>
+					<div class="card-tools">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse">
+							<i class="fas fa-plus"></i>
+						</button>
+					</div>
+					<!-- /.card-tools -->
+				</div>
+				<!-- /.card-header -->
+				<div class="row card-body">
+					<div class="col-12">
+						<div class="card">
+							{{ form_start(form)}}
+							<div class="d-flex flex-wrap card-body">
+								<div class="form-group col-4">
+									{{ form_row(form.title, {'attr' : {'placeholder' : "Nom du type de document FSC", 'class' : "form-control"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(form.color, {'attr' : {'placeholder' : "Couleur", 'class' : "form-control my-colorpicker2 colorpicker-element"}})}}
+								</div>
+								<div class="form-group col-4">
+									{{ form_row(form.icone, {'attr' : {'placeholder' : "fas fa-tree", 'class' : "form-control"}})}}
+								</div>
+							</div>
+							{{ form_end(form)}}
+						</div>
+					</div>
+				</div>
+				<!-- /.card-body -->
+			</div>
+
+			<!-- /.card -->
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-dark">
+						<div class="card-header d-flex">
+							<h3 class="card-title text-center mr-auto">Modification des types de document FSC</h3>
+							<a href="{{ path('app_admin_parameter') }}" class="badge badge-success ml-auto">Retourner aux paramétres</a>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<table id="example1" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th class="text-center">
+											<span>Titre</span>
+										</th>
+										<th class="text-center">
+											<span>Couleur</span>
+										</th>
+										<th class="text-center">
+											<span>Icone</span>
+										</th>
+                                        <th class="text-center">
+											<span>Actions</span>
+										</th>
+									</tr>
+								</thead>
+
+								<tbody>
+									<small>{{ form_errors( form.title ) }}</small>
+									{% for typeDoc in typeDocs %}
+										<tr id="<?= $id ?>">
+											<td class="text-center">
+												<a class="text-center text-dark" style="max-width: 40px;">{{typeDoc.title}}</a>
+											</td>
+											<td class="text-center">
+												<a class="btn btn-xl text-white" style= "background-color: {{ typeDoc.color }}";>{{ typeDoc.color }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center btn btn-xl text-white" style= "background-color: {{ typeDoc.color }}";><i class="{{ typeDoc.icone }}"></i></a>
+											</td>
+											<td class="text-center">
+												<a class="btn btn-warning" href="{{path('app_type_document_fsc_edit', {'id' : typeDoc.id})}}">
+													<i class="fas fa-edit"></i>
+												</a>
+												<a class="btn btn-danger" href="{{path('app_type_document_fsc_delete', {'id' : typeDoc.id})}}">
+													<i class="fas fa-trash-alt"></i>
+												</a>
+											</td>
+										{% endfor %}
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<th class="text-center">
+											<span>Titre</span>
+										</th>
+										<th class="text-center">
+											<span>Couleur</span>
+										</th>
+										<th class="text-center">
+											<span>Icone</span>
+										</th>
+                                        <th class="text-center">
+											<span>Actions</span>
+										</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock %}

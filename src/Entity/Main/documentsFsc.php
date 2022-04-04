@@ -27,6 +27,11 @@ class documentsFsc
      */
     private $fscListMovement;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=TypeDocumentFsc::class, inversedBy="documentsFscs")
+     */
+    private $TypeDoc;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -52,6 +57,18 @@ class documentsFsc
     public function setFscListMovement(?fscListMovement $fscListMovement): self
     {
         $this->fscListMovement = $fscListMovement;
+
+        return $this;
+    }
+
+    public function getTypeDoc(): ?TypeDocumentFsc
+    {
+        return $this->TypeDoc;
+    }
+
+    public function setTypeDoc(?TypeDocumentFsc $TypeDoc): self
+    {
+        $this->TypeDoc = $TypeDoc;
 
         return $this;
     }

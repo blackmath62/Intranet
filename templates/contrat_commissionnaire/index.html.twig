@@ -1,0 +1,154 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="card collapsed-card card-warning">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+                
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header d-flex justify-content-between">
+                <h3 class="card-title text-center">Email d'envoi des Produits Phyto en contrat commissionnaire</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+           {{ form_start(form)}}
+                <div class="form-group d-flex flex-wrap">
+                    {{ form_widget(form.email) }}
+                    {{ form_widget(form.Ajouter)}}
+                </div>
+            {{ form_end(form)}}
+            {% if listeMails %}
+                <table id="example2" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th class="text-center"><span>Email</span></th>
+                            <th class="text-center"><span>Action</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for listeMail in listeMails %}
+                            <tr>
+                                <td class="text-center">
+                                    <a class="text-center text-dark">{{ listeMail.email }}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a data-toggle="modal" data-target="#modal-default-{{listeMail.id}}" class="text-center btn btn-xl btn-danger"><i class="fas fa-trash-alt"></i></a>
+                                    <div class="modal fade" id="modal-default-{{listeMail.id}}">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h4 class="modal-title">Voulez vous vraiment supprimer ce mail ?</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            </div>
+                                            <div class="modal-body">
+                                            <p>Cette action est irréversible !&hellip;</p>
+                                            </div>
+                                            <div class="modal-footer justify-content-between">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                            <a type="button" href='{{path('app_contrat_commissionnaire_delete_mail', {'id' : listeMail.id } ) }}' class="btn btn-danger">Supprimer</a>
+                                            </div>
+                                        </div>
+                                        <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <!-- /.modal -->
+                                </td>
+                            </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+                
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header d-flex justify-content-between">
+                        <h3 class="card-title text-center">Produits Phyto en contrat commissionnaire</h3>
+                        <a href="{{ path('app_contrat_commissionnaire_update_list') }}" class="badge badge-success ml-auto pr-2 pl-2">Ajouter les nouveaux produits fraichement créés</a>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Contrats Commissionnaires</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							
+                                {% for listeArticle in listeArticles %}
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ listeArticle.reference }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ listeArticle.designation }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                        {% if listeArticle.contratCommissionaire == false %}
+                                            <a data-toggle="modal" data-target="#modal-article-{{listeArticle.id}}" class="text-center btn btn-xl btn-danger"><i class="fas fa-times-circle"></i></a>
+                                        {% else %}    
+                                            <a data-toggle="modal" data-target="#modal-article-{{listeArticle.id}}" class="text-center btn btn-xl btn-success"><i class="fas fa-check-circle"></i></a>
+                                        {% endif %}
+                                            <div class="modal fade" id="modal-article-{{listeArticle.id}}">
+                                                <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                    <h4 class="modal-title">Voulez vous vraiment changer le type de l'article ?</h4>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                    <p>Si vous retirez le produit des contrats Commissionnaires, il ne sera plus transmis aux destinataires du mail automatique !&hellip;</p>
+                                                    </div>
+                                                    <div class="modal-footer justify-content-between">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                                    <a type="button" href='{{path('app_contrat_commissionnaire_update_article', {'id' : listeArticle.id } ) }}' class="btn btn-danger">Changer le type de l'article</a>
+                                                    </div>
+                                                </div>
+                                                <!-- /.modal-content -->
+                                                </div>
+                                                <!-- /.modal-dialog -->
+                                            </div>
+                                            <!-- /.modal -->
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Contrats Commissionnaires</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

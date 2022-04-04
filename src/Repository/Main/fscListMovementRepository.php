@@ -19,6 +19,42 @@ class fscListMovementRepository extends ServiceEntityRepository
         parent::__construct($registry, fscListMovement::class);
     }
 
+    // Compter le nombre de piéce pour la commande ciblé
+    public function getCountTypeDocByOrderFsc($id):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT
+        typedocumentfsc.id AS idTypeDoc, typedocumentfsc.title AS titleTypeDoc, fsclistmovement.id AS idMov, COUNT(fsclistmovement.id) AS countMov
+        FROM typedocumentfsc
+        INNER JOIN documentsfsc ON typedocumentfsc.id = documentsfsc.TypeDoc_id
+        INNER JOIN fsclistmovement ON fsclistmovement.id = documentsfsc.fscListMovement_id
+        WHERE fsclistmovement.id = '$id'
+        GROUP BY typedocumentfsc.id, typedocumentfsc.title, fsclistmovement.id
+        ORDER BY fsclistmovement.id
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Compter le nombre de piéce pour toutes les commandes
+    public function getCountTypeDocByOrderFscForAll():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT
+        typedocumentfsc.id AS idTypeDoc, typedocumentfsc.title AS titleTypeDoc, fsclistmovement.id AS idMov, COUNT(fsclistmovement.id) AS countMov
+        FROM typedocumentfsc
+        INNER JOIN documentsfsc ON typedocumentfsc.id = documentsfsc.TypeDoc_id
+        INNER JOIN fsclistmovement ON fsclistmovement.id = documentsfsc.fscListMovement_id
+        GROUP BY typedocumentfsc.id, typedocumentfsc.title, fsclistmovement.id
+        ORDER BY fsclistmovement.id
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
+    
     // /**
     //  * @return fscListMovement[] Returns an array of fscListMovement objects
     //  */

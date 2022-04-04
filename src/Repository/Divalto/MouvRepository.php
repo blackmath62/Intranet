@@ -117,20 +117,44 @@ class MouvRepository extends ServiceEntityRepository
     }
 
     // Mouvements sur la piéce
-    public function getLastMouvCli()
+    public function getLastMouvCli($dos)
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT tiers AS tiers, nom AS nom, MAX(MOUV.CDDT) AS dernCmd, MAX(MOUV.BLDT) AS dernBl, MAX(MOUV.FADT) AS dernFact
+        $sql = "SELECT commercial, tiers AS tiers, nom AS nom, MAX(MOUV.CDDT) AS dernCmd, MAX(MOUV.BLDT) AS dernBl, MAX(MOUV.FADT) AS dernFact
         FROM(
-        SELECT CLI.DOS AS dos, RTRIM(LTRIM(CLI.TIERS)) AS tiers, RTRIM(LTRIM(CLI.NOM)) AS nom
+        SELECT CLI.DOS AS dos,VRP.NOM AS commercial, RTRIM(LTRIM(CLI.TIERS)) AS tiers, RTRIM(LTRIM(CLI.NOM)) AS nom
         FROM CLI
-        WHERE CLI.DOS = 3 AND CLI.HSDT IS NULL)reponse
+        LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND CLI.DOS = VRP.DOS
+        WHERE CLI.DOS IN ($dos) AND CLI.HSDT IS NULL)reponse
         LEFT JOIN MOUV ON tiers = MOUV.TIERS AND dos = MOUV.DOS
-        GROUP BY tiers, nom
+        GROUP BY commercial,tiers, nom
         ORDER BY tiers
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    // Vente des contrats commissionnaires
+    public function getVenteContratCommissionnaire($articles, $mois, $annee)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT reference, designation, uv,SUM(quantite) AS quantite
+        FROM(
+        SELECT RTRIM(LTRIM(MOUV.REF)) AS reference, RTRIM(LTRIM(MOUV.DES)) AS designation, RTRIM(LTRIM(MOUV.VENUN)) AS uv, MOUV.OP AS op, MOUV.FAQTE AS qte,
+        CASE
+            WHEN MOUV.OP IN('C','CD') THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD') THEN -1*MOUV.FAQTE
+            ELSE 0
+        END AS quantite
+        FROM MOUV
+        WHERE MOUV.DOS = 1 AND MOUV.REF IN ($articles) AND YEAR(MOUV.FADT) IN ($annee) AND MOUV.PICOD = 4 AND MOUV.TICOD = 'C' AND MONTH(MOUV.FADT) IN ($mois)
+        GROUP BY MOUV.REF, MOUV.DES, MOUV.VENUN, MOUV.OP, MOUV.FAQTE)reponse
+        GROUP BY reference, designation, uv
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
 }

@@ -2,7 +2,7 @@
 <p>Veuillez trouver ci dessous la liste des commandes et leurs délais acceptées et reportées:</p>
 
 {% if commandesAvecDelais %}
-<p><u><strong>Les commandes qui ont un délai acceptées ou reportées inférieurs ou égale à 10 jours et qui ne sont pas en terminées sont les suivantes : </strong></u></p>
+<p><u><strong>Commandes à J-15 : </strong></u></p>
     <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
         <thead>
             <tr class="text-center">
@@ -13,7 +13,6 @@
             <th>Notre Ref</th>
             <th>Délai accepté</th>
             <th>Délai reporté</th>
-            <th>Commentaires</th>
         </thead>
         <tbody>
 {% for commandesAvecDelai in commandesAvecDelais %}
@@ -25,7 +24,6 @@
             <td>{{ commandesAvecDelai.NotreRef }}</td>
             <td>{% if commandesAvecDelai.DelaiAccepte %}{{ commandesAvecDelai.DelaiAccepte|date('d-m-Y') }}{% endif %}</td>
             <td>{% if commandesAvecDelai.DelaiReporte %}{{ commandesAvecDelai.DelaiReporte|date('d-m-Y') }}{% endif %}</td>
-            <td>{{ commandesAvecDelai.Commentaire }}, pensez à la passer ne terminée</td>
         </tr>
 {% endfor %}
        </tbody>
@@ -33,7 +31,7 @@
 {% endif %}
 
 {% if commandesSansDelais %}
-<p><u><strong>Les commandes qui n'ont pas de délai acceptées ou reportées et qui ne sont pas terminées sont les suivantes : </strong></u></p>
+<p><u><strong>Commandes sans délais : </strong></u></p>
     <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
         <thead>
             <tr class="text-center">
@@ -44,7 +42,6 @@
             <th>Notre Ref</th>
             <th>Délai accepté</th>
             <th>Délai reporté</th>
-            <th>Commentaires</th>
         </thead>
         <tbody>
 {% for commandesSansDelai in commandesSansDelais %}
@@ -56,7 +53,6 @@
             <td>{{ commandesSansDelai.NotreRef }}</td>
             <td>{% if commandesSansDelai.DelaiAccepte %}{{ commandesSansDelai.DelaiAccepte|date('d-m-Y') }}{% endif %}</td>
             <td>{% if commandesSansDelai.DelaiReporte %}{{ commandesSansDelai.DelaiReporte|date('d-m-Y') }}{% endif %}</td>
-            <td>{{ commandesSansDelai.Commentaire }}</td>
         </tr>
 {% endfor %}
        </tbody>
@@ -64,7 +60,7 @@
 {% endif %}
 
 {% if commandesDelaiDepasses %}
-<p><u><strong>Les commandes qui ont dépassées le délai et qui ne sont pas terminées sont les suivantes : </strong></u></p>
+<p><u><strong>Commandes avec délais dépassés : </strong></u></p>
     <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
         <thead>
             <tr class="text-center">
@@ -75,7 +71,6 @@
             <th>Notre Ref</th>
             <th>Délai accepté</th>
             <th>Délai reporté</th>
-            <th>Commentaires</th>
         </thead>
         <tbody>
 {% for commandesDelaiDepasse in commandesDelaiDepasses %}
@@ -87,7 +82,6 @@
             <td>{{ commandesDelaiDepasse.NotreRef }}</td>
             <td>{% if commandesDelaiDepasse.DelaiAccepte %}{{ commandesDelaiDepasse.DelaiAccepte|date('d-m-Y') }}{% endif %}</td>
             <td>{% if commandesDelaiDepasse.DelaiReporte %}{{ commandesDelaiDepasse.DelaiReporte|date('d-m-Y') }}{% endif %}</td>
-            <td>{{ commandesDelaiDepasse.Commentaire }}</td>
         </tr>
 {% endfor %}
        </tbody>

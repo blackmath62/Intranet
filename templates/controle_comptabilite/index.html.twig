@@ -45,47 +45,6 @@
             </div>
             <div class="card-body">
             {% if annee %}
-            {% if is_granted('ROLE_ADMIN') %}
-            <h3>Contrôle Trous dans les factures {{ typeTiers }} </h3>
-            {% if controleTrousFactures %}
-            
-                <table id="example1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"><span>Alerte</span></th>
-                                    <th class="text-center"><span>Numéro de piéce</span></th>
-                                    <th class="text-center"><span>Date de cette facture</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-							{% for controleTrousFacture in controleTrousFactures %}                                
-                               
-                                    <tr>
-                                         <td class="text-center">
-                                            <a class="text-center text-dark"><i class="fas fa-exclamation-circle fa-2x text-danger"></i></a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ controleTrousFacture }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">Pas de facture trouvé dans le systéme</a>
-                                        </td>
-                                    </tr>
-                            {% endfor %}
-
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                   <th class="text-center"><span>Alerte</span></th>
-                                   <th class="text-center"><span>Numéro de piéce</span></th>
-                                   <th class="text-center"><span>Date de cette facture</span></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-            {% else %}
-                        <h4 class="text-left text-dark"><i class="fas fa-check-circle pr-2 text-success"></i>Pas de probléme dans la numérotation des factures {{ typeTiers }} !</h4>
-            {% endif %}
-            {% endif %}
              <div class="dropdown-divider p-2"></div>
             <h3>Contrôle Taxe Gazole</h3>
             {% if controleTaxes %}
@@ -208,7 +167,7 @@
                         <h4 class="text-left text-dark"><i class="fas fa-check-circle pr-2 text-success"></i>Pas de probléme de Régime {{ typeTiers }} sur les piéces !</h4>
             {% endif %}
 
-                        <div class="dropdown-divider p-2"></div>
+            <div class="dropdown-divider p-2"></div>
             <h3>Contrôle Transports {{ typeTiers }} </h3>
             {% if controleRegimesTransports %}
             
@@ -273,6 +232,88 @@
             {% else %}
                         <h4 class="text-left text-dark"><i class="fas fa-check-circle pr-2 text-success"></i>Pas de probléme de Régime transport {{ typeTiers }} sur les piéces !</h4>
             {% endif %}
+
+            <div class="dropdown-divider p-2"></div>
+            <h3>Contrôle Régimes Articles sur piéces {{ typeTiers }} </h3>
+            {% if controleRegimeArticles %}
+            
+                <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Alerte</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>Tva Mouvement</span></th>
+                                    <th class="text-center"><span>Tva Article</span></th>
+                                    <th class="text-center"><span>Type Piéce</span></th>
+                                    <th class="text-center"><span>Piéce</span></th>
+                                    <th class="text-center"><span>Date Piéce</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+							{% for controleRegimeArticle in controleRegimeArticles %}                                
+                               
+                                    <tr>
+                                         <td class="text-center">
+                                            <a class="text-center text-dark"><i class="fas fa-exclamation-circle fa-2x text-danger"></i></a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimeArticle.tiers }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimeArticle.ref }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimeArticle.designation }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimeArticle.sref1 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimeArticle.sref2 }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimeArticle.tvaMouv }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimeArticle.tvaArt }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimeArticle.typePiece }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimeArticle.piece }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center text-dark">{{ controleRegimeArticle.datePiece }}</a>
+                                        </td>
+                                    </tr>
+                            {% endfor %}
+
+                            </tbody>
+                            <tfoot>
+                               <tr>
+                                    <th class="text-center"><span>Alerte</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Référence</span></th>
+                                    <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Sref1</span></th>
+                                    <th class="text-center"><span>Sref2</span></th>
+                                    <th class="text-center"><span>Tva Mouvement</span></th>
+                                    <th class="text-center"><span>Tva Article</span></th>
+                                    <th class="text-center"><span>Type Piéce</span></th>
+                                    <th class="text-center"><span>Piéce</span></th>
+                                    <th class="text-center"><span>Date Piéce</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+            {% else %}
+                        <h4 class="text-left text-dark"><i class="fas fa-check-circle pr-2 text-success"></i>Pas de probléme de Régime article sur piéce {{ typeTiers }} !</h4>
+            {% endif %}
+
             {% else %}
                 <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez selectionner un filtre.</h4>
             {% endif %}

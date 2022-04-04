@@ -17,12 +17,81 @@
                 
 <div class="row">
             <div class="col-md-12">
-                <div class="card card-dark">
-                    <div class="card-header d-flex justify-content-between">
-                        <h2 class="card-title">Liste des produits de la piéce</h2>
-                      
-                        <a title = 'Retourner à la liste des piéces à alimenter' href="{{ path('app_fsc_attached_file') }}" class="btn btn-danger ml-auto"><i class="fas fa-thumbs-down"></i></a>
+                {% if piece.probleme == 0 %}
+                <div class="card card-dark"> 
+                {% else %}
+                <div class="card card-danger"> 
+                {% endif %}
+                
+                    <div class="card-header d-flex justify-content-between flex-wrap">
+                        <div class="card-title">
+                        <h2>Liste des produits de la piéce</h2>
+                        {% if piece.probleme > 0 %}<span>Il y a un probléme avec les documents remis par le fournisseur, veuillez vérifier les commentaires ci dessous</span>{% endif %}
+                        </div>
+                        <div class="ml-auto">
+                            {% if piece.probleme == 0 %}
+                                <button type="button" title = 'Bloquer cette piéce suite à un probléme' data-toggle="modal" data-target="#modal-{{piece.id}}" class="btn btn-danger "><i class="far fa-times-circle pr-2"></i> Vérrouiller manuellement cette piéce</button> 
+                            {% else %}
+                                <button type="button" title = 'Débloquer cette piéce' data-toggle="modal" data-target="#modal-{{piece.id}}" class="btn btn-success "><i class="fas fa-check-circle pr-2"></i> Dévérrouiller manuellement cette piéce</button>
+                            {% endif %}                            
+                            <a title = 'Retourner à la liste des piéces à alimenter' href="{{ path('app_fsc_attached_file') }}" class="btn btn-warning text-dark"><i class="fas fa-thumbs-down pr-2"></i>Voir les piéces à alimenter</a>
+                        </div>
                     </div>
+
+                    <!-- modal -->
+                    <div class="modal fade" id="modal-{{piece.id}}">
+                        <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            {% if piece.probleme == 0 %}
+                                <h4 class="modal-title">Souhaitez vous bloquer cette piece suite a un probléme avec les documents fournisseur ?</h4>
+                            {% else %}
+                                <h4 class="modal-title">Souhaitez vous débloquer cette piece ? Le fournisseur a pu se justifier ?</h4>
+                            {% endif %}
+                            
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body text-left">
+                            <p>Un commentaire va être automatiquement générer en votre nom avec date et heure, merci préciser les raisons de ce changement de statut ci dessous.</br>
+                            N'oubliez pas que toutes <strong>les piéces FSC doivent être appuyées de documents</strong></br>
+                            <ul>
+                                <li>Document commercial du fournisseur avec la mention FSC sur les produits (notre facture d'achat)</li>
+                                <li>Contrat d’achat de matière première du fournisseur</li>
+                                <li>permissions de coupe</li>
+                                <li>factures d’achats de la matiére premiére du fournisseur</li>
+                                <li>Le document du site FSC attestant que le fournisseur est encore certifié à ce jour</li>
+                            </ul>
+                            </p>
+                            {% if piece.probleme == 0 %}
+                                <p>Il est important de noter dans ce commentaire les <strong>numéros de piéces internes</strong> qui ont permis de régulariser cette situation en basculant les articles sur des produits standards</br>
+                                Merci de <strong>retirer les étiquettes FSC des palettes concernées et de préciser dans le commentaire qui s'en est chargé !</strong></br>
+                                <strong>Ne pas mélanger les palettes avec d'autres produits au risque de ne plus pouvoir les remettres en FSC en cas de régularisation future, il faut donc les identifier distinctement !</strong></p>
+                            {% else %}
+                                <p><strong>Seulement si ces palettes sont clairement identifiables :</strong></br>
+                                Vous devez supprimer les bons internes inutiles pour <strong>remettre les articles sur les produits FSC</strong>.</br>
+                                Vous devez également <strong>remettre les étiquettes FSC sur les palettes</strong> en question si celle ci ont été retirées.</br>
+                                <strong>Si ces palettes ne sont pas identifiables car elles n'ont pas été isolées, elles doivent rester en produits standards</strong></p>
+                            {% endif %}
+                            
+                            {{ form_start(formText) }}
+                            {{ form_errors(formText.content) }}
+                            {{ form_row(formText.content) }}
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-danger">{% if piece.probleme == 0 %}Vérrouiller cette piéce {% else %}Dévérrouiller cette piéce{% endif %}</button>
+                            {{ form_end(formText) }}
+                            </div>
+                        </div>
+                        <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
+
+
                     <!-- /.card-header -->
                     <div class="card-body">
 							{% if details %}
@@ -112,10 +181,28 @@
                     <div class="card-body">
                     {% set docs = documents.file|length %}
 							{% if docs > 0 %}
+                                <div class='d-flex justify-content-center'>
+                                    {% for typeDoc in typeDocs %}
+                                    {% set count = 0 %}
+                                        {% for findDoc in findDocs %}
+                                            {% if typeDoc.id == findDoc.id %}{% set count = findDoc.count %}{% endif %}
+                                        {% endfor %}
+                                        {% if count > 0 %}
+                                            <a class='btn btn-xl btn-success m-2'>{{ typeDoc.title }}
+                                        {% else %}
+                                            <a class='btn btn-xl btn-danger m-2'>{{ typeDoc.title }}
+                                        {% endif %}
+                                        <span class='ml-2 badge badge-dark'>{{ count }}</span>                                       
+                                        </a>
+                                       
+                                    {% endfor %}
+                                </div>
                                 <table id="example2" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
+                                            <th class="text-center"><span>Id</span></th>
                                             <th class="text-center"><span>Nom du document</span></th>
+                                            <th class="text-center"><span>Type de document</span></th>
                                             <th class="text-center"><span>Action</span></th>
                                         </tr>
                                     </thead>
@@ -123,12 +210,23 @@
                                             {% for docs in documents.file %}
                                             <tr>
                                                 <td class="text-center">
+                                                    <a class="text-left text-dark">{{ docs.id }}</a>
+                                                </td>
+                                                <td class="text-center">
                                                     <a class="text-left" href="{{ asset('/doc/Roby/Fsc/' ~ docs.file ) }}" class="text-dark">{{ docs.file }}</a></br>
                                                 </td>
                                                 <td class="text-center">
+                                                {% if docs.typeDoc %}
+                                                    <a class="btn btn-xl text-white" class="text-dark" style= "background-color: {{ docs.typeDoc.color }}";><i class='{{ docs.typeDoc.icone }} mr-2'></i>{{ docs.typeDoc.title }}</a>
+                                                    <a class="btn btn-warning" href="{{ path('app_change_type_doc_fsc', {id: docs.id })}}"  ><i class="fas fa-edit"></i></a>
+                                                {% else %}
+                                                    <a class="btn btn-primary" href="{{ path('app_change_type_doc_fsc', {id: docs.id })}}"  >Selectionner le type de document</a>
+                                                {% endif %}
+                                                </td>
+                                                <td class="text-center">
                                                     <a href="{{ asset('/doc/Roby/Fsc/' ~ docs.file ) }}" class="btn btn-info btn-xl"><i class="fas fa-download" download></i></a>
-                                                    <a class="btn btn-danger btn-xl" data-toggle="modal" data-target="#modal-default"><i class="fas fa-trash-alt"></i></a>
-                                                        <div class="modal fade" id="modal-default">
+                                                    <a class="btn btn-danger btn-xl" data-toggle="modal" data-target="#modal-default-{{docs.id}}"><i class="fas fa-trash-alt"></i></a>
+                                                        <div class="modal fade" id="modal-default-{{docs.id}}">
                                                             <div class="modal-dialog">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
@@ -156,7 +254,9 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
+                                            <th class="text-center"><span>Id</span></th>
                                             <th class="text-center"><span>Nom du document</span></th>
+                                            <th class="text-center"><span>Type de document</span></th>
                                             <th class="text-center"><span>Action</span></th>
                                         </tr>
                                     </tfoot>
@@ -172,14 +272,19 @@
 <div class="row">
     <div class="col-md-12">
     <div class="card card-dark">
-        <div class="card-header d-flex justify-content-between">
-            <h2 class="card-title">Ajouter des documents</h2>
+        <div class="card-header d-flex justify-content-between flex-wrap">
+            <h4 class="card-title">Ajouter des documents</h4>
+            <a target="_blank" class="badge badge-info ml-auto" href='https://app.powerbi.com/view?r=eyJrIjoiN2U3NGMyNWEtZTAxNS00MzVhLWExNmMtOThhZjdiYjQ4MWNkIiwidCI6IjEyNGU2OWRiLWVmNjUtNDk2Yi05NmE5LTVkNTZiZWMxZDI5MSIsImMiOjl9' >Consulter le site FSC pour voir si les fournisseurs sont tourjours agrées</a>
         </div>
         <!-- /.card-header -->
         <div class="card-body">
         {{ form_start(form, { attr: { 'accept-charset' : 'utf-8' }}) }}
+          {{ form_label(form.typeDoc) }}
+          {{ form_widget(form.typeDoc) }}
+          {{ form_errors(form.typeDoc) }}          
         <div class="input-group">
         <div class="custom-file">
+          
           {{ form_label(form.file) }}
           {{ form_widget(form.file) }}
           {{ form_errors(form.file) }}
@@ -192,6 +297,94 @@
       {{ form_end(form) }}
      </div>
 </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header d-flex justify-content-between">
+                <h2 class="card-title">Commentaires sur cette piéce</h2>
+                <div class='ml-auto'>
+            </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+
+            {% if comments %}
+                <!-- DIRECT CHAT -->
+            <div class="card direct-chat direct-chat-primary">
+                <div class="card-header">
+                <h3 class="card-title">Liste des commentaires</h3>
+
+                <div class="card-tools">
+                    <span title="{{ comments|length }} Commentaires" class="badge badge-primary">{{ comments|length }}</span>
+                    <button type="button" class="btn btn-tool text-secondary" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                <!-- Conversations are loaded here 
+                <div class="direct-chat-messages">
+                -->
+                <div class="p-5">
+                    <!-- Message. Default to the left -->
+                    {% for comment in comments %}  
+                        {% if app.user.id == comment.user.id %}
+                            
+                            <!-- Message to the right -->
+                            <div class="direct-chat-msg right">
+                            <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name float-right">{{ comment.user.pseudo }}</span>
+                                <span class="direct-chat-timestamp float-left">{{ comment.createdAt|date("d/m/Y H:i")}}</span>
+                            </div>
+                            <!-- /.direct-chat-infos -->
+                            <img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ comment.user.img))}}" alt="message user image">
+                            <!-- /.direct-chat-img -->
+                            <div class="direct-chat-text">
+                                {{ comment.content|raw }}
+                            </div>
+                            <!-- /.direct-chat-text -->
+                            </div>
+                        {% else %}
+                            <div class="direct-chat-msg">
+                            <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name float-left">{{ comment.user.pseudo }}</span>
+                                <span class="direct-chat-timestamp float-right">{{ comment.createdAt|date("d/m/Y H:i")}}</span>
+                            </div>
+                            <!-- /.direct-chat-infos -->
+                            <img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ comment.user.img))}}" alt="message user image">
+                            <!-- /.direct-chat-img -->
+                            <div class="direct-chat-text">
+                                {{ comment.content|raw }}
+                            </div>
+                            <!-- /.direct-chat-text -->
+                            </div>
+                            <!-- /.direct-chat-msg -->
+                        {% endif %}
+                    {% endfor %}
+                    <!-- /.direct-chat-msg -->
+                </div>
+                <!--/.direct-chat-messages-->
+                <!-- /.direct-chat-pane -->
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!--/.direct-chat -->               
+                    
+                
+            {% else %}
+                <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Aucun commentaire actuellement !</h4>
+            {% endif %}
+                {{ form_start(formComment) }}
+                {{ form_errors(formComment.content) }}
+                {{ form_row(formComment.content) }}
+                {{ form_widget(formComment.ajouter, {'attr' : { 'class': 'btn btn-outline-primary mt-3 float-right' }} ) }}
+                {{ form_end(formComment) }}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

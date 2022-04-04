@@ -1,0 +1,34 @@
+<p>Bonjour,</p>
+
+{% if mouvs %}
+<p><u><strong>Veuillez trouver ci dessous la liste des produits vendus en contrat commissionnaire pour le mois => {{ mois }} / {{ annee }}: </strong></u></p>
+<p>Les personnes qui doivent être destinataires du mail sont :</p>
+<ul>
+    <li href='mailto:beatrice.mlynski@syngenta.com'>beatrice.mlynski@syngenta.com</li>
+    <li href='mailto:arnaud.bonic@proverdis.fr'>arnaud.bonic@proverdis.fr</li>
+    <li href='mailto:noemie.rezkallah@syngenta.com'>noemie.rezkallah@syngenta.com</li>
+</ul>
+<p>Attention ! dans le cas du Médaillion et du Glazenn, nous avons déconditionné des packs, <strong>nous ne devons déclarer que le pack</strong>. il ne faut pas déclarer plusieurs fois la même vente, <strong>il est impératif d'avoir un suivi rigoureux !!</strong></p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Référence</th>
+            <th>Désignation</th>
+            <th>Uv</th>
+            <th>Quantité</th>
+        </thead>
+        <tbody>
+{% for mouv in mouvs %}
+        <tr>
+            <td>{{ mouv.reference }}</td>
+            <td>{{ mouv.designation }}</td>
+            <td>{{ mouv.uv }}</td>
+            <td>{{ mouv.quantite }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+<p>Pour la société Lhermitte frères, mail envoyé par l'Intranet du groupe Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

@@ -89,6 +89,11 @@ class fscListMovement
      */
     private $status;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $Probleme;
+
     public function __construct()
     {
         $this->file = new ArrayCollection();
@@ -281,6 +286,18 @@ class fscListMovement
     public function setStatus(bool $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getProbleme(): ?bool
+    {
+        return $this->Probleme;
+    }
+
+    public function setProbleme(bool $Probleme): self
+    {
+        $this->Probleme = $Probleme;
 
         return $this;
     }

@@ -37,7 +37,7 @@ class ControleComptabiliteController extends AbstractController
         $controleTaxes = "";
         $controleRegimeTiers = "";
         $controleRegimeTransport = "";
-        $controleTrousFactures = "";
+        $controleRegimeArticles = "";
             $form = $this->createForm(YearMonthType::class);
             $form->handleRequest($request);
             // initialisation de mes variables
@@ -47,7 +47,7 @@ class ControleComptabiliteController extends AbstractController
             // tracking user page for stats
             $tracking = $request->attributes->get('_route');
             $this->setTracking($tracking);
-            $facturesManquantes = [];
+
             if($form->isSubmitted() && $form->isValid()){
                 $annee = $form->getData()['year'];
                 $mois = $form->getData()['month'];
@@ -60,34 +60,9 @@ class ControleComptabiliteController extends AbstractController
                     $controleRegimeTiers = $repoVente->getControleRegimeTiersVente($annee,$mois);
                 }
 
-                $controleRegimeTransport = $repo->getControleRegimeTransport($annee,$mois,$typeTiers);
+                $controleRegimeTransport = $repo->getControleRegimeTransport($annee,$mois,$typeTiers);                
 
-                $controleTrousFactures = $repo->getControleTrousFactures($annee,$mois,$typeTiers);
-                $factures = [];
-                for ($i=0; $i <count($controleTrousFactures) ; $i++) { 
-                    array_push($factures, $controleTrousFactures[$i]['fano']);
-                }
-                $number = current($factures);
-                $lastNumber = end($factures);
-                
-
-                for ($ligFact=$number; $ligFact <$lastNumber ; $ligFact++) { 
-                                  
-                    if (in_array($ligFact, $factures)) {
-                    }else {
-                        $dateFact = $repo->getFacture($ligFact,$typeTiers);
-                        if (!$dateFact) {
-                            //$facturesManquantes = $ligFact;
-                            //dd($facturesManquantes);
-                            array_push($facturesManquantes, $ligFact);
-                        }
-                        
-                    }
-                }
-                //dd($facturesManquantes);
-                // il faudra récupérer la derniére facture du mois précédent pour voir s'il n'y a pas de trous
-                
-
+                $controleRegimeArticles = $repo->getRegimeArticleFromOrder($annee, $mois,$typeTiers);
             }
         
         return $this->render('controle_comptabilite/index.html.twig', [
@@ -98,7 +73,7 @@ class ControleComptabiliteController extends AbstractController
             'controleTaxes' => $controleTaxes,
             'controleRegimesTiers' => $controleRegimeTiers,
             'controleRegimesTransports' => $controleRegimeTransport,
-            'controleTrousFactures' => $facturesManquantes,
+            'controleRegimeArticles' => $controleRegimeArticles,
             'monthYear' => $form->createView()
         ]);
     }

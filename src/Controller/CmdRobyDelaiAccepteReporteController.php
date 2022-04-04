@@ -336,7 +336,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                         }
                         $commandesDelaiDepasse[$i]['Commentaire'] = $texte;
                     }elseif ($d < $da) { // si le délai n'est pas encore dépassé
-                        if ($intvl->days <= 10) {
+                        if ($intvl->days <= 15) {
                             if ($intvl->days == 1 ) {
                                 $texte = 'le délai convenu arrive a échéance dans ' . $intvl->days . " jour";
                             }elseif ($intvl->days == 0) {
@@ -384,8 +384,8 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
        $email = (new Email())
        ->from('intranet@groupe-axis.fr')
        ->to('ndegorre@roby-fr.com','msmal@roby-fr.com')
-       ->cc('jpochet@lhermitte.fr')
-       ->subject('Liste des commandes avec Délai à 10 jours et sans délai')
+       //->cc('jpochet@lhermitte.fr')
+       ->subject('Liste des commandes avec Délais et sans délais')
        ->html($html);
        $this->mailer->send($email);
 

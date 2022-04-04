@@ -253,6 +253,16 @@ class ArtRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
+    public function getPhyto():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT RTRIM(LTRIM(ART.REF)) AS reference, RTRIM(LTRIM(ART.DES)) AS designation FROM ART
+        WHERE DOS = 1 AND ART.REF LIKE ('PPP%') AND ART.HSDT IS NULL
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
     
 
 }
