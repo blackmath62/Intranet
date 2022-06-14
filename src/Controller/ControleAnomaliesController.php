@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Repository\Divalto\ControleComptabiliteRepository;
 use App\Repository\Divalto\ControleArtStockMouvEfRepository;
 use App\Repository\Divalto\EntRepository;
+use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\CmdRobyDelaiAccepteReporteRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,8 +44,9 @@ class ControleAnomaliesController extends AbstractController
     private $cmdRobyController;
     private $fscAttachedFileController;
     private $contratCommissionnaireController;
+    private $movRepo;
 
-    public function __construct(ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(MouvRepository $movRepo, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -58,6 +60,7 @@ class ControleAnomaliesController extends AbstractController
         $this->cmdRobyController = $cmdRobyController;
         $this->fscAttachedFileController = $fscAttachedFileController;
         $this->contratCommissionnaireController = $contratCommissionnaireController;
+        $this->movRepo = $movRepo;
         //parent::__construct();
     }
     
@@ -202,6 +205,13 @@ class ControleAnomaliesController extends AbstractController
         $subject = 'Probléme Article à corriger';
         $this->Execute($donnees, $libelle, $template, $subject);
 
+        // Anomalies mauvais article utilisé sur piéce FSC
+        $donnees = $this->movRepo->getCheckCodeAndDesArticles();
+        $libelle = 'ProblémeArticleSurPiecesFsc';
+        $template = 'mails/sendMailAnomalieArticlesPieceFsc.html.twig';
+        $subject = 'Probléme Article sur Piece FSC à corriger';
+        $this->Execute($donnees, $libelle, $template, $subject);
+
         // Anomalies Régime article sur piéce
         $donnees = $this->articleSrefFermes->getControleRegimeArtOnOrder(); // j'ai mis Utilisateur
         $libelle = 'ProblémeRegimeArticle';
@@ -214,6 +224,13 @@ class ControleAnomaliesController extends AbstractController
         $libelle = 'ArticleSrefFerme';
         $template = 'mails/sendMailSaisieArticlesSrefFermes.html.twig';
         $subject = 'Saisie sur un article ou une sous référence article fermé';
+        $this->Execute($donnees, $libelle, $template, $subject);
+
+        // Contrôle la présence de BL Direct
+        $donnees = $this->movRepo->getListBlDirect(); // j'ai mis Utilisateur
+        $libelle = 'BlDirectPasNormal';
+        $template = 'mails/sendMailBlDirect.html.twig';
+        $subject = 'BL Direct qui ne devrait pas exister';
         $this->Execute($donnees, $libelle, $template, $subject);
 
         // Contrôle que toutes les sous références ne sont pas fermées sur un article
@@ -352,7 +369,7 @@ class ControleAnomaliesController extends AbstractController
     
     
     ///////////////////////////////////// SOUS REFERENCES ARTICLES
-
+    //TODO à voir, ça ne fonctionne pas toujours correctement, faire des tests.
     public function ControlSrefArticleAFermer(){
         
         $ano = $this->anomalies->findOneBy(['idAnomalie' => '999999999996', 'type' => 'SrefArticleAFermer']);

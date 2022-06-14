@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{title}}
+{% endblock %}
+{% block body %}
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-info-circle"></i> Info</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+    <p>Un mail automatique sera envoyé si une personne saisie une piéce fournisseur pour les produits FSC dans les Pays ci dessous.</p>
+    <p>Ces pays n'ont plus le droit de vendre des produits FSC.</p>
+    <p>TODO En cours de développement.... preque fini, il ne reste plus que l'envoie du mail !</p>
+    </div>
+</div>
+ <!-- form collapse fermé de base -->
+                <div class="card collapsed-card card-dark">
+                  <div class="card-header">
+                    <h3 class="card-title">Interdire un Pays pour les commandes FSC </h3>
+
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    {{ form_start(form)}}
+					{{ form_row(form.pays)}}
+                    {{ form_row(form.envoyer)}}                          
+					{{ form_end(form)}}
+                  </div>
+                  <!-- /.card-footer-->
+                </div>
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-gray">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Liste des pays bannis des commandes FSC</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Pays</span></th>
+                                    <th class="text-center"><span>Créé par</span></th>
+                                    <th class="text-center"><span>Créé le</span></th>
+                                    <th class="text-center"><span>Action</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pay in pays %}
+                                    <tr>
+                                        <td class="">
+                                            <a class="text-center text-dark">{{ pay.pays }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center btn btn-sm">{{ pay.createdBy.pseudo }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center btn btn-sm">{{ pay.createdAt|date("d-m-Y") }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href=" {{path('app_pays_interdit_commandes_fsc_delete', {'id' : pay.id} ) }}" class="text-center btn btn-sm btn-danger text-white"><i class="far fa-trash-alt"></i></a>
+                                        </td>
+                                    {% endfor %}
+                                    </tr>
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Pays</span></th>
+                                    <th class="text-center"><span>Créé par</span></th>
+                                    <th class="text-center"><span>Créé le</span></th>
+                                    <th class="text-center"><span>Action</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

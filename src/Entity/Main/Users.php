@@ -159,6 +159,21 @@ class Users implements UserInterface
      */
     private $commentaires;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ControleArticlesFsc::class, mappedBy="controledBy")
+     */
+    private $controleArticlesFscs;
+
+    /**
+     * @ORM\OneToMany(targetEntity=PaysBanFsc::class, mappedBy="CreatedBy")
+     */
+    private $paysBanFscs;
+
+    /**
+     * @ORM\OneToMany(targetEntity=MovBillFsc::class, mappedBy="createdBy")
+     */
+    private $movBillFscs;
+
    
     public function __construct()
     {
@@ -177,6 +192,9 @@ class Users implements UserInterface
         $this->listCmdTraites = new ArrayCollection();
         $this->notes = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
+        $this->controleArticlesFscs = new ArrayCollection();
+        $this->paysBanFscs = new ArrayCollection();
+        $this->movBillFscs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -733,6 +751,96 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($commentaire->getUser() === $this) {
                 $commentaire->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ControleArticlesFsc[]
+     */
+    public function getControleArticlesFscs(): Collection
+    {
+        return $this->controleArticlesFscs;
+    }
+
+    public function addControleArticlesFsc(ControleArticlesFsc $controleArticlesFsc): self
+    {
+        if (!$this->controleArticlesFscs->contains($controleArticlesFsc)) {
+            $this->controleArticlesFscs[] = $controleArticlesFsc;
+            $controleArticlesFsc->setControledBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeControleArticlesFsc(ControleArticlesFsc $controleArticlesFsc): self
+    {
+        if ($this->controleArticlesFscs->removeElement($controleArticlesFsc)) {
+            // set the owning side to null (unless already changed)
+            if ($controleArticlesFsc->getControledBy() === $this) {
+                $controleArticlesFsc->setControledBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PaysBanFsc[]
+     */
+    public function getPaysBanFscs(): Collection
+    {
+        return $this->paysBanFscs;
+    }
+
+    public function addPaysBanFsc(PaysBanFsc $paysBanFsc): self
+    {
+        if (!$this->paysBanFscs->contains($paysBanFsc)) {
+            $this->paysBanFscs[] = $paysBanFsc;
+            $paysBanFsc->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaysBanFsc(PaysBanFsc $paysBanFsc): self
+    {
+        if ($this->paysBanFscs->removeElement($paysBanFsc)) {
+            // set the owning side to null (unless already changed)
+            if ($paysBanFsc->getCreatedBy() === $this) {
+                $paysBanFsc->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|MovBillFsc[]
+     */
+    public function getMovBillFscs(): Collection
+    {
+        return $this->movBillFscs;
+    }
+
+    public function addMovBillFsc(MovBillFsc $movBillFsc): self
+    {
+        if (!$this->movBillFscs->contains($movBillFsc)) {
+            $this->movBillFscs[] = $movBillFsc;
+            $movBillFsc->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMovBillFsc(MovBillFsc $movBillFsc): self
+    {
+        if ($this->movBillFscs->removeElement($movBillFsc)) {
+            // set the owning side to null (unless already changed)
+            if ($movBillFsc->getCreatedBy() === $this) {
+                $movBillFsc->setCreatedBy(null);
             }
         }
 

@@ -101,5 +101,18 @@ class CliRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    public function MesClients($commercial):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT CLI.TIERS AS codeTier, CLI.NOM AS nom, CLI.RUE AS rue, CLI.CPOSTAL AS cp, CLI.VIL AS ville, CLI.TEL AS tel, CLI.EMAIL AS mail FROM CLI
+        WHERE CLI.REPR_0001 = $commercial AND CLI.HSDT IS NULL
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+
+
     
 }

@@ -123,6 +123,41 @@ class EntRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetch();
     }
+
+    // ramener les factures fournisseurs FSC de Divalto
+    public function getMouvfactFournFsc():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ENT.PINO AS facture, ENT.PIDT AS dateFacture, ENT.TIERS AS tiers, FOU.NOM AS nom, ENT.PIREF AS notreRef, ENT.TICOD AS typeTiers
+        FROM ENT
+        INNER JOIN MOUV ON MOUV.FANO = ENT.PINO AND MOUV.DOS = ENT.DOS
+        INNER JOIN FOU ON MOUV.DOS = FOU.DOS AND MOUV.TIERS = FOU.TIERS
+        WHERE MOUV.REF LIKE 'FSC%' AND ENT.TICOD = 'F' AND ENT.PICOD = 4
+        GROUP BY ENT.PINO, ENT.PIDT, ENT.TIERS, FOU.NOM, ENT.PIREF, ENT.TICOD
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // ramener les factures clients FSC de Divalto
+    public function getMouvfactCliFsc():array
+    {
+        $fiveYearsAgo = new DateTime();
+        $fiveYearsAgo = date('Y-m-d', strtotime('-5 years'));
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ENT.PINO AS facture, ENT.PIDT AS dateFacture, ENT.TIERS AS tiers, CLI.NOM AS nom, ENT.PIREF AS notreRef, ENT.TICOD AS typeTiers
+        FROM ENT
+        INNER JOIN MOUV ON MOUV.FANO = ENT.PINO AND MOUV.DOS = ENT.DOS
+        INNER JOIN CLI ON MOUV.DOS = CLI.DOS AND MOUV.TIERS = CLI.TIERS
+        WHERE MOUV.REF LIKE 'FSC%' AND ENT.TICOD = 'C' AND ENT.PICOD = 4 AND ENT.PIDT >= '$fiveYearsAgo'
+        GROUP BY ENT.PINO, ENT.PIDT, ENT.TIERS, CLI.NOM, ENT.PIREF, ENT.TICOD
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
     
 
 }

@@ -42,7 +42,7 @@ class AdminDocumentsController extends AbstractController
                 $fileSoc = $form->getData()->getSociete()->getId();
                 // On la cherche dans la BDD
                 $societe = $repoSociete->findOneBy(['id' => $fileSoc]);
-                 $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                  // this is needed to safely include the file name as part of the URL
                  $safeFilename = $slugger->slug($originalFilename);
                  $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();

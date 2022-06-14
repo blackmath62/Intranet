@@ -1,0 +1,24 @@
+<p>Bonjour {{ anomalie.Utilisateur }},</p>
+<p>Une anomalie a été dectecté sur une piéce 
+    {% if anomalie.TypeTiers == 'F' %}
+    {% set TypeT = 'Fournisseur' %}
+    {% else %}
+    {% set TypeT = 'Client' %}   
+    {% endif %}
+        <strong>{{ TypeT }}</strong> contenant des produits FSC. Il s'agit
+    {% if anomalie.TypePiece == '2' %}
+    {% set TypeP = ' de la Commande ' %}
+    {% else %}
+    {% set TypeP = ' du Bon de livraison ' %}  
+    {% endif %}
+        <strong>{{ TypeP }}</strong><strong>{{ anomalie.NumPiece }}</strong>.
+</p>
+<p>Le probléme est sur l'article <strong>{{ anomalie.Ref }} {{ anomalie.Sref1 }} {{ anomalie.Sref2 }}</strong></p>
+<p>La désignation sur la piéce est : <strong>{{ anomalie.DesignationPiece}}</strong></p>
+<p>La désignation sur l'article est : <strong>{{ anomalie.DesignationArticle}}</strong></p>
+<p>Le probléme détecté est : <strong>{{ anomalie.Probleme}}</strong></p>
+
+<p>Ce mail sera renouvellé chaque jour jusqu'a résolution du probléme</p>
+<p>Pour éviter de reproduire ce probléme à l'avenir, prenez le temps de renseigner les champs en orange</p>
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

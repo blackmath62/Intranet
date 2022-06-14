@@ -94,9 +94,15 @@ class fscListMovement
      */
     private $Probleme;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=MovBillFsc::class, mappedBy="ventilations")
+     */
+    private $movBillFscs;
+
     public function __construct()
     {
         $this->file = new ArrayCollection();
+        $this->movBillFscs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -298,6 +304,33 @@ class fscListMovement
     public function setProbleme(bool $Probleme): self
     {
         $this->Probleme = $Probleme;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|MovBillFsc[]
+     */
+    public function getMovBillFscs(): Collection
+    {
+        return $this->movBillFscs;
+    }
+
+    public function addMovBillFsc(MovBillFsc $movBillFsc): self
+    {
+        if (!$this->movBillFscs->contains($movBillFsc)) {
+            $this->movBillFscs[] = $movBillFsc;
+            $movBillFsc->addVentilation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMovBillFsc(MovBillFsc $movBillFsc): self
+    {
+        if ($this->movBillFscs->removeElement($movBillFsc)) {
+            $movBillFsc->removeVentilation($this);
+        }
 
         return $this;
     }

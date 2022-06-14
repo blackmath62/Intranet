@@ -406,6 +406,17 @@
 							</li>
 							{% endif %}
 
+							{% if (is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL')) and app.user.commercial %}
+							<li class="nav-item">
+								<a href="{{path('app_mes_clients', {'commercial' : app.user.commercial})}}" class="nav-link">
+									<i class="nav-icon fa fa-address-card" aria-hidden="true"></i>
+									<p>
+										Mes Clients
+									</p>
+								</a>
+							</li>
+							{% endif %}
+
 						{% endif %}
 						{% if is_granted('ROLE_COMPTA') %}
 
@@ -519,13 +530,56 @@
 									<i class="nav-icon fas fa-hourglass-half"></i>
 									<p>Commandes</p>
 								</a>
-							</li>						
-							<li class="nav-item">
-								<a href="{{path('app_fsc_attached_file')}}" class="nav-link">
-									<i class="nav-icon fas fa-sort-alpha-down"></i>
-									<p>Documents FSC</p>
-								</a>
 							</li>
+							<li class="nav-item has-treeview">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-tree"></i>
+									<p>
+										FSC
+										<i class="fas fa-angle-left right"></i>
+									</p>
+								</a>
+								<ul class="nav nav-treeview">
+									<li class="nav-item">
+										<a href="{{path('app_documents_reglementaires_fsc')}}" class="nav-link">
+											<i class="nav-icon fas fa-file-signature text-primary"></i>
+											<p>Documents réglementaires</p>
+										</a>
+									</li>
+								</ul>
+								<ul class="nav nav-treeview">
+									<li class="nav-item">
+										<a href="{{path('app_pays_interdit_commandes_fsc')}}" class="nav-link">
+											<i class="nav-icon fas fa-ban text-warning"></i>
+											<p>Ban Pays fournisseurs</p>
+										</a>
+									</li>
+								</ul>
+								<ul class="nav nav-treeview">
+									<li class="nav-item">
+										<a href="{{path('app_movement_fsc_view_list')}}" class="nav-link">
+											<i class="nav-icon fab fa-product-hunt text-success"></i>
+											<p>Mouvements articles FSC</p>
+										</a>
+									</li>
+								</ul>
+								<ul class="nav nav-treeview">
+									<li class="nav-item">
+										<a href="{{path('app_movement_bill_fsc')}}" class="nav-link">
+											<i class="nav-icon fas fa-arrow-right text-info"></i>
+											<p>Factures Clients FSC</p>
+										</a>
+									</li>
+								</ul>
+								<ul class="nav nav-treeview">
+									<li class="nav-item">
+										<a href="{{path('app_fsc_attached_file')}}" class="nav-link">
+											<i class="nav-icon fas fa-arrow-left text-danger"></i>
+											<p>Factures Fournisseurs FSC</p>
+										</a>
+									</li>
+								</ul>
+							</li>						
 						
 							<li class="nav-item">
 								<a href="{{path('app_deb_roby')}}" class="nav-link">
@@ -724,7 +778,9 @@
 <script>
   $(function () {
     //Initialize Select2 Elements
-    $('.select2').select2()
+    $('.select2').select2({
+		 placeholder: "Selectionnez les données",
+	})
 
     //Initialize Select2 Elements
     $('.select2bs4').select2({

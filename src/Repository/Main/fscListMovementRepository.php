@@ -54,7 +54,18 @@ class fscListMovementRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
     
-    
+    public function getListFacture():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT documentsfsc.file AS fichier, documentsfsc.fscListMovement_id AS movid, fsclistmovement.numFact 
+        FROM documentsfsc INNER JOIN fsclistmovement ON fsclistmovement.id = documentsfsc.fscListMovement_id 
+        WHERE documentsfsc.TypeDoc_id = 9 
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     // /**
     //  * @return fscListMovement[] Returns an array of fscListMovement objects
     //  */

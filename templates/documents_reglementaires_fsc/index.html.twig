@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{title}}
+{% endblock %}
+{% block body %}
+ <!-- form collapse fermé de base -->
+                <div class="card collapsed-card card-dark">
+                  <div class="card-header">
+                    <h3 class="card-title">Ajout d'un document</h3>
+
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    {{ form_start(form)}}
+					{{ form_row(form.years)}}
+					{{ form_row(form.type)}}
+					{{ form_row(form.files)}}
+                    {{ form_row(form.envoyer)}}                          
+					{{ form_end(form)}}
+                  </div>
+                  <!-- /.card-footer-->
+                </div>
+
+<div class="row">
+            <div class="col-md-12">
+                <div class="card card-gray">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Documents réglementaires Fsc</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Document</span></th>
+                                    <th class="text-center"><span>Année</span></th>
+                                    <th class="text-center"><span>Type</span></th>
+                                    <th class="text-center"><span>Déposé par</span></th>
+                                    <th class="text-center"><span>Déposé le</span></th>
+                                    <th class="text-center"><span>Action</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in docs %}
+                                    <tr>
+                                        <td class="">
+                                            <a class="text-center text-dark">{{ doc.files }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center btn btn-sm">{{ doc.years}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                        {% if doc.type == 'Formation' %}
+                                            {% set color = 'primary' %}
+                                        {% elseif doc.type == 'Securite' %}
+                                            {% set color = 'danger' %}
+                                        {% elseif doc.type == 'Administratif' %}
+                                            {% set color = 'success' %}
+                                        {% elseif doc.type == 'Travail' %}
+                                            {% set color = 'warning' %}
+                                        {% endif %}
+                                        
+                                            <a class="text-center btn btn-xl btn-{{ color }}">{{ doc.type}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center btn btn-sm">{{ doc.addBy}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-center btn btn-sm">{{ doc.createdAt|date("Y/m/d")}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                        
+                                            <a target="_blank" href="{{ asset('doc/Roby/Fsc/' ~ doc.years ~ '/' ~ doc.files)}}" class="text-center btn btn-sm btn-info text-white"><i class="far fa-eye"></i></a>
+                                            <a href=" {{path('app_documents_reglementaires_fsc_delete', {'id' : doc.id} ) }}" class="text-center btn btn-sm btn-danger text-white"><i class="far fa-trash-alt"></i></a>
+                                        </td>
+                                    {% endfor %}
+                                    </tr>
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Document</span></th>
+                                    <th class="text-center"><span>Année</span></th>
+                                    <th class="text-center"><span>Type</span></th>
+                                    <th class="text-center"><span>Déposé par</span></th>
+                                    <th class="text-center"><span>Déposé le</span></th>
+                                    <th class="text-center"><span>Action</span></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

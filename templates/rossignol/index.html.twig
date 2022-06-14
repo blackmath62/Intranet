@@ -220,7 +220,11 @@
                                                 <a class="text-center text-dark">{{ venteRossignol.PrixParTO }}</a>
                                             {% endif %}
                                         </td>
-                                        {% set Delta = (((venteRossignol.Pu / venteRossignol.Prix)-1)*100)|number_format(2, '.', ' ') %}
+                                        {% if (venteRossignol.Pu < 0 or venteRossignol.Pu > 0) and (venteRossignol.Prix < 0 or venteRossignol.Prix > 0) %}
+                                            {% set Delta = (((venteRossignol.Pu / venteRossignol.Prix)-1)*100)|number_format(2, '.', ' ') %}
+                                        {% else %}
+                                            {% set Delta = 0 %}   
+                                        {% endif %}
                                         {% if Delta > 0 %}
                                             <td class="text-center">
                                                 <a class="description-text text-success"><i class="fas fa-arrow-up pr-1"></i>{{ Delta }} %</a>

@@ -1,0 +1,317 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-info-circle"></i> Info</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <p>Les listes ci dessous ne reprennent que les mouvements terminés, soit les BL de régularisation pour les piéces internes et les Factures pour les piéces clients et fournisseurs. Ces informations sont directement reccueillies sur DIVALTO en instantané.</p>
+        <p>La partie supérieur avec une entête rouge reprend les mouvements qu'il y a eu aprés le dernier contrôle (cf: colonne date maj statut et contrôlé par), si cette liste est vide c'est que tout a été contrôle et justifié.</p>
+        <p>Il y a un icone d'oeil sur chaque ligne permettant d'aller voir le détail des mouvements du produit en fonction de la nature du mouvement.</p>
+        <p>La nature du mouvement de l'article est décomposé en 2 sections, la livraison direct et la livraison dépôt, c'est à dire que pour un produit, il y aura potentiellement 2 lignes, une pour les mouvements directs et une autre pour les mouvements dépôts.</p>
+        <p>A coté de l'oeil, il y a une bulle, si celle ci est grise, c'est qu'il n'y a pas de commentaire sur l'article, si elle est bleu, il y a le nombre de commentaire précisé à coté de la bulle.</p>
+        <p>Les commentaires sont visible sur le détail des mouvements de l'article (bouton oeil bleu)</p>
+        <p>Le bouton "à Controler rouge" permet de passer le statut en Ok, celui ci est utile s'il n'y a rien à signaler, il y a l'équivalent en Ok dans le tableau du dessous qui permet de repasser l'article en "à controler"</p>
+        <p>Vous pouvez interroger Divalto pour mettre à jour cette liste en cliquant sur le bouton bleu "Mettre à jour", s'il y a eu de nouveaux mouvements sur l'article celui ci repasse automatiquement en "à contrôler" (donc le tableau rouge)</p>
+        <p>Les quantités dans les colonnes Fournisseur, Client et Interne sont le total de tous les mouvements de Divalto sur le produit en fonction de la nature du mouvement. les sorties sont éxprimées en négatifs et les entrées en positifs</p>
+        <p>La colonne Différence permet de détecter facilement les écarts entre achat et vente, cela peut être justifié par la présence de stock.</p>
+        <p>Un mail automatique est envoyé chaque jour a un utilisateur qui ferait une erreur de saisie sur commande ou BL client et fournisseur (jusqu'à correction), l'interdisant d'utiliser un produit normal comme étant FSC ou un produit FSC comme étant un Normal, un produit FSC100% comme produit FSCMIXCREDIT, etc...</p>
+        <p>Ce mail automatique a été mis en service pour les piéces supérieur ou égale à 2021 (démarrage) et permet de se prémunir de toute erreur de saisie.</p>
+    </div>
+</div>
+{% set status = 2 %}
+{% set update = '' %}
+{% set by = '' %}                
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-danger">
+            <div class="card-header d-flex justify-content-between">
+                <h2 class="card-title">Liste des Mouvements pour les produits FSC de toutes les années => Articles à contrôler</h2>
+                <a title = 'Metre à jour les données' href="{{ path('app_maj_controle_article_fsc') }}" class="btn btn-primary ml-auto"><i class="fas fa-redo-alt pr-2"></i>Mettre à jour</a>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                    {% if MovFscs %}
+                <table id="example2" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th class="text-center"><span>Référence</span></th>
+                            <th class="text-center"><span>Sref1</span></th>
+                            <th class="text-center"><span>Sref2</span></th>
+                            <th class="text-center"><span>Désignation</span></th>
+                            <th class="text-center"><span>Nature</span></th>
+                            <th class="text-center"><span>Fournisseur</span></th>
+                            <th class="text-center"><span>Client</span></th>
+                            <th class="text-center"><span>Interne</span></th>
+                            <th class="text-center"><span>Différence</span></th>
+                            <th class="text-center"><span>Statut</span></th>
+                            <th class="text-center"><span>Date Maj Statut</span></th>
+                            <th class="text-center"><span>Controlé par</span></th>
+                            <th class="text-center"><span>Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    
+                        
+                        {% for MovFsc in MovFscs %}
+                        {% for controle in controles %}
+                            {% if MovFsc.Lien == controle.products %}
+                                {% if controle.status == 0 %}
+                                    {% set status = 0 %}
+                                    {% set update = controle.UpdatedAt|date("d/m/Y") %}
+                                    {% set by = controle.controledBy.pseudo %}
+                                {% else %}
+                                    {% set status = 2 %}    
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if status == 0 %}                        
+                            <tr>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ MovFsc.Ref }}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ MovFsc.Sref1 }}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ MovFsc.Sref2}}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ MovFsc.Design}}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ MovFsc.Nature }}</a>
+                                </td>
+                                <td class="text-center">
+                                    {% if MovFsc.Fourn < 0 or MovFsc.Fourn > 0 %}
+                                        <a class="text-dark">{{ MovFsc.Fourn }}</a>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if MovFsc.Cli < 0 or MovFsc.Cli > 0 %}
+                                        <a class="text-dark">{{ MovFsc.Cli }}</a>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if MovFsc.Inter < 0 or MovFsc.Inter > 0 %}
+                                        <a class="text-dark">{{ MovFsc.Inter }}</a>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if MovFsc.Diff < 0 or MovFsc.Diff > 0 %}
+                                        <a class="text-dark">{{ MovFsc.Diff }}</a>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href='{{path('app_lock_unlock_article_fsc', {'concat' : MovFsc.Lien } ) }}' class="text-white btn btn-xl btn-danger"><i class="fas fa-lock-open mr-2"></i>controler</a>
+                                </td>                                
+                                <td class="text-center">
+                                    {% if update %}
+                                        <a class="text-dark">{{ update }}</a>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ by }}</a>
+                                </td>
+                                    
+                                <td class="text-center">
+                                    <a href='{{path('app_movement_fsc_detail_art', {'concat' : MovFsc.Lien } ) }}' class="text-light btn btn-xl btn-info"><i class="fas fa-eye"></i></a>
+                                    {% set Nombre = 0 %}
+                                    {% for comment in comments %}
+                                        {% if comment.Tables == 'artFsc' ~ MovFsc.Lien %}
+                                        {% set Nombre = Nombre + 1 %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if Nombre > 0 %}
+                                        <a class="text-primary pl-2">
+                                            <span class='mr-2'>{{ Nombre }}</span><i title="Il y a des commentaires sur cette piéce" class="fas fa-comments"></i>
+                                        </a>
+                                    {% else %}
+                                        <a class="pl-2 text-secondary">
+                                            <i title='Pas de commentaires' class="fas fa-comment-slash"></i>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="text-center"><span>Référence</span></th>
+                            <th class="text-center"><span>Sref1</span></th>
+                            <th class="text-center"><span>Sref2</span></th>
+                            <th class="text-center"><span>Désignation</span></th>
+                            <th class="text-center"><span>Nature</span></th>
+                            <th class="text-center"><span>Fournisseur</span></th>
+                            <th class="text-center"><span>Client</span></th>
+                            <th class="text-center"><span>Interne</span></th>
+                            <th class="text-center"><span>Différence</span></th>
+                            <th class="text-center"><span>Statut</span></th>
+                            <th class="text-center"><span>Date Maj Statut</span></th>
+                            <th class="text-center"><span>Controlé par</span></th>
+                            <th class="text-center"><span>Actions</span></th>
+                        </tr>
+                        </tr>
+                    </tfoot>
+                </table>
+                        {% else %}
+                                <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Aucun Mouvement Fsc actuellement</h4>
+                    {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header d-flex justify-content-between">
+                <h2 class="card-title">Liste des Mouvements pour les produits FSC de toutes les années => Articles contrôlé</h2>
+                <a title = 'Metre à jour les données' href="{{ path('app_maj_controle_article_fsc') }}" class="btn btn-primary ml-auto"><i class="fas fa-redo-alt pr-2"></i>Mettre à jour</a>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                    {% if MovFscs %}
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th class="text-center"><span>Référence</span></th>
+                            <th class="text-center"><span>Sref1</span></th>
+                            <th class="text-center"><span>Sref2</span></th>
+                            <th class="text-center"><span>Désignation</span></th>
+                            <th class="text-center"><span>Nature</span></th>
+                            <th class="text-center"><span>Fournisseur</span></th>
+                            <th class="text-center"><span>Client</span></th>
+                            <th class="text-center"><span>Interne</span></th>
+                            <th class="text-center"><span>Différence</span></th>
+                            <th class="text-center"><span>Statut</span></th>
+                            <th class="text-center"><span>Date Maj Statut</span></th>
+                            <th class="text-center"><span>Controlé par</span></th>
+                            <th class="text-center"><span>Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    
+                        
+                        {% for MovFsc in MovFscs %}
+                        {% for controle in controles %}
+                            {% if MovFsc.Lien == controle.products %}
+                                {% if controle.status == 1 %}
+                                    {% set status = 1 %}
+                                    {% set update = controle.UpdatedAt|date("d/m/Y") %}
+                                    {% set by = controle.controledBy.pseudo %}
+                                {% else %}
+                                    {% set status = 2 %}    
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if status == 1 %}                        
+                            <tr>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ MovFsc.Ref }}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ MovFsc.Sref1 }}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ MovFsc.Sref2}}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ MovFsc.Design}}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ MovFsc.Nature }}</a>
+                                </td>
+                                <td class="text-center">
+                                {% if MovFsc.Fourn < 0 or MovFsc.Fourn > 0 %}
+                                    <a class="text-dark">{{ MovFsc.Fourn }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if MovFsc.Cli < 0 or MovFsc.Cli > 0 %}
+                                    <a class="text-dark">{{ MovFsc.Cli }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if MovFsc.Inter < 0 or MovFsc.Inter > 0 %}
+                                    <a class="text-dark">{{ MovFsc.Inter }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if MovFsc.Diff < 0 or MovFsc.Diff > 0 %}
+                                    <a class="text-dark">{{ MovFsc.Diff }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href='{{path('app_lock_unlock_article_fsc', {'concat' : MovFsc.Lien } ) }}' class="text-white btn btn-xl btn-success"><i class="fas fa-lock mr-2"></i>Ok</a>
+                                </td>                                
+                                <td class="text-center">
+                                    {% if update %}
+                                        <a class="text-dark">{{ update }}</a>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ by }}</a>
+                                </td>
+                                    
+                                <td class="text-center">
+                                    <a href='{{path('app_movement_fsc_detail_art', {'concat' : MovFsc.Lien } ) }}' class="text-light btn btn-xl btn-info"><i class="fas fa-eye"></i></a>
+                                    {% set Nombre = 0 %}
+                                    {% for comment in comments %}
+                                        {% if comment.Tables == 'artFsc' ~ MovFsc.Lien %}
+                                        {% set Nombre = Nombre + 1 %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if Nombre > 0 %}
+                                        <a class="text-primary pl-2">
+                                            <span class='mr-2'>{{ Nombre }}</span><i title="Il y a des commentaires sur cette piéce" class="fas fa-comments"></i>
+                                        </a>
+                                    {% else %}
+                                        <a class="pl-2 text-secondary">
+                                            <i title='Pas de commentaires' class="fas fa-comment-slash"></i>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="text-center"><span>Référence</span></th>
+                            <th class="text-center"><span>Sref1</span></th>
+                            <th class="text-center"><span>Sref2</span></th>
+                            <th class="text-center"><span>Désignation</span></th>
+                            <th class="text-center"><span>Nature</span></th>
+                            <th class="text-center"><span>Fournisseur</span></th>
+                            <th class="text-center"><span>Client</span></th>
+                            <th class="text-center"><span>Interne</span></th>
+                            <th class="text-center"><span>Différence</span></th>
+                            <th class="text-center"><span>Statut</span></th>
+                            <th class="text-center"><span>Date Maj Statut</span></th>
+                            <th class="text-center"><span>Controlé par</span></th>
+                            <th class="text-center"><span>Actions</span></th>
+                        </tr>
+                        </tr>
+                    </tfoot>
+                </table>
+                        {% else %}
+                                <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Aucun Mouvement Fsc actuellement</h4>
+                    {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}
+
+

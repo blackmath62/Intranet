@@ -286,10 +286,26 @@ class FscAttachedFileController extends AbstractController
         $count = count($this->repoFsc->getCountTypeDocByOrderFsc($id));
 
         $piece = $this->repoFsc->findOneBy(['id' => $id]);
-        if ($count < 5) {
-            $piece->setStatus(false);
-        }elseif ($count >= 5) {
+        $d = new DateTime('2021/01/01');
+        $fiveYearsAgo = new DateTime();
+        $fiveYearsAgo = date('Y-m-d', strtotime('-5 years'));
+        $datePiece = $piece->getDateFact()->format('Y-m-d');
+        if ($datePiece <= $fiveYearsAgo) {
             $piece->setStatus(true);
+        }else{
+                if ($piece->getDateFact() < $d) {
+                    if ($count < 2) {
+                        $piece->setStatus(false);
+                }elseif ($count >= 2) {
+                    $piece->setStatus(true);
+                }
+            }else {
+                if ($count < 5) {
+                    $piece->setStatus(false);
+                }elseif ($count >= 5) {
+                    $piece->setStatus(true);
+                }
+            }
         }
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($piece);
@@ -451,7 +467,7 @@ class FscAttachedFileController extends AbstractController
            // TODO Remettre marina en destinataire des mails.
            $email = (new Email())
            ->from('intranet@groupe-axis.fr')
-           ->to('marina@roby-fr.com')
+           ->to('jpochet@groupe-axis.fr')
            ->cc('jpochet@groupe-axis.fr')
            ->subject('Liste des piéces sur lesquels il manque les piéces jointes Fsc')
            ->html($html);

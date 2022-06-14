@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ title }}{% endblock %}
 {% block body %}
-<div class="card collapsed-card card-warning">
+<div class="card collapsed-card card-info">
     <div class="card-header">
-        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
+        <h3 class="card-title"><i class="icon fas fa-info-circle"></i> Info</h3>
         <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
         </div>
@@ -14,7 +14,7 @@
         <p>Les piéces présentent dans cette liste sont celles présentent dans Divalto, si vous supprimer une commande dans Divalto, 
         celle ci sera supprimé de la liste et toutes les piéces jointes qui lui sont alouées seront supprimées</p>
         <p>A 00h45 chaque jours, la liste est mise à jour, vous pouvez cliquer sur le bouton bleu avec la fléche qui tourne pour forcer la mise à jour </p>
-        <p>La mise à jour a pour but de suivre l'évolution de la piéce et donc d'alimenter le numéro de Bl et de facture de maniére à savoir ou nous en sommes</p>
+        <p>La mise à jour a pour but de suivre l'évolution de la piéce et donc d'alimenter le numéro de Bl et de facture de maniére à savoir ou nous en sommes, elle permet également d'ajouter les nouvelles piéces.</p>
         <p>Un mail automatique vous sera envoyé chaque jour pour vous signaler les piéces à alimenter, un minimum de 5 piéces jointes est nécéssaire</p>
         <ul>
             <li>Document commercial du fournisseur avec la mention FSC sur les produits (notre facture d'achat)</li>
@@ -23,8 +23,13 @@
             <li>factures d’achats de la matiére premiére du fournisseur</li>
             <li>Le document du site FSC attestant que le fournisseur est encore certifié</li>
         </ul>
+        <p>Le bouton vert "Voir les piéces traitées" permet d'aller consulter les piéces déjà traitées</p>
+        <p>L'oeil bleu permet de voir le détail et de déposer des piéces jointes, à coté vous avez le nombre de commentaire lié à cette facture (grisé si aucun), puis le statut de la piéce, point d'exclamation = probléme signalé manuellement sur cette piéce.</p>
         <p>Les piéces jointes déposées doivent être au format pdf, jpg ou png</p>
-    <!-- /.card-footer-->
+        <p>La section en rouge reprends les piéces sur lesquels il y a eu un probléme que nous avons détecté aprés facturation, 
+        des dispositions ont été prise pour régulariser la situation, voir détail avec le bouton oeil bleu.</p>
+        <p>la colonne nbre Types Docs reprends le nombre de type de documents différents que nous avons pu reccuillir pour cette facture. le minimum étant fixé à 5</p>
+
     </div>
 </div>
                 
@@ -86,7 +91,7 @@
                                     <a class="text-dark">{{ piece.numCmd}}</a>
                                 </td>
                                 <td class="text-center">
-                                    <a class="text-dark">{{ piece.datecmd|date("d/m/Y") }}</a>
+                                    <a class="text-dark">{{ piece.datecmd|date("Y/m/d") }}</a>
                                 </td>
                                 <td class="text-center">
                                 {% if piece.numBl > 0 %}
@@ -95,7 +100,7 @@
                                 </td>
                                 <td class="text-center">
                                 {% if piece.numBl > 0 %}
-                                    <a class="text-dark">{{ piece.dateBl|date("d/m/Y") }}</a>
+                                    <a class="text-dark">{{ piece.dateBl|date("Y/m/d") }}</a>
                                 {% endif %}
                                 </td>
                                 <td class="text-center">
@@ -105,7 +110,7 @@
                                 </td>
                                 <td class="text-center">
                                 {% if piece.numFact > 0 %}
-                                    <a class="text-dark">{{ piece.dateFact|date("d/m/Y") }}</a>
+                                    <a class="text-dark">{{ piece.dateFact|date("Y/m/d") }}</a>
                                 {% endif %}
                                 </td>
                                 <td class="text-center">
