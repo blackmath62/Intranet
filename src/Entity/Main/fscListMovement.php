@@ -99,6 +99,21 @@ class fscListMovement
      */
     private $movBillFscs;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $perimetreBois;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="updatePerimetreBoisFsc")
+     */
+    private $userChangePerimetreBoisFsc;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatePerimetreBoisFsc;
+
     public function __construct()
     {
         $this->file = new ArrayCollection();
@@ -331,6 +346,42 @@ class fscListMovement
         if ($this->movBillFscs->removeElement($movBillFsc)) {
             $movBillFsc->removeVentilation($this);
         }
+
+        return $this;
+    }
+
+    public function getPerimetreBois(): ?string
+    {
+        return $this->perimetreBois;
+    }
+
+    public function setPerimetreBois(string $perimetreBois): self
+    {
+        $this->perimetreBois = $perimetreBois;
+
+        return $this;
+    }
+
+    public function getUserChangePerimetreBoisFsc(): ?Users
+    {
+        return $this->userChangePerimetreBoisFsc;
+    }
+
+    public function setUserChangePerimetreBoisFsc(?Users $userChangePerimetreBoisFsc): self
+    {
+        $this->userChangePerimetreBoisFsc = $userChangePerimetreBoisFsc;
+
+        return $this;
+    }
+
+    public function getUpdatePerimetreBoisFsc(): ?\DateTimeInterface
+    {
+        return $this->updatePerimetreBoisFsc;
+    }
+
+    public function setUpdatePerimetreBoisFsc(?\DateTimeInterface $updatePerimetreBoisFsc): self
+    {
+        $this->updatePerimetreBoisFsc = $updatePerimetreBoisFsc;
 
         return $this;
     }

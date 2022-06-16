@@ -174,6 +174,11 @@ class Users implements UserInterface
      */
     private $movBillFscs;
 
+    /**
+     * @ORM\OneToMany(targetEntity=fscListMovement::class, mappedBy="userChangePerimetreBoisFsc")
+     */
+    private $updatePerimetreBoisFsc;
+
    
     public function __construct()
     {
@@ -195,6 +200,7 @@ class Users implements UserInterface
         $this->controleArticlesFscs = new ArrayCollection();
         $this->paysBanFscs = new ArrayCollection();
         $this->movBillFscs = new ArrayCollection();
+        $this->updatePerimetreBoisFsc = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -841,6 +847,36 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($movBillFsc->getCreatedBy() === $this) {
                 $movBillFsc->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|fscListMovement[]
+     */
+    public function getUpdatePerimetreBoisFsc(): Collection
+    {
+        return $this->updatePerimetreBoisFsc;
+    }
+
+    public function addUpdatePerimetreBoisFsc(fscListMovement $updatePerimetreBoisFsc): self
+    {
+        if (!$this->updatePerimetreBoisFsc->contains($updatePerimetreBoisFsc)) {
+            $this->updatePerimetreBoisFsc[] = $updatePerimetreBoisFsc;
+            $updatePerimetreBoisFsc->setUserChangePerimetreBoisFsc($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUpdatePerimetreBoisFsc(fscListMovement $updatePerimetreBoisFsc): self
+    {
+        if ($this->updatePerimetreBoisFsc->removeElement($updatePerimetreBoisFsc)) {
+            // set the owning side to null (unless already changed)
+            if ($updatePerimetreBoisFsc->getUserChangePerimetreBoisFsc() === $this) {
+                $updatePerimetreBoisFsc->setUserChangePerimetreBoisFsc(null);
             }
         }
 

@@ -24,6 +24,7 @@ use phpDocumentor\Reflection\PseudoTypes\True_;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\fscListMovementRepository;
 use App\Repository\Main\TypeDocumentFscRepository;
+use App\Repository\Main\UsersRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -315,13 +316,21 @@ class FscAttachedFileController extends AbstractController
                     if ($count < 2) {
                         $piece->setStatus(false);
                 }elseif ($count >= 2) {
-                    $piece->setStatus(true);
+                    if ($piece->getPerimetreBois() == NULL || $piece->getPerimetreBois() == 'NR') {
+                        $piece->setStatus(false);
+                    }else {
+                        $piece->setStatus(true);
+                    }
                 }
             }else {
                 if ($count < 5) {
                     $piece->setStatus(false);
                 }elseif ($count >= 5) {
-                    $piece->setStatus(true);
+                    if ($piece->getPerimetreBois() == NULL || $piece->getPerimetreBois() == 'NR') {
+                        $piece->setStatus(false);
+                    }else {
+                        $piece->setStatus(true);
+                    }
                 }
             }
         }
@@ -335,7 +344,7 @@ class FscAttachedFileController extends AbstractController
      * @Route("/Roby/fsc/order/list/maj", name="app_fsc_order_list_maj")
      */
     // Mettre à jour la liste en comparant Divalto à la liste
-    public function majFscOrderListFromDivalto(): Response
+    public function majFscOrderListFromDivalto(UsersRepository $users): Response
     {
         
         // mise à jour des piéces
@@ -359,10 +368,14 @@ class FscAttachedFileController extends AbstractController
            $search = $this->repoFsc->findOneBy(['codePiece' => $maj[$ligMaj]['codePiece'], 'numCmd' => $maj[$ligMaj]['numCmd'], 'tiers' => $maj[$ligMaj]['tiers']]);
            if ($search == null) {
                $search = new fscListMovement();
+               $user = $users->findOneBy(['pseudo' => 'intranet']);
                $search->setCreatedAt(new DateTime())
                       ->setUpdatedAt(new DateTime())
                       ->setStatus(false)
                       ->setProbleme(false)
+                      ->setPerimetreBois('NR')
+                      ->setUserChangePerimetreBoisFsc($user)
+                      ->setUpdatePerimetreBoisFsc(new DateTime())
                       ->setNotreRef($maj[$ligMaj]['notreRef'])
                       ->setDateCmd(new DateTime($maj[$ligMaj]['dateCmd']));
                 if ( $maj[$ligMaj]['numBl'] > 0) {
