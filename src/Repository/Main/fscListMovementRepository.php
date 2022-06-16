@@ -2,9 +2,10 @@
 
 namespace App\Repository\Main;
 
+use DateTime;
 use App\Entity\Main\fscListMovement;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method fscListMovement|null find($id, $lockMode = null, $lockVersion = null)
@@ -60,6 +61,21 @@ class fscListMovementRepository extends ServiceEntityRepository
         $sql = "SELECT documentsfsc.file AS fichier, documentsfsc.fscListMovement_id AS movid, fsclistmovement.numFact 
         FROM documentsfsc INNER JOIN fsclistmovement ON fsclistmovement.id = documentsfsc.fscListMovement_id 
         WHERE documentsfsc.TypeDoc_id = 9 
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // pour l'envoi de mail automatique permetant l'alimentation des documents fsc sur les piéces fournisseurs
+    public function getPieceFscAAlimenter():array
+    {
+        $d = new DateTime('2021/01/01');
+        $d = $d->format('Y-m-d');
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * 
+        FROM fsclistmovement
+        WHERE fsclistmovement.probleme = 0 AND (fsclistmovement.dateCmd >= '$d' OR fsclistmovement.dateBl >= '$d' OR fsclistmovement.dateFact >= '$d') 
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();

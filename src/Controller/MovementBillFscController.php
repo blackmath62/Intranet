@@ -65,7 +65,6 @@ class MovementBillFscController extends AbstractController
             return $this->redirectToRoute('app_movement_bill_fsc');
         }
         $facture = $this->repoFact->findOneBy(['id' =>$id]);
-        //dd($facture->getVentilations()->getValues());
         $documents = [];
         foreach ($facture->getVentilations()->getValues() as $value) {
             $docs = $this->repoDocs->findBy(['fscListMovement' => $value->getId() ]);

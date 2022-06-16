@@ -178,6 +178,67 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-dark">
+
+                <div class="card-header d-flex">
+                    <h2 class="card-title mr-auto p-2 col-4">Liste des factures client en lien avec cette achat</h2>
+                </div>
+
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                            {% if piecesclients|length > 0 %}
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><span>Facture</span></th>
+                                    <th class="text-center"><span>Date Facture</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Notre référence</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for piecesclient in piecesclients %}                        
+                                    <tr>
+                                        <td class="text-center">
+                                            <a class="btn btn-xl btn-info" href='{{path('app_movement_bill_fsc_show', {'id' : piecesclient.id } ) }}'>{{ piecesclient.numFact }}<i class="fas fa-eye pl-2"></i></a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ piecesclient.dateFact|date("d/m/Y") }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ piecesclient.tiers}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ piecesclient.nom}}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ piecesclient.notreRef}}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center"><span>Facture</span></th>
+                                    <th class="text-center"><span>Date Facture</span></th>
+                                    <th class="text-center"><span>Tiers</span></th>
+                                    <th class="text-center"><span>Nom</span></th>
+                                    <th class="text-center"><span>Notre référence</span></th>
+                                </tr>
+                                </tr>
+                            </tfoot>
+                        </table>
+                            {% else %}
+                                        <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Pas de factures clients reliées</h4>
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
                     <div class="card-header d-flex justify-content-between">
                         <h2 class="card-title">Liste des documents pour le FSC liés à la piéce</h2>
                     </div>

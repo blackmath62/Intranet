@@ -38,9 +38,9 @@
         <div class="card card-dark">
             <div class="card-header d-flex justify-content-between">
             {% if app.request.attributes.get('_route')  == 'app_fsc_attached_file_ok' %}
-                <h2 class="card-title">Liste des piéces qui sont suffisaments alimentées avec des piéces jointes</h2>
+                <h2 class="card-title">Liste des piéces fournisseurs qui sont suffisaments alimentées avec des piéces jointes</h2>
             {% elseif app.request.attributes.get('_route')  == 'app_fsc_attached_file' %}
-                <h2 class="card-title">Liste des piéces sur lesquelles il faut ajouter des piéces jointes</h2>
+                <h2 class="card-title">Liste des piéces fournisseurs sur lesquelles il faut ajouter des piéces jointes</h2>
             {% endif %}
                 <div class='ml-auto'>
                     {% if app.request.attributes.get('_route')  == 'app_fsc_attached_file_ok' %}
@@ -55,7 +55,7 @@
             <!-- /.card-header -->
             <div class="card-body">
                     {% if pieces %}
-                <table id="example1" class="table table-bordered table-striped">
+                <table id="example2" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th class="text-center"><span>Tiers</span></th>
@@ -207,7 +207,7 @@
     <div class="col-md-12">
         <div class="card collapsed-card card-danger">
             <div class="card-header">
-                <h2 class="card-title">Liste des factures bloquées faute de document</h2>
+                <h2 class="card-title">Liste des factures fournisseurs bloquées faute de document</h2>
                 <div class="card-tools">
                     <span title="Nombre de piéce vérrouillée manuellement" class="badge badge-secondary">{{ piecesBloquees|length }}</span>
                     <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
@@ -217,7 +217,7 @@
             <!-- /.card-header -->
             <div class="card-body">
                     {% if piecesBloquees %}
-                <table id="example2" class="table table-bordered table-striped">
+                <table id="example1" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th class="text-center"><span>Tiers</span></th>

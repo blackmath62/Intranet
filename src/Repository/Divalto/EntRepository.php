@@ -151,7 +151,7 @@ class EntRepository extends ServiceEntityRepository
         FROM ENT
         INNER JOIN MOUV ON MOUV.FANO = ENT.PINO AND MOUV.DOS = ENT.DOS
         INNER JOIN CLI ON MOUV.DOS = CLI.DOS AND MOUV.TIERS = CLI.TIERS
-        WHERE MOUV.REF LIKE 'FSC%' AND ENT.TICOD = 'C' AND ENT.PICOD = 4 AND ENT.PIDT >= '$fiveYearsAgo'
+        WHERE (MOUV.REF LIKE 'FSC%' OR MOUV.FANO IN ('19021495','19021076','19021428')) AND ENT.TICOD = 'C' AND ENT.PICOD = 4 AND ENT.PIDT >= '$fiveYearsAgo'
         GROUP BY ENT.PINO, ENT.PIDT, ENT.TIERS, CLI.NOM, ENT.PIREF, ENT.TICOD
         ";
         $stmt = $conn->prepare($sql);

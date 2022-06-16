@@ -104,6 +104,18 @@ class FscAttachedFileController extends AbstractController
             $p = 'numFact';
         }
         $piece = $repo->findOneBy([$p => $num, 'codePiece' => $type, 'tiers' => $tiers]);
+        $piecesClients = [];
+        $i = 0;
+        foreach ($piece->getMovBillFscs()->getValues() as $value) {
+            // facture, sa date, tiers et notre référence
+            $piecesClients[$i]['id'] = $value->getId();
+            $piecesClients[$i]['numFact'] = $value->getFacture();
+            $piecesClients[$i]['dateFact'] = $value->getDateFact();
+            $piecesClients[$i]['tiers'] = $value->getTiers();
+            $piecesClients[$i]['nom'] = $value->getNom();
+            $piecesClients[$i]['notreRef'] = $value->getNotreRef();
+            $i++;
+        }
         $comments = $this->commentairesRepo->findBy(['Tables' => $table, 'identifiant' => $piece->getId()]);
         $typeDocFsc = $this->typeDocFscRepo->findAll();
         $findDocs = [];
@@ -205,7 +217,8 @@ class FscAttachedFileController extends AbstractController
             'formText' => $formText->createView(),
             'form' => $form->createView(),
             'formComment' => $formComment->createView(),
-            'comments' => $comments
+            'comments' => $comments,
+            'piecesclients' => $piecesClients
         ]);
     }
 
@@ -281,16 +294,21 @@ class FscAttachedFileController extends AbstractController
 
     public function changeStatusPiece($id){
 
-        // compter le nombre de piéces  jointes liées à cette piéce
-        //$count = count($this->repoDocs->findBy(['fscListMovement' => $id ]));
+        // compter le nombre de piéces jointes liées à cette piéce
         $count = count($this->repoFsc->getCountTypeDocByOrderFsc($id));
 
         $piece = $this->repoFsc->findOneBy(['id' => $id]);
+        // Date à laquelle nous avons commencé à gérer les piéces FSC sur l'intranet
         $d = new DateTime('2021/01/01');
         $fiveYearsAgo = new DateTime();
         $fiveYearsAgo = date('Y-m-d', strtotime('-5 years'));
-        $datePiece = $piece->getDateFact()->format('Y-m-d');
-        if ($datePiece <= $fiveYearsAgo) {
+        if ($piece->getDateFact() <> null) {
+            $datePiece = $piece->getDateFact()->format('Y-m-d');
+        }
+        else {
+            $datePiece = null;
+        }
+        if ( $datePiece <> null && $datePiece <= $fiveYearsAgo) {
             $piece->setStatus(true);
         }else{
                 if ($piece->getDateFact() < $d) {
@@ -445,18 +463,18 @@ class FscAttachedFileController extends AbstractController
     // mail automatique pour demander les documents Fsc
     public function sendMail(){
        $piecesAnormales = [];
-       $pieces = $this->repoFsc->findBy(['Probleme' => 0]);
+       $pieces = $this->repoFsc->getPieceFscAAlimenter();
        for ($i=0; $i <count($pieces) ; $i++) { 
-           $count = count($this->repoFsc->getCountTypeDocByOrderFsc($pieces[$i]->getId() ));
+           $count = count($this->repoFsc->getCountTypeDocByOrderFsc($pieces[$i]['id'] ));
            if ($count < 5) {
-            $piecesAnormales[$i]['notreRef'] = $pieces[$i]->getNotreRef();
-            $piecesAnormales[$i]['numCmd'] = $pieces[$i]->getNumCmd();
-            $piecesAnormales[$i]['dateCmd'] = $pieces[$i]->getDateCmd();
-            $piecesAnormales[$i]['numBl'] = $pieces[$i]->getNumBl();
-            $piecesAnormales[$i]['dateBl'] = $pieces[$i]->getDateBl();
-            $piecesAnormales[$i]['numFact'] =$pieces[$i]->getNumFact();
-            $piecesAnormales[$i]['dateFact'] = $pieces[$i]->getDateFact();
-            $piecesAnormales[$i]['tiers'] = $pieces[$i]->getTiers();
+            $piecesAnormales[$i]['notreRef'] = $pieces[$i]['notreRef'];
+            $piecesAnormales[$i]['numCmd'] = $pieces[$i]['numCmd'];
+            $piecesAnormales[$i]['dateCmd'] = $pieces[$i]['dateCmd'];
+            $piecesAnormales[$i]['numBl'] = $pieces[$i]['numBl'];
+            $piecesAnormales[$i]['dateBl'] = $pieces[$i]['dateBl'];
+            $piecesAnormales[$i]['numFact'] =$pieces[$i]['numFact'];
+            $piecesAnormales[$i]['dateFact'] = $pieces[$i]['dateFact'];
+            $piecesAnormales[$i]['tiers'] = $pieces[$i]['tiers'];
             $piecesAnormales[$i]['count'] = $count;
            }
        }

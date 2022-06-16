@@ -41,7 +41,7 @@ class MouvRepository extends ServiceEntityRepository
         ELSE 'MARINA'
         END AS utilisateur
         FROM MOUV
-        WHERE MOUV.DOS = 3 AND MOUV.REF LIKE 'FSC%' AND MOUV.TICOD IN ('F') AND MOUV.CDNO NOT IN($listpieceOk) AND MOUV.PICOD IN (2,3,4) 
+        WHERE MOUV.DOS = 3 AND ( MOUV.REF LIKE 'FSC%' OR MOUV.FANO IN ('19021142','19021427') ) AND MOUV.TICOD IN ('F') AND MOUV.CDNO NOT IN($listpieceOk) AND MOUV.PICOD IN (2,3,4) 
         --AND (MOUV.CDDT >= '2021/01/01' OR MOUV.BLDT >= '2021/01/01' OR MOUV.FADT >= '2021/01/01')
         )reponse
         INNER JOIN ENT ON dos = ENT.DOS AND tiers = ENT.TIERS AND ENT.PINO = numPiece
@@ -399,9 +399,10 @@ public function getCheckCodeAndDesArticles()
 public function getDetailFactureFscClient($facture):array
 {
     $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT MOUV.TIERS AS tiers, MOUV.REF AS ref, MOUV.DES AS designation, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MOUV.OP AS op, MOUV.FAQTE AS qte
+    $sql = "SELECT MOUV.TIERS AS tiers, MOUV.REF AS ref, MOUV.DES AS designation, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MOUV.OP AS op, MOUV.FAQTE AS qte, MVTL_STOCK_V.SERIELOT AS lot
     FROM MOUV
-    WHERE MOUV.REF LIKE 'FSC%' AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND MOUV.FANO = ?
+    LEFT JOIN MVTL_STOCK_V ON MOUV.REF = MVTL_STOCK_V.REFERENCE AND MOUV.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND MOUV.SREF2 = MVTL_STOCK_V.SREFERENCE2
+    WHERE MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND MOUV.FANO = ? AND MOUV.DOS = 3
     ";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$facture]);
