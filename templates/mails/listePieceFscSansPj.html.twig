@@ -25,6 +25,7 @@
             <th>Facture</th>
             <th>date Fact</th>
             <th>Nbre Types docs</th>
+            <th>Périmétre Bois</th>
         </thead>
         <tbody>
 {% for piecesAnormale in piecesAnormales %}
@@ -37,7 +38,8 @@
             <td>{% if piecesAnormale.numBl %}{{ piecesAnormale.dateBl|date('d-m-Y') }}{% endif %}</td>
             <td>{% if piecesAnormale.numFact %}{{ piecesAnormale.numFact }}{% endif %}</td>
             <td>{% if piecesAnormale.numFact %}{{ piecesAnormale.dateFact|date('d-m-Y') }}{% endif %}</td>
-            <td class='text-center'>{{ piecesAnormale.count }}</td>
+            <td>{{ piecesAnormale.count }}</td>
+            <td style='color:red';>{% if piecesAnormale.numFact %}{{ piecesAnormale.perimetre }}{% endif %}</td>
         </tr>
 {% endfor %}
        </tbody>

@@ -18,7 +18,7 @@
     <p>Plus bas vous pouvez ajouter un commentaire si nécéssaire et voir tous les commentaires déposés, par qui à quelle heure....</p>
     </div>
 </div>
-                
+
 <div class="row">
             <div class="col-md-12">
                 {% if piece.probleme == 0 %}
@@ -29,10 +29,16 @@
                 
                     <div class="card-header d-flex justify-content-between flex-wrap">
                         <div class="card-title">
-                        <h2>Liste des produits de la piéce</h2>
+                        <h2>Liste des produits de la piéce fournisseur pour notre référence : {{ notreRef.notreRef }}</h2>
                         {% if piece.probleme > 0 %}<span>Il y a un probléme avec les documents remis par le fournisseur, veuillez vérifier les commentaires ci dessous</span>{% endif %}
                         </div>
                         <div class="ml-auto">
+                            {% if factureAchat %}
+                                <H5 class='mr-2'>Type FSC actuel : {{ piece.perimetreBois }}</H5>
+                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#perimetre">
+                                    Modifier le Type de FSC
+                                </button>
+                            {% endif %}
                             {% if piece.probleme == 0 %}
                                 <button type="button" title = 'Bloquer cette piéce suite à un probléme' data-toggle="modal" data-target="#modal-{{piece.id}}" class="btn btn-danger "><i class="far fa-times-circle pr-2"></i> Vérrouiller manuellement cette piéce</button> 
                             {% else %}
@@ -41,6 +47,42 @@
                             <a title = 'Retourner à la liste des piéces à alimenter' href="{{ path('app_fsc_attached_file') }}" class="btn btn-warning text-dark"><i class="fas fa-thumbs-down pr-2"></i>Voir les piéces à alimenter</a>
                         </div>
                     </div>
+                    {% if factureAchat %}                    
+                     <!-- modal -->
+                    <div class="modal fade" id="perimetre">
+                        <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h4 class="modal-title">Indiquer le Type FSC</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body">
+                            <div>
+                                <embed src="{{ asset('/doc/Roby/Fsc/' ~ factureAchat.file ) }}" width="800" height="500" type="application/pdf"/>
+                                <div>
+                                <h2> Lien vers le fichier :</h2>
+                                <a class="text-left" href="{{ asset('/doc/Roby/Fsc/' ~ factureAchat.file ) }}" class="text-dark">{{ factureAchat.file }}</a></br>
+                                </div>
+                            </div>
+                            {{ form_start(formPerimetre, { attr: { 'accept-charset' : 'utf-8' }}) }}
+                            {{ form_label(formPerimetre.perimetreBois) }}
+                            {{ form_widget(formPerimetre.perimetreBois) }}
+                            {{ form_errors(formPerimetre.perimetreBois) }}
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                            {{ form_widget(formPerimetre.ModifierPerimetre, {'label': "Modifier le périmétre bois", 'attr' : { 'class': 'btn btn-outline-secondary mb-3' }}) }}
+                            {{ form_end(formPerimetre) }}
+                            </div>
+                        </div>
+                        <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
+                    {% endif %}
 
                     <!-- modal -->
                     <div class="modal fade" id="modal-{{piece.id}}">
@@ -110,6 +152,7 @@
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Lot</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -149,7 +192,10 @@
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark">{{ detail.designation}}</a>
-                                        </td>                                       
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ detail.lot}}</a>
+                                        </td>                                         
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -163,6 +209,7 @@
                                     <th class="text-center"><span>Sref1</span></th>
                                     <th class="text-center"><span>Sref2</span></th>
                                     <th class="text-center"><span>Désignation</span></th>
+                                    <th class="text-center"><span>Lot</span></th>
                                 </tr>
                                 </tr>
                             </tfoot>

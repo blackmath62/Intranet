@@ -383,7 +383,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
        $html = $this->renderView('mails/cmdRobyDelaiAccepteReporte.html.twig', ['commandesSansDelais' => $commandesSansDelai, 'commandesAvecDelais' => $commandesAvecDelai, 'commandesDelaiDepasses' => $commandesDelaiDepasse ]);
        $email = (new Email())
        ->from('intranet@groupe-axis.fr')
-       ->to('ndegorre@roby-fr.com','msmal@roby-fr.com')
+       ->to('ndegorre@roby-fr.com','kkupczak@roby-fr.com')
        //->cc('jpochet@lhermitte.fr')
        ->subject('Liste des commandes avec Délais et sans délais')
        ->html($html);

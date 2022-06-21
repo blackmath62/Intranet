@@ -62,7 +62,7 @@ class MovementBillFscController extends AbstractController
             $entityManager->flush();
             
             $this->addFlash('message', 'Mise à jour effectuée avec succés');
-            return $this->redirectToRoute('app_movement_bill_fsc');
+            return $this->redirectToRoute('app_movement_bill_fsc_show', ['id' => $id]);
         }
         $facture = $this->repoFact->findOneBy(['id' =>$id]);
         $documents = [];

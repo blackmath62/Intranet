@@ -10,8 +10,10 @@ use App\Form\DocumentsFscType;
 use App\Entity\Main\Commentaires;
 use App\Entity\Main\documentsFsc;
 use Symfony\Component\Mime\Email;
+use App\Form\PerimetreBoisFscType;
 use App\Entity\Main\fscListMovement;
 use App\Form\TypeDocumentFscChoiceType;
+use App\Repository\Main\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\Divalto\MouvRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +26,6 @@ use phpDocumentor\Reflection\PseudoTypes\True_;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\fscListMovementRepository;
 use App\Repository\Main\TypeDocumentFscRepository;
-use App\Repository\Main\UsersRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -44,8 +45,9 @@ class FscAttachedFileController extends AbstractController
     private $mailer;
     private $commentairesRepo;
     private $typeDocFscRepo;
+    private $usersRepo;
 
-    public function __construct(TypeDocumentFscRepository $typeDocFscRepo, CommentairesRepository $commentairesRepo, MouvRepository $mouvRepo, fscListMovementRepository $repoFsc, EntityManagerInterface $manager, documentsFscRepository $repoDocs,MailerInterface $mailer)
+    public function __construct(UsersRepository $usersRepo, TypeDocumentFscRepository $typeDocFscRepo, CommentairesRepository $commentairesRepo, MouvRepository $mouvRepo, fscListMovementRepository $repoFsc, EntityManagerInterface $manager, documentsFscRepository $repoDocs,MailerInterface $mailer)
     {
         $this->mouvRepo = $mouvRepo;
         $this->repoFsc = $repoFsc;
@@ -54,6 +56,7 @@ class FscAttachedFileController extends AbstractController
         $this->mailer = $mailer;
         $this->commentairesRepo =$commentairesRepo;
         $this->typeDocFscRepo = $typeDocFscRepo;
+        $this->usersRepo = $usersRepo;
         //parent::__construct();
     }
     
@@ -97,6 +100,7 @@ class FscAttachedFileController extends AbstractController
     {
         $table = 'fsclistmovement';
         $detailsPieces = $this->mouvRepo->getMouvOnOrder($num, $type, $tiers);
+        $notreRef = $this->mouvRepo->getNotreRef($num, $type, $tiers);
         if ($type == 2) {
             $p = 'numCmd';
         }elseif ($type == 3) {
@@ -125,6 +129,18 @@ class FscAttachedFileController extends AbstractController
             $findDocs[$i]['id'] = $value->getId();
             $findDocs[$i]['count'] = count($this->repoDocs->findBy(['TypeDoc' => $value->getId(), 'fscListMovement' => $piece->getId()]));
             $i += 1;
+        }
+
+        $formPerimetre = $this->createForm(PerimetreBoisFscType::class);
+        $formPerimetre->handleRequest($request);
+        if ($formPerimetre->isSubmitted() && $formPerimetre->isValid()) {
+            $per = $this->repoFsc->findOneBy(['id' => $piece->getId()]);
+            $per->setUserChangePerimetreBoisFsc($this->getUser())
+                ->setUpdatePerimetreBoisFsc(new DateTime())
+                ->setPerimetreBois($formPerimetre->get('perimetreBois')->getData());
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($per);
+            $entityManager->flush();
         }
 
         $formText = $this->createForm(TextType::class);
@@ -207,19 +223,21 @@ class FscAttachedFileController extends AbstractController
         }
         $typeDocs = $this->typeDocFscRepo->findAll();
 
-
         return $this->render('fsc_attached_file/detailsPiece.html.twig', [
             'title' => 'Détail pièce FSC',
             'typeDocs' => $typeDocs,
             'findDocs' => $findDocs,
+            'notreRef' => $notreRef,
             'piece' => $piece,
             'details' => $detailsPieces,
             'documents' => $piece,
             'formText' => $formText->createView(),
+            'formPerimetre' => $formPerimetre->createView(),
             'form' => $form->createView(),
             'formComment' => $formComment->createView(),
             'comments' => $comments,
-            'piecesclients' => $piecesClients
+            'piecesclients' => $piecesClients,
+            'factureAchat' => $this->repoDocs->findOneBy(['fscListMovement' => $piece->getId(), 'TypeDoc' => 9])
         ]);
     }
 
@@ -316,7 +334,7 @@ class FscAttachedFileController extends AbstractController
                     if ($count < 2) {
                         $piece->setStatus(false);
                 }elseif ($count >= 2) {
-                    if ($piece->getPerimetreBois() == NULL || $piece->getPerimetreBois() == 'NR') {
+                    if ($piece->getPerimetreBois() == NULL || $piece->getPerimetreBois() == 'Non Renseigné') {
                         $piece->setStatus(false);
                     }else {
                         $piece->setStatus(true);
@@ -326,7 +344,7 @@ class FscAttachedFileController extends AbstractController
                 if ($count < 5) {
                     $piece->setStatus(false);
                 }elseif ($count >= 5) {
-                    if ($piece->getPerimetreBois() == NULL || $piece->getPerimetreBois() == 'NR') {
+                    if ($piece->getPerimetreBois() == NULL || $piece->getPerimetreBois() == 'Non Renseigné') {
                         $piece->setStatus(false);
                     }else {
                         $piece->setStatus(true);
@@ -344,7 +362,7 @@ class FscAttachedFileController extends AbstractController
      * @Route("/Roby/fsc/order/list/maj", name="app_fsc_order_list_maj")
      */
     // Mettre à jour la liste en comparant Divalto à la liste
-    public function majFscOrderListFromDivalto(UsersRepository $users): Response
+    public function majFscOrderListFromDivalto(): Response
     {
         
         // mise à jour des piéces
@@ -368,12 +386,12 @@ class FscAttachedFileController extends AbstractController
            $search = $this->repoFsc->findOneBy(['codePiece' => $maj[$ligMaj]['codePiece'], 'numCmd' => $maj[$ligMaj]['numCmd'], 'tiers' => $maj[$ligMaj]['tiers']]);
            if ($search == null) {
                $search = new fscListMovement();
-               $user = $users->findOneBy(['pseudo' => 'intranet']);
+               $user = $this->usersRepo->findOneBy(['pseudo' => 'intranet']);
                $search->setCreatedAt(new DateTime())
                       ->setUpdatedAt(new DateTime())
                       ->setStatus(false)
                       ->setProbleme(false)
-                      ->setPerimetreBois('NR')
+                      ->setPerimetreBois('Non Renseigné')
                       ->setUserChangePerimetreBoisFsc($user)
                       ->setUpdatePerimetreBoisFsc(new DateTime())
                       ->setNotreRef($maj[$ligMaj]['notreRef'])
@@ -479,7 +497,7 @@ class FscAttachedFileController extends AbstractController
        $pieces = $this->repoFsc->getPieceFscAAlimenter();
        for ($i=0; $i <count($pieces) ; $i++) { 
            $count = count($this->repoFsc->getCountTypeDocByOrderFsc($pieces[$i]['id'] ));
-           if ($count < 5) {
+           if ($count < 5 or $pieces[$i]['perimetreBois'] == 'Non Renseigné') {
             $piecesAnormales[$i]['notreRef'] = $pieces[$i]['notreRef'];
             $piecesAnormales[$i]['numCmd'] = $pieces[$i]['numCmd'];
             $piecesAnormales[$i]['dateCmd'] = $pieces[$i]['dateCmd'];
@@ -488,6 +506,7 @@ class FscAttachedFileController extends AbstractController
             $piecesAnormales[$i]['numFact'] =$pieces[$i]['numFact'];
             $piecesAnormales[$i]['dateFact'] = $pieces[$i]['dateFact'];
             $piecesAnormales[$i]['tiers'] = $pieces[$i]['tiers'];
+            $piecesAnormales[$i]['perimetre'] = $pieces[$i]['perimetreBois'];
             $piecesAnormales[$i]['count'] = $count;
            }
        }

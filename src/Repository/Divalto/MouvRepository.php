@@ -80,6 +80,18 @@ class MouvRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    public function getNotreRef($piece, $typePiece, $tiers)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ENT.PIREF AS notreRef
+        FROM ENT
+        WHERE ENT.DOS = 3 AND ENT.PINO = $piece AND ENT.TIERS = '$tiers' AND ENT.PICOD = $typePiece
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
     // Mouvements sur la piéce
     public function getMouvOnOrder($num, $typePiece, $tiers):array
     {
@@ -95,10 +107,11 @@ class MouvRepository extends ServiceEntityRepository
         }
         $where = $code . ' = ' . $num;
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT DISTINCT $dateP AS datePiece, $code AS num, MOUV.PICOD AS codePiece, MOUV.TIERS AS tiers, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MAX(MOUV.DES) AS designation
+        $sql = "SELECT DISTINCT $dateP AS datePiece, $code AS num, MOUV.PICOD AS codePiece, MOUV.TIERS AS tiers, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MAX(MOUV.DES) AS designation, MVTL_STOCK_V.SERIELOT AS lot
         FROM MOUV
+        LEFT JOIN MVTL_STOCK_V ON MOUV.REF = MVTL_STOCK_V.REFERENCE AND MOUV.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND MOUV.SREF2 = MVTL_STOCK_V.SREFERENCE2
         WHERE MOUV.DOS = 3 AND MOUV.PICOD = $typePiece AND MOUV.TIERS = '$tiers' AND $where
-        GROUP BY $dateP, $code, MOUV.PICOD, MOUV.TIERS, MOUV.REF, MOUV.SREF1, MOUV.SREF2
+        GROUP BY $dateP, $code, MOUV.PICOD, MOUV.TIERS, MOUV.REF, MOUV.SREF1, MOUV.SREF2, MVTL_STOCK_V.SERIELOT
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();

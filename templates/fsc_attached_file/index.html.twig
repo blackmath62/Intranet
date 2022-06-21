@@ -71,6 +71,7 @@
                             <th class="text-center"><span>derniére demande</span></th>
                             <th class="text-center"><span>Assigné à</span></th>
                             <th class="text-center"><span>Nbre Types Docs</span></th>
+                            <th class="text-center"><span>Type FSC</span></th>
                             <th class="text-center"><span>Actions</span></th>
                         </tr>
                     </thead>
@@ -137,6 +138,13 @@
                                 
                                     <a class="font-weight-bold {{ val }} ">{{ count }}</a>
                                 </td>
+                                <td class="text-center">
+                                {% if piece.perimetreBois == 'Non Renseigné' and piece.numFact %}
+                                    <strong class="text-danger">{{ piece.perimetreBois }}</strong>
+                                {% else %}
+                                    <a class="text-dark">{{ piece.perimetreBois }}</a>        
+                                {% endif %}
+                                </td>
                                 {% if piece.codePiece == 4 %}
                                 {% set p = piece.numFact %}
                                 {% elseif piece.codePiece == 3 %}
@@ -187,6 +195,7 @@
                             <th class="text-center"><span>derniére demande</span></th>
                             <th class="text-center"><span>Assigné à</span></th>
                             <th class="text-center"><span>Nbre Types Docs</span></th>
+                            <th class="text-center"><span>Type FSC</span></th>
                             <th class="text-center"><span>Actions</span></th>
                         </tr>
                         </tr>
@@ -233,6 +242,7 @@
                             <th class="text-center"><span>derniére demande</span></th>
                             <th class="text-center"><span>Assigné à</span></th>
                             <th class="text-center"><span>Nbre de Fichiers</span></th>
+                            <th class="text-center"><span>Type FSC</span></th>
                             <th class="text-center"><span>Actions</span></th>
                         </tr>
                     </thead>
@@ -293,6 +303,13 @@
                                 
                                     <a class="font-weight-bold {{ val }} ">{{ piecesBloquee.file|length }}</a>
                                 </td>
+                                <td class="text-center">
+                                {% if piecesBloquee.perimetreBois == 'Non Renseigné' and piecesBloquee.numFact %}
+                                    <strong class="text-danger">{{ piecesBloquee.perimetreBois }}</strong>
+                                {% else %}
+                                    <a class="text-dark">{{ piecesBloquee.perimetreBois }}</a>        
+                                {% endif %}
+                                </td>
                                 {% if piecesBloquee.codePiece == 4 %}
                                 {% set p = piecesBloquee.numFact %}
                                 {% elseif piecesBloquee.codePiece == 3 %}
@@ -343,6 +360,7 @@
                             <th class="text-center"><span>derniére demande</span></th>
                             <th class="text-center"><span>Assigné à</span></th>
                             <th class="text-center"><span>Nbre de Fichiers</span></th>
+                            <th class="text-center"><span>Type FSC</span></th>
                             <th class="text-center"><span>Actions</span></th>
                         </tr>
                         </tr>
