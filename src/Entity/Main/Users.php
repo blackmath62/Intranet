@@ -179,6 +179,16 @@ class Users implements UserInterface
      */
     private $updatePerimetreBoisFsc;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ConduiteDeTravauxMe::class, mappedBy="updatedBy")
+     */
+    private $conduiteDeTravauxMes;
+
+    /**
+     * @ORM\OneToMany(targetEntity=OthersDocuments::class, mappedBy="user")
+     */
+    private $othersDocuments;
+
    
     public function __construct()
     {
@@ -201,6 +211,8 @@ class Users implements UserInterface
         $this->paysBanFscs = new ArrayCollection();
         $this->movBillFscs = new ArrayCollection();
         $this->updatePerimetreBoisFsc = new ArrayCollection();
+        $this->conduiteDeTravauxMes = new ArrayCollection();
+        $this->othersDocuments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -877,6 +889,66 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($updatePerimetreBoisFsc->getUserChangePerimetreBoisFsc() === $this) {
                 $updatePerimetreBoisFsc->setUserChangePerimetreBoisFsc(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ConduiteDeTravauxMe[]
+     */
+    public function getConduiteDeTravauxMes(): Collection
+    {
+        return $this->conduiteDeTravauxMes;
+    }
+
+    public function addConduiteDeTravauxMe(ConduiteDeTravauxMe $conduiteDeTravauxMe): self
+    {
+        if (!$this->conduiteDeTravauxMes->contains($conduiteDeTravauxMe)) {
+            $this->conduiteDeTravauxMes[] = $conduiteDeTravauxMe;
+            $conduiteDeTravauxMe->setUpdatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConduiteDeTravauxMe(ConduiteDeTravauxMe $conduiteDeTravauxMe): self
+    {
+        if ($this->conduiteDeTravauxMes->removeElement($conduiteDeTravauxMe)) {
+            // set the owning side to null (unless already changed)
+            if ($conduiteDeTravauxMe->getUpdatedBy() === $this) {
+                $conduiteDeTravauxMe->setUpdatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|OthersDocuments[]
+     */
+    public function getOthersDocuments(): Collection
+    {
+        return $this->othersDocuments;
+    }
+
+    public function addOthersDocument(OthersDocuments $othersDocument): self
+    {
+        if (!$this->othersDocuments->contains($othersDocument)) {
+            $this->othersDocuments[] = $othersDocument;
+            $othersDocument->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOthersDocument(OthersDocuments $othersDocument): self
+    {
+        if ($this->othersDocuments->removeElement($othersDocument)) {
+            // set the owning side to null (unless already changed)
+            if ($othersDocument->getUser() === $this) {
+                $othersDocument->setUser(null);
             }
         }
 

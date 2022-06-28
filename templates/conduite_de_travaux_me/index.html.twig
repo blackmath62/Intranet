@@ -1,0 +1,388 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-info-circle"></i> Info</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+       
+    </div>
+</div>
+                
+<div class="row">
+
+    <div class="col-12 col-sm-12">
+        <div class="card card-dark card-tabs">
+            <div class="card-header p-0 pt-1">
+            <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                <li class="nav-item">
+                <a class="nav-link active" id="custom-tabs-one-liste-tab" data-toggle="pill" href="#custom-tabs-one-liste" role="tab" aria-controls="custom-tabs-one-liste" aria-selected="true">Liste</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" id="custom-tabs-one-calendar-tab" data-toggle="pill" href="#custom-tabs-one-calendar" role="tab" aria-controls="custom-tabs-one-calendar" aria-selected="false">Calendrier</a>
+                </li>
+            </ul>
+            </div>
+            <div class="card-body">
+            <div class="tab-content" id="custom-tabs-one-tabContent">
+                <div class="tab-pane fade show active" id="custom-tabs-one-liste" role="tabpanel" aria-labelledby="custom-tabs-one-liste-tab">
+                    
+
+                    <div class="col-md-12">
+        <div class="card card-dark">
+            <div class="card-header d-flex justify-content-between">
+            {% if app.request.attributes.get('_route')  == 'app_conduite_de_travaux_me_ok' %}
+                <h2 class="card-title">Liste des piéces clients traitées</h2>
+            {% elseif app.request.attributes.get('_route')  == 'app_conduite_de_travaux_me_nok' %}
+                <h2 class="card-title">Liste des piéces clients à traiter</h2>
+            {% endif %}
+                <div class='ml-auto'>
+                    {% if app.request.attributes.get('_route')  == 'app_conduite_de_travaux_me_ok' %}
+                    <a title = 'Piéces à alimentées avec des piéces jointes!' href="{{ path('app_conduite_de_travaux_me_nok') }}" class="btn btn-warning text-dark"><i class="fas fa-thumbs-down pr-2"></i>Voir les piéces à traitrer</a>
+                    {% else %}
+                    <a title = 'Metre à jour les données' href="{{ path('app_conduite_de_travaux_me_update') }}" class="btn btn-primary "><i class="fas fa-redo-alt pr-2"></i>Mettre à jour</a>
+                    <a title = 'Piéces alimentées, beau travail !' href="{{ path('app_conduite_de_travaux_me_ok') }}" class="btn btn-success"><i class="fas fa-thumbs-up pr-2"></i>Voir les piéces traitées</a>
+                    {% endif %}
+                    
+            </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                    {% if pieces %}
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th class="text-center"><span>Tiers</span></th>
+                            <th class="text-center"><span>Adresse de livraison</span></th>
+                            <th class="text-center"><span>Affaire</span></th>
+                            <th class="text-center"><span>transport</span></th>
+                            <th class="text-center"><span>Cmd</span></th>
+                            <th class="text-center"><span>BL</span></th>
+                            <th class="text-center"><span>Facture</span></th>
+                            <th class="text-center"><span>Délai demandé</span></th>
+                            <th class="text-center"><span>Délai accepté</span></th>
+                            <th class="text-center"><span>Délai reporté</span></th>
+                            <th class="text-center"><span>Date Début chantier</span></th>
+                            <th class="text-center"><span>Date fin chantier</span></th>
+                            <th class="text-center"><span>Etat</span></th>
+                            <th class="text-center"><span>Durée</span></th>
+                            <th class="text-center"><span>Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    
+                        {% for piece in pieces %}
+                            <tr>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ piece.codeClient }} </a></br>
+                                    <a class="text-dark">{{ piece.nom }}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ piece.adresseLivraison}}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ piece.affaire}}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-dark">{{ piece.modeDeTransport }} / {{ piece.op }}</a>
+                                </td>
+                                <td class="text-center">
+                                {% if piece.numCmd > 0 %}
+                                    <a class="text-dark">{{ piece.numCmd}} du</a></br>
+                                    <a class="text-dark">{{ piece.dateCmd|date("Y/m/d") }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if piece.numeroBl > 0 %}
+                                    <a class="text-dark">{{ piece.numeroBl}} du</a></br>
+                                    <a class="text-dark">{{ piece.dateBl|date("Y/m/d") }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if piece.numeroFacture > 0 %}
+                                    <a class="text-dark">{{ piece.numeroFacture}} du</a></br>
+                                    <a class="text-dark">{{ piece.dateFacture|date("Y/m/d") }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if piece.delaiDemande %}
+                                    <a class="text-dark">{{ piece.delaiDemande|date("d/m/Y") }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if piece.delaiAccepte %}
+                                    <a class="text-dark">{{ piece.delaiAccepte|date("d/m/Y") }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if piece.delaiReporte %}
+                                    <a class="text-dark">{{ piece.delaiReporte|date("d/m/Y") }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if piece.dateDebutChantier %}
+                                    <a class="text-dark">{{ piece.dateDebutChantier|date("d-m-Y H:i") }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% if piece.dateFinChantier %}
+                                    <a class="text-dark">{{ piece.dateFinChantier|date("d-m-Y H:i") }}</a>
+                                {% endif %}
+                                </td>
+                                <td class="text-center">
+                                {% set color = 'success' %}
+                                {% if piece.etat == 'En attente' %}
+                                {% set color = 'warning text-dark' %}
+                                {% set icone = "fa fa-pause" %}
+                                {% elseif piece.etat == 'En cours' %}
+                                {% set color = 'primary text-white' %}
+                                {% set icone = "fa fa-spinner" %}  
+                                {% elseif piece.etat == 'A finir' %}
+                                {% set color = 'secondary text-white' %}
+                                {% set icone = "fa fa-battery-half" %}  
+                                {% elseif piece.etat == 'Termine' %}
+                                {% set color = 'success text-white' %}
+                                {% set icone = "fa fa-check" %}   
+                                {% elseif piece.etat == 'Litige' %}
+                                {% set color = 'danger text-white' %}
+                                {% set icone = "fa fa-exclamation" %}         
+                                {% endif %}                               
+                                
+                                    <a class="btn btn-{{ color}}"><i class="{{icone}}" aria-hidden="true"></i></a>
+                                </td>
+                                <td class="text-center">
+                                {% if piece.dureeTravaux %}
+                                    <a class="text-dark">{{ piece.dureeTravaux }}</a>
+                                {% endif %}
+
+                                </td>                                
+                                <td class="text-center">
+                                    <a href='{{path('app_conduite_de_travaux_me_show', {'id' : piece.entId } ) }}' class="text-light btn btn-xl btn-info"><i class="fas fa-eye"></i></a>
+                                    {% if commentaires %}
+                                    {% for commentaire in commentaires %}
+                                        {% if commentaire.ident == piece.ident and commentaire.nbeCommentaires > 0  %}
+                                        <i class="fa fa-comments text-secondary pr-2 pl-2">
+                                            <span class="badge badge-info right"> {{commentaire.nbeCommentaires}} </span>
+                                        </i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% endif %}
+                                    {% if piece.nbeDocs > 0 %}
+                                        <i class="fa fa-paperclip text-secondary">
+                                            <span class="badge badge-info right"> {{piece.nbeDocs}} </span>
+                                        </i>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="text-center"><span>Tiers</span></th>
+                            <th class="text-center"><span>Adresse de livraison</span></th>
+                            <th class="text-center"><span>Affaire</span></th>
+                            <th class="text-center"><span>transport</span></th>
+                            <th class="text-center"><span>Cmd</span></th>
+                            <th class="text-center"><span>BL</span></th>
+                            <th class="text-center"><span>Facture</span></th>
+                            <th class="text-center"><span>Délai demandé</span></th>
+                            <th class="text-center"><span>Délai accepté</span></th>
+                            <th class="text-center"><span>Délai reporté</span></th>
+                            <th class="text-center"><span>Date Début chantier</span></th>
+                            <th class="text-center"><span>Date fin chantier</span></th>
+                            <th class="text-center"><span>Etat</span></th>
+                            <th class="text-center"><span>Durée</span></th>
+                            <th class="text-center"><span>Actions</span></th>
+                        </tr>
+                        </tr>
+                    </tfoot>
+                </table>
+                        {% else %}
+                                <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Aucunes pieces à traiter actuellement, Félicitation !</h4>
+                    {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+                </div>
+                <div class="tab-pane fade" id="custom-tabs-one-calendar" role="tabpanel" aria-labelledby="custom-tabs-one-calendar-tab">
+                     <div >
+                        <!-- THE CALENDAR -->
+                        <div id="external-events"></div>
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block javascripts %}
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      "responsive": true, "lengthChange": false, "autoWidth": false,"order": [[ 0, "desc" ]],
+      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+	$("#example3").DataTable({
+      "responsive": true, "lengthChange": false, "autoWidth": false,"order": [[ 0, "desc" ]],
+      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    }).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": false,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+</script>
+
+
+<!-- fullCalendar 2.2.5 -->
+<script>
+  $(function () {
+
+    /* initialize the external events
+     -----------------------------------------------------------------*/
+    function ini_events(ele) {
+      ele.each(function () {
+
+        // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+        // it doesn't need to have a start or end
+        var eventObject = {
+          title: $.trim($(this).text()) // use the element's text as the event title
+        }
+
+        // store the Event Object in the DOM element so we can get to it later
+        $(this).data('eventObject', eventObject)
+
+        // make the event draggable using jQuery UI
+        $(this).draggable({
+          zIndex        : 1070,
+          revert        : true, // will cause the event to go back to its
+          revertDuration: 0  //  original position after the drag
+        })
+
+      })
+    }
+
+    ini_events($('#external-events div.external-event'))
+
+    /* initialize the calendar
+     -----------------------------------------------------------------*/
+    //Date for the calendar events (dummy data)
+    var date = new Date()
+    var d    = date.getDate(),
+        m    = date.getMonth(),
+        y    = date.getFullYear()
+
+    var Calendar = FullCalendar.Calendar;
+    var Draggable = FullCalendarInteraction.Draggable;
+
+    var containerEl = document.getElementById('external-events');
+    var checkbox = document.getElementById('drop-remove');
+    var calendarEl = document.getElementById('calendar');
+
+    // initialize the external events
+    // -----------------------------------------------------------------
+
+    new Draggable(containerEl, {
+      itemSelector: '.external-event',
+      eventData: function(eventEl) {
+        console.log(eventEl);
+        return {
+          title: eventEl.innerText,
+          backgroundColor: window.getComputedStyle( eventEl ,null).getPropertyValue('background-color'),
+          borderColor: window.getComputedStyle( eventEl ,null).getPropertyValue('background-color'),
+          textColor: window.getComputedStyle( eventEl ,null).getPropertyValue('color'),
+        };
+      }
+    });
+
+    var calendar = new Calendar(calendarEl, {
+      plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid' ],
+	  locale: 'fr',
+    timeZone: 'Europe/Paris',
+      header    : {
+        left  : 'prev,next today',
+        center: 'title',
+        right : 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+	  buttonText: {
+		  today: 'Aujourd\'hui',
+		  month: 'Mois',
+      day: 'Jour',
+		  week: 'Semaine'
+	  },
+      //Random default events
+      events    : {{ data|raw }},
+      editable  : false,
+      droppable : true, // this allows things to be dropped onto the calendar !!!
+      drop      : function(info) {
+        // is the "remove after drop" checkbox checked?
+        if (checkbox.checked) {
+          // if so, remove the element from the "Draggable Events" list
+          info.draggedEl.parentNode.removeChild(info.draggedEl);
+        }
+      }    
+    });
+
+    calendar.render();
+    // $('#calendar').fullCalendar()
+
+    /* ADDING EVENTS */
+    var currColor = '#3c8dbc' //Red by default
+    //Color chooser button
+    var colorChooser = $('#color-chooser-btn')
+    $('#color-chooser > li > a').click(function (e) {
+      e.preventDefault()
+      //Save color
+      currColor = $(this).css('color')
+      //Add color effect to button
+      $('#add-new-event').css({
+        'background-color': currColor,
+        'border-color'    : currColor
+      })
+    })
+    $('#add-new-event').click(function (e) {
+      e.preventDefault()
+      //Get value and make sure it is not null
+      var val = $('#new-event').val()
+      if (val.length == 0) {
+        return
+      }
+
+      //Create events
+      var event = $('<div />')
+      event.css({
+        'background-color': currColor,
+        'border-color'    : currColor,
+        'color'           : '#fff'
+      }).addClass('external-event')
+      event.html(val)
+      $('#external-events').prepend(event)
+
+      //Add draggable funtionality
+      ini_events(event)
+
+      //Remove event from text input
+      $('#new-event').val('')
+    })
+  })
+</script>
+<!-- End Calendrier -->
+
+{% endblock %}
+

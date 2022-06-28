@@ -16,14 +16,21 @@ class CommentairesType extends AbstractType
     {
         $builder
         ->add('content', TextareaType::class, [
+            'constraints' => [
+                new NotBlank([
+                    'message' => 'Veuillez saisir votre commentaire'
+                ])
+            ],
             'attr' => [
                 'class' => 'col-12 form-control textarea',
                 'placeholder' => 'Vous pouvez saisir un commentaire ici....'
             ],
             'label' => 'Nouveau commentaire...',
+            'required' => false,
+            'data' => ''
         ])
         ->add('ajouter', SubmitType::class, [
-            'label' => "Ajouter le commentaire",
+            'label' => "Ajouter",
             'attr' => ['class' => 'col-3 form-control btn btn-primary mt-3 float-right']
         ]);
     }

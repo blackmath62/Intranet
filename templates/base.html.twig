@@ -406,6 +406,15 @@
 							</li>
 							{% endif %}
 
+							<li class="nav-item">
+								<a href="{{path('app_conduite_de_travaux_me_nok')}}" class="nav-link">
+									<i class="nav-icon fa fa-car"></i>
+									<p>
+										Conduite Travaux
+									</p>
+								</a>
+							</li>
+
 							{% if (is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL')) and app.user.commercial %}
 							<li class="nav-item">
 								<a href="{{path('app_mes_clients', {'commercial' : app.user.commercial})}}" class="nav-link">

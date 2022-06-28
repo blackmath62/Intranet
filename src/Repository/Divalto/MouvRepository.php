@@ -442,5 +442,106 @@ public function getListBlDirect():array
     return $stmt->fetchAll();
 }
 
+// Update Mouvements/entête conduite de travaux
+public function getUpdateMouvConduiteTravaux():array
+{
+    $conn = $this->getEntityManager()->getConnection();
+    $sql = "SELECT MAX(dos) AS dos, MAX(tiers) AS tiers, MAX(nom) AS nom, MAX(typePiece) AS typePiece, 
+    MAX(dateCmd) AS dateCmd, MAX(numCmd) AS numCmd, MAX(dateBl) AS dateBl, MAX(numBl) AS numBl, MAX(dateFacture) AS dateFacture, MAX(numFacture) AS numFacture,
+    MAX(ENT.DELDEMDT) AS delaiDemande, MAX(ENT.DELACCDT) AS delaiAccepte, MAX(ENT.DELREPDT) AS delaiReporte, 
+    MAX(ENT.BLMOD) AS transport, MAX(ENT.PROJET) AS affaire, MAX(ENT.OP) AS op, ENT.ENT_ID AS id,
+    CASE
+    WHEN MAX(ENT.ADRCOD_0003) = '' THEN MAX(adressePrincipale)
+    ELSE MAX(CONCAT(LTRIM(RTRIM(T1.NOM)), ', ', LTRIM(RTRIM(T1.RUE)), ', ', LTRIM(RTRIM(T1.CPOSTAL)), ' ', LTRIM(RTRIM(T1.VIL)) ) )
+    END AS adresseLivraison
+    FROM(
+    SELECT MOUV.DOS AS dos, MOUV.TIERS AS tiers, CLI.NOM AS nom, MOUV.PICOD as typePiece,
+    MOUV.CDDT AS dateCmd, MOUV.CDNO AS numCmd, MOUV.BLDT AS dateBl, MOUV.BLNO AS numBl, MOUV.FADT AS dateFacture, MOUV.FANO AS numFacture,
+    CONCAT(LTRIM(RTRIM(CLI.RUE)), ', ', LTRIM(RTRIM(CLI.CPOSTAL)), ' ', LTRIM(RTRIM(CLI.VIL)) ) AS adressePrincipale,
+    CASE
+    WHEN MOUV.PICOD = 4 THEN MOUV.FANO
+    WHEN MOUV.PICOD = 3 THEN MOUV.BLNO
+    WHEN MOUV.PICOD = 2 THEN MOUV.CDNO
+    END AS numPiece,
+    CASE
+    WHEN MOUV.PICOD = 4 THEN MOUV.FADT
+    WHEN MOUV.PICOD = 3 THEN MOUV.BLDT
+    WHEN MOUV.PICOD = 2 THEN MOUV.CDDT
+    END AS datePiece
+    FROM MOUV
+    INNER JOIN CLI ON MOUV.DOS = CLI.DOS AND MOUV.TIERS = CLI.TIERS
+    INNER JOIN ART ON MOUV.DOS = ART.DOS AND MOUV.REF = ART.REF
+    WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND ART.FAM_0002 IN ('ME','MO') AND MOUV.PICOD IN (2,3,4) AND MOUV.TIERS <> ('C0160500')
+    GROUP BY MOUV.DOS, MOUV.TIERS, CLI.NOM, MOUV.PICOD, MOUV.CDDT, MOUV.CDNO, MOUV.BLDT, MOUV.BLNO, MOUV.FADT, MOUV.FANO, CLI.RUE, CLI.CPOSTAL, CLI.VIL)reponse
+    INNER JOIN ENT ON ENT.DOS = dos AND ENT.TIERS = tiers AND ENT.PICOD = typePiece AND ENT.PINO = numPiece AND ENT.TICOD = 'C'
+    LEFT JOIN T1 ON tiers = T1.TIERS AND dos = T1.DOS AND  ENT.ADRCOD_0003 = T1.ADRCOD 
+    WHERE YEAR(datePiece) > 2021
+    GROUP BY ENT.ENT_ID
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll();
+}
+
+// détail des articles de la piéce conduite de travaux
+public function getDetailArticleConduiteTravaux($id):array
+{
+    $conn = $this->getEntityManager()->getConnection();
+    $sql = "SELECT dos, tiers, ref,sref1,sref2,designation,qte,num,type
+    FROM(
+    SELECT MOUV.DOS AS dos,MOUV.TIERS AS tiers, MOUV.PICOD AS type, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MOUV.DES AS designation,
+    CASE
+    WHEN MOUV.PICOD = 2 THEN MOUV.CDQTE
+    WHEN MOUV.PICOD = 3 THEN MOUV.BLQTE
+    WHEN MOUV.PICOD = 4 THEN MOUV.FAQTE
+    END AS qte
+    ,
+    CASE
+    WHEN MOUV.PICOD = 2 THEN MOUV.CDNO
+    WHEN MOUV.PICOD = 3 THEN MOUV.BLNO
+    WHEN MOUV.PICOD = 4 THEN MOUV.FANO
+    END AS num
+    FROM MOUV
+    WHERE MOUV.DOS = 1)reponse
+    INNER JOIN ENT ON dos = ENT.DOS AND tiers = ENT.TIERS AND num = ENT.PINO AND ENT.TICOD = 'C' AND ENT.PICOD = type AND ENT.ENT_ID = $id
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll();
+}
+
+// achat en cours liés à l'affaire ->  conduite de travaux
+public function getAchatLieAffaireConduitetravaux($affaire):array
+{
+    $conn = $this->getEntityManager()->getConnection();
+    $sql = "SELECT MOUV.TIERS AS tiers, FOU.NOM AS nom, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MOUV.DES AS designation,
+    CASE
+    WHEN MOUV.PICOD = 2 THEN MOUV.CDQTE
+    WHEN MOUV.PICOD = 3 THEN MOUV.BLQTE
+    WHEN MOUV.PICOD = 4 THEN MOUV.FAQTE
+    END AS qte,
+    CASE
+    WHEN MOUV.PICOD = 2 THEN 'Commande'
+    WHEN MOUV.PICOD = 3 THEN 'Bl'
+    WHEN MOUV.PICOD = 4 THEN 'Facture'
+    END AS piece,
+    CASE
+    WHEN MOUV.PICOD = 2 THEN MOUV.CDNO
+    WHEN MOUV.PICOD = 3 THEN MOUV.BLNO
+    WHEN MOUV.PICOD = 4 THEN MOUV.FANO
+    END AS num,
+    CASE
+    WHEN MOUV.PICOD = 2 THEN MOUV.CDDT
+    WHEN MOUV.PICOD = 3 THEN MOUV.BLDT
+    WHEN MOUV.PICOD = 4 THEN MOUV.FADT
+    END AS datePiece
+    FROM MOUV
+    INNER JOIN FOU ON FOU.DOS = MOUV.DOS AND FOU.TIERS = MOUV.TIERS
+    WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'F' AND MOUV.PROJET = '$affaire'
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll();
+}
 
 }
