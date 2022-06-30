@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DoctrineMigrations;
+
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+
+/**
+ * Auto-generated Migration: Please modify to your needs!
+ */
+final class Version20220630115213 extends AbstractMigration
+{
+    public function getDescription() : string
+    {
+        return '';
+    }
+
+    public function up(Schema $schema) : void
+    {
+        // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE TABLE ConduiteTravauxAddPiece (id INT AUTO_INCREMENT NOT NULL, type INT NOT NULL, numPiece INT NOT NULL, createdAt DATETIME NOT NULL, createdBy_id INT NOT NULL, INDEX IDX_D4D614A03174800F (createdBy_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE ConduiteTravauxAddPiece ADD CONSTRAINT FK_D4D614A03174800F FOREIGN KEY (createdBy_id) REFERENCES Users (id)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_231AA45E8C9F3610 ON othersdocuments (file)');
+    }
+
+    public function down(Schema $schema) : void
+    {
+        // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('DROP TABLE ConduiteTravauxAddPiece');
+        $this->addSql('DROP INDEX UNIQ_231AA45E8C9F3610 ON OthersDocuments');
+    }
+}

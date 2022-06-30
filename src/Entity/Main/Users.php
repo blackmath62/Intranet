@@ -189,6 +189,11 @@ class Users implements UserInterface
      */
     private $othersDocuments;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ConduiteTravauxAddPiece::class, mappedBy="createdBy")
+     */
+    private $conduiteTravauxAddPieces;
+
    
     public function __construct()
     {
@@ -213,6 +218,7 @@ class Users implements UserInterface
         $this->updatePerimetreBoisFsc = new ArrayCollection();
         $this->conduiteDeTravauxMes = new ArrayCollection();
         $this->othersDocuments = new ArrayCollection();
+        $this->conduiteTravauxAddPieces = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -949,6 +955,36 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($othersDocument->getUser() === $this) {
                 $othersDocument->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ConduiteTravauxAddPiece[]
+     */
+    public function getConduiteTravauxAddPieces(): Collection
+    {
+        return $this->conduiteTravauxAddPieces;
+    }
+
+    public function addConduiteTravauxAddPiece(ConduiteTravauxAddPiece $conduiteTravauxAddPiece): self
+    {
+        if (!$this->conduiteTravauxAddPieces->contains($conduiteTravauxAddPiece)) {
+            $this->conduiteTravauxAddPieces[] = $conduiteTravauxAddPiece;
+            $conduiteTravauxAddPiece->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConduiteTravauxAddPiece(ConduiteTravauxAddPiece $conduiteTravauxAddPiece): self
+    {
+        if ($this->conduiteTravauxAddPieces->removeElement($conduiteTravauxAddPiece)) {
+            // set the owning side to null (unless already changed)
+            if ($conduiteTravauxAddPiece->getCreatedBy() === $this) {
+                $conduiteTravauxAddPiece->setCreatedBy(null);
             }
         }
 

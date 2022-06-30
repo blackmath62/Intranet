@@ -1,0 +1,41 @@
+<p>Bonjour,</p>
+
+{% if donnees %}
+<p><u><strong>{{ texte }}</strong></u></p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Tiers</th>
+            <th>Adresse Livraison</th>
+            <th>Affaire</th>
+            <th>Transport</th>
+            <th>Cmd</th>
+            <th>Bl</th>
+            <th>Facture</th>
+            <th>Début Chantier</th>
+            <th>Fin Chantier</th>
+            <th>Durée</th>
+            <th>Etat</th>
+        </thead>
+        <tbody>
+{% for donnee in donnees %}
+        <tr>
+            <td>{{ donnee.codeClient }} </br> {{ donnee.nom }}</td>
+            <td>{{ donnee.adresseLivraison }}</td>
+            <td>{{ donnee.affaire }}</td>
+            <td>{{ donnee.modeDeTransport }} / {{ donnee.op }} </td>
+            <td>{% if donnee.numCmd %}{{ donnee.numCmd}} </br> du {{ donnee.dateCmd|date('d-m-Y') }} {% endif %}</td>
+            <td>{% if donnee.numeroBl %}{{ donnee.numeroBl}} </br> du {{ donnee.dateBl|date('d-m-Y') }} {% endif %}</td>
+            <td>{% if donnee.numeroFacture %}{{ donnee.numeroFacture}} </br> du {{ donnee.dateFacture|date('d-m-Y') }} {% endif %}</td>
+            <td>{% if donnee.dateDebutChantier %}{{ donnee.dateDebutChantier|date('d-m-Y H:i') }}{% endif %}</td>
+            <td>{% if donnee.dateFinChantier %}{{ donnee.dateFinChantier|date('d-m-Y H:i') }}{% endif %}</td>
+            <td>{{ donnee.dureeTravaux }}</td>
+            <td>{{ donnee.etat }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+<p>Pour la société Lhermitte frères, mail envoyé par l'Intranet du groupe Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

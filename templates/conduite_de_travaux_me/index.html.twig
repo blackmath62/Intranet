@@ -15,6 +15,23 @@
 </div>
                 
 <div class="row">
+<div class="col-md-12">
+  <div class="card card-dark">
+    <div class="card-header d-flex">
+        <h2 class="card-title mr-auto p-2 col-4">Liste des numéros de piéces à ajouter</h2>
+        <div class="p-2 col-6">
+        {{ form_start(formAddPieces) }}
+            {{ form_errors(formAddPieces.numPieceCmd) }}
+            {{ form_widget(formAddPieces.numPieceCmd) }}
+            {{ form_errors(formAddPieces.numPieceBL) }}
+            {{ form_widget(formAddPieces.numPieceBL) }}
+            {{ form_errors(formAddPieces.numPieceFacture) }}
+            {{ form_widget(formAddPieces.numPieceFacture) }}
+        {{ form_end(formAddPieces) }}
+        </div>
+    </div>
+  </div>
+</div>
 
     <div class="col-12 col-sm-12">
         <div class="card card-dark card-tabs">
@@ -312,6 +329,7 @@
     });
 
     var calendar = new Calendar(calendarEl, {
+    weekNumbers: true,
       plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid' ],
 	  locale: 'fr',
     timeZone: 'Europe/Paris',
@@ -383,6 +401,90 @@
   })
 </script>
 <!-- End Calendrier -->
+
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select-Piece-Cmd').select2({
+		 placeholder: "Saisissez les numéros de commandes",
+     tags: true,
+     tokenSeparators: [',',' ']
+	}).on('change', function(e){
+    let label = $(this).find("[data-select2-tag=true]");
+    if(label.length && $.inArray(label.val(), $(this).val() !== -1)){
+      $.ajax({
+        url:"/Lhermitte/conduite/travaux/num/ajout/ajax/"+label.val()+"/2",
+        type: "POST"
+      }).done(function(data){
+        console.log(data)
+        $('.select-Piece-Cmd').val('');
+      });
+    }
+
+  }); 
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    }) 
+	})
+</script>
+
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select-Piece-BL').select2({
+		 placeholder: "Saisissez les numéros de bls",
+     tags: true,
+     tokenSeparators: [',',' ']
+	}).on('change', function(e){
+    let label = $(this).find("[data-select2-tag=true]");
+    if(label.length && $.inArray(label.val(), $(this).val() !== -1)){
+      $.ajax({
+        url:"/Lhermitte/conduite/travaux/num/ajout/ajax/"+label.val()+"/3",
+        type: "POST"
+      }).done(function(data){
+        console.log(data)
+        $('.select-Piece-BL').val('');
+      });
+    }
+
+  }); 
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    }) 
+	})
+</script>
+
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select-Piece-Facture').select2({
+		 placeholder: "Saisissez les numéros de Factures",
+     tags: true,
+     tokenSeparators: [',',' ']
+	}).on('change', function(e){
+    let label = $(this).find("[data-select2-tag=true]");
+    if(label.length && $.inArray(label.val(), $(this).val() !== -1)){
+      $.ajax({
+        url:"/Lhermitte/conduite/travaux/num/ajout/ajax/"+label.val()+"/4",
+        type: "POST"
+      }).done(function(data){
+        console.log(data)
+        $('.select-Piece-Facture').val('');
+      });
+    }
+
+  }); 
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    }) 
+	})
+</script>
 
 {% endblock %}
 

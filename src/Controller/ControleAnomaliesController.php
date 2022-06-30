@@ -44,9 +44,10 @@ class ControleAnomaliesController extends AbstractController
     private $cmdRobyController;
     private $fscAttachedFileController;
     private $contratCommissionnaireController;
+    private $conduiteDeTravauxMeController;
     private $movRepo;
 
-    public function __construct(MouvRepository $movRepo, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -60,6 +61,7 @@ class ControleAnomaliesController extends AbstractController
         $this->cmdRobyController = $cmdRobyController;
         $this->fscAttachedFileController = $fscAttachedFileController;
         $this->contratCommissionnaireController = $contratCommissionnaireController;
+        $this->conduiteDeTravauxMeController = $conduiteDeTravauxMeController;
         $this->movRepo = $movRepo;
         //parent::__construct();
     }
@@ -99,6 +101,9 @@ class ControleAnomaliesController extends AbstractController
                 $this->contratCommissionnaireController->sendMail();
             }
         }
+        // envoyer les mails conduite de travaux
+        $this->conduiteDeTravauxMeController->update();
+
         if ($this->isWeekend($dateDuJour) == false) {
             $this->ControleClient();
             $this->ControleFournisseur();

@@ -48,7 +48,7 @@ class ConduiteTravauxAlimenterType extends AbstractType
                     'Termine' => ['class' => 'm-2 btn btn-success'],
                     'Litige' => ['class' => 'm-2 btn btn-danger']
                 ],
-                'expanded' => true,
+                'expanded' => FALSE,
                 'multiple' => false,
                 'label_attr' => ['class' => 'float-left mr-2'],
                 'label' => 'Etat',

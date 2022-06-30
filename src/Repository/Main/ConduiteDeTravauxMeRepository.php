@@ -106,7 +106,7 @@ class ConduiteDeTravauxMeRepository extends ServiceEntityRepository
     public function getDateDebutFinChantierEnCours():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT ct.id AS id, ct.nom AS nom, ct.adresseLivraison AS adresse, ct.numCmd AS cmd, ct.affaire AS affaire, ct.dateDebutChantier AS start, ct.dateFinChantier AS end
+        $sql = "SELECT ct.id AS id, ct.nom AS nom, ct.adresseLivraison AS adresse, ct.etat AS etat, ct.numCmd AS cmd, ct.affaire AS affaire, ct.dateDebutChantier AS start, ct.dateFinChantier AS end
         FROM conduitedetravauxme ct
         WHERE ct.etat <> 'Termine' AND YEAR(ct.dateDebutChantier) >= 2010 AND YEAR(ct.dateFinChantier) >= 2010
         
@@ -115,6 +115,37 @@ class ConduiteDeTravauxMeRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    // Conduite de travaux date Début dans 7 jours
+    public function getDebutChantierDans7Jours():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * 
+        FROM conduitedetravauxme
+        WHERE DATE_FORMAT(conduitedetravauxme.dateDebutChantier, '%Y' '-' '%m' '-' '%d') = DATE_FORMAT(DATE_ADD(now(), INTERVAL 7 DAY), '%Y' '-' '%m' '-' '%d')
+        AND not conduitedetravauxme.etat = 'Termine'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Conduite de travaux date fin Chantier dépassé mais pas Terminé
+    public function getFinDepasseMaisPasTermine():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * 
+        FROM conduitedetravauxme
+        WHERE DATE_FORMAT(conduitedetravauxme.dateFinChantier, '%Y' '-' '%m' '-' '%d') < DATE_FORMAT(now(), '%Y' '-' '%m' '-' '%d')
+        AND NOT conduitedetravauxme.etat = 'Termine'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+
+    
 
     // /**
     //  * @return ConduiteDeTravauxMe[] Returns an array of ConduiteDeTravauxMe objects

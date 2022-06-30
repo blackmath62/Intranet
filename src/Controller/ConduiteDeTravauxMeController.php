@@ -3,24 +3,30 @@
 namespace App\Controller;
 
 use DateTime;
-use App\Form\CommentairesType;
 use RecursiveArrayIterator;
+use App\Entity\Main\Comments;
+use App\Form\CommentairesType;
 use RecursiveIteratorIterator;
 use App\Entity\Main\Commentaires;
-use App\Entity\Main\Comments;
 use App\Form\OthersDocumentsType;
+use Symfony\Component\Mime\Email;
 use App\Entity\Main\OthersDocuments;
 use App\Entity\Main\ConduiteDeTravauxMe;
+use App\Entity\Main\ConduiteTravauxAddPiece;
+use App\Form\AddPieceConduiteTravauxType;
 use App\Repository\Main\UsersRepository;
 use App\Form\ConduiteTravauxAlimenterType;
 use App\Repository\Divalto\MouvRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\Main\CommentairesRepository;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\Main\ConduiteDeTravauxMeRepository;
 use App\Repository\Main\OthersDocumentsRepository;
+use App\Repository\Main\ConduiteDeTravauxMeRepository;
+use App\Repository\Main\ConduiteTravauxAddPieceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ConduiteDeTravauxMeController extends AbstractController
 {
@@ -29,15 +35,48 @@ class ConduiteDeTravauxMeController extends AbstractController
     private $repoUser;
     private $repoComments;
     private $repoDocs;
+    private $mailer;
+    private $repoAddPieces;
 
-    public function __construct(OthersDocumentsRepository $repoDocs, CommentairesRepository $repoComments, ConduiteDeTravauxMeRepository $repoConduite, MouvRepository $repoMouv, UsersRepository $repoUser)
+    public function __construct(ConduiteTravauxAddPieceRepository $repoAddPieces, OthersDocumentsRepository $repoDocs,MailerInterface $mailer, CommentairesRepository $repoComments, ConduiteDeTravauxMeRepository $repoConduite, MouvRepository $repoMouv, UsersRepository $repoUser)
     {
         $this->repoMouv = $repoMouv;
         $this->repoConduite = $repoConduite;
         $this->repoUser = $repoUser;
         $this->repoComments = $repoComments;
         $this->repoDocs = $repoDocs;
+        $this->mailer = $mailer;
+        $this->repoAddPieces = $repoAddPieces;
         //parent::__construct();
+    }
+
+    /**
+     * @Route("/Lhermitte/conduite/travaux/num/ajout/ajax/{num}/{type}",name="app_conduite_de_travaux_me_add_num_piece")
+     */
+    public function addNumPiece($num, $type, Request $request): Response
+    {
+        
+        /*if ($request->attributes->get('_route') == 'app_conduite_de_travaux_me_add_num_cmd') {
+            $type = 2;
+        }
+        elseif ($request->attributes->get('_route') == 'app_conduite_de_travaux_me_add_num_bl') {
+            $type = 3;
+        }
+        elseif ($request->attributes->get('_route') == 'app_conduite_de_travaux_me_add_num_facture') {
+           $type = 4;
+        }*/
+
+        $numPiece = new ConduiteTravauxAddPiece();
+        $numPiece->setNumPiece(trim(strip_tags($num)))
+                 ->setCreatedAt(new DateTime)
+                 ->setCreatedBy($this->getUser())
+                 ->setType($type);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($numPiece);
+        $entityManager->flush();
+        $id = $numPiece->getId();
+        return new JsonResponse(['id' => $id]);
+        
     }
     
     /**
@@ -55,6 +94,18 @@ class ConduiteDeTravauxMeController extends AbstractController
             $commentaires = $this->repoConduite->getCommentsNok();
         }
 
+        $addPieces = $this->repoAddPieces->findAll();
+        $formAddPieces = $this->createForm(AddPieceConduiteTravauxType::class, $addPieces);
+        $formAddPieces->handleRequest($request);
+        if ($formAddPieces->isSubmitted() && $formAddPieces->isValid()) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($addPieces);
+            $entityManager->flush();
+            
+            $this->addFlash('message', 'Mise à jour effectuée avec succés');
+            return $this->redirectToRoute('app_conduite_de_travaux_me_nok');
+        }
+
         // Calendrier conduite travaux
         $events = $this->repoConduite->getDateDebutFinChantierEnCours();
         $rdvs = [];
@@ -68,7 +119,7 @@ class ConduiteDeTravauxMeController extends AbstractController
                 'id' => $event['id'],
                 'start' => $start->format('Y-m-d H:i:s'),
                 'end' => $end->format('Y-m-d H:i:s'),
-                'title' => $event['nom'] . $event['adresse'] . 'Etat : ' . $event['etat'],
+                'title' => $event['nom'] . $event['adresse'] . ' Etat : ' . $event['etat'],
                 'backgroundColor' => '#FCB824',
                 'borderColor' => '#FFFFFF',
                 'textColor' => '#000000',
@@ -104,7 +155,8 @@ class ConduiteDeTravauxMeController extends AbstractController
             'pieces' => $pieces,
             'data' => $data,
             'title' => "Conduire Travaux",
-            'commentaires' => $commentaires
+            'commentaires' => $commentaires,
+            'formAddPieces' => $formAddPieces->createView()
         ]);
     }
 
@@ -263,10 +315,56 @@ class ConduiteDeTravauxMeController extends AbstractController
      */
     public function update()
     {
-        ini_set('memory_limit', '1024M');
-        ini_set('max_execution_time', 0);
-        
-        $pieces = $this->repoMouv->getUpdateMouvConduiteTravaux();
+              
+        //TODO retirer toutes les piéces qui sont déjà Terminés pour réduire le délai de traitement
+        $cmd = null;
+        $bl = null;
+        $facture = null;
+        $piecesSuppl = $this->repoAddPieces->findAll();
+        foreach ($piecesSuppl as $value) {
+            if ($value->getType() == 2) {
+                $commande = $this->repoConduite->findOneBy(['numCmd' => $value->getNumPiece()]);
+                if ($commande->getEtat() <> 'Termine') {
+                    if ($cmd == null ) {
+                        $cmd =  $value->getNumPiece();   
+                    }else {
+                        $cmd = $cmd . ',' . $value->getNumPiece();
+                    }
+                }
+            }
+            if ($value->getType() == 3) {
+                $livraison = $this->repoConduite->findOneBy(['numeroBl' => $value->getNumPiece()]);
+                if ($livraison->getEtat() <> 'Termine') {
+                    if ($bl == null) {
+                        $bl =  $value->getNumPiece();   
+                    }else {
+                        $bl = $bl . ',' . $value->getNumPiece();
+                    }
+                }
+            }
+            if ($value->getType() == 4) {
+                $fact = $this->repoConduite->findOneBy(['numeroFacture' => $value->getNumPiece()]);
+                if ($fact->getEtat() <> 'Termine') {
+                    if ($facture == null) {
+                        $facture =  $value->getNumPiece();   
+                    }else {
+                        $facture = $facture . ',' . $value->getNumPiece();
+                    }
+                }
+            }
+        }
+
+        $termine = null;
+        $listFact = $this->repoConduite->findBy(['etat' => 'Termine']);
+        foreach ($listFact as $value) {
+            if ($termine == null && $value->getNumeroFacture() !== null) {
+                $termine = $value->getNumeroFacture();
+            }elseif ($termine !== null && $value->getNumeroFacture() !== null){
+                $termine = $termine . ',' . $value->getNumeroFacture();
+            }
+        }
+
+        $pieces = $this->repoMouv->getUpdateMouvConduiteTravaux($cmd,$bl,$facture, $termine);
         $user = $this->repoUser->findOneBy(['pseudo' => 'intranet']);
         foreach ($pieces as $value) {
             $bdd = $this->repoConduite->findOneBy(['entId' => $value['id']]);
@@ -335,7 +433,62 @@ class ConduiteDeTravauxMeController extends AbstractController
             $em->flush();
         }
 
+        $dateDuJour = new DateTime();
+        $heure = $dateDuJour->format('H');
+        if ($heure >= 20 && $heure < 3) {
+            $this->sendMailChantierDansSeptJours();
+            $this->sendMailChantierDepasseMaisPasTermine();
+        }
+
         $this->addFlash('message', 'Mise à jour effectuée avec succés');
         return $this->redirectToRoute('app_conduite_de_travaux_me_nok');
+    }
+
+    /**
+     * @Route("/Lhermitte/conduite/de/travaux/me/mail/chantier/dans/sept/jours", name="app_conduite_de_travaux_me_send_mail_chantier_dans_sept_jours")
+     */
+    // envoyer un mail pour les chantiers dans 7 jours
+    public function sendMailChantierDansSeptJours(): Response
+    {
+        
+        // envoyer les mails
+        $donnees = $this->repoConduite->getDebutChantierDans7Jours();
+       
+        // envoyer un mail
+       $texte = 'Veuillez trouver ci dessous la liste des chantiers qui débutent dans 7 jours : ';
+       $html = $this->renderView('mails/conduiteDeTravaux.html.twig', ['donnees' => $donnees, 'texte' => $texte ]);
+       $email = (new Email())
+       ->from('intranet@groupe-axis.fr')
+       ->to('jpochet@groupe-axis.fr')
+       //->cc('jpochet@lhermitte.fr')
+       ->subject('Conduite de travaux - Liste des chantiers programmées dans 7 jours')
+       ->html($html);
+       $this->mailer->send($email);
+
+       return $this->redirectToRoute('app_conduite_de_travaux_me_nok');
+    }
+
+    /**
+     * @Route("/Lhermitte/conduite/de/travaux/me/mail/chantier/depasse/pas/Termine", name="app_conduite_de_travaux_me_send_mail_chantier_depasse_pas_termine")
+     */
+    // envoyer un mail pour les chantiers Date de fin dépassé mais Etat non Terminé
+    public function sendMailChantierDepasseMaisPasTermine(): Response
+    {
+        
+        // envoyer les mails
+        $donnees = $this->repoConduite->getFinDepasseMaisPasTermine();
+       
+        // envoyer un mail
+       $texte = 'Veuillez trouver ci dessous la liste des chantiers dépassé mais pas Terminé : ';
+       $html = $this->renderView('mails/conduiteDeTravaux.html.twig', ['donnees' => $donnees, 'texte' => $texte ]);
+       $email = (new Email())
+       ->from('intranet@groupe-axis.fr')
+       ->to('jpochet@groupe-axis.fr')
+       //->cc('jpochet@lhermitte.fr')
+       ->subject('Conduite de travaux - Liste des chantiers Dépassés mais pas Terminés')
+       ->html($html);
+       $this->mailer->send($email);
+
+       return $this->redirectToRoute('app_conduite_de_travaux_me_nok');
     }
 }
