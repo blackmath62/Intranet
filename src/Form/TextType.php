@@ -19,7 +19,7 @@ class TextType extends AbstractType
                     'message' => 'Veuillez saisir un commentaire avec les informations demandées'
                 ])
             ],
-            'required' => true,
+            'required' => false,
             'attr' => [
                 'class' => 'col-12 form-control textarea',
                 'placeholder' => 'Saisir un commentaire ici....'
