@@ -495,9 +495,28 @@ class FscAttachedFileController extends AbstractController
     public function sendMail(){
        $piecesAnormales = [];
        $pieces = $this->repoFsc->getPieceFscAAlimenter();
-       for ($i=0; $i <count($pieces) ; $i++) { 
+       for ($i=0; $i <count($pieces) ; $i++) {
+            if ($pieces[$i]['codePiece'] == 2) {
+                $typePiece = 'dateCmd';
+            }elseif ($pieces[$i]['codePiece'] == 3) {
+                $typePiece = 'dateBl';
+            }elseif ($pieces[$i]['codePiece'] == 4) {
+                $typePiece = 'dateFact';
+            } 
+            $d = new DateTime('2021/01/01');
            $count = count($this->repoFsc->getCountTypeDocByOrderFsc($pieces[$i]['id'] ));
-           if ($count < 5 or $pieces[$i]['perimetreBois'] == 'Non Renseigné') {
+           if ($pieces[$i][$typePiece] >= $d && ($count < 5 or $pieces[$i]['perimetreBois'] == 'Non Renseigné')) {
+            $piecesAnormales[$i]['notreRef'] = $pieces[$i]['notreRef'];
+            $piecesAnormales[$i]['numCmd'] = $pieces[$i]['numCmd'];
+            $piecesAnormales[$i]['dateCmd'] = $pieces[$i]['dateCmd'];
+            $piecesAnormales[$i]['numBl'] = $pieces[$i]['numBl'];
+            $piecesAnormales[$i]['dateBl'] = $pieces[$i]['dateBl'];
+            $piecesAnormales[$i]['numFact'] =$pieces[$i]['numFact'];
+            $piecesAnormales[$i]['dateFact'] = $pieces[$i]['dateFact'];
+            $piecesAnormales[$i]['tiers'] = $pieces[$i]['tiers'];
+            $piecesAnormales[$i]['perimetre'] = $pieces[$i]['perimetreBois'];
+            $piecesAnormales[$i]['count'] = $count;
+           }elseif ($pieces[$i][$typePiece] < $d && ($count < 2 or $pieces[$i]['perimetreBois'] == 'Non Renseigné')) {
             $piecesAnormales[$i]['notreRef'] = $pieces[$i]['notreRef'];
             $piecesAnormales[$i]['numCmd'] = $pieces[$i]['numCmd'];
             $piecesAnormales[$i]['dateCmd'] = $pieces[$i]['dateCmd'];
@@ -517,7 +536,7 @@ class FscAttachedFileController extends AbstractController
            // TODO Remettre marina en destinataire des mails.
            $email = (new Email())
            ->from('intranet@groupe-axis.fr')
-           ->to('jpochet@groupe-axis.fr')
+           ->to('marina@roby-fr.com')
            ->cc('jpochet@groupe-axis.fr')
            ->subject('Liste des piéces sur lesquels il manque les piéces jointes Fsc')
            ->html($html);
