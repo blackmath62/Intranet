@@ -1,0 +1,35 @@
+<p>Bonjour,</p>
+
+<p>Vous devez créer les liaisons entre les ventes et les achats et vous assurer qu'aucuns problémes n'est détectés sur les piéces fournisseurs</p>
+<p>Si une piéce fournisseur est en anomalie, il ne faut pas intégrer la facture en comptabilité et voir comment gérer le probléme en amont si possible</p>
+<p>Il est primordial de mettre toutes les liaisons fournisseur en même temps, si vous ne pouvez pas toutes les mettre, il faut attendre, sans quoi ce mail automatique ne vous sera plus envoyé</p>
+
+{% if piecesAnormales %}
+<p><u><strong>Veuillez trouver ci dessous la liste des pièces ventes FSC sans liaison: </strong></u></p>
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Tiers</th>
+            <th>Notre Ref</th>
+            <th>Facture</th>
+            <th>date Fact</th>
+            <th>Nbre Liaison</th>
+        </thead>
+        <tbody>
+{% for piecesAnormale in piecesAnormales %}
+        <tr>
+            <td>{{ piecesAnormale.tiers }}</td>
+            <td>{{ piecesAnormale.notreRef }}</td>
+            <td>{% if piecesAnormale.facture %}{{ piecesAnormale.facture }}{% endif %}</td>
+            <td>{% if piecesAnormale.facture %}{{ piecesAnormale.dateFact|date('d-m-Y') }}{% endif %}</td>
+            <td>{{ piecesAnormale.liaison }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+<p>Vous pouvez consulter la liste des piéces à compléter à l'adresse suivante.<a href='http://192.168.50.244/Roby/movement/bill/fsc'>http://192.168.50.244/Roby/movement/bill/fsc<a/></p>
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

@@ -127,6 +127,16 @@ class ConduiteDeTravauxMe
      */
     private $entId;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $backgroundColor;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $textColor;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -392,6 +402,30 @@ class ConduiteDeTravauxMe
     public function setEntId(int $entId): self
     {
         $this->entId = $entId;
+
+        return $this;
+    }
+
+    public function getBackgroundColor(): ?string
+    {
+        return $this->backgroundColor;
+    }
+
+    public function setBackgroundColor(?string $backgroundColor): self
+    {
+        $this->backgroundColor = $backgroundColor;
+
+        return $this;
+    }
+
+    public function getTextColor(): ?string
+    {
+        return $this->textColor;
+    }
+
+    public function setTextColor(?string $textColor): self
+    {
+        $this->textColor = $textColor;
 
         return $this;
     }

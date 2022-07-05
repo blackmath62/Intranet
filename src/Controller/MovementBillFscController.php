@@ -2,18 +2,20 @@
 
 namespace App\Controller;
 
-use App\Entity\Main\documentsFsc;
-use App\Entity\Main\fscListMovement;
 use DateTime;
 use App\Entity\Main\MovBillFsc;
+use App\Entity\Main\documentsFsc;
+use Symfony\Component\Mime\Email;
+use App\Entity\Main\fscListMovement;
 use App\Form\FactureFournisseursFscType;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Divalto\EntRepository;
 use App\Repository\Divalto\MouvRepository;
-use App\Repository\Main\documentsFscRepository;
 use App\Repository\Main\MovBillFscRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use App\Repository\Main\documentsFscRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,13 +30,17 @@ class MovementBillFscController extends AbstractController
     private $repoEnt;
     private $repoMouv;
     private $repoDocs;
+    private $mailer;
+    private $repoBill;
 
-    public function __construct(documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt)
+    public function __construct(MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt,MailerInterface $mailer)
     {
         $this->repoFact = $repoFact;
         $this->repoEnt = $repoEnt;
         $this->repoMouv = $repoMouv;
+        $this->mailer = $mailer;
         $this->repoDocs = $repoDocs;
+        $this->repoBill = $repoBill;
         //parent::__construct();
     }    
     
@@ -107,10 +113,32 @@ class MovementBillFscController extends AbstractController
             $entityManager->persist($bill);
             $entityManager->flush();
     }
-
+    $this->sendMailVenteSansLiaison();
 
         $this->addFlash('message', 'Mise à jour effectuée avec succés');
         return $this->redirectToRoute('app_movement_bill_fsc');
     }
+
+    // mail automatique pour demander la liaison avec les achats
+    public function sendMailVenteSansLiaison(){
+        
+        $piecesAnormales = $this->repoBill->getFactCliSansLiaison();
+
+        // envoyer un mail si il y a des infos à envoyer
+        if (count($piecesAnormales) > 0) {
+            // envoyer un mail
+            $html = $this->renderView('mails/listePieceFscClientSansLiaison.html.twig', ['piecesAnormales' => $piecesAnormales ]);
+            // TODO Remettre Nathalie en destinataire des mails.
+            $email = (new Email())
+            ->from('intranet@groupe-axis.fr')
+            ->to('jpochet@groupe-axis.fr')
+            ->cc('jpochet@groupe-axis.fr')
+            ->subject("Liste des piéces clients FSC sur lesquels il n'y a pas de liaison")
+            ->html($html);
+            $this->mailer->send($email);
+        }
+     }
+
+     //TODO envoyer un mail avec les piéces clients dans le cas ou un probléme est détecté sur les piéces fournisseurs.
 
 }

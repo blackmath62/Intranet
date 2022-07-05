@@ -36,6 +36,28 @@ class MovBillFscRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    // Factures Clients FSC qui ont moins de 5 ans et aucune liaison fournisseur
+    public function getFactCliSansLiaison():array
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * FROM(
+            SELECT movbillfsc.id AS id, movbillfsc.facture AS facture, movbillfsc.dateFact AS dateFact,
+            movbillfsc.tiers AS tiers, movbillfsc.nom AS nom, movbillfsc.notreRef AS notreRef,
+            COUNT(movbillfsc_fsclistmovement.fsclistmovement_id) AS liaison
+            FROM movbillfsc
+            LEFT JOIN movbillfsc_fsclistmovement ON movbillfsc.id = movbillfsc_fsclistmovement.movbillfsc_id
+            GROUP BY movbillfsc.id)reponse
+            WHERE liaison = 0 AND DATE_FORMAT(dateFact, '%Y' '-' '%m' '-' '%d') > DATE_FORMAT(DATE_ADD(now(), INTERVAL - 5 YEAR), '%Y' '-' '%m' '-' '%d')
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+
+
+    
 
     // /**
     //  * @return MovBillFsc[] Returns an array of MovBillFsc objects

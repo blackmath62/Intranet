@@ -106,7 +106,8 @@ class ConduiteDeTravauxMeRepository extends ServiceEntityRepository
     public function getDateDebutFinChantierEnCours():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT ct.id AS id, ct.nom AS nom, ct.adresseLivraison AS adresse, ct.etat AS etat, ct.numCmd AS cmd, ct.affaire AS affaire, ct.dateDebutChantier AS start, ct.dateFinChantier AS end
+        $sql = "SELECT ct.id AS id, ct.nom AS nom, ct.adresseLivraison AS adresse, ct.etat AS etat, ct.numCmd AS cmd, ct.affaire AS affaire,
+        ct.dateDebutChantier AS start, ct.dateFinChantier AS end, ct.backgroundColor AS backgroundColor, ct.textColor AS textColor
         FROM conduitedetravauxme ct
         WHERE ct.etat <> 'Termine' AND YEAR(ct.dateDebutChantier) >= 2010 AND YEAR(ct.dateFinChantier) >= 2010
         

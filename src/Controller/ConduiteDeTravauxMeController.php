@@ -120,9 +120,9 @@ class ConduiteDeTravauxMeController extends AbstractController
                 'start' => $start->format('Y-m-d H:i:s'),
                 'end' => $end->format('Y-m-d H:i:s'),
                 'title' => $event['nom'] . $event['adresse'] . ' Etat : ' . $event['etat'],
-                'backgroundColor' => '#FCB824',
+                'backgroundColor' => $event['backgroundColor'],
                 'borderColor' => '#FFFFFF',
-                'textColor' => '#000000',
+                'textColor' => $event['textColor'],
                ];
            }
            
@@ -205,6 +205,12 @@ class ConduiteDeTravauxMeController extends AbstractController
             }
             if ($data->getDureeTravaux()) {
                 $conduite->setDureeTravaux($data->getDureetravaux());
+            }
+            if ($data->getbackgroundColor()) {
+                $conduite->setbackgroundColor($data->getBackgroundColor());
+            }
+            if ($data->getTextColor()) {
+                $conduite->setTextColor($data->getTextColor());
             }
             $conduite->setUpdatedBy($this->getUser());
             $conduite->setUpdatedAt(new DateTime);;
@@ -316,7 +322,7 @@ class ConduiteDeTravauxMeController extends AbstractController
     public function update()
     {
               
-        //TODO retirer toutes les piéces qui sont déjà Terminés pour réduire le délai de traitement
+        //TODO retirer toutes les piéces qui sont déjà Terminés pour réduire le délai de traitement à revoir le dernier essaie n'a pas fonctionné
         $cmd = null;
         $bl = null;
         $facture = null;
@@ -324,33 +330,27 @@ class ConduiteDeTravauxMeController extends AbstractController
         foreach ($piecesSuppl as $value) {
             if ($value->getType() == 2) {
                 $commande = $this->repoConduite->findOneBy(['numCmd' => $value->getNumPiece()]);
-                if ($commande->getEtat() <> 'Termine') {
                     if ($cmd == null ) {
                         $cmd =  $value->getNumPiece();   
                     }else {
                         $cmd = $cmd . ',' . $value->getNumPiece();
                     }
-                }
             }
             if ($value->getType() == 3) {
                 $livraison = $this->repoConduite->findOneBy(['numeroBl' => $value->getNumPiece()]);
-                if ($livraison->getEtat() <> 'Termine') {
                     if ($bl == null) {
                         $bl =  $value->getNumPiece();   
                     }else {
                         $bl = $bl . ',' . $value->getNumPiece();
                     }
-                }
             }
             if ($value->getType() == 4) {
                 $fact = $this->repoConduite->findOneBy(['numeroFacture' => $value->getNumPiece()]);
-                if ($fact->getEtat() <> 'Termine') {
                     if ($facture == null) {
                         $facture =  $value->getNumPiece();   
                     }else {
                         $facture = $facture . ',' . $value->getNumPiece();
                     }
-                }
             }
         }
 
@@ -376,6 +376,8 @@ class ConduiteDeTravauxMeController extends AbstractController
                         ->setDateCmd(new DateTime($value['dateCmd']))
                         ->setNumCmd($value['numCmd'])
                         ->setDateBl(new DateTime($value['dateBl']))
+                        ->setBackgroundColor('#FCB824')
+                        ->setTextColor('#FFFFFF')
                         ->setNumeroBl($value['numBl'])
                         ->setDateFacture(new DateTime($value['dateFacture']))
                         ->setNumeroFacture($value['numFacture']);

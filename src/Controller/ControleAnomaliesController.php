@@ -45,9 +45,10 @@ class ControleAnomaliesController extends AbstractController
     private $fscAttachedFileController;
     private $contratCommissionnaireController;
     private $conduiteDeTravauxMeController;
+    private $movementBillFscController;
     private $movRepo;
 
-    public function __construct(MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -63,6 +64,7 @@ class ControleAnomaliesController extends AbstractController
         $this->contratCommissionnaireController = $contratCommissionnaireController;
         $this->conduiteDeTravauxMeController = $conduiteDeTravauxMeController;
         $this->movRepo = $movRepo;
+        $this->movementBillFscController;
         //parent::__construct();
     }
     
@@ -109,6 +111,7 @@ class ControleAnomaliesController extends AbstractController
             $this->ControleFournisseur();
             $this->ControleArticle();
             $this->ControlStockDirect(); // j'ai mis Utilisateur
+            $this->movementBillFscController->update(); // Envoyer les mails à la référente sur les ventes FSC.
             if ($heure >= 8 && $heure < 20) {
                 $this->fscAttachedFileController->majFscOrderListFromDivalto();
             if ($jour == 5 || $jour == 1) {

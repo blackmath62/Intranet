@@ -22,6 +22,7 @@
             <li>permissions de coupe</li>
             <li>factures d’achats de la matiére premiére du fournisseur</li>
             <li>Le document du site FSC attestant que le fournisseur est encore certifié</li>
+            <li>s'il y a lieu, le bill of Lading à mettre en piéce interne</li>
         </ul>
         <p>Le bouton vert "Voir les piéces traitées" permet d'aller consulter les piéces déjà traitées</p>
         <p>L'oeil bleu permet de voir le détail et de déposer des piéces jointes, à coté vous avez le nombre de commentaire lié à cette facture (grisé si aucun), puis le statut de la piéce, point d'exclamation = probléme signalé manuellement sur cette piéce.</p>
@@ -55,7 +56,7 @@
             <!-- /.card-header -->
             <div class="card-body">
                     {% if pieces %}
-                <table id="example2" class="table table-bordered table-striped">
+                <table id="example1" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th class="text-center"><span>Tiers</span></th>
@@ -226,7 +227,7 @@
             <!-- /.card-header -->
             <div class="card-body">
                     {% if piecesBloquees %}
-                <table id="example1" class="table table-bordered table-striped">
+                <table id="example2" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th class="text-center"><span>Tiers</span></th>
