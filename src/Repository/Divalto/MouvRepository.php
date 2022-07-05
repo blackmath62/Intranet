@@ -476,7 +476,7 @@ public function getUpdateMouvConduiteTravaux($cmd,$bl,$facture,$termine):array
     GROUP BY MOUV.DOS, MOUV.TIERS, CLI.NOM, MOUV.PICOD, MOUV.CDDT, MOUV.CDNO, MOUV.BLDT, MOUV.BLNO, MOUV.FADT, MOUV.FANO, CLI.RUE, CLI.CPOSTAL, CLI.VIL)reponse
     INNER JOIN ENT ON ENT.DOS = dos AND ENT.TIERS = tiers AND ENT.PICOD = typePiece AND ENT.PINO = numPiece AND ENT.TICOD = 'C'
     LEFT JOIN T1 ON tiers = T1.TIERS AND dos = T1.DOS AND  ENT.ADRCOD_0003 = T1.ADRCOD 
-    WHERE (datePiece >= '2022-06-01' OR numCmd IN($cmd) OR numBl IN ($bl) OR numFacture IN ($facture))
+    WHERE (datePiece >= '2022-06-01' OR numCmd IN($cmd) OR numBl IN ($bl) OR numFacture IN ($facture)) AND ENT.PROJET <> ''
     GROUP BY ENT.ENT_ID
     ";
     $stmt = $conn->prepare($sql);
