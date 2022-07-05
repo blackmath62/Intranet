@@ -56,16 +56,6 @@ class ConduiteDeTravauxMeController extends AbstractController
     public function addNumPiece($num, $type, Request $request): Response
     {
         
-        /*if ($request->attributes->get('_route') == 'app_conduite_de_travaux_me_add_num_cmd') {
-            $type = 2;
-        }
-        elseif ($request->attributes->get('_route') == 'app_conduite_de_travaux_me_add_num_bl') {
-            $type = 3;
-        }
-        elseif ($request->attributes->get('_route') == 'app_conduite_de_travaux_me_add_num_facture') {
-           $type = 4;
-        }*/
-
         $numPiece = new ConduiteTravauxAddPiece();
         $numPiece->setNumPiece(trim(strip_tags($num)))
                  ->setCreatedAt(new DateTime)
@@ -76,6 +66,26 @@ class ConduiteDeTravauxMeController extends AbstractController
         $entityManager->flush();
         $id = $numPiece->getId();
         return new JsonResponse(['id' => $id]);
+        
+    }
+
+    /**
+     * @Route("/Lhermitte/conduite/travaux/change/etat/{id}/{etat}",name="app_conduite_de_travaux_me_change_etat")
+     */
+    public function changeEtat($id, $etat, Request $request): Response
+    {
+         // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
+        $piece = $this->repoConduite->findOneBy(['entId' => $id]);
+        $piece->setEtat($etat);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($piece);
+        $entityManager->flush();
+    
+        $this->addFlash('message', 'Mise à jour effectuée avec succés');
+        return $this->redirectToRoute('app_conduite_de_travaux_me_nok');
         
     }
     

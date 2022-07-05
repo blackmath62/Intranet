@@ -168,9 +168,24 @@
                                 {% elseif piece.etat == 'Litige' %}
                                 {% set color = 'danger text-white' %}
                                 {% set icone = "fa fa-exclamation" %}         
-                                {% endif %}                               
+                                {% endif %}
+
+                                <div class="btn-group">
+                                  <a class="btn btn-{{ color}}"><i class="{{icone}}" aria-hidden="true"></i></a>
+                                  <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                      <li><a class="dropdown-item" href='{{path('app_conduite_de_travaux_me_change_etat', {'id' : piece.entId, 'etat' : 'Litige' } ) }}'>Litige</a></li>
+                                      <li><a class="dropdown-item" href='{{path('app_conduite_de_travaux_me_change_etat', {'id' : piece.entId, 'etat' : 'En attente' } ) }}'>En attente</a></li>
+                                      <li><a class="dropdown-item" href='{{path('app_conduite_de_travaux_me_change_etat', {'id' : piece.entId, 'etat' : 'A finir' } ) }}'>A finir</a></li>
+                                      <li><a class="dropdown-item" href='{{path('app_conduite_de_travaux_me_change_etat', {'id' : piece.entId, 'etat' : 'En cours' } ) }}'>En cours</a></li>
+                                      <li><a class="dropdown-item" href='{{path('app_conduite_de_travaux_me_change_etat', {'id' : piece.entId, 'etat' : 'Termine' } ) }}'>Termine</a></li>
+                                    </ul>
+                                  </div>
+                                </div>                               
                                 
-                                    <a class="btn btn-{{ color}}"><i class="{{icone}}" aria-hidden="true"></i></a>
+                                    
                                 </td>
                                 <td class="text-center">
                                 {% if piece.dureeTravaux %}

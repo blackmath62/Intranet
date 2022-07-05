@@ -41,18 +41,17 @@
     <div class="card-body">
     <strong><i class="fas fa-book mr-1"></i> Piéces</strong>
         {% if piece.numCmd %}
-            <p class="text-muted">Commande : <textarea id="macopie1" style= "display: none";>{{ piece.numCmd }}</textarea><button type="btn" onclick="macopie1()" class="btn btn-dark">{{piece.numCmd}}</button> en date du {{piece.dateCmd|date("d-m-Y")}}</p>
+            <p class="text-muted">Commande : <button class="btn btn-dark" onclick="copier(this.id)" id="{{piece.numCmd}}"  >{{piece.numCmd}}</button> en date du {{piece.dateCmd|date("d-m-Y")}}</p>
         {% endif %}
         {% if piece.numeroBl %}
-            <p class="text-muted">Bon de livraison : <span id="tocopybl" style= "display: none";>{{piece.numeroBl}}</span><input type="button" value="{{piece.numeroBl}}" class="js-copy btn btn-dark" data-target="#tocopybl"> en date du {{piece.dateBl|date("d-m-Y")}}</p>
+            <p class="text-muted">Bon de livraison : <button id="{{piece.numeroBl}}"  onclick="copier(this.id)" class="btn btn-dark">{{piece.numeroBl}}</button> en date du {{piece.dateBl|date("d-m-Y")}}</p>
         {% endif %}
         {% if piece.numeroFacture %}
-            <p class="text-muted">Facture : <span id="tocopyfacture" style= "display: none";>{{piece.numeroFacture}}</span><input type="button" value="{{piece.numeroFacture}}" class="js-copy btn btn-dark" data-target="#tocopyfacture"> en date du {{piece.dateFacture|date("d-m-Y")}}</p>
+            <p class="text-muted">Facture : <button id="{{piece.numeroFacture}}"  onclick="copier(this.id)" class="btn btn-dark">{{piece.numeroFacture}}</button> en date du {{piece.dateFacture|date("d-m-Y")}}</p>
         {% endif %}
         {% if piece.affaire %}
             <p class="text-muted">Affaire : {{piece.affaire}}</p>
         {% endif %}
-        
     <hr>
 
     <strong><i class="fas fa-map-marker-alt mr-1"></i> Adresse</strong>
@@ -498,14 +497,12 @@
 {% endblock %}
 {% block javascripts %}
 <script type="text/javascript">
-   function macopie1() {
-   var copyText = document.getElementById("macopie1");
-   copyText.select();
-   document.execCommand("Copy");
-   alert("Le code est copié dans le presse papier");   
- } 
-
+// copier le texte
+function copier(id) {
+navigator.clipboard.writeText(id);
+}
 </script>
+
 <script>
 // Colorpicker
 $('.my-colorpicker2').colorpicker()
