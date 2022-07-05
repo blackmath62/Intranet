@@ -143,12 +143,12 @@
                                 </td>
                                 <td class="text-center">
                                 {% if piece.dateDebutChantier %}
-                                    <a class="text-dark">{{ piece.dateDebutChantier|date("d-m-Y H:i") }}</a>
+                                    <a class="btn" style= "background-color: {{ piece.backgroundColor }}; color: {{ piece.textColor }}";>{{ piece.dateDebutChantier|date("d-m-Y H:i") }}</a>
                                 {% endif %}
                                 </td>
                                 <td class="text-center">
                                 {% if piece.dateFinChantier %}
-                                    <a class="text-dark">{{ piece.dateFinChantier|date("d-m-Y H:i") }}</a>
+                                    <a class="btn" style= "background-color: {{ piece.backgroundColor }}; color: {{ piece.textColor }}";>{{ piece.dateFinChantier|date("d-m-Y H:i") }}</a>
                                 {% endif %}
                                 </td>
                                 <td class="text-center">
