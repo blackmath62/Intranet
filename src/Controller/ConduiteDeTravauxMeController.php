@@ -339,7 +339,7 @@ class ConduiteDeTravauxMeController extends AbstractController
         $piecesSuppl = $this->repoAddPieces->findAll();
         foreach ($piecesSuppl as $value) {
             if ($value->getType() == 2) {
-                $commande = $this->repoConduite->findOneBy(['numCmd' => $value->getNumPiece()]);
+                //$commande = $this->repoConduite->findOneBy(['numCmd' => $value->getNumPiece()]);
                     if ($cmd == null ) {
                         $cmd =  $value->getNumPiece();   
                     }else {
@@ -347,7 +347,7 @@ class ConduiteDeTravauxMeController extends AbstractController
                     }
             }
             if ($value->getType() == 3) {
-                $livraison = $this->repoConduite->findOneBy(['numeroBl' => $value->getNumPiece()]);
+                //$livraison = $this->repoConduite->findOneBy(['numeroBl' => $value->getNumPiece()]);
                     if ($bl == null) {
                         $bl =  $value->getNumPiece();   
                     }else {
@@ -355,7 +355,7 @@ class ConduiteDeTravauxMeController extends AbstractController
                     }
             }
             if ($value->getType() == 4) {
-                $fact = $this->repoConduite->findOneBy(['numeroFacture' => $value->getNumPiece()]);
+                //$fact = $this->repoConduite->findOneBy(['numeroFacture' => $value->getNumPiece()]);
                     if ($facture == null) {
                         $facture =  $value->getNumPiece();   
                     }else {
@@ -386,6 +386,7 @@ class ConduiteDeTravauxMeController extends AbstractController
                         ->setDateCmd(new DateTime($value['dateCmd']))
                         ->setNumCmd($value['numCmd'])
                         ->setDateBl(new DateTime($value['dateBl']))
+                        ->setSaisiePar($value['utilisateur'])
                         ->setBackgroundColor('#FCB824')
                         ->setTextColor('#FFFFFF')
                         ->setNumeroBl($value['numBl'])
@@ -417,6 +418,7 @@ class ConduiteDeTravauxMeController extends AbstractController
                         ->setNom($value['nom'])
                         ->setDateCmd(new DateTime($value['dateCmd']))
                         ->setNumCmd($value['numCmd'])
+                        ->setSaisiePar($value['utilisateur'])
                         ->setDateBl(new DateTime($value['dateBl']))
                         ->setNumeroBl($value['numBl'])
                         ->setDateFacture(new DateTime($value['dateFacture']))

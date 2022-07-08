@@ -160,6 +160,11 @@ class Users implements UserInterface
     private $commentaires;
 
     /**
+     * @ORM\OneToMany(targetEntity=DocumentsReglementairesFsc::class, mappedBy="user")
+     */
+    private $addBys;
+
+    /**
      * @ORM\OneToMany(targetEntity=ControleArticlesFsc::class, mappedBy="controledBy")
      */
     private $controleArticlesFscs;
@@ -212,6 +217,7 @@ class Users implements UserInterface
         $this->listCmdTraites = new ArrayCollection();
         $this->notes = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
+        $this->addBy = new ArrayCollection();
         $this->controleArticlesFscs = new ArrayCollection();
         $this->paysBanFscs = new ArrayCollection();
         $this->movBillFscs = new ArrayCollection();
@@ -775,6 +781,36 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($commentaire->getUser() === $this) {
                 $commentaire->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|DocumentsReglementairesFsc[]
+     */
+    public function getAddbys(): Collection
+    {
+        return $this->addBys;
+    }
+
+    public function addAddBy(DocumentsReglementairesFsc $addBy): self
+    {
+        if (!$this->addBys->contains($addBy)) {
+            $this->addBys[] = $addBy;
+            $addBy->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAddBy(DocumentsReglementairesFsc $addBy): self
+    {
+        if ($this->addBys->removeElement($addBy)) {
+            // set the owning side to null (unless already changed)
+            if ($addBy->getUser() === $this) {
+                $addBy->setUser(null);
             }
         }
 

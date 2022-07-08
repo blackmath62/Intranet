@@ -57,7 +57,7 @@ class DocumentsReglementairesFscController extends AbstractController
                 $doc = $form->getData();
                 $doc->setCreatedAt(new \DateTime())
                     ->setFiles($newFilename)
-                    ->setAddBy($this->getUser()->getId());
+                    ->setAddBy($this->getUser());
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($doc);
                 $em->flush();

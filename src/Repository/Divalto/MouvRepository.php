@@ -450,7 +450,7 @@ public function getUpdateMouvConduiteTravaux($cmd,$bl,$facture,$termine):array
     $sql = "SELECT MAX(dos) AS dos, MAX(tiers) AS tiers, MAX(nom) AS nom, MAX(typePiece) AS typePiece, 
     MAX(dateCmd) AS dateCmd, MAX(numCmd) AS numCmd, MAX(dateBl) AS dateBl, MAX(numBl) AS numBl, MAX(dateFacture) AS dateFacture, MAX(numFacture) AS numFacture,
     MAX(ENT.DELDEMDT) AS delaiDemande, MAX(ENT.DELACCDT) AS delaiAccepte, MAX(ENT.DELREPDT) AS delaiReporte, 
-    MAX(ENT.BLMOD) AS transport, MAX(ENT.PROJET) AS affaire, MAX(ENT.OP) AS op, ENT.ENT_ID AS id,
+    MAX(ENT.BLMOD) AS transport, MAX(ENT.PROJET) AS affaire, MAX(ENT.OP) AS op, ENT.ENT_ID AS id, MAX(utilisateur) AS utilisateur,
     CASE
     WHEN MAX(ENT.ADRCOD_0003) = '' THEN MAX(adressePrincipale)
     ELSE MAX(CONCAT(LTRIM(RTRIM(T1.NOM)), ', ', LTRIM(RTRIM(T1.RUE)), ', ', LTRIM(RTRIM(T1.CPOSTAL)), ' ', LTRIM(RTRIM(T1.VIL)) ) )
@@ -458,7 +458,7 @@ public function getUpdateMouvConduiteTravaux($cmd,$bl,$facture,$termine):array
     FROM(
     SELECT MOUV.DOS AS dos, MOUV.TIERS AS tiers, CLI.NOM AS nom, MOUV.PICOD as typePiece,
     MOUV.CDDT AS dateCmd, MOUV.CDNO AS numCmd, MOUV.BLDT AS dateBl, MOUV.BLNO AS numBl, MOUV.FADT AS dateFacture, MOUV.FANO AS numFacture,
-    CONCAT(LTRIM(RTRIM(CLI.RUE)), ', ', LTRIM(RTRIM(CLI.CPOSTAL)), ' ', LTRIM(RTRIM(CLI.VIL)) ) AS adressePrincipale,
+    CONCAT(LTRIM(RTRIM(CLI.RUE)), ', ', LTRIM(RTRIM(CLI.CPOSTAL)), ' ', LTRIM(RTRIM(CLI.VIL)) ) AS adressePrincipale, MAX(LTRIM(RTRIM(MUSER.NOM))) AS utilisateur, 
     CASE
     WHEN MOUV.PICOD = 4 THEN MOUV.FANO
     WHEN MOUV.PICOD = 3 THEN MOUV.BLNO
@@ -472,11 +472,12 @@ public function getUpdateMouvConduiteTravaux($cmd,$bl,$facture,$termine):array
     FROM MOUV
     INNER JOIN CLI ON MOUV.DOS = CLI.DOS AND MOUV.TIERS = CLI.TIERS
     INNER JOIN ART ON MOUV.DOS = ART.DOS AND MOUV.REF = ART.REF
+	INNER JOIN MUSER ON MOUV.DOS = MUSER.DOS AND MOUV.USERCR = MUSER.USERX
     WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND ART.FAM_0002 IN ('ME','MO') AND MOUV.PICOD IN (2,3,4) AND MOUV.TIERS <> ('C0160500')
     GROUP BY MOUV.DOS, MOUV.TIERS, CLI.NOM, MOUV.PICOD, MOUV.CDDT, MOUV.CDNO, MOUV.BLDT, MOUV.BLNO, MOUV.FADT, MOUV.FANO, CLI.RUE, CLI.CPOSTAL, CLI.VIL)reponse
     INNER JOIN ENT ON ENT.DOS = dos AND ENT.TIERS = tiers AND ENT.PICOD = typePiece AND ENT.PINO = numPiece AND ENT.TICOD = 'C'
     LEFT JOIN T1 ON tiers = T1.TIERS AND dos = T1.DOS AND  ENT.ADRCOD_0003 = T1.ADRCOD 
-    WHERE ((datePiece >= '2022-06-01' AND ENT.PROJET <> '') OR numCmd IN($cmd) OR numBl IN ($bl) OR numFacture IN ($facture)) 
+    WHERE ((datePiece >= '2022-06-01' AND ENT.PROJET <> '') OR numCmd IN($cmd) OR numBl IN ($bl) OR numFacture IN ($facture)) AND NOT numFacture IN ($termine)
     GROUP BY ENT.ENT_ID
     ";
     $stmt = $conn->prepare($sql);

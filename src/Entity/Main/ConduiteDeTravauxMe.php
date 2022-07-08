@@ -137,6 +137,11 @@ class ConduiteDeTravauxMe
      */
     private $textColor;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $saisiePar;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -426,6 +431,18 @@ class ConduiteDeTravauxMe
     public function setTextColor(?string $textColor): self
     {
         $this->textColor = $textColor;
+
+        return $this;
+    }
+
+    public function getSaisiePar(): ?string
+    {
+        return $this->saisiePar;
+    }
+
+    public function setSaisiePar(?string $saisiePar): self
+    {
+        $this->saisiePar = $saisiePar;
 
         return $this;
     }

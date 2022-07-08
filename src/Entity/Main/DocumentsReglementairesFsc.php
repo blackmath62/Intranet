@@ -2,8 +2,9 @@
 
 namespace App\Entity\Main;
 
-use App\Repository\Main\DocumentsReglementairesFscRepository;
+use App\Entity\Main\Users;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\Main\DocumentsReglementairesFscRepository;
 
 /**
  * @ORM\Entity(repositoryClass=DocumentsReglementairesFscRepository::class)
@@ -33,7 +34,7 @@ class DocumentsReglementairesFsc
     private $years;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="documentsReglementairesFsc")
      */
     private $addBy;
 
@@ -83,12 +84,12 @@ class DocumentsReglementairesFsc
         return $this;
     }
 
-    public function getAddBy(): ?string
+    public function getAddBy(): ?Users
     {
         return $this->addBy;
     }
 
-    public function setAddBy(string $addBy): self
+    public function setAddBy(?Users $addBy): self
     {
         $this->addBy = $addBy;
 
@@ -103,6 +104,18 @@ class DocumentsReglementairesFsc
     public function setType(string $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getUser(): ?Users
+    {
+        return $this->user;
+    }
+
+    public function setUser(?Users $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

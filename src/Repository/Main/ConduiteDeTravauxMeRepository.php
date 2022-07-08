@@ -27,7 +27,7 @@ class ConduiteDeTravauxMeRepository extends ServiceEntityRepository
 		ct.affaire AS affaire, ct.modeDeTransport AS modeDeTransport, ct.op AS op, ct.dateCmd AS dateCmd, 
         ct.numCmd AS numCmd, ct.dateBl AS dateBl, ct.numeroBl AS numeroBl, ct.dateFacture AS dateFacture, 
         ct.numeroFacture AS numeroFacture, ct.delaiDemande AS delaiDemande, ct.delaiAccepte AS delaiAccepte,
-        ct.delaiReporte AS delaiReporte, ct.dateDebutChantier AS dateDebutChantier, 
+        ct.delaiReporte AS delaiReporte, ct.dateDebutChantier AS dateDebutChantier, ct.saisiePar AS saisiePar,
         ct.dateFinChantier AS dateFinChantier, ct.etat AS etat, ct.dureeTravaux AS dureeTravaux, ct.backgroundColor AS backgroundColor, ct.textColor AS textColor,
         ct.updatedAt AS updatedAt, ct.updatedBy_id AS updatedBy, ct.entId AS entId,COUNT(od.identifiant) AS nbeDocs
         FROM conduitedetravauxme ct
@@ -49,7 +49,7 @@ class ConduiteDeTravauxMeRepository extends ServiceEntityRepository
 		ct.affaire AS affaire, ct.modeDeTransport AS modeDeTransport, ct.op AS op, ct.dateCmd AS dateCmd, 
         ct.numCmd AS numCmd, ct.dateBl AS dateBl, ct.numeroBl AS numeroBl, ct.dateFacture AS dateFacture, 
         ct.numeroFacture AS numeroFacture, ct.delaiDemande AS delaiDemande, ct.delaiAccepte AS delaiAccepte,
-        ct.delaiReporte AS delaiReporte, ct.dateDebutChantier AS dateDebutChantier, 
+        ct.delaiReporte AS delaiReporte, ct.dateDebutChantier AS dateDebutChantier, ct.saisiePar AS saisiePar,
         ct.dateFinChantier AS dateFinChantier, ct.etat AS etat, ct.dureeTravaux AS dureeTravaux, ct.backgroundColor AS backgroundColor, ct.textColor AS textColor,
         ct.updatedAt AS updatedAt, ct.updatedBy_id AS updatedBy, ct.entId AS entId,COUNT(od.identifiant) AS nbeDocs
         FROM conduitedetravauxme ct

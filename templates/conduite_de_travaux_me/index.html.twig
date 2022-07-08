@@ -75,7 +75,7 @@
                     <thead>
                         <tr>
                             <th class="text-center"><span>Tiers</span></th>
-                            <th class="text-center"><span>Adresse de livraison</span></th>
+                            <th class="text-center"><span>Adresse de livraison / par</span></th>
                             <th class="text-center"><span>Affaire</span></th>
                             <th class="text-center"><span>transport</span></th>
                             <th class="text-center"><span>Cmd</span></th>
@@ -100,7 +100,7 @@
                                     <a class="text-dark">{{ piece.nom }}</a>
                                 </td>
                                 <td class="text-center">
-                                    <a class="text-dark">{{ piece.adresseLivraison}}</a>
+                                    <a class="text-dark">{{ piece.adresseLivraison}} </br> <small class='text-mute'><cite> Saisie par {{ piece.saisiePar }}</cite></small></a>
                                 </td>
                                 <td class="text-center">
                                     <a class="text-dark">{{ piece.affaire}}</a>
@@ -216,7 +216,7 @@
                     <tfoot>
                         <tr>
                             <th class="text-center"><span>Tiers</span></th>
-                            <th class="text-center"><span>Adresse de livraison</span></th>
+                            <th class="text-center"><span>Adresse de livraison / par</span></th>
                             <th class="text-center"><span>Affaire</span></th>
                             <th class="text-center"><span>transport</span></th>
                             <th class="text-center"><span>Cmd</span></th>
