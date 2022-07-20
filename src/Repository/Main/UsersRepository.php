@@ -24,9 +24,8 @@ class UsersRepository extends ServiceEntityRepository
     public function getFindEmail($id)
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT users.email AS email FROM holiday_users
-        INNER JOIN users ON holiday_users.users_id = users.id
-        INNER JOIN holiday ON holiday.id = holiday_users.holiday_id
+        $sql = "SELECT users.email AS email FROM holiday
+        INNER JOIN users ON holiday.user_id = users.id
         WHERE holiday.id = ?
         ";
         $stmt = $conn->prepare($sql);

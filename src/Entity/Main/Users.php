@@ -198,7 +198,6 @@ class Users implements UserInterface
      * @ORM\OneToMany(targetEntity=ConduiteTravauxAddPiece::class, mappedBy="createdBy")
      */
     private $conduiteTravauxAddPieces;
-
    
     public function __construct()
     {
@@ -582,33 +581,6 @@ class Users implements UserInterface
     public function setBornAt(?\DateTimeInterface $bornAt): self
     {
         $this->bornAt = $bornAt;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Holiday[]
-     */
-    public function getHolidays(): Collection
-    {
-        return $this->holidays;
-    }
-
-    public function addHoliday(Holiday $holiday): self
-    {
-        if (!$this->holidays->contains($holiday)) {
-            $this->holidays[] = $holiday;
-            $holiday->addUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeHoliday(Holiday $holiday): self
-    {
-        if ($this->holidays->removeElement($holiday)) {
-            $holiday->removeUser($this);
-        }
 
         return $this;
     }

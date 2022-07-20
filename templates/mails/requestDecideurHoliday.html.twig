@@ -1,5 +1,5 @@
 <p>Bonjour</p>
-<p>Une demande de congés a été déposé par <strong> {% for user in holiday.user %}{{ user.pseudo }} </strong> du service <strong>{{ user.service.title }}</strong>{% endfor %}pour des congés du <strong>{{ holiday.start|date('d-m-Y H:i:s') }}</strong> au <strong>{{ holiday.end|date('d-m-Y H:i:s') }}</strong></p>
+<p>Une demande de congés a été déposé par <strong> {% for user in holiday.user %}{{ user.pseudo }} </strong> du service <strong>{{ user.service.title }}</strong>{% endfor %} pour des congés du <strong>{{ holiday.start|date('d-m-Y H:i:s') }}</strong> au <strong>{{ holiday.end|date('d-m-Y H:i:s') }}</strong></p>
 <p>Type de demande: <strong>{{ holiday.holidayType.name }}</strong></p>
 <p>Son Statut est : <strong>{{ holiday.holidayStatus.name }}</strong></p>
 {% if holiday.details %}
@@ -7,7 +7,7 @@
     <p><strong>{{ holiday.details|raw }}</strong></p>
 {% endif %}
     <p><u>Informations complémentaires : </u></p>
-    <p>Nombre total de personne totale dans ce service: {{ countService['totalUsersService'] }}</p> 
+    <p>Nombre total de personne dans ce service: {{ countService['totalUsersService'] }}</p> 
     <p>Nombre de demande de congés du service durant la même période: {{ countService['totalUsersServiceInTime'] }}</p>
     <p>Nombre de personne du service présentent en entreprise durant cette même période: {{ countService['nbPersonPresent'] }}</p>
 

@@ -15,15 +15,15 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\statusHolidayRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
- * @IsGranted("ROLE_INFORMATIQUE")
+ * @IsGranted("ROLE_USER")
 */
 
 class HolidayController extends AbstractController
@@ -47,37 +47,154 @@ class HolidayController extends AbstractController
      */
     public function index(Request $request)
     {              
-        $data = $this->repoHoliday->findBy([], ['id' => 'DESC']);
+        $holidays = $this->repoHoliday->findAll();
         
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
 
+        $users = $this->repoUser->findBy(['closedAt' => NULL]);
+        
+         // Calendrier des congés
+         $events = $this->repoHoliday->findBy(['holidayStatus' => 3]);
+         $rdvs = [];
+         
+         foreach($events as $event){
+             $id = $event->getId();
+             $userId = $this->repoHoliday->getUserIdHoliday($id);
+             $user = $this->repoUser->findOneBy(['id' => $userId]);
+             $pseudo = $user->getPseudo();
+             $color = $user->getService()->getColor();
+             $textColor = $user->getService()->getTextColor();
+             
+             $rdvs[] = [
+                 'id' => $event->getId(),
+                 'start' => $event->getStart()->format('Y-m-d H:i:s'),
+                 'end' => $event->getEnd()->format('Y-m-d H:i:s'),
+                 'title' => 'Congés ' . $pseudo,
+                 'backgroundColor' => $color,
+                 'borderColor' => '#FFFFFF',
+                 'textColor' => $textColor,
+                ];
+            }
+            
+        // récupérer les fériers en JSON sur le site etalab
+        $ferierJson = file_get_contents("https://etalab.github.io/jours-feries-france-data/json/metropole.json");
+        // On ajoute les fériers au calendrier des congés
+        $jsonIterator = new RecursiveIteratorIterator(
+            new RecursiveArrayIterator(json_decode($ferierJson, TRUE)),
+            RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($jsonIterator as $key => $val) {
+            $rdvs[] = [
+                'id' => '',
+                'start' => $key,
+                'end' => $key,
+                'title' => $val,
+                'backgroundColor' => '#404040',
+                'borderColor' => '#FFFFFF',
+                'textColor' => '#FFFFFF',
+            ];
+        }
+        // Les anniversaires des utilisateurs
+        
+        foreach ($users as $key => $value) {
+            $annif = $value->getBornAt()->format('m-d');
+            $annee = date("Y") - 1;
+            $annee2 = date("Y") + 3;
+            for ($ligAnnee=$annee; $ligAnnee <$annee2 ; $ligAnnee++) { 
+                $anniversaire = $ligAnnee . '-' . $annif;
+                
+                $rdvs[] = [
+                    'id' => '',
+                    'start' => $anniversaire,
+                    'end' => $anniversaire,
+                    'title' => 'Anniversaire ' . $value->getPseudo(),
+                    'backgroundColor' => '#FF9BFF',
+                    'borderColor' => '#D7D7D7',
+                    'textColor' => '#FFFFFF',
+                ];
+            }
+        }
+        
+         $data = json_encode($rdvs);
+
         return $this->render('holiday/index.html.twig', [
+            'holidays' => $holidays,
+            'title' => 'Liste des congés',
             'data' => $data
         ]);
     }
 
     
     /**
-     * @Route("/holiday/fermeture", name="app_holiday_new_closing", methods={"GET","POST"})
+     * @Route("/conges/holiday/fermeture", name="app_holiday_new_closing", methods={"GET","POST"})
      */
-    public function newClosing(Request $request, Holiday $holiday = null)
+    public function newClosing(Request $request)
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
-
-        $holiday = new Holiday;
-
-        $form = $this->createForm(ImposeVacationType::class, $holiday);
+        $form = $this->createForm(ImposeVacationType::class);
         $form->handleRequest($request);
-
+        
         if($form->isSubmitted() && $form->isValid() ){
-            dd($form->getData());
+            $listUsers = $form->getData()['user'];
+            // adapter l'heure de start à la tranche de journée selectionnée
+                $sliceStart = $form->getData()['sliceStart'];
+                $start = $form->getData()['start'];
+                if ($sliceStart == 'PM') {
+                    $start = $start->modify("+14 hours");
+                }
+                // adapter l'heure de End à la tranche de journée selectionnée
+                $sliceEnd = $form->getData()['sliceEnd'];
+                $end = $form->getData()['end'];
+                if ($sliceEnd == 'AM') {
+                    $end = $end->modify("+12 hours");
+                }elseif ($sliceEnd == 'PM') {
+                    $end = $end->modify("+18 hours");
+                }elseif ($sliceEnd == 'DAY') {
+                    $end = $end->modify("+23 hours");
+                }
+            //intégrer le congés pour chaque utilisateurs
+            foreach ($listUsers as $value) {
+            $holiday = new Holiday;
+            
+            $statut = $this->repoStatuts->findOneBy(['id' => 3]);
+            $holiday->setCreatedAt(new DateTime())
+                    ->setStart($start)
+                    ->setSliceStart($sliceStart)
+                    ->setEnd($end)
+                    ->setSliceEnd($sliceEnd)
+                    ->setNbJours(0)
+                    ->setHolidayType($form->getData()['holidayType'])
+                    ->setHolidayStatus($statut)
+                    ->setTreatmentedBy($this->getUser())
+                    ->setTreatmentedAt(new DateTime())
+                    ->setUser($value);
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($holiday);
+                    $em->flush();
+            $majHoliday = $this->repoHoliday->findOneBy(['id' => $this->repoHoliday->getLastHoliday()]);
+            $nbJours = $this->countHolidayDay($majHoliday);
+            if ($nbJours['nbjours'] == -1) {
+                $this->addFlash('danger', 'données irrationnelles');
+                return $this->redirectToRoute('app_holiday_new');
+            }
+            $nbJ = $nbJours['nbjours'];
+            $majHoliday->setNbJours($nbJ);
+            $em = $this->getDoctrine()->getManager();
+                    $em->persist($majHoliday);
+                    $em->flush();
+
+            }
+            $this->addFlash('message', 'Le congés a bien été enregistré' );
+            return $this->redirectToRoute('app_holiday_list');
+
         }
+        $users = $this->repoUser->findAll();
         return $this->render('holiday/closing.html.twig',[
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'users' => $users
             ]);
     }
     
@@ -107,14 +224,19 @@ class HolidayController extends AbstractController
         $form->handleRequest($request);        
         if($form->isSubmitted() && $form->isValid() ){
             // vérifier si cette utilisateur n'a pas déjà déposé durant cette période
-            $result = $this->repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $this->getUser()->getId(), $holiday->getId());
+            if ($id) {
+                $utilisateur = $holiday->getUser();
+                $result = $this->repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $utilisateur->getId(), $holiday->getId());
+            }else {
+                $utilisateur = $this->getUser();
+                $result = $this->repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $utilisateur->getId(), $holiday->getId());
+            }
             if ($result) {
                 $this->addFlash('danger', 'Vous avez déjà posé du ' . $result[0]['start'] . ' au ' . $result[0]['end'] );
                 return $this->redirectToRoute('app_holiday_list');
-                dd('On ne va pas plus loin que ça');
             }
             // Liste de congés dans le même interval de date d'un service
-            $overlaps = $this->repoHoliday->getOverlapHoliday($holiday->getStart(), $holiday->getEnd(),$this->getUser()->getService()->getId());
+            $overlaps = $this->repoHoliday->getOverlapHoliday($holiday->getStart(), $holiday->getEnd(),$utilisateur->getService()->getId());
             // On bascule les statuts des congés pour les mettres en chevauchement
             for ($ligOverlaps=0; $ligOverlaps <count($overlaps) ; $ligOverlaps++) { 
                 if ($overlaps[$ligOverlaps]['statutId'] == 2 ) {
@@ -126,7 +248,7 @@ class HolidayController extends AbstractController
                 }
             }
             // Nombre de personne dans un service
-            $countService['totalUsersService'] = count($this->repoUser->findBy(['service' =>$this->getUser()->getService()->getId() ]));
+            $countService['totalUsersService'] = count($this->repoUser->findBy(['service' => $utilisateur->getService()->getId() ]));
 
             // Nombre de personne unique en congés durant cette période
             $personService = array();
@@ -162,15 +284,18 @@ class HolidayController extends AbstractController
                 $end = $end->modify("+23 hours");
             }
             $nbJours = $this->countHolidayDay($holiday);
-            //dd($nbJours);
+            if ($nbJours['nbjours'] == -1) {
+                $this->addFlash('danger', 'données irrationnelles');
+                return $this->redirectToRoute('app_holiday_new');
+            }
+
             $nbJ = $nbJours['nbjours'];
-            dd($nbJours);
             $holiday->setCreatedAt(new DateTime())
-                    ->setStart($start)
-                    ->setEnd($end)
-                    ->setNbJours($nbJ)
-                    ->setHolidayStatus($statut)
-                    ->addUser($this->getUser());
+            ->setStart($start)
+            ->setEnd($end)
+            ->setNbJours($nbJ)
+            ->setHolidayStatus($statut)
+            ->setUser($utilisateur);
             $em = $this->getDoctrine()->getManager();
             $em->persist($holiday);
             $em->flush();
@@ -236,8 +361,12 @@ class HolidayController extends AbstractController
         // déclaration des variables
         $dateStart = $holiday->getStart()->format('Y-m-d');
         $dateEnd = $holiday->getEnd()->format('Y-m-d');
-        $dateTimeStart = new DateTime($holiday->getStart()->format('Y-m-d'));
-        $dateTimeEnd = new DateTime($holiday->getEnd()->format('Y-m-d'));
+        $dd = new DateTime($holiday->getStart()->format('Y') . '-' . $holiday->getStart()->format('m') . '-' . $holiday->getStart()->format('d') . '00:00');
+        $df = new DateTime($holiday->getEnd()->format('Y') . '-' . $holiday->getEnd()->format('m') . '-' . $holiday->getEnd()->format('d') . '23:00');
+        $interval = DateInterval::createFromDateString('1 days');
+        $days = new DatePeriod($dd,$interval, $df);
+        //$dateTimeStart = new DateTime($holiday->getStart()->format('Y-m-d'));
+        //$dateTimeEnd = new DateTime($holiday->getEnd()->format('Y-m-d'));
         $sliceStart = $holiday->getSliceStart();
         $sliceEnd = $holiday->getSliceEnd();    
 
@@ -258,61 +387,72 @@ class HolidayController extends AbstractController
         
         $nbConges = 0;
         $return= [];
-        $texte1 = '';
-        $texte3 = '';
-        $texte4 = '';
-        $texte5 = '';
-        $texte2 = '';
-        $texte6 = '';
-        $texte7 = '';
-            // le probléme vient de cette boucle, apparement il ne prendre pas en compte le dernier jour, c'est bizarre .... à voir si le probléme ne vient pas de modify qui modifie surement sur la variable de maniére permanente
-            foreach (new DatePeriod($dateTimeStart, new DateInterval('P1D') /* pas d'un jour */, $dateTimeEnd->modify('+1 day')) as $dt) {
-            // le jour qui est actuellement dans la boucle
-            // compter le nombre de jour de congés déposé hors weekend
-            if ($dt->format('N') != 6 AND $dt->format('N') != 7 ) 
-            {
-                $ymd = $dt->format('Y-m-d');
-                $texte1 = $ymd . " n\'est pas un jour du weekend" . "</br>";
-                $searchFerier = in_array($ymd, $ferierDurantConges,true);
-                // Ne pas tenir compte des jours fériers
-                if ($searchFerier == false) 
+              
+        foreach ($days as $dt) {
+                // le jour qui est actuellement dans la boucle
+                // compter le nombre de jour de congés déposé hors weekend
+                if ($dt->format('N') != 6 AND $dt->format('N') != 7 ) 
                 {
-                    $texte2 = $ymd . " n\'est pas un jour ferier";
-                    // si le jour start et le jour end sont identiques    
-                    if ($dateTimeStart->format('Y-m-d') == $dateTimeEnd->format('Y-m-d')) 
+                    $ymd = $dt->format('Y-m-d');
+                    $searchFerier = in_array($ymd, $ferierDurantConges,true);
+                    // Ne pas tenir compte des jours fériers
+                    if ($searchFerier == false) 
                     {
+                    // si le jour start et le jour end sont identiques  
+                    if ($dateStart == $dateEnd) 
+                    {
+                        if (($sliceStart == 'DAY' && $sliceEnd == 'AM')|($sliceStart == 'PM' && $sliceEnd == 'DAY')) {
+                            $return['nbjours'] = -1;
+                            return $return;
+                        }
+
                         // s'ils sont tous les 2 le matin ou l'aprés midi, on ne compte qu'une demi journée
-                        if ($sliceStart != 'AM' && $sliceEnd != 'AM' | $sliceStart != 'PM' && $sliceEnd != 'PM') {
-                            $nbConges = 0.5;
-                            $texte3 = $ymd . ' j\'ajoute 0.5 jour, dans jour identique tous les 2 matins ou aprés midi';
+                        if ($holiday->getStart()->format('H:i') == '00:00' && $holiday->getEnd()->format('H:i') == '12:00') {
+                            $nbConges = $nbConges + 0.5;
                             // S'ils sont tous les 2 Journée ou l'un matin l'autre aprés midi on ajoute un jour
-                        }elseif ($sliceStart == 'DAY' && $sliceEnd == 'DAY' | $sliceStart == 'AM' && $sliceEnd == 'PM') {
-                            $nbConges = 1;
-                            $texte4 = $ymd . ' j\'ajoute 1 jour, dans jour identique journée compléte';
+                        }
+                        if ($holiday->getStart()->format('H:i') == '14:00' && $holiday->getEnd()->format('H:i') == '18:00') {
+                            $nbConges = $nbConges + 0.5;
+                        }
+                        if ($holiday->getStart()->format('H:i') == '00:00' && $holiday->getEnd()->format('H:i') == '23:00') {
+                            $nbConges = $nbConges + 1;
+                        }
+                        if ($holiday->getStart()->format('H:i') == '00:00' && $holiday->getEnd()->format('H:i') == '18:00') {
+                            $nbConges = $nbConges + 1;
                         }
                     }else 
-                    {
+                    {   
                         // si le jour start est différent du jour end
                         // si on est sur le jour de start ou le jour end et qu'il ne s'agit pas de journée compléte
-                        if ($ymd == $dateTimeStart->format('Y-m-d') && $sliceStart != 'DAY'  | $ymd == $dateTimeEnd->format('Y-m-d') && $sliceEnd != 'DAY' ) {
+                        // l'aprés midi en date start
+                        if ($ymd == $dateStart && $holiday->getStart()->format('H:i') == '14:00' ) {
                             $nbConges = $nbConges + 0.5;
-                            $texte5 = $ymd . ' j\'ajoute 0.5 jour, dans jours différentes  et différents de journée compléte';
-                        }elseif ($ymd == $dateTimeStart->format('Y-m-d') && $sliceStart == 'DAY'  | $ymd == $dateTimeEnd->format('Y-m-d') && $sliceEnd == 'DAY' ) {
-                        // Si il s'agit de journée compléte dans les 2 cas on ajoute 1 journée
-                            $nbConges++;
-                            $texte6 = $ymd . ' j\'ajoute 1 jour, dans jours différentes  demi journée';
+                        }
+                        // si on est sur le jour de démarrage et que le slice est sur DAY
+                        // la journée compléte en start
+                        if ($ymd == $dateStart && $holiday->getStart()->format('H:i') == '00:00') {
+                            $nbConges = $nbConges + 1;
+                        }
+                        // la matinée en End
+                        if ($ymd == $dateEnd && $holiday->getEnd()->format('H:i') == '12:00' ) {
+                            $nbConges = $nbConges + 0.5;
+                        }
+                        // l'aprés midi en End
+                        if ($ymd == $dateEnd && $holiday->getEnd()->format('H:i') == '18:00' ) {
+                            $nbConges = $nbConges + 1;
+                        }
+                        // l'a journée en End
+                        if ($ymd == $dateEnd && $holiday->getEnd()->format('H:i') == '23:00') {
+                            $nbConges = $nbConges + 1;
                         }
                         // si les jours sont intermédiaires aux jours start et end, on ajoute un jour
-                        if ($ymd != $dateTimeStart->format('Y-m-d') && $ymd != $dateTimeEnd->format('Y-m-d')) {
-                            
-                            $nbConges++;
-                            $texte7 = $ymd . ' est différent de ' . $dateTimeEnd->format('Y-m-d') . ' j\'ajoute 1 jour, dans jours différents  interval';
+                        if ($ymd != $dateStart && $ymd != $dateEnd) {
+                            $nbConges = $nbConges + 1;
                         }    
-                    }      
+                    }    
                 }
             }
         }
-        $return['texte'] = $texte1 . ', ' . $texte2 . ', ' . $texte3 . ', ' . $texte4 . ', ' . $texte5 . ', ' . $texte6 . ', ' . $texte7;
         $return['nbjours'] = $nbConges;
         return $return;
     }
@@ -357,8 +497,7 @@ class HolidayController extends AbstractController
     }
 
     /**
-     * @Route("/holiday/accept/{id}", name="app_holiday_accept", methods={"GET"})
-     * @IsGranted("ROLE_CONGES")
+     * @Route("/conges/holiday/accept/{id}", name="app_holiday_accept", methods={"GET"})
      */
     // accepter un congés
     public function acceptHoliday($id, Request $request)
@@ -396,8 +535,7 @@ class HolidayController extends AbstractController
 
 
     /**
-     * @Route("/holiday/refuse/{id}", name="app_holiday_refuse", methods={"GET"})
-     * @IsGranted("ROLE_CONGES")
+     * @Route("/conges/holiday/refuse/{id}", name="app_holiday_refuse", methods={"GET"})
      */
     // refuser un congés
     public function refuseHoliday($id, Request $request)
@@ -436,20 +574,14 @@ class HolidayController extends AbstractController
     public function holiday_access($holidayId)
     {
         $access = true;
-        $holiday = $this->repoHoliday->getUserIdHoliday($holidayId);
-        
-        if ( ($holiday['users_id'] != $this->getUser()->getId() ) and !$this->isGranted('ROLE_CONGES') ){
+        $holiday = $this->repoHoliday->findOneBy(['id' => $holidayId]);
+        if ( ($holiday->getUser()->getId() != $this->getUser()->getId() ) and !$this->isGranted('ROLE_CONGES') ){
             $this->addFlash('danger', 'Vous n\'avez pas accés à ces données');
             $access = false;
         }        
         return $access;
     }
     
-    // Compter le nombre de jours de congés
-    public function holiday_count()
-    {
-
-    }
 
     // contrôle et modification des chevauchements
     public function holiday_overlaps()

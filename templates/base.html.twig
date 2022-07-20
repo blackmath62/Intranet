@@ -152,7 +152,7 @@
 								</a>
 							</li>
 
-							{% if is_granted('ROLE_INFORMATIQUE') %}
+							{% if is_granted('ROLE_CONGES') or is_granted('ROLE_INFORMATIQUE') %}
 								<li class="nav-item">
 									<a href="{{path('app_holiday_list')}}" class="nav-link">
 										<i class="nav-icon fas fa-mug-hot"></i>

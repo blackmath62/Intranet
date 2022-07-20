@@ -2,10 +2,11 @@
 
 namespace App\Entity\Main;
 
-use App\Repository\Main\HolidayRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Main\Users;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\Main\HolidayRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass=HolidayRepository::class)
@@ -18,12 +19,6 @@ class Holiday
      * @ORM\Column(type="integer")
      */
     private $id;
-
-    /**
-     * @ORM\ManyToMany(targetEntity=Users::class, inversedBy="holidays")
-     */
-    private $user;
-
     
     /**
      * @ORM\Column(type="datetime")
@@ -82,39 +77,21 @@ class Holiday
      */
     private $nbJours;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="holidays")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
     
-    public function __construct()
+    /*public function __construct()
     {
         $this->user = new ArrayCollection();
-    }
+    }*/
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    /**
-     * @return Collection|Users[]
-     */
-    public function getUser(): Collection
-    {
-        return $this->user;
-    }
-
-    public function addUser(Users $user): self
-    {
-        if (!$this->user->contains($user)) {
-            $this->user[] = $user;
-        }
-
-        return $this;
-    }
-
-    public function removeUser(Users $user): self
-    {
-        $this->user->removeElement($user);
-
-        return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeInterface
@@ -149,6 +126,18 @@ class Holiday
     public function setTreatmentedAt(?\DateTimeInterface $treatmentedAt): self
     {
         $this->treatmentedAt = $treatmentedAt;
+
+        return $this;
+    }
+
+    public function getUser(): ?Users
+    {
+        return $this->user;
+    }
+
+    public function setUser(?Users $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

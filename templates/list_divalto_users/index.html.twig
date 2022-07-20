@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<section class="content-header">
+		<div
+			class="container-fluid">
+			<!-- /.card -->
+			<div class="row">
+				<div class="col-12">
+					<div class="card card-dark">
+						<div class="card-header d-flex">
+							<h3 class="card-title text-center mr-auto">Liste des utilisateurs de Divalto</h3>
+							<a href="{{ path('app_admin') }}" class="badge badge-success ml-auto">Retourner à l'Administration générale</a>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<table id="example1" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th class="text-center">
+											<span>User X</span>
+										</th>
+										<th class="text-center">
+											<span>Nom</span>
+										</th>
+										<th class="text-center">
+											<span>Dossier</span>
+										</th>
+										<th class="text-center">
+											<span>Email</span>
+										</th>
+										<th class="text-center">
+											<span>Actions</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for user in users %}
+										<tr>
+											<form method="POST">
+												<td class="text-center col-1">
+													{{ user.userX }}
+												</td>
+												<td class="text-center col-1">
+													{{ user.nom }}
+												</td>
+												<td class="text-center col-1">
+													{{ user.dos }}
+												</td>
+												<td class="text-center col-1">
+													{{ user.email }}
+												</td>
+												<td class="text-center col-1">
+													{% if user.valid == true %}
+														<a class="btn btn-success" href="{{ path('app_list_divalto_users_lock_unlock',{'id' : user.divaltoid, 'value' : 'false'}) }}"><i class="fas fa-lock-open"></i></a>
+													{% else %}
+														<a class="btn btn-danger" href="{{ path('app_list_divalto_users_lock_unlock', {'id' : user.divaltoid, 'value' : 'true'}) }}"><i class="fas fa-lock"></i></a>
+													{% endif %}
+												</td>
+											</form>
+
+										{% endfor %}
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<th class="text-center">
+											<span>User X</span>
+										</th>
+										<th class="text-center">
+											<span>Nom</span>
+										</th>
+										<th class="text-center">
+											<span>Dossier</span>
+										</th>
+										<th class="text-center">
+											<span>Email</span>
+										</th>
+										<th class="text-center">
+											<span>Actions</span>
+										</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock %}

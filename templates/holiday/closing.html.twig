@@ -49,10 +49,13 @@
 
                        {% for user in form.user %}
                        <tr>
-                       
-                            <td class="text-center"> {{ user.vars.label }}</td>
-                            <td class="text-center">{{ user.vars.label }}</td>
-                            <td class="text-center">{{ user.vars.label }}</td>
+                       {% for thisUser in users %}
+                        {% if user.vars.value == thisUser.id %}
+                                <td class="text-center"> {{ thisUser.pseudo }}</td>
+                                <td class="text-center"><a href='mailto:{{ thisUser.Email }}'>{{ thisUser.Email }}</a></td>
+                                <td class="text-center"><div class="btn btn-sm" style="background-color: {{ thisUser.service.color }}; color: {{ thisUser.service.textColor }}";>{{ thisUser.service.title }}</div></td>
+                        {% endif %}
+                       {% endfor %}
                             <td class="text-center">{{ form_widget( user ) }}</td>
                        
                        </tr>

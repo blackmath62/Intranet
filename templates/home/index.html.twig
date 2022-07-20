@@ -20,11 +20,9 @@
         <li class="nav-item">
           <a class="nav-link active" id="actuality" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Actualités</a>
         </li>
-        {% if is_granted('ROLE_ADMIN') %}
         <li class="nav-item">
           <a class="nav-link" id="custom-tabs-one-calendar-tab" data-toggle="pill" href="#calendrier" role="tab" aria-controls="custom-tabs-one-calendar" aria-selected="false">Calendrier</a>
         </li>
-        {% endif %}
       </ul>
     </div>
     <div class="card-body">
