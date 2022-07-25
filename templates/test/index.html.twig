@@ -1,4 +1,4 @@
-
+{% extends 'base.html.twig' %}
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
@@ -7,17 +7,23 @@
 
 {% endblock %}
 {% block javascripts %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css">
 
 <script>
 
-      document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'resourceTimelineWeek'
-        });
-        calendar.render();
-      });
+      window.onload = ()=> {
+        let calendarElt = document.querySelector("#calendar")
+        let calendar = new FullCalendar.Calendar(calendarElt,{
+          initialView: 'dayGridMonth',
+          locale: 'fr',
+          timeZone:'Europe/Paris',
+          headerToolbar:{
+            start:'prev,next,today',
+            center:'title',
+            end:'dayGridMonth,timeGridWeek'
+          }
+        })
+        calendar.render()
+      }
 
     </script>
 {% endblock %}
