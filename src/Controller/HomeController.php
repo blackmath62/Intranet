@@ -117,7 +117,7 @@ class HomeController extends AbstractController
         
          $data = json_encode($rdvs);
 
-        $news = $repoNews->findBy([],['id'=>'DESC'],5);
+        $news = $repoNews->getNews();
 
         return $this->render('home/index.html.twig', [
             'title' => 'Accueil',

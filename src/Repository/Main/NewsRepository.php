@@ -2,9 +2,10 @@
 
 namespace App\Repository\Main;
 
+use DateTime;
 use App\Entity\Main\News;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method News|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,6 +18,22 @@ class NewsRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, News::class);
+    }
+
+    public function getNews()
+    {
+        $d = new DateTime();
+        $dc = date_modify($d, '-30 Days');
+        $dc= $dc->format('Y') . '-' . $dc->format('m') . '-' . $dc->format('d');
+        // congés non dépassés avec les services
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT *
+        FROM news
+        WHERE news.createdAt >= '$dc'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
 
     // /**

@@ -5,18 +5,270 @@
 {% endblock %}
 
 {% block body %}
-	<div
-		class="col-md-12">
-		<!-- general form elements disabled -->
-		<div class="card card-dark">
-			<div class="card-header d-flex">
-				<h3 class="card-title text-white">Modification de mon profil</h3>
-			</div>
-			<div class="card-body">
-				<img class="img-fluid col-2" src="{{ asset(asset('img/profile/' ~ app.user.img)) }}" alt="User Image">
-				{{ form(profileUserForm)}}
+			  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Mon profil</h1>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3">
+
+            <!-- Profile Image -->
+            <div class="card card-primary card-outline">
+              <div class="card-body box-profile">
+                <div class="text-center">
+                  <img class="profile-user-img img-fluid img-circle" src="{{ asset(asset('img/profile/' ~ app.user.img)) }}" alt="User profile picture">
+                </div>
+
+                <h3 class="profile-username text-center">{{ user.pseudo}}</h3>
+				<div class='text-center'>
+                <p class="text-muted text-center">
+					Service : 
+				</p>
+				<p class="btn btn.sm" style="background-color: {{ user.service.color }}; color: {{ user.service.textColor }}">{{ user.service.title }}</p>
 				</div>
-			</div>
-		</div>
-	</div>
+
+                <ul class="list-group list-group-unbordered mb-3">
+                  <li class="list-group-item">
+                    <b>Anniversaire</b> <a class="float-right">{{ user.bornAt|date('d-m-Y') }}</a>
+                  </li>
+                </ul>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-9">
+            <div class="card">
+              <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                  <li class="nav-item"><a class="nav-link active" href="#conges" data-toggle="tab">Mes congés</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Paramétres</a></li>
+                </ul>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+                <div class="tab-content">
+                  <div class="active tab-pane" id="conges">
+					{{ form_start(formDates) }}
+			  <div class="d-flex flex-wrap justify-content-around p-2">
+			  	<div><strong>Veuillez selectionner la période : </strong></div>
+				<div>
+			  		{{ form_widget(formDates.startDate) }}
+				</div>
+				<div>
+					{{ form_widget(formDates.endDate) }}
+				</div>
+				<div>
+					{{ form_widget(formDates.filtrer) }}
+				</div>
+			  </div>
+				<hr>
+					{{ form_end(formDates) }}
+				  <div class="d-flex flex-wrap justify-content-around">
+				  {% if acceptes %}
+				  	<div class="card card-success col-3 p-0 m-0" id="accordionAcceptes">
+						<div class="card-header">
+							<h3 class="card-title">Total des congés Acceptés</h3>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body p-0">
+							<table class="table table-hover">
+							<thead>
+								<tr>
+								<th>Type de congés</th>
+								<th>Nb Jours</th>
+								<th>Détails</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for accepte in acceptes %}
+									<tr data-toggle="collapse" href="#collapse{{ accepte.holidayType_id}}{{accepte.holidayStatus_id}}">
+										<td>{{ accepte.name }}</td>
+										<td>{{ accepte.nbJours }}</td>
+										<td class="text-center"><i class="fas fa-eye text-primary"></i></td>
+									</tr>
+									<tr id="collapse{{ accepte.holidayType_id}}{{accepte.holidayStatus_id}}" class="collapse" data-parent="#accordionAcceptes">
+										<td colspan="5">
+											<p>
+												<ul>
+												{% for detailsAccepte in detailsAcceptes %}
+												{% if  accepte.holidayType_id == detailsAccepte.holidayType_id  and accepte.holidayStatus_id ==  detailsAccepte.holidayStatus_id  %}
+													<li>du {{detailsAccepte.start }}</br> au  {{detailsAccepte.end }} </br> soit {{detailsAccepte.nbJours }} jours</li>
+												{% endif %}
+												{% endfor %}
+												</ul>
+											</p>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+							</table>
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				  {% else %}
+						<h5 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-info"></i>Pas de Congés Acceptés pour cette période !</h5>
+				  {% endif %}
+				  {% if attentes %}				  
+					<div class="card card-warning col-3 p-0 m-0" id="accordionAttentes">
+						<div class="card-header">
+							<h3 class="card-title">Total des congés En attente de validation</h3>
+						</div>
+						<div class="card-body p-0">
+						<table class="table table-hover">
+							<thead>
+								<tr>
+								<th>Type de congés</th>
+								<th>Nb Jours</th>
+								<th>Détails</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for attente in attentes %}
+									<tr data-toggle="collapse" href="#collapse{{ attente.holidayType_id}}{{attente.holidayStatus_id}}">
+										<td>{{ attente.name }}</td>
+										<td>{{ attente.nbJours }}</td>
+										<td class="text-center"><i class="fas fa-eye text-primary"></i></td>
+									</tr>
+									<tr id="collapse{{ attente.holidayType_id}}{{attente.holidayStatus_id}}" class="collapse" data-parent="#accordionAttentes">
+										<td colspan="5">
+											<p>
+												<ul>
+												{% for detailsAttente in detailsAttentes %}
+												{% if  attente.holidayType_id == detailsAttente.holidayType_id  and attente.holidayStatus_id ==  detailsAttente.holidayStatus_id  %}
+													<li>du {{detailsAttente.start }}</br> au  {{detailsAttente.end }} </br> soit {{detailsAttente.nbJours }} jours</li>
+												{% endif %}
+												{% endfor %}
+												</ul>
+											</p>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+							</table>
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				  {% else %}
+						<h5 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-info"></i>Pas de Congés en attente pour cette période !</h5>
+				  {% endif %}
+				  {% if refuses %}
+					<div class="card card-danger col-3 p-0 m-0" id="accordionRefuses">
+						<div class="card-header">
+							<h3 class="card-title">Total des congés Refusés</h3>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body p-0">
+							<table class="table table-striped">
+							<thead>
+								<tr>
+								<th>Type de congés</th>
+								<th>Nb Jours</th>
+								<th>Détails</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for refuse in refuses %}
+									<tr data-toggle="collapse" href="#collapse{{ refuse.holidayType_id}}{{refuse.holidayStatus_id}}">
+										<td>{{ refuse.name }}</td>
+										<td>{{ refuse.nbJours }}</td>
+										<td class="text-center"><i class="fas fa-eye text-primary"></i></td>
+									</tr>
+									<tr id="collapse{{ refuse.holidayType_id}}{{refuse.holidayStatus_id}}" class="collapse" data-parent="#accordionAttentes">
+										<td colspan="5">
+											<p>
+												<ul>
+												{% for detailsRefuse in detailsRefuses %}
+												{% if  refuse.holidayType_id == detailsRefuse.holidayType_id  and refuse.holidayStatus_id ==  detailsRefuse.holidayStatus_id  %}
+													<li>du {{detailsRefuse.start }}</br> au  {{detailsRefuse.end }} </br> soit {{detailsRefuse.nbJours }} jours</li>
+												{% endif %}
+												{% endfor %}
+												</ul>
+											</p>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+							</table>
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+					{% else %}
+						<h5 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-info"></i>Pas de Congés refusés pour cette période !</h5>
+				  {% endif %}
+
+				  </div>
+
+
+                  </div>
+                  <div class="tab-pane" id="settings">
+				  {{ form_start(profileUserForm) }}
+                    <form class="form-horizontal">
+                      <div class="form-group row">
+                        <label for="inputName" class="col-sm-2 col-form-label">Email</label>
+                        <div class="col-sm-10">
+						  {{ form_errors(profileUserForm.email) }}
+                		  {{ form_widget(profileUserForm.email) }}
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="inputEmail" class="col-sm-2 col-form-label">Pseudo</label>
+                        <div class="col-sm-10">
+                          {{ form_errors(profileUserForm.pseudo) }}
+                		  {{ form_widget(profileUserForm.pseudo) }}
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="inputName2" class="col-sm-2 col-form-label">Date de naissance</label>
+                        <div class="col-sm-10">
+                          {{ form_errors(profileUserForm.bornAt) }}
+                		  {{ form_widget(profileUserForm.bornAt) }}
+                        </div>
+                      </div>
+					  <div class="form-group row">
+                        <label for="inputName2" class="col-sm-2 col-form-label">Image de profil</label>
+                        <div class="col-sm-10">
+                          {{ form_errors(profileUserForm.img) }}
+                		  {{ form_widget(profileUserForm.img) }}
+                        </div>
+                      </div>                      
+                      <div class="form-group row">
+                        <div class="offset-sm-2 col-sm-10 text-right">
+                          {{ form_widget(profileUserForm.Modifier, {'label': 'Modifier'} ) }}
+                        </div>
+                      </div>
+                    </form>
+					{{ form_end(profileUserForm) }}
+                  </div>
+                  <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+              </div><!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
 {% endblock %}

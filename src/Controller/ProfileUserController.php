@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Form\ProfileUserType;
+use App\Form\StatesDateFilterType;
+use App\Repository\Main\HolidayRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -18,7 +20,7 @@ class ProfileUserController extends AbstractController
     /**
      * @Route("/profile/user", name="app_profile_user")
      */
-    public function index(Request $request, SluggerInterface $slugger)
+    public function index(Request $request, SluggerInterface $slugger, HolidayRepository $repoHoliday)
     {
         $user = $this->getUser();
         $form = $this->createForm(ProfileUserType::class, $user);
@@ -64,11 +66,39 @@ class ProfileUserController extends AbstractController
             return $this->redirectToRoute('app_profile_user');
 
         }
+        $acceptes = "";
+        $refuses = "";
+        $attentes = "";
+        $detailsAttentes = "";
+        $detailsRefuses = "";
+        $detailsAcceptes = "";
+
+        $formDates = $this->createForm(StatesDateFilterType::class);
+        $formDates->handleRequest($request);
+        if($formDates->isSubmitted() && $formDates->isValid()){
+            $start = $formDates->getData()['startDate']->format('Y-m-d');
+            $end = $formDates->getData()['endDate']->format('Y-m-d');
+            $acceptes = $repoHoliday->getCountCongesAccepted($this->getUser()->getid(), $start, $end);
+            $refuses = $repoHoliday->getCountCongesRefused($this->getUser()->getid(), $start, $end);
+            $attentes = $repoHoliday->getCountCongesWait($this->getUser()->getid(), $start, $end);
+            $detailsAttentes = $repoHoliday->getListCongesWait($this->getUser()->getid(), $start, $end);
+            $detailsRefuses = $repoHoliday->getListCongesRefused($this->getUser()->getid(), $start, $end);
+            $detailsAcceptes = $repoHoliday->getListCongesAccepted($this->getUser()->getid(), $start, $end);
+        }
+
 
         return $this->render('profile_user/index.html.twig',[
             'controller_name' => 'ProfileUserController',
             'title' => 'gestion de compte',
             'profileUserForm' => $form->createView(),
+            'user' => $user,
+            'acceptes' => $acceptes,
+            'refuses'=> $refuses,
+            'attentes' => $attentes,
+            'detailsAttentes' => $detailsAttentes,
+            'detailsRefuses' => $detailsRefuses,
+            'detailsAcceptes' => $detailsAcceptes,
+            'formDates' => $formDates->createView(),
         ]);
     }
 

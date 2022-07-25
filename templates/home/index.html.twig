@@ -17,19 +17,22 @@
   <div class="card card-dark card-tabs">
     <div class="card-header p-0 pt-1">
       <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+        {% if news %}
         <li class="nav-item">
-          <a class="nav-link active" id="actuality" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Actualités</a>
+          <a class="nav-link" id="actuality" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Actualités</a>
         </li>
+        {% endif %}
         <li class="nav-item">
-          <a class="nav-link" id="custom-tabs-one-calendar-tab" data-toggle="pill" href="#calendrier" role="tab" aria-controls="custom-tabs-one-calendar" aria-selected="false">Calendrier</a>
+          <a class="nav-link active" id="custom-tabs-one-calendar-tab" data-toggle="pill" href="#calendrier" role="tab" aria-controls="custom-tabs-one-calendar" aria-selected="false">Calendrier</a>
         </li>
       </ul>
     </div>
     <div class="card-body">
       <div class="tab-content" id="custom-tabs-one-tabContent">
-        <div class="tab-pane fade show active" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="actuality">
-          <!-- TODO ajouter les 5 derniéres actualités sous forme de caroussel--> 
+        <div class="tab-pane fade" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="actuality">
 
+
+{% if news %}
 <div id="carousel" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
   {% set myVal = 1 %}
@@ -47,9 +50,10 @@
     {% endfor %}
   </div>        
 </div>
+{% endif %}
 
         </div>
-        <div class="tab-pane fade" id="calendrier" role="tabpanel" aria-labelledby="custom-tabs-one-calendar-tab">
+        <div class="tab-pane fade show active" id="calendrier" role="tabpanel" aria-labelledby="custom-tabs-one-calendar-tab">
             <div >
             <!-- THE CALENDAR -->
             <div id="external-events"></div>

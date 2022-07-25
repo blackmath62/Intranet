@@ -12,11 +12,12 @@ use RecursiveIteratorIterator;
 use App\Form\ClosingSocityType;
 use App\Form\ImposeVacationType;
 use Symfony\Component\Mime\Email;
+use App\Form\StatesDateFilterType;
 use Symfony\Component\Mime\Address;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\statusHolidayRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -192,9 +193,20 @@ class HolidayController extends AbstractController
 
         }
         $users = $this->repoUser->findAll();
+        $listCountConges = '';
+        $formDates = $this->createForm(StatesDateFilterType::class);
+        $formDates->handleRequest($request);
+        if($formDates->isSubmitted() && $formDates->isValid()){
+            $start = $formDates->getData()['startDate']->format('Y-m-d');
+            $end = $formDates->getData()['endDate']->format('Y-m-d');
+            $listCountConges = $this->repoHoliday->getVacationTypeListByUsers($start, $end);
+        }
+
         return $this->render('holiday/closing.html.twig',[
             'form' => $form->createView(),
-            'users' => $users
+            'users' => $users,
+            'formDates' => $formDates->createView(),
+            'listCountConges' => $listCountConges,
             ]);
     }
     
@@ -228,8 +240,9 @@ class HolidayController extends AbstractController
                 $utilisateur = $holiday->getUser();
                 $result = $this->repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $utilisateur->getId(), $holiday->getId());
             }else {
+                $holiday_id = 0;
                 $utilisateur = $this->getUser();
-                $result = $this->repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $utilisateur->getId(), $holiday->getId());
+                $result = $this->repoHoliday->getAlreadyInHolidayInThisPeriod($holiday->getStart(), $holiday->getEnd(), $utilisateur->getId(), $holiday_id);
             }
             if ($result) {
                 $this->addFlash('danger', 'Vous avez déjà posé du ' . $result[0]['start'] . ' au ' . $result[0]['end'] );

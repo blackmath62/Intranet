@@ -148,5 +148,162 @@ class HolidayRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    // Liste des types de congés avec des congés acceptés par utilisateurs
+    public function getVacationTypeListByUsers($start, $end)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT pseudo, email, 
+        SUM(conges) AS conges, SUM(rtt) AS rtt, SUM(sansSolde) AS sansSolde, SUM(famille) AS famille, 
+        SUM(maternite) AS maternite, SUM(deces) AS deces, SUM(demenagement) AS demenagement, SUM(autre) AS autre, SUM(total) AS total
+        FROM(
+        SELECT users.pseudo AS pseudo, users.email AS email,
+        CASE
+        WHEN holiday.holidayType_id = 9 THEN holiday.nbJours
+        END AS conges,
+        CASE
+        WHEN holiday.holidayType_id = 15 THEN holiday.nbJours
+        END AS rtt,
+        CASE
+        WHEN holiday.holidayType_id = 10 THEN holiday.nbJours
+        END AS sansSolde,
+        CASE
+        WHEN holiday.holidayType_id = 11 THEN holiday.nbJours
+        END AS famille,
+        CASE
+        WHEN holiday.holidayType_id = 12 THEN holiday.nbJours
+        END AS maternite,
+        CASE
+        WHEN holiday.holidayType_id = 13 THEN holiday.nbJours
+        END AS deces,
+        CASE
+        WHEN holiday.holidayType_id = 14 THEN holiday.nbJours
+        END AS demenagement,
+        CASE
+        WHEN holiday.holidayType_id = 16 THEN holiday.nbJours
+        END AS autre,
+        CASE
+        WHEN holiday.holidayType_id > 0 THEN holiday.nbJours
+        END AS total
+        FROM holiday
+        INNER JOIN users ON users.id = holiday.user_id
+        WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.holidayStatus_id = 3)reponse
+        GROUP BY pseudo, email
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Nombre de jour de congés acceptés pour tous les utilisateurs 
+    public function getCountCongesAcceptedForAllUsers($start, $end)
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT users.pseudo, users.email, holidaytypes.name, holidaytypes.color , holiday.holidayType_id, holiday.holidayStatus_id, SUM(holiday.nbJours) AS nbJours
+        FROM holiday
+        INNER JOIN  holidaytypes ON holiday.holidayType_id = holidaytypes.id
+        INNER JOIN statusholiday ON holiday.holidayStatus_id = statusholiday.id
+        INNER JOIN users ON users.id = holiday.user_id
+        WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.holidayStatus_id = 3
+        GROUP BY users.pseudo, users.email, holidaytypes.name, holidaytypes.color, holiday.holidayType_id, holiday.holidayStatus_id
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Nombre de jour de congés acceptés par utilisateur 
+    public function getCountCongesAccepted($user, $start, $end)
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT holidaytypes.name, holidaytypes.color , holiday.holidayType_id, statusholiday.name AS statusName, holiday.holidayStatus_id, SUM(holiday.nbJours) AS nbJours
+        FROM holiday
+        INNER JOIN  holidaytypes ON holiday.holidayType_id = holidaytypes.id
+        INNER JOIN statusholiday ON holiday.holidayStatus_id = statusholiday.id
+        WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.user_id = $user AND holiday.holidayStatus_id = 3
+        GROUP BY holidaytypes.name, holidaytypes.color,statusholiday.name, holiday.holidayType_id, holiday.holidayStatus_id
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Nombre de jour de congés Refusés par utilisateur 
+    public function getCountCongesRefused($user, $start, $end)
+    {
+        // congés non dépassés avec les services
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT holidaytypes.name, holidaytypes.color , holiday.holidayType_id, statusholiday.name AS statusName, holiday.holidayStatus_id, SUM(holiday.nbJours) AS nbJours
+        FROM holiday
+        INNER JOIN  holidaytypes ON holiday.holidayType_id = holidaytypes.id
+        INNER JOIN statusholiday ON holiday.holidayStatus_id = statusholiday.id
+        WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.user_id = $user AND holiday.holidayStatus_id = 4
+        GROUP BY holidaytypes.name, holidaytypes.color,statusholiday.name, holiday.holidayType_id, holiday.holidayStatus_id
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Nombre de jour de congés en attente par utilisateur 
+    public function getCountCongesWait($user, $start, $end)
+    {
+        // congés non dépassés avec les services
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT holidaytypes.name, holidaytypes.color , holiday.holidayType_id, statusholiday.name AS statusName, holiday.holidayStatus_id, SUM(holiday.nbJours) AS nbJours
+        FROM holiday
+        INNER JOIN  holidaytypes ON holiday.holidayType_id = holidaytypes.id
+        INNER JOIN statusholiday ON holiday.holidayStatus_id = statusholiday.id
+        WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.user_id = $user AND holiday.holidayStatus_id IN (1,2)
+        GROUP BY holidaytypes.name, holidaytypes.color,statusholiday.name, holiday.holidayType_id, holiday.holidayStatus_id
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Liste des jours de congés en attente par utilisateur 
+    public function getListCongesWait($user, $start, $end)
+    {
+        // congés non dépassés avec les services
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT holiday.start, holiday.sliceStart, holiday.end, holiday.sliceEnd, holiday.nbJours, holiday.treatmentedAt, holiday.treatmentedBy_id, holiday.holidayType_id, holiday.holidayStatus_id
+        FROM holiday
+        WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.user_id = $user AND holiday.holidayStatus_id IN (1,2)
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Liste des jours de congés en accepté par utilisateur 
+    public function getListCongesAccepted($user, $start, $end)
+    {
+        // congés non dépassés avec les services
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT holiday.start, holiday.sliceStart, holiday.end, holiday.sliceEnd, holiday.nbJours, holiday.treatmentedAt, holiday.treatmentedBy_id, holiday.holidayType_id, holiday.holidayStatus_id
+        FROM holiday
+        WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.user_id = $user AND holiday.holidayStatus_id IN (3)
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Liste des jours de congés en refusé par utilisateur 
+    public function getListCongesRefused($user, $start, $end)
+    {
+        // congés non dépassés avec les services
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT holiday.start, holiday.sliceStart, holiday.end, holiday.sliceEnd, holiday.nbJours, holiday.treatmentedAt, holiday.treatmentedBy_id, holiday.holidayType_id, holiday.holidayStatus_id
+        FROM holiday
+        WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.user_id = $user AND holiday.holidayStatus_id IN (4)
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
     
 }
