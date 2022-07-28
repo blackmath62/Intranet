@@ -481,7 +481,7 @@ class ConduiteDeTravauxMeController extends AbstractController
        $html = $this->renderView('mails/conduiteDeTravaux.html.twig', ['donnees' => $donnees, 'texte' => $texte ]);
        $email = (new Email())
        ->from($this->mailEnvoi)
-       ->to($this->mailTreatement)
+       ->to('adefaria@lhermitte.fr')
        ->subject('Conduite de travaux - Liste des chantiers programmées dans 7 jours')
        ->html($html);
        $this->mailer->send($email);
@@ -504,7 +504,7 @@ class ConduiteDeTravauxMeController extends AbstractController
        $html = $this->renderView('mails/conduiteDeTravaux.html.twig', ['donnees' => $donnees, 'texte' => $texte ]);
        $email = (new Email())
        ->from($this->mailEnvoi)
-       ->to($this->mailTreatement)
+       ->to('adefaria@lhermitte.fr')
        ->subject('Conduite de travaux - Liste des chantiers Dépassés mais pas Terminés')
        ->html($html);
        $this->mailer->send($email);
