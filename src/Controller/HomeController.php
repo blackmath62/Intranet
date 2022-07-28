@@ -94,7 +94,7 @@ class HomeController extends AbstractController
                 'id' => '',
                 'start' => $key,
                 'end' => $key,
-                'title' => $val,
+                'title' => 'Férié ' . $val,
                 'backgroundColor' => '#404040',
                 'borderColor' => '#FFFFFF',
                 'textColor' => '#FFFFFF',

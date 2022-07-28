@@ -48,6 +48,22 @@ class HolidayRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    // Liste des congés à venir
+    public function getFuturHoliday(){
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT * 
+        FROM holiday
+        INNER JOIN statusHoliday ON holiday.holidayStatus_id = statusHoliday.id
+        INNER JOIN users ON users.id = holiday.user_id 
+        WHERE 
+        holiday.end >= CURRENT_DATE()
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     public function getUserActuallyHoliday($user)
     {
         $conn = $this->getEntityManager()->getConnection();

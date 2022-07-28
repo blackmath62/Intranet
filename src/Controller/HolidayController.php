@@ -139,6 +139,7 @@ class HolidayController extends AbstractController
      */
     public function newClosing(Request $request)
     {
+        $i = 0;
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
@@ -163,8 +164,21 @@ class HolidayController extends AbstractController
                 }elseif ($sliceEnd == 'DAY') {
                     $end = $end->modify("+23 hours");
                 }
+            
+            $id = '';
+
             //intégrer le congés pour chaque utilisateurs
             foreach ($listUsers as $value) {
+
+                // vérifier si cette utilisateur n'a pas déjà déposé durant cette période
+                $holiday_id = 0;
+                $result = $this->repoHoliday->getAlreadyInHolidayInThisPeriod($start, $end, $value->getId(), $holiday_id);
+
+            if ($result) {
+                $this->addFlash('danger',  $value->getpseudo() . ' a déjà posé du ' . $result[0]['start'] . ' au ' . $result[0]['end'] . ' aucun congés n\'a été ajouté pour cette utilisateur');
+                goto end;
+            }
+
             $holiday = new Holiday;
             
             $statut = $this->repoStatuts->findOneBy(['id' => 3]);
@@ -193,9 +207,23 @@ class HolidayController extends AbstractController
             $em = $this->getDoctrine()->getManager();
                     $em->persist($majHoliday);
                     $em->flush();
+                    $i++ ;
 
+                    // Avertir l'utilisateur par mail
+                    $html = $this->renderView('mails/ImposeHoliday.html.twig', ['holiday' => $holiday]);
+                    $email = (new Email())
+                    ->from('intranet@groupe-axis.fr')
+                    ->to($value->getEmail())
+                    ->priority(Email::PRIORITY_HIGH)
+                    ->subject('Dépôt d\'un nouveau congés en votre nom')
+                    ->html($html);
+                    
+                    $this->mailerInterface->send($email);
+                    end:;
             }
-            $this->addFlash('message', 'Le congés a bien été enregistré' );
+            if ($i > 1) {
+                $this->addFlash('message', 'Les congés ont bien été enregistrés' );
+            }
             return $this->redirectToRoute('app_holiday_list');
 
         }
@@ -623,11 +651,7 @@ class HolidayController extends AbstractController
         return $lock;
     }
 
-    // autorité sur les congés
-    public function holiday_authority()
-    {
 
-    }
 
     // envoie de mail 
     public function holiday_send_mail($role, $id,$object,$html)
@@ -665,7 +689,6 @@ class HolidayController extends AbstractController
     
             $this->mailerInterface->send($email);
         }
-        // envoyer un mail à toute la société TODO
 
     }
 }

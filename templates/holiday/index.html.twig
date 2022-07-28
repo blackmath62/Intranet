@@ -55,7 +55,7 @@
                             {% endif %}
                             </td>
                                 <td>{{ holiday.user.pseudo }}</td>
-                                <td><div class="btn" style="background-color: {{ holiday.user.service.color }}; color: {{ holiday.user.service.textColor }}">{{ holiday.user.service.title }}</div></td>
+                                <td><div class="btn" style="background-color: {{ holiday.user.service.color }}; color: {{ holiday.user.service.textColor }}"><i class='pr-2 fa {{ holiday.user.service.fa }}'></i>{{ holiday.user.service.title }}</div></td>
                             {% if holiday.sliceStart == 'AM' %}{% set trancheStart = 'Matin' %}{% elseif holiday.sliceStart == 'PM' %}{% set trancheStart = 'Aprés midi' %}{% else %}{% set trancheStart = 'Journée' %}{% endif %}
                             <td>{{ holiday.start ? holiday.start|date('d-m-Y') : '' }} {{ trancheStart }}</td>
                             {% if holiday.sliceEnd == 'AM' %}{% set trancheEnd = 'Matin' %}{% elseif holiday.sliceEnd == 'PM' %}{% set trancheEnd = 'Aprés midi' %}{% else %}{% set trancheEnd = 'Journée' %}{% endif %}
@@ -142,7 +142,7 @@
         let calendarElt = document.querySelector("#calendar")
         let calendar = new FullCalendar.Calendar(calendarElt, {
           weekNumbers: true, // numéro de semaine
-          weekNumberCalculation: "ISO",
+          weekNumberCalculation: 'ISO',
           initialView:'dayGridMonth',
           locale: 'fr',
           timeZone: 'Europe/Paris',
