@@ -155,7 +155,7 @@ class HolidayRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT pseudo, email, 
         SUM(conges) AS conges, SUM(rtt) AS rtt, SUM(sansSolde) AS sansSolde, SUM(famille) AS famille, 
-        SUM(maternite) AS maternite, SUM(deces) AS deces, SUM(demenagement) AS demenagement, SUM(autre) AS autre, SUM(total) AS total
+        SUM(maternite) AS maternite, SUM(deces) AS deces, SUM(demenagement) AS demenagement,SUM(arretTravail) AS arretTravail, SUM(arretCovid) AS arretCovid, SUM(autre) AS autre, SUM(total) AS total
         FROM(
         SELECT users.pseudo AS pseudo, users.email AS email,
         CASE
@@ -179,6 +179,12 @@ class HolidayRepository extends ServiceEntityRepository
         CASE
         WHEN holiday.holidayType_id = 14 THEN holiday.nbJours
         END AS demenagement,
+        CASE
+        WHEN holiday.holidayType_id = 17 THEN holiday.nbJours
+        END AS arretTravail,
+        CASE
+        WHEN holiday.holidayType_id = 18 THEN holiday.nbJours
+        END AS arretCovid,
         CASE
         WHEN holiday.holidayType_id = 16 THEN holiday.nbJours
         END AS autre,

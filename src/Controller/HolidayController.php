@@ -78,6 +78,7 @@ class HolidayController extends AbstractController
                 ];
             }
             
+            
         // récupérer les fériers en JSON sur le site etalab
         $ferierJson = file_get_contents("https://etalab.github.io/jours-feries-france-data/json/metropole.json");
         // On ajoute les fériers au calendrier des congés
@@ -95,6 +96,7 @@ class HolidayController extends AbstractController
                 'textColor' => '#FFFFFF',
             ];
         }
+        
         // Les anniversaires des utilisateurs
         
         foreach ($users as $key => $value) {
