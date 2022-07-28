@@ -60,23 +60,29 @@ class HolidayController extends AbstractController
          $rdvs = [];
          
          foreach($events as $event){
-             $id = $event->getId();
-             $userId = $this->repoHoliday->getUserIdHoliday($id);
-             $user = $this->repoUser->findOneBy(['id' => $userId]);
-             $pseudo = $user->getPseudo();
-             $color = $user->getService()->getColor();
-             $textColor = $user->getService()->getTextColor();
-             
-             $rdvs[] = [
-                 'id' => $event->getId(),
-                 'start' => $event->getStart()->format('Y-m-d H:i:s'),
-                 'end' => $event->getEnd()->format('Y-m-d H:i:s'),
-                 'title' => 'Congés ' . $pseudo,
-                 'backgroundColor' => $color,
-                 'borderColor' => '#FFFFFF',
-                 'textColor' => $textColor,
-                ];
+            $id = $event->getId();
+            $userId = $this->repoHoliday->getUserIdHoliday($id);
+            $user = $this->repoUser->findOneBy(['id' => $userId]);
+            $pseudo = $user->getPseudo();
+            $color = $user->getService()->getColor();
+            $textColor = $user->getService()->getTextColor();
+            $start = $event->getStart()->format('Y-m-d H:i:s');
+            $end = $event->getEnd()->format('Y-m-d H:i:s');
+            if ($event->getStart()->format('Y-m-d') == $event->getEnd()->format('Y-m-d') && $event->getStart()->format('H:i') == '00:00' && $event->getEnd()->format('H:i') == '23:00') {
+               $start = $event->getStart()->format('Y-m-d');
+               $end = $event->getEnd()->format('Y-m-d');
             }
+
+            $rdvs[] = [
+                'id' => $event->getId(),
+                'start' => $start,
+                'end' => $end,
+                'title' => 'Congés ' . $pseudo,
+                'backgroundColor' => $color,
+                'borderColor' => '#FFFFFF',
+                'textColor' => $textColor,
+               ];
+           }
             
             
         // récupérer les fériers en JSON sur le site etalab

@@ -65,11 +65,17 @@ class HomeController extends AbstractController
              $pseudo = $user->getPseudo();
              $color = $user->getService()->getColor();
              $textColor = $user->getService()->getTextColor();
-             
+             $start = $event->getStart()->format('Y-m-d H:i:s');
+             $end = $event->getEnd()->format('Y-m-d H:i:s');
+             if ($event->getStart()->format('Y-m-d') == $event->getEnd()->format('Y-m-d') && $event->getStart()->format('H:i') == '00:00' && $event->getEnd()->format('H:i') == '23:00') {
+                $start = $event->getStart()->format('Y-m-d');
+                $end = $event->getEnd()->format('Y-m-d');
+             }
+
              $rdvs[] = [
                  'id' => $event->getId(),
-                 'start' => $event->getStart()->format('Y-m-d H:i:s'),
-                 'end' => $event->getEnd()->format('Y-m-d H:i:s'),
+                 'start' => $start,
+                 'end' => $end,
                  'title' => 'Congés ' . $pseudo,
                  'backgroundColor' => $color,
                  'borderColor' => '#FFFFFF',
