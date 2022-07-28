@@ -16,6 +16,7 @@ use App\Form\TypeDocumentFscChoiceType;
 use App\Repository\Main\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\Divalto\MouvRepository;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Container8AgRG4X\getMouvRepositoryService;
@@ -46,8 +47,11 @@ class FscAttachedFileController extends AbstractController
     private $commentairesRepo;
     private $typeDocFscRepo;
     private $usersRepo;
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
 
-    public function __construct(UsersRepository $usersRepo, TypeDocumentFscRepository $typeDocFscRepo, CommentairesRepository $commentairesRepo, MouvRepository $mouvRepo, fscListMovementRepository $repoFsc, EntityManagerInterface $manager, documentsFscRepository $repoDocs,MailerInterface $mailer)
+    public function __construct(MailListRepository $repoMail, UsersRepository $usersRepo, TypeDocumentFscRepository $typeDocFscRepo, CommentairesRepository $commentairesRepo, MouvRepository $mouvRepo, fscListMovementRepository $repoFsc, EntityManagerInterface $manager, documentsFscRepository $repoDocs,MailerInterface $mailer)
     {
         $this->mouvRepo = $mouvRepo;
         $this->repoFsc = $repoFsc;
@@ -57,6 +61,9 @@ class FscAttachedFileController extends AbstractController
         $this->commentairesRepo =$commentairesRepo;
         $this->typeDocFscRepo = $typeDocFscRepo;
         $this->usersRepo = $usersRepo;
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
         //parent::__construct();
     }
     
@@ -535,9 +542,9 @@ class FscAttachedFileController extends AbstractController
            $html = $this->renderView('mails/listePieceFscSansPj.html.twig', ['piecesAnormales' => $piecesAnormales ]);
            // TODO Remettre marina en destinataire des mails.
            $email = (new Email())
-           ->from('intranet@groupe-axis.fr')
+           ->from($this->mailEnvoi)
            ->to('marina@roby-fr.com')
-           ->cc('jpochet@groupe-axis.fr')
+           ->cc($this->mailTreatement)
            ->subject('Liste des piéces sur lesquels il manque les piéces jointes Fsc')
            ->html($html);
            $this->mailer->send($email);

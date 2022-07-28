@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\Main\StatusRepository;
 use App\Repository\Main\TicketsRepository;
 use App\Repository\Main\CommentsRepository;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use App\Repository\Main\PrestataireRepository;
@@ -27,6 +28,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 class CommentsController extends AbstractController
 {
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
+
+    public function __construct(MailListRepository $repoMail)
+    {
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        //parent::__construct();
+    }
+    
     /**
      * @Route("/ticket/comment/add/{id<\d+>}", name="app_comment")
      * @ParamConverter("Comments", options={"id" = "Ticket_id"})
@@ -109,7 +122,7 @@ class CommentsController extends AbstractController
                 $html = $this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]);
                 $pdf = $pdf->getOutputFromHtml($html);
                 $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
+                    ->from($this->mailEnvoi)
                     ->to($data->getEmail())
                     ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle() . " => " . $ticket->getStatu()->getTitle())
                     ->html($html)
@@ -162,7 +175,7 @@ class CommentsController extends AbstractController
                 $html = $this->renderView('mails/sendMailToPrestataire.html.twig', ['Mail' => $formSendAnnuaireTicket->getData(), 'ticket' => $ticket, 'commentsOfTicket' => $commentsOfTicket]);
                 $pdf = $pdf->getOutputFromHtml($html);
                 $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
+                    ->from($this->mailEnvoi)
                     ->to($data->getMail())
                     ->subject('Ticket ' . $ticket->getId() . ' : ' . $ticket->getTitle() . " => " . $ticket->getStatu()->getTitle())
                     ->html($html)

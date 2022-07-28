@@ -2,15 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\Main\ListCmdTraite;
-use Symfony\Component\Mime\Email;
-use App\Repository\Divalto\EntRepository;
-use App\Repository\Main\ListCmdTraiteRepository;
-use Symfony\Component\Mailer\MailerInterface;
 use DateTime;
+use Symfony\Component\Mime\Email;
+use App\Entity\Main\ListCmdTraite;
+use App\Repository\Divalto\EntRepository;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\Main\ListCmdTraiteRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -22,10 +23,17 @@ class OldCmdController extends AbstractController
 {
     private $repoNumCmd;
     private $mailer;
-    public function __construct(ListCmdTraiteRepository $repoNumCmd,MailerInterface $mailer)
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
+
+    public function __construct(MailListRepository $repoMail, ListCmdTraiteRepository $repoNumCmd,MailerInterface $mailer)
     {
         $this->repoNumCmd = $repoNumCmd;
         $this->mailer = $mailer;
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
 
         //parent::__construct();
     }
@@ -112,13 +120,13 @@ class OldCmdController extends AbstractController
         // envoyer un mail
         $html = $this->renderView('mails/MailDeleteCmd.html.twig', ['lockCmd' => $lockCmd]);
         if ($lockCmd->getDossier() == 1) {
-            $destinataire = 'jpochet@lhermitte.fr';
+            $destinataire = $this->mailTreatement;
         }
         if ($lockCmd->getDossier() == 3) {
             $destinataire = 'ndegorre@roby-fr.com';
         }
         $email = (new Email())
-        ->from('intranet@groupe-axis.fr')
+        ->from($this->mailEnvoi)
         ->to($destinataire)
         ->subject('Message Intranet, merci de supprimer la commande ' . $lockCmd->getNumero() . ' pour le dossier ' . $lockCmd->getDossier())
         ->html($html);

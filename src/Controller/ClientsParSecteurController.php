@@ -4,13 +4,14 @@ namespace App\Controller;
 
 use App\Form\ClientsType;
 use Symfony\Component\Mime\Email;
+use App\Repository\Main\UsersRepository;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use App\Repository\Divalto\ClientLhermitteByCommercialRepository;
-use App\Repository\Main\UsersRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -19,6 +20,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ClientsParSecteurController extends AbstractController
 {
+
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
+
+    public function __construct(MailListRepository $repoMail)
+    {
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        //parent::__construct();
+    }
+
     /**
      * @Route("/Lhermitte/clients", name="app_lhermitte_clients_secteur")
      */
@@ -61,7 +75,6 @@ class ClientsParSecteurController extends AbstractController
     public function need($tiers=null, Request $request, MailerInterface $mailer,ClientLhermitteByCommercialRepository $clients): Response
     {
                 
-        
         if ($tiers) {
             $mail = $clients->getClient($tiers);
             $nom = $mail['Nom'];
@@ -69,11 +82,11 @@ class ClientsParSecteurController extends AbstractController
                 $mail = trim($mail['Email']);
             }
             if ($mail == '') {
-                $mail ='jpochet@lhermitte.fr';
+                $mail =$this->mailTreatement;
             }
 
             $email = (new Email())
-                        ->from('intranet@groupe-axis.fr')
+                        ->from($this->mailEnvoi)
                         ->to($this->getUser()->getEmail(),$mail)
                         ->subject('J\'aimerai récupérer ce client ' . $tiers)
                         ->html('Bonjour, </br> j\'aimerai suivre le client ' . $tiers . $nom );
@@ -102,8 +115,8 @@ class ClientsParSecteurController extends AbstractController
         if ($tiers) {
 
             $email = (new Email())
-                        ->from('intranet@groupe-axis.fr')
-                        ->to('jpochet@lhermitte.fr')
+                        ->from($this->mailEnvoi)
+                        ->to($this->mailTreatement)
                         ->subject('Merci de fermer ce client ' . $tiers)
                         ->html('Bonjour, </br> Merci de fermer le client ' . $tiers );
                     $mailer->send($email);

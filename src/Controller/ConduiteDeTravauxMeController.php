@@ -12,21 +12,22 @@ use App\Form\OthersDocumentsType;
 use Symfony\Component\Mime\Email;
 use App\Entity\Main\OthersDocuments;
 use App\Entity\Main\ConduiteDeTravauxMe;
-use App\Entity\Main\ConduiteTravauxAddPiece;
-use App\Form\AddPieceConduiteTravauxType;
 use App\Repository\Main\UsersRepository;
+use App\Form\AddPieceConduiteTravauxType;
 use App\Form\ConduiteTravauxAlimenterType;
 use App\Repository\Divalto\MouvRepository;
+use App\Repository\Main\MailListRepository;
+use App\Entity\Main\ConduiteTravauxAddPiece;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\Main\CommentairesRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\OthersDocumentsRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\Main\ConduiteDeTravauxMeRepository;
 use App\Repository\Main\ConduiteTravauxAddPieceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ConduiteDeTravauxMeController extends AbstractController
 {
@@ -37,8 +38,11 @@ class ConduiteDeTravauxMeController extends AbstractController
     private $repoDocs;
     private $mailer;
     private $repoAddPieces;
-
-    public function __construct(ConduiteTravauxAddPieceRepository $repoAddPieces, OthersDocumentsRepository $repoDocs,MailerInterface $mailer, CommentairesRepository $repoComments, ConduiteDeTravauxMeRepository $repoConduite, MouvRepository $repoMouv, UsersRepository $repoUser)
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
+    
+    public function __construct(MailListRepository $repoMail, ConduiteTravauxAddPieceRepository $repoAddPieces, OthersDocumentsRepository $repoDocs,MailerInterface $mailer, CommentairesRepository $repoComments, ConduiteDeTravauxMeRepository $repoConduite, MouvRepository $repoMouv, UsersRepository $repoUser)
     {
         $this->repoMouv = $repoMouv;
         $this->repoConduite = $repoConduite;
@@ -47,8 +51,12 @@ class ConduiteDeTravauxMeController extends AbstractController
         $this->repoDocs = $repoDocs;
         $this->mailer = $mailer;
         $this->repoAddPieces = $repoAddPieces;
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
         //parent::__construct();
     }
+
 
     /**
      * @Route("/Lhermitte/conduite/travaux/num/ajout/ajax/{num}/{type}",name="app_conduite_de_travaux_me_add_num_piece")
@@ -472,9 +480,8 @@ class ConduiteDeTravauxMeController extends AbstractController
        $texte = 'Veuillez trouver ci dessous la liste des chantiers qui débutent dans 7 jours : ';
        $html = $this->renderView('mails/conduiteDeTravaux.html.twig', ['donnees' => $donnees, 'texte' => $texte ]);
        $email = (new Email())
-       ->from('intranet@groupe-axis.fr')
-       ->to('jpochet@groupe-axis.fr')
-       //->cc('jpochet@lhermitte.fr')
+       ->from($this->mailEnvoi)
+       ->to($this->mailTreatement)
        ->subject('Conduite de travaux - Liste des chantiers programmées dans 7 jours')
        ->html($html);
        $this->mailer->send($email);
@@ -496,9 +503,8 @@ class ConduiteDeTravauxMeController extends AbstractController
        $texte = 'Veuillez trouver ci dessous la liste des chantiers dépassé mais pas Terminé : ';
        $html = $this->renderView('mails/conduiteDeTravaux.html.twig', ['donnees' => $donnees, 'texte' => $texte ]);
        $email = (new Email())
-       ->from('intranet@groupe-axis.fr')
-       ->to('jpochet@groupe-axis.fr')
-       //->cc('jpochet@lhermitte.fr')
+       ->from($this->mailEnvoi)
+       ->to($this->mailTreatement)
        ->subject('Conduite de travaux - Liste des chantiers Dépassés mais pas Terminés')
        ->html($html);
        $this->mailer->send($email);

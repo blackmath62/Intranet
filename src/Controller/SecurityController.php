@@ -9,6 +9,7 @@ use App\Form\ModifiedPasswordType;
 use App\Form\UserRegistrationFormType;
 use App\Repository\Main\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,17 @@ class SecurityController extends AbstractController
 {
 
     public const LAST_EMAIL = 'app_login_form_last_email';
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
+
+    public function __construct(MailListRepository $repoMail)
+    {
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        //parent::__construct();
+    }
 
     /**
      * @Route("/login", name="app_login" , methods={"GET", "POST"})
@@ -78,7 +90,7 @@ class SecurityController extends AbstractController
             $em->flush();
 
             $email = (new Email())
-                ->from('intranet@groupe-axis.fr')
+                ->from($this->mailEnvoi)
                 ->to($user->getEmail())
                 //->cc('cc@example.com')
                 //->bcc('bcc@example.com')
@@ -91,8 +103,8 @@ class SecurityController extends AbstractController
             $mailerInterface->send($email);
 
             $emailAdmin = (new Email())
-                ->from('intranet@groupe-axis.fr')
-                ->to('jpochet@lhermitte.fr')
+                ->from($this->mailEnvoi)
+                ->to($this->mailTreatement)
                 //->cc('cc@example.com')
                 //->bcc('bcc@example.com')
                 //->replyTo('fabien@example.com')
@@ -137,7 +149,7 @@ class SecurityController extends AbstractController
             $em->flush();
 
             $email = (new Email())
-                ->from('intranet@groupe-axis.fr')
+                ->from($this->mailEnvoi)
                 ->to($user->getEmail())
                 ->priority(Email::PRIORITY_HIGH)
                 ->subject('Modification de votre mot de passe !')

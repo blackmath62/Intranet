@@ -11,6 +11,7 @@ use App\Form\FactureFournisseursFscType;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Divalto\EntRepository;
 use App\Repository\Divalto\MouvRepository;
+use App\Repository\Main\MailListRepository;
 use App\Repository\Main\MovBillFscRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
@@ -32,8 +33,11 @@ class MovementBillFscController extends AbstractController
     private $repoDocs;
     private $mailer;
     private $repoBill;
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
 
-    public function __construct(MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt,MailerInterface $mailer)
+    public function __construct(MailListRepository $repoMail, MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt,MailerInterface $mailer)
     {
         $this->repoFact = $repoFact;
         $this->repoEnt = $repoEnt;
@@ -41,8 +45,12 @@ class MovementBillFscController extends AbstractController
         $this->mailer = $mailer;
         $this->repoDocs = $repoDocs;
         $this->repoBill = $repoBill;
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
         //parent::__construct();
-    }    
+    }
+
     
     /**
      * @Route("/Roby/movement/bill/fsc", name="app_movement_bill_fsc")
@@ -130,9 +138,9 @@ class MovementBillFscController extends AbstractController
             $html = $this->renderView('mails/listePieceFscClientSansLiaison.html.twig', ['piecesAnormales' => $piecesAnormales ]);
             // TODO Remettre Nathalie en destinataire des mails.
             $email = (new Email())
-            ->from('intranet@groupe-axis.fr')
-            ->to('jpochet@groupe-axis.fr')
-            ->cc('jpochet@groupe-axis.fr')
+            ->from($this->mailEnvoi)
+            ->to('ndegorre@roby-fr.com')
+            ->cc($this->mailTreatement)
             ->subject("Liste des piéces clients FSC sur lesquels il n'y a pas de liaison")
             ->html($html);
             $this->mailer->send($email);

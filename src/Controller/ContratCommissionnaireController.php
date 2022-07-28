@@ -31,6 +31,7 @@ class ContratCommissionnaireController extends AbstractController
     private $repoMouv;
     private $mailer;
     private $repoMail;
+    private $mailEnvoi;
     
     public function __construct(ProduitsCommissionnairesRepository $cc, MouvRepository $repoMouv,MailerInterface $mailer, MailListRepository $repoMail)
     {
@@ -38,6 +39,8 @@ class ContratCommissionnaireController extends AbstractController
         $this->cc = $cc;
         $this->repoMail = $repoMail;
         $this->repoMouv = $repoMouv;
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
         //parent::__construct();
     }
 
@@ -170,9 +173,8 @@ class ContratCommissionnaireController extends AbstractController
                     // envoyer un mail
                     $html = $this->renderView('mails/mailContratCommissionnaire.html.twig', ['mouvs' => $mouvs, 'annee' => $annee, 'mois' => $mois ]);
                     $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
+                    ->from($this->mailEnvoi)
                     ->to(...$mails)
-                    ->cc('jpochet@groupe-axis.fr')
                     ->subject('Liste des ventes de produits sous contrat commissionnaire')
                     ->html($html);
                     $this->mailer->send($email);

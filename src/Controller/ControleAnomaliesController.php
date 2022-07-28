@@ -2,26 +2,27 @@
 
 namespace App\Controller;
 
-use App\Entity\Main\CmdRobyDelaiAccepteReporte;
 use DateTime;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
 use App\Entity\Main\ControlesAnomalies;
 use App\Repository\Divalto\ArtRepository;
 use App\Repository\Divalto\CliRepository;
+use App\Repository\Divalto\EntRepository;
 use App\Repository\Divalto\FouRepository;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Repository\Divalto\MouvRepository;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use App\Entity\Main\CmdRobyDelaiAccepteReporte;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\ControlesAnomaliesRepository;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Repository\Divalto\ControleComptabiliteRepository;
 use App\Repository\Divalto\ControleArtStockMouvEfRepository;
-use App\Repository\Divalto\EntRepository;
-use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\CmdRobyDelaiAccepteReporteRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -47,8 +48,11 @@ class ControleAnomaliesController extends AbstractController
     private $conduiteDeTravauxMeController;
     private $movementBillFscController;
     private $movRepo;
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
 
-    public function __construct(MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(MailListRepository $repoMail, MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -65,8 +69,12 @@ class ControleAnomaliesController extends AbstractController
         $this->conduiteDeTravauxMeController = $conduiteDeTravauxMeController;
         $this->movRepo = $movRepo;
         $this->movementBillFscController;
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
         //parent::__construct();
     }
+
     
     public function lancer_macro(){
         $this->ControlStockDirect();
@@ -313,9 +321,8 @@ class ControleAnomaliesController extends AbstractController
                 // envoyer un mail
                 $html = $this->renderView($template, ['anomalie' => $donnees[$lig]]);
                 $email = (new Email())
-                ->from('intranet@groupe-axis.fr')
+                ->from($this->mailEnvoi)
                 ->to($donnees[$lig]['Email'])
-                ->cc('jpochet@lhermitte.fr')
                 ->subject($subject . '- id: ' . $donnees[$lig]['Identification'] . ' - Type: ' . $libelle)
                 ->html($html);
                 $this->mailer->send($email);
@@ -329,9 +336,8 @@ class ControleAnomaliesController extends AbstractController
                     // envoyer un mail
                     $html = $this->renderView($template, ['anomalie' => $donnees[$lig]]);
                     $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
+                    ->from($this->mailEnvoi)
                     ->to($donnees[$lig]['Email'])
-                    ->cc('jpochet@lhermitte.fr')
                     ->subject($subject . '- id: ' . $donnees[$lig]['Identification'] . ' - Type: ' . $libelle)
                     ->html($html);
                     $this->mailer->send($email);
@@ -442,16 +448,12 @@ class ControleAnomaliesController extends AbstractController
                     }
                 }
                 
-                /*$MailsList = [
-                    new Address('jpochet@lhermitte.fr')];*/
                 if ($MailsList) {
-                    # code...
-                    //dd($MailsList);
                     $html = $this->renderView('mails/sendMailForUsersArticleAFermer.html.twig', ['produits' => $produits, 'Srefs' => $Srefs ]);
                     $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
+                    ->from($this->mailEnvoi)
                     ->to(...$MailsList)
-                    ->cc('jpochet@lhermitte.fr')
+                    ->cc($this->mailTreatement)
                     ->subject('INFORMATION Articles qui vont être fermés Divalto')
                     ->html($html);
                     $this->mailer->send($email);        
@@ -597,8 +599,8 @@ class ControleAnomaliesController extends AbstractController
 
                 $html = $this->renderView('mails/sendMailArticleAFermer.html.twig', ['produits' => $produits ]);
                 $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
-                    ->to('jpochet@lhermitte.fr')
+                    ->from($this->mailEnvoi)
+                    ->to($this->mailTreatement)
                     ->subject('Sous références Article Divalto à fermer')
                     ->html($html)
                     ->attachFromPath($temp_file, $fileName, 'application/msexcel');
@@ -767,8 +769,8 @@ class ControleAnomaliesController extends AbstractController
 
                 $html = $this->renderView('mails/sendMailArticleAFermer.html.twig', ['produits' => $produits ]);
                 $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
-                    ->to('jpochet@lhermitte.fr')
+                    ->from($this->mailEnvoi)
+                    ->to($this->mailTreatement)
                     ->subject('Article Divalto à fermer')
                     ->html($html)
                     ->attachFromPath($temp_file, $fileName, 'application/msexcel');
@@ -903,31 +905,14 @@ class ControleAnomaliesController extends AbstractController
 
                 $html = $this->renderView('mails/sendMailAnomalieStockDirect.html.twig');
                 $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
+                    ->from($this->mailEnvoi)
                     ->to(...$MailsList)
-                    ->cc('jpochet@lhermitte.fr')
                     ->subject('Liste des Stocks Direct de Divalto')
                     ->html($html)
                     ->attachFromPath($temp_file, $fileName, 'application/msexcel');
                 $this->mailer->send($email);
         }
   
-    }
-
-    /**
-     * @Route("/controle/anomalies/TEST", name="app_controle_anomalies_test")
-     */ 
-    public function getCreationArticleVivien()
-    {
-        $html = $this->renderView('mails/sendMailArticleCreerModifierVivien.html.twig', ['articles' => $this->article->ControleCreationVivienArticle() ]);
-                $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
-                    ->to('jpochet@lhermitte.fr')
-                    ->subject('Article et sous références créér par Vivien')
-                    ->html($html);
-                $this->mailer->send($email);
-
-        return $this->render('test/pageVide.html.twig');
     }
 
 }

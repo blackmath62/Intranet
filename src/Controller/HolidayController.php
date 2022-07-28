@@ -15,6 +15,7 @@ use App\Form\StatesDateFilterType;
 use Symfony\Component\Mime\Address;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Main\HolidayRepository;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,13 +34,19 @@ class HolidayController extends AbstractController
     private $repoHoliday;
     private $repoStatuts;
     private $repoUser;
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
 
-    public function __construct(MailerInterface $mailerInterface, HolidayRepository $repoHoliday,statusHolidayRepository $repoStatuts, UsersRepository $repoUser)
+    public function __construct(MailListRepository $repoMail, MailerInterface $mailerInterface, HolidayRepository $repoHoliday,statusHolidayRepository $repoStatuts, UsersRepository $repoUser)
     {
         $this->mailerInterface = $mailerInterface;
         $this->repoHoliday = $repoHoliday;
         $this->repoStatuts = $repoStatuts;
         $this->repoUser = $repoUser;
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
     }
 
     /**
@@ -212,7 +219,7 @@ class HolidayController extends AbstractController
                     // Avertir l'utilisateur par mail
                     $html = $this->renderView('mails/ImposeHoliday.html.twig', ['holiday' => $holiday]);
                     $email = (new Email())
-                    ->from('intranet@groupe-axis.fr')
+                    ->from($this->mailEnvoi)
                     ->to($value->getEmail())
                     ->priority(Email::PRIORITY_HIGH)
                     ->subject('Dépôt d\'un nouveau congés en votre nom')
@@ -668,7 +675,7 @@ class HolidayController extends AbstractController
                 ];
             }    
                 $email = (new Email())
-                ->from('intranet@groupe-axis.fr')
+                ->from($this->mailEnvoi)
                 ->to(...$MailsList)
                 ->priority(Email::PRIORITY_HIGH)
                 ->subject($object)
@@ -681,7 +688,7 @@ class HolidayController extends AbstractController
             // Chercher le mail du dépositaire du congés
             $userMail = $this->repoUser->getFindEmail($id)['email'] ;   
             $email = (new Email())
-            ->from('intranet@groupe-axis.fr')
+            ->from($this->mailEnvoi)
             ->to($userMail)
             ->priority(Email::PRIORITY_HIGH)
             ->subject($object)

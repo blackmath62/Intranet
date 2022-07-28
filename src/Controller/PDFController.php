@@ -6,6 +6,7 @@ use Knp\Snappy\Pdf;
 use App\Entity\Main\Users;
 use Symfony\Component\Mime\Email;
 use App\Repository\Main\FAQRepository;
+use App\Repository\Main\MailListRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class PdfController extends AbstractController
 {
+    private $repoMail;
+    private $mailEnvoi;
+
+    public function __construct(MailListRepository $repoMail)
+    {
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        //parent::__construct();
+    }
+
     /**
      * @Route("/pdf/faq/{id}", name="app_send_pdf_faq")
      */
@@ -32,7 +43,7 @@ class PdfController extends AbstractController
             $html = $this->renderView('mails/MailFaq.html.twig', ['faq' => $faq, 'user' => $user]);
             $pdf = $pdf->getOutputFromHtml($htmlPdf);
             $email = (new Email())
-                ->from('intranet@groupe-axis.fr')
+                ->from($this->mailEnvoi)
                 ->to($this->getUser()->getEmail())
                 ->subject('Tutoriel PDF : ' . $faq->getTitle())
                 ->html($html)

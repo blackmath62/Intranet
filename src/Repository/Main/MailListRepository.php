@@ -19,6 +19,31 @@ class MailListRepository extends ServiceEntityRepository
         parent::__construct($registry, MailList::class);
     }
 
+    // Email d'envoi
+    public function getEmailEnvoi(){
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT maillist.email AS email
+        FROM maillist WHERE maillist.page = 'app_admin_email' AND maillist.SecondOption = 'envoi'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    // Email de traitement
+    public function getEmailTreatement(){
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT maillist.email AS email
+        FROM maillist WHERE maillist.page = 'app_admin_email' AND maillist.SecondOption = 'traitement'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+
     // /**
     //  * @return MailList[] Returns an array of MailList objects
     //  */

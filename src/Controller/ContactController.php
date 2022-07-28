@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Form\ContactType;
 use Symfony\Component\Mime\Email;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,6 +16,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class ContactController extends AbstractController
 {
+    
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
+
+    public function __construct(MailListRepository $repoMail)
+    {
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        //parent::__construct();
+    }
+    
     /**
      * @Route("/contact", name="app_contact")
      */
@@ -30,8 +44,8 @@ class ContactController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
             $data = $form->getData();
         $email = (new Email())
-            ->from('intranet@groupe-axis.fr')
-            ->to('jpochet@lhermitte.fr')
+            ->from($this->mailEnvoi)
+            ->to($this->mailTreatement)
             ->subject($data['objet'])
             ->html($this->renderView('mails/contact.html.twig', ['contact' => $form->getData()]));
 

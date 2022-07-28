@@ -9,6 +9,7 @@ use Symfony\Component\Mime\Email;
 use App\Repository\Main\NoteRepository;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Divalto\EntRepository;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,13 +30,19 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
     private $cmdRoby;
     private $Users;
     private $entete;
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
 
-    public function __construct(EntRepository $entete,UsersRepository $Users, CmdRobyDelaiAccepteReporteRepository $cmdRoby,MailerInterface $mailer)
+    public function __construct(EntRepository $entete,UsersRepository $Users, CmdRobyDelaiAccepteReporteRepository $cmdRoby,MailerInterface $mailer, MailListRepository $repoMail)
     {
         $this->mailer = $mailer;
         $this->cmdRoby = $cmdRoby;
         $this->Users = $Users;
         $this->entete = $entete;
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
 
         //parent::__construct();
     }
@@ -382,9 +389,8 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         // envoyer un mail
        $html = $this->renderView('mails/cmdRobyDelaiAccepteReporte.html.twig', ['commandesSansDelais' => $commandesSansDelai, 'commandesAvecDelais' => $commandesAvecDelai, 'commandesDelaiDepasses' => $commandesDelaiDepasse ]);
        $email = (new Email())
-       ->from('intranet@groupe-axis.fr')
+       ->from($this->mailEnvoi)
        ->to('ndegorre@roby-fr.com','kkupczak@roby-fr.com')
-       //->cc('jpochet@lhermitte.fr')
        ->subject('Liste des commandes avec Délais et sans délais')
        ->html($html);
        $this->mailer->send($email);
