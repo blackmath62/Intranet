@@ -198,6 +198,21 @@ class Users implements UserInterface
      * @ORM\OneToMany(targetEntity=ConduiteTravauxAddPiece::class, mappedBy="createdBy")
      */
     private $conduiteTravauxAddPieces;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $ev;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $hp;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $me;
    
     public function __construct()
     {
@@ -995,6 +1010,42 @@ class Users implements UserInterface
                 $conduiteTravauxAddPiece->setCreatedBy(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEv(): ?bool
+    {
+        return $this->ev;
+    }
+
+    public function setEv(?bool $ev): self
+    {
+        $this->ev = $ev;
+
+        return $this;
+    }
+
+    public function getHp(): ?bool
+    {
+        return $this->hp;
+    }
+
+    public function setHp(?bool $hp): self
+    {
+        $this->hp = $hp;
+
+        return $this;
+    }
+
+    public function getMe(): ?bool
+    {
+        return $this->me;
+    }
+
+    public function setMe(?bool $me): self
+    {
+        $this->me = $me;
 
         return $this;
     }

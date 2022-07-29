@@ -6,6 +6,7 @@ use DateTime;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
 use App\Entity\Main\ControlesAnomalies;
+use App\Controller\AdminEmailController;
 use App\Repository\Divalto\ArtRepository;
 use App\Repository\Divalto\CliRepository;
 use App\Repository\Divalto\EntRepository;
@@ -24,6 +25,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Repository\Divalto\ControleComptabiliteRepository;
 use App\Repository\Divalto\ControleArtStockMouvEfRepository;
 use App\Repository\Main\CmdRobyDelaiAccepteReporteRepository;
+use App\Repository\Main\UsersRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -51,8 +53,10 @@ class ControleAnomaliesController extends AbstractController
     private $repoMail;
     private $mailEnvoi;
     private $mailTreatement;
+    private $adminEmailController;
+    private $repoUsers;
 
-    public function __construct(MailListRepository $repoMail, MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -68,10 +72,12 @@ class ControleAnomaliesController extends AbstractController
         $this->contratCommissionnaireController = $contratCommissionnaireController;
         $this->conduiteDeTravauxMeController = $conduiteDeTravauxMeController;
         $this->movRepo = $movRepo;
-        $this->movementBillFscController;
+        $this->movementBillFscController = $movementBillFscController;
         $this->repoMail =$repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
         $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->adminEmailController = $adminEmailController;
+        $this->repoUsers = $repoUsers;
         //parent::__construct();
     }
 
@@ -421,29 +427,19 @@ class ControleAnomaliesController extends AbstractController
                 $EV = in_array('EV',$metier);
                 $HP = in_array('HP',$metier);
                 $ME = in_array('ME',$metier);
-                if ($EV == true | $HP == true) {
-                    $MailsList = [
-                        new Address('dlouchart@lhermitte.fr'),
-                        new Address('clerat@lhermitte.fr'),
-                        new Address('ctrannin@lhermitte.fr'),
-                        new Address('bgovaere@lhermitte.fr'),
-                        new Address('twrazidlo@lhermitte.fr'),
-                        new Address('ymalmonte@lhermitte.fr'),
-                        new Address('xdupire@lhermitte.fr'),
-                        new Address('lleleu@lhermitte.fr'),
-                        new Address('rvasset@lhermitte.fr'),
-                    ];
+                if ($ME == false) {
+                    if (($EV == true | $HP == true)) {
+                        $treatementMails = $this->repoUsers->getFindUsersEvHp();
+                        $MailsList = $this->adminEmailController->formateEmailList($treatementMails);     
+                    }
                 }
                 if ($ME == true) {
                     if ($EV == true | $HP == true) {
-                        array_push($MailsList, new Address('adeschodt@lhermitte.fr'),
-                                               new Address('crichard@lhermitte.fr')
-                        );
+                        $treatementMails = $this->repoUsers->getFindUsersEvHpMe();
+                        $MailsList = $this->adminEmailController->formateEmailList($treatementMails);
                     }else {
-                        $MailsList = [
-                            new Address('adeschodt@lhermitte.fr'),
-                            new Address('crichard@lhermitte.fr'),
-                        ];
+                        $treatementMails = $this->repoUsers->findBy(['me' => 1]);
+                        $MailsList = $this->adminEmailController->formateEmailList($treatementMails);
                     }
                 }
                 

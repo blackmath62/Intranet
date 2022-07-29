@@ -40,6 +40,15 @@
 											<span>roles</span>
 										</th>
 										<th class="text-center">
+											<span>Mail EV</span>
+										</th>
+										<th class="text-center">
+											<span>Mail HP</span>
+										</th>
+										<th class="text-center">
+											<span>Mail ME</span>
+										</th>
+										<th class="text-center">
 											<span>Actions</span>
 										</th>
 									</tr>
@@ -65,10 +74,31 @@
 													{{ user.service.title }}
 												{% endif %}
 												</td>
-												<td class="text-center col-6">
+												<td class="text-center col-3">
 													{% for role in user.roles %}
 														{{ role }}
 													{% endfor %}
+												</td>												
+												<td class='text-center col-1'>
+													{% if user.ev == true %}
+														<a href="{{ path('app_admin_users_change_metier', {'id' : user.id, 'metier': 'ev', 'value': 0}) }}"><i class="fas fa-lock-open text-success"></i></a>
+													{% else %}
+														<a href="{{ path('app_admin_users_change_metier', {'id' : user.id, 'metier': 'ev', 'value': 1}) }}"><i class="fas fa-lock text-danger"></i></a>
+													{% endif %}
+												</td>
+												<td class='text-center col-1'>
+													{% if user.hp == true %}
+														<a href="{{ path('app_admin_users_change_metier', {'id' : user.id, 'metier': 'hp', 'value': 0}) }}"><i class="fas fa-lock-open text-success"></i></a>
+													{% else %}
+														<a href="{{ path('app_admin_users_change_metier', {'id' : user.id, 'metier': 'hp', 'value': 1}) }}"><i class="fas fa-lock text-danger"></i></a>
+													{% endif %}
+												</td>
+												<td class='text-center col-1'>
+													{% if user.me == true %}
+														<a href="{{ path('app_admin_users_change_metier', {'id' : user.id, 'metier': 'me', 'value': 0}) }}"><i class="fas fa-lock-open text-success"></i></a>
+													{% else %}
+														<a href="{{ path('app_admin_users_change_metier', {'id' : user.id, 'metier': 'me', 'value': 1}) }}"><i class="fas fa-lock text-danger"></i></a>
+													{% endif %}
 												</td>
 												<td class="text-center col-1">
 													<a class="btn btn-warning" href="{{ path('app_edit_user', {'id' : user.id}) }}"><i class="fas fa-edit"></i></a>
@@ -102,6 +132,15 @@
 										</th>
 										<th class="text-center">
 											<span>roles</span>
+										</th>
+										<th class="text-center">
+											<span>Mail EV</span>
+										</th>
+										<th class="text-center">
+											<span>Mail HP</span>
+										</th>
+										<th class="text-center">
+											<span>Mail ME</span>
 										</th>
 										<th class="text-center">
 											<span>Actions</span>

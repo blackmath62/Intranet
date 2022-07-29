@@ -46,4 +46,30 @@ class UsersRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    // Liste des utilisateurs avec Ev ou Hp à true
+    public function getFindUsersEvHp()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT users.email
+        FROM users
+        WHERE users.ev = 1 OR users.hp = 1
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Liste des utilisateurs avec Ev Me ou Hp à true
+    public function getFindUsersEvHpMe()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT users.email
+        FROM users
+        WHERE users.ev = 1 OR users.hp = 1 OR users.me = 1
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
 }

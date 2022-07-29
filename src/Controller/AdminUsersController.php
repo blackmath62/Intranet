@@ -6,6 +6,7 @@ use DateTime;
 use App\Entity\Main\Users;
 use App\Form\EditUsersType;
 use App\Repository\Main\UsersRepository;
+use Proxies\__CG__\App\Entity\Users as EntityUsers;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -35,6 +36,32 @@ class AdminUsersController extends AbstractController
             'title' => 'Administration des Utilisateurs',
             'users' => $users,
         ]);
+    }
+
+    /**
+     * @Route("/admin/users/change/metier/{id}/{metier}/{value}", name="app_admin_users_change_metier")
+     */
+    public function getChangeMetier($metier, $value, Request $request, Users $user)
+    {
+        if ($metier == 'ev') {
+            $user->setEv($value);
+        }elseif ($metier == 'hp') {
+            $user->setHp($value);
+        }elseif ($metier == 'me') {
+            $user->setMe($value);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+                $em->persist($user);
+                $em->flush();
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
+        
+        $this->addFlash('message', 'Utilisateur modifié avec succès');
+        return $this->redirectToRoute('app_admin_users');
     }
     /**
      * Modifier un Utilisateur

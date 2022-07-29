@@ -40,11 +40,13 @@ class MovementBillFscController extends AbstractController
     private $mailEnvoi;
     private $mailTreatement;
     private $adminEmailController;
+    private $repoUsers;
 
-    public function __construct(AdminEmailController $adminEmailController,MailListRepository $repoMail, MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt,MailerInterface $mailer)
+    public function __construct(UsersRepository $repoUsers, AdminEmailController $adminEmailController,MailListRepository $repoMail, MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt,MailerInterface $mailer)
     {
         $this->repoFact = $repoFact;
         $this->repoEnt = $repoEnt;
+        $this->repoUsers = $repoUsers;
         $this->repoMouv = $repoMouv;
         $this->mailer = $mailer;
         $this->repoDocs = $repoDocs;
@@ -129,29 +131,31 @@ class MovementBillFscController extends AbstractController
      * @Route("/Roby/movement/bill/fsc/update", name="app_movement_bill_fsc_update")
      */
     // on ajoute les factures clients qui n'y sont pas déjà
-    public function update(UsersRepository $users): Response
+    public function update(): Response
     {
-        $user = $users->findOneBy(['pseudo' => 'intranet']);
+        $user = $this->repoUsers->findOneBy(['pseudo' => 'intranet']);
             $factures = $this->repoEnt->getMouvfactCliFsc();
-            foreach ($factures as $value) {
-                $bill = $this->repoFact->findOneBy(['facture' => $value['facture']]);
-                if ($bill == NULL) {
-                    $bill = new MovBillFsc();
-                    $bill->setCreatedAt(new DateTime())
-                    ->setCreatedBy($user)
-                    ->setFacture($value['facture'])
-                    ->setdateFact(new DateTime($value['dateFacture']))
-                    ->setTiers($value['tiers'])
-                    ->setNom($value['nom'])
-                    ->setNotreRef($value['notreRef'])
-                    ->setTypeTiers($value['typeTiers']);
-                    
+            if ($factures) {
+                foreach ($factures as $value) {
+                    $bill = $this->repoFact->findOneBy(['facture' => $value['facture']]);
+                    if ($bill == NULL) {
+                        $bill = new MovBillFsc();
+                        $bill->setCreatedAt(new DateTime())
+                        ->setCreatedBy($user)
+                        ->setFacture($value['facture'])
+                        ->setdateFact(new DateTime($value['dateFacture']))
+                        ->setTiers($value['tiers'])
+                        ->setNom($value['nom'])
+                        ->setNotreRef($value['notreRef'])
+                        ->setTypeTiers($value['typeTiers']);
+                        
+                    }
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->persist($bill);
+                    $entityManager->flush();
                 }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($bill);
-            $entityManager->flush();
-    }
-    $this->sendMailVenteSansLiaison();
+                $this->sendMailVenteSansLiaison();
+            }
 
         $this->addFlash('message', 'Mise à jour effectuée avec succés');
         return $this->redirectToRoute('app_movement_bill_fsc');
@@ -168,7 +172,6 @@ class MovementBillFscController extends AbstractController
         if (count($piecesAnormales) > 0) {
             // envoyer un mail
             $html = $this->renderView('mails/listePieceFscClientSansLiaison.html.twig', ['piecesAnormales' => $piecesAnormales ]);
-            // TODO Remettre Nathalie en destinataire des mails.
             $email = (new Email())
             ->from($this->mailEnvoi)
             ->to(...$mails)
