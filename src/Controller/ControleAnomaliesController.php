@@ -111,15 +111,14 @@ class ControleAnomaliesController extends AbstractController
                 $this->contratCommissionnaireController->sendMail();
             }
         }
-        // envoyer les mails conduite de travaux
-        $this->conduiteDeTravauxMeController->update();
-
+        
         if ($this->isWeekend($dateDuJour) == false) {
             $this->ControleClient();
             $this->ControleFournisseur();
             $this->ControleArticle();
             $this->ControlStockDirect(); // j'ai mis Utilisateur
             $this->movementBillFscController->update(); // Envoyer les mails à la référente sur les ventes FSC.
+            $this->conduiteDeTravauxMeController->update(); // envoyer les mails conduite de travaux
             if ($heure >= 8 && $heure < 20) {
                 $this->fscAttachedFileController->majFscOrderListFromDivalto();
             if ($jour == 5 || $jour == 1) {

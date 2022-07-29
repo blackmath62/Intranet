@@ -3,14 +3,17 @@
 namespace App\Controller;
 
 use DateTime;
+use App\Form\AddEmailType;
 use RecursiveArrayIterator;
 use App\Entity\Main\Comments;
+use App\Entity\Main\MailList;
 use App\Form\CommentairesType;
 use RecursiveIteratorIterator;
 use App\Entity\Main\Commentaires;
 use App\Form\OthersDocumentsType;
 use Symfony\Component\Mime\Email;
 use App\Entity\Main\OthersDocuments;
+use App\Controller\AdminEmailController;
 use App\Entity\Main\ConduiteDeTravauxMe;
 use App\Repository\Main\UsersRepository;
 use App\Form\AddPieceConduiteTravauxType;
@@ -41,8 +44,9 @@ class ConduiteDeTravauxMeController extends AbstractController
     private $repoMail;
     private $mailEnvoi;
     private $mailTreatement;
+    private $adminEmailController;
     
-    public function __construct(MailListRepository $repoMail, ConduiteTravauxAddPieceRepository $repoAddPieces, OthersDocumentsRepository $repoDocs,MailerInterface $mailer, CommentairesRepository $repoComments, ConduiteDeTravauxMeRepository $repoConduite, MouvRepository $repoMouv, UsersRepository $repoUser)
+    public function __construct(AdminEmailController $adminEmailController, MailListRepository $repoMail, ConduiteTravauxAddPieceRepository $repoAddPieces, OthersDocumentsRepository $repoDocs,MailerInterface $mailer, CommentairesRepository $repoComments, ConduiteDeTravauxMeRepository $repoConduite, MouvRepository $repoMouv, UsersRepository $repoUser)
     {
         $this->repoMouv = $repoMouv;
         $this->repoConduite = $repoConduite;
@@ -54,6 +58,7 @@ class ConduiteDeTravauxMeController extends AbstractController
         $this->repoMail =$repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
         $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->adminEmailController = $adminEmailController;
         //parent::__construct();
     }
 
@@ -167,6 +172,25 @@ class ConduiteDeTravauxMeController extends AbstractController
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
 
+        unset($form);
+        $form = $this->createForm(AddEmailType::class);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $find = $this->repoMail->findBy(['email' => $form->getData()['email'], 'page' => $tracking]);
+            if (empty($find) | is_null($find)) {
+                $mail = new MailList();
+                $mail->setCreatedAt(new DateTime())
+                     ->setEmail($form->getData()['email'])
+                     ->setPage($tracking);
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($mail);
+                $em->flush();
+            }else {
+                $this->addFlash('danger', 'le mail est déjà inscrit pour cette page !');
+                return $this->redirectToRoute('app_conduite_de_travaux_me_nok');
+            }
+        }
+
         
         return $this->render('conduite_de_travaux_me/index.html.twig', [
             // todo à voir pour filtrer l'état en fonction de la page affichée
@@ -174,7 +198,9 @@ class ConduiteDeTravauxMeController extends AbstractController
             'data' => $data,
             'title' => "Conduire Travaux",
             'commentaires' => $commentaires,
-            'formAddPieces' => $formAddPieces->createView()
+            'formAddPieces' => $formAddPieces->createView(),
+            'listeMails' => $this->repoMail->findBy(['page' => $tracking]),
+            'form' => $form->createView()
         ]);
     }
 
@@ -475,13 +501,15 @@ class ConduiteDeTravauxMeController extends AbstractController
         
         // envoyer les mails
         $donnees = $this->repoConduite->getDebutChantierDans7Jours();
+        $treatementMails = $this->repoMail->findBy(['page' => 'app_conduite_de_travaux_me_nok']);
+        $mails = $this->adminEmailController->formateEmailList($treatementMails); 
        
         // envoyer un mail
        $texte = 'Veuillez trouver ci dessous la liste des chantiers qui débutent dans 7 jours : ';
        $html = $this->renderView('mails/conduiteDeTravaux.html.twig', ['donnees' => $donnees, 'texte' => $texte ]);
        $email = (new Email())
        ->from($this->mailEnvoi)
-       ->to('adefaria@lhermitte.fr')
+       ->to(...$mails)
        ->subject('Conduite de travaux - Liste des chantiers programmées dans 7 jours')
        ->html($html);
        $this->mailer->send($email);
@@ -502,9 +530,11 @@ class ConduiteDeTravauxMeController extends AbstractController
         // envoyer un mail
        $texte = 'Veuillez trouver ci dessous la liste des chantiers dépassé mais pas Terminé : ';
        $html = $this->renderView('mails/conduiteDeTravaux.html.twig', ['donnees' => $donnees, 'texte' => $texte ]);
+       $treatementMails = $this->repoMail->findBy(['page' => 'app_conduite_de_travaux_me_nok']);
+       $mails = $this->adminEmailController->formateEmailList($treatementMails); 
        $email = (new Email())
        ->from($this->mailEnvoi)
-       ->to('adefaria@lhermitte.fr')
+       ->to(...$mails)
        ->subject('Conduite de travaux - Liste des chantiers Dépassés mais pas Terminés')
        ->html($html);
        $this->mailer->send($email);
