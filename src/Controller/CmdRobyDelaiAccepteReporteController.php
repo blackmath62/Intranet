@@ -161,6 +161,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                     $listCmd->setCreatedAt(new DateTime);
                     $listCmd->setTiers($donnees[$lig]['Tiers']);
                     $listCmd->setNom($donnees[$lig]['Nom']);
+                    $listCmd->setHt($donnees[$lig]['ht']);
                     $listCmd->setTel($donnees[$lig]['Tel']);
                     $listCmd->setCmd($donnees[$lig]['Cmd']);
                     $listCmd->setDateCmd(new DateTime($donnees[$lig]['DateCmd']));
@@ -179,6 +180,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                     $listCmd = $search;
                     $listCmd->setNotreRef($donnees[$lig]['NotreRef']);
                     $listCmd->setTel($donnees[$lig]['Tel']);
+                    $listCmd->setHt($donnees[$lig]['ht']);
                     if ($donnees[$lig]['DelaiAccepte']) {
                         $listCmd->setDelaiAccepte(new DateTime($donnees[$lig]['DelaiAccepte']));
                     }else {
@@ -197,6 +199,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
 
             $nbeCmdAfter = count($cmdRoby->findBy(['statut' => 'en cours ...']));
             $nbre = $nbeCmdBefore - $nbeCmdAfter;
+            $texte = '';
             if ($nbre == 1) {
                 $texte = ' commande a été ajoutée';
             }elseif ($nbre == 0) {
@@ -356,6 +359,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                         $commandesDelaiDepasse[$i]['Cmd'] = $donnee->getCmd();
                         $commandesDelaiDepasse[$i]['DateCmd'] = $donnee->getDateCmd();
                         $commandesDelaiDepasse[$i]['NotreRef'] = $donnee->getNotreRef();
+                        $commandesDelaiDepasse[$i]['ht'] = $donnee->getHt();
                         if ($donnee->getDelaiAccepte() != null) {
                             $commandesDelaiDepasse[$i]['DelaiAccepte'] = $donnee->getDelaiAccepte();
                         }else {
@@ -381,6 +385,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                             $commandesAvecDelai[$i]['Cmd'] = $donnee->getCmd();
                             $commandesAvecDelai[$i]['DateCmd'] = $donnee->getDateCmd();
                             $commandesAvecDelai[$i]['NotreRef'] = $donnee->getNotreRef();
+                            $commandesAvecDelai[$i]['ht'] = $donnee->getHt();
                             if ($donnee->getDelaiAccepte() != null) {
                                 $commandesAvecDelai[$i]['DelaiAccepte'] = $donnee->getDelaiAccepte();
                             }else {
@@ -400,6 +405,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                 $commandesSansDelai[$i]['Cmd'] = $donnee->getCmd();
                 $commandesSansDelai[$i]['DateCmd'] = $donnee->getDateCmd();
                 $commandesSansDelai[$i]['NotreRef'] = $donnee->getNotreRef();
+                $commandesSansDelai[$i]['ht'] = $donnee->getHt();
                 if ($donnee->getDelaiAccepte() != null) {
                     $commandesSansDelai[$i]['DelaiAccepte'] = $donnee->getDelaiAccepte();
                 }else {

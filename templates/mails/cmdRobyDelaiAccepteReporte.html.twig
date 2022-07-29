@@ -13,6 +13,7 @@
             <th>Notre Ref</th>
             <th>Délai accepté</th>
             <th>Délai reporté</th>
+            <th>Montant HT</th>
         </thead>
         <tbody>
 {% for commandesAvecDelai in commandesAvecDelais %}
@@ -24,6 +25,7 @@
             <td>{{ commandesAvecDelai.NotreRef }}</td>
             <td>{% if commandesAvecDelai.DelaiAccepte %}{{ commandesAvecDelai.DelaiAccepte|date('d-m-Y') }}{% endif %}</td>
             <td>{% if commandesAvecDelai.DelaiReporte %}{{ commandesAvecDelai.DelaiReporte|date('d-m-Y') }}{% endif %}</td>
+            <td>{{ commandesAvecDelai.ht }}</td>
         </tr>
 {% endfor %}
        </tbody>
@@ -42,6 +44,7 @@
             <th>Notre Ref</th>
             <th>Délai accepté</th>
             <th>Délai reporté</th>
+            <th>Montant HT</th>
         </thead>
         <tbody>
 {% for commandesSansDelai in commandesSansDelais %}
@@ -53,6 +56,7 @@
             <td>{{ commandesSansDelai.NotreRef }}</td>
             <td>{% if commandesSansDelai.DelaiAccepte %}{{ commandesSansDelai.DelaiAccepte|date('d-m-Y') }}{% endif %}</td>
             <td>{% if commandesSansDelai.DelaiReporte %}{{ commandesSansDelai.DelaiReporte|date('d-m-Y') }}{% endif %}</td>
+            <td>{{ commandesSansDelai.ht }}</td>
         </tr>
 {% endfor %}
        </tbody>
@@ -71,6 +75,7 @@
             <th>Notre Ref</th>
             <th>Délai accepté</th>
             <th>Délai reporté</th>
+            <th>Montant HT</th>
         </thead>
         <tbody>
 {% for commandesDelaiDepasse in commandesDelaiDepasses %}
@@ -82,6 +87,7 @@
             <td>{{ commandesDelaiDepasse.NotreRef }}</td>
             <td>{% if commandesDelaiDepasse.DelaiAccepte %}{{ commandesDelaiDepasse.DelaiAccepte|date('d-m-Y') }}{% endif %}</td>
             <td>{% if commandesDelaiDepasse.DelaiReporte %}{{ commandesDelaiDepasse.DelaiReporte|date('d-m-Y') }}{% endif %}</td>
+            <td>{{ commandesDelaiDepasse.ht }}</td>
         </tr>
 {% endfor %}
        </tbody>

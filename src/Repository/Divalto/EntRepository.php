@@ -104,10 +104,12 @@ class EntRepository extends ServiceEntityRepository
     public function majCmdsRobyDelaiAccepteReporte():array
     {    
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT LTRIM(RTRIM(ENT.ENT_ID)) AS Identification, LTRIM(RTRIM(ENT.TIERS)) AS Tiers, LTRIM(RTRIM(CLI.NOM)) AS Nom, LTRIM(RTRIM(CLI.TEL)) AS Tel, LTRIM(RTRIM(ENT.PINO)) AS Cmd, ENT.PIDT AS DateCmd, LTRIM(RTRIM(ENT.PIREF)) AS NotreRef,  ENT.DELACCDT AS DelaiAccepte, ENT.DELREPDT AS DelaiReporte
-        FROM ENT 
-        INNER JOIN CLI ON ENT.DOS = CLI.DOS AND ENT.TIERS = CLI.TIERS
-        WHERE ENT.DOS = 3 AND ENT.PICOD = 2 AND ENT.CE4 = 1 AND ENT.TICOD = 'C'
+        $sql = "SELECT LTRIM(RTRIM(ENT.ENT_ID)) AS Identification, LTRIM(RTRIM(ENT.TIERS)) AS Tiers, LTRIM(RTRIM(CLI.NOM)) AS Nom,
+        LTRIM(RTRIM(CLI.TEL)) AS Tel, LTRIM(RTRIM(ENT.PINO)) AS Cmd, ENT.PIDT AS DateCmd, LTRIM(RTRIM(ENT.PIREF)) AS NotreRef,
+        ENT.DELACCDT AS DelaiAccepte, ENT.DELREPDT AS DelaiReporte, ENT.HTPDTMT AS ht
+                FROM ENT 
+                INNER JOIN CLI ON ENT.DOS = CLI.DOS AND ENT.TIERS = CLI.TIERS
+                WHERE ENT.DOS = 3 AND ENT.PICOD = 2 AND ENT.CE4 = 1 AND ENT.TICOD = 'C'
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();

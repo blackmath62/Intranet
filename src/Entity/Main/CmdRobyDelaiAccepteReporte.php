@@ -89,6 +89,11 @@ class CmdRobyDelaiAccepteReporte
      */
     private $tel;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $ht;
+
     public function __construct()
     {
         $this->note = new ArrayCollection();
@@ -281,6 +286,18 @@ class CmdRobyDelaiAccepteReporte
     public function setTel(?string $tel): self
     {
         $this->tel = $tel;
+
+        return $this;
+    }
+
+    public function getHt(): ?string
+    {
+        return $this->ht;
+    }
+
+    public function setHt(?string $ht): self
+    {
+        $this->ht = $ht;
 
         return $this;
     }

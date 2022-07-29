@@ -110,6 +110,7 @@
                                     <th class="text-center"><span>Notre Ref</span></th>
                                     <th class="text-center"><span>Délai accepté</span></th>
                                     <th class="text-center"><span>Délai reporté</span></th>
+                                    <th class="text-center"><span>Montant HT</span></th>
                                     <th class="text-center"><span>Action</span></th>
                                 </tr>
                             </thead>
@@ -146,6 +147,9 @@
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark">{% if commande.delaiReporte %}{{ commande.delaiReporte|date("d/m/Y") }}{% endif %}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{% if commande.ht %}{{ commande.ht }}{% endif %}</a>
                                         </td>
                                         <td class="text-center">
                                             <a title="Pour passer la commande en terminée" class="btn btn-success" data-toggle="modal" data-target="#modal-{{commande.id}}"><i class="fas fa-lock-open"></i></a>
@@ -202,6 +206,7 @@
                                     <th class="text-center"><span>Notre Ref</span></th>
                                     <th class="text-center"><span>Délai accepté</span></th>
                                     <th class="text-center"><span>Délai reporté</span></th>
+                                    <th class="text-center"><span>Montant HT</span></th>
                                     <th class="text-center"><span>Action</span></th>
                                 </tr>
                                 </tr>
