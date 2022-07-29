@@ -93,14 +93,16 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         }        
         
         $countNotes = $repoNotes->getCountNoteByCmd();
-        
+        $total = $repo->getTotalHt();
+        //dd($total);
         return $this->render($view, [
             'controller_name' => 'CmdRobyDelaiAccepteReporteController',
             'title' => 'Commandes Actives Roby',
             'commandes' => $commandes,
             'countNotes' => $countNotes,
             'listeMails' => $this->repoMail->findBy(['page' => $tracking]),
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'total' => $total,
         ]);
     }
 
@@ -338,6 +340,9 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         $commandesAvecDelai = [];
         $commandesSansDelai = [];
         $commandesDelaiDepasse = [];
+        $commandesDelaiDepasseTotal = 0;
+        $commandesAvecDelaiTotal = 0;
+        $commandesSansDelaiTotal = 0;
         foreach ($donnees as $donnee) {
             $texte = '';
             if ($donnee->getDelaiReporte() != null | $donnee->getDelaiAccepte() != null) {
@@ -360,6 +365,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                         $commandesDelaiDepasse[$i]['DateCmd'] = $donnee->getDateCmd();
                         $commandesDelaiDepasse[$i]['NotreRef'] = $donnee->getNotreRef();
                         $commandesDelaiDepasse[$i]['ht'] = $donnee->getHt();
+                        $commandesDelaiDepasseTotal += $donnee->getHt();
                         if ($donnee->getDelaiAccepte() != null) {
                             $commandesDelaiDepasse[$i]['DelaiAccepte'] = $donnee->getDelaiAccepte();
                         }else {
@@ -386,6 +392,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                             $commandesAvecDelai[$i]['DateCmd'] = $donnee->getDateCmd();
                             $commandesAvecDelai[$i]['NotreRef'] = $donnee->getNotreRef();
                             $commandesAvecDelai[$i]['ht'] = $donnee->getHt();
+                            $commandesAvecDelaiTotal += $donnee->getHt();
                             if ($donnee->getDelaiAccepte() != null) {
                                 $commandesAvecDelai[$i]['DelaiAccepte'] = $donnee->getDelaiAccepte();
                             }else {
@@ -406,6 +413,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                 $commandesSansDelai[$i]['DateCmd'] = $donnee->getDateCmd();
                 $commandesSansDelai[$i]['NotreRef'] = $donnee->getNotreRef();
                 $commandesSansDelai[$i]['ht'] = $donnee->getHt();
+                $commandesSansDelaiTotal += $donnee->getHt();
                 if ($donnee->getDelaiAccepte() != null) {
                     $commandesSansDelai[$i]['DelaiAccepte'] = $donnee->getDelaiAccepte();
                 }else {
@@ -420,7 +428,14 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         // envoyer un mail
        $treatementMails = $this->repoMail->findBy(['page' => 'app_cmd_roby_delai_accepte_reporte_active']);
        $mails = $this->adminEmailController->formateEmailList($treatementMails); 
-       $html = $this->renderView('mails/cmdRobyDelaiAccepteReporte.html.twig', ['commandesSansDelais' => $commandesSansDelai, 'commandesAvecDelais' => $commandesAvecDelai, 'commandesDelaiDepasses' => $commandesDelaiDepasse ]);
+       $total = $commandesDelaiDepasseTotal + $commandesAvecDelaiTotal + $commandesSansDelaiTotal;
+       $html = $this->renderView('mails/cmdRobyDelaiAccepteReporte.html.twig', ['commandesSansDelais' => $commandesSansDelai,
+                                                                                'commandesAvecDelais' => $commandesAvecDelai,
+                                                                                'commandesDelaiDepasses' => $commandesDelaiDepasse,
+                                                                                'commandesDelaiDepasseTotal' => $commandesDelaiDepasseTotal,
+                                                                                'commandesAvecDelaiTotal' => $commandesAvecDelaiTotal,
+                                                                                'commandesSansDelaiTotal' => $commandesSansDelaiTotal,
+                                                                                'total' => $total]);
        $email = (new Email())
        ->from($this->mailEnvoi)
        ->to(...$mails)

@@ -90,7 +90,10 @@
             <div class="col-md-12">
                 <div class="card card-dark">
                     <div class="card-header d-flex justify-content-between flex-wrap">
-                        <h2 class="card-title">Liste des commandes en cours Roby<span class="badge badge-info ml-2">{{ commandes|length }} détectées</span></h2>
+                        <div>
+                            <h2 class="card-title">Liste des commandes en cours Roby<span class="badge badge-info ml-2">{{ commandes|length }} commandes</span></h2>
+                            <h4>Pour un total de {{ total['total'] |format_currency('EUR', locale='fr') }}</h4>
+                        </div>
                     <div class='ml-auto'>
                             <a title='Mettre à jour la liste maintenant' href="{{ path('app_cmd_roby_update') }}" class="btn btn-success "><i class="fas fa-redo-alt"></i></a>
                             <a title='Liste des commandes mise en terminées' href="{{ path('app_cmd_roby_delai_accepte_reporte_close') }}" class="btn btn-danger "><i class="fas fa-lock"></i></a>
@@ -149,7 +152,7 @@
                                             <a class="text-dark">{% if commande.delaiReporte %}{{ commande.delaiReporte|date("d/m/Y") }}{% endif %}</a>
                                         </td>
                                         <td class="text-center">
-                                            <a class="text-dark">{% if commande.ht %}{{ commande.ht }}{% endif %}</a>
+                                            <a class="text-dark">{% if commande.ht > 0 %}{{ commande.ht }}{% endif %}</a>
                                         </td>
                                         <td class="text-center">
                                             <a title="Pour passer la commande en terminée" class="btn btn-success" data-toggle="modal" data-target="#modal-{{commande.id}}"><i class="fas fa-lock-open"></i></a>

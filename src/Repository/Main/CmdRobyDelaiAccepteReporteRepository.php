@@ -52,6 +52,20 @@ class CmdRobyDelaiAccepteReporteRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    // Total HT des commandes en attentes
+    public function getTotalHt()
+    {
+        
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT SUM(ht) AS total
+        FROM cmdrobydelaiacceptereporte 
+        WHERE cmdrobydelaiacceptereporte.statut <> 'Terminé'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
     /*
     public function findOneBySomeField($value): ?CmdRobyDelaiAccepteReporte
     {

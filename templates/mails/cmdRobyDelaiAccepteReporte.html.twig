@@ -1,8 +1,8 @@
 <p>Bonjour,</p>
-<p>Veuillez trouver ci dessous la liste des commandes et leurs délais acceptées et reportées:</p>
+<p>Veuillez trouver ci dessous la liste des commandes et leurs délais acceptées et reportées pour un montant Total de {{total|format_currency('EUR', locale='fr')}}</p>
 
 {% if commandesAvecDelais %}
-<p><u><strong>Commandes à J-15 : </strong></u></p>
+<p><u><strong>Commandes à J-15 : {% if commandesAvecDelaiTotal %} pour un montant de {{commandesAvecDelaiTotal|format_currency('EUR', locale='fr')}} {% endif %}</strong></u></p>
     <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
         <thead>
             <tr class="text-center">
@@ -33,7 +33,7 @@
 {% endif %}
 
 {% if commandesSansDelais %}
-<p><u><strong>Commandes sans délais : </strong></u></p>
+<p><u><strong>Commandes sans délais : {% if commandesSansDelaiTotal %} pour un montant de {{commandesSansDelaiTotal|format_currency('EUR', locale='fr')}} {% endif %}</strong></u></p>
     <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
         <thead>
             <tr class="text-center">
@@ -64,7 +64,7 @@
 {% endif %}
 
 {% if commandesDelaiDepasses %}
-<p><u><strong>Commandes avec délais dépassés : </strong></u></p>
+<p><u><strong>Commandes avec délais dépassés : {% if commandesDelaiDepasseTotal %} pour un montant de {{commandesDelaiDepasseTotal|format_currency('EUR', locale='fr')}} {% endif %}</strong></u></p>
     <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
         <thead>
             <tr class="text-center">
