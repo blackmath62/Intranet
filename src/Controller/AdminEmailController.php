@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use DateTime;
+use Symfony\Component\Mime\Address;
 use App\Form\AddEmailType;
 use App\Entity\Main\MailList;
 use App\Form\AddEmailTreatementType;
@@ -12,10 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-/**
- * @IsGranted("ROLE_ADMIN")
- */
 
  class AdminEmailController extends AbstractController
 {
@@ -114,5 +111,30 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
         $this->addFlash('message', 'le mail a bien été supprimé !');
         return $this->redirectToRoute('app_admin_email');
+    }
+
+    /**
+     * @Route("/email/delete/{id}/{route}", name="app_email_delete_redirect")
+     */
+    public function deleteMailAndRedirect($id,$route): Response
+    {
+
+       $search = $this->repoMail->findOneBy(['id' => $id]);
+        
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($search);
+            $em->flush();
+
+        $this->addFlash('message', 'le mail a bien été supprimé !');
+        return $this->redirectToRoute($route);
+    }
+
+    public function formateEmailList($listMails)
+    {
+        $MailsList = [];
+        foreach ($listMails as $value) {
+            array_push( $MailsList, new Address($value->getEmail()) );
+        }   
+        return $MailsList;
     }
 }

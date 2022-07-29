@@ -5,8 +5,11 @@ namespace App\Controller;
 use DateTime;
 use App\Form\NoteType;
 use App\Entity\Main\Note;
+use App\Form\AddEmailType;
+use App\Entity\Main\MailList;
 use Symfony\Component\Mime\Email;
 use App\Repository\Main\NoteRepository;
+use App\Controller\AdminEmailController;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Divalto\EntRepository;
 use App\Repository\Main\MailListRepository;
@@ -33,8 +36,9 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
     private $repoMail;
     private $mailEnvoi;
     private $mailTreatement;
+    private $adminEmailController;
 
-    public function __construct(EntRepository $entete,UsersRepository $Users, CmdRobyDelaiAccepteReporteRepository $cmdRoby,MailerInterface $mailer, MailListRepository $repoMail)
+    public function __construct(AdminEmailController $adminEmailController, EntRepository $entete,UsersRepository $Users, CmdRobyDelaiAccepteReporteRepository $cmdRoby,MailerInterface $mailer, MailListRepository $repoMail)
     {
         $this->mailer = $mailer;
         $this->cmdRoby = $cmdRoby;
@@ -43,6 +47,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         $this->repoMail =$repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
         $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->adminEmailController = $adminEmailController;
 
         //parent::__construct();
     }
@@ -68,6 +73,24 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
             $view = 'cmd_roby_delai_accepte_reporte/cmdClose.html.twig';
         }
 
+        unset($form);
+        $form = $this->createForm(AddEmailType::class);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $find = $this->repoMail->findBy(['email' => $form->getData()['email'], 'page' => $tracking]);
+            if (empty($find) | is_null($find)) {
+                $mail = new MailList();
+                $mail->setCreatedAt(new DateTime())
+                     ->setEmail($form->getData()['email'])
+                     ->setPage($tracking);
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($mail);
+                $em->flush();
+            }else {
+                $this->addFlash('danger', 'le mail est déjà inscrit pour cette page !');
+                return $this->redirectToRoute('app_cmd_roby_delai_accepte_reporte_active');
+            }
+        }        
         
         $countNotes = $repoNotes->getCountNoteByCmd();
         
@@ -75,7 +98,9 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
             'controller_name' => 'CmdRobyDelaiAccepteReporteController',
             'title' => 'Commandes Actives Roby',
             'commandes' => $commandes,
-            'countNotes' => $countNotes
+            'countNotes' => $countNotes,
+            'listeMails' => $this->repoMail->findBy(['page' => $tracking]),
+            'form' => $form->createView()
         ]);
     }
 
@@ -387,10 +412,12 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         }
        
         // envoyer un mail
+       $treatementMails = $this->repoMail->findBy(['page' => 'app_cmd_roby_delai_accepte_reporte_active']);
+       $mails = $this->adminEmailController->formateEmailList($treatementMails); 
        $html = $this->renderView('mails/cmdRobyDelaiAccepteReporte.html.twig', ['commandesSansDelais' => $commandesSansDelai, 'commandesAvecDelais' => $commandesAvecDelai, 'commandesDelaiDepasses' => $commandesDelaiDepasse ]);
        $email = (new Email())
        ->from($this->mailEnvoi)
-       ->to('ndegorre@roby-fr.com','kkupczak@roby-fr.com')
+       ->to(...$mails)
        ->subject('Liste des commandes avec Délais et sans délais')
        ->html($html);
        $this->mailer->send($email);

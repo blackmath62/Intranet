@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use DateTime;
+use App\Form\AddEmailType;
+use App\Entity\Main\MailList;
 use App\Entity\Main\MovBillFsc;
 use App\Entity\Main\documentsFsc;
 use Symfony\Component\Mime\Email;
 use App\Entity\Main\fscListMovement;
+use App\Controller\AdminEmailController;
 use App\Form\FactureFournisseursFscType;
 use App\Repository\Main\UsersRepository;
 use App\Repository\Divalto\EntRepository;
@@ -36,8 +39,9 @@ class MovementBillFscController extends AbstractController
     private $repoMail;
     private $mailEnvoi;
     private $mailTreatement;
+    private $adminEmailController;
 
-    public function __construct(MailListRepository $repoMail, MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt,MailerInterface $mailer)
+    public function __construct(AdminEmailController $adminEmailController,MailListRepository $repoMail, MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt,MailerInterface $mailer)
     {
         $this->repoFact = $repoFact;
         $this->repoEnt = $repoEnt;
@@ -48,6 +52,7 @@ class MovementBillFscController extends AbstractController
         $this->repoMail =$repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
         $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->adminEmailController = $adminEmailController;
         //parent::__construct();
     }
 
@@ -55,11 +60,36 @@ class MovementBillFscController extends AbstractController
     /**
      * @Route("/Roby/movement/bill/fsc", name="app_movement_bill_fsc")
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
+        unset($form);
+        $form = $this->createForm(AddEmailType::class);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $find = $this->repoMail->findBy(['email' => $form->getData()['email'], 'page' => $tracking]);
+            if (empty($find) | is_null($find)) {
+                $mail = new MailList();
+                $mail->setCreatedAt(new DateTime())
+                     ->setEmail($form->getData()['email'])
+                     ->setPage($tracking);
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($mail);
+                $em->flush();
+            }else {
+                $this->addFlash('danger', 'le mail est déjà inscrit pour cette page !');
+                return $this->redirectToRoute('app_movement_bill_fsc');
+            }
+        }
+
         return $this->render('movement_bill_fsc/index.html.twig', [
             'clients' => $this->repoFact->findAll(),
-            'title' => 'Factures clients Fsc'
+            'title' => 'Factures clients Fsc',
+            'listeMails' => $this->repoMail->findBy(['page' => $tracking]),
+            'form' => $form->createView()
         ]);
     }
 
@@ -132,6 +162,8 @@ class MovementBillFscController extends AbstractController
         
         $piecesAnormales = $this->repoBill->getFactCliSansLiaison();
 
+        $treatementMails = $this->repoMail->findBy(['page' => 'app_movement_bill_fsc']);
+        $mails = $this->adminEmailController->formateEmailList($treatementMails); 
         // envoyer un mail si il y a des infos à envoyer
         if (count($piecesAnormales) > 0) {
             // envoyer un mail
@@ -139,7 +171,7 @@ class MovementBillFscController extends AbstractController
             // TODO Remettre Nathalie en destinataire des mails.
             $email = (new Email())
             ->from($this->mailEnvoi)
-            ->to('ndegorre@roby-fr.com')
+            ->to(...$mails)
             ->cc($this->mailTreatement)
             ->subject("Liste des piéces clients FSC sur lesquels il n'y a pas de liaison")
             ->html($html);
