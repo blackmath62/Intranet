@@ -5,13 +5,17 @@ namespace App\Controller;
 use DateTime;
 use App\Form\TicketsType;
 use App\Entity\Main\Tickets;
+use Symfony\Component\Mime\Email;
+use App\Controller\AdminEmailController;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\Main\StatusRepository;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Repository\Main\TicketsRepository;
 use App\Repository\Main\CommentsRepository;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -30,11 +34,21 @@ class TicketsController extends AbstractController
      * @var EntityManagerInterface
      */
     private $entityManager;
+    private $mailer;
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
+    private $adminEmailController;
 
-    public function __construct( EntityManagerInterface $entityManager)
+    public function __construct( AdminEmailController $adminEmailController, EntityManagerInterface $entityManager,MailerInterface $mailer, MailListRepository $repoMail)
     {
 
         $this->entityManager = $entityManager;
+        $this->mailer = $mailer;
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->adminEmailController = $adminEmailController;
     }
 
     
@@ -95,6 +109,16 @@ class TicketsController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($ticket);
             $em->flush();
+
+            $treatementMails = $this->repoMail->findBy(['page' => 'app_admin_email', 'SecondOption' => 'traitement']);
+            $mails = $this->adminEmailController->formateEmailList($treatementMails);
+            $html = $this->renderView('mails/sendMailNewTicket.html.twig', ['ticket' => $ticket]); 
+            $email = (new Email())
+            ->from($this->mailEnvoi)
+            ->to(...$mails)
+            ->subject('Un nouveau ticket à été créé sur le site intranet: ' . $ticket->getTitle())
+            ->html($html);
+            $this->mailer->send($email);
             
             $this->addFlash('message', 'Ticket créé avec succés');
             return $this->redirectToRoute('app_tickets');

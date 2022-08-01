@@ -1,0 +1,11 @@
+<p>Bonjour,</p>
+<p>Un nouveau ticket à été déposé sur le site intranet</p>
+<p><strong>{{ ticket.title }}</strong></p>
+<p><strong>{{ ticket.content|raw }}</strong>.</p>
+<p>Degrés d'urgence: <strong>{{ ticket.priority.title }}</strong></p>
+<p>Pour la société: <strong>{{ ticket.societe.nom }}</strong>
+<p>Pour le service : <strong>{{ ticket.service.title }}</strong></p>
+<p>Déposé par : <strong>{{ ticket.user.pseudo }}</strong></p>
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>
