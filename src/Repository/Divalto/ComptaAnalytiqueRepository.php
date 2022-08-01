@@ -19,18 +19,19 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Mouv::class);
     }
-   
 
-    public function getSaleByMonth($annee,$mois):array
+    public function getRapportClient($annee, $mois)
     {
-        $conn = $this->getEntityManager()
-        ->getConnection();
-        $sql = "SELECT MAX(VentAss) AS VentAssMax, Dos, Ref, Sref1, Sref2, Designation, Uv, CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, RegimeTva, SUM(QteSign) AS QteSigne
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT Numero AS Facture, VentAss AS VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op AS Op,
+         CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, RegimeTva, SUM(QteSign) AS QteSign, qteVtl AS qteVtl, regimeFou
         FROM
         (
-        SELECT RTRIM(LTRIM(MVTL.VTLNA)) AS VentAss, RTRIM(LTRIM(MOUV.DOS)) AS Dos, MOUV.FADT AS DateFacture, RTRIM(LTRIM(MOUV.FANO)) AS Numero,
-        RTRIM(LTRIM(MOUV.REF)) AS Ref, RTRIM(LTRIM(MOUV.SREF1)) AS Sref1, RTRIM(LTRIM(MOUV.SREF2)) AS Sref2, RTRIM(LTRIM(ART.DES)) AS Designation, RTRIM(LTRIM(ART.VENUN)) AS Uv, RTRIM(LTRIM(MOUV.OP)) AS Op, RTRIM(LTRIM(SART.CR)) AS CoutRevient, RTRIM(LTRIM(SART.CMP)) AS CoutMoyenPondere,
-        RTRIM(LTRIM(ART.FAM_0002)) AS Article, RTRIM(LTRIM(CLI.STAT_0002)) AS Client, RTRIM(LTRIM(ART.CPTA)) AS CompteAchat, RTRIM(LTRIM(ART.TVAART)) AS RegimeTva,
+        SELECT RTRIM(LTRIM(MVTL.VTLNA)) AS VentAss, RTRIM(LTRIM(MVTL.QTE)) AS qteVtl, RTRIM(LTRIM(MOUV.DOS)) AS Dos, MOUV.FADT AS DateFacture, RTRIM(LTRIM(MOUV.FANO)) AS Numero,
+        RTRIM(LTRIM(MOUV.REF)) AS Ref, RTRIM(LTRIM(MOUV.SREF1)) AS Sref1, RTRIM(LTRIM(MOUV.SREF2)) AS Sref2, RTRIM(LTRIM(ART.DES)) AS Designation, RTRIM(LTRIM(ART.VENUN)) AS Uv,
+        RTRIM(LTRIM(MOUV.OP)) AS Op, RTRIM(LTRIM(SART.CR)) AS CoutRevient, RTRIM(LTRIM(SART.CMP)) AS CoutMoyenPondere,
+        RTRIM(LTRIM(ART.FAM_0002)) AS Article, RTRIM(LTRIM(CLI.STAT_0002)) AS Client, RTRIM(LTRIM(ART.CPTA)) AS CompteAchat,
+        RTRIM(LTRIM(ART.TVAART)) AS RegimeTva, RTRIM(LTRIM(ART.TIERS)) AS fouPrin, FOU.TVATIE AS regimeFou,
         CASE
             WHEN MOUV.OP IN('C','CD') THEN MOUV.FAQTE
             WHEN MOUV.OP IN('D','DD') THEN -1*MOUV.FAQTE
@@ -38,6 +39,7 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
         END AS QteSign
         FROM MOUV 
         INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+        INNER JOIN FOU ON ART.TIERS = FOU.TIERS AND ART.DOS = FOU.DOS
         LEFT JOIN SART ON MOUV.REF = SART.REF AND MOUV.DOS = SART.DOS AND MOUV.SREF1 = SART.SREF1 AND MOUV.SREF2 = SART.SREF2
         INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
         LEFT JOIN MVTL ON MOUV.DOS = MVTL.DOS AND MOUV.TIERS = MVTL.TIERS AND MOUV.FANO = MVTL.PINO AND MOUV.REF = MVTL.REF AND MOUV.SREF1 = MVTL.SREF1 AND MOUV.SREF2 = MVTL.SREF2
@@ -45,124 +47,94 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
         AND ART.FAM_0002 <> CLI.STAT_0002
         AND ART.FAM_0002 IN ('EV', 'HP')AND YEAR(MOUV.FADT) IN (?) AND MONTH(MOUV.FADT) IN (?)
         )reponse
-        GROUP BY Dos, Ref, Sref1, Sref2, Designation, Uv, CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, RegimeTva
+        GROUP BY Numero, VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op, CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, RegimeTva, qteVtl, regimeFou
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$annee,$mois]);
+        $stmt->execute([$annee, $mois]);
         return $stmt->fetchAll();
     }
 
-    public function getAveragePurchasePrice($ref, $ventilation)
+    public function getRapportFournisseurAvecSref($ventilation, $ref, $sref1, $sref2)
     {
-        $conn = $this->getEntityManager()
-        ->getConnection();
-        $sql = "SELECT 
-        CASE
-        WHEN MOUV.MONT <> 0 AND MOUV.FAQTE <> 0 THEN (MOUV.MONT / MOUV.FAQTE)
-        ELSE 0
-        END AS Pu
-        FROM MOUV
-        LEFT JOIN MVTL ON MOUV.DOS = MVTL.DOS AND MOUV.TIERS = MVTL.TIERS AND MOUV.FANO = MVTL.PINO
-        WHERE MOUV.DOS = 1 AND MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.REF = ? AND MVTL.VTLNO = ?
-        ";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$ref, $ventilation]);
-        return $stmt->fetch();
-    }
+        $code = '';
+        $filtre = '';
+        if ($sref1 && !$sref2) {
+            $code = "AND '" . $sref1 . "'= MOUV.SREF1";
+            $filtre = " AND LTRIM(RTRIM(MVTL.SREF1)) = '" . $sref1 . "'";
+        }elseif ($sref2 && ! $sref1) {
+            $code = "AND '" . $sref2 . "'= MOUV.SREF2";
+            $filtre = " AND LTRIM(RTRIM(MVTL.SREF2)) = '" . $sref2 . "'";
+        }elseif ($sref1 && $sref2 ) {
+            $code = "AND '" . $sref1 . "'= MOUV.SREF1" . " AND '" . $sref2 . "'= MOUV.SREF2";
+            $filtre = " AND LTRIM(RTRIM(MVTL.SREF1)) = ' " . $sref1 . "'" . " AND LTRIM(RTRIM(MVTL.SREF2)) = '" . $sref2 . "'";
+        }
 
-    public function getSaleList($annee, $mois)
-    {
-        $conn = $this->getEntityManager()
-        ->getConnection();
-        $sql = "SELECT MOUV.FANO AS Facture, RTRIM(LTRIM(MOUV.REF)) AS Ref,  RTRIM(LTRIM(MOUV.SREF1)) AS Sref1,  RTRIM(LTRIM(MOUV.SREF2)) AS Sref2,
-        RTRIM(LTRIM(ART.DES)) AS Designation,  RTRIM(LTRIM(MOUV.VENUN)) AS Uv, RTRIM(LTRIM(MOUV.OP)) AS Op,  RTRIM(LTRIM(ART.FAM_0002)) AS Article,
-        RTRIM(LTRIM(CLI.STAT_0002)) AS Client,  ART.CPTA AS CompteAchat,  RTRIM(LTRIM(MOUV.FAQTE)) AS QteSign, RTRIM(LTRIM(SART.CR)) AS CoutRevient, RTRIM(LTRIM(SART.CMP)) AS CoutMoyenPondere
-        FROM MOUV
-        INNER JOIN ART ON ART.REF = MOUV.REF AND ART.DOS = MOUV.DOS
-        INNER JOIN CLI ON CLI.TIERS = MOUV.TIERS AND CLI.DOS = MOUV.DOS
-        LEFT JOIN SART ON MOUV.REF = SART.REF AND MOUV.DOS = SART.DOS AND MOUV.SREF1 = SART.SREF1 AND MOUV.SREF2 = SART.SREF2
-        WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4
-        AND ART.FAM_0002 IN ('EV', 'HP')
-        AND CLI.STAT_0002 <> ART.FAM_0002
-        AND MOUV.OP IN ('C','D')
-        AND YEAR(MOUV.FADT) IN (?) AND MONTH(MOUV.FADT) IN (?)
-        ORDER BY MOUV.FANO
-        ";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$annee,$mois]);
-        return $stmt->fetchAll();
-    }
-    public function getSaleVentilationByFactAndRef($facture, $ref)
-    {
-        $conn = $this->getEntityManager()
-        ->getConnection();
-        $sql = "SELECT RTRIM(LTRIM(MVTL.VTLNA)) AS Vtl
-        FROM MVTL
-        WHERE MVTL.PINO = $facture AND MVTL.REF = '$ref' AND MVTL.DOS = 1 AND MVTL.OP IN ('C','D') AND  MVTL.TICOD = 'C'
-        ";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-    public function getPurchase($ref, $VentAss)
-    {
-        $conn = $this->getEntityManager()
-        ->getConnection();
-        $sql = "SELECT RTRIM(LTRIM(MVTL.PINO)) AS Facture
-        FROM MVTL
-        WHERE MVTL.REF = '$ref' AND MVTL.DOS = 1 AND MVTL.OP IN ('F','G') AND MVTL.TICOD = 'F' AND MVTL.VTLNO IN ($VentAss)
-        ";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
-    public function getCma($facture, $Ref)
-    {
-        $conn = $this->getEntityManager()
-        ->getConnection();
-        $sql = "SELECT (SUM(MontantSign) / SUM(QteSign)) AS Pu
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT Vent,ticod, pinoFou, fou, regimePiece,
+        CASE 
+        WHEN MOUV.MONT <> 0 AND MOUV.FAQTE <> 0 THEN MOUV.MONT/MOUV.FAQTE
+        END AS pa
         FROM(
-        SELECT MOUV.OP AS Op, MOUV.MONT, MOUV.REMPIEMT_0004,MOUV.FAQTE,
-        CASE -- Signature du montant
-            WHEN MOUV.OP IN('F','FD') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-            WHEN MOUV.OP IN('GD','G') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
-            ELSE 0
-        END AS MontantSign,
-        CASE
-            WHEN MOUV.OP IN('F','FD') THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('G','GD') THEN -1*MOUV.FAQTE
-            ELSE 0
-        END AS QteSign
-        FROM MOUV
-        WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FANO IN ($facture) AND MOUV.REF = '$Ref')reponse
+        SELECT Vent,ticod, pinoFou, fou, FOU.TVATIE AS regimePiece
+        FROM(
+        SELECT MVTL.VTLNO AS Vent, MVTL.TICOD AS ticod, MVTL.PINO AS pinoFou, MVTL.TIERS AS fou
+        FROM MVTL
+        WHERE MVTL.VTLNO = $ventilation AND LTRIM(RTRIM(MVTL.REF)) = '$ref' AND MVTL.TICOD = 'F' AND MVTL.PICOD = 4 $filtre
+        )reponse3
+        LEFT JOIN FOU ON fou = FOU.TIERS AND 1 = FOU.DOS) reponse4
+        LEFT JOIN MOUV ON pinoFou = MOUV.FANO AND fou = MOUV.TIERS AND 1 = MOUV.DOS AND '$ref' = MOUV.REF $code
+        WHERE MOUV.TICOD = 'F' AND MOUV.PICOD = 4
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetch();
     }
 
-    public function getDetailPurchase($facture)
+    public function getTransportFournisseur($piece)
     {
-        $conn = $this->getEntityManager()
-        ->getConnection();
-        $sql = "SELECT MOUV.FANO AS Facture,MOUV.REF AS Ref, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2, MOUV.DES AS Designation, MOUV.VENUN AS Uv, MOUV.FAQTE AS Qte,MOUV.OP AS Op, MOUV.REMPIEMT_0004 AS Remise, MOUV.MONT AS Montant,
-        CASE -- Signature du montant
-            WHEN MOUV.OP IN('F','FD') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-            WHEN MOUV.OP IN('GD','G') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
-            ELSE 0
-        END AS MontantSign
-        FROM MOUV
-        WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FANO IN ($facture)
-        
+    
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 
+        "SELECT SUM(MOUV.MONT) AS montant
+        FROM MOUV 
+        INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND ART.FAM_0001 = 'TRANSPOR'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    public function getDetailPieceFournisseur($piece)
+    {
+    
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 
+        "SELECT MOUV.FANO AS Facture, MOUV.REF AS Ref, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,
+         MOUV.DES AS Designation, MOUV.FAQTE AS Qte, MOUV.OP AS Op, MOUV.MONT AS MontantSign
+        FROM MOUV 
+        INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
+    public function getQteHorsPortFournisseur($piece)
+    {
     
-
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 
+        "SELECT SUM(MOUV.FAQTE) AS qte
+        FROM MOUV 
+        INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND ART.FAM_0001 <> 'TRANSPOR'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
 
     
 } 

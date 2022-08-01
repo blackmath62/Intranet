@@ -45,6 +45,7 @@ security:
         - { path: ^/Roby, roles: ROLE_ROBY }
         - { path: ^/Lhermitte, roles: ROLE_LHERMITTE }
         - { path: ^/conges, roles: ROLE_CONGES }
+        - { path: ^/compta, roles: ROLE_COMPTA }
 
     
     role_hierarchy:
