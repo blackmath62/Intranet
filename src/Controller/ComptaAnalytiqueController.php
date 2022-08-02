@@ -20,16 +20,15 @@ class ComptaAnalytiqueController extends AbstractController
     /**
      * @Route("compta/compta_analytique", name="app_compta_analytique")
      */
-    public function getSaleList(Request $request, ComptaAnalytiqueRepository $repo): Response
+    public function index(Request $request, ComptaAnalytiqueRepository $repo): Response
     {
         $achat = [];
         $ventes = [];
-        $estimation = '';
-        $estimationTotal = '';
-        $transport = '';
+        $estimation = 0;
+        $estimationTotal = 0;
         $form = $this->createForm(YearMonthType::class);
-                    $form->handleRequest($request);
- 
+        $form->handleRequest($request);
+        
                     if($form->isSubmitted() && $form->isValid()){
                         $annee = $form->getData()['year'];
                         $mois = $form->getData()['month'];
@@ -37,6 +36,8 @@ class ComptaAnalytiqueController extends AbstractController
                         $exportVentes = $repo->getRapportClient($annee, $mois);
                         // exportation des ventes
                         for ($lig=0; $lig <count($exportVentes) ; $lig++) { 
+                            $port = 0;
+                            
                             $ventes[$lig]['Facture'] = $exportVentes[$lig]['Facture'];
                             $ventes[$lig]['Ref'] = $exportVentes[$lig]['Ref'];
                             $ventes[$lig]['Sref1'] = $exportVentes[$lig]['Sref1'];
@@ -90,7 +91,7 @@ class ComptaAnalytiqueController extends AbstractController
                             if ($achat['pinoFou']) {
                                 // ramener la somme des montants du transport sur cette piéce
                                 $port = $repo->getTransportFournisseur($achat['pinoFou']);
-                                if ($port <> NULL) {
+                                if ($port['montant'] > 0 && $port['montant'] <> 'null') {
                                     // ramener le détail de la piéce fournisseur
                                     $transport = $repo->getDetailPieceFournisseur($achat['pinoFou']);
                                     // La quantité pour les produits qui ne sont pas des articles de transport
@@ -101,15 +102,27 @@ class ComptaAnalytiqueController extends AbstractController
                                         } catch (Exception $e) {
                                             echo 'Exception reçue : ',  $e->getMessage() . $port['montant'] . ' - ' . $estim['qte'], "\n";
                                         }
-                                        if ($exportVentes[$lig]['qteVtl'] ) {
+                                        if ($exportVentes[$lig]['qteVtl'] <> 0 ) {
                                             $ventes[$lig]['estimationTotal'] = $exportVentes[$lig]['qteVtl'] * ($port['montant']/$estim['qte']);
                                         }
                                     }
+                                }else {
+                                    $transport = 0;
                                 }
 
                             }
+                            if ($cmat) {
+                                $ventes[$lig]['prixRetenu'] = $cmat;
+                            }elseif ($cmpt) {
+                                $ventes[$lig]['prixRetenu'] = $cmpt;
+                            }elseif ($crt) {
+                                $ventes[$lig]['prixRetenu'] = $crt;
+                            }else {
+                                $ventes[$lig]['prixRetenu'] = 0;
+                            }
                             $ventes[$lig]['DetailFacture'] = [];
                             $ventes[$lig]['DetailFacture'] = $transport;
+                            
                         }
                     }
         return $this->render('compta_analytique/index.html.twig', [
@@ -118,4 +131,12 @@ class ComptaAnalytiqueController extends AbstractController
             'monthYear' => $form->createView()
             ]);
     }
+
+    // créer une fonction avec l'export qui sera aussi utilisé pour la génération du fichier Excel
+
+    // ajouter les adresses mails concernés par cette export Excel
+
+    // générer un fichier Excel qui sera envoyé par mail aux adresses renseignées
+
+    // ajouter une section par total par compte
 }

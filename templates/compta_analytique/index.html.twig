@@ -10,15 +10,18 @@
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-    <p>Export en cours d'affinage, il est impératif de procéder a des comntrôles manuels pour détecter d'éventuelles incohérences.</br>
-    Cette extraction est le reflet de ce qui est présent dans Divalto....</p>
+    <p>Export en cours d'affinage, il est impératif de procéder a des contrôles manuels pour détecter d'éventuelles incohérences.</br>
+    Cette extraction est le reflet de ce qui est présent dans Divalto, elle ne pourra jamais être parfaite et nécéssitera toujours une intervention humaine....</p>
     <p>CR => Coût de Revient</p>
     <p>CMP => Coût moyen pondéré</p>
     <p>CMA => Coût d'achat</p>
+    <p>La colonne Total Retenu reprends le prix qui est le plus probablement juste dans cette ordre de priorité => prix d'achat, CMP, CR</p>
     <p>Le CMA est déterminé par la ventilation achat associé, il est possible que pour une vente il y ai plusieurs achats concernés,
     pour représenter cela, la quantité vente est éclaté en fonction des ventilations achats dans lesquels elle pioche</p>
     <p>Le compte achat est adapté en fonction du mouvement de ventilation en achat lié, si aucun mouvement en achat n'est trouvé,
     le compte achat est déterminé par le fournisseur habituel de l'article</p>
+    <p>L'estimation du transport ne tient pas compte des ZRPO (Redevance), cette fonctionnalité n'est pas parfaite, 
+    car certains produits ont beau être en plus grande quantité dans la facture fournisseur, cela ne signifie pas qu'ils sont responsable à part égale du transport</p> 
     <!-- /.card-footer-->
     </div>
 </div>
@@ -69,6 +72,7 @@
                                     <th class="text-center"><span>Total CR</span></th>
                                     <th class="text-center"><span>Total CMP</span></th>
                                     <th class="text-center"><span>Total CMA</span></th>
+                                    <th class="text-center"><span>Total Retenu</span></th>
                                     <th class="text-center"><span>Transport Fournisseur</span></th>
                                 </tr>
                             </thead>
@@ -128,6 +132,9 @@
                                             <a class="text-dark">{% if vente.TotalCoutCma %}{{ vente.TotalCoutCma|number_format(4) }}{% endif %}</a>
                                         </td>
                                         <td class="text-center">
+                                            <a class="text-dark">{% if vente.prixRetenu %}{{ vente.prixRetenu|number_format(4) }}{% endif %}</a>
+                                        </td>
+                                        <td class="text-center">
                                             {% if vente.DetailFacture %}<button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-xl-{{ vente.Facture }}"><i class="fas fa-eye"></i></button>{% endif %}
                                         {% if vente.DetailFacture %}
                                         <!-- modal -->
@@ -137,9 +144,21 @@
                                                         <div class="modal-header">
                                                         <div class='d-flex flex-column'>
                                                         <h3 class="modal-title">Détail des factures achats</h3>
-                                                        <span class="modal-title text-left">Le produit concerné : ref: {{ vente.Ref }} Des:{{ vente.Designation }} Sref1: {{ vente.Sref1 }} Sref2: {{ vente.Sref2 }}</span>
-                                                        <span class="modal-title text-left">L'estimation du port par unité de vente est de {{ vente.estimation}}</span>
-                                                        <span class="modal-title text-left">L'estimation du port pour le total des unitées de vente est de {{ vente.estimationTotal }}</span>
+                                                        <span class="modal-title text-left">
+                                                            Le produit concerné : ref: {{ vente.Ref }} Des:{{ vente.Designation }}  
+                                                            {% if vente.Sref1 %} Sref1: {{ vente.Sref1 }}{% endif %}
+                                                            {% if vente.Sref2 %} Sref2: {{ vente.Sref2 }}{% endif %}
+                                                        </span>
+                                                        
+                                                        {% if vente.estimation or vente.estimationTotal %}
+                                                            <span class="modal-title text-left">Seul les produits de la famille 'TRANSPOR' sont utilisés pour calculer l'estimation du port par produits</span>
+                                                        {% endif %}
+                                                        {% if vente.estimation %}
+                                                            <span class="modal-title text-left">L'estimation du port par unité de vente est de {{ vente.estimation|number_format(2) }} €</span>
+                                                        {% endif %}
+                                                        {% if vente.estimationTotal %}
+                                                            <span class="modal-title text-left">L'estimation du port pour le total des unitées de vente est de {{ vente.estimationTotal|number_format(2) }} €</span>
+                                                        {% endif %}
                                                         </div>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                             <span aria-hidden="true">&times;</span>
@@ -150,6 +169,7 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th class="text-center"><span>Facture</span></th>
+                                                                    <th class="text-center"><span>Famille</span></th>
                                                                     <th class="text-center"><span>Référence</span></th>
                                                                     <th class="text-center"><span>Sref1</span></th>
                                                                     <th class="text-center"><span>Sref2</span></th>
@@ -164,6 +184,9 @@
                                                                     <tr>
                                                                         <td class="text-center">
                                                                             <a class="text-dark">{{ detail.Facture }}</a>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a class="text-dark">{{ detail.famille }}</a>
                                                                         </td>
                                                                         <td class="text-center">
                                                                             <a class="text-dark">{{ detail.Ref }}</a>
@@ -224,6 +247,7 @@
                                     <th class="text-center"><span>Total CR</span></th>
                                     <th class="text-center"><span>Total CMP</span></th>
                                     <th class="text-center"><span>Total CMA</span></th>
+                                    <th class="text-center"><span>Total Retenu</span></th>
                                     <th class="text-center"><span>Détail</span></th>
                                 </tr>
                             </tfoot>

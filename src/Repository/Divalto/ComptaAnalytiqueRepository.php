@@ -98,7 +98,7 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
         "SELECT SUM(MOUV.MONT) AS montant
         FROM MOUV 
         INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND ART.FAM_0001 = 'TRANSPOR'
+        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND ART.FAM_0001 = 'TRANSPOR' AND NOT ART.REF IN ('ZRPO196', 'ZRPO196HP', 'ZRPO7', 'ZRPO7HP')
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -110,11 +110,12 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
     
         $conn = $this->getEntityManager()->getConnection();
         $sql = 
-        "SELECT MOUV.FANO AS Facture, MOUV.REF AS Ref, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,
+        "SELECT MOUV.FANO AS Facture, ART.FAM_0001 AS famille, MOUV.REF AS Ref, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,
          MOUV.DES AS Designation, MOUV.FAQTE AS Qte, MOUV.OP AS Op, MOUV.MONT AS MontantSign
         FROM MOUV 
         INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece
+        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND NOT ART.REF IN ('ZRPO196', 'ZRPO196HP', 'ZRPO7', 'ZRPO7HP')
+        ORDER BY ART.FAM_0001
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -129,7 +130,7 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
         "SELECT SUM(MOUV.FAQTE) AS qte
         FROM MOUV 
         INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND ART.FAM_0001 <> 'TRANSPOR'
+        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND ART.FAM_0001 <> 'TRANSPOR' AND NOT ART.REF IN ('ZRPO196', 'ZRPO196HP', 'ZRPO7', 'ZRPO7HP')
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
