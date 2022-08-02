@@ -2,9 +2,15 @@
 
 namespace App\Controller;
 
+use DateTime;
 use Exception;
+use App\Form\AddEmailType;
 use App\Form\YearMonthType;
+use App\Entity\Main\MailList;
+use App\Controller\AdminEmailController;
+use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Divalto\ComptaAnalytiqueRepository;
@@ -17,11 +23,34 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ComptaAnalytiqueController extends AbstractController
 {
+
+    private $mailer;
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
+    private $adminEmailController;
+
+    public function __construct(AdminEmailController $adminEmailController,MailerInterface $mailer, MailListRepository $repoMail)
+    {
+        $this->mailer = $mailer;
+        $this->repoMail =$repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->adminEmailController = $adminEmailController;
+
+        //parent::__construct();
+    }
+
+
     /**
      * @Route("compta/compta_analytique", name="app_compta_analytique")
      */
     public function index(Request $request, ComptaAnalytiqueRepository $repo): Response
     {
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
         $achat = [];
         $ventes = [];
         $estimation = 0;
@@ -125,16 +154,37 @@ class ComptaAnalytiqueController extends AbstractController
                             
                         }
                     }
+
+                    // form pour gérer la liste des mails d'envois
+                    unset($formMails);
+                    $formMails = $this->createForm(AddEmailType::class);
+                    $formMails->handleRequest($request);
+                    if($formMails->isSubmitted() && $formMails->isValid()){
+                        $find = $this->repoMail->findBy(['email' => $formMails->getData()['email'], 'page' => $tracking]);
+                        if (empty($find) | is_null($find)) {
+                            $mail = new MailList();
+                            $mail->setCreatedAt(new DateTime())
+                                ->setEmail($formMails->getData()['email'])
+                                ->setPage($tracking);
+                            $em = $this->getDoctrine()->getManager();
+                            $em->persist($mail);
+                            $em->flush();
+                            $this->addFlash('message', 'le mail a été ajouté avec succés !');
+                        }else {
+                            $this->addFlash('danger', 'le mail est déjà inscrit pour cette page !');
+                            return $this->redirectToRoute('app_compta_analytique');
+                        }
+                    }  
         return $this->render('compta_analytique/index.html.twig', [
             'ventes' => $ventes,
             'title' => 'Compta Analytique par mois',
-            'monthYear' => $form->createView()
+            'monthYear' => $form->createView(),
+            'formMails' => $formMails->createView(),
+            'listeMails' => $this->repoMail->findBy(['page' => $tracking]),
             ]);
     }
 
     // créer une fonction avec l'export qui sera aussi utilisé pour la génération du fichier Excel
-
-    // ajouter les adresses mails concernés par cette export Excel
 
     // générer un fichier Excel qui sera envoyé par mail aux adresses renseignées
 

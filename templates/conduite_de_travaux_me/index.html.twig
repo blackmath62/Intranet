@@ -67,7 +67,7 @@
                                             </div>
                                             <div class="modal-footer justify-content-between">
                                             <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                                            <a type="button" href='{{path('app_email_delete_redirect', {'id' : listeMail.id, 'route' : 'app_conduite_de_travaux_me_nok' } ) }}' class="btn btn-danger">Supprimer</a>
+                                            <a type="button" href='{{path('app_email_delete_redirect', {'id' : listeMail.id, 'route' : app.request.attributes.get('_route')  } ) }}' class="btn btn-danger">Supprimer</a>
                                             </div>
                                         </div>
                                         <!-- /.modal-content -->
