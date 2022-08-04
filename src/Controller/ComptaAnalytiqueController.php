@@ -108,7 +108,6 @@ class ComptaAnalytiqueController extends AbstractController
 
     // créer une fonction avec l'export qui sera aussi utilisé pour la génération du fichier Excel
     public function getRapport($annee, $mois){
-        $achat = [];
         $exportVentes = $this->repoAnal->getRapportClient($annee, $mois);
         // exportation des ventes
         $ventes = [];
@@ -116,6 +115,7 @@ class ComptaAnalytiqueController extends AbstractController
                             $regime = "";
                             $port = 0;
                             $transport = 0;
+                            $achat = [];
                             
                             $ventes[$lig]['Facture'] = $exportVentes[$lig]['Facture'];
                             $ventes[$lig]['Ref'] = $exportVentes[$lig]['Ref'];
@@ -129,6 +129,10 @@ class ComptaAnalytiqueController extends AbstractController
                             $ventes[$lig]['QteSign'] = $exportVentes[$lig]['qteVtl'];
                             $ventes[$lig]['CoutRevient'] = $exportVentes[$lig]['CoutRevient'];
                             $ventes[$lig]['CoutMoyenPondere'] = $exportVentes[$lig]['CoutMoyenPondere'];
+                            $ventes[$lig]['type'] = '';
+                            $ventes[$lig]['color'] = '';
+                            $ventes[$lig]['estimation'] = '';
+                            $ventes[$lig]['estimationTotal'] = '';
                             // rapprocher les achats
                             $achat = $this->repoAnal->getRapportFournisseurAvecSref(
                                         $exportVentes[$lig]['VentAss'], 
@@ -136,6 +140,9 @@ class ComptaAnalytiqueController extends AbstractController
                                         $exportVentes[$lig]['Sref1'], 
                                         $exportVentes[$lig]['Sref2']);
                             $pa = 0;
+                            /*if ($ventes[$lig]['Ref'] == 'EVD3073') {
+                                dd($achat);
+                            }*/
                             if ($achat)
                                 {$pa = $achat['pa'];}
                             $ventes[$lig]['Cma'] = $pa;
@@ -143,13 +150,13 @@ class ComptaAnalytiqueController extends AbstractController
                             $cmpt = 0;
                             $cmat = 0;
                             if ($exportVentes[$lig]['CoutRevient'] <> 0 && $exportVentes[$lig]['qteVtl'] <> 0)
-                                { $crt  = $exportVentes[$lig]['qteVtl'] * $exportVentes[$lig]['CoutRevient']; }
+                                { $crt  = abs($exportVentes[$lig]['qteVtl']) * $exportVentes[$lig]['CoutRevient']; }
                             $ventes[$lig]['TotalCoutRevient'] = $crt;
                             if ($exportVentes[$lig]['CoutMoyenPondere'] <> 0 && $exportVentes[$lig]['qteVtl'] <> 0)
-                                { $cmpt  = $exportVentes[$lig]['qteVtl'] * $exportVentes[$lig]['CoutMoyenPondere']; }
+                                { $cmpt  = abs($exportVentes[$lig]['qteVtl']) * $exportVentes[$lig]['CoutMoyenPondere']; }
                             $ventes[$lig]['TotalCoutMoyenPondere'] = $cmpt;
                             if ($pa <> 0 && $exportVentes[$lig]['qteVtl'] <> 0)
-                                { $cmat  = $exportVentes[$lig]['qteVtl'] * $pa; }
+                                { $cmat  = abs($exportVentes[$lig]['qteVtl']) * $pa; }
                             $ventes[$lig]['TotalCoutCma'] = $cmat;
                             if ($achat['regimePiece']) {
                                 $regime = $achat['regimePiece'];
@@ -164,13 +171,13 @@ class ComptaAnalytiqueController extends AbstractController
                                 $compteAchat = $exportVentes[$lig]['CompteAchat'] + 20000;
                             }
                             $ventes[$lig]['CompteAchat'] = $compteAchat;
-                            $ventes[$lig]['estimation'] = '';
-                            $ventes[$lig]['estimationTotal'] = '';
                             if ($achat['pinoFou']) {
                                 // ramener la somme des montants du transport sur cette piéce
-                                $port = $this->repoAnal->getTransportFournisseur($achat['pinoFou']);
+                                $port = $this->repoAnal->getTransportFournisseur($achat['pinoFou'], $exportVentes[$lig]['Article']);
                                 if ($port['montant'] > 0 && $port['montant'] <> 'null' && $cmat > 0) {
                                     // ramener le détail de la piéce fournisseur
+                                    $ventes[$lig]['type'] = 'truck';
+                                    $ventes[$lig]['color'] = 'secondary';
                                     $transport = $this->repoAnal->getDetailPieceFournisseur($achat['pinoFou']);
                                     // La quantité pour les produits qui ne sont pas des articles de transport
                                     $estim = $this->repoAnal->getQteHorsPortFournisseur($achat['pinoFou']);
@@ -184,6 +191,11 @@ class ComptaAnalytiqueController extends AbstractController
                                             $ventes[$lig]['estimationTotal'] = $exportVentes[$lig]['qteVtl'] * ($port['montant']/$estim['qte']);
                                         }
                                     }
+                                }elseif (($port['montant'] == 0 | $port['montant'] == 'null') && $cmat > 0) {
+                                    // ramener le détail de la piéce fournisseur
+                                    $ventes[$lig]['type'] = 'dollar-sign';
+                                    $ventes[$lig]['color'] = 'warning';
+                                    $transport = $this->repoAnal->getDetailPieceFournisseur($achat['pinoFou']);
                                 }
                             }
                             if ($cmat) {
@@ -197,6 +209,7 @@ class ComptaAnalytiqueController extends AbstractController
                             }
                             $ventes[$lig]['DetailFacture'] = [];
                             $ventes[$lig]['DetailFacture'] = $transport;
+                            unset($achat);
                             
                         }
                         return $ventes;
@@ -700,9 +713,5 @@ class ComptaAnalytiqueController extends AbstractController
          $compteArticleClient = array_values(array_unique($listCompte, SORT_REGULAR)); // faire une liste des comptes, Articles, Clients sans doublon 
          return $compteArticleClient;
      }
-
-    // ajouter une section par total par compte dans le tableau Excel
-
-    // mail automatique à date modifiable par l'utilisateur
 
 }

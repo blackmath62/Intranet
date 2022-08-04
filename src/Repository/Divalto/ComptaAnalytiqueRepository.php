@@ -29,14 +29,23 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
         (
         SELECT RTRIM(LTRIM(MVTL.VTLNA)) AS VentAss, RTRIM(LTRIM(MVTL.QTE)) AS qteVtl, RTRIM(LTRIM(MOUV.DOS)) AS Dos, MOUV.FADT AS DateFacture, RTRIM(LTRIM(MOUV.FANO)) AS Numero,
         RTRIM(LTRIM(MOUV.REF)) AS Ref, RTRIM(LTRIM(MOUV.SREF1)) AS Sref1, RTRIM(LTRIM(MOUV.SREF2)) AS Sref2, RTRIM(LTRIM(ART.DES)) AS Designation, RTRIM(LTRIM(ART.VENUN)) AS Uv,
-        RTRIM(LTRIM(MOUV.OP)) AS Op, RTRIM(LTRIM(SART.CR)) AS CoutRevient, RTRIM(LTRIM(SART.CMP)) AS CoutMoyenPondere,
-        RTRIM(LTRIM(ART.FAM_0002)) AS Article, RTRIM(LTRIM(CLI.STAT_0002)) AS Client, RTRIM(LTRIM(ART.CPTA)) AS CompteAchat,
+        RTRIM(LTRIM(MOUV.OP)) AS Op,RTRIM(LTRIM(ART.FAM_0002)) AS Article, RTRIM(LTRIM(CLI.STAT_0002)) AS Client, RTRIM(LTRIM(ART.CPTA)) AS CompteAchat,
         RTRIM(LTRIM(ART.TVAART)) AS RegimeTva, RTRIM(LTRIM(ART.TIERS)) AS fouPrin, FOU.TVATIE AS regimeFou,
         CASE
             WHEN MOUV.OP IN('C','CD') THEN MOUV.FAQTE
             WHEN MOUV.OP IN('D','DD') THEN -1*MOUV.FAQTE
             ELSE 0
-        END AS QteSign
+        END AS QteSign,
+        CASE
+            WHEN MOUV.OP IN('C','CD') THEN SART.CR
+            WHEN MOUV.OP IN('D','DD') THEN -1*SART.CR
+            ELSE 0
+        END AS CoutRevient,
+        CASE
+            WHEN MOUV.OP IN('C','CD') THEN SART.CMP
+            WHEN MOUV.OP IN('D','DD') THEN -1*SART.CMP
+            ELSE 0
+        END AS CoutMoyenPondere
         FROM MOUV 
         INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
         INNER JOIN FOU ON ART.TIERS = FOU.TIERS AND ART.DOS = FOU.DOS
@@ -72,7 +81,8 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Vent,ticod, pinoFou, fou, regimePiece,
         CASE 
-        WHEN MOUV.MONT <> 0 AND MOUV.FAQTE <> 0 THEN MOUV.MONT/MOUV.FAQTE
+        WHEN MOUV.MONT <> 0 AND MOUV.FAQTE <> 0 AND MOUV.OP IN('F','FD') THEN MOUV.MONT/MOUV.FAQTE
+        WHEN MOUV.MONT <> 0 AND MOUV.FAQTE <> 0 AND MOUV.OP IN('G','GD') THEN (-1 * MOUV.MONT)/MOUV.FAQTE
         END AS pa
         FROM(
         SELECT Vent,ticod, pinoFou, fou, FOU.TVATIE AS regimePiece
@@ -83,22 +93,7 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
         )reponse3
         LEFT JOIN FOU ON fou = FOU.TIERS AND 1 = FOU.DOS) reponse4
         LEFT JOIN MOUV ON pinoFou = MOUV.FANO AND fou = MOUV.TIERS AND 1 = MOUV.DOS AND '$ref' = MOUV.REF $code
-        WHERE MOUV.TICOD = 'F' AND MOUV.PICOD = 4
-        ";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
-    }
-
-    public function getTransportFournisseur($piece)
-    {
-    
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = 
-        "SELECT SUM(MOUV.MONT) AS montant
-        FROM MOUV 
-        INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND ART.FAM_0001 = 'TRANSPOR' AND NOT ART.REF IN ('ZRPO196', 'ZRPO196HP', 'ZRPO7', 'ZRPO7HP')
+        WHERE MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.DOS = 1
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -110,11 +105,23 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
     
         $conn = $this->getEntityManager()->getConnection();
         $sql = 
-        "SELECT MOUV.FANO AS Facture, ART.FAM_0001 AS famille, MOUV.REF AS Ref, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,
-         MOUV.DES AS Designation, MOUV.FAQTE AS Qte, MOUV.OP AS Op, MOUV.MONT AS MontantSign
+        "SELECT MOUV.FANO AS Facture, ART.FAM_0001 AS famille, ART.FAM_0002 AS article, MOUV.REF AS Ref, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2,
+         MOUV.DES AS Designation, MOUV.OP AS Op,
+         CASE
+         WHEN MOUV.OP IN ('FD','F') THEN MOUV.FAQTE
+         WHEN MOUV.OP IN ('GD','G') THEN -1 * MOUV.FAQTE
+         END AS Qte,
+         CASE
+         WHEN MOUV.OP IN ('FD','F') THEN MOUV.MONT
+         WHEN MOUV.OP IN ('GD','G') THEN -1 * MOUV.MONT
+         END AS MontantSign,  
+         CASE
+         WHEN MOUV.MONT <> 0 AND MOUV.FAQTE <> 0 AND MOUV.OP IN ('FD','F') THEN MOUV.MONT/MOUV.FAQTE
+         WHEN MOUV.MONT <> 0 AND MOUV.FAQTE <> 0 AND MOUV.OP IN ('GD','G') THEN (-1 * MOUV.MONT) / MOUV.FAQTE
+         END AS pu
         FROM MOUV 
         INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND NOT ART.REF IN ('ZRPO196', 'ZRPO196HP', 'ZRPO7', 'ZRPO7HP')
+        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND NOT ART.REF IN ('ZRPO196', 'ZRPO196HP', 'ZRPO7', 'ZRPO7HP') AND MOUV.DOS = 1
         ORDER BY ART.FAM_0001
         ";
         $stmt = $conn->prepare($sql);
@@ -127,15 +134,41 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
     
         $conn = $this->getEntityManager()->getConnection();
         $sql = 
-        "SELECT SUM(MOUV.FAQTE) AS qte
+        "SELECT SUM(qte) AS qte
+        FROM(
+        SELECT MOUV.DOS AS dos,
+        CASE
+        WHEN MOUV.OP IN ('FD','F') THEN MOUV.FAQTE
+        WHEN MOUV.OP IN ('GD','G') THEN -1 * MOUV.FAQTE
+        END AS qte
         FROM MOUV 
         INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND ART.FAM_0001 <> 'TRANSPOR' AND NOT ART.REF IN ('ZRPO196', 'ZRPO196HP', 'ZRPO7', 'ZRPO7HP')
+        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND ART.FAM_0001 <> 'TRANSPOR' AND NOT ART.REF IN ('ZRPO196', 'ZRPO196HP', 'ZRPO7', 'ZRPO7HP') AND MOUV.DOS = 1)reponse
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetch();
     }
 
+    public function getTransportFournisseur($piece, $metier)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 
+        "SELECT SUM(montant) AS montant
+        FROM(
+        SELECT MOUV.DOS AS dos,
+        CASE
+        WHEN MOUV.OP IN ('FD','F') THEN MOUV.MONT
+        WHEN MOUV.OP IN ('GD','G') THEN -1 * MOUV.MONT
+        END AS montant
+        FROM MOUV 
+        INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+        WHERE MOUV.PICOD = 4 AND MOUV.TICOD = 'F' AND MOUV.FANO = $piece AND ART.FAM_0001 = 'TRANSPOR' 
+        AND NOT ART.REF IN ('ZRPO196', 'ZRPO196HP', 'ZRPO7', 'ZRPO7HP') AND ART.FAM_0002 = '$metier' AND MOUV.DOS = 1)reponse
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
     
 } 
