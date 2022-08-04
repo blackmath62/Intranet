@@ -14,14 +14,16 @@
     Cette extraction est le reflet de ce qui est présent dans Divalto, elle ne pourra jamais être parfaite et nécéssitera toujours une intervention humaine....</p>
     <p>CR => Coût de Revient</p>
     <p>CMP => Coût moyen pondéré</p>
-    <p>CMA => Coût d'achat</p>
+    <p>CA => Coût d'achat récupéré grâce à la ventilation du mouvement</p>
     <p>La colonne Total Retenu reprends le prix qui est le plus probablement juste dans cette ordre de priorité => prix d'achat, CMP, CR</p>
-    <p>Le CMA est déterminé par la ventilation achat associé, il est possible que pour une vente il y ai plusieurs achats concernés,
+    <p>Le CA est déterminé par la ventilation achat relié à la ventilation vente associé, il est possible que pour une vente il y ai plusieurs achats concernés,
     pour représenter cela, la quantité vente est éclaté en fonction des ventilations achats dans lesquels elle pioche</p>
     <p>Le compte achat est adapté en fonction du mouvement de ventilation en achat lié, si aucun mouvement en achat n'est trouvé,
     le compte achat est déterminé par le fournisseur habituel de l'article</p>
-    <p>L'estimation du transport ne tient pas compte des ZRPO (Redevance), cette fonctionnalité n'est pas parfaite, 
-    car certains produits ont beau être en plus grande quantité dans la facture fournisseur, cela ne signifie pas qu'ils sont responsable à part égale du transport</p> 
+    <p>L'estimation du transport ne tient pas compte des ZRPO (Redevance) dans la division port/quantités, cette fonctionnalité n'est pas parfaite, 
+    car certains produits ont beau être en plus grande quantité dans la facture fournisseur, cela ne signifie pas qu'ils sont responsables à part égale du transport</p>
+    <p>Le port qui est indiqué ne l'ai que si le métier du port est différent de celui du client(fonctionnalité en cours de développement)</p>
+    <p>le mot de passe pour ôter les protections des fichiers Excel est => intranet</p> 
     <!-- /.card-footer-->
     </div>
 </div>
@@ -30,7 +32,7 @@
     <div class="col-md-12">
         <div class="card collapsed-card card-dark">
             <div class="card-header">
-                <h3 class="card-title text-center">Emails d'envoi de la liste des commandes</h3>
+                <h3 class="card-title text-center">Paramétre d'envoi automatique de la compta analytique</h3>
                 <div class="card-tools">
                   <button type="button" class="btn btn-tool" data-card-widget="collapse">
                     <i class="fas fa-minus"></i>
@@ -43,9 +45,14 @@
             <!-- /.card-header -->
             <div class="card-body">
            {{ form_start(formMails)}}
-                <div class="form-group d-flex flex-wrap">
+                <div class="form-group d-flex justify-content-around flex-wrap">
+                    {{ form_label(formMails.SecondOption) }}
+                    {{ form_widget(formMails.SecondOption) }}
                     {{ form_widget(formMails.email) }}
                     {{ form_widget(formMails.Ajouter)}}
+                </div>
+                <div class='text-center m-2'>
+                    <span class="text-secondary"><i class="fas fa-clock text-secondary"></i> Le mois envoyé est toujours le mois précédent à celui en cours.... Exemple : si vous selectionnez le jour d'envoi 20, le 20 février à 00h45 vous recevrez le mois de janvier, le 20 mars à 00h45 => le mois de février, etc...</span>
                 </div>
             {{ form_end(formMails)}}
             {% if listeMails %}
@@ -53,6 +60,7 @@
                     <thead>
                         <tr>
                             <th class="text-center"><span>Email actuellement dans la liste</span></th>
+                            <th class="text-center"><span>Jour d'envoi chaque mois à 00h45</span></th>
                             <th class="text-center"><span>Action</span></th>
                         </tr>
                     </thead>
@@ -61,6 +69,9 @@
                             <tr>
                                 <td class="text-center">
                                     <a class="text-center text-dark">{{ listeMail.email }}</a>
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-center text-dark">{{ listeMail.SecondOption }}</a>
                                 </td>
                                 <td class="text-center">
                                     <a data-toggle="modal" data-target="#modal-default-{{listeMail.id}}" class="text-center btn btn-xl btn-danger"><i class="fas fa-trash-alt"></i></a>
@@ -101,11 +112,14 @@
             <div class="col-md-12">
                 <div class="card card-dark">
                     <div class="card-header d-flex justify-content-between">
-                        <h2 class="card-title">Compta Analytique Lhermitte frères</h2>
+                        <h2 class="card-title">Compta Analytique Lhermitte frères 
+                            {% if annee and mois %}{{mois}} - {{annee}}{% endif %}
+                        </h2>
+                        
                         {{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }} ) }}
                         <div class='d-flex'>
                             <div class="p-1 mt-2">
-                                Selectionnez les dates : 
+                                Selectionnez le mois et l'année : 
                             </div>
                             <div class="p-1">
                                 {{ form_row(monthYear.month) }}
@@ -116,6 +130,13 @@
                             <div class="p-1">
                                 {{ form_row(monthYear.filtrer)}}
                             </div>
+                            {% if ventes %}
+                            <div class="p-1">
+                                <a href="{{path('app_compta_analytique_export_excel', {'annee' : annee, 'mois' : mois, 'type' : 'download' } ) }}" class="btn btn-success">
+                                    <i class="nav-icon fas fa-file-excel"></i>
+                                </a>
+                            </div>
+                            {% endif %}
                         </div>
                     {{ form_end(monthYear)}}
                     </div>
@@ -132,17 +153,17 @@
                                     <th class="text-center"><span>Designation</span></th>
                                     <th class="text-center"><span>Uv</span></th>
                                     <th class="text-center"><span>OP</span></th>
-                                    <th class="text-center"><span>CR</span></th>
-                                    <th class="text-center"><span>CMP</span></th>
-                                    <th class="text-center"><span>CMA</span></th>
+                                    <th class="text-center table-info"><span>CR</span></th>
+                                    <th class="text-center table-warning"><span>CMP</span></th>
+                                    <th class="text-center table-success"><span>CA</span></th>
                                     <th class="text-center"><span>Article</span></th>
                                     <th class="text-center"><span>Client</span></th>
                                     <th class="text-center"><span>Compte Achat</span></th>
-                                    <th class="text-center"><span>Qte Vendu</span></th>
-                                    <th class="text-center"><span>Total CR</span></th>
-                                    <th class="text-center"><span>Total CMP</span></th>
-                                    <th class="text-center"><span>Total CMA</span></th>
-                                    <th class="text-center"><span>Total Retenu</span></th>
+                                    <th class="text-center table-danger"><span>Qte Vendu</span></th>
+                                    <th class="text-center table-info"><span>Total CR</span></th>
+                                    <th class="text-center table-warning"><span>Total CMP</span></th>
+                                    <th class="text-center table-success"><span>Total CA</span></th>
+                                    <th class="text-center table-primary"><span>Total Proposé</span></th>
                                     <th class="text-center"><span>Transport Fournisseur</span></th>
                                 </tr>
                             </thead>
@@ -171,14 +192,26 @@
                                         <td class="text-left">
                                             <a class="text-dark">{{ vente.Op }}</a>
                                         </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.CoutRevient|number_format(4) }}</a>
+                                        <td class="text-center table-info">
+                                            <a class="text-dark">
+                                            {% if vente.CoutRevient %}
+                                                {{ vente.CoutRevient|number_format(4) }}
+                                            {% endif %}
+                                            </a>
                                         </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.CoutMoyenPondere|number_format(4) }}</a>
+                                        <td class="text-center table-warning">
+                                            <a class="text-dark">
+                                            {% if vente.CoutMoyenPondere %}
+                                                {{ vente.CoutMoyenPondere|number_format(4) }}
+                                            {% endif %}
+                                            </a>
                                         </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.Cma|number_format(4) }}</a>
+                                        <td class="text-center table-success">
+                                            <a class="text-dark">
+                                            {% if vente.Cma %}
+                                                {{ vente.Cma|number_format(4) }}
+                                            {% endif %}
+                                            </a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark">{{ vente.Article }}</a>
@@ -189,23 +222,27 @@
                                         <td class="text-center">
                                             <a class="text-dark">{{ vente.CompteAchat }}</a>
                                         </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.QteSign }}</a>
+                                        <td class="text-center table-danger">
+                                            <a class="text-dark">
+                                            {% if vente.QteSign %}
+                                                {{ vente.QteSign }}
+                                            {% endif %}
+                                            </a>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-center table-info">
                                             <a class="text-dark">{% if vente.TotalCoutRevient %}{{ vente.TotalCoutRevient|number_format(4) }}{% endif %}</a>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-center table-warning">
                                             <a class="text-dark">{% if vente.TotalCoutMoyenPondere %}{{ vente.TotalCoutMoyenPondere|number_format(4) }}{% endif %}</a>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-center table-success">
                                             <a class="text-dark">{% if vente.TotalCoutCma %}{{ vente.TotalCoutCma|number_format(4) }}{% endif %}</a>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-center table-primary">
                                             <a class="text-dark">{% if vente.prixRetenu %}{{ vente.prixRetenu|number_format(4) }}{% endif %}</a>
                                         </td>
                                         <td class="text-center">
-                                            {% if vente.DetailFacture %}<button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-xl-{{ vente.Facture }}"><i class="fas fa-eye"></i></button>{% endif %}
+                                            {% if vente.DetailFacture %}<button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-xl-{{ vente.Facture }}"><i class="fas fa-truck"></i></button>{% endif %}
                                         {% if vente.DetailFacture %}
                                         <!-- modal -->
                                                 <div class="modal fade" id="modal-xl-{{ vente.Facture }}">
@@ -307,18 +344,18 @@
                                     <th class="text-center"><span>Designation</span></th>
                                     <th class="text-center"><span>Uv</span></th>
                                     <th class="text-center"><span>OP</span></th>
-                                    <th class="text-center"><span>CR</span></th>
-                                    <th class="text-center"><span>CMP</span></th>
-                                    <th class="text-center"><span>CMA</span></th>
+                                    <th class="text-center table-info"><span>CR</span></th>
+                                    <th class="text-center table-warning"><span>CMP</span></th>
+                                    <th class="text-center table-success"><span>CA</span></th>
                                     <th class="text-center"><span>Article</span></th>
                                     <th class="text-center"><span>Client</span></th>
                                     <th class="text-center"><span>Compte Achat</span></th>
-                                    <th class="text-center"><span>Qte Vendu</span></th>
-                                    <th class="text-center"><span>Total CR</span></th>
-                                    <th class="text-center"><span>Total CMP</span></th>
-                                    <th class="text-center"><span>Total CMA</span></th>
-                                    <th class="text-center"><span>Total Retenu</span></th>
-                                    <th class="text-center"><span>Détail</span></th>
+                                    <th class="text-center table-danger"><span>Qte Vendu</span></th>
+                                    <th class="text-center table-info"><span>Total CR</span></th>
+                                    <th class="text-center table-warning"><span>Total CMP</span></th>
+                                    <th class="text-center table-success"><span>Total CA</span></th>
+                                    <th class="text-center table-primary"><span>Total Proposé</span></th>
+                                    <th class="text-center"><span>Transport Fournisseur</span></th>
                                 </tr>
                             </tfoot>
                         </table>
