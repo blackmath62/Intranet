@@ -55,8 +55,9 @@ class ControleAnomaliesController extends AbstractController
     private $mailTreatement;
     private $adminEmailController;
     private $repoUsers;
+    private $comptaAnalytiqueController;	
 
-    public function __construct(UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(ComptaAnalytiqueController $comptaAnalytiqueController, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -78,6 +79,7 @@ class ControleAnomaliesController extends AbstractController
         $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
         $this->adminEmailController = $adminEmailController;
         $this->repoUsers = $repoUsers;
+        $this->comptaAnalytiqueController = $comptaAnalytiqueController;
         //parent::__construct();
     }
 
@@ -131,6 +133,9 @@ class ControleAnomaliesController extends AbstractController
                     $this->MajCmdRobyAccepteReporte();
                     $this->cmdRobyController->sendMail();
             }
+            }
+            if ($heure >= 20 && $heure < 4) {
+                $this->comptaAnalytiqueController->sendMail();
             }
             $this->run_auto_wash();
         }
