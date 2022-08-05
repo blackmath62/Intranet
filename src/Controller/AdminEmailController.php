@@ -3,9 +3,10 @@
 namespace App\Controller;
 
 use DateTime;
-use Symfony\Component\Mime\Address;
 use App\Form\AddEmailType;
 use App\Entity\Main\MailList;
+use App\Form\AddEmailFeuType;
+use Symfony\Component\Mime\Address;
 use App\Form\AddEmailTreatementType;
 use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +40,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
         $formSendGeneralWithMails = $this->createForm(AddEmailType::class);
         $formSendGeneralWithMails->handleRequest($request);
         if($formSendGeneralWithMails->isSubmitted() && $formSendGeneralWithMails->isValid()){
-            $find = $this->repoMail->findBy(['email' => $formSendGeneralWithMails->getData()['email'], 'page' => $tracking]);
+            $find = $this->repoMail->findBy(['email' => $formSendGeneralWithMails->getData()['email'], 'page' => $tracking, 'SecondOption' => 'envoi']);
             if (empty($find) | is_null($find)) {
                 $mailEnvoi = $this->repoMail->getEmailEnvoi();
                 if ($mailEnvoi == NULL) {
@@ -57,7 +58,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
                 }
             }else {
                 $this->addFlash('danger', 'le mail est déjà inscrit pour ce paramétre !');
-                return $this->redirectToRoute('app_admin_email');
+                return $this->redirectToRoute($tracking);
             }
         }
         
@@ -65,7 +66,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
         $formSendTreatementWithMails = $this->createForm(AddEmailTreatementType::class);
         $formSendTreatementWithMails->handleRequest($request);
         if($formSendTreatementWithMails->isSubmitted() && $formSendTreatementWithMails->isValid()){
-            $find = $this->repoMail->findBy(['email' => $formSendTreatementWithMails->getData()['email'], 'page' => $tracking]);
+            $find = $this->repoMail->findBy(['email' => $formSendTreatementWithMails->getData()['email'], 'page' => $tracking, 'SecondOption' => 'traitement']);
             if (empty($find) | is_null($find)) {
                 $mailEnvoi = $this->repoMail->findOneBy(['page' => 'app_admin_email', 'SecondOption' => 'traitement']);
                 if ($mailEnvoi == NULL) {
@@ -83,7 +84,27 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
                 }
             }else {
                 $this->addFlash('danger', 'le mail est déjà inscrit pour ce paramétre !');
-                return $this->redirectToRoute('app_admin_email');
+                return $this->redirectToRoute($tracking);
+            }
+        }
+
+        unset($formFeu);
+        $formFeu = $this->createForm(AddEmailFeuType::class);
+        $formFeu->handleRequest($request);
+        if($formFeu->isSubmitted() && $formFeu->isValid()){
+            $find = $this->repoMail->findBy(['email' => $formFeu->getData()['email'], 'page' => $tracking, 'SecondOption' => 'feu']);
+            if (empty($find) | is_null($find)) {
+                $mail = new MailList();
+                $mail->setCreatedAt(new DateTime())
+                     ->setEmail($formFeu->getData()['email'])
+                     ->setPage($tracking)
+                     ->setSecondOption('feu');
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($mail);
+                $em->flush();
+            }else {
+                $this->addFlash('danger', 'le mail est déjà inscrit pour cette page !');
+                return $this->redirectToRoute($tracking);
             }
         }
 
@@ -91,8 +112,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
             'controller_name' => 'AdminEmailController',
             'formSendGeneralWithMails' => $formSendGeneralWithMails->createView(),
             'formSendTreatementWithMails' => $formSendTreatementWithMails->createView(),
+            'formFeu' => $formFeu->createView(),
             'listeMailsGeneral' => $this->repoMail->findBy(['page' => $tracking, 'SecondOption' => 'envoi']),
             'listeMailsTreatement' => $this->repoMail->findBy(['page' => $tracking, 'SecondOption' => 'traitement']),
+            'listeMailsFeu' => $this->repoMail->findBy(['page' => $tracking, 'SecondOption' => 'feu']),
             'title' => "Paramétrage des Emails"
         ]);
     }

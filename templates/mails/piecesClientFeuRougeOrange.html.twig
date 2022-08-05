@@ -1,0 +1,41 @@
+<p>Bonjour,</p>
+<p>Veuillez trouver ci dessous la liste des piéces saisies la veille pour les clients Feu Rouge et Orange</p>
+</br>
+
+{% if pieces %}
+    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+        <thead>
+            <tr class="text-center">
+            <th>Tiers</th>
+            <th>Nom</th>
+            <th>OP</th>
+            <th>Feu</th>
+            <th>Types Piéces</th>
+            <th>Numéros Piéces</th>
+            <th>Dates Piéces</th>
+            <th>Montant HT</th>
+            <th>Créateurs piéces</th>
+            <th>Commercial du client</th>
+        </thead>
+        <tbody>
+{% for piece in pieces %}
+        <tr>
+            <td>{{ piece.tiers }}</td>
+            <td>{{ piece.nom }}</td>
+            <td>{{ piece.op }}</td>
+            <td>{{ piece.feu }}</td>
+            <td>{{ piece.typePiece }}</td>
+            <td>{{ piece.numPiece }}</td>
+            <td>{% if piece.datePiece %}{{ piece.datePiece|date('d-m-Y') }}{% endif %}</td>
+            <td>{{ piece.montant }}</td>
+            <td>{{ piece.userCr }}</td>
+            <td>{{ piece.commercial }}</td>
+        </tr>
+{% endfor %}
+       </tbody>
+    </table>
+{% endif %}
+
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

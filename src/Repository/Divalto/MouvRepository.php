@@ -546,4 +546,42 @@ public function getAchatLieAffaireConduitetravaux($affaire):array
     return $stmt->fetchAll();
 }
 
+// Commande et BL de la veille pour les clients feu rouge et orange
+public function getCmdBlClientFeuRougeOrange():array
+{
+    $conn = $this->getEntityManager()->getConnection();
+    $sql = "SELECT * 
+    FROM(
+        SELECT ENT.TIERS AS tiers, CLI.NOM AS nom, ENT.OP AS op,
+        CASE
+        WHEN CLI.FEU = 1 THEN 'vert'
+        WHEN CLI.FEU = 2 THEN 'orange'
+        WHEN CLI.FEU = 3 THEN 'rouge'
+        END AS feu, 
+        CASE
+        WHEN ENT.PICOD = 2 THEN 'cmd'
+        WHEN ENT.PICOD = 3 THEN 'bl'
+        END AS typePiece,
+        CASE
+        WHEN ENT.PICOD IN(2,3) THEN ENT.PINO
+        END AS numPiece,
+        CASE
+        WHEN ENT.PICOD IN(2,3) THEN ENT.PIDT
+        END AS datePiece,
+        CASE
+        WHEN ENT.OP IN ('CD','C') THEN ENT.HTPDTMT
+        WHEN ENT.OP IN ('DD','D') THEN -1*ENT.HTPDTMT
+        END AS montant, 
+        ENT.USERCR AS userCr, VRP.NOM AS commercial
+        FROM ENT
+        INNER JOIN CLI ON CLI.DOS = ENT.DOS AND CLI.TIERS = ENT.TIERS
+        INNER JOIN VRP ON VRP.TIERS = CLI.REPR_0001 AND VRP.DOS = ENT.DOS
+        WHERE ENT.PIDT = DATEADD(day,-1,CAST(GETDATE() as date)) AND ENT.CE4 = 1 )reponse
+        WHERE feu <> 'vert'
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll();
+}
+
 }

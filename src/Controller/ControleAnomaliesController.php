@@ -55,9 +55,10 @@ class ControleAnomaliesController extends AbstractController
     private $mailTreatement;
     private $adminEmailController;
     private $repoUsers;
-    private $comptaAnalytiqueController;	
+    private $comptaAnalytiqueController;
+    private $clientFeuRougeOrangeController;	
 
-    public function __construct(ComptaAnalytiqueController $comptaAnalytiqueController, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(ClientFeuRougeOrangeController $clientFeuRougeOrangeController, ComptaAnalytiqueController $comptaAnalytiqueController, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -80,6 +81,7 @@ class ControleAnomaliesController extends AbstractController
         $this->adminEmailController = $adminEmailController;
         $this->repoUsers = $repoUsers;
         $this->comptaAnalytiqueController = $comptaAnalytiqueController;
+        $this->clientFeuRougeOrangeController = $clientFeuRougeOrangeController;
         //parent::__construct();
     }
 
@@ -135,7 +137,10 @@ class ControleAnomaliesController extends AbstractController
             }
             }
             if ($heure >= 20 && $heure < 4) {
+                // envoi automatique de la compta analytique
                 $this->comptaAnalytiqueController->sendMail();
+                // envoi automatique des piéces clients feu rouge et orange
+                $this->clientFeuRougeOrangeController->sendMail();
             }
             $this->run_auto_wash();
         }
