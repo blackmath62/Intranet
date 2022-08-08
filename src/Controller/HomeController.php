@@ -76,7 +76,7 @@ class HomeController extends AbstractController
                  'id' => $event->getId(),
                  'start' => $start,
                  'end' => $end,
-                 'title' => 'Congés ' . $pseudo,
+                 'title' => 'Congés ' . $pseudo . ' du ' . $event->getStart()->format('d-m-Y') . ' au ' . $event->getEnd()->format('d-m-Y'),
                  'backgroundColor' => $color,
                  'borderColor' => '#FFFFFF',
                  'textColor' => $textColor,
