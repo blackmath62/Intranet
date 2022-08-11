@@ -43,6 +43,19 @@ class FouRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    public function getFournisseurDivalto():array
+    {
+        $conn = $this->getEntityManager()
+        ->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(FOU.TIERS)) AS tiers, LTRIM(RTRIM(FOU.NOM)) AS nom
+        FROM FOU
+        WHERE FOU.DOS = 1 AND FOU.HSDT IS NULL
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
     
     public function SurveillanceFournisseurLhermitteReglStatVrpTransVisaTvaPay():array
     {

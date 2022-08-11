@@ -46,6 +46,7 @@ security:
         - { path: ^/Lhermitte, roles: ROLE_LHERMITTE }
         - { path: ^/conges, roles: ROLE_CONGES }
         - { path: ^/compta, roles: ROLE_COMPTA }
+        - { path: ^/rs, roles: ROLE_RESPONSABLE_SECTEUR }
 
     
     role_hierarchy:
