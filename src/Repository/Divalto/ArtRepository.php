@@ -229,25 +229,17 @@ class ArtRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    public function ControleCreationVivienArticle():array
+    public function StockBlobMatiereDangeureuse():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT LTRIM(RTRIM(ART.REF)) AS Ref, LTRIM(RTRIM(SART.SREF1)) AS Sref1, LTRIM(RTRIM(SART.SREF2)) AS Sref2,
-        LTRIM(RTRIM(ART.DES)) AS Designation, LTRIM(RTRIM(ART.REFUN)) AS Uv, LTRIM(RTRIM(ART.TIERS)) AS Fournisseur, 
-        LTRIM(RTRIM(ART.USERCR)) AS ArtUserCreation, LTRIM(RTRIM(ART.USERCRDH)) AS ArtUserDateCreation, 
-        LTRIM(RTRIM(ART.USERMO)) AS ArtUserModification, LTRIM(RTRIM(ART.USERMODH)) AS ArtUserDateModification, 
-        LTRIM(RTRIM(SART.USERCR)) AS SartUserCreation, LTRIM(RTRIM(SART.USERCRDH)) AS SartUserDateCreation, 
-        LTRIM(RTRIM(SART.USERMO)) AS SartUserModification, LTRIM(RTRIM(SART.USERMODH)) AS SartUserDateModification
-        FROM ART
-        LEFT JOIN SART ON ART.DOS = SART.DOS AND ART.REF = SART.REF
-        WHERE ART.DOS = 1 
-        AND (
-        (ART.USERCR = 'JEROME' AND ART.USERCRDH = GETDATE()) 
-        OR (ART.USERMO = 'JEROME' AND ART.USERMODH = GETDATE()) 
-        OR (SART.USERCR = 'JEROME' AND SART.USERCRDH = GETDATE()) 
-        OR (SART.USERMO = 'JEROME' AND SART.USERMODH = GETDATE())
-        )
-        ORDER BY ART.REF
+        $sql = "SELECT l.REF AS ref, l.SREF1 AS sref1, l.SREF2 AS sref2, a.DES AS designation, a.VENUN AS uv, l.EDCOD_0001 AS code, a.TIERS AS fournisseur,SUM(s.QTETJSENSTOCK) AS stock, l.NOTE_0001 AS note, n.NOTEBLOB AS blob
+        FROM LART l
+        INNER JOIN ART a ON a.REF = l.REF AND a.DOS = l.DOS
+        INNER JOIN MNOTE n ON n.NOTE = l.NOTE_0001 
+        LEFT JOIN MVTL_STOCK_V s ON a.REF = s.REFERENCE AND l.SREF1 = s.SREFERENCE1 AND l.SREF2 = s.SREFERENCE2
+        WHERE l.EDCOD_0001 <> '' AND l.DOS = 1 AND a.HSDT IS NULL
+        GROUP BY l.REF, l.SREF1, l.SREF2, a.DES, a.VENUN, l.EDCOD_0001, a.TIERS, l.NOTE_0001, n.NOTEBLOB
+        ORDER BY a.TIERS
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();

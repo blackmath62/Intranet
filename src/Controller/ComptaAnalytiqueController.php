@@ -56,6 +56,11 @@ class ComptaAnalytiqueController extends AbstractController
      */
     public function index(Request $request): Response
     {
+        ini_set('memory_limit', '1024M');
+        ini_set('max_execution_time', 0);
+        // désactiver le Garbage Collector
+        gc_disable();  
+
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
@@ -67,34 +72,37 @@ class ComptaAnalytiqueController extends AbstractController
         $form->handleRequest($request);
         
         if($form->isSubmitted() && $form->isValid()){
-                        $annee = $form->getData()['year'];
-                        $mois = $form->getData()['month'];
-                        
-                        // appel de ma fonction
-                        $ventes = $this->getRapport($annee, $mois);
-                    }
+            $annee = $form->getData()['year'];
+            $mois = $form->getData()['month'];
+            
+            // appel de ma fonction
+            $ventes = $this->getRapport($annee, $mois);
+        }
 
-                    // form pour gérer la liste des mails d'envois
-                    unset($formMails);
-                    $formMails = $this->createForm(AddEmailWithNumberType::class);
-                    $formMails->handleRequest($request);
-                    if($formMails->isSubmitted() && $formMails->isValid()){
-                        $find = $this->repoMail->findBy(['email' => $formMails->getData()['email'], 'page' => $tracking]);
-                        if (empty($find) | is_null($find)) {
-                            $mail = new MailList();
-                            $mail->setCreatedAt(new DateTime())
-                                ->setEmail($formMails->getData()['email'])
-                                ->setSecondOption($formMails->getData()['SecondOption'])
-                                ->setPage($tracking);
-                            $em = $this->getDoctrine()->getManager();
-                            $em->persist($mail);
-                            $em->flush();
-                            $this->addFlash('message', 'le mail a été ajouté avec succés !');
-                        }else {
-                            $this->addFlash('danger', 'le mail est déjà inscrit pour cette page !');
-                            return $this->redirectToRoute('app_compta_analytique');
-                        }
-                    }  
+            // form pour gérer la liste des mails d'envois
+            unset($formMails);
+            $formMails = $this->createForm(AddEmailWithNumberType::class);
+            $formMails->handleRequest($request);
+            if($formMails->isSubmitted() && $formMails->isValid()){
+                $find = $this->repoMail->findBy(['email' => $formMails->getData()['email'], 'page' => $tracking]);
+                if (empty($find) | is_null($find)) {
+                    $mail = new MailList();
+                    $mail->setCreatedAt(new DateTime())
+                        ->setEmail($formMails->getData()['email'])
+                        ->setSecondOption($formMails->getData()['SecondOption'])
+                        ->setPage($tracking);
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($mail);
+                    $em->flush();
+                    $this->addFlash('message', 'le mail a été ajouté avec succés !');
+                }else {
+                    $this->addFlash('danger', 'le mail est déjà inscrit pour cette page !');
+                    return $this->redirectToRoute('app_compta_analytique');
+                }
+            }
+        // lancement manuel du Garbage Collector pour libérer de la mémoire
+        gc_collect_cycles();
+
         return $this->render('compta_analytique/index.html.twig', [
             'ventes' => $ventes,
             'annee' => $annee,
@@ -118,6 +126,7 @@ class ComptaAnalytiqueController extends AbstractController
                             $achat = [];
                             
                             $ventes[$lig]['Facture'] = $exportVentes[$lig]['Facture'];
+                            $ventes[$lig]['Tiers'] = $exportVentes[$lig]['Tiers'];
                             $ventes[$lig]['Ref'] = $exportVentes[$lig]['Ref'];
                             $ventes[$lig]['Sref1'] = $exportVentes[$lig]['Sref1'];
                             $ventes[$lig]['Sref2'] = $exportVentes[$lig]['Sref2'];
@@ -140,9 +149,6 @@ class ComptaAnalytiqueController extends AbstractController
                                         $exportVentes[$lig]['Sref1'], 
                                         $exportVentes[$lig]['Sref2']);
                             $pa = 0;
-                            /*if ($ventes[$lig]['Ref'] == 'EVD3073') {
-                                dd($achat);
-                            }*/
                             if ($achat)
                                 {$pa = $achat['pa'];}
                             $ventes[$lig]['Cma'] = $pa;
@@ -198,7 +204,7 @@ class ComptaAnalytiqueController extends AbstractController
                                     $transport = $this->repoAnal->getDetailPieceFournisseur($achat['pinoFou']);
                                 }
                             }
-                            if ($cmat) {
+                            if ($cmat && $cmat > 0) {
                                 $ventes[$lig]['prixRetenu'] = $cmat;
                             }elseif ($cmpt) {
                                 $ventes[$lig]['prixRetenu'] = $cmpt;
@@ -231,7 +237,7 @@ class ComptaAnalytiqueController extends AbstractController
        if ($treatementMails) {
 
            $mails = $this->adminEmailController->formateEmailList($treatementMails); 
-           $excel = $this->get_states_excel_metier($annee, $mois, 'mail');
+           $excel = $this->get_compta_analytique_excel($annee, $mois, 'mail');
            $html = $this->renderView('mails/sendMailComptaAnalytique.html.twig');
            $email = (new Email())
            ->from($this->mailEnvoi)
@@ -250,7 +256,7 @@ class ComptaAnalytiqueController extends AbstractController
      * @Route("compta/compta_analytique/export/excel/{annee}/{mois}/{type}", name="app_compta_analytique_export_excel")
      */ 
  
-     public function get_states_excel_metier($annee, $mois, $type){
+     public function get_compta_analytique_excel($annee, $mois, $type){
  
         //$request = new Request();
         // tracking user page for stats
@@ -259,6 +265,8 @@ class ComptaAnalytiqueController extends AbstractController
          
          ini_set('memory_limit', '1024M');
          ini_set('max_execution_time', 0);
+         // désactiver le Garbage Collector
+         gc_disable();  
  
          $spreadsheet = new Spreadsheet();
          
@@ -267,46 +275,48 @@ class ComptaAnalytiqueController extends AbstractController
          $sheet->setTitle('detail');
          // Entête de colonne
          $sheet->getCell('A5')->setValue('Facture');
-         $sheet->getCell('B5')->setValue('Ref');
-         $sheet->getCell('C5')->setValue('Sref1');
-         $sheet->getCell('D5')->setValue('Sref2');
-         $sheet->getCell('E5')->setValue('Désignation');
-         $sheet->getCell('F5')->setValue('Uv');
-         $sheet->getCell('G5')->setValue('OP');
-         $sheet->getCell('H5')->setValue('CR');
-         $sheet->getCell('I5')->setValue('CMP');
-         $sheet->getCell('J5')->setValue('CA');
-         $sheet->getCell('K5')->setValue('Article');
-         $sheet->getCell('L5')->setValue('Client');
-         $sheet->getCell('M5')->setValue('Compte Achat');
-         $sheet->getCell('N5')->setValue('Qte Vendu');
-         $sheet->getCell('O5')->setValue('Total CR');
-         $sheet->getCell('P5')->setValue('Total CMP');
-         $sheet->getCell('Q5')->setValue('Total CA');
-         $sheet->getCell('R5')->setValue('Total Proposé');
-         $sheet->getCell('S5')->setValue('Port total estimé');
-         $sheet->getCell('T5')->setValue('Pu Corrigé');
-         $sheet->getCell('U5')->setValue('Total Corrigé');
-         $sheet->getCell('V5')->setValue('Port Corrigé');
-         $sheet->getCell('W5')->setValue('Total Port Corrigé');
+         $sheet->getCell('B5')->setValue('Tiers');
+         $sheet->getCell('C5')->setValue('Ref');
+         $sheet->getCell('D5')->setValue('Sref1');
+         $sheet->getCell('E5')->setValue('Sref2');
+         $sheet->getCell('F5')->setValue('Désignation');
+         $sheet->getCell('G5')->setValue('Uv');
+         $sheet->getCell('H5')->setValue('OP');
+         $sheet->getCell('I5')->setValue('CR');
+         $sheet->getCell('J5')->setValue('CMP');
+         $sheet->getCell('K5')->setValue('CA');
+         $sheet->getCell('L5')->setValue('Article');
+         $sheet->getCell('M5')->setValue('Client');
+         $sheet->getCell('N5')->setValue('Compte Achat');
+         $sheet->getCell('O5')->setValue('Qte Vendu');
+         $sheet->getCell('P5')->setValue('Total CR');
+         $sheet->getCell('Q5')->setValue('Total CMP');
+         $sheet->getCell('R5')->setValue('Total CA');
+         $sheet->getCell('S5')->setValue('Total Proposé');
+         $sheet->getCell('T5')->setValue('Port total estimé');
+         $sheet->getCell('U5')->setValue('Pu Corrigé');
+         $sheet->getCell('V5')->setValue('Total Corrigé');
+         $sheet->getCell('W5')->setValue('Port total des uv Corrigé');
+         $sheet->getCell('X5')->setValue('Total Port Corrigé');
+         $sheet->getCell('Y5')->setValue('Commentaires');
 
          // Increase row cursor after header write
          $sheet->fromArray($this->getDataDetail($annee, $mois),null, 'A6', true);
          $dernLign = count($this->getDataDetail($annee, $mois)) + 5;
          
-         $sheet->setCellValue("O4", "=SUBTOTAL(9,O6:O{$dernLign})"); // Total CR
-         $sheet->setCellValue("P4", "=SUBTOTAL(9,P6:P{$dernLign})"); // Total CMP
-         $sheet->setCellValue("Q4", "=SUBTOTAL(9,Q6:Q{$dernLign})"); // Total CA
-         $sheet->setCellValue("R4", "=SUBTOTAL(9,R6:R{$dernLign})"); // Total proposé
-         $sheet->setCellValue("S4", "=SUBTOTAL(9,S6:S{$dernLign})"); // Total port Estimé
-         $sheet->setCellValue("T4", "=SUBTOTAL(9,T6:T{$dernLign})"); // Total Modification
-         $sheet->setCellValue("U4", "=SUBTOTAL(9,U6:U{$dernLign})"); // Total Corrigé
-         $sheet->setCellValue("V4", "=SUBTOTAL(9,V6:V{$dernLign})"); // Port Corrigé
-         $sheet->setCellValue("W4", "=SUBTOTAL(9,W6:W{$dernLign})"); // Total port Corrigé
+         $sheet->setCellValue("P4", "=SUBTOTAL(9,P6:P{$dernLign})"); // Total CR
+         $sheet->setCellValue("Q4", "=SUBTOTAL(9,Q6:Q{$dernLign})"); // Total CMP
+         $sheet->setCellValue("R4", "=SUBTOTAL(9,R6:R{$dernLign})"); // Total CA
+         $sheet->setCellValue("S4", "=SUBTOTAL(9,S6:S{$dernLign})"); // Total proposé
+         $sheet->setCellValue("T4", "=SUBTOTAL(9,T6:T{$dernLign})"); // Total port Estimé
+         $sheet->setCellValue("U4", "=SUBTOTAL(9,U6:U{$dernLign})"); // Total Modification
+         $sheet->setCellValue("V4", "=SUBTOTAL(9,V6:V{$dernLign})"); // Total Corrigé
+         $sheet->setCellValue("W4", "=SUBTOTAL(9,W6:W{$dernLign})"); // Port Corrigé
+         $sheet->setCellValue("X4", "=SUBTOTAL(9,X6:X{$dernLign})"); // Total port Corrigé
 
          for ($j=6; $j <= $dernLign ; $j++) { 
-            $sheet->setCellValue("U" . $j ,"=IF(T" . $j . "<>0,T" . $j . "*N" . $j . ",R" . $j . " )"); // Total Corrigé
-            $sheet->setCellValue("W" . $j ,"=IF(V" . $j . "<>0,V" . $j . ",S" . $j . " )"); // Total port Corrigé
+            $sheet->setCellValue("V" . $j ,"=IF(U" . $j . "<>0,U" . $j . "*O" . $j . ",S" . $j . " )"); // Total Corrigé
+            $sheet->setCellValue("X" . $j ,"=IF(W" . $j . "<>0,W" . $j . ",T" . $j . " )"); // Total port Corrigé
          }
          
          $d = new DateTime('NOW');
@@ -336,51 +346,52 @@ class ComptaAnalytiqueController extends AbstractController
                  ],
              ],
          ];
-         $spreadsheet->getActiveSheet()->getStyle("A5:W{$dernLign}")->applyFromArray($styleArray);
+         $spreadsheet->getActiveSheet()->getStyle("A5:X{$dernLign}")->applyFromArray($styleArray);
+         
          // Le style cr en BLEU CLAIR
-         $spreadsheet->getActiveSheet()->getStyle("H6:H{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("I6:I{$dernLign}")->getFill()
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('bee5eb');
-         $spreadsheet->getActiveSheet()->getStyle("O4:O{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("P4:P{$dernLign}")->getFill()
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('bee5eb');
          // Le style cmp en JAUNE
-         $spreadsheet->getActiveSheet()->getStyle("I6:I{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("J6:J{$dernLign}")->getFill() 
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('ffeeba');
-         $spreadsheet->getActiveSheet()->getStyle("P4:P{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("Q4:Q{$dernLign}")->getFill() 
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('ffeeba');
          // Le style CA en vERT CLAIR
-         $spreadsheet->getActiveSheet()->getStyle("J6:J{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("K6:K{$dernLign}")->getFill() 
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('c3e6cb');
-         $spreadsheet->getActiveSheet()->getStyle("Q4:Q{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("R4:R{$dernLign}")->getFill() 
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('c3e6cb');
          // Le style qTE en ROUGE
-         $spreadsheet->getActiveSheet()->getStyle("N6:N{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("O6:O{$dernLign}")->getFill() 
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('f5c6cb');
          // Le style TOTAL RETENU et port estimé en BLEU FONCE
-         $spreadsheet->getActiveSheet()->getStyle("R4:R{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("S4:S{$dernLign}")->getFill() 
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('b8daff');
-         $spreadsheet->getActiveSheet()->getStyle("S4:S{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("T4:T{$dernLign}")->getFill() 
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('b8daff');
          // Le style Champs modifiable en rose CLAIR
-         $spreadsheet->getActiveSheet()->getStyle("T4:T{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("U4:U{$dernLign}")->getFill() 
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('FBD5ED');
-         $spreadsheet->getActiveSheet()->getStyle("V4:V{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("W4:W{$dernLign}")->getFill() 
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('FBD5ED');
          // Le style totaux modifiés en violet CLAIR
-         $spreadsheet->getActiveSheet()->getStyle("U4:U{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("V4:V{$dernLign}")->getFill()
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('C9A7E3');
-         $spreadsheet->getActiveSheet()->getStyle("W4:W{$dernLign}")->getFill()
+         $spreadsheet->getActiveSheet()->getStyle("X4:X{$dernLign}")->getFill()
          ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
          ->getStartColor()->setARGB('C9A7E3');
          // Le style de l'entête
@@ -404,7 +415,7 @@ class ComptaAnalytiqueController extends AbstractController
              ],
          ];
          
-         $spreadsheet->getActiveSheet()->getStyle("A5:W5")->applyFromArray($styleEntete);
+         $spreadsheet->getActiveSheet()->getStyle("A5:Y5")->applyFromArray($styleEntete);
 
          // Le style de l'entête
         $styleEnteteBorders = [
@@ -414,12 +425,12 @@ class ComptaAnalytiqueController extends AbstractController
                 ],
             ]
         ];        
-        $spreadsheet->getSheetByName('detail')->getStyle("O4:W4")->applyFromArray($styleEnteteBorders);
+        $spreadsheet->getSheetByName('detail')->getStyle("P4:X4")->applyFromArray($styleEnteteBorders);
          
-         $sheet->getStyle("F1:W{$dernLign}")
+         $sheet->getStyle("F1:Y{$dernLign}")
          ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
          // Espacement automatique sur toutes les colonnes sauf la A
-         $sheet->setAutoFilter("A5:W{$dernLign}");
+         $sheet->setAutoFilter("A5:Y{$dernLign}");
          $sheet->getColumnDimension('A')->setWidth(10, 'pt');
          $sheet->getColumnDimension('B')->setAutoSize(true);
          $sheet->getColumnDimension('C')->setAutoSize(true);
@@ -443,19 +454,21 @@ class ComptaAnalytiqueController extends AbstractController
          $sheet->getColumnDimension('U')->setAutoSize(true);
          $sheet->getColumnDimension('V')->setAutoSize(true);
          $sheet->getColumnDimension('W')->setAutoSize(true);
+         $sheet->getColumnDimension('X')->setAutoSize(true);
+         $sheet->getColumnDimension('Y')->setWidth(150, 'pt');
 
 
          // Format nombre € colonne montant
-        $sheet->getStyle("H4:J" . $dernLign)
+        $sheet->getStyle("I4:K" . $dernLign)
         ->getNumberFormat()
         ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
          
          // Format nombre € colonne montant Totaux
-        $sheet->getStyle("O4:W" . $dernLign)
+        $sheet->getStyle("P4:X" . $dernLign)
         ->getNumberFormat()
         ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
         // figer les volets 
-        $spreadsheet->getSheetByName('detail')->freezePane('H6');
+        $spreadsheet->getSheetByName('detail')->freezePane('I6');
 
          // Mise en place d'une protection sur le fichier pour éviter les erreurs d'intentions
         $protection = $spreadsheet->getActiveSheet()->getProtection();
@@ -465,10 +478,13 @@ class ComptaAnalytiqueController extends AbstractController
         $protection->setInsertRows(true);
         $protection->setFormatCells(true);
          // ne pas protéger la colonne permettant de corriger
-        $spreadsheet->getSheetByName('detail')->getStyle('T6:T' . $dernLign)
+        $spreadsheet->getSheetByName('detail')->getStyle('U6:U' . $dernLign)
             ->getProtection()
             ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
-        $spreadsheet->getSheetByName('detail')->getStyle('V6:V' . $dernLign)
+        $spreadsheet->getSheetByName('detail')->getStyle('W6:W' . $dernLign)
+            ->getProtection()
+            ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+        $spreadsheet->getSheetByName('detail')->getStyle('Y6:Y' . $dernLign)
             ->getProtection()
             ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
@@ -596,10 +612,10 @@ class ComptaAnalytiqueController extends AbstractController
         $sheetResume->getColumnDimension('H')->setAutoSize(true);
         
         for ($i=6; $i <= $dernLignResume ; $i++) { 
-            $sheetResume->setCellValue("E" . $i, "=SUMIFS(detail!R:R,detail!M:M,B" . $i . ",detail!K:K,C" . $i . ",detail!L:L,D" . $i . ")"); // Montant Initial
-            $sheetResume->setCellValue("F" . $i, "=SUMIFS(detail!U:U,detail!M:M,B" . $i . ",detail!K:K,C" . $i . ",detail!L:L,D" . $i . ")"); // Montant Corrigé
-            $sheetResume->setCellValue("G" . $i, "=SUMIFS(detail!S:S,detail!M:M,B" . $i . ",detail!K:K,C" . $i . ",detail!L:L,D" . $i . ")"); // Montant port estimé
-            $sheetResume->setCellValue("H" . $i, "=SUMIFS(detail!W:W,detail!M:M,B" . $i . ",detail!K:K,C" . $i . ",detail!L:L,D" . $i . ")"); // Montant port Corrigé
+            $sheetResume->setCellValue("E" . $i, "=SUMIFS(detail!S:S,detail!N:N,B" . $i . ",detail!L:L,C" . $i . ",detail!M:M,D" . $i . ")"); // Montant Initial
+            $sheetResume->setCellValue("F" . $i, "=SUMIFS(detail!V:V,detail!N:N,B" . $i . ",detail!L:L,C" . $i . ",detail!M:M,D" . $i . ")"); // Montant Corrigé
+            $sheetResume->setCellValue("G" . $i, "=SUMIFS(detail!T:T,detail!N:N,B" . $i . ",detail!L:L,C" . $i . ",detail!M:M,D" . $i . ")"); // Montant port estimé
+            $sheetResume->setCellValue("H" . $i, "=SUMIFS(detail!X:X,detail!N:N,B" . $i . ",detail!L:L,C" . $i . ",detail!M:M,D" . $i . ")"); // Montant port Corrigé
         }
 
         // Format nombre € colonne montant
@@ -658,6 +674,7 @@ class ComptaAnalytiqueController extends AbstractController
  
              $list[] = [
                  $donnee['Facture'],
+                 $donnee['Tiers'],
                  $donnee['Ref'],
                  $donnee['Sref1'],
                  $donnee['Sref2'],

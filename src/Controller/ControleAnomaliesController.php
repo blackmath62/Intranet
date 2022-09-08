@@ -136,7 +136,7 @@ class ControleAnomaliesController extends AbstractController
                     $this->cmdRobyController->sendMail();
             }
             }
-            if ($heure >= 20 && $heure < 4) {
+            if ($heure >= 0 && $heure < 2) {
                 // envoi automatique de la compta analytique
                 $this->comptaAnalytiqueController->sendMail();
                 // envoi automatique des piéces clients feu rouge et orange

@@ -23,11 +23,11 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
     public function getRapportClient($annee, $mois)
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT Numero AS Facture, VentAss AS VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op AS Op,
+        $sql = "SELECT Numero AS Facture, Tiers AS Tiers, VentAss AS VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op AS Op,
          CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, RegimeTva, SUM(QteSign) AS QteSign, qteVtl AS qteVtl, regimeFou
         FROM
         (
-        SELECT RTRIM(LTRIM(MVTL.VTLNA)) AS VentAss, RTRIM(LTRIM(MVTL.QTE)) AS qteVtl, RTRIM(LTRIM(MOUV.DOS)) AS Dos, MOUV.FADT AS DateFacture, RTRIM(LTRIM(MOUV.FANO)) AS Numero,
+        SELECT RTRIM(LTRIM(MOUV.TIERS)) AS Tiers, RTRIM(LTRIM(MVTL.VTLNA)) AS VentAss, RTRIM(LTRIM(MVTL.QTE)) AS qteVtl, RTRIM(LTRIM(MOUV.DOS)) AS Dos, MOUV.FADT AS DateFacture, RTRIM(LTRIM(MOUV.FANO)) AS Numero,
         RTRIM(LTRIM(MOUV.REF)) AS Ref, RTRIM(LTRIM(MOUV.SREF1)) AS Sref1, RTRIM(LTRIM(MOUV.SREF2)) AS Sref2, RTRIM(LTRIM(ART.DES)) AS Designation, RTRIM(LTRIM(ART.VENUN)) AS Uv,
         RTRIM(LTRIM(MOUV.OP)) AS Op,RTRIM(LTRIM(ART.FAM_0002)) AS Article, RTRIM(LTRIM(CLI.STAT_0002)) AS Client, RTRIM(LTRIM(ART.CPTA)) AS CompteAchat,
         RTRIM(LTRIM(ART.TVAART)) AS RegimeTva, RTRIM(LTRIM(ART.TIERS)) AS fouPrin, FOU.TVATIE AS regimeFou,
@@ -52,11 +52,11 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
         LEFT JOIN SART ON MOUV.REF = SART.REF AND MOUV.DOS = SART.DOS AND MOUV.SREF1 = SART.SREF1 AND MOUV.SREF2 = SART.SREF2
         INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
         LEFT JOIN MVTL ON MOUV.DOS = MVTL.DOS AND MOUV.TIERS = MVTL.TIERS AND MOUV.FANO = MVTL.PINO AND MOUV.REF = MVTL.REF AND MOUV.SREF1 = MVTL.SREF1 AND MOUV.SREF2 = MVTL.SREF2
-        WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND MOUV.OP IN ('C','D')
+        WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND MOUV.OP IN ('C','D') AND NOT MOUV.TIERS IN ('C0160500')
         AND ART.FAM_0002 <> CLI.STAT_0002
         AND ART.FAM_0002 IN ('EV', 'HP')AND YEAR(MOUV.FADT) IN (?) AND MONTH(MOUV.FADT) IN (?)
         )reponse
-        GROUP BY Numero, VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op, CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, RegimeTva, qteVtl, regimeFou
+        GROUP BY Numero, Tiers, VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op, CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, RegimeTva, qteVtl, regimeFou
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute([$annee, $mois]);
