@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="card collapsed-card card-info">
+    <div class="card-header">
+        <h3 class="card-title"><i class="icon fas fa-info-circle"></i> Info</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <p>l'objectif de cette page est de positionner les produits dans l'entrepot en fonction du nombre de Bon de livraison qui les concernent afin d'optimiser le parcours du préparateur et ainsi gagner en confort de travail</p>
+        <p>Selectionnez un dossier, Vous pouvez choisir de n'afficher que les articles ouverts ou même les articles fermés</p>
+        <p>Vous pouvez renseigner des catégories produits si vous souhaitez affiner le filtrage, si vous n'en renseignez pas, toutes les catégories produits seront affichées</p>
+        <p>Renseignez les dates début et fin que vous souhaitez étudier puis cliquer sur filtrer</p>
+        <p>Vous obtiendrez le tableau que vous pouvez trier en cliquant sur les entêtes de colonne et ainsi voir les produits à plus forte rotation et le stock actuel</p>
+        <p>La colonne nbe BL ne tient pas compte du dépôt d'expédition, le résultat s'entends tout dépôt confondu</p>
+        <p>Les stocks sont séparés par Dépôt ( s'il y a du stock ) et emplacement si il y en a un, cela permet de voir si l'emplacement est toujours adapté</p>
+        <p>Il y a 2 maniéres de différentes d'extraire les données, en se basant sur le stock actuel (il y aura tous les produits en stock) ou en se basant sur les produits ayant eu le plus de BL durant la période (il n'y aura donc pas tous les produits présents en stock)</p>
+        <ul>
+            <li>la méthode qui se base sur les BLs est intéréssantes si vous souhaitez anticiper les réappros qui devraient tomber pour la saison</li>
+            <li>la méthode qui se base sur le stock actuel est intéréssantes pour n'oublier aucun produit en stock</li>
+        </ul>
+    </div>
+</div>
+
+<div class='row'>
+<!-- /.col -->
+<div class="col-md-12">
+<div class="card card-dark">
+    <div class="card-header">
+    <h3 class="card-title">Liste des produits avec le nombre de BL sur la période et le stock actuel</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+    <div class="d-flex justify-content-around">
+    <div class="alert alert-success alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <h5><i class="icon fas fa-arrow-up"></i> Rotation forte du produit</h5>
+        + de 30 BLs édités pour la période
+    </div>
+    <div class="alert alert-warning alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <h5><i class="icon fas fa-arrow-up"></i> Rotation importante du produit</h5>
+        entre 20 et 29 Bls pour la période
+    </div>
+    <div class="alert alert-dismissible text-white" style="background-color:#ff851b">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <h5><i class="icon fas fa-arrow-right"></i> Rotation moyenne du produit</h5>
+        entre 10 et 19 Bls pour la période
+    </div>
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <h5><i class="icon fas fa-arrow-down"></i> Rotation faible du produit</h5>
+        entre 1 et 9 Bls pour la période
+    </div>
+    <div class="alert alert-info alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <h5><i class="icon fas fa-arrow-down"></i> Rotation nulle du produit</h5>
+        Aucun Bl pour cette période
+    </div>
+    </div>
+    {{ form_start(form) }}
+    <div class="d-flex flex-wrap justify-content-around align-items-center p-2">
+        <div class='col-1 text-center'>
+            <div>{{ form_label(form.dossier) }}</div>
+            <div>{{ form_widget(form.dossier) }}</div>
+        </div>
+        <div class='col-2 text-center'>
+            <div>{{ form_label(form.fermeOuvert) }}</div>
+            <div>{{ form_widget(form.fermeOuvert) }}</div>
+        </div>
+        <div class='col-2 text-center'>
+            <div>{{ form_label(form.stockOuBl) }}</div>
+            <div>{{ form_widget(form.stockOuBl) }}</div>
+        </div>
+        <div class='col-7'>
+            <div>{{ form_label(form.famille) }}</div>
+            <div>{{ form_widget(form.famille) }}</div>
+        </div>
+    </div>
+        <div class="d-flex flex-wrap justify-content-around align-items-center p-2">
+        <div><strong>Veuillez selectionner la période :</strong></div>
+        <div>{{ form_label(form.start) }}</div>
+        <div>{{ form_widget(form.start) }}</div>
+        <div>{{ form_label(form.end) }}</div>
+        <div>{{ form_widget(form.end) }}</div>
+        <div>{{ form_widget(form.filtrer) }}</div>
+        </div>
+        <hr>
+	{{ form_end(form) }}
+{% if produits %}
+    <table id="example1" class="table table-striped">
+        <thead>
+        <tr>
+            <th class='text-center'>Dossier</th>
+            <th class='text-center'>Famille</th>
+            <th class='text-center'>Référence</th>
+            <th class='text-center'>Sref1</th>
+            <th class='text-center'>Sref2</th>
+            <th class='text-left'>Désignation</th>
+            <th class='text-center'>Uv</th>
+            <th class='text-center'>Date Fermeture</th>
+            <th class='text-center'>Nbe BL</th>
+            <th class='text-center'>Stock actuel</th>
+            <th class='text-center'>Dépôt</th>
+            <th class='text-center'>Emplacement actuel</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for produit in produits %}
+            <tr>
+                <td class='text-center'>{{ produit.dos }}</td>
+                <td class='text-center'>{{ produit.famille }}</td>
+                <td class='text-center'>{{ produit.ref }}</td>
+                <td class='text-center'>{{ produit.sref1 }}</td>
+                <td class='text-center'>{{ produit.sref2 }}</td>
+                <td class='text-left'>{{ produit.designation }}</td>
+                <td class='text-center'>{{ produit.uv }}</td>
+                <td class='text-center'>
+                    {% if produit.fermeture %}
+                        {{ produit.fermeture|date("d-m-Y") }}
+                    {% endif %}
+                </td>
+                {% set text = "text-white" %}
+                {% if produit.nbeBl > 30 %}
+                {% set color = "#28a745" %} <!-- success -->
+                {% elseif produit.nbeBl > 20 %}
+                {% set color = "#ffc107" %} <!-- warning -->
+                {% set text = "text-dark" %}
+                {% elseif produit.nbeBl > 10 %}
+                {% set color = "#ff851b" %} <!-- orange -->
+                {% elseif produit.nbeBl > 0 %}
+                {% set color = "#dc3545" %} <!-- danger -->
+                {% elseif produit.nbeBl == 0 %}
+                {% set color = "#17a2b8" %} <!-- info -->
+                {% endif %}
+
+                <td class='text-center {{ text }}' style="background-color:{{color}}">{{ produit.nbeBl }}</td>
+                <td class='text-center'>{{ produit.stock }}</td>
+                <td class='text-center'>{{ produit.depot }}</td>
+                <td class='text-center'>{{ produit.emplacement }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <!-- /.card-body -->
+{% else %}
+    <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Aucun Résultat, veuillez alimenter les filtres et lancer la requête</h4>
+{% endif %}
+    </div>
+</div>
+<!-- /.card -->
+</div>
+<!-- /.col -->
+</div>
+
+{% endblock %}
+
+

@@ -255,6 +255,17 @@ class ArtRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
+    public function getFamilleProduitOuvert():array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT DISTINCT RTRIM(LTRIM(ART.FAM_0001)) AS famille
+        FROM ART
+        WHERE ART.HSDT IS NULL
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
     
 
 }
