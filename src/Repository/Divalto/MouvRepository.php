@@ -412,10 +412,10 @@ public function getCheckCodeAndDesArticles()
 public function getDetailFactureFscClient($facture):array
 {
     $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT MOUV.TIERS AS tiers, MOUV.REF AS ref, MOUV.DES AS designation, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MOUV.OP AS op, MOUV.FAQTE AS qte, MVTL_STOCK_V.SERIELOT AS lot
-    FROM MOUV
-    LEFT JOIN MVTL_STOCK_V ON MOUV.REF = MVTL_STOCK_V.REFERENCE AND MOUV.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND MOUV.SREF2 = MVTL_STOCK_V.SREFERENCE2
-    WHERE MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND MOUV.FANO = ? AND MOUV.DOS = 3
+    $sql = "SELECT m.TIERS AS tiers, m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, m.OP AS op, m.QTE AS qte, m.SERIE AS lot
+    FROM MVTL m
+    INNER JOIN ART a ON a.REF = m.REF AND a.DOS = m.DOS
+    WHERE m.DOS = 3 AND m.PINO = ? AND m.TICOD = 'C'
     ";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$facture]);
