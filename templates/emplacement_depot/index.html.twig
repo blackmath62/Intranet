@@ -76,7 +76,7 @@
             <div>{{ form_widget(form.stockOuBl) }}</div>
         </div>
         <div class='col-7'>
-            <div>{{ form_label(form.famille) }}</div>
+            <div>{{ form_label(form.famille) }} <small>(non recommandé si vous consultez également les articles fermés)</small></div>
             <div>{{ form_widget(form.famille) }}</div>
         </div>
     </div>
@@ -90,6 +90,10 @@
         </div>
         <hr>
 	{{ form_end(form) }}
+    {% if produits %}
+    <u><h2 class="text-center">Top par familles de produit</h2></u>
+        <canvas id="myChart" width="400" height="50"></canvas>
+    {% endif %}
 {% if produits %}
     <table id="example1" class="table table-striped">
         <thead>
@@ -155,6 +159,66 @@
 </div>
 <!-- /.col -->
 </div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      "responsive": true, "lengthChange": false, "autoWidth": false,"order": [[ 0, "desc" ]],
+      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": false,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+</script>
+<script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{famille|raw}},
+        datasets: [{
+            label: '# of Votes',
+            data: {{count|raw}},
+            backgroundColor: {{color|raw}},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                display: true,
+                labels: {
+                    color: 'rgb(100, 99, 132)'
+                }                
+            }
+        }
+    }
+});
+</script>
+
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2({
+		 placeholder: "Selectionnez les données",
+	})
+
+    //Initialize Select2 Elements
+    $('.select2bs4').select2({
+      theme: 'bootstrap4'
+    }) 
+	})
+</script>
 
 {% endblock %}
 

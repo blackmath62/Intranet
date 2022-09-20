@@ -629,4 +629,48 @@ public function getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert, $famille
         return $stmt->fetchAll();
     }
 
+    public function getNbeBlEtStockParFamille($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl):array
+    {
+        $code = '';
+        $codeFamille = "";
+        if ($fermeOuvert == 'ouvert') {
+            $code = " AND a.HSDT IS NULL";
+        }
+        // s'il y a des familles de produits, il faut filtrer dessus, sinon afficher toutes les familles produits
+        if ($famille) {
+            $codeFamille = " AND a.FAM_0001 IN($famille)";
+        }
+        $conn = $this->getEntityManager()->getConnection();
+        if ($stockOuBl == 'bl') {
+            $sql = "SELECT dos, LTRIM(RTRIM(famille)) AS famille, SUM(nbeBl) AS nbeBl
+            FROM(
+            SELECT MOUV.DOS AS dos,a.FAM_0001 as famille, COUNT(MOUV.BLNO) AS nbeBl
+            FROM MOUV
+            INNER JOIN ART a ON a.REF = MOUV.REF AND a.DOS = MOUV.DOS
+            WHERE MOUV.BLDT BETWEEN '$dd' AND '$df' AND MOUV.TICOD = 'C' AND MOUV.OP IN('C','D') AND MOUV.BLNO <> 0 AND MOUV.DOS = $dos $code $codeFamille
+            AND NOT a.FAM_0001 IN ('TRANSPOR', 'TAXE', 'DIVERS') AND NOT a.REF LIKE ('DIVERS20%') 
+            GROUP BY MOUV.DOS, a.FAM_0001, MOUV.REF, MOUV.SREF1, MOUV.SREF2, a.DES, MOUV.VENUN, a.HSDT)reponse
+            GROUP BY dos, famille
+            ORDER BY nbeBl DESC
+        ";
+        }else {
+            $sql = "SELECT dos,LTRIM(RTRIM(famille)) AS famille, COUNT(m.BLNO) AS nbeBl
+            FROM(
+            SELECT s.DOSSIER AS dos,a.FAM_0001 AS famille,s.REFERENCE AS ref, s.SREFERENCE1 AS sref1, s.SREFERENCE2 AS sref2, a.DES AS designation,
+            a.VENUN AS uv, a.HSDT AS fermeture, s.DEPOT AS depot, s.EMPLACEMENT AS emplacement, SUM(s.QTETJSENSTOCK) AS stock
+            FROM MVTL_STOCK_V s
+            INNER JOIN ART a ON a.DOS = s.DOSSIER AND s.REFERENCE = a.REF
+            WHERE s.DOSSIER = $dos AND NOT a.FAM_0001 IN ('TRANSPOR', 'TAXE', 'DIVERS') AND NOT a.REF LIKE ('DIVERS20%') $code $codeFamille
+            GROUP BY s.DOSSIER, a.FAM_0001, s.REFERENCE, s.SREFERENCE1, s.SREFERENCE2, a.DES, a.VENUN, a.HSDT, s.DEPOT, s.EMPLACEMENT)reponse
+            LEFT JOIN MOUV m ON ref = m.REF AND sref1 = m.SREF1 AND sref2 = m.SREF2 AND dos = m.DOS
+            AND m.BLDT BETWEEN '$dd' AND '$df' AND m.TICOD = 'C' AND m.OP IN('C','D') AND m.BLNO <> 0 
+            GROUP BY dos,famille
+            ORDER BY nbeBl DESC
+        ";
+        }
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
 }

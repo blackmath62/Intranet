@@ -260,7 +260,7 @@ class ArtRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT DISTINCT RTRIM(LTRIM(ART.FAM_0001)) AS famille
         FROM ART
-        WHERE ART.HSDT IS NULL
+        WHERE ART.HSDT IS NULL AND NOT ART.FAM_0001 IN ('ACCESS','ACOMPTE', 'COMMISSI', 'DIVERS','FIN','NC','PRESTA','REMISE','TAXE','TRANSPOR')
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();

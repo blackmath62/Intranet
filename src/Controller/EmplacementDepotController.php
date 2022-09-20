@@ -17,6 +17,9 @@ class EmplacementDepotController extends AbstractController
     public function index(Request $request, MouvRepository $repo): Response
     {
         $produits = '';
+        $fam = [];
+        $color = [];
+        $count = [];
         $form = $this->createForm(DateDebutFinFamilleDossierType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -37,12 +40,32 @@ class EmplacementDepotController extends AbstractController
             $i++;    
             }
             $produits = $repo->getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert,$famille,$stockOuBl);
+
+        $data = $repo->getNbeBlEtStockParFamille($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl);
+        /*for ($ligFamille=0; $ligFamille <count($data) ; $ligFamille++) { 
+            if (!empty($data[$ligFamille]['famille'])) { 
+                //dd($data[$ligFamille]['famille']);   
+                $famille[] = $data[$ligFamille]['famille'];
+                $count[] = $data[$ligFamille]['nbeBl'];
+                $color[] = 'rgba(' . rand(0, 255) . ',' . rand(0, 255) . ', ' . rand(0, 255) . ', 1)';
+            }
+        }*/
+        foreach ($data as $value) {
+                $fam[] = $value['famille'];
+                $count[] = $value['nbeBl'];
+                $color[] = 'rgba(' . rand(0, 255) . ',' . rand(0, 255) . ', ' . rand(0, 255) . ', 1)';
+        }
+        
+
         }
 
         return $this->render('emplacement_depot/index.html.twig', [
             'title' => 'Emplacement Dépôt',
             'produits' => $produits,
             'form' => $form->createView(),
+            'famille' => json_encode($fam),
+            'color' => json_encode($color),
+            'count' => json_encode($count),
         ]);
     }
 }
