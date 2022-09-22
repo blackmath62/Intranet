@@ -13,13 +13,18 @@ use App\Form\ImposeVacationType;
 use Symfony\Component\Mime\Email;
 use App\Form\StatesDateFilterType;
 use Symfony\Component\Mime\Address;
+use App\Controller\AdminEmailController;
 use App\Repository\Main\UsersRepository;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Form\HolidayTypeDateDebutFinExcel;
 use App\Repository\Main\HolidayRepository;
 use App\Repository\Main\MailListRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Main\statusHolidayRepository;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -37,8 +42,10 @@ class HolidayController extends AbstractController
     private $repoMail;
     private $mailEnvoi;
     private $mailTreatement;
+    private $mailer;
+    private $adminEmailController;
 
-    public function __construct(MailListRepository $repoMail, MailerInterface $mailerInterface, HolidayRepository $repoHoliday,statusHolidayRepository $repoStatuts, UsersRepository $repoUser)
+    public function __construct(AdminEmailController $adminEmailController, MailListRepository $repoMail,MailerInterface $mailer, MailerInterface $mailerInterface, HolidayRepository $repoHoliday,statusHolidayRepository $repoStatuts, UsersRepository $repoUser)
     {
         $this->mailerInterface = $mailerInterface;
         $this->repoHoliday = $repoHoliday;
@@ -47,6 +54,25 @@ class HolidayController extends AbstractController
         $this->repoMail =$repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
         $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->mailer = $mailer;
+        $this->adminEmailController = $adminEmailController;
+    }
+
+    public function sendMailSummerForAllUsers(){
+        $usersMails = $this->repoUser->getFindAllEmails();
+        $listMails = $this->adminEmailController->formateEmailList($usersMails);
+
+        // Avertir chaque utilisateur par mail
+        $html = $this->renderView('mails/pleaseDeposeSummerHoliday.html.twig');
+        $email = (new Email())
+        ->from($this->mailEnvoi)
+        ->to(...$listMails)
+        ->priority(Email::PRIORITY_HIGH)
+        ->subject("Veuillez déposer vos congés d'été sur le site intranet avant le 31 Mars")
+        ->html($html);
+        
+        $this->mailer->send($email);
+
     }
 
     /**
@@ -150,6 +176,17 @@ class HolidayController extends AbstractController
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
+        
+        $formExportExcel = $this->createForm(HolidayTypeDateDebutFinExcel::class);
+        $formExportExcel->handleRequest($request);
+        
+        if($formExportExcel->isSubmitted() && $formExportExcel->isValid() ){
+            $start = $formExportExcel->getData()->getStart()->format('Y-m-d');
+            $end = $formExportExcel->getData()->getEnd()->format('Y-m-d');
+
+            $this->sendMail($start,$end);            
+        }
+
         $form = $this->createForm(ImposeVacationType::class);
         $form->handleRequest($request);
         
@@ -226,7 +263,6 @@ class HolidayController extends AbstractController
                     ->html($html);
                     
                     $this->mailerInterface->send($email);
-                    end:;
             }
             if ($i > 1) {
                 $this->addFlash('message', 'Les congés ont bien été enregistrés' );
@@ -248,6 +284,7 @@ class HolidayController extends AbstractController
             'form' => $form->createView(),
             'users' => $users,
             'formDates' => $formDates->createView(),
+            'formExportExcel' => $formExportExcel->createView(),
             'listCountConges' => $listCountConges,
             ]);
     }
@@ -698,4 +735,302 @@ class HolidayController extends AbstractController
         }
 
     }
+
+    // générer un fichier Excel qui sera envoyé par mail à l'utilisateur
+    public function getDataRecapConges($start, $end): array
+    {
+        $list = [];
+        $donnees = [];
+        
+        $donnees = $this->repoHoliday->getVacationTypeListByUsers($start, $end);
+
+        for ($d=0; $d < count($donnees); $d++) {
+                
+            $donnee = $donnees[$d];
+            $list[] = [
+                $donnee['pseudo'],
+                $donnee['email'],
+                $donnee['conges'],
+                $donnee['rtt'],
+                $donnee['sansSolde'],
+                $donnee['famille'],
+                $donnee['maternite'],
+                $donnee['deces'],
+                $donnee['demenagement'],
+                $donnee['arretTravail'],
+                $donnee['arretCovid'],
+                $donnee['autre'],
+                $donnee['total']                  
+            ];
+        } 
+        return $list;
+    }
+    
+    // générer un fichier Excel qui sera envoyé par mail à l'utilisateur
+    public function getDataListConges($start, $end): array
+    {
+        $list = [];
+        $donnees = [];
+        
+        $donnees = $this->repoHoliday->getListeCongesDurantPeriode($start, $end);
+        
+        for ($d=0; $d < count($donnees); $d++) {
+            
+            $donnee = $donnees[$d];
+            if ($donnee['sliceStart'] == 'DAY') {
+                $sd = 'Journée';
+            }elseif ($donnee['sliceStart'] == 'AM') {
+                $sd = 'Matin';
+            }elseif ($donnee['sliceStart'] == 'PM') {
+                $sd = 'Aprés Midi';
+            }
+            if ($donnee['sliceEnd'] == 'DAY') {
+                $se = 'Journée';
+            }elseif ($donnee['sliceEnd'] == 'AM') {
+                $se = 'Matin';
+            }elseif ($donnee['sliceEnd'] == 'PM') {
+                $se = 'Aprés Midi';
+            }
+            $list[] = [
+                $donnee['nom'],
+                $donnee['startCp'],
+                $sd,
+                $donnee['endCp'],
+                $se,
+                $donnee['createdAtHoliday'],
+                $donnee['treatmentedAt'],
+                $donnee['treatmentedBy_id'],
+                $donnee['nbJours'],
+                $donnee['typeCp'],
+                $donnee['statut'],
+                $donnee['details']               
+            ];
+        } 
+        return $list;
+    }
+
+    public function get_export_excel($start,$end)
+    {
+ 
+         $spreadsheet = new Spreadsheet();
+         
+         $sheet = $spreadsheet->getActiveSheet();
+         
+         $sheet->setTitle('detail');
+         // Entête de colonne
+         $sheet->getCell('A5')->setValue('Salarié');
+         $sheet->getCell('B5')->setValue('Date Début');
+         $sheet->getCell('C5')->setValue('Tranche Début');
+         $sheet->getCell('D5')->setValue('Date Fin');
+         $sheet->getCell('E5')->setValue('Tranche Fin');
+         $sheet->getCell('F5')->setValue('Créé le');
+         $sheet->getCell('G5')->setValue('Traité le');
+         $sheet->getCell('H5')->setValue('Traité par');
+         $sheet->getCell('I5')->setValue('Nbre Jours');
+         $sheet->getCell('J5')->setValue('Type');
+         $sheet->getCell('K5')->setValue('Statut');
+         $sheet->getCell('L5')->setValue('Détails');
+         
+         // Increase row cursor after header write
+         $sheet->fromArray($this->getDataListConges($start, $end),null, 'A6', true);
+         $dernLign = count($this->getDataListConges($start, $end)) + 5;
+
+         
+         $d = new DateTime('NOW');
+         $dateTime = $d->format('d-m-Y') ;
+         $dd = $start;
+         $df = $end;
+         $nomFichier = 'Détail congés du ' . $dd . ' au ' . $df . ' le '. $dateTime ;
+         // Titre de la feuille
+         $sheet->getCell('A1')->setValue($nomFichier);
+         $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
+         $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
+         // Le style du tableau
+         $styleArray = [
+             'font' => [
+                 'bold' => false,
+             ],
+             'alignment' => [
+                 'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+             ],
+             'borders' => [
+                 'allBorders' => [
+                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                 ],
+             ],
+             'fill' => [
+                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                 'startColor' => [
+                     'argb' => 'FFFFFFFF',
+                 ],
+             ],
+         ];
+         $spreadsheet->getActiveSheet()->getStyle("A5:L{$dernLign}")->applyFromArray($styleArray);
+         
+        
+         // Le style de l'entête
+         $styleEntete = [
+             'font' => [
+                 'bold' => true,
+             ],
+             'alignment' => [
+                 'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+             ],
+             'borders' => [
+                 'allBorders' => [
+                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                 ],
+             ],
+             'fill' => [
+                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                 'startColor' => [
+                     'argb' => '9B5BCA',
+                 ],
+             ],
+         ];
+         
+         $spreadsheet->getActiveSheet()->getStyle("A5:L5")->applyFromArray($styleEntete);
+         
+         $sheet->getStyle("A1:L{$dernLign}")
+         ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+         // Espacement automatique sur toutes les colonnes sauf la A
+         $sheet->setAutoFilter("A5:L{$dernLign}");
+         $sheet->getColumnDimension('A')->setWidth(15, 'pt');
+         $sheet->getColumnDimension('B')->setAutoSize(true);
+         $sheet->getColumnDimension('C')->setAutoSize(true);
+         $sheet->getColumnDimension('D')->setAutoSize(true);
+         $sheet->getColumnDimension('E')->setAutoSize(true);
+         $sheet->getColumnDimension('F')->setAutoSize(true);
+         $sheet->getColumnDimension('G')->setAutoSize(true);
+         $sheet->getColumnDimension('H')->setAutoSize(true);
+         $sheet->getColumnDimension('I')->setAutoSize(true);
+         $sheet->getColumnDimension('J')->setAutoSize(true);
+         $sheet->getColumnDimension('K')->setAutoSize(true);
+         $sheet->getColumnDimension('L')->setAutoSize(true);
+
+         // Create a new worksheet called "My Data"
+        $myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'resume');
+
+        // Attach the "My Data" worksheet as the first worksheet in the Spreadsheet object
+        $spreadsheet->addSheet($myWorkSheet, 0);
+
+        $sheetResume = $spreadsheet->getSheetByName('resume');
+
+         // Entête de colonne
+         $sheetResume->getCell('A5')->setValue('Pseudo');
+         $sheetResume->getCell('B5')->setValue('Email');
+         $sheetResume->getCell('C5')->setValue('Congés Payé');
+         $sheetResume->getCell('D5')->setValue('RTT');
+         $sheetResume->getCell('E5')->setValue('Sans Solde');
+         $sheetResume->getCell('F5')->setValue('Familiale');
+         $sheetResume->getCell('G5')->setValue('Maternité');
+         $sheetResume->getCell('H5')->setValue('Décés');
+         $sheetResume->getCell('I5')->setValue('Déménagement');
+         $sheetResume->getCell('J5')->setValue('Arrêt de travail');
+         $sheetResume->getCell('K5')->setValue('Arrêt Covid');
+         $sheetResume->getCell('L5')->setValue('Autre');
+         $sheetResume->getCell('M5')->setValue('Total');
+        
+         $sheetResume->fromArray($this->getDataRecapConges($start, $end),null, 'A6', true);
+         $dernLignResume = count($this->getDataRecapConges($start, $end)) + 5;
+
+         $nomFichierResume = 'Résumé des congés du ' . $dd . ' au ' . $df . ' le '. $dateTime ;
+
+         // Titre de la feuille
+         $sheetResume->getCell('A1')->setValue($nomFichierResume);
+         $sheetResume->getCell('A1')->getStyle()->getFont()->setSize(20);
+         $sheetResume->getCell('A1')->getStyle()->getFont()->setUnderline(true);
+
+         
+         // Le style du tableau
+         $styleArrayCompte = [
+            'font' => [
+                'bold' => false,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FFFFFFFF',
+                ],
+            ],
+        ];
+        $spreadsheet->getSheetByName('resume')->getStyle("A5:M{$dernLignResume}")->applyFromArray($styleArrayCompte);
+        
+        // Le style de l'entête
+        $styleEnteteCompte = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => '9B5BCA',
+                ],
+            ],
+        ];
+        
+        $spreadsheet->getSheetByName('resume')->getStyle("A5:M5")->applyFromArray($styleEnteteCompte);
+        $sheet->getStyle("A1:M{$dernLignResume}")
+         ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $sheetResume->getColumnDimension('A')->setWidth(15, 'pt');
+        $sheetResume->getColumnDimension('B')->setAutoSize(true);
+        $sheetResume->getColumnDimension('C')->setAutoSize(true);
+        $sheetResume->getColumnDimension('D')->setAutoSize(true);
+        $sheetResume->getColumnDimension('E')->setAutoSize(true);
+        $sheetResume->getColumnDimension('F')->setAutoSize(true);
+        $sheetResume->getColumnDimension('G')->setAutoSize(true);
+        $sheetResume->getColumnDimension('H')->setAutoSize(true);
+        $sheetResume->getColumnDimension('I')->setAutoSize(true);
+        $sheetResume->getColumnDimension('J')->setAutoSize(true);
+        $sheetResume->getColumnDimension('K')->setAutoSize(true);
+        $sheetResume->getColumnDimension('L')->setAutoSize(true);
+        $sheetResume->getColumnDimension('M')->setAutoSize(true);
+
+         
+               $writer = new Xlsx($spreadsheet);
+               // Create a Temporary file in the system
+               $fileName = $nomFichier . '.xlsx';
+               // Return the excel file as an attachment
+       
+               $chemin = 'doc/CP/';
+               $fichier = $chemin . '/' . $fileName;
+               $writer->save($fichier);
+               return $fichier;
+     }
+
+     public function sendMail($start,$end)
+    {
+       // envoyer un mail
+           $excel = $this->get_export_excel($start,$end);
+           $html = $this->renderView('mails/sendMailSvgConges.html.twig');
+           $email = (new Email())
+           ->from($this->mailEnvoi)
+           ->to($this->getUser()->getEmail())
+           ->subject('Sauvegarde des congés du ' . $start . ' au ' . $end)
+           ->html($html)
+           ->attachFromPath($excel);
+           $this->mailer->send($email);
+           unlink($excel);
+       
+       $this->addFlash('message', 'Consultez votre boite mail....');
+       return $this->redirectToRoute('app_holiday_new_closing');
+    }
+
 }

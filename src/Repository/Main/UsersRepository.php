@@ -33,6 +33,19 @@ class UsersRepository extends ServiceEntityRepository
         return $stmt->fetch();
     }
 
+    // ramener les mails
+    public function getFindAllEmails()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT users.email AS email 
+        FROM users
+        WHERE users.closedAt is NULL
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     // Liste des utilisateurs non fermés
     public function getFindAllUsers()
     {

@@ -5,8 +5,10 @@ namespace App\Controller;
 use DateTime;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
+use App\Controller\HolidayController;
 use App\Entity\Main\ControlesAnomalies;
 use App\Controller\AdminEmailController;
+use App\Repository\Main\UsersRepository;
 use App\Repository\Divalto\ArtRepository;
 use App\Repository\Divalto\CliRepository;
 use App\Repository\Divalto\EntRepository;
@@ -15,17 +17,23 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\MailListRepository;
+use App\Controller\FscAttachedFileController;
+use App\Controller\MovementBillFscController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
+use App\Controller\ComptaAnalytiqueController;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Main\CmdRobyDelaiAccepteReporte;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Controller\ConduiteDeTravauxMeController;
+use App\Controller\ClientFeuRougeOrangeController;
+use App\Controller\ContratCommissionnaireController;
 use App\Repository\Main\ControlesAnomaliesRepository;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use App\Controller\CmdRobyDelaiAccepteReporteController;
 use App\Repository\Divalto\ControleComptabiliteRepository;
 use App\Repository\Divalto\ControleArtStockMouvEfRepository;
 use App\Repository\Main\CmdRobyDelaiAccepteReporteRepository;
-use App\Repository\Main\UsersRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -57,8 +65,9 @@ class ControleAnomaliesController extends AbstractController
     private $repoUsers;
     private $comptaAnalytiqueController;
     private $clientFeuRougeOrangeController;	
+    private $holidayController;
 
-    public function __construct(ClientFeuRougeOrangeController $clientFeuRougeOrangeController, ComptaAnalytiqueController $comptaAnalytiqueController, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
+    public function __construct(HolidayController $holidayController, ClientFeuRougeOrangeController $clientFeuRougeOrangeController, ComptaAnalytiqueController $comptaAnalytiqueController, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController ,FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes,MailerInterface $mailer, ControlesAnomaliesRepository $anomalies,ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -82,6 +91,7 @@ class ControleAnomaliesController extends AbstractController
         $this->repoUsers = $repoUsers;
         $this->comptaAnalytiqueController = $comptaAnalytiqueController;
         $this->clientFeuRougeOrangeController = $clientFeuRougeOrangeController;
+        $this->holidayController = $holidayController;
         //parent::__construct();
     }
 
@@ -112,9 +122,24 @@ class ControleAnomaliesController extends AbstractController
     Public function Run_Cron(){
         $dateDuJour = new DateTime();
         $jour = $dateDuJour->format('w');
+        $mois = $dateDuJour->format('m');
         $d = $dateDuJour->format('d');
         $heure = $dateDuJour->format('H');
         $dateDuJour  = $dateDuJour->format('d-m-Y');
+        // envoie du mail pour les congés d'été le 01 mars de chaque année
+        if ($mois == 3 && $jour == 1) {
+            if ($heure >= 0 && $heure < 5) {
+                $this->holidayController->sendMailSummerForAllUsers();
+            }
+        }
+
+        if ($heure >= 0 && $heure < 2) {
+            // envoi automatique de la compta analytique
+            $this->comptaAnalytiqueController->sendMail();
+            // envoi automatique des piéces clients feu rouge et orange
+            $this->clientFeuRougeOrangeController->sendMail();
+        }
+
         // envoie d'un mail le 5 de chaque mois
         if ($d == 20) {
             if ($heure >= 8 && $heure < 20) {
@@ -135,12 +160,6 @@ class ControleAnomaliesController extends AbstractController
                     $this->MajCmdRobyAccepteReporte();
                     $this->cmdRobyController->sendMail();
             }
-            }
-            if ($heure >= 0 && $heure < 2) {
-                // envoi automatique de la compta analytique
-                $this->comptaAnalytiqueController->sendMail();
-                // envoi automatique des piéces clients feu rouge et orange
-                $this->clientFeuRougeOrangeController->sendMail();
             }
             $this->run_auto_wash();
         }

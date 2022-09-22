@@ -74,8 +74,56 @@
                                     <a class='btn btn-warning' title="Modifier" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}"><i class="fas fa-edit"></i></a>
                                 {% endif %}
                             {% if is_granted('ROLE_CONGES') %}
-                                <a class='btn btn-success' title="Accepter" href="{{ path('app_holiday_accept', {'id': holiday.id}) }}"><i class="fas fa-check"></i></a>
-                                <a class='btn btn-danger' title="Refuser" href="{{ path('app_holiday_refuse', {'id': holiday.id}) }}"><i class="fas fa-times"></i></a>
+                                {% if holiday.holidayStatus.id != 3 %}
+                                <a class='btn btn-success' title="Accepter" data-toggle="modal" data-target="#modal-accepte"><i class="fas fa-check"></i></a>
+                                    <div class="modal fade" id="modal-accepte">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h4 class="modal-title">Voulez vous vraiment Accepter ce congés ?</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            </div>
+                                            <div class="modal-body">
+                                            <p>Vous êtes sûr de sûr ? l'utilisateur va recevoir un email !&hellip;</p>
+                                            </div>
+                                            <div class="modal-footer justify-content-between">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                            <a type="button" href="{{ path('app_holiday_accept', {'id': holiday.id}) }}" class="btn btn-success">Accepter</a>
+                                            </div>
+                                        </div>
+                                        <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <!-- /.modal -->
+                                {% endif %}
+                                {% if holiday.holidayStatus.id != 4 %}
+                                <a class='btn btn-danger' title="Refuser" data-toggle="modal" data-target="#modal-refuse"><i class="fas fa-times"></i></a>
+                                    <div class="modal fade" id="modal-refuse">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h4 class="modal-title">Voulez vous vraiment Refuser ce congés ?</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            </div>
+                                            <div class="modal-body">
+                                            <p>Vous êtes sûr de sûr ? l'utilisateur va recevoir un email !&hellip;</p>
+                                            </div>
+                                            <div class="modal-footer justify-content-between">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                            <a type="button" href="{{ path('app_holiday_refuse', {'id': holiday.id}) }}" class="btn btn-danger">Refuser</a>
+                                            </div>
+                                        </div>
+                                        <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <!-- /.modal -->
+                                {% endif %}
                             {% endif %}
                             </td>
                         </tr>

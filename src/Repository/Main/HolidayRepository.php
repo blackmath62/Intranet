@@ -42,6 +42,7 @@ class HolidayRepository extends ServiceEntityRepository
         OR '$start' BETWEEN holiday.start AND holiday.end  -- la date début saisie est comprise entre les dates début et fin
         OR '$end' BETWEEN holiday.start AND holiday.end) -- la date fin saisie est comprise entre les dates début et fin
         AND holiday.user_id = $user AND not holiday.id IN( $id )
+        AND not holiday.holidayStatus_id IN (4)
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -165,11 +166,33 @@ class HolidayRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    public function getListeCongesDurantPeriode($start, $end)
+    {
+        // congés non dépassés avec les services
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT nom AS nom, startCp AS startCp, sliceStart AS sliceStart, endCp AS endCp, sliceEnd AS sliceEnd, details AS details, createdAtHoliday AS createdAtHoliday,
+         treatmentedAt AS treatmentedAt, us.pseudo AS treatmentedBy_id, nbJours AS nbJours, typeCp AS typeCp, statut AS statut
+        FROM(
+        SELECT u.pseudo AS nom, h.start AS startCp, h.sliceStart AS sliceStart, h.end AS endCp, h.sliceEnd AS sliceEnd, h.details AS details,
+        h.createdAt AS createdAtHoliday, h.treatmentedAt AS treatmentedAt, h.treatmentedBy_id AS treatmentedBy_id, h.nbJours AS nbJours, ht.name AS typeCp,
+        sh.name AS statut
+        FROM holiday h
+        INNER JOIN users u ON u.id = h.user_id
+        INNER JOIN holidaytypes ht ON ht.id = h.holidayType_id
+        INNER JOIN statusholiday sh ON sh.id = h.holidayStatus_id
+        WHERE h.start BETWEEN '$start' AND '$end' AND h.end BETWEEN '$start' AND '$end' AND h.holidayStatus_id = 3)reponse
+        INNER JOIN users us ON us.id = treatmentedBy_id
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     // Liste des types de congés avec des congés acceptés par utilisateurs
     public function getVacationTypeListByUsers($start, $end)
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT pseudo, email, 
+        $sql = "SELECT pseudo AS pseudo, email AS email, 
         SUM(conges) AS conges, SUM(rtt) AS rtt, SUM(sansSolde) AS sansSolde, SUM(famille) AS famille, 
         SUM(maternite) AS maternite, SUM(deces) AS deces, SUM(demenagement) AS demenagement,SUM(arretTravail) AS arretTravail, SUM(arretCovid) AS arretCovid, SUM(autre) AS autre, SUM(total) AS total
         FROM(
@@ -214,6 +237,7 @@ class HolidayRepository extends ServiceEntityRepository
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
+
         return $stmt->fetchAll();
     }
 
