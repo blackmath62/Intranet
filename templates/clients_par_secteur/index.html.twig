@@ -28,14 +28,15 @@
                             <thead>
                                 <tr>
                                     <th class="text-center"><span>Commercial</span></th>
-                                    <th class="text-center"><span>Famille</span></th>
                                     <th class="text-center"><span>Code Tiers</span></th>
+                                    <th class="text-center"><span>Famille</span></th>
                                     <th class="text-center"><span>Nom</span></th>
                                     <th class="text-center"><span>rue</span></th>
                                     <th class="text-center"><span>CP</span></th>
                                     <th class="text-center"><span>Ville</span></th>
                                     <th class="text-center"><span>Téléphone</span></th>
                                     <th class="text-center"><span>Mail</span></th>
+                                    <th class="text-center"><span>Web</span></th>
                                     <th class="text-center"><span>Actions</span></th>
                                 </tr>
                             </thead>
@@ -76,6 +77,9 @@
                                             <a class="text-dark">{{client.Mail}}</a>
                                         </td>
                                         <td class="text-center">
+                                            <a class="text-dark">{{client.Web}}</a>
+                                        </td>
+                                        <td class="text-center">
                                             <a class="btn btn-danger" title='Je veux suivre ce client' href="{{ path('app_lhermitte_need_clients', {'tiers' : client.Tiers} ) }}" ><i class="fas fa-heart"></i></a>
                                             <a class="btn btn-warning" title='Je veux fermer ce client' data-toggle="modal" data-target="#modal-danger" ><i class="fas fa-sign-out-alt"></i></i></a>
                                             <a class="btn btn-info" title='Voir les contacts de ce client' href="{{ path('app_lhermitte_contact_client', {'tiers' : client.Tiers} ) }}" ><i class="fas fa-users"></i></a>
@@ -111,14 +115,15 @@
                             <tfoot>
                                 <tr>
                                     <th class="text-center"><span>Commercial</span></th>
-                                    <th class="text-center"><span>Famille</span></th>
                                     <th class="text-center"><span>Code Tiers</span></th>
+                                    <th class="text-center"><span>Famille</span></th>
                                     <th class="text-center"><span>Nom</span></th>
                                     <th class="text-center"><span>rue</span></th>
                                     <th class="text-center"><span>CP</span></th>
                                     <th class="text-center"><span>Ville</span></th>
                                     <th class="text-center"><span>Téléphone</span></th>
                                     <th class="text-center"><span>Mail</span></th>
+                                    <th class="text-center"><span>Web</span></th>
                                     <th class="text-center"><span>Actions</span></th>
                                 </tr>
                             </tfoot>

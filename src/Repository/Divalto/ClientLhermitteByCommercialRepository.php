@@ -30,7 +30,8 @@ class ClientLhermitteByCommercialRepository extends ServiceEntityRepository
     public function getClientLhermitteByCommercial():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT VRP.NOM AS Commercial, VRP.TIERS AS Id, CLI.STAT_0001 AS Famille, VRP.EMAIL AS Mail, CLI.TIERS AS Tiers, CLI.NOM AS Nom, CLI.RUE AS Rue, CLI.CPOSTAL AS CP, CLI.VIL AS Ville, CLI.TEL AS Tel, CLI.EMAIL AS Mail
+        $sql = "SELECT VRP.NOM AS Commercial, VRP.TIERS AS Id, CLI.STAT_0001 AS Famille, VRP.EMAIL AS Mail, CLI.WEB AS Web,
+        CLI.TIERS AS Tiers, CLI.NOM AS Nom, CLI.RUE AS Rue, CLI.CPOSTAL AS CP, CLI.VIL AS Ville, CLI.TEL AS Tel, CLI.EMAIL AS Mail
         FROM CLI
         LEFT JOIN VRP ON CLI.DOS = VRP.DOS AND CLI.REPR_0001 = VRP.TIERS
         WHERE CLI.DOS = 1 AND CLI.HSDT IS NULL";
