@@ -263,6 +263,7 @@ class HolidayController extends AbstractController
                     ->html($html);
                     
                     $this->mailerInterface->send($email);
+                    end:;
             }
             if ($i > 1) {
                 $this->addFlash('message', 'Les congés ont bien été enregistrés' );
