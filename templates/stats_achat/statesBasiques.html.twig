@@ -14,7 +14,6 @@
         <p>Selectionnez le type d'export souhaité dans le menu déroulant</p>
         <p>Selectionnez la date de début et la date de fin</p>
         <p>Cliquez sur filtrer</p>
-        <p>Si vous ne trouver pas un fournisseur, cliquez sur le bouton Mettre à jours la liste des fournisseurs</p>
     </div>
 </div>
 
@@ -114,15 +113,14 @@
         <div class="card card-dark">
             <div class="card-header d-flex justify-content-between">
                 <h2 class="card-title">Liste des achats fournisseurs par produit</h2>
-                <div class='ml-auto'>
-                    <a title = 'Metre à jour les fournisseurs' href="{{ path('app_fournisseurs_divalto') }}" class="btn btn-primary "><i class="fas fa-redo-alt pr-2"></i>Mettre à jour la liste des fournisseurs</a>                   
-                </div>
             </div>
             <!-- /.card-header -->
             <div class="card-body">
                 {{ form_start(form) }}
                 <div>{{ form_label(form.fournisseurs) }}</div>
                 <div>{{ form_widget(form.fournisseurs) }}</div>
+                <div>{{ form_label(form.familles) }}</div>
+                <div>{{ form_widget(form.familles) }}</div>
                 <div>{{ form_label(form.type) }}</div>
                 <div>{{ form_widget(form.type) }}</div>
               <div class="d-flex flex-wrap justify-content-around align-items-center p-2">
@@ -140,6 +138,7 @@
                     <thead>
                         <tr>
                             <th class="text-center"><span>Tiers</span></th>
+                            <th class="text-center"><span>Familles</span></th>
                             <th class="text-center"><span>Référence</span></th>
                             <th class="text-center"><span>Sref1</span></th>
                             <th class="text-center"><span>Sref2</span></th>
@@ -154,6 +153,9 @@
                                     <tr>
                                         <td class="text-center">
                                             <a class="text-dark">{{ state.tiers }}</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="text-dark">{{ state.famille }}</a>
                                         </td>
                                         <td class="text-center">
                                             <a class="text-dark">{{ state.ref }}</a>
@@ -194,6 +196,7 @@
                     <tfoot>
                         <tr>
                             <th class="text-center"><span>Tiers</span></th>
+                            <th class="text-center"><span>Familles</span></th>
                             <th class="text-center"><span>Référence</span></th>
                             <th class="text-center"><span>Sref1</span></th>
                             <th class="text-center"><span>Sref2</span></th>

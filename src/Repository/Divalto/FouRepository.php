@@ -83,4 +83,44 @@ class FouRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    public function getAllMailFournisseur($dos):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(f.TIERS)) AS tiers, LTRIM(RTRIM(f.NOM)) AS nom, 
+        CASE
+        WHEN f.EMAIL LIKE '%@%' THEN LTRIM(RTRIM(f.EMAIL))
+        ELSE ''
+        END AS fouMail,
+        CASE
+        WHEN f.WEB LIKE '%@%' THEN LTRIM(RTRIM(f.WEB))
+        ELSE ''
+        END AS web
+        , 
+        CASE
+        WHEN c.EMAIL LIKE '%@%' THEN LTRIM(RTRIM(c.EMAIL))
+        ELSE ''
+        END AS contactMail
+        FROM FOU f
+        LEFT JOIN T2 c ON f.TIERS = c.TIERS AND f.DOS = c.DOS
+        WHERE f.HSDT IS NULL AND (f.EMAIL LIKE '%@%' OR f.WEB LIKE '%@%' OR c.EMAIL LIKE '%@%') AND f.DOS = $dos
+        ORDER BY f.TIERS
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getListFou($dos):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(f.TIERS)) AS tiers, LTRIM(RTRIM(f.NOM)) AS nom
+        FROM FOU f
+        WHERE f.HSDT IS NULL AND f.DOS = $dos
+        ORDER BY f.TIERS
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
 }

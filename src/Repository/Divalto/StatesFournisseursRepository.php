@@ -17,12 +17,21 @@ class StatesFournisseursRepository extends ServiceEntityRepository
     }
    
     // states fournisseurs basiques
-    public function getStatesBasiques($dos, $dd, $df, $fous):array
+    public function getStatesBasiques($dos, $dd, $df, $fous, $fams):array
     {        
+        $code = "";        
+        if ($fous <> '') {
+            $code = 'AND MOUV.TIERS IN (' . $fous . ')' ;
+        }
+        $codeFams = "";        
+        if ($fams <> '') {
+            $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')' ;
+        }
+
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT tiers, ref, sref1, sref2, designation, SUM(qte) AS qte, SUM(montant) AS montant 
+        $sql = "SELECT tiers, famille, ref, sref1, sref2, designation, SUM(qte) AS qte, SUM(montant) AS montant 
         FROM (
-            SELECT MOUV.TIERS AS tiers, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, ART.DES AS designation,
+            SELECT MOUV.TIERS AS tiers, ART.FAM_0001 AS famille, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, ART.DES AS designation,
             CASE
             WHEN MOUV.OP IN ('F','FD') THEN MOUV.FAQTE 
             WHEN MOUV.OP IN ('G','GD') THEN -1 * MOUV.FAQTE 
@@ -33,9 +42,9 @@ class StatesFournisseursRepository extends ServiceEntityRepository
             END AS montant
             FROM MOUV
             INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
-            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' AND MOUV.TIERS IN ($fous) 
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams
             ) reponse
-            GROUP BY tiers, ref, sref1,sref2, designation
+            GROUP BY tiers,famille, ref, sref1,sref2, designation
             ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -43,10 +52,19 @@ class StatesFournisseursRepository extends ServiceEntityRepository
     }
 
     // states fournisseurs détaillées
-    public function getStatesDetaillees($dos, $dd, $df, $fous):array
+    public function getStatesDetaillees($dos, $dd, $df, $fous, $fams):array
     {        
+        $code = ""; 
+        if ($fous <> '') {
+            $code = 'AND MOUV.TIERS IN (' . $fous . ')' ;
+        }
+        $codeFams = "";        
+        if ($fams <> '') {
+            $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')' ;
+        }
+
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT tiers, ref, sref1, sref2, designation, op, dateFacture, facture, qte, montant, codeLiv, tiersLiv,
+        $sql = "SELECT tiers, famille, ref, sref1, sref2, designation, op, dateFacture, facture, qte, montant, codeLiv, tiersLiv,
         CASE
             WHEN codeLiv = '' AND tiersLiv = '' THEN 'Ste Lhermitte Frères'
             WHEN codeLiv <> '' AND tiersLiv = '' THEN  'adresse sur le fournisseur'
@@ -54,9 +72,9 @@ class StatesFournisseursRepository extends ServiceEntityRepository
             WHEN codeLiv <> '' AND tiersLiv <> '' THEN  CONCAT(LTRIM(RTRIM(T1.NOM)), ', ', LTRIM(RTRIM(T1.RUE)), ', ', LTRIM(RTRIM(T1.CPOSTAL)), ' ', LTRIM(RTRIM(T1.VIL)) )
             END AS adresseLivraison 
         FROM(
-        SELECT tiers, ref, sref1, sref2, designation, op, dateFacture, facture, SUM(qte) AS qte, SUM(montant) AS montant, ENT.ADRCOD_0003 AS codeLiv, ENT.ADRTIERS_0003 AS tiersLiv
+        SELECT tiers,famille, ref, sref1, sref2, designation, op, dateFacture, facture, SUM(qte) AS qte, SUM(montant) AS montant, ENT.ADRCOD_0003 AS codeLiv, ENT.ADRTIERS_0003 AS tiersLiv
         FROM (
-            SELECT MOUV.TIERS AS tiers, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, ART.DES AS designation, MOUV.OP AS op, MOUV.FADT AS dateFacture, MOUV.FANO AS facture,
+            SELECT MOUV.TIERS AS tiers, ART.FAM_0001 AS famille, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, ART.DES AS designation, MOUV.OP AS op, MOUV.FADT AS dateFacture, MOUV.FANO AS facture,
             CASE
             WHEN MOUV.OP IN ('F','FD') THEN MOUV.FAQTE 
             WHEN MOUV.OP IN ('G','GD') THEN -1 * MOUV.FAQTE 
@@ -67,10 +85,10 @@ class StatesFournisseursRepository extends ServiceEntityRepository
             END AS montant
             FROM MOUV
             INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
-            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' AND MOUV.TIERS IN ($fous) 
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams
             ) reponse
             INNER JOIN ENT ON ENT.DOS = $dos AND ENT.TIERS = tiers AND ENT.PICOD = 4 AND ENT.PINO = facture AND ENT.TICOD = 'F'
-            GROUP BY tiers, ref, sref1,sref2, designation, op, dateFacture, facture, ENT.ADRTIERS_0003, ENT.ADRCOD_0003)reponse2
+            GROUP BY tiers,famille, ref, sref1,sref2, designation, op, dateFacture, facture, ENT.ADRTIERS_0003, ENT.ADRCOD_0003)reponse2
             LEFT JOIN T1 ON tiersLiv = T1.TIERS AND $dos = T1.DOS AND  codeLiv = T1.ADRCOD
             LEFT JOIN CLI ON tiersLiv = CLI.TIERS AND $dos = CLI.DOS
             ";
@@ -80,8 +98,17 @@ class StatesFournisseursRepository extends ServiceEntityRepository
     }
 
     // Totaux states par fournisseurs
-    public function getTotauxStatesParFournisseurs($dos, $dd, $df, $fous):array
+    public function getTotauxStatesParFournisseurs($dos, $dd, $df, $fous, $fams):array
     {        
+        $code = ""; 
+        if ($fous <> '') {
+            $code = 'AND MOUV.TIERS IN (' . $fous . ')' ;
+        }
+        $codeFams = "";        
+        if ($fams <> '') {
+            $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')' ;
+        }
+
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT tiers, nom,SUM(montantDepot) AS montantDepot, SUM(montantDirect) AS montantDirect, SUM(montant) AS montant
         FROM (
@@ -99,8 +126,9 @@ class StatesFournisseursRepository extends ServiceEntityRepository
                 WHEN MOUV.OP IN ('GD') THEN (-1 * MOUV.MONT) + MOUV.REMPIEMT_0004 
             END AS montantDirect
             FROM MOUV
-            INNER JOIN  FOU ON FOU.DOS = MOUV.DOS AND FOU.TIERS = MOUV.TIERS
-            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' AND MOUV.TIERS IN ($fous) 
+            INNER JOIN FOU ON FOU.DOS = MOUV.DOS AND FOU.TIERS = MOUV.TIERS
+            INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams
             ) reponse
             GROUP BY tiers, nom
             ORDER BY montant DESC
@@ -111,8 +139,17 @@ class StatesFournisseursRepository extends ServiceEntityRepository
     }
 
     // Totaux states pour tous les fournisseurs
-    public function getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous):array
+    public function getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous, $fams):array
     {        
+        $code = ""; 
+        if ($fous <> '') {
+            $code = 'AND MOUV.TIERS IN (' . $fous . ')' ;
+        }
+        $codeFams = "";        
+        if ($fams <> '') {
+            $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')' ;
+        }
+
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT SUM(montantDepot) AS montantDepot, SUM(montantDirect) AS montantDirect, SUM(montant) AS montant
         FROM (
@@ -131,7 +168,8 @@ class StatesFournisseursRepository extends ServiceEntityRepository
             END AS montantDirect
             FROM MOUV
             INNER JOIN  FOU ON FOU.DOS = MOUV.DOS AND FOU.TIERS = MOUV.TIERS
-            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' AND MOUV.TIERS IN ($fous) 
+            INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams
             )reponse
             ";
         $stmt = $conn->prepare($sql);

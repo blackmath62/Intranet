@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+
+<div class="col-md-12">
+<div class="card card-primary card-outline">
+    <div class="card-header">
+    <h3 class="card-title">Composez votre mailing</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+    {{ form_start(form, { attr: { 'accept-charset' : 'utf-8' }}) }}
+        <div class="form-group">
+            {{ form_label(form.de) }}
+            {{ form_widget(form.de) }}
+            {{ form_errors(form.de) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.a) }}
+            {{ form_widget(form.a) }}
+            {{ form_errors(form.a) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.dossier) }}
+            {{ form_widget(form.dossier) }}
+            {{ form_errors(form.dossier) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.tiers) }}
+            {{ form_widget(form.tiers) }}
+            {{ form_errors(form.tiers) }}
+        </div>
+        <div class="form-group">
+             {{ form_label(form.objet) }}
+            {{ form_widget(form.objet) }}
+            {{ form_errors(form.objet) }}
+        </div>
+        <div class="form-group">
+             {{ form_label(form.message) }}
+            {{ form_widget(form.message) }}
+            {{ form_errors(form.message) }}
+        </div>
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer">
+    <div class="float-right">
+            {{ form_widget(form.envoyer, {'label': "Envoyer", 'attr' : { 'class': 'btn btn-outline-primary mb-3' }}) }}
+    </div>
+    </div>
+    {{ form_end(form) }}
+    <!-- /.card-footer -->
+</div>
+<!-- /.card -->
+</div>
+
+{% endblock %}

@@ -266,6 +266,16 @@ class ArtRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    
+    public function getFamilleProduitOuvertParDossier($dos):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT DISTINCT RTRIM(LTRIM(ART.FAM_0001)) AS famille
+        FROM ART
+        WHERE ART.HSDT IS NULL AND NOT ART.FAM_0001 IN ('ACCESS','ACOMPTE', 'COMMISSI', 'DIVERS','FIN','NC','PRESTA','REMISE','TAXE','TRANSPOR') AND ART.DOS = '$dos'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
 }

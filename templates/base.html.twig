@@ -373,21 +373,22 @@
 									</p>
 								</a>
 								<ul class="nav nav-treeview">
-									{% if is_granted('ROLE_ADMIN') %}
-										<li class="nav-item">
-											<a href="{{path('app_states_excel_globales')}}" class="nav-link">
-												<i class="nav-icon fas fa-file-excel text-success"></i>
-												<p>States Excels globales</p>
-											</a>
-										</li>
-									{% endif %}
-									
 									<li class="nav-item">
 										<a href="{{ path('app_states_lhermitte') }}" class="nav-link">
 											<i class="fas fa-globe nav-icon text-primary"></i>
 											<p>Lhermitte Frères</p>
 										</a>
 									</li>
+									{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
+									<li class="nav-item">
+										<a href="{{path('app_stats_achat', {'dos' : '1'})}}" class="nav-link">
+											<i class="nav-icon fas fa-shopping-basket text-warning"></i>
+											<p>
+												States achats par article
+											</p>
+										</a>
+									</li>
+									{% endif %}
 								</ul>
 							</li>
 							{% endif %}
@@ -412,14 +413,6 @@
 									<i class="nav-icon fas fa-address-book"></i>
 									<p>
 										Clients
-									</p>
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="{{path('app_stats_achat')}}" class="nav-link">
-									<i class="nav-icon fas fa-shopping-basket"></i>
-									<p>
-										States achats par article
 									</p>
 								</a>
 							</li>
@@ -551,6 +544,16 @@
 											<p>Roby</p>
 										</a>
 									</li>
+									{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
+									<li class="nav-item">
+										<a href="{{path('app_stats_achat', {'dos' : '3'})}}" class="nav-link">
+											<i class="nav-icon fas fa-shopping-basket text-warning"></i>
+											<p>
+												States achats par article
+											</p>
+										</a>
+									</li>
+									{% endif %}
 								</ul>
 							</li>
 							<li class="nav-item">
