@@ -41,6 +41,10 @@ class StatsAchatController extends AbstractController
             if ($form->getData()['type'] == 'basique') {
                 $states = $repo->getStatesBasiques($dos, $dd, $df, $fous,$fams);
             }
+            if ($form->getData()['type'] == 'sansFournisseurs') {
+                $states = $repo->getStatesSansFournisseurs($dos, $dd, $df, $fous,$fams);
+                $template = 'stats_achat/statesSansFournisseurs.html.twig';
+            }
             $totauxFournisseurs = $repo->getTotauxStatesParFournisseurs($dos, $dd, $df, $fous,$fams);
             $totaux = $repo->getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous,$fams);
         }

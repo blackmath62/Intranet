@@ -51,6 +51,41 @@ class StatesFournisseursRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    // states fournisseurs sans Fournisseurs
+    public function getStatesSansFournisseurs($dos, $dd, $df, $fous, $fams):array
+    {        
+        $code = "";        
+        if ($fous <> '') {
+            $code = 'AND MOUV.TIERS IN (' . $fous . ')' ;
+        }
+        $codeFams = "";        
+        if ($fams <> '') {
+            $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')' ;
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT famille, ref, sref1, sref2, designation, SUM(qte) AS qte, SUM(montant) AS montant 
+        FROM (
+            SELECT MOUV.TIERS AS tiers, ART.FAM_0001 AS famille, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, ART.DES AS designation,
+            CASE
+            WHEN MOUV.OP IN ('F','FD') THEN MOUV.FAQTE 
+            WHEN MOUV.OP IN ('G','GD') THEN -1 * MOUV.FAQTE 
+            END AS qte,
+            CASE
+            WHEN MOUV.OP IN ('F','FD') THEN MOUV.MONT - MOUV.REMPIEMT_0004 
+            WHEN MOUV.OP IN ('G','GD') THEN (-1 * MOUV.MONT) + MOUV.REMPIEMT_0004 
+            END AS montant
+            FROM MOUV
+            INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams
+            ) reponse
+            GROUP BY famille, ref, sref1,sref2, designation
+            ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     // states fournisseurs détaillées
     public function getStatesDetaillees($dos, $dd, $df, $fous, $fams):array
     {        

@@ -84,10 +84,12 @@ class DateDebutDateFinFournisseursType extends AbstractType
             ->add('type', ChoiceType::class,[
                 'choices' => [
                     'Tiers | Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => "basique",
+                    'Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => "sansFournisseurs",
                     'Tiers | Famille | Référence | Sref1 | Sref2 | Désignation | Op | Date Facture | Facture | Qte | Prix Unitaire | Montant | Adresse Livraison' => "dateOp",
                 ],
                 'choice_attr' => [
                     'Tiers | Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => ['class' => 'm-3'],
+                    'Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => ['class' => 'm-3'],
                     'Tiers | Famille | Référence | Sref1 | Sref2 | Désignation | Op | Date Facture | Facture | Qte | Prix Unitaire | Montant | Adresse Livraison' => ['class' => 'm-3'],
                 ],
                 'expanded' => false,
