@@ -6,6 +6,61 @@
 
 {% block body %}
 
+<div class="row">
+<div class="card card-primary card-outline col-12">
+    <div class="card-header">
+    <h3 class="card-title">Liste des erreurs rencontrées lors de l'envoi du mailing, aucune sauvegarde de cette liste ne sera sauvegarder, vous pouvez la télécharger en appuyant sur le bouton Excel</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th class="text-center">
+                        <span>Code Tiers</span>
+                    </th>
+                    <th class="text-center">
+                        <span>Nom</span>
+                    </th>
+                    <th class="text-center">
+                        <span>Email</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for erreur in erreurs %}
+                    <tr>
+                        <td class="text-center">
+                            <a class="text-center">{{ erreur.tiers}}</a>
+                        </td>
+                        <td class="text-center">
+                            <a class="text-center">{{ erreur.nom}}</a>
+                        </td>
+                        <td class="text-center">
+                            <a class="text-center">{{ erreur.mail}}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th class="text-center">
+                        <span>Code Tiers</span>
+                    </th>
+                    <th class="text-center">
+                        <span>Nom</span>
+                    </th>
+                    <th class="text-center">
+                        <span>Email</span>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+</div>
+
+
 <div class="col-md-12">
 <div class="card card-primary card-outline">
     <div class="card-header">
@@ -44,10 +99,17 @@
             {{ form_widget(form.message) }}
             {{ form_errors(form.message) }}
         </div>
+        <div class="form-group">
+            {{ form_label(form.file) }}
+            {{ form_widget(form.file) }}
+            {{ form_errors(form.file) }}
+        </div>
     </div>
     <!-- /.card-body -->
     <div class="card-footer">
     <div class="float-right">
+            {{ form_label(form.test) }}
+            {{ form_widget(form.test) }}
             {{ form_widget(form.envoyer, {'label': "Envoyer", 'attr' : { 'class': 'btn btn-outline-primary mb-3' }}) }}
     </div>
     </div>

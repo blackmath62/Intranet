@@ -6,10 +6,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class MailingType extends AbstractType
@@ -23,7 +25,8 @@ class MailingType extends AbstractType
                         'message' => 'Merci de saisir l\'adresse Email d\'envoie'
                     ])
                     ],
-                    'disabled' => false,
+                    'disabled' => true,
+                    'required' => false,
                     'attr' => [
                         'class' => 'col-12 form-control'
                     ]
@@ -55,7 +58,7 @@ class MailingType extends AbstractType
                     'Fournisseurs' => "FOU",
                     'Clients' => "CLI",
                 ],
-                'disabled' => true,
+                'disabled' => false,
                 'expanded' => false,
                 'multiple' => false,
                 'label' => 'Type Tiers',
@@ -84,6 +87,22 @@ class MailingType extends AbstractType
                     'placeholder' => 'Veuillez saisir votre message'
                 ],
                 'label' => 'Message',
+            ])
+            ->add('file', FileType::class, [
+                'label' => ' La piéce jointe que vous voulez envoyer',
+                'mapped' => false, // Tell that there is no Entity to link
+                'required' => false,
+                'disabled' => true,
+                'multiple' => false,
+                'attr' => ['class' => 'form-control m-3 col-12 text-center'],
+              ])
+            ->add('test', CheckboxType::class, [
+                'label'    => 'Faire un essai sans envoyer pour voir les mails qui bloquent',
+                'required' => false,
+                'data' => true,
+                'attr' => [
+                'checked'   => 'checked',
+            ],
             ])
             ->add('envoyer', SubmitType::class,[
                 'attr' => ['class' => 'btn btn-primary m-2 col-3 float-right'],
