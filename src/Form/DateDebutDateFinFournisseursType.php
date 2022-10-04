@@ -8,6 +8,7 @@ use App\Entity\Main\FournisseursDivalto;
 use App\Repository\Divalto\ArtRepository;
 use Symfony\Component\Form\AbstractType;
 use App\Repository\Divalto\FouRepository;
+use phpDocumentor\Reflection\PseudoTypes\False_;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -97,6 +98,24 @@ class DateDebutDateFinFournisseursType extends AbstractType
                 'multiple' => false,
                 'label' => 'Selectionnez le type d\'export',
                 'attr' => ['class' => 'form-control'],
+               
+            ])
+            ->add('metier', ChoiceType::class,[
+                'choices' => [
+                    'EV' => "EV",
+                    'HP' => "HP",
+                    'ME' => "ME",
+                ],
+                'choice_attr' => [
+                    'EV' => ['class' => 'm-3'],
+                    'HP' => ['class' => 'm-3'],
+                    'ME' => ['class' => 'm-3'],
+                ],
+                'expanded' => true,
+                'required' => false,
+                'multiple' => true,
+                'label' => 'Choisissez un ou plusieurs métiers (optionnel)',
+                'attr' => ['class' => ''],
                
             ])
             ->add('filtrer', SubmitType::class,[

@@ -17,7 +17,7 @@ class StatesFournisseursRepository extends ServiceEntityRepository
     }
    
     // states fournisseurs basiques
-    public function getStatesBasiques($dos, $dd, $df, $fous, $fams):array
+    public function getStatesBasiques($dos, $dd, $df, $fous, $fams, $metier):array
     {        
         $code = "";        
         if ($fous <> '') {
@@ -26,6 +26,10 @@ class StatesFournisseursRepository extends ServiceEntityRepository
         $codeFams = "";        
         if ($fams <> '') {
             $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')' ;
+        }
+        $codeMetier = "";
+        if ($metier <> '') {
+            $codeMetier = 'AND ART.FAM_0002 IN (' . $metier . ')';
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -42,7 +46,7 @@ class StatesFournisseursRepository extends ServiceEntityRepository
             END AS montant
             FROM MOUV
             INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
-            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams $codeMetier
             ) reponse
             GROUP BY tiers,famille, ref, sref1,sref2, designation
             ";
@@ -52,7 +56,7 @@ class StatesFournisseursRepository extends ServiceEntityRepository
     }
 
     // states fournisseurs sans Fournisseurs
-    public function getStatesSansFournisseurs($dos, $dd, $df, $fous, $fams):array
+    public function getStatesSansFournisseurs($dos, $dd, $df, $fous, $fams, $metier):array
     {        
         $code = "";        
         if ($fous <> '') {
@@ -61,6 +65,10 @@ class StatesFournisseursRepository extends ServiceEntityRepository
         $codeFams = "";        
         if ($fams <> '') {
             $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')' ;
+        }
+        $codeMetier = "";
+        if ($metier <> '') {
+            $codeMetier = 'AND ART.FAM_0002 IN (' . $metier . ')';
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -77,7 +85,7 @@ class StatesFournisseursRepository extends ServiceEntityRepository
             END AS montant
             FROM MOUV
             INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
-            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams $codeMetier
             ) reponse
             GROUP BY famille, ref, sref1,sref2, designation
             ";
@@ -87,7 +95,7 @@ class StatesFournisseursRepository extends ServiceEntityRepository
     }
 
     // states fournisseurs détaillées
-    public function getStatesDetaillees($dos, $dd, $df, $fous, $fams):array
+    public function getStatesDetaillees($dos, $dd, $df, $fous, $fams, $metier):array
     {        
         $code = ""; 
         if ($fous <> '') {
@@ -96,6 +104,10 @@ class StatesFournisseursRepository extends ServiceEntityRepository
         $codeFams = "";        
         if ($fams <> '') {
             $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')' ;
+        }
+        $codeMetier = "";
+        if ($metier <> '') {
+            $codeMetier = 'AND ART.FAM_0002 IN (' . $metier . ')';
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -120,7 +132,7 @@ class StatesFournisseursRepository extends ServiceEntityRepository
             END AS montant
             FROM MOUV
             INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
-            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams $codeMetier
             ) reponse
             INNER JOIN ENT ON ENT.DOS = $dos AND ENT.TIERS = tiers AND ENT.PICOD = 4 AND ENT.PINO = facture AND ENT.TICOD = 'F'
             GROUP BY tiers,famille, ref, sref1,sref2, designation, op, dateFacture, facture, ENT.ADRTIERS_0003, ENT.ADRCOD_0003)reponse2
@@ -133,7 +145,7 @@ class StatesFournisseursRepository extends ServiceEntityRepository
     }
 
     // Totaux states par fournisseurs
-    public function getTotauxStatesParFournisseurs($dos, $dd, $df, $fous, $fams):array
+    public function getTotauxStatesParFournisseurs($dos, $dd, $df, $fous, $fams, $metier):array
     {        
         $code = ""; 
         if ($fous <> '') {
@@ -142,6 +154,10 @@ class StatesFournisseursRepository extends ServiceEntityRepository
         $codeFams = "";        
         if ($fams <> '') {
             $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')' ;
+        }
+        $codeMetier = "";
+        if ($metier <> '') {
+            $codeMetier = 'AND ART.FAM_0002 IN (' . $metier . ')';
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -163,7 +179,7 @@ class StatesFournisseursRepository extends ServiceEntityRepository
             FROM MOUV
             INNER JOIN FOU ON FOU.DOS = MOUV.DOS AND FOU.TIERS = MOUV.TIERS
             INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
-            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams $codeMetier
             ) reponse
             GROUP BY tiers, nom
             ORDER BY montant DESC
@@ -174,7 +190,7 @@ class StatesFournisseursRepository extends ServiceEntityRepository
     }
 
     // Totaux states pour tous les fournisseurs
-    public function getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous, $fams):array
+    public function getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous, $fams, $metier):array
     {        
         $code = ""; 
         if ($fous <> '') {
@@ -183,6 +199,10 @@ class StatesFournisseursRepository extends ServiceEntityRepository
         $codeFams = "";        
         if ($fams <> '') {
             $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')' ;
+        }
+        $codeMetier = "";
+        if ($metier <> '') {
+            $codeMetier = 'AND ART.FAM_0002 IN (' . $metier . ')';
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -204,7 +224,7 @@ class StatesFournisseursRepository extends ServiceEntityRepository
             FROM MOUV
             INNER JOIN  FOU ON FOU.DOS = MOUV.DOS AND FOU.TIERS = MOUV.TIERS
             INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
-            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = 'F' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams $codeMetier
             )reponse
             ";
         $stmt = $conn->prepare($sql);

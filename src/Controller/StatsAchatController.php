@@ -21,6 +21,7 @@ class StatsAchatController extends AbstractController
         $df = '';
         $fous = '';
         $fams = '';
+        $metier = '';
         $states = '';
         $totauxFournisseurs = '';
         $totaux = '';
@@ -34,19 +35,28 @@ class StatsAchatController extends AbstractController
             $fams = $this->miseEnForme($form->getData()['familles']);
             $dd = $form->getData()['start']->format('Y-m-d');
             $df = $form->getData()['end']->format('Y-m-d');
+            $job = $form->getData()['metier'];
+            for ($i=0; $i <count($job) ; $i++) { 
+                if ($i == 0) {
+                    $metier = "'" . $job[$i] . "'";
+                }else {
+                    $metier = $metier . ",'" . $job[$i] . "'";
+                }
+                
+            }
             if ($form->getData()['type'] == 'dateOp') {
-                $states = $repo->getStatesDetaillees($dos, $dd, $df, $fous,$fams);
+                $states = $repo->getStatesDetaillees($dos, $dd, $df, $fous,$fams, $metier);
                 $template = 'stats_achat/statesDetaillees.html.twig';
             }
             if ($form->getData()['type'] == 'basique') {
-                $states = $repo->getStatesBasiques($dos, $dd, $df, $fous,$fams);
+                $states = $repo->getStatesBasiques($dos, $dd, $df, $fous,$fams, $metier);
             }
             if ($form->getData()['type'] == 'sansFournisseurs') {
-                $states = $repo->getStatesSansFournisseurs($dos, $dd, $df, $fous,$fams);
+                $states = $repo->getStatesSansFournisseurs($dos, $dd, $df, $fous,$fams, $metier);
                 $template = 'stats_achat/statesSansFournisseurs.html.twig';
             }
-            $totauxFournisseurs = $repo->getTotauxStatesParFournisseurs($dos, $dd, $df, $fous,$fams);
-            $totaux = $repo->getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous,$fams);
+            $totauxFournisseurs = $repo->getTotauxStatesParFournisseurs($dos, $dd, $df, $fous,$fams, $metier);
+            $totaux = $repo->getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous,$fams, $metier);
         }
 
         return $this->render($template, [
