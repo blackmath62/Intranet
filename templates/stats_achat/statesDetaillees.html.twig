@@ -120,8 +120,16 @@
                 <div>{{ form_widget(form.fournisseurs) }}</div>
                 <div>{{ form_label(form.familles) }}</div>
                 <div>{{ form_widget(form.familles) }}</div>
-                <div>{{ form_label(form.type) }}</div>
-                <div>{{ form_widget(form.type) }}</div>
+                 <div class='d-flex justify-content-between'>
+                    <div>
+                        <div>{{ form_label(form.type) }}</div>
+                        <div>{{ form_widget(form.type) }}</div>
+                    </div>
+                    <div>
+                        <div>{{ form_label(form.metier) }}</div>
+                        <div>{{ form_widget(form.metier) }}</div>
+                    </div>
+                </div>
               <div class="d-flex flex-wrap justify-content-around align-items-center p-2">
 			  	<div><strong>Veuillez selectionner la période :</strong></div>
                 <div>{{ form_label(form.start) }}</div>

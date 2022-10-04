@@ -35,15 +35,7 @@ class StatsAchatController extends AbstractController
             $fams = $this->miseEnForme($form->getData()['familles']);
             $dd = $form->getData()['start']->format('Y-m-d');
             $df = $form->getData()['end']->format('Y-m-d');
-            $job = $form->getData()['metier'];
-            for ($i=0; $i <count($job) ; $i++) { 
-                if ($i == 0) {
-                    $metier = "'" . $job[$i] . "'";
-                }else {
-                    $metier = $metier . ",'" . $job[$i] . "'";
-                }
-                
-            }
+            $metier = $this->miseEnForme($form->getData()['metier']);
             if ($form->getData()['type'] == 'dateOp') {
                 $states = $repo->getStatesDetaillees($dos, $dd, $df, $fous,$fams, $metier);
                 $template = 'stats_achat/statesDetaillees.html.twig';
