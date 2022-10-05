@@ -91,8 +91,8 @@ class CliRepository extends ServiceEntityRepository
         WHERE 
         CLI.HSDT IS NULL AND CLI.DOS IN (1,3) AND(
         CLI.PAY = 'FR' AND CLI.TVATIE NOT IN ('0','01')
-        OR CLI.PAY IN('AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','GR','HR','HU','IRL','IT','IE','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK') AND CLI.TVATIE NOT IN ('1','5')
-        OR CLI.PAY NOT IN('AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','GR','HR','HU','IRL', 'IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK','FR') AND CLI.TVATIE NOT IN ('2')
+        OR CLI.PAY IN('AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','GR','HR','HU','IRL','IT','IE','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK') AND CLI.TVATIE NOT IN ('1','11','5','51')
+        OR CLI.PAY NOT IN('AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','GR','HR','HU','IRL', 'IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK','FR') AND CLI.TVATIE NOT IN ('2', '21')
         ))reponse
         INNER JOIN MUSER ON MUSER.DOS = Dos AND MUSER.USERX = Utilisateur
         ";
