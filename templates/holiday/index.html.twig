@@ -79,8 +79,8 @@
                                 {% endif %}
                             {% if is_granted('ROLE_CONGES') %}
                                 {% if holiday.holidayStatus.id != 3 %}
-                                <a class='btn btn-success' title="Accepter" data-toggle="modal" data-target="#modal-accepte"><i class="fas fa-check"></i></a>
-                                    <div class="modal fade" id="modal-accepte">
+                                <a class='btn btn-success' title="Accepter" data-toggle="modal" data-target="#modal-accepte-{{holiday.id}}" ><i class="fas fa-check"></i></a>
+                                    <div class="modal fade" id="modal-accepte-{{holiday.id}}">
                                         <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
@@ -104,8 +104,8 @@
                                     <!-- /.modal -->
                                 {% endif %}
                                 {% if holiday.holidayStatus.id != 4 %}
-                                <a class='btn btn-danger' title="Refuser" data-toggle="modal" data-target="#modal-refuse"><i class="fas fa-times"></i></a>
-                                    <div class="modal fade" id="modal-refuse">
+                                <a class='btn btn-danger' title="Refuser" data-toggle="modal" data-target="#modal-refuse-{{holiday.id}}"><i class="fas fa-times"></i></a>
+                                    <div class="modal fade" id="modal-refuse-{{holiday.id}}">
                                         <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
