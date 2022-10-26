@@ -32,8 +32,8 @@ class FouRepository extends ServiceEntityRepository
         END AS Utilisateur
         FROM FOU 
         WHERE 
-        FOU.HSDT IS NULL AND FOU.DOS IN (1,3) AND(
-        FOU.PAY = 'FR' AND FOU.TVATIE NOT IN ('0','01')
+        FOU.HSDT IS NULL AND FOU.DOS IN (1,3) AND FOU.CPT = FOU.TIERS
+        AND(FOU.PAY = 'FR' AND FOU.TVATIE NOT IN ('0','01')
         OR FOU.PAY IN('AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','GR','HR','HU','IRL','IT','IE','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK') AND FOU.TVATIE NOT IN ('1','11','5','51')
         OR FOU.PAY NOT IN('AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','GR','HR','HU','IRL', 'IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK','FR') AND FOU.TVATIE NOT IN ('2','21')
         ))reponse

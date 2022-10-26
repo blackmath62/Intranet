@@ -23,7 +23,8 @@
                             <th>Services</th>
                             <th>Date de Début</th>
                             <th>Date de Fin</th>
-                            <th>Nb CP</th>
+                            <th>Nb jour(s)</th>
+                            <th>Type</th>
                             <th>Demande déposé</th>
                             <th>Date de traitement</th>
                             <th>Traité par</th>
@@ -61,6 +62,9 @@
                             {% if holiday.sliceEnd == 'AM' %}{% set trancheEnd = 'Matin' %}{% elseif holiday.sliceEnd == 'PM' %}{% set trancheEnd = 'Aprés midi' %}{% else %}{% set trancheEnd = 'Journée' %}{% endif %}
                             <td>{{ holiday.end ? holiday.end|date('d-m-Y') : '' }} {{ trancheEnd }}</td>
                             <td>{{ holiday.nbJours }}</td>
+                            <td>{% if holiday.user.id == app.user.id or is_granted('ROLE_CONGES') %}
+                                {{ holiday.holidayType.name }}
+                            {% endif %}</td>
                             <td>{{ holiday.createdAt|time_diff }}</td>
                             <td>{{ holiday.treatmentedAt ? holiday.treatmentedAt|date('d-m-Y H:i:s') : '' }}</td>
                             <td>
