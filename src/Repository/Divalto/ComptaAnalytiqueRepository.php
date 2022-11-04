@@ -24,6 +24,50 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Numero AS Facture, Tiers AS Tiers, VentAss AS VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op AS Op,
+        CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, CompteVente, RegimeTva, qteVtl AS qteVtl, regimeFou, VtlNo
+       FROM
+       (
+       SELECT RTRIM(LTRIM(m.TIERS)) AS Tiers, RTRIM(LTRIM(v.VTLNA)) AS VentAss, RTRIM(LTRIM(v.QTE)) AS qteVtl, RTRIM(LTRIM(m.DOS)) AS Dos, m.FADT AS DateFacture, RTRIM(LTRIM(m.FANO)) AS Numero,
+       RTRIM(LTRIM(m.REF)) AS Ref, RTRIM(LTRIM(m.SREF1)) AS Sref1, RTRIM(LTRIM(m.SREF2)) AS Sref2, RTRIM(LTRIM(a.DES)) AS Designation, RTRIM(LTRIM(a.VENUN)) AS Uv,
+       RTRIM(LTRIM(m.OP)) AS Op,RTRIM(LTRIM(m.AXE_0001)) AS Article, RTRIM(LTRIM(m.AXE_0002)) AS Client, RTRIM(LTRIM(a.CPTA)) AS CompteAchat, CONCAT(6 , RIGHT(RTRIM(LTRIM(m.CPTV)), 7)) AS CompteVente,
+       RTRIM(LTRIM(a.TVAART)) AS RegimeTva, RTRIM(LTRIM(a.TIERS)) AS fPrin, f.TVATIE AS regimeFou, v.VTLNO AS VtlNo,
+       CASE
+           WHEN m.OP IN('C','CD') THEN m.FAQTE
+           WHEN m.OP IN('D','DD') THEN -1*m.FAQTE
+           ELSE 0
+       END AS QteSign,
+       CASE
+           WHEN m.OP IN('C','CD') THEN s.CR
+           WHEN m.OP IN('D','DD') THEN -1*s.CR
+           ELSE 0
+       END AS CoutRevient,
+       CASE
+           WHEN m.OP IN('C','CD') THEN s.CMP
+           WHEN m.OP IN('D','DD') THEN -1*s.CMP
+           ELSE 0
+       END AS CoutMoyenPondere
+       FROM MOUV m
+       INNER JOIN ART a ON m.REF = a.REF AND m.DOS = a.DOS
+       INNER JOIN FOU f ON a.TIERS = f.TIERS AND a.DOS = f.DOS
+       LEFT JOIN SART s ON m.REF = s.REF AND m.DOS = s.DOS AND m.SREF1 = s.SREF1 AND m.SREF2 = s.SREF2
+       INNER JOIN CLI c ON m.TIERS = c.TIERS AND m.DOS = c.DOS
+       LEFT JOIN MVTL v ON m.DOS = v.DOS AND m.TIERS = v.TIERS AND m.FANO = v.PINO AND m.REF = v.REF AND m.SREF1 = v.SREF1 AND m.SREF2 = v.SREF2
+       WHERE m.DOS = 1 AND m.TICOD = 'C' AND m.PICOD = 4 AND m.OP IN ('C','D') AND NOT m.TIERS IN ('C0160500')
+       AND m.AXE_0002 <> m.AXE_0001 -- a.FAM_0002 <> c.STAT_0002
+       AND a.FAM_0002 IN ('EV', 'HP')AND YEAR(m.FADT) IN (?) AND MONTH(m.FADT) IN (?)
+       )reponse
+       GROUP BY Numero, Tiers, VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op, CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, CompteVente, RegimeTva, qteVtl, regimeFou, VtlNo
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$annee, $mois]);
+        return $stmt->fetchAll();
+    }
+
+    /* 
+    
+    Ancienne requête getRapportClient
+
+    SELECT Numero AS Facture, Tiers AS Tiers, VentAss AS VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op AS Op,
          CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, RegimeTva, SUM(QteSign) AS QteSign, qteVtl AS qteVtl, regimeFou
         FROM
         (
@@ -57,11 +101,7 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
         AND ART.FAM_0002 IN ('EV', 'HP')AND YEAR(MOUV.FADT) IN (?) AND MONTH(MOUV.FADT) IN (?)
         )reponse
         GROUP BY Numero, Tiers, VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op, CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, RegimeTva, qteVtl, regimeFou
-        ";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$annee, $mois]);
-        return $stmt->fetchAll();
-    }
+    */
 
     public function getRapportFournisseurAvecSref($ventilation, $ref, $sref1, $sref2)
     {
