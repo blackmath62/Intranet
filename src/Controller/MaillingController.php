@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class MaillingController extends AbstractController
 {
     /**
-     * @Route("/admin/mailling", name="app_mailling")
+     * @Route("/admin/mailing", name="app_mailing")
      */
     public function index(MailerInterface $mailer,FouRepository $repo, Request $request, SluggerInterface $slugger): Response
     {

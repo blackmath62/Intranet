@@ -195,29 +195,6 @@
 									<p>Derniéres intéractions client</p>
 								</a>
 							</li>	
-
-						{% if is_granted('ROLE_ADMIN') %}
-							<li class="nav-item">
-								<a href="{{ path('app_chats')}}" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-comments "></i>
-									<p>
-										Chat
-									</p>
-									<!-- <span class="badge badge-info right">4</span> -->
-								</a>
-							</li>
-						{% endif %}
-						{% if is_granted('ROLE_ADMIN') %}
-							<li class="nav-item">
-								<a href="{{ path('app_bourse_transport')}}" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-truck-loading"></i>
-									<p>
-										Bourse au transport à faire
-									</p>
-									<!-- <span class="badge badge-info right">1</span> -->
-								</a>
-							</li>
-						{% endif %}
 						{% if is_granted('ROLE_INFORMATIQUE') %}
 							<li class="nav-item has-treeview">
 								<a href="" class="nav-link">
@@ -234,14 +211,6 @@
 												<p>Agence de l'eau</p>
 											</a>
 										</li>
-									{% if is_granted('ROLE_ADMIN') %}
-										<li class="nav-item">
-											<a href="" class="nav-link">
-												<i class="nav-icon fas fa-certificate text-warning"></i>
-												<p>Audit AFNOR</p>
-											</a>
-										</li>
-									{% endif %}
 								</ul>
 							</li>
 						{% endif %}
@@ -250,7 +219,7 @@
 								<a href="" class="nav-link">
 									<i class="nav-icon fas fa-box-open"></i>
 									<p>
-										Stocks
+										Logistique
 										<i class="fas fa-angle-left right"></i>
 									</p>
 								</a>
@@ -259,12 +228,6 @@
 											<a href="{{ path('app_controle_produit_stock_mouv_ef')}}" class="nav-link">
 												<i class="nav-icon fab fa-searchengin text-warning"></i>
 												<p>Article impossible à fermer</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="{{ path('app_anomalies_produits_fermes')}}" class="nav-link">
-												<i class="nav-icon fas fa-bullhorn text-danger"></i>
-												<p>Anomalies (Articles fermés)</p>
 											</a>
 										</li>
 										<li class="nav-item">
@@ -285,16 +248,16 @@
 												<p>Matiéres Dangeureuses</p>
 											</a>
 										</li>
+										<li class="nav-item">
+											<a href="{{ path('app_emplacement_depot')}}" class="nav-link">
+												<i class="nav-icon fas fa-map-marker-alt text-primary"></i>
+												<p>
+													Gestion Emplacement
+												</p>
+												<!-- <span class="badge badge-info right">1</span> -->
+											</a>
+										</li>
 								</ul>
-							</li>
-							<li class="nav-item">
-								<a href="{{ path('app_emplacement_depot')}}" class="nav-link">
-									<i class="nav-icon fas fa-map-marker-alt"></i>
-									<p>
-										Gestion Emplacement
-									</p>
-									<!-- <span class="badge badge-info right">1</span> -->
-								</a>
 							</li>
 							<li class="nav-item has-treeview">
 								<a href="" class="nav-link">
@@ -317,18 +280,8 @@
 												<p>Vieilles commandes</p>
 											</a>
 										</li>
-										{% if is_granted('ROLE_ADMIN') %}
-										<li class="nav-item">
-											<a href="{{ path('app_old_cmd')}}" class="nav-link">
-												<i class="nav-icon fas fa-blind text-success"></i>
-												<p>Vieux Bls</p>
-											</a>
-										</li>
-										{% endif %}
 								</ul>
 							</li>
-
-					
 							<li class="nav-item">
 								<a href="{{ path('app_faq')}}" class="nav-link">
 									<i class="nav-icon fas fa-question-circle"></i>
@@ -392,8 +345,6 @@
 								</ul>
 							</li>
 							{% endif %}
-
-
 							<li class="nav-item">
 								<a href="{{path('app_lhermitte_rossignols')}}" class="nav-link">
 									<i class="nav-icon fas fa-dove text-light"></i>
@@ -450,20 +401,6 @@
 									</p>
 								</a>
 								<ul class="nav nav-treeview">
-									{% if is_granted('ROLE_ADMIN') %}
-										<li class="nav-item">
-											<a href="" class="nav-link">
-												<i class="nav-icon fas fa-euro-sign text-warning"></i>
-												<p>TVA</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="" class="nav-link">
-												<i class="nav-icon fas fa-fw fa-plane text-light"></i>
-												<p>DEB</p>
-											</a>
-										</li>
-									{% endif %}
 										<li class="nav-item">
 											<a href="{{path('app_controle_comptabilite', {'slug' : 'F'}) }}" class="nav-link">
 												<i class="nav-icon fas fa-balance-scale-left text-danger"></i>
@@ -487,25 +424,6 @@
 								</ul>
 							</li>
 						{% endif %}
-						{% if is_granted('ROLE_ADMIN') %}
-							<li class="nav-item has-treeview">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-truck-moving"></i>
-									<p>
-										Logistique
-										<i class="fas fa-angle-left right"></i>
-									</p>
-								</a>
-								<ul class="nav nav-treeview">
-										<li class="nav-item">
-											<a href="{{path('app_fin_de_journee')}}" class="nav-link">
-												<i class="nav-icon fas fa-hourglass-end text-warning"></i>
-												<p>Fin de journée</p>
-											</a>
-										</li>
-								</ul>
-							</li>
-						{% endif %}
 							<li class="nav-item">
 								<a href="{{path('app_lhermitte_documents')}}" class="nav-link">
 									<i class="nav-icon fas fa-copy"></i>
@@ -513,19 +431,8 @@
 										Documents
 									</p>
 								</a>
-							</li>
-						{% if is_granted('ROLE_ADMIN') %}
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-truck"></i>
-									<p>
-										Groupage
-										<!-- <span class="badge badge-info right">2</span> -->
-									</p>
-								</a>
-							</li>
+							</li>							
 							<!--Fin Table Menu Lhermitte -->
-						{% endif %}
 							<!--Table Menu Roby -->
 							<li class="nav-header">Roby</li>
 						{% if is_granted('ROLE_ROBY') %}
@@ -580,14 +487,6 @@
 								</ul>
 								<ul class="nav nav-treeview">
 									<li class="nav-item">
-										<a href="{{path('app_pays_interdit_commandes_fsc')}}" class="nav-link">
-											<i class="nav-icon fas fa-ban text-warning"></i>
-											<p>Ban Pays fournisseurs</p>
-										</a>
-									</li>
-								</ul>
-								<ul class="nav nav-treeview">
-									<li class="nav-item">
 										<a href="{{path('app_movement_fsc_view_list')}}" class="nav-link">
 											<i class="nav-icon fab fa-product-hunt text-success"></i>
 											<p>Mouvements articles FSC</p>
@@ -618,14 +517,6 @@
 									<p>D.E.B</p>
 								</a>
 							</li>
-							{% if is_granted('ROLE_ADMIN') %}
-							<li class="nav-item">
-								<a href="" class="nav-link">
-									<i class="fas fa-fw fa-table nav-icon"></i>
-									<p>Planning</p>
-								</a>
-							</li>
-							{% endif %}
 							{% endif %}
 							<li class="nav-item">
 								<a href="{{path('app_Roby_documents')}}" class="nav-link">
@@ -654,7 +545,92 @@
 									<!-- <span class="badge badge-danger right">8</span> -->
 								</a>
 							</li>
-							
+							<li class="nav-item has-treeview">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-truck-moving"></i>
+									<p>
+										à faire
+										<i class="fas fa-angle-left right"></i>
+									</p>
+								</a>
+								<ul class="nav nav-treeview">
+									<li class="nav-item">
+										<a href="{{path('app_mailing')}}" class="nav-link">
+											<i class="nav-icon fas fa-hourglass-end text-warning"></i>
+											<p>Mailing</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{path('app_fin_de_journee')}}" class="nav-link">
+											<i class="nav-icon fas fa-hourglass-end text-warning"></i>
+											<p>Fin de journée Logistique</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="" class="nav-link">
+											<i class="fas fa-fw fa-table nav-icon"></i>
+											<p>Planning Roby</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-fw fa-truck"></i>
+											<p>
+												Groupage Terreaux
+												<!-- <span class="badge badge-info right">2</span> -->
+											</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-certificate text-warning"></i>
+											<p>Audit AFNOR</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{ path('app_chats')}}" class="nav-link">
+											<i class="nav-icon fas fa-fw fa-comments "></i>
+											<p>
+												Chat
+											</p>
+											<!-- <span class="badge badge-info right">4</span> -->
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{ path('app_bourse_transport')}}" class="nav-link">
+											<i class="nav-icon fas fa-fw fa-truck-loading"></i>
+											<p>
+												Bourse au transport à faire
+											</p>
+											<!-- <span class="badge badge-info right">1</span> -->
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{ path('app_old_cmd')}}" class="nav-link">
+											<i class="nav-icon fas fa-blind text-success"></i>
+											<p>Vieux Bls</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-fw fa-plane text-light"></i>
+											<p>DEB Lhermitte</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{path('app_pays_interdit_commandes_fsc')}}" class="nav-link">
+											<i class="nav-icon fas fa-ban text-warning"></i>
+											<p>Ban Pays fournisseurs</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{ path('app_anomalies_produits_fermes')}}" class="nav-link">
+											<i class="nav-icon fas fa-bullhorn text-danger"></i>
+											<p>Anomalies (Articles fermés)</p>
+										</a>
+									</li>
+								</ul>
+							</li>
 							</li>
 							{% endif %}
 					</ul>
