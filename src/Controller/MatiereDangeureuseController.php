@@ -15,6 +15,7 @@ class MatiereDangeureuseController extends AbstractController
     public function index(ArtRepository $repo): Response
     {
         $articles = $repo->StockBlobMatiereDangeureuse();
+        //dd(stream_get_contents($articles['blob']));
 
         return $this->render('matiere_dangeureuse/index.html.twig', [
             'articles' => $articles,
