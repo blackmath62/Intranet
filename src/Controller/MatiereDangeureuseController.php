@@ -15,11 +15,24 @@ class MatiereDangeureuseController extends AbstractController
     public function index(ArtRepository $repo): Response
     {
         $articles = $repo->StockBlobMatiereDangeureuse();
-        //dd(stream_get_contents($articles['blob']));
+
+        /*foreach ($articles as $key => $value) {
+            dd($value['blob']);
+        }*/
 
         return $this->render('matiere_dangeureuse/index.html.twig', [
             'articles' => $articles,
             'title' => 'Matiéres Dangeureuses'
         ]);
+    }
+
+    private function blobToString($data): string
+    {
+        $details = '';
+        while(!feof($data)){
+            $details.= fread($data, 1024);
+        }
+        rewind($data);
+        return $details;
     }
 }

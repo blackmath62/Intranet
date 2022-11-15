@@ -232,7 +232,8 @@ class ArtRepository extends ServiceEntityRepository
     public function StockBlobMatiereDangeureuse():array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT l.REF AS ref, l.SREF1 AS sref1, l.SREF2 AS sref2, a.DES AS designation, a.VENUN AS uv, l.EDCOD_0001 AS code, a.TIERS AS fournisseur,SUM(s.QTETJSENSTOCK) AS stock, l.NOTE_0001 AS note, MAX(convert(varchar(max),n.NOTEBLOB)) AS blob
+        $sql = "SELECT l.REF AS ref, l.SREF1 AS sref1, l.SREF2 AS sref2, a.DES AS designation, a.VENUN AS uv, l.EDCOD_0001 AS code, 
+        a.TIERS AS fournisseur,SUM(s.QTETJSENSTOCK) AS stock, l.NOTE_0001 AS note, n.NOTEBLOB AS blob
         FROM LART l
         INNER JOIN ART a ON a.REF = l.REF AND a.DOS = l.DOS
         INNER JOIN MNOTE n ON n.NOTE = l.NOTE_0001 
