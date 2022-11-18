@@ -191,16 +191,26 @@ class HolidayController extends AbstractController
         $form->handleRequest($request);
         
         if($form->isSubmitted() && $form->isValid() ){
-            $listUsers = $form->getData()['user'];
-            // adapter l'heure de start à la tranche de journée selectionnée
+                $listUsers = $form->getData()['user'];
+                // adapter l'heure de start à la tranche de journée selectionnée
                 $sliceStart = $form->getData()['sliceStart'];
                 $start = $form->getData()['start'];
+                $anneeStart = substr($form->getData()['start']->format('Y'),-4,2);
+                if ($anneeStart <> 20) {
+                    $this->addFlash('danger', 'Votre année début n\'est pas cohérente, aucune information n\'a été enregistré');
+                    return $this->redirectToRoute('app_holiday_new_closing');
+                }
                 if ($sliceStart == 'PM') {
                     $start = $start->modify("+14 hours");
                 }
                 // adapter l'heure de End à la tranche de journée selectionnée
                 $sliceEnd = $form->getData()['sliceEnd'];
                 $end = $form->getData()['end'];
+                $anneeEnd = substr($form->getData()['end']->format('Y'),-4,2);
+                if ($anneeEnd <> 20) {
+                    $this->addFlash('danger', 'Votre année de fin n\'est pas cohérente, aucune information n\'a été enregistré');
+                    return $this->redirectToRoute('app_holiday_new_closing');
+                }
                 if ($sliceEnd == 'AM') {
                     $end = $end->modify("+12 hours");
                 }elseif ($sliceEnd == 'PM') {
@@ -315,6 +325,18 @@ class HolidayController extends AbstractController
         $form = $this->createForm(HolidayType::class, $holiday);
         $form->handleRequest($request);        
         if($form->isSubmitted() && $form->isValid() ){
+            // Vérifier la cohérence des années
+            $anneeStart = substr($holiday->getStart()->format('Y'),-4,2);
+            if ($anneeStart <> 20) {
+                $this->addFlash('danger', 'Votre année début n\'est pas cohérente, aucune information n\'a été enregistré');
+                return $this->redirectToRoute($tracking);
+            }
+            $anneeEnd = substr($holiday->getEnd()->format('Y'),-4,2);
+            if ($anneeEnd <> 20) {
+                $this->addFlash('danger', 'Votre année fin n\'est pas cohérente, aucune information n\'a été enregistré');
+                return $this->redirectToRoute($tracking);
+            }
+            
             // vérifier si cette utilisateur n'a pas déjà déposé durant cette période
             if ($id) {
                 $utilisateur = $holiday->getUser();
