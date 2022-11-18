@@ -279,4 +279,36 @@ class ArtRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    public function getSrefByArt($dos, $prefixe):array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT dos, ref, designation, sref1, sref2, conf, stock, qteCmdCli, qteCmdFou, qteBlCli, SUM(m.BLQTE) AS qteBlFou
+        FROM(
+            SELECT dos, ref, designation, sref1, sref2, conf, stock, qteCmdCli, qteCmdFou, SUM(m.BLQTE) AS qteBlCli
+            FROM(
+                SELECT dos, ref, designation, sref1, sref2, conf, stock, qteCmdCli, SUM(m.CDQTE) AS qteCmdFou
+                FROM(
+                    SELECT dos, ref, designation, sref1, sref2, conf, stock, SUM(m.CDQTE) AS qteCmdCli
+                    FROM(
+                        SELECT s.DOS AS dos, s.REF AS ref, a.DES AS designation, s.SREF1 AS sref1, s.SREF2 AS sref2, s.CONF AS conf, SUM(v.QTETJSENSTOCK) AS stock
+                        FROM SART s
+                        INNER JOIN ART a ON  a.REF = s.REF AND a.DOS = s.DOS
+                        LEFT JOIN MVTL_STOCK_V v ON s.REF = v.REFERENCE AND s.SREF1 = v.SREFERENCE1 AND s.SREF2 = v.SREFERENCE2 AND s.DOS = v.DOSSIER
+                        WHERE s.REF LIKE '$prefixe%' AND s.DOS = '$dos' AND NOT s.CONF IN ('Usrd') AND a.HSDT IS NULL
+                        GROUP BY s.DOS, s.REF, a.DES, s.SREF1, s.SREF2, s.CONF)repo
+                    LEFT JOIN MOUV m ON ref = m.REF AND sref1 = m.SREF1 AND sref2 = m.SREF2 AND dos = m.DOS AND m.PICOD = 2 AND m.TICOD IN ('C') AND m.CDCE4 IN (1)
+                    GROUP BY dos, ref, designation, sref1, sref2, conf, stock
+                    )reponse
+                LEFT JOIN MOUV m ON ref = m.REF AND sref1 = m.SREF1 AND sref2 = m.SREF2 AND dos = m.DOS AND m.PICOD = 2 AND m.TICOD IN ('F') AND m.CDCE4 IN (1)
+                GROUP BY dos, ref, designation, sref1, sref2, conf, stock, qteCmdCli)repon
+            LEFT JOIN MOUV m ON ref = m.REF AND sref1 = m.SREF1 AND sref2 = m.SREF2 AND dos = m.DOS AND m.PICOD = 3 AND m.TICOD IN ('C') AND m.BLCE4 IN (1)
+            GROUP BY dos, ref, designation, sref1, sref2, conf, stock, qteCmdCli, qteCmdFou)rep
+        LEFT JOIN MOUV m ON ref = m.REF AND sref1 = m.SREF1 AND sref2 = m.SREF2 AND dos = m.DOS AND m.PICOD = 3 AND m.TICOD IN ('F') AND m.BLCE4 IN (1)
+        GROUP BY dos, ref, designation, sref1, sref2, conf, stock, qteCmdCli, qteCmdFou, qteBlCli
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
 }
