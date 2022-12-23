@@ -1,28 +1,46 @@
 <p>Bonjour,</p>
 
 {% if mouvs %}
-<p><u><strong>Veuillez trouver ci dessous la liste des produits vendus en contrat commissionnaire pour le mois => {{ mois }} / {{ annee }}: </strong></u></p>
-<p>Ne facturer que sur la base des produits livrés en 2022</strong></p>
-    <table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
-        <thead>
-            <tr class="text-center">
-            <th>Référence</th>
-            <th>Désignation</th>
-            <th>Uv</th>
-            <th>Quantité</th>
-        </thead>
-        <tbody>
-{% for mouv in mouvs %}
-        <tr>
-            <td>{{ mouv.reference }}</td>
-            <td>{{ mouv.designation }}</td>
-            <td>{{ mouv.uv }}</td>
-            <td>{{ mouv.quantite }}</td>
-        </tr>
-{% endfor %}
-       </tbody>
-    </table>
+	<p>
+		<u>
+			<strong>Veuillez trouver ci dessous la liste des produits vendus en contrat commissionnaire pour le mois =>
+				{{ mois }}
+				/
+				{{ annee }}:
+			</strong>
+		</u>
+	</p>
+	<p>Ne facturer que sur la base des produits livrés en 2022</p>
+	<table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+		<thead>
+			<tr class="text-center">
+				<th>Référence</th>
+				<th>Désignation</th>
+				<th>Uv</th>
+				<th>Quantité</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for mouv in mouvs %}
+				<tr>
+					<td>{{ mouv.reference }}</td>
+					<td>{{ mouv.designation }}</td>
+					<td>{{ mouv.uv }}</td>
+					<td>{{ mouv.quantite }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% else %}
+	<p>
+		<u>
+			<strong>Aucun produit n'a été vendu en contrat commissionnaire pour le mois =>
+				{{ mois }}
+				/
+				{{ annee }}.
+			</strong>
+		</u>
+	</p>
 {% endif %}
-
 <p>Pour la société Lhermitte frères, mail envoyé par l'Intranet du groupe Axis</p>
 <p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

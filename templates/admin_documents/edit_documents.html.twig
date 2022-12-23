@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}
+	{{ title }}
+{% endblock %}
 
 {% block body %}
 
@@ -17,7 +19,7 @@
 				<div class="form">
 					<div class="row">
 						<div class="form-group col-2">
-							{{ form_row(documentEditForm.title, {'attr' : {'class' : "form-control"}})}}
+							{{ form_row(documentEditForm.title, {'attr' : {'class' : "form-control"}}) }}
 						</div>
 						<div class="form-group col-4">
 							{{ form_row(documentEditForm.beginningDate, {'attr' : {'class' : "form-control"}})}}
@@ -26,14 +28,11 @@
 							{{ form_row(documentEditForm.endDate, {'attr' : {'class' : "form-control"}})}}
 						</div>
 					</div>
-					<div class="row">
-						
-						
-					</div>
+					<div class="row"></div>
 				</div>
-                <div class="text-center">
-				{{ form_row(documentEditForm.Modifier, {'attr' : {'class' : "btn btn-dark"}})}}
-                </div>
+				<div class="text-center">
+					{{ form_row(documentEditForm.Modifier, {'attr' : {'class' : "btn btn-dark"}})}}
+				</div>
 				{{form_end(documentEditForm)}}
 			</div>
 		</div>
