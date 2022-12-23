@@ -119,11 +119,13 @@ class ComptaAnalytiqueController extends AbstractController
         $exportVentes = $this->repoAnal->getRapportClient($annee, $mois);
         // exportation des ventes
         $ventes = [];
+        $achat = '';
         for ($lig=0; $lig <count($exportVentes) ; $lig++) { 
                             $regime = "";
                             $port = 0;
                             $transport = 0;
                             $achat = [];
+                            $pa = 0;
                             
                             $ventes[$lig]['Facture'] = $exportVentes[$lig]['Facture'];
                             $ventes[$lig]['Tiers'] = $exportVentes[$lig]['Tiers'];
@@ -143,12 +145,14 @@ class ComptaAnalytiqueController extends AbstractController
                             $ventes[$lig]['estimation'] = '';
                             $ventes[$lig]['estimationTotal'] = '';
                             // rapprocher les achats
-                            $achat = $this->repoAnal->getRapportFournisseurAvecSref(
-                                        $exportVentes[$lig]['VentAss'], 
-                                        $exportVentes[$lig]['Ref'], 
-                                        $exportVentes[$lig]['Sref1'], 
-                                        $exportVentes[$lig]['Sref2']);
-                            $pa = 0;
+                           /*if ($exportVentes[$lig]['VentAss'] != NULL) 
+                           {*/
+                                $achat = $this->repoAnal->getRapportFournisseurAvecSref(
+                                    $exportVentes[$lig]['VentAss'], 
+                                    $exportVentes[$lig]['Ref'], 
+                                    $exportVentes[$lig]['Sref1'], 
+                                    $exportVentes[$lig]['Sref2']);
+                            //}
                             if ($achat)
                                 {$pa = $achat['pa'];}
                             $ventes[$lig]['Cma'] = $pa;

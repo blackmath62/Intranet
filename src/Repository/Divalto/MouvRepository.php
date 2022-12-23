@@ -2,10 +2,9 @@
 
 namespace App\Repository\Divalto;
 
-
 use App\Entity\Divalto\Mouv;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Mouv|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,21 +13,21 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  * @method Mouv[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class MouvRepository extends ServiceEntityRepository
-{   
+{
 
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Mouv::class);
-          
+
     }
 
     // Liste des piéces avec des produits FSC
-    public function getFscOrderList($listpieceOk):array
+    public function getFscOrderList($listpieceOk): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT RTRIM(LTRIM(ENT.PIREF)) AS notreRef, tiers AS tiers, codePiece AS codePiece, numCmd AS numCmd, dateCmd AS dateCmd, numBl AS numBl, dateBl AS dateBl, numFact AS numFact, dateFact AS dateFact, utilisateur AS utilisateur
         FROM(
-        SELECT DISTINCT MOUV.DOS AS dos, RTRIM(LTRIM(MOUV.TIERS)) AS tiers, RTRIM(LTRIM(MOUV.PICOD)) AS codePiece, 
+        SELECT DISTINCT MOUV.DOS AS dos, RTRIM(LTRIM(MOUV.TIERS)) AS tiers, RTRIM(LTRIM(MOUV.PICOD)) AS codePiece,
         RTRIM(LTRIM(MOUV.CDNO)) AS numCmd,MOUV.CDDT AS dateCmd,RTRIM(LTRIM(MOUV.BLNO)) AS numBl, MOUV.BLDT AS dateBl,
         RTRIM(LTRIM(MOUV.FANO)) AS numFact, MOUV.FADT AS dateFact,
         CASE
@@ -41,7 +40,7 @@ class MouvRepository extends ServiceEntityRepository
         ELSE 'MARINA'
         END AS utilisateur
         FROM MOUV
-        WHERE MOUV.DOS = 3 AND ( MOUV.REF LIKE 'FSC%' OR MOUV.FANO IN ('19021142','19021427') ) AND MOUV.TICOD IN ('F') AND MOUV.CDNO NOT IN($listpieceOk) AND MOUV.PICOD IN (2,3,4) 
+        WHERE MOUV.DOS = 3 AND ( MOUV.REF LIKE 'FSC%' OR MOUV.FANO IN ('19021142','19021427') ) AND MOUV.TICOD IN ('F') AND MOUV.CDNO NOT IN($listpieceOk) AND MOUV.PICOD IN (2,3,4)
         --AND (MOUV.CDDT >= '2021/01/01' OR MOUV.BLDT >= '2021/01/01' OR MOUV.FADT >= '2021/01/01')
         )reponse
         INNER JOIN ENT ON dos = ENT.DOS AND tiers = ENT.TIERS AND ENT.PINO = numPiece
@@ -52,12 +51,12 @@ class MouvRepository extends ServiceEntityRepository
     }
 
     // Liste des piéces avec des produits FSC pour tourner à vide
-    public function getFscOrderListRun():array
+    public function getFscOrderListRun(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT RTRIM(LTRIM(ENT.PIREF)) AS notreRef, tiers AS tiers, codePiece AS codePiece, numCmd AS numCmd, dateCmd AS dateCmd, numBl AS numBl, dateBl AS dateBl, numFact AS numFact, dateFact AS dateFact, utilisateur AS utilisateur
         FROM(
-        SELECT DISTINCT MOUV.DOS AS dos, RTRIM(LTRIM(MOUV.TIERS)) AS tiers, RTRIM(LTRIM(MOUV.PICOD)) AS codePiece, 
+        SELECT DISTINCT MOUV.DOS AS dos, RTRIM(LTRIM(MOUV.TIERS)) AS tiers, RTRIM(LTRIM(MOUV.PICOD)) AS codePiece,
         RTRIM(LTRIM(MOUV.CDNO)) AS numCmd,MOUV.CDDT AS dateCmd,RTRIM(LTRIM(MOUV.BLNO)) AS numBl, MOUV.BLDT AS dateBl,
         RTRIM(LTRIM(MOUV.FANO)) AS numFact, MOUV.FADT AS dateFact,
         CASE
@@ -70,7 +69,7 @@ class MouvRepository extends ServiceEntityRepository
         ELSE 'MARINA'
         END AS utilisateur
         FROM MOUV
-        WHERE MOUV.DOS = 3 AND MOUV.REF LIKE 'FSC%' AND MOUV.TICOD IN ('F') AND MOUV.PICOD IN (2,3,4) 
+        WHERE MOUV.DOS = 3 AND MOUV.REF LIKE 'FSC%' AND MOUV.TICOD IN ('F') AND MOUV.PICOD IN (2,3,4)
         --AND (MOUV.CDDT >= '2021/01/01' OR MOUV.BLDT >= '2021/01/01' OR MOUV.FADT >= '2021/01/01')
         )reponse
         INNER JOIN ENT ON dos = ENT.DOS AND tiers = ENT.TIERS AND ENT.PINO = numPiece
@@ -93,17 +92,17 @@ class MouvRepository extends ServiceEntityRepository
     }
 
     // Mouvements sur la piéce
-    public function getMouvOnOrder($num, $typePiece, $tiers):array
+    public function getMouvOnOrder($num, $typePiece, $tiers): array
     {
-        if ($typePiece == 2 ) {
+        if ($typePiece == 2) {
             $code = 'MOUV.CDNO';
-            $dateP = 'MOUV.CDDT';        
-        }elseif ($typePiece == 3 ) {
+            $dateP = 'MOUV.CDDT';
+        } elseif ($typePiece == 3) {
             $code = 'MOUV.BLNO';
-            $dateP = 'MOUV.BLDT';    
-        }elseif ($typePiece == 4 ) {
+            $dateP = 'MOUV.BLDT';
+        } elseif ($typePiece == 4) {
             $code = 'MOUV.FANO';
-            $dateP = 'MOUV.FADT';    
+            $dateP = 'MOUV.FADT';
         }
         $where = $code . ' = ' . $num;
         $conn = $this->getEntityManager()->getConnection();
@@ -177,7 +176,7 @@ class MouvRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT REPLACE(CONCAT(Ref,Sref1,Sref2,Nature),'/','-') AS Lien, Ref,Sref1,Sref2,Designation AS Design,Nature
-        , 
+        ,
         SUM(Fournisseur) AS Fourn, SUM(Client) AS Cli, SUM(Interne) AS Inter,SUM(Fournisseur)+SUM(Client)+SUM(Interne) AS Diff
         FROM(
         SELECT MOUV.DOS AS Dos, MOUV.TIERS AS Tiers, MOUV.TICOD AS TypePiece, RTRIM(LTRIM(MOUV.REF)) AS Ref, RTRIM(LTRIM(MOUV.SREF1)) AS Sref1, RTRIM(LTRIM(MOUV.SREF2)) AS Sref2, RTRIM(LTRIM(ART.DES)) AS Designation,
@@ -217,12 +216,12 @@ class MouvRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-        // Mouvements FSC pour un Article
-        public function getMovFscOneArt($lien)
-        {
-            $conn = $this->getEntityManager()->getConnection();
-            $sql = "SELECT REPLACE(CONCAT(Ref,Sref1,Sref2,Nature),'/','-') AS Lien, Ref,Sref1,Sref2,Designation AS Design,Nature
-            , 
+    // Mouvements FSC pour un Article
+    public function getMovFscOneArt($lien)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT REPLACE(CONCAT(Ref,Sref1,Sref2,Nature),'/','-') AS Lien, Ref,Sref1,Sref2,Designation AS Design,Nature
+            ,
             SUM(Fournisseur) AS Fourn, SUM(Client) AS Cli, SUM(Interne) AS Inter,SUM(Fournisseur)+SUM(Client)+SUM(Interne) AS Diff
             FROM(
                 SELECT MOUV.DOS AS Dos, MOUV.TIERS AS Tiers, MOUV.TICOD AS TypePiece, RTRIM(LTRIM(MOUV.REF)) AS Ref, RTRIM(LTRIM(MOUV.SREF1)) AS Sref1, RTRIM(LTRIM(MOUV.SREF2)) AS Sref2, RTRIM(LTRIM(ART.DES)) AS Designation,
@@ -258,10 +257,10 @@ class MouvRepository extends ServiceEntityRepository
             GROUP BY Ref,Sref1,Sref2, Designation, Nature
             ORDER BY Ref
             ";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetch();
-        }
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
 
     // Détails Mouvements FSC par article
     public function getDetailArtMovFsc($lien)
@@ -315,12 +314,12 @@ class MouvRepository extends ServiceEntityRepository
     }
 
 // ramener le dernier mouvement avec Type Piéce, numéro piéce et date piéce sur un article FSC
-public function getMaxPiece($lien)
-{
-    $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT TOP 1 * FROM(
+    public function getMaxPiece($lien)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT TOP 1 * FROM(
         SELECT CONCAT(Lien,Nature) AS Lien, TypePiece AS TypePiece, MAX(DatePiece) AS MaxDate, MAX(NumPiece) AS NumPiece, Nature AS Nature FROM(
-        SELECT REPLACE(CONCAT(RTRIM(LTRIM(MOUV.REF)),RTRIM(LTRIM(MOUV.SREF1)),RTRIM(LTRIM(MOUV.SREF2))),'/','-') AS Lien, 
+        SELECT REPLACE(CONCAT(RTRIM(LTRIM(MOUV.REF)),RTRIM(LTRIM(MOUV.SREF1)),RTRIM(LTRIM(MOUV.SREF2))),'/','-') AS Lien,
         MOUV.TICOD AS TypePiece,
         CASE
         WHEN MOUV.TICOD IN('F','C') THEN MOUV.FANO
@@ -342,16 +341,16 @@ public function getMaxPiece($lien)
     WHERE Lien = '$lien'
     ORDER BY MaxDate,NumPiece DESC
     ";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetch();
-}
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
 
 // ramener les produits en liens avec des factures FSC
-public function getListeProduits($listFactures)
-{
-    $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT CONCAT(Lien,Nature) AS Lien,TypePiece, Factures, Nature FROM(
+    public function getListeProduits($listFactures)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT CONCAT(Lien,Nature) AS Lien,TypePiece, Factures, Nature FROM(
         SELECT REPLACE(CONCAT(RTRIM(LTRIM(MOUV.REF)),RTRIM(LTRIM(MOUV.SREF1)),RTRIM(LTRIM(MOUV.SREF2))),'/','-') AS Lien, MOUV.PICOD AS PieceCode,
         MOUV.TICOD AS TypePiece, MOUV.FANO AS Factures,
         CASE
@@ -364,16 +363,16 @@ public function getListeProduits($listFactures)
     WHERE Factures IN($listFactures) AND TypePiece = 'F' AND PieceCode = 4
     GROUP BY Lien, TypePiece, Factures, Nature
     ";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll();
-}
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
 // Vérifier que les bons codes articles sont utilisés
-public function getCheckCodeAndDesArticles()
-{
-    $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT REPLACE(CONCAT(TypePiece,TypeTiers, NumPiece, Ref, Sref1, Sref2),'/','-') AS Identification, TypePiece as TypePiece, TypeTiers as TypeTiers,
+    public function getCheckCodeAndDesArticles()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT REPLACE(CONCAT(TypePiece,TypeTiers, NumPiece, Ref, Sref1, Sref2),'/','-') AS Identification, TypePiece as TypePiece, TypeTiers as TypeTiers,
     Ref AS Ref, Sref1 AS Sref1, Sref2 AS Sref2, DesignationPiece AS DesignationPiece, DesignationArticle AS DesignationArticle,
         Probleme AS Probleme, NumPiece AS NumPiece, Utilisateur AS Utilisateur, MUSER.EMAIL AS Email FROM(
         SELECT MOUV.TICOD AS TypeTiers, MOUV.PICOD AS TypePiece, MOUV.REF AS Ref,MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2, MOUV.DES AS DesignationPiece, ART.DES AS DesignationArticle,
@@ -403,31 +402,31 @@ public function getCheckCodeAndDesArticles()
         WHERE NOT Probleme IS NULL
         ORDER BY Probleme DESC
     ";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll();
-}
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
 // ramener le Détail d'une facture client FSC
-public function getDetailFactureFscClient($facture):array
-{
-    $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT m.TIERS AS tiers, m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, m.OP AS op, m.QTE AS qte, m.SERIE AS lot
+    public function getDetailFactureFscClient($facture): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT m.TIERS AS tiers, m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, m.OP AS op, m.QTE AS qte, m.SERIE AS lot
     FROM MVTL m
     INNER JOIN ART a ON a.REF = m.REF AND a.DOS = m.DOS
     WHERE m.DOS = 3 AND m.PINO = ? AND m.TICOD = 'C'
     ";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([$facture]);
-    return $stmt->fetchAll();
-}
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$facture]);
+        return $stmt->fetchAll();
+    }
 
 // ramener les BLs Directs
-public function getListBlDirect():array
-{
-    $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT CONCAT(tiers,'BL',numeroBl) AS Identification, tiers, numeroBl, dateBl, Utilisateur, MUSER.EMAIL AS Email FROM(
-        SELECT LTRIM(RTRIM(MOUV.TIERS)) AS tiers, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MOUV.DES AS designation, LTRIM(RTRIM(MOUV.BLNO)) AS numeroBl, MOUV.BLDT AS dateBl, 
+    public function getListBlDirect(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT CONCAT(tiers,'BL',numeroBl) AS Identification, tiers, numeroBl, dateBl, Utilisateur, MUSER.EMAIL AS Email FROM(
+        SELECT LTRIM(RTRIM(MOUV.TIERS)) AS tiers, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MOUV.DES AS designation, LTRIM(RTRIM(MOUV.BLNO)) AS numeroBl, MOUV.BLDT AS dateBl,
         CASE
         WHEN MOUV.USERMO = '' THEN MOUV.USERCR
         ELSE MOUV.USERCR
@@ -437,19 +436,19 @@ public function getListBlDirect():array
         INNER JOIN MUSER ON Utilisateur = MUSER.USERX
         GROUP BY tiers, numeroBl,dateBl,Utilisateur,MUSER.EMAIL
     ";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll();
-}
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
 // Update Mouvements/entête conduite de travaux
-public function getUpdateMouvConduiteTravaux($cmd,$bl,$facture,$termine):array
-{
-    
-    $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT MAX(dos) AS dos, MAX(tiers) AS tiers, MAX(nom) AS nom, MAX(typePiece) AS typePiece, 
+    public function getUpdateMouvConduiteTravaux($cmd, $bl, $facture, $termine): array
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT MAX(dos) AS dos, MAX(tiers) AS tiers, MAX(nom) AS nom, MAX(typePiece) AS typePiece,
     MAX(dateCmd) AS dateCmd, MAX(numCmd) AS numCmd, MAX(dateBl) AS dateBl, MAX(numBl) AS numBl, MAX(dateFacture) AS dateFacture, MAX(numFacture) AS numFacture,
-    MAX(ENT.DELDEMDT) AS delaiDemande, MAX(ENT.DELACCDT) AS delaiAccepte, MAX(ENT.DELREPDT) AS delaiReporte, 
+    MAX(ENT.DELDEMDT) AS delaiDemande, MAX(ENT.DELACCDT) AS delaiAccepte, MAX(ENT.DELREPDT) AS delaiReporte,
     MAX(ENT.BLMOD) AS transport, MAX(ENT.PROJET) AS affaire, MAX(ENT.OP) AS op, ENT.ENT_ID AS id, MAX(utilisateur) AS utilisateur,
     CASE
     WHEN MAX(ENT.ADRCOD_0003) = '' THEN MAX(adressePrincipale)
@@ -458,7 +457,7 @@ public function getUpdateMouvConduiteTravaux($cmd,$bl,$facture,$termine):array
     FROM(
     SELECT MOUV.DOS AS dos, MOUV.TIERS AS tiers, CLI.NOM AS nom, MOUV.PICOD as typePiece,
     MOUV.CDDT AS dateCmd, MOUV.CDNO AS numCmd, MOUV.BLDT AS dateBl, MOUV.BLNO AS numBl, MOUV.FADT AS dateFacture, MOUV.FANO AS numFacture,
-    CONCAT(LTRIM(RTRIM(CLI.RUE)), ', ', LTRIM(RTRIM(CLI.CPOSTAL)), ' ', LTRIM(RTRIM(CLI.VIL)) ) AS adressePrincipale, MAX(LTRIM(RTRIM(MUSER.NOM))) AS utilisateur, 
+    CONCAT(LTRIM(RTRIM(CLI.RUE)), ', ', LTRIM(RTRIM(CLI.CPOSTAL)), ' ', LTRIM(RTRIM(CLI.VIL)) ) AS adressePrincipale, MAX(LTRIM(RTRIM(MUSER.NOM))) AS utilisateur,
     CASE
     WHEN MOUV.PICOD = 4 THEN MOUV.FANO
     WHEN MOUV.PICOD = 3 THEN MOUV.BLNO
@@ -476,20 +475,20 @@ public function getUpdateMouvConduiteTravaux($cmd,$bl,$facture,$termine):array
     WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND ART.FAM_0002 IN ('ME','MO') AND MOUV.PICOD IN (2,3,4) AND MOUV.TIERS <> ('C0160500')
     GROUP BY MOUV.DOS, MOUV.TIERS, CLI.NOM, MOUV.PICOD, MOUV.CDDT, MOUV.CDNO, MOUV.BLDT, MOUV.BLNO, MOUV.FADT, MOUV.FANO, CLI.RUE, CLI.CPOSTAL, CLI.VIL)reponse
     INNER JOIN ENT ON ENT.DOS = dos AND ENT.TIERS = tiers AND ENT.PICOD = typePiece AND ENT.PINO = numPiece AND ENT.TICOD = 'C'
-    LEFT JOIN T1 ON tiers = T1.TIERS AND dos = T1.DOS AND  ENT.ADRCOD_0003 = T1.ADRCOD 
+    LEFT JOIN T1 ON tiers = T1.TIERS AND dos = T1.DOS AND  ENT.ADRCOD_0003 = T1.ADRCOD
     WHERE (datePiece >= '2022-06-01' AND ENT.PROJET <> '' AND NOT numFacture IN ($termine)) OR ( numCmd IN($cmd) OR numBl IN ($bl) OR numFacture IN ($facture) )
     GROUP BY ENT.ENT_ID
     ";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll();
-}
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
 // détail des articles de la piéce conduite de travaux
-public function getDetailArticleConduiteTravaux($id):array
-{
-    $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT dos, tiers, ref,sref1,sref2,designation,qte,num,type
+    public function getDetailArticleConduiteTravaux($id): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT dos, tiers, ref,sref1,sref2,designation,qte,num,type
     FROM(
     SELECT MOUV.DOS AS dos,MOUV.TIERS AS tiers, MOUV.PICOD AS type, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MOUV.DES AS designation,
     CASE
@@ -507,16 +506,16 @@ public function getDetailArticleConduiteTravaux($id):array
     WHERE MOUV.DOS = 1)reponse
     INNER JOIN ENT ON dos = ENT.DOS AND tiers = ENT.TIERS AND num = ENT.PINO AND ENT.TICOD = 'C' AND ENT.PICOD = type AND ENT.ENT_ID = $id
     ";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll();
-}
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
 // achat en cours liés à l'affaire ->  conduite de travaux
-public function getAchatLieAffaireConduitetravaux($affaire):array
-{
-    $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT MOUV.TIERS AS tiers, FOU.NOM AS nom, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MOUV.DES AS designation,
+    public function getAchatLieAffaireConduitetravaux($affaire): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT MOUV.TIERS AS tiers, FOU.NOM AS nom, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, MOUV.DES AS designation,
     CASE
     WHEN MOUV.PICOD = 2 THEN MOUV.CDQTE
     WHEN MOUV.PICOD = 3 THEN MOUV.BLQTE
@@ -541,23 +540,23 @@ public function getAchatLieAffaireConduitetravaux($affaire):array
     INNER JOIN FOU ON FOU.DOS = MOUV.DOS AND FOU.TIERS = MOUV.TIERS
     WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'F' AND MOUV.PROJET = '$affaire'
     ";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll();
-}
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
 // Commande et BL de la veille pour les clients feu rouge et orange
-public function getCmdBlClientFeuRougeOrange():array
-{
-    $conn = $this->getEntityManager()->getConnection();
-    $sql = "SELECT * 
+    public function getCmdBlClientFeuRougeOrange(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT *
     FROM(
         SELECT ENT.TIERS AS tiers, CLI.NOM AS nom, ENT.OP AS op,
         CASE
         WHEN CLI.FEU = 1 THEN 'vert'
         WHEN CLI.FEU = 2 THEN 'orange'
         WHEN CLI.FEU = 3 THEN 'rouge'
-        END AS feu, 
+        END AS feu,
         CASE
         WHEN ENT.PICOD = 2 THEN 'cmd'
         WHEN ENT.PICOD = 3 THEN 'bl'
@@ -571,7 +570,7 @@ public function getCmdBlClientFeuRougeOrange():array
         CASE
         WHEN ENT.OP IN ('CD','C') THEN ENT.HTPDTMT
         WHEN ENT.OP IN ('DD','D') THEN -1*ENT.HTPDTMT
-        END AS montant, 
+        END AS montant,
         ENT.USERCR AS userCr, VRP.NOM AS commercial
         FROM ENT
         INNER JOIN CLI ON CLI.DOS = ENT.DOS AND CLI.TIERS = ENT.TIERS
@@ -579,12 +578,12 @@ public function getCmdBlClientFeuRougeOrange():array
         WHERE ENT.PIDT = DATEADD(day,-1,CAST(GETDATE() as date)) AND ENT.CE4 = 1 )reponse
         WHERE feu <> 'vert'
     ";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll();
-}
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 
-public function getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl):array
+    public function getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl): array
     {
         $code = '';
         $codeFamille = "";
@@ -597,7 +596,7 @@ public function getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert, $famille
         }
         $conn = $this->getEntityManager()->getConnection();
         if ($stockOuBl == 'bl') {
-            $sql = "SELECT dos, famille, ref,sref1,sref2, designation, uv,fermeture, nbeBl, s.DEPOT AS depot, s.EMPLACEMENT AS emplacement, SUM(s.QTETJSENSTOCK) AS stock 
+            $sql = "SELECT dos, famille, ref,sref1,sref2, designation, uv,fermeture, nbeBl, s.DEPOT AS depot, s.EMPLACEMENT AS emplacement, SUM(s.QTETJSENSTOCK) AS stock
         FROM(
         SELECT MOUV.DOS AS dos,a.FAM_0001 as famille, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, a.DES AS designation, MOUV.VENUN AS uv, a.HSDT as fermeture, COUNT(MOUV.BLNO) AS nbeBl
         FROM MOUV
@@ -609,7 +608,7 @@ public function getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert, $famille
         GROUP BY dos, famille, ref,sref1,sref2, designation, uv, fermeture, nbeBl, s.DEPOT, s.EMPLACEMENT
         ORDER BY nbeBl DESC
         ";
-        }else {
+        } else {
             $sql = "SELECT dos,famille,ref,sref1,sref2,designation,uv,fermeture,depot, emplacement, stock, COUNT(m.BLNO) AS nbeBl
             FROM(
             SELECT s.DOSSIER AS dos,a.FAM_0001 AS famille,s.REFERENCE AS ref, s.SREFERENCE1 AS sref1, s.SREFERENCE2 AS sref2, a.DES AS designation,
@@ -629,7 +628,7 @@ public function getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert, $famille
         return $stmt->fetchAll();
     }
 
-    public function getNbeBlEtStockParFamille($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl):array
+    public function getNbeBlEtStockParFamille($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl): array
     {
         $code = '';
         $codeFamille = "";
@@ -648,12 +647,12 @@ public function getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert, $famille
             FROM MOUV
             INNER JOIN ART a ON a.REF = MOUV.REF AND a.DOS = MOUV.DOS
             WHERE MOUV.BLDT BETWEEN '$dd' AND '$df' AND MOUV.TICOD = 'C' AND MOUV.OP IN('C','D') AND MOUV.BLNO <> 0 AND MOUV.DOS = $dos $code $codeFamille
-            AND NOT a.FAM_0001 IN ('TRANSPOR', 'TAXE', 'DIVERS') AND NOT a.REF LIKE ('DIVERS20%') 
+            AND NOT a.FAM_0001 IN ('TRANSPOR', 'TAXE', 'DIVERS') AND NOT a.REF LIKE ('DIVERS20%')
             GROUP BY MOUV.DOS, a.FAM_0001, MOUV.REF, MOUV.SREF1, MOUV.SREF2, a.DES, MOUV.VENUN, a.HSDT)reponse
             GROUP BY dos, famille
             ORDER BY nbeBl DESC
         ";
-        }else {
+        } else {
             $sql = "SELECT dos,LTRIM(RTRIM(famille)) AS famille, COUNT(m.BLNO) AS nbeBl
             FROM(
             SELECT s.DOSSIER AS dos,a.FAM_0001 AS famille,s.REFERENCE AS ref, s.SREFERENCE1 AS sref1, s.SREFERENCE2 AS sref2, a.DES AS designation,
@@ -663,11 +662,212 @@ public function getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert, $famille
             WHERE s.DOSSIER = $dos AND NOT a.FAM_0001 IN ('TRANSPOR', 'TAXE', 'DIVERS') AND NOT a.REF LIKE ('DIVERS20%') $code $codeFamille
             GROUP BY s.DOSSIER, a.FAM_0001, s.REFERENCE, s.SREFERENCE1, s.SREFERENCE2, a.DES, a.VENUN, a.HSDT, s.DEPOT, s.EMPLACEMENT)reponse
             LEFT JOIN MOUV m ON ref = m.REF AND sref1 = m.SREF1 AND sref2 = m.SREF2 AND dos = m.DOS
-            AND m.BLDT BETWEEN '$dd' AND '$df' AND m.TICOD = 'C' AND m.OP IN('C','D') AND m.BLNO <> 0 
+            AND m.BLDT BETWEEN '$dd' AND '$df' AND m.TICOD = 'C' AND m.OP IN('C','D') AND m.BLNO <> 0
             GROUP BY dos,famille
             ORDER BY nbeBl DESC
         ";
         }
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    // activité métier par produits
+    public function getActivitesMetier($dd, $df, $metier): array
+    {
+        $code = '';
+        if ($metier == 'EV') {
+            $code = "AND c.STAT_0002 IN ('EV') AND a.FAM_0002 IN ('EV', 'HP')";
+        } elseif ($metier == 'HP') {
+            $code = "AND c.STAT_0002 IN ('HP') AND a.FAM_0002 IN ('EV', 'HP')";
+        } elseif ($metier == 'ME') {
+            $code = "AND a.FAM_0002 IN ('ME', 'MO')";
+        } elseif ($metier == 'Tous') {
+            $code = "AND a.FAM_0002 IN ('EV', 'HP', 'ME', 'MO')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT famille, ref,des, SUM(qte) AS qteSign, SUM(montant) AS montantSign
+            FROM(
+            SELECT a.FAM_0001 AS famille, m.REF AS ref, m.DES AS des,
+                CASE
+                    WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
+                    WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+                END AS montant,
+                CASE
+                    WHEN m.OP IN ('C','CD') THEN m.FAQTE
+                    WHEN m.OP IN ('D','DD') THEN (-1 * m.FAQTE)
+                END AS qte
+            FROM MOUV m
+            INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+            INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+            WHERE m.DOS = 1 AND m.FADT BETWEEN '$dd' AND '$df'
+            $code
+            AND m.TICOD = 'C' AND m.PICOD = 4
+            AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP'))reponse
+            GROUP BY famille, ref, des
+            ORDER BY montantSign DESC
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // activité métier par clients
+    public function getActivitesMetierClient($dd, $df, $metier): array
+    {
+        $code = '';
+        if ($metier == 'EV') {
+            $code = "AND c.STAT_0002 IN ('EV') AND a.FAM_0002 IN ('EV', 'HP')";
+        } elseif ($metier == 'HP') {
+            $code = "AND c.STAT_0002 IN ('HP') AND a.FAM_0002 IN ('EV', 'HP')";
+        } elseif ($metier == 'ME') {
+            $code = "AND a.FAM_0002 IN ('ME', 'MO')";
+        } elseif ($metier == 'Tous') {
+            $code = "AND a.FAM_0002 IN ('EV', 'HP', 'ME', 'MO')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT famille,tiers, nom, SUM(montant) AS montantSign
+        FROM(
+        SELECT RTRIM(LTRIM(c.STAT_0001)) AS famille, c.TIERS AS tiers, c.NOM AS nom,
+        CASE
+        WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
+        WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montant,
+        CASE
+        WHEN m.OP IN ('C','CD') THEN m.FAQTE
+        WHEN m.OP IN ('D','DD') THEN (-1 * m.FAQTE)
+        END AS qte
+        FROM MOUV m
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        WHERE m.DOS = 1 AND m.FADT BETWEEN '$dd' AND '$df'
+        $code
+        AND m.TICOD = 'C' AND m.PICOD = 4
+        AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP'))reponse
+        GROUP BY famille, tiers, nom
+        ORDER BY montantSign DESC
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getTotalActivitesMetier($dd, $df, $metier)
+    {
+        $code = '';
+        if ($metier == 'EV') {
+            $code = "AND c.STAT_0002 IN ('EV') AND a.FAM_0002 IN ('EV', 'HP')";
+        } elseif ($metier == 'HP') {
+            $code = "AND c.STAT_0002 IN ('HP') AND a.FAM_0002 IN ('EV', 'HP')";
+        } elseif ($metier == 'ME') {
+            $code = "AND a.FAM_0002 IN ('ME', 'MO')";
+        } elseif ($metier == 'Tous') {
+            $code = "AND a.FAM_0002 IN ('EV', 'HP', 'ME', 'MO')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT SUM(montantSign) AS total FROM(
+            SELECT famille, ref,des, SUM(qte) AS qteSign, SUM(montant) AS montantSign
+            FROM(
+            SELECT a.FAM_0001 AS famille, m.REF AS ref, m.DES AS des,
+                CASE
+                    WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
+                    WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+                END AS montant,
+                CASE
+                    WHEN m.OP IN ('C','CD') THEN m.FAQTE
+                    WHEN m.OP IN ('D','DD') THEN (-1 * m.FAQTE)
+                END AS qte
+            FROM MOUV m
+            INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+            INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+            WHERE m.DOS = 1 AND m.FADT BETWEEN '$dd' AND '$df'
+            $code
+            AND m.TICOD = 'C' AND m.PICOD = 4
+            AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP'))reponse
+            GROUP BY famille, ref, des)rep
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    public function getActivitesFamilleProduit($dd, $df, $metier): array
+    {
+        $code = '';
+        if ($metier == 'EV') {
+            $code = "AND c.STAT_0002 IN ('EV') AND a.FAM_0002 IN ('EV', 'HP')";
+        } elseif ($metier == 'HP') {
+            $code = "AND c.STAT_0002 IN ('HP') AND a.FAM_0002 IN ('EV', 'HP')";
+        } elseif ($metier == 'ME') {
+            $code = "AND a.FAM_0002 IN ('ME', 'MO')";
+        } elseif ($metier == 'Tous') {
+            $code = "AND a.FAM_0002 IN ('EV', 'HP', 'ME', 'MO')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT famille, SUM(montant) AS montantSign
+            FROM(
+            SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille, m.REF AS ref, m.DES AS des,
+            CASE
+            WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
+            WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+            END AS montant,
+            CASE
+            WHEN m.OP IN ('C','CD') THEN m.FAQTE
+            WHEN m.OP IN ('D','DD') THEN (-1 * m.FAQTE)
+            END AS qte
+            FROM MOUV m
+            INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+            INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+            WHERE m.DOS = 1 AND m.FADT BETWEEN '$dd' AND '$df'
+            $code
+            AND m.TICOD = 'C' AND m.PICOD = 4
+            AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP'))reponse
+            GROUP BY famille
+            ORDER BY montantSign DESC
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getActivitesFamilleClient($dd, $df, $metier): array
+    {
+        $code = '';
+        if ($metier == 'EV') {
+            $code = "AND c.STAT_0002 IN ('EV') AND a.FAM_0002 IN ('EV', 'HP')";
+        } elseif ($metier == 'HP') {
+            $code = "AND c.STAT_0002 IN ('HP') AND a.FAM_0002 IN ('EV', 'HP')";
+        } elseif ($metier == 'ME') {
+            $code = "AND a.FAM_0002 IN ('ME', 'MO')";
+        } elseif ($metier == 'Tous') {
+            $code = "AND a.FAM_0002 IN ('EV', 'HP', 'ME', 'MO')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT famille, SUM(montant) AS montantSign
+            FROM(
+            SELECT RTRIM(LTRIM(c.STAT_0001)) AS famille, m.REF AS ref, m.DES AS des,
+            CASE
+            WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
+            WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+            END AS montant,
+            CASE
+            WHEN m.OP IN ('C','CD') THEN m.FAQTE
+            WHEN m.OP IN ('D','DD') THEN (-1 * m.FAQTE)
+            END AS qte
+            FROM MOUV m
+            INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+            INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+            WHERE m.DOS = 1 AND m.FADT BETWEEN '$dd' AND '$df'
+            $code
+            AND m.TICOD = 'C' AND m.PICOD = 4
+            AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP'))reponse
+            GROUP BY famille
+            ORDER BY montantSign DESC
+        ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();

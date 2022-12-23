@@ -56,7 +56,8 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
        AND m.AXE_0002 <> m.AXE_0001 -- a.FAM_0002 <> c.STAT_0002
        AND a.FAM_0002 IN ('EV', 'HP')AND YEAR(m.FADT) IN (?) AND MONTH(m.FADT) IN (?)
        )reponse
-       GROUP BY Numero, Tiers, VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op, CoutRevient, CoutMoyenPondere, Article, Client, CompteAchat, CompteVente, RegimeTva, qteVtl, regimeFou, VtlNo
+       GROUP BY Numero, Tiers, VentAss, Dos, Ref, Sref1, Sref2, Designation, Uv, Op, CoutRevient, CoutMoyenPondere, Article,
+        Client, CompteAchat, CompteVente, RegimeTva, qteVtl, regimeFou, VtlNo
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute([$annee, $mois]);
@@ -105,6 +106,10 @@ class ComptaAnalytiqueRepository extends ServiceEntityRepository
 
     public function getRapportFournisseurAvecSref($ventilation, $ref, $sref1, $sref2)
     {
+        /*if ($ventilation == "") {
+            $ventilation = 0;
+        }*/
+        
         $code = '';
         $filtre = '';
         if ($sref1 && !$sref2) {

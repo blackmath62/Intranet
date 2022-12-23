@@ -22,7 +22,7 @@ class OthersDocumentsType extends AbstractType
                 ])
                 ],
                 'label' => false,
-                'multiple' => true,
+                'multiple' => false,
                 'mapped' => false,
                 'required' => true,
                 'attr' => ['class' => 'form-control col-12 text-center']
