@@ -2,24 +2,25 @@
 
 namespace App\Repository\Divalto;
 
-
 use App\Entity\Divalto\Mouv;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use DoctrineExtensions\Query\Mysql\Year;
+use Doctrine\Persistence\ManagerRegistry;
 
 class StatesByTiersRepository extends ServiceEntityRepository
 {
+    private $artBan;
 
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Mouv::class);
+        $artBan = "'ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20'";
+        $this->artBan = $artBan;
     }
-   
+
     // bandeau avec les states par commerciaux
-    public function getStatesTotauxParCommerciaux($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier):array
+    public function getStatesTotauxParCommerciaux($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier): array
     {
-        
+
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Periode AS Periode,SecteurMouvement AS SecteurMouvement, Commercial, CommercialId,COUNT(DISTINCT Bl) AS NbBl,COUNT(DISTINCT Facture) AS NbFacture,COUNT(DISTINCT Tiers) AS NbTiers,
         SUM(MontantSignDepot) As CADepot,  SUM(MontantSignDirect) As CADirect,  SUM(MontantSign) As CATotal
@@ -62,7 +63,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
                 LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
                 LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
-                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP')
+                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
+
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
                 AND ((MOUV.FADT >= ? AND MOUV.FADT <= ? ) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? )))reponse
                 WHERE SecteurMouvement IN( $metiers )
@@ -74,22 +76,22 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States Excel par commercial
-    public function getStatesExcelParCommercial($metiers, $dateDebutN, $dateFinN, $commercial, $dossier):array
+    public function getStatesExcelParCommercial($metiers, $dateDebutN, $dateFinN, $commercial, $dossier): array
     {
-        $dateDebutN1 = date_create($dateDebutN); 
+        $dateDebutN1 = date_create($dateDebutN);
         $dateDebutN1 = date_modify($dateDebutN1, '-1 Year');
-        $dateDebutN1= $dateDebutN1->format('Y') . '-' . $dateDebutN1->format('m') . '-' . $dateDebutN1->format('d');
+        $dateDebutN1 = $dateDebutN1->format('Y') . '-' . $dateDebutN1->format('m') . '-' . $dateDebutN1->format('d');
         $dateFinN1 = date_create($dateFinN);
         $dateFinN1 = date_modify($dateFinN1, '-1 Year');
-        $dateFinN1= $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
-        
-        $dateDebutN2 = date_create($dateDebutN1); 
+        $dateFinN1 = $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
+
+        $dateDebutN2 = date_create($dateDebutN1);
         $dateDebutN2 = date_modify($dateDebutN2, '-1 Year');
-        $dateDebutN2= $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
+        $dateDebutN2 = $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
         $dateFinN2 = date_create($dateFinN1);
         $dateFinN2 = date_modify($dateFinN2, '-1 Year');
-        $dateFinN2= $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
-        
+        $dateFinN2 = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
+
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT LTRIM(RTRIM(Commercial)) AS Commercial, LTRIM(RTRIM(Famille_Client)) AS Famille_Client, LTRIM(RTRIM(Client)) AS Client, LTRIM(RTRIM(nom)) as Nom,LTRIM(RTRIM(Pays)) as Pays,
         LTRIM(RTRIM(Famille_Article)) AS Fam_Art, LTRIM(RTRIM(Ref)) AS Ref,LTRIM(RTRIM(Designation)) AS Designation,
@@ -150,8 +152,10 @@ class StatesByTiersRepository extends ServiceEntityRepository
         INNER JOIN ART ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
         INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND CLI.DOS = MOUV.DOS
         LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
-        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ))
+        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
+        AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ))
         AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
+
         AND MOUV.OP IN('C','CD','DD','D')) Reponse
         WHERE SecteurMouvement IN( $metiers ) AND CommercialId IN ($commercial)
         GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
@@ -162,22 +166,22 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States Excel par metier
-    public function getStatesExcelParMetier($metiers, $dateDebutN, $dateFinN, $dossier):array
+    public function getStatesExcelParMetier($metiers, $dateDebutN, $dateFinN, $dossier): array
     {
-        $dateDebutN1 = date_create($dateDebutN); 
+        $dateDebutN1 = date_create($dateDebutN);
         $dateDebutN1 = date_modify($dateDebutN1, '-1 Year');
-        $dateDebutN1= $dateDebutN1->format('Y') . '-' . $dateDebutN1->format('m') . '-' . $dateDebutN1->format('d');
+        $dateDebutN1 = $dateDebutN1->format('Y') . '-' . $dateDebutN1->format('m') . '-' . $dateDebutN1->format('d');
         $dateFinN1 = date_create($dateFinN);
         $dateFinN1 = date_modify($dateFinN1, '-1 Year');
-        $dateFinN1= $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
-        
-        $dateDebutN2 = date_create($dateDebutN1); 
+        $dateFinN1 = $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
+
+        $dateDebutN2 = date_create($dateDebutN1);
         $dateDebutN2 = date_modify($dateDebutN2, '-1 Year');
-        $dateDebutN2= $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
+        $dateDebutN2 = $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
         $dateFinN2 = date_create($dateFinN1);
         $dateFinN2 = date_modify($dateFinN2, '-1 Year');
-        $dateFinN2= $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
-        
+        $dateFinN2 = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
+
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT LTRIM(RTRIM(Commercial)) AS Commercial, LTRIM(RTRIM(Famille_Client)) AS Famille_Client, LTRIM(RTRIM(Client)) AS Client, LTRIM(RTRIM(nom)) as Nom,LTRIM(RTRIM(Pays)) as Pays,
         LTRIM(RTRIM(Famille_Article)) AS Fam_Art, LTRIM(RTRIM(Ref)) AS Ref,LTRIM(RTRIM(Designation)) AS Designation,
@@ -238,8 +242,10 @@ class StatesByTiersRepository extends ServiceEntityRepository
         INNER JOIN ART ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
         INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND CLI.DOS = MOUV.DOS
         LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
-        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ) )
+        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
+        AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ) )
         AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
+
         AND MOUV.OP IN('C','CD','DD','D')) Reponse
         WHERE SecteurMouvement IN( $metiers )
         GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
@@ -251,11 +257,10 @@ class StatesByTiersRepository extends ServiceEntityRepository
 
     // NOM DU COMMERCIAL
 
-
     // States Excel par commercial
     public function getCommercialName($commercialid, $dossier)
     {
-    
+
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT LTRIM(RTRIM(VRP.SELCOD)) AS SELCOD FROM VRP
         WHERE VRP.TIERS = $commercialid AND VRP.DOS = $dossier";
@@ -267,12 +272,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
     // States TOP 10 Familles produits
     public function getTop10FamillesProduits($dateDebutN, $dateFinN, $dossier)
     {
-        $dateDebutN1 = date_create($dateDebutN); 
+        $dateDebutN1 = date_create($dateDebutN);
         $dateDebutN1 = date_modify($dateDebutN1, '-1 Year');
-        $dateDebutN1= $dateDebutN1->format('Y') . '-' . $dateDebutN1->format('m') . '-' . $dateDebutN1->format('d');
+        $dateDebutN1 = $dateDebutN1->format('Y') . '-' . $dateDebutN1->format('m') . '-' . $dateDebutN1->format('d');
         $dateFinN1 = date_create($dateFinN);
         $dateFinN1 = date_modify($dateFinN1, '-1 Year');
-        $dateFinN1= $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
+        $dateFinN1 = $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
 
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT TOP 5 LTRIM(RTRIM(Famille_Article)) AS Fam_Article,
@@ -293,8 +298,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
         END AS MontantSignN1
         FROM MOUV
         INNER JOIN ART ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
-        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) )
+        WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) )
         AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL') AND ART.FAM_0001 NOT IN ('REMISE')
+
         AND MOUV.OP IN('C','CD','DD','D')) Reponse
         GROUP BY Famille_Article
         ORDER BY SUM(MontantSignN) DESC";
@@ -302,12 +308,11 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    
 
     // Bandeau avec CA du secteur d'extraction
-    public function getStatesTotauxParSecteur($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier):array
+    public function getStatesTotauxParSecteur($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier): array
     {
-        
+
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Periode AS Periode,SecteurMouvement AS SecteurMouvement, COUNT(DISTINCT Bl) AS NbBl,COUNT(DISTINCT Facture) AS NbFacture,COUNT(DISTINCT Tiers) AS NbTiers,
         SUM(MontantSignDepot) As CADepot,  SUM(MontantSignDirect) As CADirect,  SUM(MontantSign) As CATotal
@@ -342,7 +347,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
                 LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
                 LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
-                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP')
+                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
+
                 AND CLI.STAT_0002 IN( 'EV','HP','RB' ) AND ART.FAM_0002 IN( 'EV','HP','ME','MO', 'RB', 'D', 'RG', 'RL', 'S', 'BL' )
                 AND ((MOUV.FADT >= ? AND MOUV.FADT <= ? ) OR (MOUV.FADT >= ?  AND MOUV.FADT <= ? )))reponse
                 WHERE SecteurMouvement IN( $metiers )
@@ -353,9 +359,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    public function getStatesDetailClient($metiers,$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier):array
+    public function getStatesDetailClient($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier): array
     {
-        
+
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT SecteurMouvement AS SecteurMouvement, Commercial AS Commercial,commercialId AS commercialId, Tiers AS Tiers, Nom AS Nom,  SUM(MontantSignN1) As CATotalN1,  SUM(MontantSignN) As CATotalN
         FROM(	SELECT MOUV.BLNO AS Bl,MOUV.FANO AS Facture,
@@ -389,7 +395,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
                 LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
                 LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
-                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP')
+                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
+
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
                 AND ((MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? )))reponse
                 WHERE SecteurMouvement IN( $metiers )
@@ -400,8 +407,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    // CA Par métiers 
-    public function getStatesMetier($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier):array
+    // CA Par métiers
+    public function getStatesMetier($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT	SecteurMouvement AS SecteurMouvement,Color AS Color,Icon AS Icon,  SUM(MontantSignN1) As CATotalN1,  SUM(MontantSignN) As CATotalN
@@ -444,7 +451,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 FROM MOUV
                 LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
                 LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
-                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP')
+                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
+
                 AND CLI.STAT_0002 IN('EV','HP', 'RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
                 AND ((MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? )))reponse
         GROUP BY SecteurMouvement, Color,Icon
@@ -454,15 +462,14 @@ class StatesByTiersRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-
-    public function getStatesLhermitteByArticles($tiers,$metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1,$dossier ):array
+    public function getStatesLhermitteByArticles($tiers, $metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier): array
     {
-        $dateDebutN2 = date_create($dateDebutN1); 
+        $dateDebutN2 = date_create($dateDebutN1);
         $dateDebutN2 = date_modify($dateDebutN2, '-1 Year');
-        $dateDebutN2= $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
+        $dateDebutN2 = $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
         $dateFinN2 = date_create($dateFinN1);
         $dateFinN2 = date_modify($dateFinN2, '-1 Year');
-        $dateFinN2= $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
+        $dateFinN2 = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
 
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT MAX(Nom) AS Nom ,Mois AS Mois ,MAX(FamArticle) AS FamArticle, Ref AS Ref, MAX(Designation) AS Designation, Sref1 AS Sref1, Sref2 AS Sref2, Uv AS Uv, SUM(QteSignN2) As QteTotalN2, SUM(MontantSignN2) As CATotalN2, SUM(QteSignN1) As QteTotalN1, SUM(MontantSignN1) As CATotalN1, SUM(QteSignN) As QteTotalN,  SUM(MontantSignN) As CATotalN
@@ -513,7 +520,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
                 LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
                 LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
-                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND MOUV.TIERS = '$tiers'
+                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND MOUV.TIERS = '$tiers'
+
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
                 AND ( (MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ) ))reponse
                 WHERE SecteurMouvement IN( $metiers )
@@ -525,14 +533,14 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // CA bandeau détail client famille produit
-    public function getStatesBandeauClientFamilleProduit($tiers,$metiers,$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier):array
+    public function getStatesBandeauClientFamilleProduit($tiers, $metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier): array
     {
-        $dateDebutN2 = date_create($dateDebutN1); 
+        $dateDebutN2 = date_create($dateDebutN1);
         $dateDebutN2 = date_modify($dateDebutN2, '-1 Year');
-        $dateDebutN2= $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
+        $dateDebutN2 = $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
         $dateFinN2 = date_create($dateFinN1);
         $dateFinN2 = date_modify($dateFinN2, '-1 Year');
-        $dateFinN2= $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
+        $dateFinN2 = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
 
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT LTRIM(RTRIM(FamArticle)) AS FamArticle, SUM(MontantSignN2) As CATotalN2, SUM(MontantSignN1) As CATotalN1, SUM(MontantSignN) As CATotalN
@@ -563,7 +571,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 FROM MOUV
                 LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
                 LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
-                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND MOUV.TIERS = '$tiers'
+                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND MOUV.TIERS = '$tiers'
+
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
                 AND ( (MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ) ))reponse
                 WHERE SecteurMouvement IN( $metiers )
@@ -575,14 +584,14 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // CA global du commercial
-    public function getStatesBandeauClientCaTotalCommercial($commercial,$metiers,$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier):array
+    public function getStatesBandeauClientCaTotalCommercial($commercial, $metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier): array
     {
-        $dateDebutN2 = date_create($dateDebutN1); 
+        $dateDebutN2 = date_create($dateDebutN1);
         $dateDebutN2 = date_modify($dateDebutN2, '-1 Year');
-        $dateDebutN2= $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
+        $dateDebutN2 = $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
         $dateFinN2 = date_create($dateFinN1);
         $dateFinN2 = date_modify($dateFinN2, '-1 Year');
-        $dateFinN2= $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
+        $dateFinN2 = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
 
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT SUM(MontantSignN2) As CATotalN2, SUM(MontantSignN1) As CATotalN1, SUM(MontantSignN) As CATotalN
@@ -613,7 +622,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 FROM MOUV
                 LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
                 LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
-                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP') AND (CLI.REPR_0001 = $commercial OR CLI.REPR_0002 = $commercial )
+                WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND (CLI.REPR_0001 = $commercial OR CLI.REPR_0002 = $commercial )
+
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
                 AND ( (MOUV.FADT >= ? AND MOUV.FADT <= ? ) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ) ) )reponse
                 WHERE SecteurMouvement IN( $metiers )";
@@ -622,5 +632,4 @@ class StatesByTiersRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    
 }
