@@ -1,0 +1,243 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block body %}
+	<div class="card collapsed-card card-warning">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-exclamation-triangle"></i>
+				Avertissement</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<p>Cette liste permet d'identifier les produits qui ont une info stock et pour lesquels :</p>
+			<ul>
+				<li>l'emplacement de la piéce n'est pas identique</li>
+				<li>l'emplacement du stock n'est pas identique</li>
+			</ul>
+		</br>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="card card-dark">
+			<div class="card-header d-flex justify-content-between">
+				<h2 class="card-title">Liste des produits pour lesquels les emplacements différes entre l'info stock, la piéce, le stock</h2>
+			</div>
+			<!-- /.card-header -->
+			<div class="card-body">
+				{% if pieces %}
+					<table id="example1" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="text-center">
+									<span>Dossier</span>
+								</th>
+								<th class="text-center">
+									<span>Référence</span>
+								</th>
+								<th class="text-center">
+									<span>Sref1</span>
+								</th>
+								<th class="text-center">
+									<span>Sref2</span>
+								</th>
+								<th class="text-center table-success">
+									<span>Dépôt IS</span>
+								</th>
+								<th class="text-center table-success">
+									<span>Empl IS</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Tiers</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Vtl</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Dépôt Vtl</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Type P</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Num P</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Op P</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Empl Vtl</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Dépôt S</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Stock</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Empl S</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+
+							{% for piece in pieces %}
+								<tr>
+									<td class="text-center">
+										<a class="text-dark">{{ piece.dos }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-dark">{{ piece.ref }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-dark">{{ piece.sref1}}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-dark">{{ piece.sref2}}</a>
+									</td>
+									<td class="text-center table-success">
+										<a class="text-dark">{{ piece.depot }}</a>
+									</td>
+									<td class="text-center table-success">
+										<a class="text-dark">{{ piece.empl }}</a>
+									</td>
+									<td class="text-center table-info">
+										<a class="text-dark">{{ piece.tiers }}</a>
+									</td>
+									<td class="text-center table-info">
+										<a class="text-dark">{{ piece.vtlNumber }}</a>
+									</td>
+									{% if piece.depot != piece.depotVtl %}
+										{% set colDepotVtl = "text-danger fw-bolder" %}
+									{% else %}
+										{% set colDepotVtl = "text-dark" %}
+									{% endif %}
+									<td class="text-center table-info">
+										<a class="{{colDepotVtl}}">{{ piece.depotVtl }}</a>
+									</td>
+									<td class="text-center table-info">
+										<a class="text-dark">
+											{% if piece.typePiece == 2 %}
+												Commande
+											{% else %}
+												Livraison
+											{% endif %}
+										</a>
+									</td>
+									<td class="text-center table-info">
+										<a class="text-dark">{{ piece.numeroPiece }}</a>
+									</td>
+									<td class="text-center table-info">
+										<a class="text-dark">{{ piece.opVtl }}</a>
+									</td>
+									{% if piece.empl != piece.emplVtl  %}
+										{% set colEmplVtl = "text-danger fw-bolder" %}
+									{% else %}
+										{% set colEmplVtl = "text-dark" %}
+									{% endif %}
+									<td class="text-center table-info">
+										<a class="{{colEmplVtl}}">
+											{% if piece.emplVtl %}
+												{{ piece.emplVtl }}
+											{% else %}
+												NULL
+											{% endif %}
+										</a>
+									</td>
+									{% if piece.depot != piece.depotStock  %}
+										{% set colDepotStock = "text-danger fw-bolder" %}
+									{% else %}
+										{% set colDepotStock = "text-dark" %}
+									{% endif %}
+									<td class="text-center table-warning">
+										<a class="{{colDepotStock}}">{{ piece.depotStock }}</a>
+									</td>
+									<td class="text-center table-warning">
+										<a class="text-dark">{{ piece.stock }}</a>
+									</td>
+									{% if piece.empl != piece.emplStock  %}
+										{% set colEmplStock = "text-danger fw-bolder" %}
+									{% else %}
+										{% set colEmplStock = "text-dark" %}
+									{% endif %}
+									<td class="text-center table-warning">
+										<a class="{{colEmplStock}}">
+											{% if piece.emplStock %}
+												{{ piece.emplStock }}
+											{% else %}
+												NULL
+											{% endif %}
+										</a>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+						<tfoot>
+							<tr>
+								<th class="text-center">
+									<span>Dossier</span>
+								</th>
+								<th class="text-center">
+									<span>Référence</span>
+								</th>
+								<th class="text-center">
+									<span>Sref1</span>
+								</th>
+								<th class="text-center">
+									<span>Sref2</span>
+								</th>
+								<th class="text-center table-success">
+									<span>Dépôt IS</span>
+								</th>
+								<th class="text-center table-success">
+									<span>Empl IS</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Tiers</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Vtl</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Dépôt Vtl</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Type P</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Num P</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Op P</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Empl Vtl</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Dépôt S</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Stock</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Empl S</span>
+								</th>
+							</tr>
+						</tfoot>
+					</table>
+				{% else %}
+					<h4 class="text-left text-dark">
+						<i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez selectionner un mois et une année !</h4>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>{% endblock %}
