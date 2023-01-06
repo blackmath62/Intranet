@@ -16,7 +16,7 @@
 		</div>
 		<!-- /.card-header -->
 		<div class="card-body">
-			<p>Cette liste permet d'identifier les produits qui ont une info stock et pour lesquels :</p>
+			<p>Cette liste permet d'identifier les produits qui ont une info Dépôt et pour lesquels :</p>
 			<ul>
 				<li>l'emplacement de la piéce n'est pas identique</li>
 				<li>l'emplacement du stock n'est pas identique</li>
@@ -29,7 +29,7 @@
 	<div class="col-md-12">
 		<div class="card card-dark">
 			<div class="card-header d-flex justify-content-between">
-				<h2 class="card-title">Liste des produits pour lesquels les emplacements différes entre l'info stock, la piéce, le stock</h2>
+				<h2 class="card-title">Liste des produits pour lesquels les emplacements différes entre l'info Dépôt et la piéce</h2>
 			</div>
 			<!-- /.card-header -->
 			<div class="card-body">
@@ -53,10 +53,10 @@
 									<span>Désignation</span>
 								</th>
 								<th class="text-center table-success">
-									<span>Dépôt IS</span>
+									<span>Dépôt ID</span>
 								</th>
 								<th class="text-center table-success">
-									<span>Empl IS</span>
+									<span>Empl ID</span>
 								</th>
 								<th class="text-center table-info">
 									<span>Tiers</span>
@@ -65,28 +65,19 @@
 									<span>Vtl</span>
 								</th>
 								<th class="text-center table-info">
-									<span>Dépôt Vtl</span>
+									<span>Dépôt</span>
 								</th>
 								<th class="text-center table-info">
-									<span>Type P</span>
+									<span>Type Piéce</span>
 								</th>
 								<th class="text-center table-info">
-									<span>Num P</span>
+									<span>Num Piéce</span>
 								</th>
 								<th class="text-center table-info">
-									<span>Op P</span>
+									<span>Op</span>
 								</th>
 								<th class="text-center table-info">
-									<span>Empl Vtl</span>
-								</th>
-								<th class="text-center table-warning">
-									<span>Dépôt S</span>
-								</th>
-								<th class="text-center table-warning">
-									<span>Stock</span>
-								</th>
-								<th class="text-center table-warning">
-									<span>Empl S</span>
+									<span>Empl</span>
 								</th>
 							</tr>
 						</thead>
@@ -158,26 +149,166 @@
 											{% endif %}
 										</a>
 									</td>
-									{% if piece.depot != piece.depotStock  %}
+								</tr>
+							{% endfor %}
+						</tbody>
+						<tfoot>
+							<tr>
+								<th class="text-center">
+									<span>Dossier</span>
+								</th>
+								<th class="text-center">
+									<span>Référence</span>
+								</th>
+								<th class="text-center">
+									<span>Sref1</span>
+								</th>
+								<th class="text-center">
+									<span>Sref2</span>
+								</th>
+								<th class="text-center">
+									<span>Désignation</span>
+								</th>
+								<th class="text-center table-success">
+									<span>Dépôt ID</span>
+								</th>
+								<th class="text-center table-success">
+									<span>Empl ID</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Tiers</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Vtl</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Dépôt</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Type Piéce</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Num Piéce</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Op</span>
+								</th>
+								<th class="text-center table-info">
+									<span>Empl</span>
+								</th>
+							</tr>
+						</tfoot>
+					</table>
+				{% else %}
+					<h4 class="text-left text-dark">
+						<i class="fas fa-info-circle pr-2 text-primary"></i>Félicitation, toutes les piéces ont été traitées !</h4>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="card card-dark">
+			<div class="card-header d-flex justify-content-between">
+				<h2 class="card-title">Liste des produits pour lesquels les emplacements différes entre l'info Dépôt et le stock</h2>
+			</div>
+			<!-- /.card-header -->
+			<div class="card-body">
+				{% if stocks %}
+					<table id="example2" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="text-center">
+									<span>Dossier</span>
+								</th>
+								<th class="text-center">
+									<span>Référence</span>
+								</th>
+								<th class="text-center">
+									<span>Sref1</span>
+								</th>
+								<th class="text-center">
+									<span>Sref2</span>
+								</th>
+								<th class="text-center">
+									<span>Désignation</span>
+								</th>
+								<th class="text-center table-success">
+									<span>Dépôt ID</span>
+								</th>
+								<th class="text-center table-success">
+									<span>Empl ID</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Dépôt S</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Stock</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Nature</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Empl S</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+
+							{% for stock in stocks %}
+								<tr>
+									<td class="text-center">
+										<a class="text-dark">{{ stock.dos }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-dark">{{ stock.ref }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-dark">{{ stock.sref1}}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-dark">{{ stock.sref2}}</a>
+									</td>
+									<td class="text-left">
+										<a class="text-dark">{{ stock.designation}}</a>
+									</td>
+									<td class="text-center table-success">
+										<a class="text-dark">{{ stock.depot }}</a>
+									</td>
+									<td class="text-center table-success">
+										<a class="text-dark">{{ stock.empl }}</a>
+									</td>
+									{% if stock.depot != stock.depotStock  %}
 										{% set colDepotStock = "text-danger fw-bolder" %}
 									{% else %}
 										{% set colDepotStock = "text-dark" %}
 									{% endif %}
 									<td class="text-center table-warning">
-										<a class="{{colDepotStock}}">{{ piece.depotStock }}</a>
+										<a class="{{colDepotStock}}">{{ stock.depotStock }}</a>
 									</td>
 									<td class="text-center table-warning">
-										<a class="text-dark">{{ piece.stock }}</a>
+										<a class="text-dark">{{ stock.stock }}</a>
 									</td>
-									{% if piece.empl != piece.emplStock  %}
+									<td class="text-center table-warning">
+										<a class="text-dark">
+											{% if stock.nature == 'N' %}
+												Neuf
+											{% elseif stock.nature == 'O' %}
+												Occasion
+											{% endif %}
+										</a>
+									</td>
+									{% if stock.empl != stock.emplStock  %}
 										{% set colEmplStock = "text-danger fw-bolder" %}
 									{% else %}
 										{% set colEmplStock = "text-dark" %}
 									{% endif %}
 									<td class="text-center table-warning">
 										<a class="{{colEmplStock}}">
-											{% if piece.emplStock %}
-												{{ piece.emplStock }}
+											{% if stock.emplStock %}
+												{{ stock.emplStock }}
 											{% else %}
 												NULL
 											{% endif %}
@@ -204,37 +335,19 @@
 									<span>Désignation</span>
 								</th>
 								<th class="text-center table-success">
-									<span>Dépôt IS</span>
+									<span>Dépôt ID</span>
 								</th>
 								<th class="text-center table-success">
-									<span>Empl IS</span>
-								</th>
-								<th class="text-center table-info">
-									<span>Tiers</span>
-								</th>
-								<th class="text-center table-info">
-									<span>Vtl</span>
-								</th>
-								<th class="text-center table-info">
-									<span>Dépôt Vtl</span>
-								</th>
-								<th class="text-center table-info">
-									<span>Type P</span>
-								</th>
-								<th class="text-center table-info">
-									<span>Num P</span>
-								</th>
-								<th class="text-center table-info">
-									<span>Op P</span>
-								</th>
-								<th class="text-center table-info">
-									<span>Empl Vtl</span>
+									<span>Empl ID</span>
 								</th>
 								<th class="text-center table-warning">
 									<span>Dépôt S</span>
 								</th>
 								<th class="text-center table-warning">
 									<span>Stock</span>
+								</th>
+								<th class="text-center table-warning">
+									<span>Nature</span>
 								</th>
 								<th class="text-center table-warning">
 									<span>Empl S</span>
@@ -244,7 +357,7 @@
 					</table>
 				{% else %}
 					<h4 class="text-left text-dark">
-						<i class="fas fa-info-circle pr-2 text-primary"></i>Félicitation, tous les articles ont été traité !</h4>
+						<i class="fas fa-info-circle pr-2 text-primary"></i>Félicitation, tous les Stocks ont été traité !</h4>
 				{% endif %}
 			</div>
 		</div>

@@ -21,7 +21,8 @@ class EmplStockDifEmplPieceController extends AbstractController
 
         return $this->render('empl_stock_dif_empl_piece/index.html.twig', [
             'controller_name' => 'EmplStockDifEmplPieceController',
-            'pieces' => $repo->getBadPlaceProduct(),
+            'pieces' => $repo->getBadPlaceProductOrder(),
+            'stocks' => $repo->getBadPlaceProductStock(),
             'title' => 'Anomalie Emplacements',
         ]);
     }
