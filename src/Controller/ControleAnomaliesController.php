@@ -472,7 +472,7 @@ class ControleAnomaliesController extends AbstractController
                     $MailsList = $this->adminEmailController->formateEmailList($treatementMails);
                 }
             }
-            dd($MailsList);
+            //dd($MailsList);
             if ($MailsList) {
                 $html = $this->renderView('mails/sendMailForUsersArticleAFermer.html.twig', ['produits' => $produits, 'Srefs' => $Srefs]);
                 $email = (new Email())

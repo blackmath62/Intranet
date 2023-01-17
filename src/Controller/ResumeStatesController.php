@@ -1,0 +1,282 @@
+<?php
+
+namespace App\Controller;
+
+use App\Form\StatesDateFilterType;
+use App\Repository\Divalto\StatesByTiersRepository;
+use DateTime;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class ResumeStatesController extends AbstractController
+{
+    /**
+     * @Route("/resume/states", name="app_resume_states")
+     * @Route("/resume/states/{dd}/{df}", name="app_resume_states_dd_df")
+     */
+    public function index($dd = null, $df = null, Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle): Response
+    {
+
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
+        $total = '';
+        $familleProduit = [];
+        $colorProduit = [];
+        $montantProduit = [];
+        $familleClient = [];
+        $colorClient = [];
+        $montantClient = [];
+
+        $dos = 3;
+
+        $form = $this->createForm(StatesDateFilterType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $startN = $form->getData()['startDate']->format('Y-m-d');
+            $endN = $form->getData()['endDate']->format('Y-m-d');
+
+            $s1 = new DateTime($form->getData()['startDate']->format('Y-m-d'));
+            $e1 = new DateTime($form->getData()['endDate']->format('Y-m-d'));
+
+            $startN1 = $controlArticle->getDateDiff($s1, $s1, $e1);
+
+            $s1 = new DateTime($form->getData()['startDate']->format('Y-m-d'));
+            $e1 = new DateTime($form->getData()['endDate']->format('Y-m-d'));
+
+            $endN1 = $controlArticle->getDateDiff($e1, $s1, $e1);
+
+        } else {
+            if ($dd == null | $df == null) {
+                $startN = new DateTime(date("Y") . "-01-01");
+                $endN = new DateTime('now');
+
+                $startN1 = $controlArticle->getDateDiff($startN, $startN, $endN);
+
+                $startN = new DateTime(date("Y") . "-01-01");
+                $endN = new DateTime('now');
+
+                $endN1 = $controlArticle->getDateDiff($endN, $startN, $endN);
+
+                $startN = new DateTime(date("Y") . "-01-01");
+                $endN = new DateTime('now');
+
+                $startN = $controlArticle->getYmd($startN);
+                $endN = $controlArticle->getYmd($endN);
+
+            } else {
+                $startN = $dd;
+                $endN = $df;
+                $startN1 = $controlArticle->getDateDiff(new DateTime($dd), new DateTime($dd), new DateTime($df));
+                $endN1 = $controlArticle->getDateDiff(new DateTime($df), new DateTime($dd), new DateTime($df));
+            }
+        }
+
+        // Données stats camenbert Produits
+        $dataProduit = $repoTiers->getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dos, $startN, $endN, "produits");
+        for ($ligFamProduit = 0; $ligFamProduit < count($dataProduit); $ligFamProduit++) {
+            $familleProduit[] = $dataProduit[$ligFamProduit]['famille'];
+            $montantProduit[] = $dataProduit[$ligFamProduit]['montantN'];
+            $colorProduit[] = 'rgba(' . $this->listeCouleur($ligFamProduit) . ')';
+        }
+
+        // Données stats camenbert Client
+        $dataClient = $repoTiers->getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dos, $startN, $endN, "clients");
+        for ($ligFamClient = 0; $ligFamClient < count($dataClient); $ligFamClient++) {
+            $familleClient[] = $dataClient[$ligFamClient]['famille'];
+            $montantClient[] = $dataClient[$ligFamClient]['montantN'];
+            $colorClient[] = 'rgba(' . $this->listeCouleur($ligFamClient) . ')';
+        }
+        // Données stats diagramme mois
+        $dataMois = $repoTiers->getStatesRobyTotalParClientArticle($dos, $startN, $endN, $startN1, $endN1, 'mois');
+        for ($ligMois = 0; $ligMois < count($dataMois); $ligMois++) {
+            $mois[] = $dataMois[$ligMois]['mois'];
+            $moisMontantN[] = $dataMois[$ligMois]['montantN'];
+            $moisMontantN1[] = $dataMois[$ligMois]['montantN1'];
+        }
+        $total = $repoTiers->getStatesRobyTotal($dos, $startN, $endN);
+        $nbClients = count($repoTiers->getStatesRobyTotalParClient($dos, $startN, $endN));
+        $nbProduits = count($repoTiers->getStatesRobyTotalParProduit($dos, $startN, $endN));
+        $pourcTotaux = $repoTiers->getStatesParFamilleRobyTotaux($dos, $startN, $endN, $startN1, $endN1, 'produits');
+
+        $trancheF = "du " . $startN . " au " . $endN;
+        $trancheD = "du " . $startN1 . " au " . $endN1;
+
+        return $this->render('resume_states/index.html.twig', [
+            'title' => "Résumé des states",
+            'form' => $form->createView(),
+            'familleProduit' => json_encode($familleProduit),
+            'colorProduit' => json_encode($colorProduit),
+            'montantProduit' => json_encode($montantProduit),
+            'familleClient' => json_encode($familleClient),
+            'colorClient' => json_encode($colorClient),
+            'montantClient' => json_encode($montantClient),
+            'mois' => json_encode($mois),
+            'moisMontantN' => json_encode($moisMontantN),
+            'moisMontantN1' => json_encode($moisMontantN1),
+            'dd' => $startN,
+            'df' => $endN,
+            'total' => $total,
+            'nbClient' => $nbClients,
+            'nbProduits' => $nbProduits,
+            'pourcTotaux' => $pourcTotaux,
+            'trancheDJson' => json_encode($trancheD),
+            'trancheFJson' => json_encode($trancheF),
+            'trancheD' => $trancheD,
+            'trancheF' => $trancheF,
+        ]);
+    }
+
+    public function couleurAutomatique($mot)
+    {
+        $nombre = "";
+        $arr = str_split($mot);
+        foreach ($arr as $value) {
+            $n = $this->alphabetNumérique($value);
+            $nombre = $nombre . $n;
+        }
+        return $nombre;
+
+    }
+
+    public function alphabetNumérique($lettre)
+    {
+        switch ($lettre) {
+            case 'A':
+                $v = 1;
+                break;
+            case 'B':
+                $v = 2;
+                break;
+            case 'C':
+                $v = 3;
+                break;
+            case 'D':
+                $v = 4;
+                break;
+            case 'E':
+                $v = 5;
+                break;
+            case 'F':
+                $v = 6;
+                break;
+            case 'G':
+                $v = 7;
+                break;
+            case 'H':
+                $v = 8;
+                break;
+            case 'I':
+                $v = 9;
+                break;
+            case 'J':
+                $v = 10;
+                break;
+            case 'K':
+                $v = 11;
+                break;
+            case 'L':
+                $v = 12;
+                break;
+            case 'M':
+                $v = 13;
+                break;
+            case 'N':
+                $v = 14;
+                break;
+            case 'O':
+                $v = 15;
+                break;
+            case 'P':
+                $v = 16;
+                break;
+            case 'Q':
+                $v = 17;
+                break;
+            case 'R':
+                $v = 18;
+                break;
+            case 'S':
+                $v = 19;
+                break;
+            case 'T':
+                $v = 20;
+                break;
+            case 'U':
+                $v = 21;
+                break;
+            case 'V':
+                $v = 22;
+                break;
+            case 'W':
+                $v = 23;
+                break;
+            case 'X':
+                $v = 24;
+                break;
+            case 'Y':
+                $v = 25;
+                break;
+            case 'Z':
+                $v = 26;
+                break;
+            default:
+                $v = 0;
+                break;
+        }
+        return $v;
+    }
+
+    public function listeCouleur($n)
+    {
+        //dd($n);
+        switch ($n) {
+            case '0':
+                $couleur = '97, 177, 70,1'; // vert
+                break;
+            case '1':
+                $couleur = "208, 221, 55,1"; //vert clair
+                break;
+            case '2':
+                $couleur = "242, 235, 58"; // jaune
+                break;
+            case '3':
+                $couleur = "248, 189, 24"; // orange
+                break;
+            case '4':
+                $couleur = "249, 155, 31"; // orange foncé
+                break;
+            case '5':
+                $couleur = "240, 83, 37"; // rouge clair
+                break;
+            case '6':
+                $couleur = "240, 49, 36"; // rouge
+                break;
+            case '7':
+                $couleur = "167, 30, 72"; // violet clair
+                break;
+            case '8':
+                $couleur = "124, 54, 150"; // violet
+                break;
+            case '9':
+                $couleur = "70, 50, 145"; // violet foncé
+                break;
+            case '10':
+                $couleur = "62, 94, 171"; // bleu foncé
+                break;
+            case '11':
+                $couleur = "20, 149, 207"; // bleu clair
+                break;
+
+            default:
+                $couleur = "108, 117, 125,1"; //secondary
+                break;
+
+        }
+        return $couleur;
+    }
+}

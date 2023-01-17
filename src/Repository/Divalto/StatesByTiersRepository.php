@@ -632,4 +632,243 @@ class StatesByTiersRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    // States par famille société Roby
+    public function getStatesParFamilleRoby($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    {
+
+        if ($famille == "produits") {
+            $type = "RTRIM(LTRIM(a.FAM_0001))";
+        } elseif ($famille == "clients") {
+            $type = "RTRIM(LTRIM(c.STAT_0001))";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT tiers, nom, famille, SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN1,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20')
+        AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')
+        )reponse
+        GROUP BY tiers, nom, famille";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States par famille société Roby Totaux
+    public function getStatesParFamilleRobyTotaux($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    {
+
+        if ($famille == "produits") {
+            $type = "RTRIM(LTRIM(a.FAM_0001))";
+        } elseif ($famille == "clients") {
+            $type = "RTRIM(LTRIM(c.STAT_0001))";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN1,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20')
+        AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')
+        )reponse";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States société Roby Total
+    public function getStatesRobyTotal($dossier, $startN, $endN)
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20')
+        AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')
+        )reponse";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    // States société Roby par clients
+    public function getStatesRobyTotalParClient($dossier, $startN, $endN): array
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT tiers, nom, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20')
+        AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')
+        )reponse
+        GROUP BY tiers, nom";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States société Roby par produits
+    public function getStatesRobyTotalParProduit($dossier, $startN, $endN): array
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ref, sref1, sref2, designation,uv, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1, RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20')
+        AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')
+        )reponse
+        GROUP BY ref, sref1, sref2, designation,uv";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States société Roby par clients/article 2 ans
+    public function getStatesRobyTotalParClientArticle($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    {
+        if ($famille == "produits") {
+            $type = "ref, sref1, sref2, designation, uv";
+        } elseif ($famille == "clients") {
+            $type = "tiers, nom";
+        } elseif ($famille == "mois") {
+            $type = "mois";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT $type, RTRIM(LTRIM(SUM(montantSignN))) AS montantN , RTRIM(LTRIM(SUM(montantSignN1))) AS montantN1
+        FROM(
+        SELECT  MONTH(m.FADT) AS mois,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1, RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN1
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20')
+        AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')
+        )reponse
+        GROUP BY $type";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States par famille société Roby Totaux PAR FAMILLE
+    public function getStatesParFamilleRobyTotauxParFamille($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    {
+
+        if ($famille == "produits") {
+            $type = "RTRIM(LTRIM(a.FAM_0001))";
+        } elseif ($famille == "clients") {
+            $type = "RTRIM(LTRIM(c.STAT_0001))";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT famille, SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN1,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20')
+        AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')
+        )reponse
+        GROUP BY famille
+        ORDER BY montantN DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States par famille société Roby Totaux PAR FAMILLE produit
+    public function getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dossier, $startN, $endN, $famille): array
+    {
+
+        if ($famille == "produits") {
+            $type = "RTRIM(LTRIM(a.FAM_0001))";
+        } elseif ($famille == "clients") {
+            $type = "RTRIM(LTRIM(c.STAT_0001))";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT famille, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20')
+        AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')
+        )reponse
+        GROUP BY famille
+        ORDER BY montantN DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
 }

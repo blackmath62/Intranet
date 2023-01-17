@@ -486,6 +486,14 @@
 											</a>
 										</li>
 										<li class="nav-item">
+											<a href="{{ path('app_resume_states') }}" class="nav-link">
+												<i class="nav-icon fas fa-chart-pie text-primary"></i>
+												<p>
+													Résumé des states
+												</p>
+											</a>
+										</li>
+										<li class="nav-item">
 											<a href="{{path('app_stats_achat', {'dos' : '3'})}}" class="nav-link">
 												<i class="nav-icon fas fa-shopping-basket text-warning"></i>
 												<p>
@@ -767,6 +775,15 @@
 			<script src="{{ asset("plugins/datatables-buttons/js/buttons.html5.min.js")}}"></script>
 			<script src="{{ asset("plugins/datatables-buttons/js/buttons.print.min.js")}}"></script>
 			<script src="{{ asset("plugins/datatables-buttons/js/buttons.colVis.min.js")}}"></script>
+
+			<!-- AdminLTE App -->
+			<script src="{{ asset("dist/js/adminlte.min.js")}}"></script>
+			<!-- FLOT CHARTS -->
+			<script src="{{ asset("plugins/flot/jquery.flot.js")}}"></script>
+			<!-- FLOT RESIZE PLUGIN - allows the chart to redraw when the window is resized -->
+			<script src="{{ asset("plugins/flot/plugins/jquery.flot.resize.js")}}"></script>
+			<!-- FLOT PIE PLUGIN - also used to draw donut charts -->
+			<script src="{{ asset("plugins/flot/plugins/jquery.flot.pie.js")}}"></script>
 
 			<!-- bootstrap color picker -->
 			<script src="{{ asset("vendor/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js")}}"></script>
