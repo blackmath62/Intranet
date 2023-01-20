@@ -13,10 +13,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class ResumeStatesController extends AbstractController
 {
     /**
-     * @Route("/resume/states", name="app_resume_states")
-     * @Route("/resume/states/{dd}/{df}", name="app_resume_states_dd_df")
+     * @Route("/resume/states/{dos}", name="app_resume_states")
+     * @Route("/resume/states/{dos}/{dd}/{df}", name="app_resume_states_dd_df")
      */
-    public function index($dd = null, $df = null, Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle): Response
+    public function index($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle): Response
     {
 
         // tracking user page for stats
@@ -30,8 +30,6 @@ class ResumeStatesController extends AbstractController
         $familleClient = [];
         $colorClient = [];
         $montantClient = [];
-
-        $dos = 3;
 
         $form = $this->createForm(StatesDateFilterType::class);
         $form->handleRequest($request);
@@ -103,6 +101,44 @@ class ResumeStatesController extends AbstractController
         $nbProduits = count($repoTiers->getStatesRobyTotalParProduit($dos, $startN, $endN));
         $pourcTotaux = $repoTiers->getStatesParFamilleRobyTotaux($dos, $startN, $endN, $startN1, $endN1, 'produits');
 
+        // données line sur 7 ans
+        $dataSeven = $repoTiers->getStatesSevenYearsAgo($dos, 'annee');
+
+        for ($ligSeven = 0; $ligSeven < count($dataSeven); $ligSeven++) {
+            $sevenAnnee[] = $dataSeven[$ligSeven]['annee'];
+            $sevenMontant[] = $dataSeven[$ligSeven]['montant'];
+        }
+
+        // données line par commerciaux sur 6 ans
+        $nomCommerciaux = [];
+        $donneesCommerciaux = [];
+        $anneeCommerciaux = [];
+        $startCommerciaux = new DateTime('now');
+        $startyear = $startCommerciaux->format('Y');
+        $dataCommerciaux = $repoTiers->getStatesSixYearsAgoCommerciaux($dos);
+        $color = [$this->listeCouleur(0), $this->listeCouleur(4), $this->listeCouleur(10), $this->listeCouleur(6), $this->listeCouleur(9), $this->listeCouleur(2)];
+        for ($i = 0; $i < count($dataCommerciaux); $i++) {
+
+            $nomCommerciaux[] = $dataCommerciaux[$i]['commercial'];
+            $donneesCommerciaux[] = [
+                $dataCommerciaux[$i]['montantN5'],
+                $dataCommerciaux[$i]['montantN4'],
+                $dataCommerciaux[$i]['montantN3'],
+                $dataCommerciaux[$i]['montantN2'],
+                $dataCommerciaux[$i]['montantN1'],
+                $dataCommerciaux[$i]['montantN'],
+            ]; //[[], [], []];
+            $anneeCommerciaux = [
+                $startyear - 5,
+                $startyear - 4,
+                $startyear - 3,
+                $startyear - 2,
+                $startyear - 1,
+                $startyear,
+            ];
+            $couleurCommercial[] = 'rgb(' . $color[$i] . ')';
+        }
+
         $trancheF = "du " . $startN . " au " . $endN;
         $trancheD = "du " . $startN1 . " au " . $endN1;
 
@@ -128,6 +164,12 @@ class ResumeStatesController extends AbstractController
             'trancheFJson' => json_encode($trancheF),
             'trancheD' => $trancheD,
             'trancheF' => $trancheF,
+            'sevenAnnee' => json_encode($sevenAnnee),
+            'sevenMontant' => json_encode($sevenMontant),
+            'nomCommerciaux' => json_encode($nomCommerciaux),
+            'anneeCommerciaux' => json_encode($anneeCommerciaux),
+            'donneesCommerciaux' => json_encode($donneesCommerciaux),
+            'couleurCommercial' => json_encode($couleurCommercial),
         ]);
     }
 
@@ -233,7 +275,6 @@ class ResumeStatesController extends AbstractController
 
     public function listeCouleur($n)
     {
-        //dd($n);
         switch ($n) {
             case '0':
                 $couleur = '97, 177, 70,1'; // vert

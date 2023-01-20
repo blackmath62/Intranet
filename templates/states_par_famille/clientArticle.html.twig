@@ -10,9 +10,9 @@
 			<div class="card card-dark">
 				<div class="card-header d-flex bd-highlight">
 					<div class="p-2 flex-grow-1 bd-highlight">
-						{% if app.request.attributes.get('_route')  == 'app_states_par_produits' or app.request.attributes.get('_route')  == 'app_states_par_produits_dd_df' %}
+						{% if app.request.attributes.get('_route')  == 'app_states_par_produits' or app.request.attributes.get('_route')  == 'app_states_par_produits_dd_df' or app.request.attributes.get('_route')  == 'app_states_par_produitsLh' or app.request.attributes.get('_route')  == 'app_states_par_produits_dd_dfLh' %}
 							{% set type = "produits" %}
-						{% elseif app.request.attributes.get('_route')  == 'app_states_par_clients' or app.request.attributes.get('_route')  == 'app_states_par_clients_dd_df' %}
+						{% elseif app.request.attributes.get('_route')  == 'app_states_par_clients' or app.request.attributes.get('_route')  == 'app_states_par_clients_dd_df' or app.request.attributes.get('_route')  == 'app_states_par_clientsLh' or app.request.attributes.get('_route')  == 'app_states_par_clients_dd_dfLh' %}
 							{% set type = "clients" %}
 						{% endif %}
 						<h3 class="card-title text-center">States par
@@ -40,8 +40,10 @@
 								{{ form_row(form.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }}
 								) }}
 							</div>
+							<pre>
+							</pre>
 							<div class="p-1">
-								<a class="btn btn-success" href="{{path('app_resume_states_dd_df', {'dd' : dd, 'df' : df})}}">Résumé</a>
+								<a class="btn btn-success" href="{{path('app_resume_states_dd_df', {'dos' : app.request.attributes.get('dos'), 'dd' : dd, 'df' : df})}}">Résumé</a>
 							</div>
 						</div>
 						{{ form_end(form) }}
@@ -98,9 +100,12 @@
 							<div class="col-md-12">
 								<div class="card card-primary">
 									<div class="card-header">
-										<div class="p-2">
-											<h3 class="card-title text-center">Par
-												{{ type }}</h3>
+										<h3 class="card-title text-center">Par
+											{{ type }}</h3>
+										<div class="card-tools">
+											<button type="button" class="btn btn-tool" data-card-widget="maximize">
+												<i class="fas fa-expand"></i>
+											</button>
 										</div>
 									</div>
 									<div class='card-body'>

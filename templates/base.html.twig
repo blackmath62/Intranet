@@ -360,6 +360,16 @@
 													<p>States ventes</p>
 												</a>
 											</li>
+											{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
+												<li class="nav-item">
+													<a href="{{ path('app_resume_states', {'dos' : '1' }) }}" class="nav-link">
+														<i class="nav-icon fas fa-chart-pie text-danger"></i>
+														<p>
+															Résumé des states EV
+														</p>
+													</a>
+												</li>
+											{% endif %}
 											<li class="nav-item">
 												<a href="{{ path('app_activite_metier') }}" class="nav-link">
 													<i class="fas fa-store nav-icon text-success"></i>
@@ -486,8 +496,8 @@
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="{{ path('app_resume_states') }}" class="nav-link">
-												<i class="nav-icon fas fa-chart-pie text-primary"></i>
+											<a href="{{ path('app_resume_states', {'dos' : '3' }) }}" class="nav-link">
+												<i class="nav-icon fas fa-chart-pie text-danger"></i>
 												<p>
 													Résumé des states
 												</p>

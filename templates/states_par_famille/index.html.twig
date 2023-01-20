@@ -10,17 +10,17 @@
 			<div class="card card-dark">
 				<div class="card-header d-flex bd-highlight">
 					<div class="p-2 flex-grow-1 bd-highlight">
-						{% if app.request.attributes.get('_route')  == 'app_states_par_famille' or app.request.attributes.get('_route')  == 'app_states_par_famille_dd_df' %}
+						{% if app.request.attributes.get('_route')  == 'app_states_par_famille' or app.request.attributes.get('_route')  == 'app_states_par_famille_dd_df' or app.request.attributes.get('_route')  == 'app_states_par_familleLh' or app.request.attributes.get('_route')  == 'app_states_par_famille_dd_dfLh' %}
 							{% set type = "produits" %}
-						{% elseif app.request.attributes.get('_route')  == 'app_states_par_famille_clients' or app.request.attributes.get('_route')  == 'app_states_par_famille_clients_dd_df' %}
+						{% elseif app.request.attributes.get('_route')  == 'app_states_par_famille_clients' or app.request.attributes.get('_route')  == 'app_states_par_famille_clients_dd_df' or app.request.attributes.get('_route')  == 'app_states_par_famille_clientsLh' or app.request.attributes.get('_route')  == 'app_states_par_famille_clients_dd_dfLh' %}
 							{% set type = "clients" %}
 						{% endif %}
 						<h3 class="card-title text-center">States par famille de
 							{{ type }}
 							{% if trancheD and trancheF %}
-								{{ trancheD }}
-								et
 								{{ trancheF }}
+								et
+								{{ trancheD }}
 							{% endif %}
 						</h3>
 					</div>
@@ -41,7 +41,7 @@
 								) }}
 							</div>
 							<div class="p-1">
-								<a class="btn btn-success" href="{{path('app_resume_states_dd_df', {'dd' : dd, 'df' : df})}}">Résumé</a>
+								<a class="btn btn-success" href="{{path('app_resume_states_dd_df', {'dos' : app.request.attributes.get('dos'),'dd' : dd, 'df' : df})}}">Résumé</a>
 							</div>
 						</div>
 						{{ form_end(form) }}
@@ -56,7 +56,7 @@
 								<div class="description-block border-right">
 									<h1 class="description-header">{{ totaux[0].montantN1|format_currency('EUR', locale='fr') }}</h1>
 									<span class="description-text">Total
-										{{ trancheD }}
+										{{ trancheF }}
 									</span>
 								</div>
 								<!-- /.description-block -->
@@ -88,7 +88,7 @@
 								<div class="description-block">
 									<h1 class="description-header">{{ totaux[0].montantN|format_currency('EUR', locale='fr') }}</h1>
 									<span class="description-text">Total
-										{{ trancheF }}</span>
+										{{ trancheD }}</span>
 								</div>
 								<!-- /.description-block -->
 							</div>
@@ -98,9 +98,12 @@
 							<div class="col-md-12">
 								<div class="card card-primary">
 									<div class="card-header">
-										<div class="p-2">
-											<h3 class="card-title text-center">Par famille de
-												{{ type }}</h3>
+										<h3 class="card-title text-center">Par famille de
+											{{ type }}</h3>
+										<div class="card-tools">
+											<button type="button" class="btn btn-tool" data-card-widget="maximize">
+												<i class="fas fa-expand"></i>
+											</button>
 										</div>
 									</div>
 									<div class='card-body d-flex flex-wrap'>
@@ -126,7 +129,7 @@
 											</div>
 											<div class="card-body">
 												<div class="chart">
-													<canvas id="areaChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+													<canvas id="areaChart" style="min-height: 250px; height: 250px; max-height: 94%; max-width: 94%;"></canvas>
 												</div>
 											</div>
 											<!-- /.card-body -->
@@ -209,89 +212,91 @@
 							</div>
 						</div>
 					{% endif %}
-
-					{% if states %}
-						<div class="row">
-							<div class="col-md-12">
-								<div class="card card-warning">
-									<div class="card-header">
-										<div class="p-2">
-											<h3 class="card-title text-center">Détail clients par famille de
-												{{ type }}</h3>
-										</div>
+				</div>
+				{% if states %}
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-warning">
+								<div class="card-header">
+									<h3 class="card-title text-center">Détail clients par famille de
+										{{ type }}</h3>
+									<div class="card-tools">
+										<button type="button" class="btn btn-tool" data-card-widget="maximize">
+											<i class="fas fa-expand"></i>
+										</button>
 									</div>
-									<div class="card-body">
-										<table id="example1" class="table table-bordered table-striped">
-											<thead>
-												<tr class='text-center'>
-													<th>Tiers</th>
-													<th>Nom</th>
-													<th>Famille</th>
-													<th>{{ trancheF }}</th>
-													<th>Delta %</th>
-													<th>Delta €</th>
-													<th>{{ trancheD }}</th>
-												</tr>
-											</thead>
-											<tbody>
-												{% for state in states %}
-													<tr class='text-center'>
-														<td>{{state.tiers}}</td>
-														<td>{{state.nom}}</td>
-														<td>{{state.famille}}</td>
-														<td>{{state.montantN1}}</td>
-														{% set color = "text-dark" %}
-														{% if state.montantN > 0 and state.montantN1 > 0 %}
-															{% set delta = ((state.montantN - state.montantN1) / state.montantN1)* 100 %}
-															{% if delta > 0 %}
-																{% set color = "text-success" %}
-															{% elseif delta < 0 %}
-																{% set color = "text-danger" %}
-															{% endif %}
-															<td class="{{ color }}">
-																<b>{{ delta|number_format(2, '.', ' ') }}</b>
-															</td>
-														{% elseif state.montantN > 0 and (state.montantN1 == 0 or state.montantN1 == "") %}
-															{% set color = "text-success" %}
-															<td class="{{ color }}">
-																<b>100</b>
-															</td>
-														{% elseif (state.montantN == 0 or state.montantN == "") and state.montantN1 > 0 %}
-															{% set color = "text-danger" %}
-															<td class="{{ color }}">
-																<b>- 100</b>
-															</td>
-														{% else %}
-															{% set color = "text-warning" %}
-															<td class="{{ color }}">
-																<b>0</b>
-															</td>
-														{% endif %}
-														{% if state.montantN - state.montantN1 > 0 %}
-															{% set couleur = 'text-success' %}
-														{% elseif state.montantN - state.montantN1 < 0 %}
-															{% set couleur = 'text-danger' %}
-														{% else %}
-															{% set couleur = 'text-warning' %}
-														{% endif %}
-														<td class="{{ couleur }}">
-															<b>{{(state.montantN - state.montantN1)}}</b>
-														</td>
-														<td>{{state.montantN}}</td>
-													</tr>
-												{% endfor %}
-											</tbody>
-										</table>
-									</div>
-
-								{% else %}
-									<h5 class="text-left text-dark">
-										<i class="fas fa-info-circle pr-2 text-info"></i>Pas de states pour cette période !</h5>
 								</div>
+								<div class="card-body">
+									<table id="example1" class="table table-bordered table-striped">
+										<thead>
+											<tr class='text-center'>
+												<th>Tiers</th>
+												<th>Nom</th>
+												<th>Famille</th>
+												<th>{{ trancheF }}</th>
+												<th>Delta %</th>
+												<th>Delta €</th>
+												<th>{{ trancheD }}</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for state in states %}
+												<tr class='text-center'>
+													<td>{{state.tiers}}</td>
+													<td>{{state.nom}}</td>
+													<td>{{state.famille}}</td>
+													<td>{{state.montantN1}}</td>
+													{% set color = "text-dark" %}
+													{% if state.montantN > 0 and state.montantN1 > 0 %}
+														{% set delta = ((state.montantN - state.montantN1) / state.montantN1)* 100 %}
+														{% if delta > 0 %}
+															{% set color = "text-success" %}
+														{% elseif delta < 0 %}
+															{% set color = "text-danger" %}
+														{% endif %}
+														<td class="{{ color }}">
+															<b>{{ delta|number_format(2, '.', ' ') }}</b>
+														</td>
+													{% elseif state.montantN > 0 and (state.montantN1 == 0 or state.montantN1 == "") %}
+														{% set color = "text-success" %}
+														<td class="{{ color }}">
+															<b>100</b>
+														</td>
+													{% elseif (state.montantN == 0 or state.montantN == "") and state.montantN1 > 0 %}
+														{% set color = "text-danger" %}
+														<td class="{{ color }}">
+															<b>- 100</b>
+														</td>
+													{% else %}
+														{% set color = "text-warning" %}
+														<td class="{{ color }}">
+															<b>0</b>
+														</td>
+													{% endif %}
+													{% if state.montantN - state.montantN1 > 0 %}
+														{% set couleur = 'text-success' %}
+													{% elseif state.montantN - state.montantN1 < 0 %}
+														{% set couleur = 'text-danger' %}
+													{% else %}
+														{% set couleur = 'text-warning' %}
+													{% endif %}
+													<td class="{{ couleur }}">
+														<b>{{(state.montantN - state.montantN1)}}</b>
+													</td>
+													<td>{{state.montantN}}</td>
+												</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+
+							{% else %}
+								<h5 class="text-left text-dark">
+									<i class="fas fa-info-circle pr-2 text-info"></i>Pas de states pour cette période !</h5>
 							</div>
 						</div>
-					{% endif %}
-				</div>
+					</div>
+				{% endif %}
 			</div>
 		</div>
 	</div>
