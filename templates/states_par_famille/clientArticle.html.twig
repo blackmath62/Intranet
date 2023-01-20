@@ -1,0 +1,264 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header d-flex bd-highlight">
+					<div class="p-2 flex-grow-1 bd-highlight">
+						{% if app.request.attributes.get('_route')  == 'app_states_par_produits' or app.request.attributes.get('_route')  == 'app_states_par_produits_dd_df' or app.request.attributes.get('_route')  == 'app_states_par_produitsLh' or app.request.attributes.get('_route')  == 'app_states_par_produits_dd_dfLh' %}
+							{% set type = "produits" %}
+						{% elseif app.request.attributes.get('_route')  == 'app_states_par_clients' or app.request.attributes.get('_route')  == 'app_states_par_clients_dd_df' or app.request.attributes.get('_route')  == 'app_states_par_clientsLh' or app.request.attributes.get('_route')  == 'app_states_par_clients_dd_dfLh' %}
+							{% set type = "clients" %}
+						{% endif %}
+						<h3 class="card-title text-center">States par
+							{{ type }}
+							{% if trancheD and trancheF %}
+								{{ trancheF }}
+								et
+								{{ trancheD }}
+							{% endif %}
+						</h3>
+					</div>
+					<div class="p-2 bd-highlight">
+						{{ form_start(form) }}
+						<div class='d-flex'>
+							<div class="p-1 mt-2">
+								Veuillez selectionner la période :
+							</div>
+							<div class="p-1">
+								{{ form_widget(form.startDate) }}
+							</div>
+							<div class="p-1">
+								{{ form_widget(form.endDate) }}
+							</div>
+							<div class="p-1">
+								{{ form_row(form.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }}
+								) }}
+							</div>
+							<pre>
+							</pre>
+							<div class="p-1">
+								<a class="btn btn-success" href="{{path('app_resume_states_dd_df', {'dos' : app.request.attributes.get('dos'), 'dd' : dd, 'df' : df})}}">Résumé</a>
+							</div>
+						</div>
+						{{ form_end(form) }}
+					</div>
+				</div>
+				<!-- /.card-header -->
+				<div class="card-body">
+					{% if states %}
+						<div class="row">
+							<div class="col-sm-4 col-6">
+								<div class="description-block border-right">
+									<h1 class="description-header">{{ totaux[0].montantN1|format_currency('EUR', locale='fr') }}</h1>
+									<span class="description-text">Total
+										{{ trancheD }}
+									</span>
+								</div>
+								<!-- /.description-block -->
+							</div>
+							<!-- /.col -->
+							<div class="col-sm-4 col-6">
+								{% if totaux[0].montantN - totaux[0].montantN1 > 0 %}
+									{% set fleche = "up" %}
+									{% set colFleche = "success" %}
+								{% elseif totaux[0].montantN - totaux[0].montantN1 < 0 %}
+									{% set fleche = "down" %}
+									{% set colFleche = "danger" %}
+								{% elseif totaux[0].montantN - totaux[0].montantN1 == 0 %}
+									{% set fleche = "left" %}
+									{% set colFleche = "warning" %}
+								{% endif %}
+								<div class="description-block border-right">
+									<span class="description-percentage text-{{colFleche}}">
+										<i class="fas fa-caret-{{fleche}}"></i>
+										{{ ( ( (totaux[0].montantN - totaux[0].montantN1) / totaux[0].montantN1 ) * 100) |number_format(2, '.', ' ')}}
+										%</span>
+									<h5 class="description-header">{{ (totaux[0].montantN - totaux[0].montantN1)}}</h5>
+									<span class="description-text">Delta</span>
+								</div>
+								<!-- /.description-block -->
+							</div>
+							<!-- /.col -->
+							<div class="col-sm-4 col-6">
+								<div class="description-block">
+									<h1 class="description-header">{{ totaux[0].montantN|format_currency('EUR', locale='fr') }}</h1>
+									<span class="description-text">Total
+										{{ trancheF }}</span>
+								</div>
+								<!-- /.description-block -->
+							</div>
+						</div>
+						<!-- /.row -->
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card card-primary">
+									<div class="card-header">
+										<h3 class="card-title text-center">Par
+											{{ type }}</h3>
+										<div class="card-tools">
+											<button type="button" class="btn btn-tool" data-card-widget="maximize">
+												<i class="fas fa-expand"></i>
+											</button>
+										</div>
+									</div>
+									<div class='card-body'>
+										<table id="example1" class="table table-bordered table-striped">
+											<thead>
+												<tr class='text-center'>
+													{% if type == "clients" %}
+														<th>Tiers</th>
+														<th>Nom</th>
+													{% elseif type == "produits" %}
+														<th>Référence</th>
+														<th>Sref1</th>
+														<th>Sref2</th>
+														<th>Désignation</th>
+														<th>Uv</th>
+													{% endif %}
+													<th>{{ trancheF }}</th>
+													<th>Delta %</th>
+													<th>Delta €</th>
+													<th>{{ trancheD }}</th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for state in states %}
+													<tr class='text-center'>
+														{% if type == "clients" %}
+															<td>{{state.tiers}}</td>
+															<td>{{state.nom}}</td>
+														{% elseif type == "produits" %}
+															<td>{{state.ref}}</td>
+															<td>{{state.sref1}}</td>
+															<td>{{state.sref2}}</td>
+															<td>{{state.designation}}</td>
+															<td>{{state.uv}}</td>
+														{% endif %}
+														<td>{{state.montantN1}}</td>
+														{% set color = "text-dark" %}
+														{% if state.montantN > 0 and state.montantN1 > 0 %}
+															{% set delta = ((state.montantN - state.montantN1) / state.montantN1)* 100 %}
+															{% if delta > 0 %}
+																{% set color = "text-success" %}
+															{% elseif delta < 0 %}
+																{% set color = "text-danger" %}
+															{% endif %}
+															<td class="{{ color }}">
+																<b>{{ delta|number_format(2, '.', ' ') }}</b>
+															</td>
+														{% elseif state.montantN > 0 and (state.montantN1 == 0 or state.montantN1 == "") %}
+															{% set color = "text-success" %}
+															<td class="{{ color }}">
+																<b>100</b>
+															</td>
+														{% elseif (state.montantN == 0 or state.montantN == "") and state.montantN1 > 0 %}
+															{% set color = "text-danger" %}
+															<td class="{{ color }}">
+																<b>- 100</b>
+															</td>
+														{% else %}
+															{% set color = "text-warning" %}
+															<td class="{{ color }}">
+																<b>0</b>
+															</td>
+														{% endif %}
+														{% if state.montantN - state.montantN1 > 0 %}
+															{% set couleur = 'text-success' %}
+														{% elseif state.montantN - state.montantN1 < 0 %}
+															{% set couleur = 'text-danger' %}
+														{% else %}
+															{% set couleur = 'text-warning' %}
+														{% endif %}
+														<td class="{{ couleur }}">
+															<b>{{(state.montantN - state.montantN1)}}</b>
+														</td>
+														<td>
+															{{state.montantN}}
+														</td>
+													</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+
+								{% else %}
+									<h5 class="text-left text-dark">
+										<i class="fas fa-info-circle pr-2 text-info"></i>Pas de states pour cette période !</h5>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+
+
+	<script>
+		$(function () {
+$("#example1").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+$("#example3").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+$('#example2').DataTable({
+"paging": true,
+"lengthChange": false,
+"searching": false,
+"ordering": false,
+"info": true,
+"autoWidth": false,
+"responsive": true
+});
+});
+	</script>
+
+	<script>
+		$('#selectAll').click(function (e) {
+if ($(this).hasClass('checkedAll')) {
+$('input').prop('checked', false);
+$(this).removeClass('checkedAll');
+} else {
+$('input').prop('checked', true);
+$(this).addClass('checkedAll');
+}
+});
+	</script>
+{% endblock %}

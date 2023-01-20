@@ -3,6 +3,7 @@
 namespace App\Repository\Divalto;
 
 use App\Entity\Divalto\Mouv;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -630,6 +631,449 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $stmt = $conn->prepare($sql);
         $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dateDebutN2, $dateFinN2]);
         return $stmt->fetchAll();
+    }
+
+    // States par famille société Roby
+    public function getStatesParFamilleRoby($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    {
+
+        if ($famille == "produits") {
+            $type = "RTRIM(LTRIM(a.FAM_0001))";
+        } elseif ($famille == "clients") {
+            $type = "RTRIM(LTRIM(c.STAT_0001))";
+        }
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT tiers, nom, famille, SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN1,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse
+        GROUP BY tiers, nom, famille";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States par famille société Roby Totaux
+    public function getStatesParFamilleRobyTotaux($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    {
+
+        if ($famille == "produits") {
+            $type = "RTRIM(LTRIM(a.FAM_0001))";
+        } elseif ($famille == "clients") {
+            $type = "RTRIM(LTRIM(c.STAT_0001))";
+        }
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN1,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States société Roby Total
+    public function getStatesRobyTotal($dossier, $startN, $endN)
+    {
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    // States société Roby par clients
+    public function getStatesRobyTotalParClient($dossier, $startN, $endN): array
+    {
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT tiers, nom, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse
+        GROUP BY tiers, nom";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States société Roby par produits
+    public function getStatesRobyTotalParProduit($dossier, $startN, $endN): array
+    {
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ref, sref1, sref2, designation,uv, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1, RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse
+        GROUP BY ref, sref1, sref2, designation,uv";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States société Roby par clients/article 2 ans
+    public function getStatesRobyTotalParClientArticle($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    {
+        if ($famille == "produits") {
+            $type = "ref, sref1, sref2, designation, uv";
+        } elseif ($famille == "clients") {
+            $type = "tiers, nom";
+        } elseif ($famille == "mois") {
+            $type = "mois";
+        }
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT $type, RTRIM(LTRIM(SUM(montantSignN))) AS montantN , RTRIM(LTRIM(SUM(montantSignN1))) AS montantN1
+        FROM(
+        SELECT  MONTH(m.FADT) AS mois,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1, RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN1
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse
+        GROUP BY $type";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States par famille société Roby Totaux PAR FAMILLE
+    public function getStatesParFamilleRobyTotauxParFamille($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    {
+
+        if ($famille == "produits") {
+            $type = "RTRIM(LTRIM(a.FAM_0001))";
+        } elseif ($famille == "clients") {
+            $type = "RTRIM(LTRIM(c.STAT_0001))";
+        }
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT famille, SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN1,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse
+        GROUP BY famille
+        ORDER BY montantN DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States par famille société Roby Totaux PAR FAMILLE produit
+    public function getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dossier, $startN, $endN, $famille): array
+    {
+
+        if ($famille == "produits") {
+            $type = "RTRIM(LTRIM(a.FAM_0001))";
+        } elseif ($famille == "clients") {
+            $type = "RTRIM(LTRIM(c.STAT_0001))";
+        }
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT famille, SUM(montantSignN) AS montantN
+        FROM(
+        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
+        CASE
+            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSignN
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse
+        GROUP BY famille
+        ORDER BY montantN DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States CA par année sur 6 années
+    public function getStatesSevenYearsAgo($dossier, $type): array
+    {
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        if ($type == "annee") {
+            $type = 'annee';
+        } elseif ($type == "commercial") {
+            $type = 'annee, commercial';
+        }
+
+        $d = new DateTime('now');
+        $n = $d->format('Y');
+        $n1 = $n - 1;
+        $n2 = $n1 - 1;
+        $n3 = $n2 - 1;
+        $n4 = $n3 - 1;
+        $n5 = $n4 - 1;
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT $type, RTRIM(LTRIM(SUM(montantSign))) AS montant
+        FROM(
+        SELECT  YEAR(m.FADT) AS annee, RTRIM(LTRIM(v.SELCOD)) AS commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
+		RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
+        CASE
+            WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSign
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        INNER JOIN VRP v ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
+        WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ($n, $n1, $n2, $n3, $n4, $n5) AND m.PICOD = 4 AND m.TICOD = 'C'
+		AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse
+        GROUP BY $type";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // States CA par année sur 6 années Commerciaux
+    public function getStatesSixYearsAgoCommerciaux($dossier): array
+    {
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $d = new DateTime('now');
+        $n = $d->format('Y');
+        $n1 = $n - 1;
+        $n2 = $n1 - 1;
+        $n3 = $n2 - 1;
+        $n4 = $n3 - 1;
+        $n5 = $n4 - 1;
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT commercial, RTRIM(LTRIM(SUM(montantSign))) AS montantN, RTRIM(LTRIM(SUM(montantSign1))) AS montantN1, RTRIM(LTRIM(SUM(montantSign2))) AS montantN2, RTRIM(LTRIM(SUM(montantSign3))) AS montantN3
+        , RTRIM(LTRIM(SUM(montantSign4))) AS montantN4, RTRIM(LTRIM(SUM(montantSign5))) AS montantN5
+        FROM(
+        SELECT  YEAR(m.FADT) AS annee, RTRIM(LTRIM(v.SELCOD)) AS commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
+		RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
+        CASE
+            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSign,
+        CASE
+            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n1 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n1 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSign1,
+        CASE
+            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n2 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n2 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSign2,
+        CASE
+            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n3 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n3 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSign3,
+        CASE
+            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n4 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n4 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSign4,
+        CASE
+            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n5 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n5 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+        END AS montantSign5
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        INNER JOIN VRP v ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
+        WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ($n, $n1, $n2, $n3, $n4, $n5) AND m.PICOD = 4 AND m.TICOD = 'C'
+		AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse
+        GROUP BY commercial
+        ORDER BY montantN1 ASC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Compter le nombre de piéces
+    public function countPieceCommerciaux($dossier, $startN, $endN, $startN1, $endN1, $type)
+    {
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $num = 'm.' . $type . 'NO';
+        $d = 'm.' . $type . 'DT';
+        if ($type == 'DV') {
+            $piece = 1;
+        } elseif ($type == 'CD') {
+            $piece = 4;
+        } elseif ($type == 'BL') {
+            $piece = 4;
+        } elseif ($type == 'FA') {
+            $piece = 4;
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(DISTINCT pieceN1) AS nbPieceN1, COUNT(DISTINCT pieceN) AS nbPieceN
+        FROM(
+        SELECT  DISTINCT $num AS piece,
+		CASE
+		WHEN $d BETWEEN '$startN' AND '$endN' THEN $num
+		END AS pieceN,
+		CASE
+		WHEN $d BETWEEN '$startN1' AND '$endN1' THEN $num
+		END AS pieceN1
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND ($d BETWEEN '$startN' AND '$endN' or $d BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = $piece AND m.TICOD = 'C'
+		AND a.REF NOT IN($this->artBan)
+        $metier
+        )reponse";
+
+        //dd($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
     }
 
 }

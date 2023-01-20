@@ -1,0 +1,461 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header d-flex bd-highlight">
+					<div class="p-2 flex-grow-1 bd-highlight">
+						{% if app.request.attributes.get('_route')  == 'app_states_commerciaux' or app.request.attributes.get('_route')  == 'app_states_commerciaux_dd_df' or app.request.attributes.get('_route')  == 'app_states_commerciauxLh' or app.request.attributes.get('_route')  == 'app_states_commerciaux_dd_dfLh' %}
+							{% set type = "produits" %}
+						{% elseif app.request.attributes.get('_route')  == 'app_states_commerciaux_clients' or app.request.attributes.get('_route')  == 'app_states_commerciaux_clients_dd_df' or app.request.attributes.get('_route')  == 'app_states_commerciaux_clientsLh' or app.request.attributes.get('_route')  == 'app_states_commerciaux_clients_dd_dfLh' %}
+							{% set type = "clients" %}
+						{% endif %}
+						<h3 class="card-title text-center">States par Commerciaux de
+							{{ type }}
+							{% if trancheD and trancheF %}
+								{{ trancheF }}
+								et
+								{{ trancheD }}
+							{% endif %}
+						</h3>
+					</div>
+					<div class="p-2 bd-highlight">
+						{{ form_start(form) }}
+						<div class='d-flex'>
+							<div class="p-1 mt-2">
+								Veuillez selectionner la période :
+							</div>
+							<div class="p-1">
+								{{ form_widget(form.startDate) }}
+							</div>
+							<div class="p-1">
+								{{ form_widget(form.endDate) }}
+							</div>
+							<div class="p-1">
+								{{ form_row(form.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }}
+								) }}
+							</div>
+							<div class="p-1">
+								<a class="btn btn-success" href="{{path('app_resume_states_dd_df', {'dos' : app.request.attributes.get('dos'),'dd' : dd, 'df' : df})}}">Résumé</a>
+							</div>
+						</div>
+						{{ form_end(form) }}
+					</div>
+				</div>
+				<!-- /.card-header -->
+				<div class="card-body">
+					<div
+						class="container-fluid">
+						<!-- Info boxes -->
+						<div class="row">
+							<div class="col-12 col-sm-6 col-md-3">
+								<div class="info-box">
+									<span class="info-box-icon bg-info elevation-1">
+										<i class="fas fa-cog"></i>
+									</span>
+
+									<div class="info-box-content d-flex">
+										<div class="col-sm-4 border-right">
+											<div class="description-block">
+												<h5 class="description-header">{{ countDevis.nbPieceN1 }}</h5>
+												<span class="description-text">{{ dd|date("Y") -1 }}</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+										<div class="col-sm-4 border-right">
+											<div class="description-block">
+												<h5 class="description-header">{{ ((countDevis.nbPieceN / countDevis.nbPieceN1) -1)|format_percent_number }}</h5>
+												<span class="description-text">DEVIS</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+										<div class="col-sm-4">
+											<div class="description-block">
+												<h5 class="description-header">{{ countDevis.nbPieceN }}</h5>
+												<span class="description-text">{{ dd|date("Y") }}</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+
+									</div>
+									<!-- /.info-box-content -->
+								</div>
+								<!-- /.info-box -->
+							</div>
+							<!-- /.col -->
+							<div class="col-12 col-sm-6 col-md-3">
+								<div class="info-box mb-3">
+									<span class="info-box-icon bg-danger elevation-1">
+										<i class="fas fa-thumbs-up"></i>
+									</span>
+
+									<div class="info-box-content d-flex">
+										<div class="col-sm-4 border-right">
+											<div class="description-block">
+												<h5 class="description-header">{{ countCommande.nbPieceN1 }}</h5>
+												<span class="description-text">{{ dd|date("Y") -1 }}</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+										<div class="col-sm-4 border-right">
+											<div class="description-block">
+												<h5 class="description-header">{{ ((countCommande.nbPieceN / countCommande.nbPieceN1) -1)|format_percent_number }}</h5>
+												<span class="description-text">COMMANDE</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+										<div class="col-sm-4">
+											<div class="description-block">
+												<h5 class="description-header">{{ countCommande.nbPieceN }}</h5>
+												<span class="description-text">{{ dd|date("Y") }}</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+
+									</div>
+									<!-- /.info-box-content -->
+								</div>
+								<!-- /.info-box -->
+							</div>
+							<!-- /.col -->
+
+							<!-- fix for small devices only -->
+							<div class="clearfix hidden-md-up"></div>
+
+							<div class="col-12 col-sm-6 col-md-3">
+								<div class="info-box mb-3">
+									<span class="info-box-icon bg-success elevation-1">
+										<i class="fas fa-fw fa-truck-loading"></i>
+									</span>
+
+									<div class="info-box-content d-flex">
+										<div class="col-sm-4 border-right">
+											<div class="description-block">
+												<h5 class="description-header">{{ countBl.nbPieceN1 }}</h5>
+												<span class="description-text">{{ dd|date("Y") -1 }}</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+										<div class="col-sm-4 border-right">
+											<div class="description-block">
+												<h5 class="description-header">{{ ((countBl.nbPieceN / countBl.nbPieceN1) -1)|format_percent_number }}</h5>
+												<span class="description-text">BL</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+										<div class="col-sm-4">
+											<div class="description-block">
+												<h5 class="description-header">{{ countBl.nbPieceN }}</h5>
+												<span class="description-text">{{ dd|date("Y") }}</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+
+									</div>
+									<!-- /.info-box-content -->
+								</div>
+								<!-- /.info-box -->
+							</div>
+							<!-- /.col -->
+							<div class="col-12 col-sm-6 col-md-3">
+								<div class="info-box mb-3">
+									<span class="info-box-icon bg-warning elevation-1">
+										<i class="fas fa-euro-sign"></i>
+									</span>
+
+									<div class="info-box-content d-flex">
+										<div class="col-sm-4 border-right">
+											<div class="description-block">
+												<h5 class="description-header">{{ countFacture.nbPieceN1 }}</h5>
+												<span class="description-text">{{ dd|date("Y") -1 }}</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+										<div class="col-sm-4 border-right">
+											<div class="description-block">
+												<h5 class="description-header">{{ ((countFacture.nbPieceN / countFacture.nbPieceN1) -1)|format_percent_number }}</h5>
+												<span class="description-text">FACTURE</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+										<div class="col-sm-4">
+											<div class="description-block">
+												<h5 class="description-header">{{ countFacture.nbPieceN }}</h5>
+												<span class="description-text">{{ dd|date("Y") }}</span>
+											</div>
+											<!-- /.description-block -->
+										</div>
+										<!-- /.col -->
+
+									</div>
+									<!-- /.info-box-content -->
+								</div>
+								<!-- /.info-box -->
+							</div>
+							<!-- /.col -->
+						</div>
+						<!-- /.row -->
+
+
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card card-dark">
+									<div class="card-header">
+										<h5 class="card-title">Comparaison par commercial par mois</h5>
+
+										<div class="card-tools">
+											<button type="button" class="btn btn-tool" data-card-widget="maximize">
+												<i class="fas fa-expand"></i>
+											</button>
+										</div>
+									</div>
+									<!-- /.card-header -->
+									<div class='card-body d-flex flex-wrap'>
+										<div
+											class="chart col-12 col-sm-12 col-md-12 col-lg-6">
+											<!-- Sales Chart Canvas -->
+											<canvas id="lineChartCommerciaux" style="min-height: 250px; height: 250px; max-height: 90%; max-width: 90%;"></canvas>
+										</div>
+										<!-- /.chart-responsive -->
+
+
+										<div class="col-12 col-sm-12 col-md-12 col-lg-6">
+											<table id="example2" class="table table-hover">
+												<thead>
+													<tr class="text-center">
+														<th>Commercial</th>
+														<th>{{ "now"|date("Y") - 5 }}</th>
+														<th>{{ "now"|date("Y") - 4 }}</th>
+														<th>{{ "now"|date("Y") - 3 }}</th>
+														<th>{{ "now"|date("Y") - 2 }}</th>
+														<th>{{ "now"|date("Y") - 1 }}</th>
+														<th>{{ "now"|date("Y")  }}</th>
+													</tr>
+												</thead>
+												<tbody>
+													{% for dataCommerciau in dataCommerciaux %}
+
+														<tr class='text-center'>
+															<td class="align-middle">
+																<a href="" class="text-center">
+																	{{ dataCommerciau.commercial}}
+																	<i class="far fa-eye ml-1"></i>
+																</a>
+															</td>
+															<td class="align-middle">{{ dataCommerciau.montantN5|format_currency('EUR', locale='fr')}}
+															</td>
+															{% if dataCommerciau.montantN4 != 0 and dataCommerciau.montantN5 != 0 %}
+																{% set deltaN4 = ((dataCommerciau.montantN4 / dataCommerciau.montantN5) - 1) %}
+																{% if deltaN4 > 0 %}
+																	{% set colorDeltaN4 = 'success' %}
+																{% elseif deltaN4 == 0  %}
+																	{% set colorDeltaN4 = 'warning' %}
+																{% elseif deltaN4 < 0  %}
+																	{% set colorDeltaN4 = 'danger' %}
+																{% endif %}
+															{% else %}
+																{% set colorDeltaN4 = 'warning' %}
+																{% set deltaN4 = 0 %}
+															{% endif %}
+															<td>
+																<div class="d-flex flex-column">
+																	<div class="p-1">{{ dataCommerciau.montantN4|format_currency('EUR', locale='fr') }}</div>
+																	<div class="badge bg-{{colorDeltaN4}}">{{deltaN4|format_percent_number}}</div>
+																</div>
+															</td>
+															{% if dataCommerciau.montantN3 != 0 and dataCommerciau.montantN4 != 0 %}
+																{% set deltaN3 = ((dataCommerciau.montantN3 / dataCommerciau.montantN4) - 1) %}
+																{% if deltaN3 > 0 %}
+																	{% set colorDeltaN3 = 'success' %}
+																{% elseif deltaN3 == 0  %}
+																	{% set colorDeltaN3 = 'warning' %}
+																{% elseif deltaN3 < 0  %}
+																	{% set colorDeltaN3 = 'danger' %}
+																{% endif %}
+															{% else %}
+																{% set colorDeltaN3 = 'warning' %}
+																{% set deltaN3 = 0 %}
+															{% endif %}
+															<td>
+																<div class="d-flex flex-column">
+																	<div class="p-1">{{ dataCommerciau.montantN3|format_currency('EUR', locale='fr')}}</div>
+																	<div class="badge bg-{{colorDeltaN3}}">{{deltaN3|format_percent_number}}</div>
+																</div>
+															</td>
+															{% if dataCommerciau.montantN2 != 0 and dataCommerciau.montantN3 != 0 %}
+																{% set deltaN2 = ((dataCommerciau.montantN2 / dataCommerciau.montantN3) - 1) %}
+																{% if deltaN2 > 0 %}
+																	{% set colorDeltaN2 = 'success' %}
+																{% elseif deltaN2 == 0  %}
+																	{% set colorDeltaN2 = 'warning' %}
+																{% elseif deltaN2 < 0  %}
+																	{% set colorDeltaN2 = 'danger' %}
+																{% endif %}
+															{% else %}
+																{% set colorDeltaN2 = 'warning' %}
+																{% set deltaN2 = 0 %}
+															{% endif %}
+															<td>
+																<div class="d-flex flex-column">
+																	<div class="p-1">{{ dataCommerciau.montantN2|format_currency('EUR', locale='fr')}}</div>
+																	<div class="badge bg-{{colorDeltaN2}}">{{deltaN2|format_percent_number}}</div>
+																</div>
+															</td>
+															{% if dataCommerciau.montantN1 != 0 and dataCommerciau.montantN2 != 0 %}
+																{% set deltaN1 = ((dataCommerciau.montantN1 / dataCommerciau.montantN2) - 1) %}
+																{% if deltaN1 > 0 %}
+																	{% set colorDeltaN1 = 'success' %}
+																{% elseif deltaN1 == 0  %}
+																	{% set colorDeltaN1 = 'warning' %}
+																{% elseif deltaN1 < 0  %}
+																	{% set colorDeltaN1 = 'danger' %}
+																{% endif %}
+															{% else %}
+																{% set colorDeltaN1 = 'warning' %}
+																{% set deltaN1 = 0 %}
+															{% endif %}
+															<td>
+																<div class="d-flex flex-column">
+																	<div class="p-1">{{ dataCommerciau.montantN1|format_currency('EUR', locale='fr')}}</div>
+																	<div class="badge bg-{{colorDeltaN1}}">{{deltaN1|format_percent_number}}</div>
+																</div>
+															</td>
+															{% if dataCommerciau.montantN != 0 and dataCommerciau.montantN1 != 0 %}
+																{% set deltaN = ((dataCommerciau.montantN / dataCommerciau.montantN1) - 1) %}
+																{% if deltaN > 0 %}
+																	{% set colorDeltaN = 'success' %}
+																{% elseif deltaN == 0  %}
+																	{% set colorDeltaN = 'warning' %}
+																{% elseif deltaN < 0  %}
+																	{% set colorDeltaN = 'danger' %}
+																{% endif %}
+															{% else %}
+																{% set colorDeltaN = 'warning' %}
+																{% set deltaN = 0 %}
+															{% endif %}
+															<td>
+																<div class="d-flex flex-column">
+																	<div class="p-1">
+																		{% if dataCommerciau.montantN %}
+																			{{ dataCommerciau.montantN|format_currency('EUR', locale='fr')}}
+																		{% else %}
+																			0 €
+																		{% endif %}
+																	</div>
+																	<div class="badge bg-{{colorDeltaN}}">{{deltaN|format_percent_number}}</div>
+																</div>
+															</td>
+														</tr>
+													{% endfor %}
+
+
+												</tbody>
+											</table>
+										</div>
+										<!-- /.col -->
+									</div>
+								</div>
+								<!-- /.card -->
+							</div>
+							<!-- /.col -->
+						</div>
+						<!-- /.row -->
+					</div>
+					<!-- /.card-body -->
+
+
+				</div>
+				<!-- /.card -->
+
+			</section>
+			<!-- /.content -->
+		</div>
+
+	{% endblock %}
+	{% block javascripts %}
+		<script>
+			$(function () {
+$("#example1").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+$("#example3").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+$('#example2').DataTable({
+"paging": true,
+"lengthChange": false,
+"searching": false,
+"ordering": false,
+"info": true,
+"autoWidth": false,
+"responsive": true
+});
+});
+		</script>
+		<script>
+			// Line Chart Commerciaux
+var names2 = {{ nomCommerciaux|raw }};
+var colors2 = {{ couleurCommercial|raw }};
+var data2 = {{ donneesCommerciaux|raw }};
+var dates2 = {{ anneeCommerciaux|raw }};
+
+new Chart('lineChartCommerciaux', {
+type: 'line',
+data: {
+labels: dates2,
+datasets: names2.map(
+(ds, i) => ({label: names2[i], data: data2[i], borderColor: colors2[i], borderWidth: 3})
+)
+},
+options: {
+scales: {
+y: {
+min: 0
+}
+}
+}
+});
+		</script>
+	{% endblock %}
