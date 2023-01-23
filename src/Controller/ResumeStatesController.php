@@ -126,7 +126,7 @@ class ResumeStatesController extends AbstractController
                 $dataCommerciaux[$i]['montantN3'],
                 $dataCommerciaux[$i]['montantN2'],
                 $dataCommerciaux[$i]['montantN1'],
-                $dataCommerciaux[$i]['montantN'],
+                //$dataCommerciaux[$i]['montantN'],
             ]; //[[], [], []];
             $anneeCommerciaux = [
                 $startyear - 5,
@@ -134,7 +134,7 @@ class ResumeStatesController extends AbstractController
                 $startyear - 3,
                 $startyear - 2,
                 $startyear - 1,
-                $startyear,
+                //$startyear,
             ];
             $couleurCommercial[] = 'rgb(' . $color[$i] . ')';
         }

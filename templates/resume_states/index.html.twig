@@ -148,9 +148,9 @@
 						<div class="card card-info">
 							<div class="card-header">
 								<h3 class="card-title">Evolution du chiffre d'affaire
-									{{ "now"|date("Y") - 6 }}
+									{{ "now"|date("Y") - 5 }}
 									et
-									{{ "now"|date("Y") }}</h3>
+									{{ "now"|date("Y") - 1 }}</h3>
 
 								<div class="card-tools">
 									<button type="button" class="btn btn-tool" data-card-widget="maximize">
@@ -160,7 +160,7 @@
 							</div>
 							<div class="card-body">
 								<div class="chart">
-									<canvas id="lineChart7years" style="min-height: 250px; height: 250px; max-height: 93%; max-width: 93%;"></canvas>
+									<canvas id="lineChart7years" style="min-height: 250px; height: 250px; max-height: 90%; max-width: 90%;"></canvas>
 								</div>
 							</div>
 							<!-- /.card-body -->
@@ -184,7 +184,7 @@
 							</div>
 							<div class="card-body">
 								<div class="chart">
-									<canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 93%; max-width: 93%;"></canvas>
+									<canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 90%; max-width: 90%;"></canvas>
 								</div>
 							</div>
 							<!-- /.card-body -->
@@ -208,7 +208,7 @@
 								</div>
 							</div>
 							<div class="card-body">
-								<canvas id="donutChart" style="min-height: 250px; height: 300px; max-height: 93%; max-width: 93%;"></canvas>
+								<canvas id="donutChart" style="min-height: 250px; height: 300px; max-height: 90%; max-width: 90%;"></canvas>
 							</div>
 							<!-- /.card-body -->
 						</div>
@@ -224,9 +224,9 @@
 						<div class="card card-primary">
 							<div class="card-header">
 								<h3 class="card-title">Chiffre d'affaire par commercial
-									{{ "now"|date("Y") - 6 }}
+									{{ "now"|date("Y") - 5 }}
 									et
-									{{ "now"|date("Y") }}</h3>
+									{{ "now"|date("Y") - 1 }}</h3>
 
 								<div class="card-tools">
 									<a class="btn btn-dark text-white" href="{{path(commerciaux, {'dos' : app.request.attributes.get('dos'), 'dd' : dd, 'df' : df})}}">Détails</a>
@@ -237,7 +237,7 @@
 							</div>
 							<div class="card-body">
 								<div class="chart">
-									<canvas id="lineChartCommerciaux" style="min-height: 250px; height: 250px; max-height: 93%; max-width: 93%;"></canvas>
+									<canvas id="lineChartCommerciaux" style="min-height: 250px; height: 250px; max-height: 90%; max-width: 90%;"></canvas>
 								</div>
 							</div>
 							<!-- /.card-body -->
@@ -259,7 +259,7 @@
 							</div>
 							<div class="card-body">
 								<div class="chart">
-									<canvas id="lineChart" style="min-height: 250px; height: 250px; max-height: 93%; max-width: 93%;"></canvas>
+									<canvas id="lineChart" style="min-height: 250px; height: 250px; max-height: 90%; max-width: 90%;"></canvas>
 								</div>
 							</div>
 							<!-- /.card-body -->
@@ -283,7 +283,7 @@
 								</div>
 							</div>
 							<div class="card-body">
-								<canvas id="pieChart" style="min-height: 250px; height: 300px; max-height: 93%; max-width: 93%;"></canvas>
+								<canvas id="pieChart" style="min-height: 250px; height: 300px; max-height: 90%; max-width: 90%;"></canvas>
 							</div>
 							<!-- /.card-body -->
 						</div>

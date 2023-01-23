@@ -175,16 +175,177 @@ class StatesParFamilleController extends AbstractController
     }
 
     /**
-     * @Route("/Roby/states/commerciaux/produits/{dos}", name="app_states_commerciaux")
-     * @Route("/Roby/states/commerciaux/produits/{dos}/{dd}/{df}", name="app_states_commerciaux_dd_df")
-     *  @Route("/Roby/states/commerciaux/clients/{dos}", name="app_states_commerciaux_clients")
-     * @Route("/Roby/states/commerciaux/clients/{dos}/{dd}/{df}", name="app_states_commerciaux_clients_dd_df")
-     * @Route("/Lhermitte/states/commerciaux/produits/{dos}", name="app_states_commerciauxLh")
-     * @Route("/Lhermitte/states/commerciaux/produits/{dos}/{dd}/{df}", name="app_states_commerciaux_dd_dfLh")
-     *  @Route("/Lhermitte/states/commerciaux/clients/{dos}", name="app_states_commerciaux_clientsLh")
-     * @Route("/Lhermitte/states/commerciaux/clients/{dos}/{dd}/{df}", name="app_states_commerciaux_clients_dd_dfLh")
+     * @Route("/Roby/states/commerciaux/{dos}/{dd}/{df}", name="app_states_commerciaux_dd_df")
+     * @Route("/Lhermitte/states/commerciaux/{dos}/{dd}/{df}", name="app_states_commerciaux_dd_dfLh")
      */
     public function commerciaux($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume): Response
+    {
+        // tracking user page for stats
+        $tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);
+
+        $start = "";
+        $end = "";
+        $startN1 = "";
+        $endN1 = "";
+        $totaux = "";
+
+        $form = $this->createForm(StatesDateFilterType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $start = $form->getData()["startDate"];
+            $end = $form->getData()["endDate"];
+
+            $d = new DateTime($start->format('Y-m-d'));
+            $startN = $this->getYmd($d);
+            $startN1 = $this->getDateDiff($d, $start, $end);
+
+            $d = new DateTime($end->format('Y-m-d'));
+            $endN = $this->getYmd($d);
+            $endN1 = $this->getDateDiff($d, $start, $end);
+
+        } else {
+            $d = new DateTime($dd);
+            $startN = $this->getYmd($d);
+            $startN1 = $this->getDateDiff($d, new DateTime($dd), new DateTime($df));
+            $d = new DateTime($df);
+            $endN = $this->getYmd($d);
+            $endN1 = $this->getDateDiff($d, new DateTime($dd), new DateTime($df));
+        }
+        $trancheD = "du " . $startN . " au " . $endN;
+        $trancheF = "du " . $startN1 . " au " . $endN1;
+
+        $dd = $startN;
+        $df = $endN;
+
+        // données line par commerciaux sur 6 ans
+        $nomCommerciaux = [];
+        $donneesCommerciaux = [];
+        $anneeCommerciaux = [];
+        $startCommerciaux = new DateTime('now');
+        $startyear = $startCommerciaux->format('Y');
+        $dataCommerciaux = $repo->getStatesSixYearsAgoCommerciaux($dos);
+        $color = [$resume->listeCouleur(0), $resume->listeCouleur(4), $resume->listeCouleur(10), $resume->listeCouleur(6), $resume->listeCouleur(9), $resume->listeCouleur(2)];
+        for ($i = 0; $i < count($dataCommerciaux); $i++) {
+
+            $nomCommerciaux[] = $dataCommerciaux[$i]['commercial'];
+            $donneesCommerciaux[] = [
+                $dataCommerciaux[$i]['montantN5'],
+                $dataCommerciaux[$i]['montantN4'],
+                $dataCommerciaux[$i]['montantN3'],
+                $dataCommerciaux[$i]['montantN2'],
+                $dataCommerciaux[$i]['montantN1'],
+                //$dataCommerciaux[$i]['montantN'],
+            ]; //[[], [], []];
+            $anneeCommerciaux = [
+                $startyear - 5,
+                $startyear - 4,
+                $startyear - 3,
+                $startyear - 2,
+                $startyear - 1,
+                //$startyear,
+            ];
+            $couleurCommercial[] = 'rgb(' . $color[$i] . ')';
+        }
+
+        // Données Produits
+        $topProduit = $repo->StatesCommercial($dos, null, 'topProduitResume');
+        $topFamilleProduit = $repo->StatesCommercial($dos, null, 'topFamilleProduit');
+
+        // données line par commercial sur 5 ans
+        $nomCommercialFamilleProduit = [];
+        $donneesCommercialFamilleProduit = [];
+        $anneeCommercialFamilleProduit = [];
+        $startCommercialFamilleProduit = new DateTime('now');
+        $startyear = $startCommercialFamilleProduit->format('Y');
+        $dataCommercialFamilleProduit = $repo->StatesCommercial($dos, null, 'topFamilleProduit');
+
+        for ($i = 0; $i < count($dataCommercialFamilleProduit); $i++) {
+
+            $nomCommercialFamilleProduit[] = $dataCommercialFamilleProduit[$i]['familleProduit'];
+            $donneesCommercialFamilleProduit[] = [
+                $dataCommercialFamilleProduit[$i]['montantN4'],
+                $dataCommercialFamilleProduit[$i]['montantN3'],
+                $dataCommercialFamilleProduit[$i]['montantN2'],
+                $dataCommercialFamilleProduit[$i]['montantN1'],
+                //$dataCommercialFamilleProduit[$i]['montantN'],
+            ]; //[[], [], []];
+            $anneeCommercialFamilleProduit = [
+                $startyear - 4,
+                $startyear - 3,
+                $startyear - 2,
+                $startyear - 1,
+                //$startyear,
+            ];
+            $couleurCommercialFamilleProduit[] = 'rgb(' . $resume->listeCouleur($i) . ')';
+        }
+
+        // Données Clients
+        $topClient = $repo->StatesCommercial($dos, null, 'topClient');
+        $topFamilleClient = $repo->StatesCommercial($dos, null, 'topFamilleClient');
+
+        // données line par commercial sur 5 ans
+        $nomCommercialFamilleClient = [];
+        $donneesCommercialFamilleClient = [];
+        $anneeCommercialFamilleClient = [];
+        $startCommercialFamilleClient = new DateTime('now');
+        $startyear = $startCommercialFamilleClient->format('Y');
+        $dataCommercialFamilleClient = $repo->StatesCommercial($dos, null, 'topFamilleClient');
+
+        for ($i = 0; $i < count($dataCommercialFamilleClient); $i++) {
+
+            $nomCommercialFamilleClient[] = $dataCommercialFamilleClient[$i]['familleClient'];
+            $donneesCommercialFamilleClient[] = [
+                $dataCommercialFamilleClient[$i]['montantN4'],
+                $dataCommercialFamilleClient[$i]['montantN3'],
+                $dataCommercialFamilleClient[$i]['montantN2'],
+                $dataCommercialFamilleClient[$i]['montantN1'],
+                //$dataCommercialFamilleClient[$i]['montantN'],
+            ]; //[[], [], []];
+            $anneeCommercialFamilleClient = [
+                $startyear - 4,
+                $startyear - 3,
+                $startyear - 2,
+                $startyear - 1,
+                //$startyear,
+            ];
+            $couleurCommercialFamilleClient[] = 'rgb(' . $resume->listeCouleur($i) . ')';
+        }
+        $totaux = $repo->totauxStatesCommerciaux($dos, null);
+        //dd($totaux);
+        return $this->render('states_par_famille/commerciaux.html.twig', [
+            'title' => 'States par commerciaux',
+            'form' => $form->createView(),
+            'dd' => $dd,
+            'df' => $df,
+            'trancheD' => $trancheD,
+            'trancheF' => $trancheF,
+            'nomCommerciaux' => json_encode($nomCommerciaux),
+            'anneeCommerciaux' => json_encode($anneeCommerciaux),
+            'donneesCommerciaux' => json_encode($donneesCommerciaux),
+            'couleurCommercial' => json_encode($couleurCommercial),
+            "dataCommerciaux" => $dataCommerciaux,
+            'topProduits' => $topProduit,
+            'topFamilleProduits' => $topFamilleProduit,
+            'nomCommercialFamilleProduit' => json_encode($nomCommercialFamilleProduit),
+            'anneeCommercialFamilleProduit' => json_encode($anneeCommercialFamilleProduit),
+            'donneesCommercialFamilleProduit' => json_encode($donneesCommercialFamilleProduit),
+            'couleurCommercialFamilleProduit' => json_encode($couleurCommercialFamilleProduit),
+            'topClients' => $topClient,
+            'topFamilleClients' => $topFamilleClient,
+            'nomCommercialFamilleClient' => json_encode($nomCommercialFamilleClient),
+            'anneeCommercialFamilleClient' => json_encode($anneeCommercialFamilleClient),
+            'donneesCommercialFamilleClient' => json_encode($donneesCommercialFamilleClient),
+            'couleurCommercialFamilleClient' => json_encode($couleurCommercialFamilleClient),
+            'totaux' => $totaux,
+        ]);
+    }
+
+    /**
+     * @Route("/Roby/states/commercial/{dos}/{commercial}/{dd}/{df}", name="app_states_commercial_dd_df")
+     * @Route("/Lhermitte/states/commercial/{dos}/{commercial}/{dd}/{df}", name="app_states_commercial_dd_dfLh")
+     */
+    public function commercial($dos, $commercial = null, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume): Response
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
@@ -217,63 +378,98 @@ class StatesParFamilleController extends AbstractController
             $endN = $this->getYmd($d);
             $endN1 = $this->getDateDiff($d, new DateTime($dd), new DateTime($df));
         }
+
+        // Données Clients
+        $topClient = $repo->StatesCommercial($dos, $commercial, 'topClient');
+        $topFamilleClient = $repo->StatesCommercial($dos, $commercial, 'topFamilleClient');
+
+        // données line par commercial sur 5 ans
+        $nomCommercialFamilleClient = [];
+        $donneesCommercialFamilleClient = [];
+        $anneeCommercialFamilleClient = [];
+        $startCommercialFamilleClient = new DateTime('now');
+        $startyear = $startCommercialFamilleClient->format('Y');
+        $dataCommercialFamilleClient = $repo->StatesCommercial($dos, $commercial, 'topFamilleClient');
+
+        for ($i = 0; $i < count($dataCommercialFamilleClient); $i++) {
+
+            $nomCommercialFamilleClient[] = $dataCommercialFamilleClient[$i]['familleClient'];
+            $donneesCommercialFamilleClient[] = [
+                $dataCommercialFamilleClient[$i]['montantN4'],
+                $dataCommercialFamilleClient[$i]['montantN3'],
+                $dataCommercialFamilleClient[$i]['montantN2'],
+                $dataCommercialFamilleClient[$i]['montantN1'],
+                //$dataCommercialFamilleClient[$i]['montantN'],
+            ]; //[[], [], []];
+            $anneeCommercialFamilleClient = [
+                $startyear - 4,
+                $startyear - 3,
+                $startyear - 2,
+                $startyear - 1,
+                //$startyear,
+            ];
+            $couleurCommercialFamilleClient[] = 'rgb(' . $resume->listeCouleur($i) . ')';
+        }
+
+        // Données Produits
+        $topProduit = $repo->StatesCommercial($dos, $commercial, 'topProduit');
+        $topFamilleProduit = $repo->StatesCommercial($dos, $commercial, 'topFamilleProduit');
+
+        // données line par commercial sur 5 ans
+        $nomCommercialFamilleProduit = [];
+        $donneesCommercialFamilleProduit = [];
+        $anneeCommercialFamilleProduit = [];
+        $startCommercialFamilleProduit = new DateTime('now');
+        $startyear = $startCommercialFamilleProduit->format('Y');
+        $dataCommercialFamilleProduit = $repo->StatesCommercial($dos, $commercial, 'topFamilleProduit');
+
+        for ($i = 0; $i < count($dataCommercialFamilleProduit); $i++) {
+
+            $nomCommercialFamilleProduit[] = $dataCommercialFamilleProduit[$i]['familleProduit'];
+            $donneesCommercialFamilleProduit[] = [
+                $dataCommercialFamilleProduit[$i]['montantN4'],
+                $dataCommercialFamilleProduit[$i]['montantN3'],
+                $dataCommercialFamilleProduit[$i]['montantN2'],
+                $dataCommercialFamilleProduit[$i]['montantN1'],
+                //$dataCommercialFamilleProduit[$i]['montantN'],
+            ]; //[[], [], []];
+            $anneeCommercialFamilleProduit = [
+                $startyear - 4,
+                $startyear - 3,
+                $startyear - 2,
+                $startyear - 1,
+                //$startyear,
+            ];
+            $couleurCommercialFamilleProduit[] = 'rgb(' . $resume->listeCouleur($i) . ')';
+        }
+
         $trancheD = "du " . $startN . " au " . $endN;
         $trancheF = "du " . $startN1 . " au " . $endN1;
 
         $dd = $startN;
         $df = $endN;
 
-        $countDevis = $repo->countPieceCommerciaux($dos, $startN, $endN, $startN1, $endN1, 'DV');
-        $countCommande = $repo->countPieceCommerciaux($dos, $startN, $endN, $startN1, $endN1, 'CD');
-        $countBl = $repo->countPieceCommerciaux($dos, $startN, $endN, $startN1, $endN1, 'BL');
-        $countFacture = $repo->countPieceCommerciaux($dos, $startN, $endN, $startN1, $endN1, 'FA');
-
-        // données line par commerciaux sur 6 ans
-        $nomCommerciaux = [];
-        $donneesCommerciaux = [];
-        $anneeCommerciaux = [];
-        $startCommerciaux = new DateTime('now');
-        $startyear = $startCommerciaux->format('Y');
-        $dataCommerciaux = $repo->getStatesSixYearsAgoCommerciaux($dos);
-        $color = [$resume->listeCouleur(0), $resume->listeCouleur(4), $resume->listeCouleur(10), $resume->listeCouleur(6), $resume->listeCouleur(9), $resume->listeCouleur(2)];
-        for ($i = 0; $i < count($dataCommerciaux); $i++) {
-
-            $nomCommerciaux[] = $dataCommerciaux[$i]['commercial'];
-            $donneesCommerciaux[] = [
-                $dataCommerciaux[$i]['montantN5'],
-                $dataCommerciaux[$i]['montantN4'],
-                $dataCommerciaux[$i]['montantN3'],
-                $dataCommerciaux[$i]['montantN2'],
-                $dataCommerciaux[$i]['montantN1'],
-                $dataCommerciaux[$i]['montantN'],
-            ]; //[[], [], []];
-            $anneeCommerciaux = [
-                $startyear - 5,
-                $startyear - 4,
-                $startyear - 3,
-                $startyear - 2,
-                $startyear - 1,
-                $startyear,
-            ];
-            $couleurCommercial[] = 'rgb(' . $color[$i] . ')';
-        }
-
-        return $this->render('states_par_famille/commerciaux.html.twig', [
-            'title' => 'States par commerciaux',
+        $totaux = $repo->totauxStatesCommerciaux($dos, $commercial);
+        return $this->render('states_par_famille/commercial.html.twig', [
+            'title' => 'States ' . $commercial,
             'form' => $form->createView(),
             'dd' => $dd,
             'df' => $df,
             'trancheD' => $trancheD,
             'trancheF' => $trancheF,
-            'countDevis' => $countDevis,
-            'countCommande' => $countCommande,
-            'countBl' => $countBl,
-            'countFacture' => $countFacture,
-            'nomCommerciaux' => json_encode($nomCommerciaux),
-            'anneeCommerciaux' => json_encode($anneeCommerciaux),
-            'donneesCommerciaux' => json_encode($donneesCommerciaux),
-            'couleurCommercial' => json_encode($couleurCommercial),
-            "dataCommerciaux" => $dataCommerciaux,
+            'topClients' => $topClient,
+            'topFamilleClients' => $topFamilleClient,
+            'nomCommercialFamilleClient' => json_encode($nomCommercialFamilleClient),
+            'anneeCommercialFamilleClient' => json_encode($anneeCommercialFamilleClient),
+            'donneesCommercialFamilleClient' => json_encode($donneesCommercialFamilleClient),
+            'couleurCommercialFamilleClient' => json_encode($couleurCommercialFamilleClient),
+            'topProduits' => $topProduit,
+            'topFamilleProduits' => $topFamilleProduit,
+            'nomCommercialFamilleProduit' => json_encode($nomCommercialFamilleProduit),
+            'anneeCommercialFamilleProduit' => json_encode($anneeCommercialFamilleProduit),
+            'donneesCommercialFamilleProduit' => json_encode($donneesCommercialFamilleProduit),
+            'couleurCommercialFamilleProduit' => json_encode($couleurCommercialFamilleProduit),
+            'totaux' => $totaux,
         ]);
     }
 

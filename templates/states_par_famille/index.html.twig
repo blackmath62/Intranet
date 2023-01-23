@@ -141,19 +141,26 @@
 												<thead>
 													<tr class='text-center'>
 														<th>Famille</th>
-														<th>{{ trancheF }}</th>
+														<th class='table-info'>{{ trancheF }}</th>
+														<th class='table-info'>% CA</th>
 														<th>Delta %</th>
 														<th>Delta €</th>
-														<th>{{ trancheD }}</th>
+														<th class='table-success'>{{ trancheD }}</th>
+														<th class='table-success'>% CA</th>
 													</tr>
 												</thead>
 												<tbody>
 													{% for famille in familles %}
 														<tr class='text-center'>
 															<td>{{famille.famille}}</td>
-															<td>
+															<td class='table-info'>
 																{% if famille.montantN1 < 0 or famille.montantN1 > 0 %}
 																	{{famille.montantN1}}
+																{% endif %}
+															</td>
+															<td class='table-info'>
+																{% if famille.montantN1 > 0 %}
+																	{{ (( famille.montantN1 * 100 ) / totaux[0].montantN1 )|number_format(2, '.', ' ') }}
 																{% endif %}
 															</td>
 															{% set color = "text-dark" %}
@@ -193,9 +200,14 @@
 															<td class="{{ couleur }}">
 																<b>{{(famille.montantN - famille.montantN1)}}</b>
 															</td>
-															<td>
+															<td class='table-success'>
 																{% if famille.montantN < 0 or famille.montantN > 0 %}
 																	{{famille.montantN}}
+																{% endif %}
+															</td>
+															<td class='table-success'>
+																{% if famille.montantN > 0 %}
+																	{{ (( famille.montantN * 100 ) / totaux[0].montantN )|number_format(2, '.', ' ') }}
 																{% endif %}
 															</td>
 														</tr>
@@ -312,7 +324,7 @@ $("#example1").DataTable({
 "lengthChange": false,
 "autoWidth": false,
 "order": [
-[0, "desc"]
+[6, "desc"]
 ],
 "buttons": [
 "copy",
