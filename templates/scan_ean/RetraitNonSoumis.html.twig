@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block body %}
+	<a href="{{ path('app_scan_ean') }}" class="text-white btn btn-success col-12">Commencer une nouvelle saisie</a>
+	{% if ns %}
+		<div class="card-body">
+			{% for n in ns %}
+				<div class="callout callout-warning">
+					<div class="d-flex justify-content-between">
+						<h5>{{ n.chantier }}</h5>
+						<a href="{{path('app_scan_ean', {'chantier' : n.chantier })}}" class="text-white btn btn-info">Voir</a>
+					</div>
+					<i>
+						<p>Saisie par
+							{{ n.user }}</p>
+					</i>
+					<p class="text-right">
+						<i>
+							<small>le
+								{{ n.dateCreation }}</small>
+						</i>
+					</p>
+				</div>
+			{% endfor %}
+		</div>
+	{% else %}
+		<div class="card-body">
+			<div class="callout callout-success">
+				<div class="d-flex justify-content-between">
+					<h5>Tous les retraits de marchandises ont été soumis</h5>
+				</div>
+				<i>
+					<p>il n'y a rien à voir..</p>
+				</i>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
+{% block javascripts %}{% endblock %}

@@ -3,20 +3,20 @@
 namespace App\Entity\Main;
 
 use App\Entity\Main\FAQ;
-use App\Entity\Main\Trackings;
 use App\Entity\Main\FinDeJournee;
-use Doctrine\ORM\Mapping as ORM;
-
+use App\Entity\Main\RetraitMarchandisesEan;
+use App\Entity\Main\Trackings;
 use App\Repository\Main\UsersRepository;
-use Doctrine\Common\Collections\Collection;
-use Proxies\__CG__\App\Entity\Main\IdeaBox;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Proxies\__CG__\App\Entity\Main\IdeaBox;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UsersRepository::class)
- * 
+ *
  */
 class Users implements UserInterface
 {
@@ -213,7 +213,12 @@ class Users implements UserInterface
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $me;
-   
+
+    /**
+     * @ORM\OneToMany(targetEntity=RetraitMarchandisesEan::class, mappedBy="createdBy")
+     */
+    private $retraitMarchandisesEans;
+
     public function __construct()
     {
         $this->documents = new ArrayCollection();
@@ -239,6 +244,7 @@ class Users implements UserInterface
         $this->conduiteDeTravauxMes = new ArrayCollection();
         $this->othersDocuments = new ArrayCollection();
         $this->conduiteTravauxAddPieces = new ArrayCollection();
+        $this->retraitMarchandisesEans = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -348,7 +354,6 @@ class Users implements UserInterface
         return $this;
     }
 
-    
     /**
      * @return Collection|IdeaBox[]
      */
@@ -363,7 +368,7 @@ class Users implements UserInterface
     {
         return $this->trackings;
     }
-     
+
     /**
      * @return Collection|Documents[]
      */
@@ -548,24 +553,25 @@ class Users implements UserInterface
 
         return $this;
     }
-     /**
+    /**
      * Returns the roles granted to the user.
      *
      * *@see UserInterface
      */
-        public function getRoles():array
-         {
-            $roles = $this->roles; 
-            return array_unique($roles);
-           
-         }
-   
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        return array_unique($roles);
+
+    }
+
     /**
      * Returns the salt that was originally used to encode the password.
-     * 
+     *
      * @see UserInterface
      */
-    public function getSalt(){
+    public function getSalt()
+    {
         // pour le hashage des mdp géré automatiquement par symfony
     }
 
@@ -574,7 +580,8 @@ class Users implements UserInterface
      *
      * @see UserInterface
      */
-    public function getUsername(){
+    public function getUsername()
+    {
         return $this->email;
     }
 
@@ -584,7 +591,8 @@ class Users implements UserInterface
      * This is important if, at any given point, sensitive information like
      * the plain-text password is stored on this object.
      */
-    public function eraseCredentials(){
+    public function eraseCredentials()
+    {
         //
     }
 
@@ -1046,6 +1054,36 @@ class Users implements UserInterface
     public function setMe(?bool $me): self
     {
         $this->me = $me;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|RetraitMarchandisesEan[]
+     */
+    public function getRetraitMarchandisesEans(): Collection
+    {
+        return $this->retraitMarchandisesEans;
+    }
+
+    public function addRetraitMarchandisesEan(RetraitMarchandisesEan $retraitMarchandisesEan): self
+    {
+        if (!$this->retraitMarchandisesEans->contains($retraitMarchandisesEan)) {
+            $this->retraitMarchandisesEans[] = $retraitMarchandisesEan;
+            $retraitMarchandisesEan->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRetraitMarchandisesEan(RetraitMarchandisesEan $retraitMarchandisesEan): self
+    {
+        if ($this->retraitMarchandisesEans->removeElement($retraitMarchandisesEan)) {
+            // set the owning side to null (unless already changed)
+            if ($retraitMarchandisesEan->getCreatedBy() === $this) {
+                $retraitMarchandisesEan->setCreatedBy(null);
+            }
+        }
 
         return $this;
     }

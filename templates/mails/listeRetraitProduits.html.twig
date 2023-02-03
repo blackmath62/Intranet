@@ -1,0 +1,49 @@
+<p>Bonjour,</p>
+
+<p>De la marchandise a été retiré pour le Chantier
+	<strong>{{ chantier }}</strong>
+</p>
+
+{% if historiques %}
+	<p>
+		<u>
+			<strong>Veuillez trouver ci dessous la liste des produits:
+			</strong>
+		</u>
+	</p>
+	<table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+		<thead>
+			<tr class="text-center">
+				<th>Référence</th>
+				<th>Sref1</th>
+				<th>Sref2</th>
+				<th>Désignation</th>
+				<th>U.V</th>
+				<th>Quantité</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for historique in historiques %}
+				<tr>
+					<td>{{ historique.ref }}</td>
+					<td>{{ historique.sref1 }}</td>
+					<td>{{ historique.sref2 }}</td>
+					<td>{{ historique.designation }}</td>
+					<td>{{ historique.uv }}</td>
+					<td>{{ historique.qte }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endif %}
+
+{% if commentaire %}
+
+	<p>Un commentaire a été ajouté a ce retrait de marchandise :</p>
+
+	<p>{{ commentaire|raw }}</p>
+
+{% endif %}
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

@@ -20,7 +20,7 @@ class ArtRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Art::class);
     }
-    public function getControleArt():array
+    public function getControleArt(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Identification, Ref, Designation, REFUM, ACHUN, VENUN, STUN, FAM_0001, FAM_0002, FAM_0003,Utilisateur, MUSER.EMAIL AS Email
@@ -33,9 +33,9 @@ class ArtRepository extends ServiceEntityRepository
                     ELSE USERCR
                     END AS Utilisateur
                     FROM ART
-                    WHERE ART.HSDT IS NULL AND 
+                    WHERE ART.HSDT IS NULL AND
                     (
-                    ART.REFUN <> ART.ACHUN 
+                    ART.REFUN <> ART.ACHUN
                     OR ART.REFUN <> ART.VENUN
                     OR ART.REFUN <> ART.STUN
                     OR ART.FAM_0001 IS NULL
@@ -52,7 +52,7 @@ class ArtRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    public function getControleStockDirect():array
+    public function getControleStockDirect(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT RTRIM(LTRIM(ART.FAM_0002)) AS Metier, RTRIM(LTRIM(MVTL_STOCK_V.REFERENCE)) AS Ref,RTRIM(LTRIM(MVTL_STOCK_V.DOSSIER)) AS Dos, RTRIM(LTRIM(MVTL_STOCK_V.SREFERENCE1))  AS Sref1
@@ -81,7 +81,7 @@ class ArtRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    public function getControleStockDirectFiltre($metier, $dos):array
+    public function getControleStockDirectFiltre($metier, $dos): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM(SELECT RTRIM(LTRIM(ART.FAM_0002)) AS Metier, RTRIM(LTRIM(MVTL_STOCK_V.REFERENCE)) AS Ref,RTRIM(LTRIM(MVTL_STOCK_V.DOSSIER)) AS Dos, RTRIM(LTRIM(MVTL_STOCK_V.SREFERENCE1))  AS Sref1
@@ -111,13 +111,13 @@ class ArtRepository extends ServiceEntityRepository
     }
 
     // Controle des articles à fermés tenant compte des réappro
-    public function getControleArticleAFermer():array
+    public function getControleArticleAFermer(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Dos,Metier, Ref, Sref1, Sref2, Designation,  SUM(Stock) AS Stock, SUM(Alerte) AS Alerte, SUM(Cmd) AS Cmd, SUM(Bl) AS Bl, Op, Hsdt, Blob, Identification, Utilisateur, Email
         FROM(
-        SELECT LTRIM(RTRIM(LART.DOS)) AS Dos, LTRIM(RTRIM(LART.REF)) AS Ref, LTRIM(RTRIM(LART.SREF1)) AS Sref1, LTRIM(RTRIM(LART.SREF2)) AS Sref2, 
-        LTRIM(RTRIM(ART.DES)) AS Designation, MVTL_STOCK_V.QTETJSENSTOCK AS Stock, RSO.STALERTQTE AS Alerte, 
+        SELECT LTRIM(RTRIM(LART.DOS)) AS Dos, LTRIM(RTRIM(LART.REF)) AS Ref, LTRIM(RTRIM(LART.SREF1)) AS Sref1, LTRIM(RTRIM(LART.SREF2)) AS Sref2,
+        LTRIM(RTRIM(ART.DES)) AS Designation, MVTL_STOCK_V.QTETJSENSTOCK AS Stock, RSO.STALERTQTE AS Alerte,
         MOUV.CDQTE AS Cmd, MOUV.BLQTE AS Bl, LTRIM(RTRIM(MVTL.OP)) AS Op, LTRIM(RTRIM(ART.HSDT)) AS Hsdt,MAX(convert(varchar(max),MNOTE.NOTEBLOB)) AS Blob, LTRIM(RTRIM(ART.FAM_0002)) AS Metier,
         CASE
         WHEN LART.DOS <> '' THEN '999999999997'
@@ -139,9 +139,9 @@ class ArtRepository extends ServiceEntityRepository
         GROUP BY LART.DOS,ART.FAM_0002, LART.REF, LART.SREF1, LART.SREF2,ART.DES ,MVTL_STOCK_V.QTETJSENSTOCK, RSO.STALERTQTE,MOUV.CDQTE, MOUV.BLQTE,MVTL.OP, ART.HSDT)reponse
         WHERE (Stock IN (0) OR Stock IS NULL)
         AND Blob LIKE '%FERMETU%'
-        AND (Cmd = 0 OR Cmd IS NULL) 
-        AND (Bl = 0 OR Bl IS NULL) 
-        AND Op IS NULL 
+        AND (Cmd = 0 OR Cmd IS NULL)
+        AND (Bl = 0 OR Bl IS NULL)
+        AND Op IS NULL
         GROUP BY Dos, Metier, Ref, Sref1, Sref2, Designation, Op, Hsdt, Blob, Identification, Utilisateur, Email
         ORDER BY Ref
         ";
@@ -151,14 +151,14 @@ class ArtRepository extends ServiceEntityRepository
     }
 
     // Controle des Sous références articles à fermées tenant compte des réappro
-    public function getControleSousRefArticleAFermer():array
+    public function getControleSousRefArticleAFermer(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Dos,Metier, Ref, Sref1, Sref2, Designation, SUM(Stock) AS Stock, SUM(Alerte) AS Alerte, SUM(Cmd) AS Cmd, SUM(Bl) AS Bl, Op, Conf, Hsdt, Blob, Identification, Utilisateur, Email
         FROM(
-        SELECT LTRIM(RTRIM(LART.DOS)) AS Dos, LTRIM(RTRIM(LART.REF)) AS Ref, LTRIM(RTRIM(LART.SREF1)) AS Sref1, LTRIM(RTRIM(LART.SREF2)) AS Sref2, 
-		LTRIM(RTRIM(ART.DES)) AS Designation, MVTL_STOCK_V.QTETJSENSTOCK AS Stock, RSO.STALERTQTE AS Alerte, 
-		MOUV.CDQTE AS Cmd, MOUV.BLQTE AS Bl, LTRIM(RTRIM(MVTL.OP)) AS Op, LTRIM(RTRIM(SART.CONF)) AS Conf , 
+        SELECT LTRIM(RTRIM(LART.DOS)) AS Dos, LTRIM(RTRIM(LART.REF)) AS Ref, LTRIM(RTRIM(LART.SREF1)) AS Sref1, LTRIM(RTRIM(LART.SREF2)) AS Sref2,
+		LTRIM(RTRIM(ART.DES)) AS Designation, MVTL_STOCK_V.QTETJSENSTOCK AS Stock, RSO.STALERTQTE AS Alerte,
+		MOUV.CDQTE AS Cmd, MOUV.BLQTE AS Bl, LTRIM(RTRIM(MVTL.OP)) AS Op, LTRIM(RTRIM(SART.CONF)) AS Conf ,
 		LTRIM(RTRIM(ART.HSDT)) AS Hsdt,MAX(convert(varchar(max),MNOTE.NOTEBLOB)) AS Blob, LTRIM(RTRIM(ART.FAM_0002)) AS Metier,
         CASE
         WHEN LART.DOS <> '' THEN '999999999996'
@@ -170,7 +170,7 @@ class ArtRepository extends ServiceEntityRepository
         WHEN LART.DOS <> '' THEN 'jpochet@lhermitte.fr'
         END AS Email
         FROM LART
-        LEFT JOIN ART ON LART.DOS = ART.DOS AND ART.REF = LART.REF -- Ramener les dates de fermetures 
+        LEFT JOIN ART ON LART.DOS = ART.DOS AND ART.REF = LART.REF -- Ramener les dates de fermetures
         LEFT JOIN MNOTE ON MNOTE.NOTE = LART.NOTE_0010 -- Ramener les textes
         LEFT JOIN RSO ON RSO.DOS = LART.DOS AND RSO.REF = LART.REF AND RSO.SREF1 = LART.SREF1 AND RSO.SREF2 = LART.SREF2 -- Ramener les réappros produits
         LEFT JOIN SART ON SART.REF = LART.REF AND SART.DOS = LART.DOS AND SART.SREF1 = LART.SREF1 AND SART.SREF2 = LART.SREF2 -- Ramener les Conf
@@ -181,9 +181,9 @@ class ArtRepository extends ServiceEntityRepository
         GROUP BY LART.DOS, LART.REF, LART.SREF1, LART.SREF2, ART.DES, MVTL_STOCK_V.QTETJSENSTOCK, RSO.STALERTQTE,MOUV.CDQTE, MOUV.BLQTE,MVTL.OP, SART.CONF, ART.HSDT, ART.FAM_0002)reponse
         WHERE (Stock IN (0) OR Stock IS NULL)
         AND Blob LIKE '%FERMETU%'
-        AND (Cmd = 0 OR Cmd IS NULL) 
-        AND (Bl = 0 OR Bl IS NULL) 
-        AND Op IS NULL 
+        AND (Cmd = 0 OR Cmd IS NULL)
+        AND (Bl = 0 OR Bl IS NULL)
+        AND Op IS NULL
         AND Conf NOT IN ('Usrd')
         GROUP BY Dos, Metier,Ref, Sref1, Sref2, Designation, Op, Conf, Hsdt, Blob, Identification, Utilisateur, Email
         ORDER BY Ref
@@ -193,7 +193,7 @@ class ArtRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    public function ControleToutesSrefFermeesArticle():array
+    public function ControleToutesSrefFermeesArticle(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM(
@@ -208,12 +208,12 @@ class ArtRepository extends ServiceEntityRepository
             END AS Utilisateur,
             CASE
             WHEN SART.REF <> '' THEN 'jpochet@lhermitte.fr'
-            END AS Email, 
-            CASE 
+            END AS Email,
+            CASE
             WHEN SART.REF <> '' THEN 1
             ELSE 0
-            END AS Nombre_Sref, 
-            CASE 
+            END AS Nombre_Sref,
+            CASE
             WHEN SART.CONF IN ('Usrd') THEN 1
             ELSE 0
             END AS Nombre_Conf
@@ -229,14 +229,14 @@ class ArtRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    public function StockBlobMatiereDangeureuse():array
+    public function StockBlobMatiereDangeureuse(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT l.REF AS ref, l.SREF1 AS sref1, l.SREF2 AS sref2, a.DES AS designation, a.VENUN AS uv, l.EDCOD_0001 AS code, 
+        $sql = "SELECT l.REF AS ref, l.SREF1 AS sref1, l.SREF2 AS sref2, a.DES AS designation, a.VENUN AS uv, l.EDCOD_0001 AS code,
         a.TIERS AS fournisseur,SUM(s.QTETJSENSTOCK) AS stock, l.NOTE_0001 AS note, n.NOTEBLOB AS blob
         FROM LART l
         INNER JOIN ART a ON a.REF = l.REF AND a.DOS = l.DOS
-        INNER JOIN MNOTE n ON n.NOTE = l.NOTE_0001 
+        INNER JOIN MNOTE n ON n.NOTE = l.NOTE_0001
         LEFT JOIN MVTL_STOCK_V s ON a.REF = s.REFERENCE AND l.SREF1 = s.SREFERENCE1 AND l.SREF2 = s.SREFERENCE2
         WHERE l.EDCOD_0001 <> '' AND l.DOS = 1 AND a.HSDT IS NULL
         GROUP BY l.REF, l.SREF1, l.SREF2, a.DES, a.VENUN, l.EDCOD_0001, a.TIERS, l.NOTE_0001, n.NOTEBLOB
@@ -246,7 +246,7 @@ class ArtRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    public function getPhyto():array
+    public function getPhyto(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT RTRIM(LTRIM(ART.REF)) AS reference, RTRIM(LTRIM(ART.DES)) AS designation FROM ART
@@ -256,7 +256,7 @@ class ArtRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    public function getFamilleProduitOuvert():array
+    public function getFamilleProduitOuvert(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT DISTINCT RTRIM(LTRIM(ART.FAM_0001)) AS famille
@@ -267,7 +267,7 @@ class ArtRepository extends ServiceEntityRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    public function getFamilleProduitOuvertParDossier($dos):array
+    public function getFamilleProduitOuvertParDossier($dos): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT DISTINCT RTRIM(LTRIM(ART.FAM_0001)) AS famille
@@ -279,7 +279,7 @@ class ArtRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    public function getSrefByArt($dos, $prefixe):array
+    public function getSrefByArt($dos, $prefixe): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT dos, ref, designation, sref1, sref2, conf, stock, qteCmdCli, qteCmdFou, qteBlCli, SUM(m.BLQTE) AS qteBlFou
@@ -309,6 +309,31 @@ class ArtRepository extends ServiceEntityRepository
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
+    }
+
+    public function getEanStock($dos, $ean)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ref AS ref, sref1 AS sref1, sref2 AS sref2, designation AS designation, uv AS uv, stock AS stock, ean AS ean, ferme AS ferme
+        FROM(
+        SELECT LTRIM(RTRIM(a.REF)) AS ref, LTRIM(RTRIM(s.SREF1)) AS sref1, LTRIM(RTRIM(s.SREF2)) AS sref2, LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(a.VENUN)) AS uv, LTRIM(RTRIM(m.QTETJSENSTOCK)) AS stock,
+        CASE
+        WHEN a.SREFCOD = 1 THEN LTRIM(RTRIM(a.EAN))
+        WHEN a.SREFCOD = 2 THEN LTRIM(RTRIM(s.EAN)) --, a.HSDT AS ferme, s.EAN AS sean, s.USERMODH AS fermeSref
+        END AS ean,
+        CASE
+        WHEN a.SREFCOD = 1 THEN LTRIM(RTRIM(a.HSDT))
+        WHEN a.SREFCOD = 2 AND s.CONF = 'Usrd' THEN LTRIM(RTRIM(s.USERMODH)) --, a.HSDT AS ferme, s.EAN AS sean, s.USERMODH AS fermeSref
+        END AS ferme
+        FROM ART a
+        LEFT JOIN SART s ON a.DOS = s.DOS AND a.REF = s.REF
+        LEFT JOIN MVTL_STOCK_V m ON a.REF = m.REFERENCE AND s.SREF1 = m.SREFERENCE1 AND s.SREF2 = m.SREFERENCE2
+        WHERE a.DOS = $dos)reponse
+        WHERE ean = '$ean'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
     }
 
 }
