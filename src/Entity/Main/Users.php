@@ -219,6 +219,11 @@ class Users implements UserInterface
      */
     private $retraitMarchandisesEans;
 
+    /**
+     * @ORM\OneToMany(targetEntity=AlimentationEmplacement::class, mappedBy="createdBy")
+     */
+    private $alimentationEmplacements;
+
     public function __construct()
     {
         $this->documents = new ArrayCollection();
@@ -245,6 +250,7 @@ class Users implements UserInterface
         $this->othersDocuments = new ArrayCollection();
         $this->conduiteTravauxAddPieces = new ArrayCollection();
         $this->retraitMarchandisesEans = new ArrayCollection();
+        $this->alimentationEmplacements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1082,6 +1088,36 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($retraitMarchandisesEan->getCreatedBy() === $this) {
                 $retraitMarchandisesEan->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|AlimentationEmplacement[]
+     */
+    public function getAlimentationEmplacements(): Collection
+    {
+        return $this->alimentationEmplacements;
+    }
+
+    public function addAlimentationEmplacement(AlimentationEmplacement $alimentationEmplacement): self
+    {
+        if (!$this->alimentationEmplacements->contains($alimentationEmplacement)) {
+            $this->alimentationEmplacements[] = $alimentationEmplacement;
+            $alimentationEmplacement->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlimentationEmplacement(AlimentationEmplacement $alimentationEmplacement): self
+    {
+        if ($this->alimentationEmplacements->removeElement($alimentationEmplacement)) {
+            // set the owning side to null (unless already changed)
+            if ($alimentationEmplacement->getCreatedBy() === $this) {
+                $alimentationEmplacement->setCreatedBy(null);
             }
         }
 

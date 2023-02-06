@@ -250,7 +250,7 @@ class ArtRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT RTRIM(LTRIM(ART.REF)) AS reference, RTRIM(LTRIM(ART.DES)) AS designation FROM ART
-        WHERE DOS = 1 AND ART.REF LIKE ('PPP%') AND ART.HSDT IS NULL
+        WHERE DOS = 1 AND (ART.REF LIKE ('PPP%') OR ART.REF IN ('MAP65272')) AND ART.HSDT IS NULL
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();

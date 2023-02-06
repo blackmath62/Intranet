@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Main\AlimentationEmplacement;
+use App\Form\AlimentationEmplacementEanType;
 use App\Form\RetraitMarchandiseEanType;
 use App\Repository\Divalto\ArtRepository;
+use App\Repository\Main\AlimentationEmplacementRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
 use DateTime;
@@ -28,7 +31,7 @@ class ScanEanController extends AbstractController
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
         //parent::__construct();
     }
-
+    // Retrait chantier
     /**
      * @Route("/scan/ean/{chantier}", name="app_scan_ean")
      */
@@ -77,7 +80,6 @@ class ScanEanController extends AbstractController
                 $historique[$ligHisto]['qte'] = $histo[$ligHisto]->getQte();
             }
         }
-        //dd($historique);
         return $this->render('scan_ean/index.html.twig', [
             'title' => 'Retrait produits',
             'form' => $form->createView(),
@@ -215,4 +217,158 @@ class ScanEanController extends AbstractController
         ]);
     }
 
+    // Alimentation d'emplacement
+    /**
+     * @Route("/emplacement/scan/ean/{emplacement}", name="app_scan_ean_alim_empl")
+     */
+    public function alimentationEmplacement($emplacement = null, ArtRepository $repo, Request $request, AlimentationEmplacementRepository $repoRetrait): Response
+    {
+        $dos = 1;
+        $produit = "";
+        $historique = [];
+        // tracking user page for stats
+        /*$tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);*/
+
+        $form = $this->createForm(AlimentationEmplacementEanType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $produit = $repo->getEanStock($dos, $form->getData()->getEan());
+            if ($produit) {
+                $retrait = $form->getData();
+                $emplacement = $form->getData()->getEmplacement();
+                $retrait->setCreatedAt(new \DateTime())
+                    ->setCreatedBy($this->getUser());
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($retrait);
+                $em->flush();
+                $this->addFlash('message', 'Produit ajouté avec succés');
+                return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
+            } else {
+                $emplacement = $form->getData()->getEmplacement();
+                $this->addFlash('danger', 'Produit introuvable');
+                return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
+            }
+        }
+        if ($emplacement) {
+            $histo = $repoRetrait->findBy(['emplacement' => $emplacement, 'sendAt' => null]);
+            for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
+                $prod = $repo->getEanStock($dos, $histo[$ligHisto]->getEan());
+                $historique[$ligHisto]['id'] = $histo[$ligHisto]->getId();
+                $historique[$ligHisto]['emplacement'] = $histo[$ligHisto]->getEmplacement();
+                $historique[$ligHisto]['ref'] = $prod['ref'];
+                $historique[$ligHisto]['sref1'] = $prod['sref1'];
+                $historique[$ligHisto]['sref2'] = $prod['sref2'];
+                $historique[$ligHisto]['designation'] = $prod['designation'];
+                $historique[$ligHisto]['uv'] = $prod['uv'];
+                $historique[$ligHisto]['ean'] = $prod['ean'];
+            }
+        }
+        return $this->render('scan_ean/alim_empl_scan.html.twig', [
+            'title' => 'Alim Empl',
+            'form' => $form->createView(),
+            'produit' => $produit,
+            'emplacement' => $emplacement,
+            "historiques" => $historique,
+        ]);
+    }
+
+    /**
+     * @Route("/emplacement/scan/ean/all/delete/{emplacement}", name="app_emplacement_scan_ean_delete_all")
+     */
+    public function emplacementDeleteAll($emplacement, Request $request, AlimentationEmplacementRepository $repo)
+    {
+        //dd($emplacement);
+        $retrait = $repo->findBy(['emplacement' => $emplacement, 'sendAt' => null]);
+        foreach ($retrait as $value) {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($value);
+            $em->flush();
+        }
+
+        $route = $request->attributes->get('_route');
+        $this->setTracking($route);
+
+        $this->addFlash('message', 'Emplacement ' . $emplacement . ' supprimée avec succès');
+        return $this->redirectToRoute('app_scan_ean_alim_empl');
+    }
+
+    /**
+     * @Route("/emplacement/scan/ean/delete/{id}/{emplacement}", name="app_emplacement_scan_ean-delete")
+     */
+    public function deleteEmplacement($id, $emplacement = null, Request $request, AlimentationEmplacementRepository $repo)
+    {
+        $retrait = $repo->findOneBy(['id' => $id]);
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($retrait);
+        $em->flush();
+
+        $route = $request->attributes->get('_route');
+        $this->setTracking($route);
+
+        $this->addFlash('message', 'Article supprimée avec succès');
+        return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
+    }
+
+    /**
+     * @Route("/emplacement/scan/ns", name="app_scan_ean_ns")
+     */
+    public function emplacementNs(Request $request, AlimentationEmplacementRepository $repo)
+    {
+        $ns = $repo->getEmplacementNonSoumis();
+
+        $route = $request->attributes->get('_route');
+        $this->setTracking($route);
+
+        return $this->render('scan_ean/alim_empl_scan_ns.html.twig', [
+            'title' => 'Empl NS',
+            'ns' => $ns,
+        ]);
+    }
+
+    /**
+     * @Route("/emplacement/scan/send/ean", name="app_emplacement_scan_ean-send")
+     */
+    public function EmplacementsSend(Request $request, AlimentationEmplacementRepository $repo, ArtRepository $repoArt)
+    {
+        $dos = 1;
+        $historique = [];
+        $histo = $repo->findBy(['sendAt' => null]);
+        for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
+            $prod = $repoArt->getEanStock($dos, $histo[$ligHisto]->getEan());
+            $basculeSend = $repo->findOneBy(['id' => $histo[$ligHisto]->getId()]);
+            $basculeSend->setSendAt(new DateTime());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($basculeSend);
+            $em->flush();
+            $historique[$ligHisto]['emplacement'] = $histo[$ligHisto]->getEmplacement();
+            $historique[$ligHisto]['ref'] = $prod['ref'];
+            $historique[$ligHisto]['sref1'] = $prod['sref1'];
+            $historique[$ligHisto]['sref2'] = $prod['sref2'];
+            $historique[$ligHisto]['designation'] = $prod['designation'];
+            $historique[$ligHisto]['uv'] = $prod['uv'];
+            $historique[$ligHisto]['ean'] = $prod['ean'];
+        }
+        // envoyer un mail si il y a des infos à envoyer
+        if ($historique) {
+            // envoyer un mail
+            $html = $this->renderView('mails/AlimentationEmplacementScan.html.twig', ['historiques' => $historique, 'commentaire' => $request->request->get('ta')]);
+            $d = new DateTime();
+            $email = (new Email())
+                ->from($this->mailEnvoi)
+                ->to('jpochet@groupe-axis.fr')
+                ->subject('Liste des produits pour alimentation emplacement par ' . $this->getUser()->getPseudo() . " le " . $d->format('d-m-Y H:i:s'))
+                ->html($html);
+            $this->mailer->send($email);
+        } else {
+            $this->addFlash('danger', 'Pas d\'emplacement à cloturer');
+            return $this->redirectToRoute('app_scan_ean_alim_empl');
+        }
+
+        /*$route = $request->attributes->get('_route');
+        $this->setTracking($route);*/
+
+        $this->addFlash('message', 'Soumission effectuée avec succès');
+        return $this->redirectToRoute('app_scan_ean_alim_empl');
+    }
 }

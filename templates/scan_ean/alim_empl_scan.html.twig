@@ -1,0 +1,304 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block body %}
+	<a href="{{ path('app_scan_ean_alim_empl') }}" class="text-white btn btn-primary col-12 mb-3">Commencer une nouvelle saisie</a>
+	<a href="" class="text-white btn btn-secondary col-12 mb-3">imprimer une etiquette</a>
+	<!-- general form elements disabled -->
+	<div class="card card-navy">
+		<div class="card-header d-flex">
+			<h3 class="card-title">Alimentation d'emplacement</h3>
+			<a href="{{ path('app_scan_ean_ns') }}" class="badge badge-danger ml-auto">Non soumis</a>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			{{ form_start(form, { 'attr' : { 'class' : 'ml-auto' }}
+			) }}
+			<div class="form-group">
+				<label class="col-form-label">
+					<i class="fas fa-map-marker-alt"></i>
+					Emplacement
+				</label>
+				{{ form_widget(form.emplacement, {'id': 'emplacement' ,'attr' : { 'value' : emplacement} }) }}
+				{{ form_errors(form.emplacement) }}
+			</div>
+			<div class="form-group">
+				<label class="col-form-label" for="ean">
+					<i class="fas fa-barcode"></i>
+					{{ form_label(form.ean) }}
+				</label>
+				{{ form_widget(form.ean, { 'id': 'ean' , 'attr' : { 'class' : 'form-control col-12 is-warning' } }) }}
+				{{ form_errors(form.ean) }}
+			</div>
+			{{ form_row(form.save, {'attr' : { 'class' : 'btn btn-xl btn-warning col-12' } }) }}
+			{{ form_end(form)}}
+		<!-- /.card -->
+			<!-- /.card-body -->
+		</div>
+		<!-- /.card -->
+	</div>
+	<!-- /.card-body -->
+
+	<div id="produit" class="d-none">
+		<div class="card">
+			<div class="card-content card-orange">
+				<div class="card-header">
+					<h4 class="card-title text-white resultDes"></h4>
+				</div>
+				<div class="card-footer p-0">
+					<ul class="nav flex-column">
+						<li class="nav-item">
+							<small class="nav-link">
+								<b>Référence :</b>
+								<span class="float-right resultRef"></span>
+							</small>
+						</li>
+						<li class="nav-item d-flex justify-content-between">
+							<small id="sref1" class="nav-link">
+								<b class="mr-3">Sref1 :</b>
+								<span class="float-right resultSref1"></span>
+							</small>
+							<small id="sref2" class="nav-link">
+								<b class="mr-3">Sref2 :</b>
+								<span class="float-right resultSref2"></span>
+							</small>
+							<small class="nav-link">
+								<b class="mr-3">Unité de vente :</b>
+								<span class="float-right resultUv"></span>
+							</small>
+						</li>
+						<li class="nav-item d-flex justify-content-between">
+							<small id="stock" class="nav-link">
+								<b class="mr-1">Stock :</b>
+								<span class="float-right resultStock"></span>
+							</small>
+							<small id="ferme" class="nav-link">
+								<b class="mr-1">Date Fermeture :</b>
+								<span class="float-right resultFerme"></span>
+							</small>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+
+
+	{% if historiques %}
+		<div class="card card-dark mt-4">
+			<div class="card-header">
+				<h3 class="card-title">Actuellement sur cet emplacement</h3>
+			</div>
+			<!-- /.card-header -->
+			<div class="card-body p-0">
+				<table class="table table-sm">
+					<thead>
+						<tr>
+							<th>Produit</th>
+							<th style="width: 40px">X</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for historique in historiques %}
+							<tr>
+								<td>{{ historique.designation }}</td>
+								<td class="text-align align-middle">
+									<a data-toggle="modal" data-target={{"#modal-sm#{historique.id}"}} class="text-dark">
+										<i class="fas fa-trash-alt"></i>
+									</a>
+									<div class="modal fade" id={{"modal-sm#{historique.id}"}}>
+										<div class="modal-dialog modal-sm">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h4 class="modal-title">Voulez vous vraiment supprimer cette ligne ?</h4>
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
+												</div>
+												<div class="card-footer p-0">
+													<ul class="nav flex-column">
+														<li class="nav-item">
+															<small class="nav-link">
+																Id :
+																<span class="float-right">{{ historique.id }}</span>
+															</small>
+														</li>
+														<li class="nav-item">
+															<small class="nav-link">
+																Ean :
+																<span class="float-right">{{ historique.ean }}</span>
+															</small>
+														</li>
+														<li class="nav-item">
+															<small class="nav-link">
+																Référence :
+																<span class="float-right">{{historique.ref}}</span>
+															</small>
+														</li>
+														{% if historique.sref1 %}
+															<li class="nav-item">
+																<small class="nav-link">
+																	Sref1 :
+																	<span class="float-right">{{historique.sref1}}</span>
+																</small>
+															</li>
+														{% endif %}
+														{% if historique.sref2 %}
+															<li class="nav-item">
+																<small class="nav-link">
+																	Sref2 :
+																	<span class="float-right">{{historique.sref2}}</span>
+																</small>
+															</li>
+														{% endif %}
+														<li class="nav-item">
+															<small class="nav-link">
+																Désignation :
+																<span class="float-right">{{historique.designation}}</span>
+															</small>
+														</li>
+														<li class="nav-item">
+															<small class="nav-link">
+																Unité de vente :
+																<span class="float-right">{{historique.uv}}</span>
+															</small>
+														</li>
+													</ul>
+												</div>
+												<div class="modal-footer justify-content-between">
+													<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+													<a href="{{path('app_scan_ean_alim_empl', {'id' : historique.id, 'emplacement' : app.request.attributes.get('emplacement') })}}" type="button" class="btn btn-danger">Supprimer cette ligne</a>
+												</div>
+											</div>
+											<!-- /.modal-content -->
+										</div>
+										<!-- /.modal-dialog -->
+									</div>
+									<!-- /.modal -->
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<!-- /.card-body -->
+		</div>
+		<!-- /.card -->
+
+		<a data-toggle="modal" data-target="#modal-sm-supprimer" class="text-white btn btn-danger col-12">Supprimer cette saisie définitivement</a>
+		<div class="modal fade" id="modal-sm-supprimer">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Voulez vous vraiment supprimer intégralement et définitivement cet emplacement
+							{{app.request.attributes.get('emplacement')}}
+							?</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-footer justify-content-between">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+						<a href="{{path('app_emplacement_scan_ean_delete_all', {'emplacement' : app.request.attributes.get('emplacement') })}}" type="button" class="btn btn-danger">Supprimer</a>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
+		<!-- /.modal -->
+	{% endif %}
+{% endblock %}
+{% block javascripts %}
+
+	<script>
+
+		window.onload = (event) => { // console.log('La page est complètement chargée');
+let emplacement = document.getElementById("emplacement");
+if (emplacement.value) {
+document.getElementById("ean").value = "";
+document.getElementById("ean").focus();
+// alert("L'emplacement n'est pas vide");
+} else {
+document.getElementById("emplacement").value = ""
+document.getElementById("emplacement").focus();
+// alert(emplacement.value);
+}
+}
+
+
+var monAlert = $('#alert');
+console.log(monAlert);
+if (monAlert.length > 0) {
+monAlert.delay(3000).slideUp();
+}
+	</script>
+
+	<script>
+		$(function () { // Initialize
+$('#ean').on('change', function () {
+let ean = $('#ean');
+if (ean.length = 13) { // alert(ean.val()); créer une alerte
+$.ajax({
+url: "/scan/ean/ajax/1/" + ean.val(),
+type: "GET"
+}).done(function (data) {
+console.log(data);
+const resultRef = document.querySelector('.resultRef');
+const resultDes = document.querySelector('.resultDes');
+// const resultEan = document.querySelector('.resultEan');
+const resultStock = document.querySelector('.resultStock');
+const resultUv = document.querySelector('.resultUv');
+const resultFerme = document.querySelector('.resultFerme');
+const resultSref1 = document.querySelector('.resultSref1');
+const resultSref2 = document.querySelector('.resultSref2');
+
+resultRef.textContent = data.ref;
+resultDes.textContent = data.designation;
+// resultEan.textContent = data.ean;
+resultStock.textContent = data.stock;
+resultUv.textContent = data.uv;
+resultFerme.textContent = data.ferme;
+resultSref1.textContent = data.sref1;
+resultSref2.textContent = data.sref2;
+if (data.ean) {
+$("#ean").attr('class', 'form-control col-12 is-valid');
+$("#produit").attr('class', 'card mt-3');
+} else {
+$("#ean").attr('class', 'form-control col-12 is-invalid');
+$("#produit").attr('class', 'd-none');
+}
+if (data.sref1) {
+$("#sref1").attr('class', 'nav-link');
+} else {
+$("#sref1").attr('class', 'd-none');
+}
+if (data.sref2) {
+$("#sref2").attr('class', 'nav-link');
+} else {
+$("#sref2").attr('class', 'd-none');
+}
+if (data.stock) {
+$("#stock").attr('class', 'nav-link');
+} else {
+$("#stock").attr('class', 'd-none');
+}
+if (data.ferme) {
+$("#ferme").attr('class', 'nav-link');
+} else {
+$("#ferme").attr('class', 'd-none');
+}
+
+});
+}
+
+});
+
+})
+	</script>
+{% endblock %}

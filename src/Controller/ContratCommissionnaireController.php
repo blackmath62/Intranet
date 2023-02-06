@@ -53,6 +53,7 @@ class ContratCommissionnaireController extends AbstractController
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
         $this->setTracking($tracking);
+
         $mouvs = "";
         $art = "";
         unset($form);
@@ -128,7 +129,6 @@ class ContratCommissionnaireController extends AbstractController
             $articleIntranet = $cc->findOneBy(['reference' => $value['reference']]);
             if (empty($articleIntranet) | is_null($articleIntranet)) {
                 $article = new ProduitsCommissionnaires();
-                //dd('je suis passé');
                 $article->setReference($value['reference'])
                     ->setDesignation($value['designation'])
                     ->setContratCommissionaire(false)
