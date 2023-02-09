@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Main\RetraitMarchandisesEan;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -36,6 +37,12 @@ class RetraitMarchandiseEanType extends AbstractType
                 'label' => 'Quantité',
                 'required' => true,
                 'attr' => ['class' => 'form-control col-12'],
+            ))
+            ->add('stockFaux', CheckboxType::class, array(
+                'label' => 'Stock Faux ?',
+                'required' => false,
+                'attr' => ['class' => ''],
+                'label_attr' => ['class' => 'form-check-label'],
             ))
             ->add('save', SubmitType::class, [
                 'label' => "Ajouter ce produit",

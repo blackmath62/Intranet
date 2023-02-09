@@ -20,7 +20,8 @@ class MailListRepository extends ServiceEntityRepository
     }
 
     // Email d'envoi
-    public function getEmailEnvoi(){
+    public function getEmailEnvoi()
+    {
 
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT maillist.email AS email
@@ -32,7 +33,8 @@ class MailListRepository extends ServiceEntityRepository
     }
 
     // Email de traitement
-    public function getEmailTreatement(){
+    public function getEmailTreatement()
+    {
 
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT maillist.email AS email
@@ -43,33 +45,32 @@ class MailListRepository extends ServiceEntityRepository
         return $stmt->fetch();
     }
 
-
     // /**
     //  * @return MailList[] Returns an array of MailList objects
     //  */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('m.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+    return $this->createQueryBuilder('m')
+    ->andWhere('m.exampleField = :val')
+    ->setParameter('val', $value)
+    ->orderBy('m.id', 'ASC')
+    ->setMaxResults(10)
+    ->getQuery()
+    ->getResult()
+    ;
     }
-    */
+     */
 
     /*
-    public function findOneBySomeField($value): ?MailList
-    {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+public function findOneBySomeField($value): ?MailList
+{
+return $this->createQueryBuilder('m')
+->andWhere('m.exampleField = :val')
+->setParameter('val', $value)
+->getQuery()
+->getOneOrNullResult()
+;
+}
+ */
 }

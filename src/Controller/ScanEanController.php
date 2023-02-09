@@ -4,12 +4,15 @@ namespace App\Controller;
 
 use App\Entity\Main\AlimentationEmplacement;
 use App\Form\AlimentationEmplacementEanType;
+use App\Form\GeneralSearchType;
 use App\Form\RetraitMarchandiseEanType;
 use App\Repository\Divalto\ArtRepository;
 use App\Repository\Main\AlimentationEmplacementRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
+use Com\Tecnick\Barcode\Barcode;
 use DateTime;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +20,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+
+/**
+ * @IsGranted("ROLE_USER")
+ */
 
 class ScanEanController extends AbstractController
 {
@@ -78,6 +85,7 @@ class ScanEanController extends AbstractController
                 $historique[$ligHisto]['uv'] = $prod['uv'];
                 $historique[$ligHisto]['ean'] = $prod['ean'];
                 $historique[$ligHisto]['qte'] = $histo[$ligHisto]->getQte();
+                $historique[$ligHisto]['stockFaux'] = $histo[$ligHisto]->getStockFaux();
             }
         }
         return $this->render('scan_ean/index.html.twig', [
@@ -167,6 +175,7 @@ class ScanEanController extends AbstractController
                 $historique[$ligHisto]['uv'] = $prod['uv'];
                 $historique[$ligHisto]['ean'] = $prod['ean'];
                 $historique[$ligHisto]['qte'] = $histo[$ligHisto]->getQte();
+                $historique[$ligHisto]['stockFaux'] = $histo[$ligHisto]->getStockFaux();
             }
             // envoyer un mail si il y a des infos à envoyer
             if (count($historique) > 0) {
@@ -217,6 +226,22 @@ class ScanEanController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/emplacement/scan/ajax/{dos}/{emplacement}", name="app_emplacement_scan_ajax")
+     */
+    public function EmplacementAjax($dos = null, $emplacement = null, ArtRepository $repo, Request $request): Response
+    {
+        $dos = 1;
+        $empl = "";
+        // tracking user page for stats
+        /*$tracking = $request->attributes->get('_route');
+        $this->setTracking($tracking);*/
+        if ($emplacement) {
+            $empl = $repo->getEmpl($dos, $emplacement);
+        }
+        return new JsonResponse(['empl' => $empl['empl']]);
+    }
+
     // Alimentation d'emplacement
     /**
      * @Route("/emplacement/scan/ean/{emplacement}", name="app_scan_ean_alim_empl")
@@ -234,6 +259,11 @@ class ScanEanController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $produit = $repo->getEanStock($dos, $form->getData()->getEan());
+            $empl = $repo->getEmpl($dos, $form->getData()->getEmplacement());
+            if (!$empl) {
+                $this->addFlash('danger', 'Emplacement introuvable');
+                return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
+            }
             if ($produit) {
                 $retrait = $form->getData();
                 $emplacement = $form->getData()->getEmplacement();
@@ -279,8 +309,8 @@ class ScanEanController extends AbstractController
     public function emplacementDeleteAll($emplacement, Request $request, AlimentationEmplacementRepository $repo)
     {
         //dd($emplacement);
-        $retrait = $repo->findBy(['emplacement' => $emplacement, 'sendAt' => null]);
-        foreach ($retrait as $value) {
+        $empl = $repo->findBy(['emplacement' => $emplacement, 'sendAt' => null]);
+        foreach ($empl as $value) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($value);
             $em->flush();
@@ -298,9 +328,9 @@ class ScanEanController extends AbstractController
      */
     public function deleteEmplacement($id, $emplacement = null, Request $request, AlimentationEmplacementRepository $repo)
     {
-        $retrait = $repo->findOneBy(['id' => $id]);
+        $empl = $repo->findOneBy(['id' => $id]);
         $em = $this->getDoctrine()->getManager();
-        $em->remove($retrait);
+        $em->remove($empl);
         $em->flush();
 
         $route = $request->attributes->get('_route');
@@ -311,7 +341,7 @@ class ScanEanController extends AbstractController
     }
 
     /**
-     * @Route("/emplacement/scan/ns", name="app_scan_ean_ns")
+     * @Route("/emplacement/scan/ns", name="app_scan_emplacement_ns")
      */
     public function emplacementNs(Request $request, AlimentationEmplacementRepository $repo)
     {
@@ -370,5 +400,46 @@ class ScanEanController extends AbstractController
 
         $this->addFlash('message', 'Soumission effectuée avec succès');
         return $this->redirectToRoute('app_scan_ean_alim_empl');
+    }
+
+    /**
+     * @Route("/emplacement/produit/print/{emplacement}", name="app_scan_emplacement_print")
+     */
+    function print($emplacement = null, Request $request, ArtRepository $repo, Barcode $ean) {
+
+        $dos = 1;
+        $produits = "";
+
+        $form = $this->createForm(GeneralSearchType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $produits = $repo->getSearchArt($dos, $form->getData()['search']);
+        }
+
+        // instantiate the barcode class
+        $barcode = new Barcode();
+
+// generate a barcode
+        $bobj = $barcode->getBarcodeObj(
+            'QRCODE,H', // barcode type and additional comma-separated parameters
+            'https://tecnick.com', // data string to encode
+            -4, // bar width (use absolute or negative value as multiplication factor)
+            -4, // bar height (use absolute or negative value as multiplication factor)
+            'black', // foreground color
+            array(-2, -2, -2, -2) // padding (use absolute or negative values as multiplication factors)
+        )->setBackgroundColor('white'); // background color
+
+// output the barcode as HTML div (see other output formats in the documentation and examples)
+        echo $bobj->getHtmlDiv();
+
+        $route = $request->attributes->get('_route');
+        $this->setTracking($route);
+
+        return $this->render('scan_ean/print.html.twig', [
+            'title' => 'Imprimer',
+            'form' => $form->createView(),
+            'produits' => $produits,
+
+        ]);
     }
 }

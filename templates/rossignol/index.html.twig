@@ -1,294 +1,441 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}
+	{{ title }}
+{% endblock %}
 {% block body %}
 
-<div class="card collapsed-card card-info">
-    <div class="card-header">
-    <h3 class="card-title"><i class="icon fas fa-info-circle pr-2"></i>Informations utiles</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-        </div>
-    </div>
-<!-- /.card-header -->
-    <div class="card-body">
-        <p>Pour saisir une commande de produit Rossignol dans Divalto, il faut impérativement utiliser le code OP "CO" ( la lettre C et la lettre O comme Occasion)</p>
-        <p>Le stock est sur la nature de stock O (comme Occasion), il est donc clairement distingué du reste, le service logistique peut donc alimenter ce stock Occasion avec des produits abimés, l'intranet sera mis à jour instantanément</p>
-        <p>Pour qu'une vente soit lié a un rossignol, il faut donc impérativement utiliser le code op "CO"</p>
-        <p>Vous pouvez utiliser les codes OP suivants:</p>
-        <ul>
-            <li>JIO => Régularisation en entrée Occasion (les caractéres JIO sont tous des lettres, le O signifie Occasion)</li>
-            <li>IIO => Régularisation en sortie Occasion (les caractéres IIO sont tous des lettres, le O signifie Occasion)</li>
-            <li>CO => Vente Occasion (les caractéres CO sont tous des lettres, le O signifie Occasion)</li>
-            <li>DO => Avoir Occasion (DO sont des lettres, comme la note de musique DO en majuscule, le O signifie Occasion)</li>
-        </ul>
-        <p>Le <strong>Code Tarif</strong> pour les produits rossignols est TO (en lettre) comme Tarif Occasion</p>
-    </div>
-<!-- /.card-footer-->
-</div>
+	<div class="card collapsed-card card-info">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-info-circle pr-2"></i>Informations utiles</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<p>Pour saisir une commande de produit Rossignol dans Divalto, il faut impérativement utiliser le code OP "CO" ( la lettre C et la lettre O comme Occasion)</p>
+			<p>Le stock est sur la nature de stock O (comme Occasion), il est donc clairement distingué du reste, le service logistique peut donc alimenter ce stock Occasion avec des produits abimés, l'intranet sera mis à jour instantanément</p>
+			<p>Pour qu'une vente soit lié a un rossignol, il faut donc impérativement utiliser le code op "CO"</p>
+			<p>Vous pouvez utiliser les codes OP suivants:</p>
+			<ul>
+				<li>JIO => Régularisation en entrée Occasion (les caractéres JIO sont tous des lettres, le O signifie Occasion)</li>
+				<li>IIO => Régularisation en sortie Occasion (les caractéres IIO sont tous des lettres, le O signifie Occasion)</li>
+				<li>CO => Vente Occasion (les caractéres CO sont tous des lettres, le O signifie Occasion)</li>
+				<li>DO => Avoir Occasion (DO sont des lettres, comme la note de musique DO en majuscule, le O signifie Occasion)</li>
+			</ul>
+			<p>Le
+				<strong>Code Tarif</strong>
+				pour les produits rossignols est TO (en lettre) comme Tarif Occasion</p>
+		</div>
+		<!-- /.card-footer-->
+	</div>
 
-<div class="row">
+	<div class="row">
 
-<div class="col-12 col-sm-12">
-            <div class="card card-dark card-tabs">
-              <div class="card-header p-0 pt-1">
-                <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
-                  {% if app.request.attributes.get('annee') %}
-                        {% set stocks = '' %}
-                        {% set ariaStocks = false %}
-                        {% set ventes = 'show active' %}
-                        {% set ariaVentes = true %}
-                        {% else %}
-                        {% set stocks = 'show active' %}
-                        {% set ariaStocks = true %}
-                        {% set ventes = '' %}
-                        {% set ariaVentes = false %}   
-                        {% endif %}
-                  <li class="nav-item">
-                    <a class="nav-link {{stocks}}" id="custom-tabs-one-home-tab" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home">Stock Rossignols</a>
-                  </li>
-                  {% if ((is_granted('ROLE_HP')) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS')) %}
-                  <li class="nav-item">
-                    <a class="nav-link {{ventes}}" id="custom-tabs-one-profile-tab" data-toggle="pill" href="#custom-tabs-one-profile" role="tab" aria-controls="custom-tabs-one-profile">Ventes Rossignols</a>
-                  </li>
-                  {% endif %}
-                </ul>
-              </div>
-              <div class="card-body">
-                <div class="tab-content" id="custom-tabs-one-tabContent">
-                  <div class="tab-pane fade {{stocks}}" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="custom-tabs-one-home-tab">
-                        <table id="example1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"><span>Référence</span></th>
-                                    <th class="text-center"><span>Désignation</span></th>
-                                    <th class="text-center"><span>Sref1</span></th>
-                                    <th class="text-center"><span>Sref2</span></th>
-                                    <th class="text-center"><span>U.V</span></th>
-                                    <th class="text-center"><span>Date du Tarif</span></th>
-                                    <th class="text-center"><span>Code Tarif</span></th>
-                                    <th class="text-center"><span>Prix de vente</span></th>
-                                    <th class="text-center"><span>Prix Par</span></th>
-                                    <th class="text-center"><span>Dépôt</span></th>
-                                    <th class="text-center"><span>Nature</span></th>
-                                    <th class="text-center"><span>stock</span></th>
-                                    <th class="text-center"><span>Qté Réservée</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-							 
-                              <!-- >boucle -->
-                              {% for stockRossignol in stockRossignols %}
-                                    <tr>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.Ref }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.Designation }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.Sref1 }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.Sref2 }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.Uv }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.DateTarif }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.CodeTarif }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.Tarif|number_format(2, '.', ' ') }} €</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.PrixPar }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.Depot }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.Nature }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.Stock }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ stockRossignol.CmdQte }}</a>
-                                        </td>
-                                    </tr>
-                              {% endfor %}
-                             <!-- >boucle -->
+		<div class="col-12 col-sm-12">
+			<div class="card card-dark card-tabs">
+				<div class="card-header p-0 pt-1">
+					<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+						{% if app.request.attributes.get('annee') %}
+							{% set stocks = '' %}
+							{% set ariaStocks = false %}
+							{% set ventes = 'show active' %}
+							{% set ariaVentes = true %}
+						{% else %}
+							{% set stocks = 'show active' %}
+							{% set ariaStocks = true %}
+							{% set ventes = '' %}
+							{% set ariaVentes = false %}
+						{% endif %}
+						<li class="nav-item">
+							<a class="nav-link {{stocks}}" id="custom-tabs-one-home-tab" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home">Stock Rossignols</a>
+						</li>
+						{% if ((is_granted('ROLE_HP')) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS')) %}
+							<li class="nav-item">
+								<a class="nav-link {{ventes}}" id="custom-tabs-one-profile-tab" data-toggle="pill" href="#custom-tabs-one-profile" role="tab" aria-controls="custom-tabs-one-profile">Ventes Rossignols</a>
+							</li>
+						{% endif %}
+					</ul>
+				</div>
+				<div class="card-body">
+					<div class="tab-content" id="custom-tabs-one-tabContent">
+						<div class="tab-pane fade {{stocks}}" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="custom-tabs-one-home-tab">
+							<table id="example1" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th class="text-center">
+											<span>Référence</span>
+										</th>
+										<th class="text-center">
+											<span>Désignation</span>
+										</th>
+										<th class="text-center">
+											<span>Sref1</span>
+										</th>
+										<th class="text-center">
+											<span>Sref2</span>
+										</th>
+										<th class="text-center">
+											<span>U.V</span>
+										</th>
+										<th class="text-center">
+											<span>Date du Tarif</span>
+										</th>
+										<th class="text-center">
+											<span>Code Tarif</span>
+										</th>
+										<th class="text-center">
+											<span>Prix de vente</span>
+										</th>
+										<th class="text-center">
+											<span>Prix Par</span>
+										</th>
+										<th class="text-center">
+											<span>Dépôt</span>
+										</th>
+										<th class="text-center">
+											<span>Nature</span>
+										</th>
+										<th class="text-center">
+											<span>stock</span>
+										</th>
+										<th class="text-center">
+											<span>Qté Réservée</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
 
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th class="text-center"><span>Référence</span></th>
-                                    <th class="text-center"><span>Désignation</span></th>
-                                    <th class="text-center"><span>Sref1</span></th>
-                                    <th class="text-center"><span>Sref2</span></th>
-                                    <th class="text-center"><span>U.V</span></th>
-                                    <th class="text-center"><span>Date du Tarif</span></th>
-                                    <th class="text-center"><span>Code Tarif</span></th>
-                                    <th class="text-center"><span>Prix de vente</span></th>
-                                    <th class="text-center"><span>Prix Par</span></th>
-                                    <th class="text-center"><span>Dépôt</span></th>
-                                    <th class="text-center"><span>Nature</span></th>
-                                    <th class="text-center"><span>stock</span></th>
-                                    <th class="text-center"><span>Qté Réservée</span></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                  </div>
-                  <!-- Second onglet vente rossignol -->
-                  <div class="tab-pane fade {{ventes}}" id="custom-tabs-one-profile" role="tabpanel" aria-labelledby="custom-tabs-one-profile-tab">
-                        {% set annee = 'now' | date('Y') %}
-                        {% set anneeN1 = annee - 1 %}
-                        {% set anneeN2 = annee - 2 %}
-                        <h3>Ventes Rossignols client HP Année 
-                        {% if app.request.attributes.get('annee') %}
-                        {{ app.request.attributes.get('annee') }}
-                        {% else %}
-                        {{ annee }}    
-                        {% endif %}
-                        </h3>
-                       <div class='d-flex justify-content-end'>
-                            <a class='btn btn-info m-3' href='{{path('app_lhermitte_rossignols', {'annee' : anneeN2 } ) }}' title="Résultats figés">Année {{ anneeN2 }}</a>
-                            <a class='btn btn-success m-3' href='{{path('app_lhermitte_rossignols', {'annee' : anneeN1 } ) }}' title="Résultats figés aprés le 20 janvier {{ annee }}">Année {{ anneeN1 }}</a>
-                            <a class='btn btn-secondary m-3' href='{{path('app_lhermitte_rossignols', {'annee' : annee } ) }}' title="Attention cette année n'est pas compléte">Année {{ annee }}</a>
-                        </div>
-                       <table id="example3" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"><span>Tiers</span></th>
-                                    <th class="text-center"><span>Nom</span></th>
-                                    <th class="text-center"><span>Commercial</span></th>
-                                    <th class="text-center"><span>Référence</span></th>
-                                    <th class="text-center"><span>Désignation</span></th>
-                                    <th class="text-center"><span>Sref1</span></th>
-                                    <th class="text-center"><span>Sref2</span></th>
-                                    <th class="text-center"><span>U.V</span></th>
-                                    <th class="text-center"><span>Code Tarif</span></th>
-                                    <th class="text-center"><span>Prix Tarif TO</span></th>
-                                    <th class="text-center"><span>Prix par Tarif TO</span></th>
-                                    <th class="text-center"><span>Delta</span></th>
-                                    <th class="text-center"><span>Qté Vendus</span></th>
-                                    <th class="text-center"><span>Prix unitaire</span></th>
-                                    <th class="text-center"><span>Prix par facture</span></th>
-                                    <th class="text-center"><span>Montant facture</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-							 
-                              <!-- >boucle -->
-                              {% for venteRossignol in venteRossignols %}
-                                    <tr>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Tiers }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Nom }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Commercial }}</a>
-                                        </td>                                        
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Ref }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Designation }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Sref1 }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Sref2 }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Uv }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.CodeTarif }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Prix|number_format(2, '.', ' ') }} €</a>
-                                        </td>
-                                        <td class="text-center">
-                                            {% if venteRossignol.PrixParTO > 0 %}
-                                                <a class="text-center text-dark">{{ venteRossignol.PrixParTO }}</a>
-                                            {% endif %}
-                                        </td>
-                                        {% if (venteRossignol.Pu < 0 or venteRossignol.Pu > 0) and (venteRossignol.Prix < 0 or venteRossignol.Prix > 0) %}
-                                            {% set Delta = (((venteRossignol.Pu / venteRossignol.Prix)-1)*100)|number_format(2, '.', ' ') %}
-                                        {% else %}
-                                            {% set Delta = 0 %}   
-                                        {% endif %}
-                                        {% if Delta > 0 %}
-                                            <td class="text-center">
-                                                <a class="description-text text-success"><i class="fas fa-arrow-up pr-1"></i>{{ Delta }} %</a>
-                                            </td>
-                                        {% elseif Delta == 0 %}
-                                            <td class="text-center">
-                                                <a class="description-text text-warning"><i class="fas fa-arrow-left pr-1"></i>{{ Delta }} %</a>
-                                            </td>
-                                        {% elseif Delta < 0 %}
-                                            <td class="text-center">
-                                                <a class="description-text text-danger"><i class="fas fa-arrow-down pr-1"></i>{{ Delta }} %</a>
-                                            </td>
-                                        {% endif %}
+									<!-- >boucle -->
+									{% for stockRossignol in stockRossignols %}
+										<tr>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.Ref }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.Designation }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.Sref1 }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.Sref2 }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.Uv }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.DateTarif }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.CodeTarif }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.Tarif|number_format(2, '.', ' ') }}
+													€</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.PrixPar }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.Depot }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.Nature }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.Stock }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ stockRossignol.CmdQte }}</a>
+											</td>
+										</tr>
+									{% endfor %}
+									<!-- >boucle -->
 
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Qte|number_format(2, '.', ' ')}}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Pu|number_format(2, '.', ' ') }} €</a>
-                                        </td>
-                                        <td class="text-center">
-                                            {% if venteRossignol.PrixPar > 0 %}
-                                                <a class="text-center text-dark">{{ venteRossignol.PrixPar }}</a>
-                                            {% endif %}
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ venteRossignol.Montant|number_format(2, '.', ' ') }} €</a>
-                                        </td>
-                                    </tr>
-                              {% endfor %}
-                             <!-- >boucle -->
+								</tbody>
+								<tfoot>
+									<tr>
+										<th class="text-center">
+											<span>Référence</span>
+										</th>
+										<th class="text-center">
+											<span>Désignation</span>
+										</th>
+										<th class="text-center">
+											<span>Sref1</span>
+										</th>
+										<th class="text-center">
+											<span>Sref2</span>
+										</th>
+										<th class="text-center">
+											<span>U.V</span>
+										</th>
+										<th class="text-center">
+											<span>Date du Tarif</span>
+										</th>
+										<th class="text-center">
+											<span>Code Tarif</span>
+										</th>
+										<th class="text-center">
+											<span>Prix de vente</span>
+										</th>
+										<th class="text-center">
+											<span>Prix Par</span>
+										</th>
+										<th class="text-center">
+											<span>Dépôt</span>
+										</th>
+										<th class="text-center">
+											<span>Nature</span>
+										</th>
+										<th class="text-center">
+											<span>stock</span>
+										</th>
+										<th class="text-center">
+											<span>Qté Réservée</span>
+										</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+						<!-- Second onglet vente rossignol -->
+						<div class="tab-pane fade {{ventes}}" id="custom-tabs-one-profile" role="tabpanel" aria-labelledby="custom-tabs-one-profile-tab">
+							{% set annee = 'now' | date('Y') %}
+							{% set anneeN1 = annee - 1 %}
+							{% set anneeN2 = annee - 2 %}
+							<h3>Ventes Rossignols client HP Année
+								{% if app.request.attributes.get('annee') %}
+									{{ app.request.attributes.get('annee') }}
+								{% else %}
+									{{ annee }}
+								{% endif %}
+							</h3>
+							<div class='d-flex justify-content-end'>
+								<a class='btn btn-info m-3' href='{{path('app_lhermitte_rossignols', {'annee' : anneeN2 } ) }}' title="Résultats figés">Année
+									{{ anneeN2 }}</a>
+								<a class='btn btn-success m-3' href='{{path('app_lhermitte_rossignols', {'annee' : anneeN1 } ) }}' title="Résultats figés aprés le 20 janvier {{ annee }}">Année
+									{{ anneeN1 }}</a>
+								<a class='btn btn-secondary m-3' href='{{path('app_lhermitte_rossignols', {'annee' : annee } ) }}' title="Attention cette année n'est pas compléte">Année
+									{{ annee }}</a>
+							</div>
+							<table id="example3" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th class="text-center">
+											<span>Tiers</span>
+										</th>
+										<th class="text-center">
+											<span>Nom</span>
+										</th>
+										<th class="text-center">
+											<span>Commercial</span>
+										</th>
+										<th class="text-center">
+											<span>Référence</span>
+										</th>
+										<th class="text-center">
+											<span>Désignation</span>
+										</th>
+										<th class="text-center">
+											<span>Sref1</span>
+										</th>
+										<th class="text-center">
+											<span>Sref2</span>
+										</th>
+										<th class="text-center">
+											<span>U.V</span>
+										</th>
+										<th class="text-center">
+											<span>Code Tarif</span>
+										</th>
+										<th class="text-center">
+											<span>Date Tarif</span>
+										</th>
+										<th class="text-center">
+											<span>Prix Tarif TO</span>
+										</th>
+										<th class="text-center">
+											<span>Prix par Tarif TO</span>
+										</th>
+										<th class="text-center">
+											<span>Delta</span>
+										</th>
+										<th class="text-center">
+											<span>Qté Vendus</span>
+										</th>
+										<th class="text-center">
+											<span>Prix unitaire</span>
+										</th>
+										<th class="text-center">
+											<span>Prix par facture</span>
+										</th>
+										<th class="text-center">
+											<span>Montant facture</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
 
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th class="text-center"><span>Tiers</span></th>
-                                    <th class="text-center"><span>Nom</span></th>
-                                    <th class="text-center"><span>Commercial</span></th>
-                                    <th class="text-center"><span>Référence</span></th>
-                                    <th class="text-center"><span>Désignation</span></th>
-                                    <th class="text-center"><span>Sref1</span></th>
-                                    <th class="text-center"><span>Sref2</span></th>
-                                    <th class="text-center"><span>U.V</span></th>
-                                    <th class="text-center"><span>Code Tarif</span></th>
-                                    <th class="text-center"><span>Prix Tarif TO</span></th>
-                                    <th class="text-center"><span>Prix par Tarif TO</span></th>
-                                    <th class="text-center"><span>Delta</span></th>
-                                    <th class="text-center"><span>Qté Vendus</span></th>
-                                    <th class="text-center"><span>Prix unitaire</span></th>
-                                    <th class="text-center"><span>Prix par facture</span></th>
-                                    <th class="text-center"><span>Montant facture</span></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                  </div>
-                </div>
-              </div>
-              <!-- /.card -->
-            </div>
-          </div>
+									<!-- >boucle -->
+									{% for venteRossignol in venteRossignols %}
+										<tr>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Tiers }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Nom }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Commercial }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Ref }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Designation }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Sref1 }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Sref2 }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Uv }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.CodeTarif }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">
+													{% if venteRossignol.dateTarif %}
+														{{ venteRossignol.dateTarif|date("d/m/Y") }}
+													{% endif %}
+												</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Prix|number_format(2, '.', ' ') }}
+													€</a>
+											</td>
+											<td class="text-center">
+												{% if venteRossignol.PrixParTO > 0 %}
+													<a class="text-center text-dark">{{ venteRossignol.PrixParTO }}</a>
+												{% endif %}
+											</td>
+											{% if (venteRossignol.Pu < 0 or venteRossignol.Pu > 0) and (venteRossignol.Prix < 0 or venteRossignol.Prix > 0) %}
+												{% set Delta = (((venteRossignol.Pu / venteRossignol.Prix)-1)*100)|number_format(2, '.', ' ') %}
+											{% else %}
+												{% set Delta = 0 %}
+											{% endif %}
+											{% if Delta > 0 %}
+												<td class="text-center">
+													<a class="description-text text-success">
+														<i class="fas fa-arrow-up pr-1"></i>
+														{{ Delta }}
+														%</a>
+												</td>
+											{% elseif Delta == 0 %}
+												<td class="text-center">
+													<a class="description-text text-warning">
+														<i class="fas fa-arrow-left pr-1"></i>
+														{{ Delta }}
+														%</a>
+												</td>
+											{% elseif Delta < 0 %}
+												<td class="text-center">
+													<a class="description-text text-danger">
+														<i class="fas fa-arrow-down pr-1"></i>
+														{{ Delta }}
+														%</a>
+												</td>
+											{% endif %}
 
-                
-            
-        </div>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Qte|number_format(2, '.', ' ')}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Pu|number_format(2, '.', ' ') }}
+													€</a>
+											</td>
+											<td class="text-center">
+												{% if venteRossignol.PrixPar > 0 %}
+													<a class="text-center text-dark">{{ venteRossignol.PrixPar }}</a>
+												{% endif %}
+											</td>
+											<td class="text-center">
+												<a class="text-center text-dark">{{ venteRossignol.Montant|number_format(2, '.', ' ') }}
+													€</a>
+											</td>
+										</tr>
+									{% endfor %}
+									<!-- >boucle -->
+
+								</tbody>
+								<tfoot>
+									<tr>
+										<th class="text-center">
+											<span>Tiers</span>
+										</th>
+										<th class="text-center">
+											<span>Nom</span>
+										</th>
+										<th class="text-center">
+											<span>Commercial</span>
+										</th>
+										<th class="text-center">
+											<span>Référence</span>
+										</th>
+										<th class="text-center">
+											<span>Désignation</span>
+										</th>
+										<th class="text-center">
+											<span>Sref1</span>
+										</th>
+										<th class="text-center">
+											<span>Sref2</span>
+										</th>
+										<th class="text-center">
+											<span>U.V</span>
+										</th>
+										<th class="text-center">
+											<span>Code Tarif</span>
+										</th>
+										<th class="text-center">
+											<span>Prix Tarif TO</span>
+										</th>
+										<th class="text-center">
+											<span>Prix par Tarif TO</span>
+										</th>
+										<th class="text-center">
+											<span>Delta</span>
+										</th>
+										<th class="text-center">
+											<span>Qté Vendus</span>
+										</th>
+										<th class="text-center">
+											<span>Prix unitaire</span>
+										</th>
+										<th class="text-center">
+											<span>Prix par facture</span>
+										</th>
+										<th class="text-center">
+											<span>Montant facture</span>
+										</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+				<!-- /.card -->
+			</div>
+		</div>
+
+
+	</div>
 
 {% endblock %}
-

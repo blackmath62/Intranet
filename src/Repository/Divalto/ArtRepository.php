@@ -336,4 +336,46 @@ class ArtRepository extends ServiceEntityRepository
         return $stmt->fetch();
     }
 
+    public function getEmpl($dos, $emplacement)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(e.LIEU)) AS empl
+        FROM T018 e
+        WHERE e.DOS = $dos AND e.LIEU = '$emplacement'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    public function getSearchArt($dos, $produit): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ref AS ref, sref1 AS sref1, sref2 AS sref2, designation AS designation, uv AS uv, stock AS stock, ean AS ean, ferme AS ferme, color AS color
+        FROM(
+        SELECT LTRIM(RTRIM(a.REF)) AS ref, LTRIM(RTRIM(s.SREF1)) AS sref1, LTRIM(RTRIM(s.SREF2)) AS sref2, LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(a.VENUN)) AS uv, LTRIM(RTRIM(m.QTETJSENSTOCK)) AS stock,
+        CASE
+        WHEN a.SREFCOD = 1 THEN LTRIM(RTRIM(a.EAN))
+        WHEN a.SREFCOD = 2 THEN LTRIM(RTRIM(s.EAN)) --, a.HSDT AS ferme, s.EAN AS sean, s.USERMODH AS fermeSref
+        END AS ean,
+        CASE
+        WHEN a.FAM_0002 = 'HP' THEN 'danger'
+        WHEN a.FAM_0002 = 'EV' THEN 'success'
+        WHEN a.FAM_0002 = 'ME' THEN 'warning'
+        END AS color,
+        CASE
+        WHEN a.SREFCOD = 1 THEN LTRIM(RTRIM(a.HSDT))
+        WHEN a.SREFCOD = 2 AND s.CONF = 'Usrd' THEN LTRIM(RTRIM(s.USERMODH)) --, a.HSDT AS ferme, s.EAN AS sean, s.USERMODH AS fermeSref
+        END AS ferme
+        FROM ART a
+        LEFT JOIN SART s ON a.DOS = s.DOS AND a.REF = s.REF
+        LEFT JOIN MVTL_STOCK_V m ON a.REF = m.REFERENCE AND s.SREF1 = m.SREFERENCE1 AND s.SREF2 = m.SREFERENCE2
+        WHERE a.DOS = $dos)reponse
+        WHERE ref LIKE '%$produit%'
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
 }

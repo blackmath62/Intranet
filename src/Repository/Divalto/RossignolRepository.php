@@ -2,10 +2,9 @@
 
 namespace App\Repository\Divalto;
 
-
 use App\Entity\Divalto\Mouv;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 class RossignolRepository extends ServiceEntityRepository
 {
@@ -14,8 +13,8 @@ class RossignolRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Mouv::class);
     }
-   
-    public function getRossignolStockList():array
+
+    public function getRossignolStockList(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT MVTL_STOCK_V.REFERENCE AS Ref,  MVTL_STOCK_V.SREFERENCE1 AS Sref1,MVTL_STOCK_V.SREFERENCE2 AS Sref2, SUM(MOUV.CDQTE) AS CmdQte
@@ -39,16 +38,16 @@ class RossignolRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
-    public function getRossignolVenteList($annee):array
+    public function getRossignolVenteList($annee): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT Tiers, Nom, Commercial, Ref, Sref1, Sref2, Designation, Uv, TAR.TACOD AS CodeTarif, TAR.PUB AS Prix, TAR.PPAR AS PrixParTO, 
-        SUM(QteSign) AS Qte, (SUM(MontantSign) / SUM(QteSign)) AS Pu, PrixPar,  SUM(MontantSign) AS Montant 
+        $sql = "SELECT Tiers, Nom, Commercial, Ref, Sref1, Sref2, Designation, Uv, TAR.TACOD AS CodeTarif, TAR.TADT AS dateTarif, TAR.PUB AS Prix, TAR.PPAR AS PrixParTO,
+        SUM(QteSign) AS Qte, (SUM(MontantSign) / SUM(QteSign)) AS Pu, PrixPar,  SUM(MontantSign) AS Montant
         FROM(
-        SELECT RTRIM(LTRIM(MOUV.DOS)) AS Dos, RTRIM(LTRIM(CLI.TIERS)) AS Tiers, RTRIM(LTRIM(CLI.NOM)) AS Nom, RTRIM(LTRIM(VRP.SELCOD)) AS Commercial,  
-        RTRIM(LTRIM(MOUV.REF)) AS Ref,  RTRIM(LTRIM(MOUV.SREF1)) AS Sref1,RTRIM(LTRIM(MOUV.SREF2)) AS Sref2, 
-        RTRIM(LTRIM(MOUV.DES)) AS Designation, RTRIM(LTRIM(ART.VENUN)) AS Uv,RTRIM(LTRIM(MOUV.OP)) AS Op, 
-        RTRIM(LTRIM(MOUV.MONT)) AS Montant, RTRIM(LTRIM(MOUV.REMPIEMT_0004)) AS Remise, RTRIM(LTRIM(MOUV.FADT)) AS DateFacture, 
+        SELECT RTRIM(LTRIM(MOUV.DOS)) AS Dos, RTRIM(LTRIM(CLI.TIERS)) AS Tiers, RTRIM(LTRIM(CLI.NOM)) AS Nom, RTRIM(LTRIM(VRP.SELCOD)) AS Commercial,
+        RTRIM(LTRIM(MOUV.REF)) AS Ref,  RTRIM(LTRIM(MOUV.SREF1)) AS Sref1,RTRIM(LTRIM(MOUV.SREF2)) AS Sref2,
+        RTRIM(LTRIM(MOUV.DES)) AS Designation, RTRIM(LTRIM(ART.VENUN)) AS Uv,RTRIM(LTRIM(MOUV.OP)) AS Op,
+        RTRIM(LTRIM(MOUV.MONT)) AS Montant, RTRIM(LTRIM(MOUV.REMPIEMT_0004)) AS Remise, RTRIM(LTRIM(MOUV.FADT)) AS DateFacture,
         RTRIM(LTRIM(MOUV.FAQTE)) AS QuantiteFacture,
         CASE -- Signature du montant
             WHEN MOUV.OP IN('C 2','CO') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
@@ -71,7 +70,7 @@ class RossignolRepository extends ServiceEntityRepository
         WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND MOUV.OP IN('C 2', 'CO') AND CLI.STAT_0002 = 'HP' AND YEAR(MOUV.FADT) IN($annee)
         GROUP BY MOUV.DOS, CLI.TIERS, CLI.NOM, VRP.SELCOD, MOUV.REF,  MOUV.SREF1, MOUV.SREF2,MOUV.DES,ART.VENUN,MOUV.OP, MOUV.PPAR, MOUV.FADT, MOUV.FAQTE, MOUV.MONT, MOUV.REMPIEMT_0004)reponse
         LEFT JOIN TAR ON Dos = TAR.DOS AND Ref = TAR.REF AND Sref1 = TAR.SREF1 AND Sref2 = TAR.SREF2 AND TAR.TACOD = 'TO'
-        GROUP BY Tiers, Nom, Commercial, Ref, Sref1, Sref2, Designation, Uv, TAR.TACOD, TAR.PUB, TAR.PPAR, PrixPar
+        GROUP BY Tiers, Nom, Commercial, Ref, Sref1, Sref2, Designation, Uv, TAR.TACOD, TAR.TADT, TAR.PUB, TAR.PPAR, PrixPar
         ";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -79,5 +78,3 @@ class RossignolRepository extends ServiceEntityRepository
     }
 
 }
-
-

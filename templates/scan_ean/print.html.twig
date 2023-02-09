@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block body %}
+	<!-- general form elements disabled -->
+	<div class="card card-navy">
+		<div class="card-header d-flex">
+			<h3 class="card-title">Recherche de produit</h3>
+			<a href="{{ path('app_scan_ean_alim_empl', {'emplacement' : app.request.attributes.get('emplacement') })}}" class="badge badge-danger ml-auto">Retour saisie</a>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<div class="row">
+				<div class="col-md-8 offset-md-2">
+					{{ form_start(form, { 'attr' : { 'class' : 'ml-auto' }}) }}
+					<small>Vous pouvez taper une partie de la référence</small>
+					<div class="input-group">
+						{{ form_widget(form.search, { 'placeholder' : "Référence article",'attr' : { 'class' : 'form-control form-control-lg' }}) }}
+						<div class="input-group-append">
+							{{ form_widget(form.rechercher) }}
+						</div>
+					</div>
+					{{ form_end(form, { 'attr' : { 'class' : 'ml-auto' }}) }}
+				</div>
+			</div>
+		</div>
+		<!-- /.card -->
+	</div>
+
+	{% if produits %}
+		<div class="content-header">
+			<div class="container-fluid">
+				<div class="text-center">
+					<h1>
+						{{ produits|length}}
+						{% if produits|length > 1 %}
+							produits trouvés
+						{% else %}
+							produit trouvé
+						{% endif %}
+					</h1>
+					<small>Plus la recherche saisie sera précise, moins vous aurez de résultat</small>
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			{% for produit in produits %}
+				<div class="callout callout-{{ produit.color }}">
+					<div class="d-flex justify-content-between">
+						<a onclick="imprime_zone('Recette de cuisine', '{{produit.ean}}');" class="text-white btn btn-dark col-12">
+							<i class="nav-icon pr-3 fas fa-barcode text-white"></i>
+							Imprimer l'étiquette
+						</a>
+					</div>
+					<div id="{{ produit.ean }}" class="card-footer p-0">
+						<ul class="nav flex-column">
+							<li class="nav-item">
+								<small class="nav-link">
+									Référence :
+									<span class="float-right">{{produit.ref}}</span>
+								</small>
+							</li>
+							{% if produit.sref1 %}
+								<li class="nav-item">
+									<small class="nav-link">
+										Sref1 :
+										<span class="float-right">{{produit.sref1}}</span>
+									</small>
+								</li>
+							{% endif %}
+							{% if produit.sref2 %}
+								<li class="nav-item">
+									<small class="nav-link">
+										Sref2 :
+										<span class="float-right">{{produit.sref2}}</span>
+									</small>
+								</li>
+							{% endif %}
+							<li class="nav-item">
+								<small class="nav-link">
+									Désignation :
+									<span class="float-right">{{produit.designation}}</span>
+								</small>
+							</li>
+							<li class="nav-item">
+								<small class="nav-link">
+									Unité de vente :
+									<span class="float-right">{{produit.uv}}</span>
+								</small>
+							</li>
+							{% if produit.stock %}
+								<li class="nav-item">
+									<small class="nav-link">
+										Stock :
+										<span class="float-right">{{produit.stock}}</span>
+									</small>
+								</li>
+							{% endif %}
+							<li class="nav-item">
+								<small class="nav-link">
+									Gencod :
+									<span class="float-right barcode">
+										{% if produit.ean %}
+											{{produit.ean}}
+										{% else %}
+											Pas de code EAN
+										{% endif %}
+									</span>
+								</small>
+							</li>
+							<li class="nav-item">
+								<small class="nav-link">
+									EAN :
+									<span class="float-right">
+										{% if produit.ean %}
+											{{produit.ean}}
+										{% else %}
+											Pas de code EAN
+										{% endif %}
+									</span>
+								</small>
+							</li>
+							{% if produit.ferme %}
+								<li class="nav-item text-danger bold">
+									<small class="nav-link">
+										Date Fermeture :
+										<i class="nav-icon fas fa-bullhorn text-danger"></i>
+										<span class="float-right">{{produit.ferme|date("d/m/Y")}}</span>
+									</small>
+								</li>
+							{% endif %}
+						</ul>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	{% else %}
+		<div class="card-body">
+			<div class="callout callout-warning">
+				<div class="d-flex justify-content-between">
+					<h5>Aucun produit trouvé</h5>
+				</div>
+				<i>
+					<p>il n'y a rien à voir..</p>
+				</i>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
+{% block javascripts %}
+	<script>
+		var monAlert = $('#alert');
+console.log(monAlert);
+if (monAlert.length > 0) {
+monAlert.delay(3000).slideUp();
+}
+	</script>
+
+	<script type="text/javascript">
+		function imprimer_page() {
+window.print();
+}
+	</script>
+	<script>
+		// impression zone Modal
+$().ready(function () {
+$('.modal.printable').on('shown.bs.modal', function () {
+$('.modal-dialog', this).addClass('focused');
+$('body').addClass('modalprinter');
+
+if ($(this).hasClass('autoprint')) {
+window.print();
+}
+}).on('hidden.bs.modal', function () {
+$('.modal-dialog', this).removeClass('focused');
+$('body').removeClass('modalprinter');
+});
+});
+	</script>
+
+	<script language="JavaScript">
+		function imprime_zone(titre, obj) { // Définie la zone à imprimer
+var zi = document.getElementById(obj).innerHTML;
+// Ouvre une nouvelle fenetre
+var f = window.open("", "ZoneImpr", "height=500, width=600,toolbar=0, menubar=0, scrollbars=1, resizable=1,status=0, location=0, left=10, top=10");
+// Définit le Style de la page
+f.document.body.style.color = '#000000';
+f.document.body.style.backgroundColor = '#FFFFFF';
+f.document.body.style.padding = "10px";
+// Ajoute les Données
+f.document.title = titre;
+f.document.body.innerHTML += " " + zi + " ";
+// Imprime et ferme la fenetre
+f.window.print();
+f.window.close();
+return true;
+}
+	</script>
+{% endblock %}

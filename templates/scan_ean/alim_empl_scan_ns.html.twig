@@ -4,41 +4,56 @@
 	{{ title }}
 {% endblock %}
 {% block body %}
-	<a href="{{ path('app_scan_ean_alim_empl') }}" class="text-white btn btn-primary col-12">Commencer une nouvelle saisie</a>
 	{% if ns %}
-		<a data-toggle="modal" data-target="#modal-sm-cloture" class="btn btn-success text-center col-12 mt-3">Soumettre ces emplacements</a>
-		<div class="modal fade" id="modal-sm-cloture">
-			<div class="modal-dialog modal-sm">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h4 class="modal-title">Voulez vous vraiment soumettre ces emplacements ?</h4>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<form action="{{path('app_emplacement_scan_ean-send', {'emplacement' : app.request.attributes.get('emplacement') })}}" method="POST">
-						<div class="modal-body form-group">
-							<label>Commentaires
-								<small>
-									<i>(facultatif)</i>
-								</small>
-							</label>
-							<textarea type="text" name="ta" class="form-control" rows="10" placeholder="Vous pouvez ajouter un commentaire..."></textarea>
+		<div class="btn-group mb-2 col-12">
+			<a href="{{ path('app_scan_ean_alim_empl') }}" type="button" class="btn btn-primary col-6">
+				<i class="fas fa-plus mr-2"></i>Nouvelle saisie
+			</a>
+			<a data-toggle="modal" data-target="#modal-sm-cloture" type="button" class="btn btn-success col-6">
+				<i class="fas fa-bullhorn mr-2"></i>Soumettre
+			</a>
+			<div class="modal fade" id="modal-sm-cloture">
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title">Voulez vous vraiment soumettre ces emplacements ?</h4>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
 						</div>
-						<div class="modal-footer justify-content-between">
-							<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+						<form action="{{path('app_emplacement_scan_ean-send', {'emplacement' : app.request.attributes.get('emplacement') })}}" method="POST">
+							<div class="modal-body form-group">
+								<label>Commentaires
+									<small>
+										<i>(facultatif)</i>
+									</small>
+								</label>
+								<textarea type="text" name="ta" class="form-control" rows="10" placeholder="Vous pouvez ajouter un commentaire..."></textarea>
+							</div>
+							<div class="modal-footer justify-content-between">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
 
-							<button class="btn btn-success" type="submit">Soumettre ces emplacements</button>
-						</div>
-					</form>
+								<button class="btn btn-success" type="submit">Soumettre ces emplacements</button>
+							</div>
+						</form>
+					</div>
+					<!-- /.modal-content -->
 				</div>
-				<!-- /.modal-content -->
+				<!-- /.modal-dialog -->
 			</div>
-			<!-- /.modal-dialog -->
+			<!-- /.modal -->
 		</div>
-		<!-- /.modal -->
+	{% else %}
+		<a href="{{ path('app_scan_ean_alim_empl') }}" class="text-white btn btn-primary col-12">Commencer une nouvelle saisie</a>
 	{% endif %}
 	{% if ns %}
+		<div class="content-header">
+			<div class="container-fluid">
+				<div class="text-center">
+					<h1>Emplacements non soumis</h1>
+				</div>
+			</div>
+		</div>
 		<div class="card-body">
 			{% for n in ns %}
 				<div class="callout callout-warning">

@@ -5,6 +5,13 @@
 {% endblock %}
 {% block body %}
 	<a href="{{ path('app_scan_ean') }}" class="text-white btn btn-success col-12">Commencer une nouvelle saisie</a>
+	<div class="content-header">
+		<div class="container-fluid">
+			<div class="text-center">
+				<h1>Retraits non soumis</h1>
+			</div>
+		</div>
+	</div>
 	{% if ns %}
 		<div class="card-body">
 			{% for n in ns %}

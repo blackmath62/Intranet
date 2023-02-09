@@ -3,154 +3,175 @@
 	{{ title }}
 {% endblock %}
 {% block body %}
-<section class="content-header">
-  <div class="alert alert-info alert-dismissible col-12" role="alert" id="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <h5><i class="icon fas fa-info-circle"></i> info</h5>
-    Pour déposer une idée d'amélioration, cliquez sur tickets sur la gauche puis sur la barre à droite de Créer un nouveau ticket. </br>
-    Dans le degrés d'urgence, selectionnez boite à idée. </br>
-  </div>
+	<section class="content-header pc">
+		<div class="alert alert-info alert-dismissible col-12 pc" role="alert" id="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			<h5>
+				<i class="icon fas fa-info-circle"></i>
+				info
+			</h5>
+			<p>Pour déposer une idée d'amélioration, cliquez sur tickets sur la gauche puis sur la barre à droite de Créer un nouveau ticket.</p>
+			<p>Dans le degrés d'urgence, selectionnez boite à idée.</p>
+		</div>
 
-<div class='d-flex justify-content-between'>
+		<div class='d-flex justify-content-between pc'>
 
-<div class="col-12 col-sm-9">
-{% set new = '' %}
-{% set cal = 'active' %}
-{% if news %}
-  {% set new = 'show active' %}
-{% else %}
-  {% set cal = 'show active' %}
-{% endif %}
-  <div class="card card-dark card-tabs">
-    <div class="card-header p-0 pt-1">
-      <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
-        {% if news %}
-        <li class="nav-item">
-          <a class="nav-link {{ new }}" id="actuality" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Actualités</a>
-        </li>
-        {% endif %}
-        <li class="nav-item">
-          <a class="nav-link" id="custom-tabs-one-calendar-tab" data-toggle="pill" href="#calendrier" role="tab" aria-controls="custom-tabs-one-calendar" aria-selected="false">Calendrier des congés et anniversaires</a>
-        </li>
-      </ul>
-    </div>
-    <div class="card-body">
-      <div class="tab-content" id="custom-tabs-one-tabContent">
+			<div class="col-12 col-sm-9">
+				{% set new = '' %}
+				{% set cal = 'active' %}
+				{% if news %}
+					{% set new = 'show active' %}
+				{% else %}
+					{% set cal = 'show active' %}
+				{% endif %}
+				<div class="card card-dark card-tabs">
+					<div class="card-header p-0 pt-1">
+						<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+							{% if news %}
+								<li class="nav-item">
+									<a class="nav-link {{ new }}" id="actuality" data-toggle="pill" href="#custom-tabs-one-home" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Actualités</a>
+								</li>
+							{% endif %}
+							<li class="nav-item">
+								<a class="nav-link" id="custom-tabs-one-calendar-tab" data-toggle="pill" href="#calendrier" role="tab" aria-controls="custom-tabs-one-calendar" aria-selected="false">Calendrier des congés et anniversaires</a>
+							</li>
+						</ul>
+					</div>
+					<div class="card-body">
+						<div class="tab-content" id="custom-tabs-one-tabContent">
 
-        <div class="tab-pane fade {{ new }}" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="actuality">
+							<div class="tab-pane fade {{ new }}" id="custom-tabs-one-home" role="tabpanel" aria-labelledby="actuality">
 
-{% if news %}
-<div id="carousel" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-inner">
-  {% set myVal = 1 %}
+								{% if news %}
+									<div id="carousel" class="carousel slide" data-bs-ride="carousel">
+										<div class="carousel-inner">
+											{% set myVal = 1 %}
+											{% for new in news %}
+												{% if myVal == 1 %}
+													<div class="carousel-item active">
+													{% else %}
+														<div class="carousel-item">
+														{% endif %}
+														<h2 class="d-block w-100 text-center text-dark">{{ new.title }}
+														</h2>
+														<p class="d-block w-100">{{ new.content|raw }}
+														</p>
+														{% set myVal = myVal + 1 %}
+													</div>
+												{% endfor %}
+											</div>
+										</div>
+									{% endif %}
+								</div>
+								<div class="tab-pane fade {{ cal }}" id="calendrier" role="tabpanel" aria-labelledby="custom-tabs-one-calendar-tab">
+									<div>
+										<!-- THE CALENDAR -->
+										<div id="external-events"></div>
+										<div id="calendar"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- /.card -->
+					</div>
+				</div>
 
-    {% for new in news %}
-    {% if myVal == 1 %}
-    <div class="carousel-item active">
-    {% else %}
-    <div class="carousel-item">
-    {% endif %}
-      <h2 class="d-block w-100 text-center text-dark">{{ new.title }} </h2>
-      <p class="d-block w-100">{{ new.content|raw }} </p>
-     {% set myVal = myVal + 1 %}
-    </div>
-    {% endfor %}
-  </div>        
-</div>
-{% endif %}
+				<div
+					class="col-md-3 float-right">
+					<!-- USERS LIST -->
+					<div class="card">
+						<div class="card-header">
+							<h3 class="card-title">Membres</h3>
+							<div class="card-tools">
+								<span class="badge badge-danger">{{ users|length }}
+									Membres</span>
+								<button type="button" class="btn btn-tool" data-card-widget="collapse">
+									<i class="fas fa-minus"></i>
+								</button>
+								<button type="button" class="btn btn-tool" data-card-widget="remove">
+									<i class="fas fa-times"></i>
+								</button>
+							</div>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body p-0">
+							<ul class="users-list clearfix">
+								{% for user in users %}
+									<li>
+										<img src="img/profile/{{ user.img }}" alt="User Image">
+										<a class="users-list-name" href="mailto:{{ user.email }}">{{ user.pseudo }}</a>
 
-        </div>
-        <div class="tab-pane fade {{ cal }}" id="calendrier" role="tabpanel" aria-labelledby="custom-tabs-one-calendar-tab">
-            <div >
-              <!-- THE CALENDAR -->
-              <div id="external-events"></div>
-              <div id="calendar"></div>
-            </div>
-        </div>
-      </div>
-    </div>
-    <!-- /.card -->
-  </div>
-</div>
-
-<div class="col-md-3 float-right">
-<!-- USERS LIST -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Membres</h3>
-            <div class="card-tools">
-                <span class="badge badge-danger">{{ users|length }} Membres</span>
-                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-            </div>
-        </div>
-    <!-- /.card-header -->
-        <div class="card-body p-0">
-            <ul class="users-list clearfix">
-                {% for user in users %}
-                    <li>
-                    <img src="img/profile/{{ user.img }}" alt="User Image">
-                    <a class="users-list-name" href="mailto:{{ user.email }}">{{ user.pseudo }}</a>
-                    
-                        {% for track in tracks %}
-                            {% if track.user_id == user.id %}
-                              {% if track.inHoliday %}
-                                  <small class="badge badge-warning"><i class="fas fa-sun text-white mr-1"></i> {{ track.inHoliday }}</small>
-                              {% else %}
-                                  {% if track.ago == 'en ligne' or track.ago ends with 'secondes' %}
-                                  <small class="badge badge-success"><i class="far fa-clock text-white mr-1"></i> en ligne</small>
-                                  {% else %}
-                                  <small class="badge badge-secondary"><i class="far fa-clock text-white mr-1"></i> {{ track.ago }}</small>  
-                                  {% endif %}                                
-                              {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    </li>
-                {% endfor %}              
-            </ul>
-        </div>
-    </div>
-</div>
-</div>             
-</section>
+										{% for track in tracks %}
+											{% if track.user_id == user.id %}
+												{% if track.inHoliday %}
+													<small class="badge badge-warning">
+														<i class="fas fa-sun text-white mr-1"></i>
+														{{ track.inHoliday }}</small>
+												{% else %}
+													{% if track.ago == 'en ligne' or track.ago ends with 'secondes' %}
+														<small class="badge badge-success">
+															<i class="far fa-clock text-white mr-1"></i>
+															en ligne</small>
+													{% else %}
+														<small class="badge badge-secondary">
+															<i class="far fa-clock text-white mr-1"></i>
+															{{ track.ago }}</small>
+													{% endif %}
+												{% endif %}
+											{% endif %}
+										{% endfor %}
+									</li>
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="text-center mobile">
+			<a href="{{ path('app_scan_ean') }}" class="btn btn-lg btn-warning col-11 mt-5 mb-5">
+				<i class="fa fa-truck mr-2"></i>Retrait marchandise
+			</a>
+			<a href="{{ path('app_scan_ean_alim_empl') }}" class="text-white btn btn-lg btn-primary col-11 mb-5">
+				<i class="fa fa-plus mr-2"></i>Alimenter emplacement
+			</a>
+		</div>
+	</section>
 {% endblock %}
 {% block javascripts %}
 
-<script>
-var myCarousel = document.querySelector('#carousel')
-var carousel = new bootstrap.Carousel(myCarousel, {
-  interval: 2000
-})
-</script>
+	<script>
+		var myCarousel = document.querySelector('#carousel')
+var carousel = new bootstrap.Carousel(myCarousel, {interval: 2000})
+	</script>
 
-<!-- fullCalendar -->
-<script>
-    /* initialize the calendar
+	<!-- fullCalendar -->
+	<script>
+		/* initialize the calendar
      -----------------------------------------------------------------*/
-     window.onload = ()=> {
-        let calendarElt = document.querySelector("#calendar")
-        let calendar = new FullCalendar.Calendar(calendarElt, {
-          weekNumbers: true, // numéro de semaine
-          weekNumberCalculation: "ISO",
-          initialView:'dayGridMonth',
-          locale: 'fr',
-          timeZone: 'Europe/Paris',
-          headerToolbar:{
-            left  : 'prev,next today',
-            center: 'title',
-            right : 'dayGridMonth,timeGridWeek,timeGridDay'
-          },
-          buttonText: {
-            today: 'Aujourd\'hui',
-            month: 'Mois',
-            day: 'Jour',
-            week: 'Semaine'
-        },
-          events    : {{ data|raw }},   
-        })      
-        calendar.render()
-      };
-</script>
-<!-- End Calendrier -->
-
+window.onload = () => {
+let calendarElt = document.querySelector("#calendar")
+let calendar = new FullCalendar.Calendar(calendarElt, {
+weekNumbers: true, // numéro de semaine
+weekNumberCalculation: "ISO",
+initialView: 'dayGridMonth',
+locale: 'fr',
+timeZone: 'Europe/Paris',
+headerToolbar: {
+left: 'prev,next today',
+center: 'title',
+right: 'dayGridMonth,timeGridWeek,timeGridDay'
+},
+buttonText: {
+today: 'Aujourd\'hui',
+month: 'Mois',
+day: 'Jour',
+week: 'Semaine'
+},
+events: {{ data|raw }}
+})
+calendar.render()
+};
+	</script>
+	<!-- End Calendrier -->
 {% endblock %}

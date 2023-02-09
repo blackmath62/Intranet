@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use App\Repository\Divalto\RossignolRepository;
 use DateTime;
-use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @IsGranted("ROLE_LHERMITTE")
@@ -37,7 +37,7 @@ class RossignolController extends AbstractController
         return $this->render('rossignol/index.html.twig', [
             'title' => 'Rossignol',
             'stockRossignols' => $stockRossignol,
-            'venteRossignols' => $venteRossignol
+            'venteRossignols' => $venteRossignol,
         ]);
     }
 }

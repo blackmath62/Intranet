@@ -50,6 +50,11 @@ class RetraitMarchandisesEan
      */
     private $qte;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $stockFaux;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -123,6 +128,18 @@ class RetraitMarchandisesEan
     public function setQte(float $qte): self
     {
         $this->qte = $qte;
+
+        return $this;
+    }
+
+    public function getStockFaux(): ?bool
+    {
+        return $this->stockFaux;
+    }
+
+    public function setStockFaux(bool $stockFaux): self
+    {
+        $this->stockFaux = $stockFaux;
 
         return $this;
     }

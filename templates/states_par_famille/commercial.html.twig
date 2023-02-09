@@ -11,11 +11,11 @@
 				<div class="col-sm-10">
 					<div class='d-flex'>
 						<h1>{{app.request.attributes.get('commercial')}}</h1>
-						{% if app.request.attributes.get('commercial') == 'Xavier Dupire' and ((app.user.id == 1) or (app.user.id == 7 and  "now"|date("d/m/Y") > '29/01/2023')) %}
+						{% if app.request.attributes.get('commercial') == 'Xavier Dupire' and ((app.user.id == 1) or (app.user.id == 7 )) %}
 							<img class="img-fluid pl-5" src="{{ asset(asset('img/profile/stallone.jpg'))}}" alt="User Image">
-						{% elseif app.request.attributes.get('commercial') == 'Rémi Vasset' and ((app.user.id == 1) or (app.user.id == 7 and  "now"|date("d/m/Y") > '29/01/2023')) %}
+						{% elseif app.request.attributes.get('commercial') == 'Rémi Vasset' and ((app.user.id == 1) or (app.user.id == 7 )) %}
 							<img class="img-fluid pl-5" src="{{ asset(asset('img/profile/rvasset.jpg'))}}" alt="User Image">
-						{% elseif app.request.attributes.get('commercial') == 'Laurent Leleu' and ((app.user.id == 1) or (app.user.id == 7 and  "now"|date("d/m/Y") > '29/01/2023')) %}
+						{% elseif app.request.attributes.get('commercial') == 'Laurent Leleu' and ((app.user.id == 1) or (app.user.id == 7 )) %}
 							<img class="img-fluid pl-5" src="{{ asset(asset('img/profile/lleleu.jpg'))}}" alt="User Image">
 						{% endif %}
 					</div>

@@ -24,11 +24,23 @@
 				{{ form_errors(form.chantier) }}
 			</div>
 			<div class="form-group">
-				<label class="col-form-label" for="ean">
-					<i class="fas fa-barcode"></i>
-					{{ form_label(form.ean) }}
+				<label class="col-form-label col-12" for="ean">
+					<div class='d-flex justify-content-between'>
+						<div>
+							<i class="fas fa-barcode"></i>
+							{{ form_label(form.ean) }}
+						</div>
+						<div class="resultStockR"></div>
+						<div class="d-flex">
+							<div id="stockFaux" class="form-check">
+								{{ form_widget(form.stockFaux, {'attr' : { 'class' : 'form-check-input' } }) }}
+								{{ form_label(form.stockFaux) }}
+							</div>
+						</div>
+					</div>
 				</label>
 				{{ form_widget(form.ean, { 'id': 'ean' , 'attr' : { 'class' : 'form-control col-12 is-warning' } }) }}
+				<small class="resultDesR"></small>
 				{{ form_errors(form.ean) }}
 			</div>
 			<div class="form-group">
@@ -36,7 +48,7 @@
 					<i class="fas fa-shopping-basket"></i>
 					{{ form_label(form.qte) }}
 				</label>
-				{{ form_widget(form.qte, { 'id': 'qte' , 'attr' : { 'class' : 'form-control col-12' } }) }}
+				{{ form_widget(form.qte, { 'id': 'qte' ,'type' : "number", 'attr' : { 'class' : 'form-control col-12' ,'step' : "0.001", 'min' : "0" } }) }}
 				{{ form_errors(form.qte) }}
 			</div>
 			{{ form_row(form.save, {'attr' : { 'class' : 'btn btn-xl btn-warning col-12' } }) }}
@@ -215,6 +227,18 @@
 																<span class="float-right">{{historique.qte}}</span>
 															</small>
 														</li>
+														<li class="nav-item">
+															<small class="nav-link">
+																Stock Faux ? :
+																<span class="float-right">
+																	{% if historique.stockFaux == 1 %}
+																		Oui
+																	{% else %}
+																		Non
+																	{% endif %}
+																</span>
+															</small>
+														</li>
 													</ul>
 												</div>
 												<div class="modal-footer justify-content-between">
@@ -291,8 +315,10 @@ type: "GET"
 console.log(data);
 const resultRef = document.querySelector('.resultRef');
 const resultDes = document.querySelector('.resultDes');
+const resultDesR = document.querySelector('.resultDesR');
 // const resultEan = document.querySelector('.resultEan');
 const resultStock = document.querySelector('.resultStock');
+const resultStockR = document.querySelector('.resultStockR');
 const resultUv = document.querySelector('.resultUv');
 const resultFerme = document.querySelector('.resultFerme');
 const resultSref1 = document.querySelector('.resultSref1');
@@ -300,8 +326,10 @@ const resultSref2 = document.querySelector('.resultSref2');
 
 resultRef.textContent = data.ref;
 resultDes.textContent = data.designation;
+resultDesR.textContent = data.designation;
 // resultEan.textContent = data.ean;
 resultStock.textContent = data.stock;
+resultStockR.textContent = data.stock;
 resultUv.textContent = data.uv;
 resultFerme.textContent = data.ferme;
 resultSref1.textContent = data.sref1;
@@ -309,9 +337,11 @@ resultSref2.textContent = data.sref2;
 if (data.ean) {
 $("#ean").attr('class', 'form-control col-12 is-valid');
 $("#produit").attr('class', 'card mt-3');
+$("#stockFaux").attr('class', 'd-flex');
 } else {
 $("#ean").attr('class', 'form-control col-12 is-invalid');
 $("#produit").attr('class', 'd-none');
+$("#stockFaux").attr('class', 'd-none');
 }
 if (data.sref1) {
 $("#sref1").attr('class', 'nav-link');
@@ -328,6 +358,7 @@ $("#stock").attr('class', 'nav-link');
 } else {
 $("#stock").attr('class', 'd-none');
 }
+console.log(data.stock);
 if (data.ferme) {
 $("#ferme").attr('class', 'nav-link');
 } else {
