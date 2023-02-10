@@ -6,11 +6,11 @@ use App\Entity\Main\TypeDocumentFsc;
 use App\Form\TypeDocumentFscType;
 use App\Repository\Main\TypeDocumentFscRepository;
 use DateTime;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @IsGranted("ROLE_ADMIN")
@@ -36,8 +36,8 @@ class TypeDocumentFscController extends AbstractController
         $typeDocs = $repo->findAll();
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //  $tracking = $request->attributes->get('_route');
+        //  $this->setTracking($tracking);
 
         return $this->render('type_document_fsc/index.html.twig', [
             'typeDocs' => $typeDocs,
@@ -47,31 +47,31 @@ class TypeDocumentFscController extends AbstractController
     }
 
     /**
-    * @Route("/type/document/fsc/edit/{id}", name="app_type_document_fsc_edit")
-    */
+     * @Route("/type/document/fsc/edit/{id}", name="app_type_document_fsc_edit")
+     */
     public function edit($id, TypeDocumentFsc $typeDocFsc, Request $request): Response
     {
         $form = $this->createForm(TypeDocumentFscType::class, $typeDocFsc);
-            $form->handleRequest($request);
+        $form->handleRequest($request);
 
-            // tracking user page for stats
-            $tracking = $request->attributes->get('_route');
-            $this->setTracking($tracking);
+        // tracking user page for stats
+        //    $tracking = $request->attributes->get('_route');
+        //   $this->setTracking($tracking);
 
-            if($form->isSubmitted() && $form->isValid()){
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($typeDocFsc);
-                $em->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($typeDocFsc);
+            $em->flush();
 
-                $this->addFlash('message', 'Type de document FSC modifié avec succès');
-                return $this->redirectToRoute('app_type_document_fsc');
+            $this->addFlash('message', 'Type de document FSC modifié avec succès');
+            return $this->redirectToRoute('app_type_document_fsc');
 
-            }
-            return $this->render('type_document_fsc/edit_type_doc_fsc.html.twig',[
-                'form' => $form->createView(),
-                'typeDocFsc' => $typeDocFsc,
-                'title' => 'Modification type doc Fsc'
-            ]);
+        }
+        return $this->render('type_document_fsc/edit_type_doc_fsc.html.twig', [
+            'form' => $form->createView(),
+            'typeDocFsc' => $typeDocFsc,
+            'title' => 'Modification type doc Fsc',
+        ]);
     }
 
     /**
@@ -81,16 +81,16 @@ class TypeDocumentFscController extends AbstractController
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(TypeDocumentFsc::class);
         $typeDocFscId = $repository->find($id);
-         
+
         $em = $this->getDoctrine()->getManager();
         $em->remove($typeDocFscId);
-        $em->flush();        
+        $em->flush();
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //    $tracking = $request->attributes->get('_route');
+        //    $this->setTracking($tracking);
 
         return $this->redirect($this->generateUrl('app_type_document_fsc'));
     }
-    
+
 }

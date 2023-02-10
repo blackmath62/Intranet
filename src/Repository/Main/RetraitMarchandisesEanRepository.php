@@ -30,8 +30,8 @@ class RetraitMarchandisesEanRepository extends ServiceEntityRepository
         GROUP BY chantier, user, dateCreation
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // /**

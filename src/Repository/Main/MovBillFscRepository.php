@@ -2,10 +2,10 @@
 
 namespace App\Repository\Main;
 
-use DateTime;
 use App\Entity\Main\MovBillFsc;
-use Doctrine\Persistence\ManagerRegistry;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method MovBillFsc|null find($id, $lockMode = null, $lockVersion = null)
@@ -20,24 +20,24 @@ class MovBillFscRepository extends ServiceEntityRepository
         parent::__construct($registry, MovBillFsc::class);
     }
 
-    // Factures Clients FSC qui ont moins de 5 ans 
-    public function getFactCliFiveYearsAgo():array
+    // Factures Clients FSC qui ont moins de 5 ans
+    public function getFactCliFiveYearsAgo(): array
     {
         $fiveYearsAgo = new DateTime();
         $fiveYearsAgo = date('Y-m-d', strtotime('-5 years'));
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * 
+        $sql = "SELECT *
         FROM movbillfsc
         WHERE movbillfsc.dateFact >= '$fiveYearsAgo'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Factures Clients FSC qui ont moins de 5 ans et aucune liaison fournisseur
-    public function getFactCliSansLiaison():array
+    public function getFactCliSansLiaison(): array
     {
 
         $conn = $this->getEntityManager()->getConnection();
@@ -51,13 +51,9 @@ class MovBillFscRepository extends ServiceEntityRepository
             WHERE liaison = 0 AND DATE_FORMAT(dateFact, '%Y' '-' '%m' '-' '%d') > DATE_FORMAT(DATE_ADD(now(), INTERVAL - 5 YEAR), '%Y' '-' '%m' '-' '%d')
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
-
-
-
-    
 
     // /**
     //  * @return MovBillFsc[] Returns an array of MovBillFsc objects
@@ -65,27 +61,26 @@ class MovBillFscRepository extends ServiceEntityRepository
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('m.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+    return $this->createQueryBuilder('m')
+    ->andWhere('m.exampleField = :val')
+    ->setParameter('val', $value)
+    ->orderBy('m.id', 'ASC')
+    ->setMaxResults(10)
+    ->getQuery()
+    ->getResult()
+    ;
     }
-    */
+     */
 
     /*
-    public function findOneBySomeField($value): ?MovBillFsc
-    {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+public function findOneBySomeField($value): ?MovBillFsc
+{
+return $this->createQueryBuilder('m')
+->andWhere('m.exampleField = :val')
+->setParameter('val', $value)
+->getQuery()
+->getOneOrNullResult()
+;
 }
-
+ */
+}

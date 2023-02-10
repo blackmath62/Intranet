@@ -30,8 +30,8 @@ class AlimentationEmplacementRepository extends ServiceEntityRepository
          GROUP BY emplacement, user, dateCreation
          ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // /**

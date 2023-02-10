@@ -28,8 +28,8 @@ class MailListRepository extends ServiceEntityRepository
         FROM maillist WHERE maillist.page = 'app_admin_email' AND maillist.SecondOption = 'envoi'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
 
     // Email de traitement
@@ -41,8 +41,8 @@ class MailListRepository extends ServiceEntityRepository
         FROM maillist WHERE maillist.page = 'app_admin_email' AND maillist.SecondOption = 'traitement'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
 
     // /**

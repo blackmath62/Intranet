@@ -82,8 +82,8 @@ class ControleAnomaliesController extends AbstractController
         $this->movRepo = $movRepo;
         $this->movementBillFscController = $movementBillFscController;
         $this->repoMail = $repoMail;
-        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
-        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
+        $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
         $this->repoUsers = $repoUsers;
         $this->comptaAnalytiqueController = $comptaAnalytiqueController;

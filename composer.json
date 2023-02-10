@@ -17,6 +17,7 @@
         "fzaninotto/faker": "^1.9",
         "h4cc/wkhtmltoimage-amd64": "0.12.x",
         "h4cc/wkhtmltopdf-amd64": "0.12.x",
+        "tecnickcom/tc-lib-barcode": "^1.17",
         "helios-ag/fm-elfinder-bundle": "^10.0",
         "knplabs/knp-snappy-bundle": "^1.8",
         "mercuryseries/flashy": "^1.0",

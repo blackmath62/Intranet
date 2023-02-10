@@ -2,10 +2,9 @@
 
 namespace App\Repository\Divalto;
 
-
 use App\Entity\Divalto\Mouv;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 class ControleComptabiliteRepository extends ServiceEntityRepository
 {
@@ -13,8 +12,8 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Mouv::class);
     }
-   
-    public function getControleTaxesComptabilite($annee,$mois,$typeTiers):array
+
+    public function getControleTaxesComptabilite($annee, $mois, $typeTiers): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT MOUV.REF AS ref, MOUV.DES AS des, MOUV.TVAART AS regime,MOUV.FANO AS facture,MOUV.FADT AS date, MOUV.TIERS AS tiers, ENT.CE4 AS status
@@ -23,51 +22,51 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
         RIGHT JOIN T085 ON T085.DOS = 999 AND MOUV.TVAART = T085.TVAART
         WHERE MOUV.DOS = 1 --AND ENT.CE4 <> 8
         AND MOUV.REF IN('PCMTAXEGAZOLE10') AND MOUV.TVAART <> 2
-        AND YEAR(MOUV.FADT) IN(?) AND MONTH(MOUV.FADT) IN(?) AND MOUV.TICOD = ?
+        AND YEAR(MOUV.FADT) IN($annee) AND MONTH(MOUV.FADT) IN($mois) AND MOUV.TICOD = '$typeTiers'
 		GROUP BY MOUV.REF, MOUV.DES,MOUV.TVAART, MOUV.FANO, MOUV.FADT, MOUV.TIERS, ENT.CE4";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$annee,$mois,$typeTiers]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
-    
-    public function getControleRegimeTransport($annee,$mois,$typeTiers):array
+
+    public function getControleRegimeTransport($annee, $mois, $typeTiers): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT ENT.TIERS AS tiers, MOUV.REF AS reference, MOUV.DES AS designation,ART.FAM_0001 AS famille, MOUV.TVAART AS regimeTva,MOUV.FANO AS facture,MOUV.FADT AS dateFacture
-        FROM MOUV 
+        FROM MOUV
         INNER JOIN ENT ON MOUV.FANO = ENT.PINO AND MOUV.DOS = ENT.DOS AND MOUV.TIERS = ENT.TIERS
         INNER JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-        WHERE MOUV.DOS = 1 AND YEAR(MOUV.FADT) IN(?) AND MONTH(MOUV.FADT) IN(?) AND ART.FAM_0001 IN('TRANSPOR') AND MOUV.TVAART <> 3 AND ENT.TICOD = ?";
+        WHERE MOUV.DOS = 1 AND YEAR(MOUV.FADT) IN($annee) AND MONTH(MOUV.FADT) IN($mois) AND ART.FAM_0001 IN('TRANSPOR') AND MOUV.TVAART <> 3 AND ENT.TICOD = '$typeTiers'";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$annee,$mois,$typeTiers]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function getControleTrousFactures($annee,$mois,$typeTiers):array
+    public function getControleTrousFactures($annee, $mois, $typeTiers): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT MOUV.FANO AS fano
         FROM MOUV
-        WHERE MOUV.DOS = 1 AND YEAR(MOUV.FADT) IN (?) AND MONTH(MOUV.FADT) IN (?) AND MOUV.TICOD = ? AND MOUV.PICOD = 4
+        WHERE MOUV.DOS = 1 AND YEAR(MOUV.FADT) IN ($annee) AND MONTH(MOUV.FADT) IN ($mois) AND MOUV.TICOD = '$typeTiers' AND MOUV.PICOD = 4
         GROUP BY MOUV.FANO
         ORDER BY MOUV.FANO";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$annee,$mois,$typeTiers]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function getFacture($facture,$typeTiers)
+    public function getFacture($facture, $typeTiers)
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT ENT.PINO AS fano
         FROM ENT
-        WHERE ENT.DOS = 1 AND ENT.PINO = ? AND ENT.PICOD = 4 AND ENT.TICOD = ?
+        WHERE ENT.DOS = 1 AND ENT.PINO = $facture AND ENT.PICOD = 4 AND ENT.TICOD = '$typeTiers'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$facture,$typeTiers]);
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
-    public function getRegimeArticleFromOrder($annee, $mois,$typeTiers)
+    public function getRegimeArticleFromOrder($annee, $mois, $typeTiers)
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT dos, Op, typePiece, typeTiers, tiers,ref, sref1, sref2, designation, uv, tvaMouv, tvaArt, piece, datePiece
@@ -93,11 +92,11 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
         WHERE YEAR(ENT.PIDT) IN ($annee) AND MONTH(ENT.PIDT) IN ($mois)
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function getSendMailErreurRegimeFournisseur():array
+    public function getSendMailErreurRegimeFournisseur(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT ENT.ENT_ID AS Identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece,
@@ -125,13 +124,13 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
         WHERE YEAR(ENT.PIDT) >= 2021 AND MONTH(ENT.PIDT) >= 9 AND ENT.TVATIE <> FOU.TVATIE AND ENT.CE4 = 1 AND ENT.PICOD IN (2,3)
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
-    public function getSendMailErreurRegimeClient():array
+    public function getSendMailErreurRegimeClient(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT ENT.ENT_ID AS Identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece, 
+        $sql = "SELECT ENT.ENT_ID AS Identification, ENT.PICOD AS typePiece, ENT.PINO AS numeroPiece,
         ENT.TIERS AS tiers, ENT.TVATIE AS regimePiece, CLI.TVATIE AS regimeTiers, ENT.USERCR AS Utilisateur, MUSER.EMAIL AS Email,
         CASE
         WHEN ENT.PICOD = 2 THEN 'Commande Client'
@@ -156,8 +155,8 @@ class ControleComptabiliteRepository extends ServiceEntityRepository
         WHERE YEAR(ENT.PIDT) >= 2021 AND MONTH(ENT.PIDT) >= 9 AND ENT.TVATIE <> CLI.TVATIE AND ENT.CE4 = 1 AND ENT.PICOD IN (2,3)
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 }

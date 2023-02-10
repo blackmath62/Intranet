@@ -2,30 +2,25 @@
 
 namespace App\Controller;
 
-use DateInterval;
-use App\Entity\Divalto\Ent;
-use App\Entity\Main\Trackings;
-use App\Repository\Main\UsersRepository;
 use App\Repository\Main\AnnuaireRepository;
 use App\Repository\Main\HolidayRepository;
-use App\Repository\Main\TrackingsRepository;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\Main\UsersRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @IsGranted("ROLE_USER")
  */
 
 class AnnuaireController extends AbstractController
-{  
+{
 
     public function indexAction()
     {
     }
-    
+
     /**
      * @Route("/annuaire", name="annuaire")
      */
@@ -33,33 +28,31 @@ class AnnuaireController extends AbstractController
     {
 
         $annuaires = $repo->findAll();
-        
+
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
-        
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
+
         return $this->render('annuaire/index.html.twig', [
             'controller_name' => 'AnnuaireController',
             'annuaires' => $annuaires,
-            'title' => "Annuaire"
+            'title' => "Annuaire",
         ]);
     }
-    
 
     public function home(UsersRepository $repo, Request $request, HolidayRepository $holidayRepo)
     {
-        
-            
+
         $users = $repo->findAll();
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         return $this->render('annuaire/home.html.twig', [
             'title' => "page d'accueil",
             'users' => $users,
-              
+
         ]);
 
     }

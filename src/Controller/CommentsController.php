@@ -2,26 +2,27 @@
 
 namespace App\Controller;
 
-use DateTime;
-use Knp\Snappy\Pdf;
-use App\Form\SendTicketType;
 use App\Entity\Main\Comments;
 use App\Form\CommentsTicketsType;
-use Symfony\Component\Mime\Email;
-use App\Form\SendTicketAnnuaireType;
 use App\Form\EditStatusTicketFormType;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\Main\StatusRepository;
-use App\Repository\Main\TicketsRepository;
+use App\Form\SendTicketAnnuaireType;
+use App\Form\SendTicketType;
 use App\Repository\Main\CommentsRepository;
 use App\Repository\Main\MailListRepository;
+use App\Repository\Main\PrestataireRepository;
+use App\Repository\Main\StatusRepository;
+use App\Repository\Main\TicketsRepository;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use Knp\Snappy\Pdf;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
-use App\Repository\Main\PrestataireRepository;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+
 /**
  * @IsGranted("ROLE_USER")
  */
@@ -34,37 +35,37 @@ class CommentsController extends AbstractController
 
     public function __construct(MailListRepository $repoMail)
     {
-        $this->repoMail =$repoMail;
-        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
-        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->repoMail = $repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
+        $this->mailTreatement = $this->repoMail->getEmailTreatement();
         //parent::__construct();
     }
-    
+
     /**
      * @Route("/ticket/comment/add/{id<\d+>}", name="app_comment")
      * @ParamConverter("Comments", options={"id" = "Ticket_id"})
      */
-    public function addComment(int $id, Pdf $pdf,StatusRepository $repoStatut, MailerInterface $mailer,TicketsRepository $repoTicket, CommentsRepository $repoComments, Request $request, EntityManagerInterface $em, PrestataireRepository $repoPresta	)
+    public function addComment(int $id, Pdf $pdf, StatusRepository $repoStatut, MailerInterface $mailer, TicketsRepository $repoTicket, CommentsRepository $repoComments, Request $request, EntityManagerInterface $em, PrestataireRepository $repoPresta)
     {
         // Enregistrement des commentaires
-        
+
         $comments = $repoComments->findBy(['ticket' => $id]);
         $formComment = $this->createForm(CommentsTicketsType::class);
         $formComment->handleRequest($request);
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
-        
-        if($formComment->isSubmitted() && $formComment->isValid()){
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
+
+        if ($formComment->isSubmitted() && $formComment->isValid()) {
             $comment = new Comments();
             $comment = $formComment->getData();
             $comment->setCreatedAt(new \DateTime())
             // TODO JEROME pouvoir ajouter plusieurs piéces jointes
             //->setFiles($id)
-            ->setUser($this->getUser())
-            ->setTicket($repoTicket->findOneBy(['id' => $id]));
-            // TODO JEROME Modification du statut du ticket il est plus logique que cela se produise dans le commentaire      
+                ->setUser($this->getUser())
+                ->setTicket($repoTicket->findOneBy(['id' => $id]));
+            // TODO JEROME Modification du statut du ticket il est plus logique que cela se produise dans le commentaire
             $em = $this->getDoctrine()->getManager();
             $em->persist($comment);
             $em->flush();
@@ -76,46 +77,46 @@ class CommentsController extends AbstractController
             $em->flush();
 
             $this->addFlash('message', 'Votre commentaire a bien été déposé');
-            return $this->redirectToRoute('app_comment', ['id' => $id ]);
+            return $this->redirectToRoute('app_comment', ['id' => $id]);
         }
-        
+
         // Changement de statut du ticket
-        
+
         $ticket = $repoTicket->findOneBy(['id' => $id]);
         $formEditStatut = $this->createForm(EditStatusTicketFormType::class, $ticket);
         $formEditStatut->handleRequest($request);
 
-        if($formEditStatut->isSubmitted() && $formEditStatut->isValid()){
-            
+        if ($formEditStatut->isSubmitted() && $formEditStatut->isValid()) {
+
             $ticket = $formEditStatut->getData();
             $ticket->setModifiedAt(new \DateTime());
             $em->persist($ticket);
             $em->flush();
-            
+
             // créer un commentaire pour sauvegarder les dates d'envois de mails
             $comment = new Comments();
             $dateTimeSend = new DateTime('NOW');
             $commentSend = "Le ticket est maintenant " . $ticket->getStatu()->getTitle();
             $comment->setTitle($commentSend)
-                    ->setContent('')
-                    ->setTicket($repoTicket->findOneBy(['id' => $id]))
-                    ->setUser($this->getUser())
-                    ->setCreatedAt(new \DateTime());
-                    $em = $this->getDoctrine()->getManager();
-                    $em->persist($comment);
-                    $em->flush();
+                ->setContent('')
+                ->setTicket($repoTicket->findOneBy(['id' => $id]))
+                ->setUser($this->getUser())
+                ->setCreatedAt(new \DateTime());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($comment);
+            $em->flush();
 
             $this->addFlash('message', 'Le Ticket a bien été déplacé');
             return $this->redirectToRoute('app_tickets');
         }
 
         // Envoyer par mail tous le contenu du ticket et des commentaires a un prestataire
-        
+
         $formSendTicket = $this->createForm(SendTicketType::class);
         $formSendTicket->handleRequest($request);
-        
-        if($formSendTicket->isSubmitted() && $formSendTicket->isValid()){
-            
+
+        if ($formSendTicket->isSubmitted() && $formSendTicket->isValid()) {
+
             $data = $formSendTicket['prestataire']->getData();
             if ($data->getEmail()) {
                 $commentsOfTicket = $repoComments->findBy(['ticket' => $id]);
@@ -137,28 +138,27 @@ class CommentsController extends AbstractController
                 $statuEnCours = $repoStatut->findOneBy(['id' => 16]);
                 $ticket->setStatu($statuEnCours);
                 $em = $this->getDoctrine()->getManager();
-                         $em->persist($ticket);
-                         $em->flush();
+                $em->persist($ticket);
+                $em->flush();
 
-
-                 // créer un commentaire pour sauvegarder les dates d'envois de mails
-                 $comment = new Comments();
-                 $dateTimeSend = new DateTime('NOW');
-                 $commentSend = "Mail envoyer le " . $dateTimeSend->format('d-m-Y-H:i:s') . " à " . $data->getEmail();
-                 $comment->setTitle($commentSend)
-                         ->setContent('')
-                         ->setTicket($repoTicket->findOneBy(['id' => $id]))
-                         ->setUser($this->getUser())
-                         ->setCreatedAt(new \DateTime());
-                         $em = $this->getDoctrine()->getManager();
-                         $em->persist($comment);
-                         $em->flush();
+                // créer un commentaire pour sauvegarder les dates d'envois de mails
+                $comment = new Comments();
+                $dateTimeSend = new DateTime('NOW');
+                $commentSend = "Mail envoyer le " . $dateTimeSend->format('d-m-Y-H:i:s') . " à " . $data->getEmail();
+                $comment->setTitle($commentSend)
+                    ->setContent('')
+                    ->setTicket($repoTicket->findOneBy(['id' => $id]))
+                    ->setUser($this->getUser())
+                    ->setCreatedAt(new \DateTime());
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($comment);
+                $em->flush();
 
                 $this->addFlash('message', 'Message envoyé a ce prestataire!');
-                    return $this->redirectToRoute('app_tickets');
-            }else {
+                return $this->redirectToRoute('app_tickets');
+            } else {
                 $this->addFlash('danger', 'Pas d\'adresse mail, Impossible d\'envoyer a ce prestataire !');
-                    return $this->redirectToRoute('app_tickets');
+                return $this->redirectToRoute('app_tickets');
             }
 
         }
@@ -167,8 +167,8 @@ class CommentsController extends AbstractController
 
         $formSendAnnuaireTicket = $this->createForm(SendTicketAnnuaireType::class);
         $formSendAnnuaireTicket->handleRequest($request);
-        
-        if($formSendAnnuaireTicket->isSubmitted() && $formSendAnnuaireTicket->isValid()){
+
+        if ($formSendAnnuaireTicket->isSubmitted() && $formSendAnnuaireTicket->isValid()) {
             $data = $formSendAnnuaireTicket['annuaire']->getData();
             if ($data->getMail()) {
                 $commentsOfTicket = $repoComments->findBy(['ticket' => $id]);
@@ -187,18 +187,18 @@ class CommentsController extends AbstractController
                 $dateTimeSend = new DateTime('NOW');
                 $commentSend = "Mail envoyer le " . $dateTimeSend->format('d-m-Y-H:i:s') . " à " . $data->getMail();
                 $comment->setTitle($commentSend)
-                        ->setContent('')
-                        ->setTicket($repoTicket->findOneBy(['id' => $id]))
-                        ->setUser($this->getUser())
-                        ->setCreatedAt(new \DateTime());
-                        $em = $this->getDoctrine()->getManager();
-                        $em->persist($comment);
-                        $em->flush();
+                    ->setContent('')
+                    ->setTicket($repoTicket->findOneBy(['id' => $id]))
+                    ->setUser($this->getUser())
+                    ->setCreatedAt(new \DateTime());
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($comment);
+                $em->flush();
                 $this->addFlash('warning', 'Message envoyé a ce collégue!');
-                    return $this->redirectToRoute('app_tickets');
-            }else {
+                return $this->redirectToRoute('app_tickets');
+            } else {
                 $this->addFlash('danger', 'Pas d\'adresse mail, Impossible d\'envoyer a ce collégue !');
-                    return $this->redirectToRoute('app_tickets');
+                return $this->redirectToRoute('app_tickets');
             }
 
         }
@@ -210,7 +210,7 @@ class CommentsController extends AbstractController
             'formstatu' => $formEditStatut->createView(),
             'formSendTicket' => $formSendTicket->createView(),
             'title' => 'Ajout de Commentaires',
-            'formSendAnnuaireTicket' => $formSendAnnuaireTicket->createView()
+            'formSendAnnuaireTicket' => $formSendAnnuaireTicket->createView(),
         ]);
     }
 

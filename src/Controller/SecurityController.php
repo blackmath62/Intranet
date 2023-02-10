@@ -2,22 +2,21 @@
 
 namespace App\Controller;
 
-use App\Form\ChangepasswordType;
-use App\Form\PasswordForgotType;
-use Symfony\Component\Mime\Email;
 use App\Form\ModifiedPasswordType;
+use App\Form\PasswordForgotType;
 use App\Form\UserRegistrationFormType;
+use App\Repository\Main\MailListRepository;
 use App\Repository\Main\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\Main\MailListRepository;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class SecurityController extends AbstractController
 {
@@ -29,9 +28,9 @@ class SecurityController extends AbstractController
 
     public function __construct(MailListRepository $repoMail)
     {
-        $this->repoMail =$repoMail;
-        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
-        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->repoMail = $repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
+        $this->mailTreatement = $this->repoMail->getEmailTreatement();
         //parent::__construct();
     }
 
@@ -42,7 +41,7 @@ class SecurityController extends AbstractController
     {
         return $this->render('security/login.html.twig', [
             'controller_name' => 'SecurityController',
-            'title' => "connexion"
+            'title' => "connexion",
         ]);
     }
     /**
@@ -60,32 +59,31 @@ class SecurityController extends AbstractController
                 ->setPassword($passwordEncoder->encodePassword($user, $plainPassword))
                 ->setToken(md5(uniqid()));
 
-                $file = $form->get('img')->getData();
+            $file = $form->get('img')->getData();
 
+            if ($file) {
 
-                if ($file) {
-                   
-                    $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                    // this is needed to safely include the file name as part of the URL
-                    $safeFilename = $slugger->slug($originalFilename);
-                    $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
-    
-                    // Move the file to the directory where brochures are stored
-                    try {
-                        $file->move(
-                            $this->getParameter('doc_profiles'),
-                            $newFilename
-                        );
-                    } catch (FileException $e) {
-                        // ... handle exception if something happens during file upload
-                    }
-    
-                    // updates the 'Filename' property to store the PDF file name
-                    // instead of its contents
-                    $user->setImg($newFilename);
-                }else{
-                   $user->setImg('AdminLTELogo.png');
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $file->move(
+                        $this->getParameter('doc_profiles'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
                 }
+
+                // updates the 'Filename' property to store the PDF file name
+                // instead of its contents
+                $user->setImg($newFilename);
+            } else {
+                $user->setImg('AdminLTELogo.png');
+            }
             $em->persist($user);
             $em->flush();
 
@@ -121,7 +119,7 @@ class SecurityController extends AbstractController
         return $this->render('security/register.html.twig', [
             'controller_name' => 'SecurityController',
             'title' => "inscription",
-            'registrationForm' => $form->createView()
+            'registrationForm' => $form->createView(),
         ]);
     }
     /**
@@ -136,8 +134,8 @@ class SecurityController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
             // On verifie si l'utilisateur existe et qu'il n'est pas fermé
-            $user = $usersRepo->findOneBy(['email' => $user->getEmail(), 'closedAt' => NULL ]);
-            // si l'utilisateur n'existe pas        
+            $user = $usersRepo->findOneBy(['email' => $user->getEmail(), 'closedAt' => null]);
+            // si l'utilisateur n'existe pas
             if (!$user) {
                 // erreur 404
                 throw $this->createNotFoundException('Cet utilisateur n\'existe pas');
@@ -166,7 +164,7 @@ class SecurityController extends AbstractController
         return $this->render('security/passwordForgot.html.twig', [
             'controller_name' => 'SecurityController',
             'title' => "mot de passe oublié",
-            'passwordForgotForm' => $form->createView()
+            'passwordForgotForm' => $form->createView(),
         ]);
     }
     /**
@@ -176,11 +174,11 @@ class SecurityController extends AbstractController
     {
         $form = $this->createForm(ModifiedPasswordType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted()&& $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             // On verifie si un utilisateur a ce token
             // Vérification du token utilisateur  et qu'il n'est pas fermé
-            $user = $usersRepo->findOneBy(['token' => $token, 'closedAt' => NULL]);
-            
+            $user = $usersRepo->findOneBy(['token' => $token, 'closedAt' => null]);
+
             // si aucun utilisateur n'existe avec ce token
             if (!$user) {
                 // erreur 404
@@ -192,7 +190,7 @@ class SecurityController extends AbstractController
             $plainPassword = $form['plainPassword']->getData();
             $user->setPassword($passwordEncoder->encodePassword($user, $plainPassword))
             // on supprime le token
-                 ->setToken(null);
+                ->setToken(null);
             $em->persist($user);
             $em->flush();
 
@@ -204,10 +202,9 @@ class SecurityController extends AbstractController
         return $this->render('security/changePassword.html.twig', [
             'controller_name' => 'SecurityController',
             'title' => "Changement de mot de passe",
-            'changePasswordForm' => $form->createView()
+            'changePasswordForm' => $form->createView(),
         ]);
     }
-
 
     /**
      * @Route("/logout", name="app_logout", methods={"GET"})

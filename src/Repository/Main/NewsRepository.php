@@ -2,10 +2,10 @@
 
 namespace App\Repository\Main;
 
-use DateTime;
 use App\Entity\Main\News;
-use Doctrine\Persistence\ManagerRegistry;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method News|null find($id, $lockMode = null, $lockVersion = null)
@@ -24,7 +24,7 @@ class NewsRepository extends ServiceEntityRepository
     {
         $d = new DateTime();
         $dc = date_modify($d, '-30 Days');
-        $dc= $dc->format('Y') . '-' . $dc->format('m') . '-' . $dc->format('d');
+        $dc = $dc->format('Y') . '-' . $dc->format('m') . '-' . $dc->format('d');
         // congés non dépassés avec les services
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT *
@@ -32,8 +32,8 @@ class NewsRepository extends ServiceEntityRepository
         WHERE news.createdAt >= '$dc'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // /**
@@ -42,26 +42,26 @@ class NewsRepository extends ServiceEntityRepository
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('n.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+    return $this->createQueryBuilder('n')
+    ->andWhere('n.exampleField = :val')
+    ->setParameter('val', $value)
+    ->orderBy('n.id', 'ASC')
+    ->setMaxResults(10)
+    ->getQuery()
+    ->getResult()
+    ;
     }
-    */
+     */
 
     /*
-    public function findOneBySomeField($value): ?News
-    {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+public function findOneBySomeField($value): ?News
+{
+return $this->createQueryBuilder('n')
+->andWhere('n.exampleField = :val')
+->setParameter('val', $value)
+->getQuery()
+->getOneOrNullResult()
+;
+}
+ */
 }

@@ -25,19 +25,19 @@ class CmdRobyDelaiAccepteReporteRepository extends ServiceEntityRepository
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+    return $this->createQueryBuilder('c')
+    ->andWhere('c.exampleField = :val')
+    ->setParameter('val', $value)
+    ->orderBy('c.id', 'ASC')
+    ->setMaxResults(10)
+    ->getQuery()
+    ->getResult()
+    ;
     }
-    */
+     */
 
     // Compter le nombre de notes par commande
-    public function getAllDataAndCountNoteByCmd():array
+    public function getAllDataAndCountNoteByCmd(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT cmdrobydelaiacceptereporte.id,cmdrobydelaiacceptereporte.identification, cmdrobydelaiacceptereporte.statut,
@@ -48,33 +48,33 @@ class CmdRobyDelaiAccepteReporteRepository extends ServiceEntityRepository
         INNER JOIN cmdrobydelaiacceptereporte ON cmdrobydelaiacceptereporte.id = note.cmdRobyDelaiAccepteReporte_id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Total HT des commandes en attentes
     public function getTotalHt()
     {
-        
+
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT SUM(ht) AS total
-        FROM cmdrobydelaiacceptereporte 
+        FROM cmdrobydelaiacceptereporte
         WHERE cmdrobydelaiacceptereporte.statut <> 'Terminé'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
 
     /*
-    public function findOneBySomeField($value): ?CmdRobyDelaiAccepteReporte
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+public function findOneBySomeField($value): ?CmdRobyDelaiAccepteReporte
+{
+return $this->createQueryBuilder('c')
+->andWhere('c.exampleField = :val')
+->setParameter('val', $value)
+->getQuery()
+->getOneOrNullResult()
+;
+}
+ */
 }

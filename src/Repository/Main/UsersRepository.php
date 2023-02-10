@@ -2,10 +2,9 @@
 
 namespace App\Repository\Main;
 
-
 use App\Entity\Main\Users;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Users|null find($id, $lockMode = null, $lockVersion = null)
@@ -26,24 +25,24 @@ class UsersRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT users.email AS email FROM holiday
         INNER JOIN users ON holiday.user_id = users.id
-        WHERE holiday.id = ?
+        WHERE holiday.id = $id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
 
     // ramener les mails
     public function getFindAllEmails()
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT users.email AS email 
+        $sql = "SELECT users.email AS email
         FROM users
         WHERE users.closedAt is NULL
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Liste des utilisateurs non fermés
@@ -55,8 +54,8 @@ class UsersRepository extends ServiceEntityRepository
         LEFT JOIN services ON users.service_id = services.id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Liste des utilisateurs avec Ev ou Hp à true
@@ -68,8 +67,8 @@ class UsersRepository extends ServiceEntityRepository
         WHERE users.ev = 1 OR users.hp = 1
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Liste des utilisateurs avec Ev Me ou Hp à true
@@ -81,8 +80,8 @@ class UsersRepository extends ServiceEntityRepository
         WHERE users.ev = 1 OR users.hp = 1 OR users.me = 1
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 }

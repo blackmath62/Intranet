@@ -2,10 +2,9 @@
 
 namespace App\Repository\Divalto;
 
-
 use App\Entity\Divalto\Mouv;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 class StocksJardinewRepository extends ServiceEntityRepository
 {
@@ -14,8 +13,8 @@ class StocksJardinewRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Mouv::class);
     }
-   
-    public function getStocksJardinewRepository():array
+
+    public function getStocksJardinewRepository(): array
     {
 
         $conn = $this->getEntityManager()->getConnection();
@@ -38,10 +37,8 @@ class StocksJardinewRepository extends ServiceEntityRepository
         ORDER BY Ref
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 }
-
-

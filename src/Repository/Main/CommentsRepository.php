@@ -22,7 +22,7 @@ class CommentsRepository extends ServiceEntityRepository
     // /**
     //  * @return Comments[] Returns an array of Comments objects
     //  */
-   
+
     public function findAllExceptStatu($value)
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -31,20 +31,19 @@ class CommentsRepository extends ServiceEntityRepository
         INNER JOIN tickets ON tickets.statu_id <> $value AND tickets.id = comments.ticket_id
         GROUP BY comments.ticket_id";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
-    
 
     /*
-    public function findOneBySomeField($value): ?Comments
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+public function findOneBySomeField($value): ?Comments
+{
+return $this->createQueryBuilder('c')
+->andWhere('c.exampleField = :val')
+->setParameter('val', $value)
+->getQuery()
+->getOneOrNullResult()
+;
+}
+ */
 }

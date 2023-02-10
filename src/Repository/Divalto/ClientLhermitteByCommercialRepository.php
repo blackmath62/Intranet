@@ -2,10 +2,9 @@
 
 namespace App\Repository\Divalto;
 
-
 use App\Entity\Divalto\Mouv;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 class ClientLhermitteByCommercialRepository extends ServiceEntityRepository
 {
@@ -14,20 +13,20 @@ class ClientLhermitteByCommercialRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Mouv::class);
     }
-       
-    public function getClientByContactName($nom, $dossier):array
+
+    public function getClientByContactName($nom, $dossier): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT CLI.TIERS AS Tiers, CLI.NOM AS RaisonSociale,T2.TIT AS Titre, T2.NOM AS Nom, T2.PRENOM AS Prenom, T2.TEL AS Telephone, T2.TELGSM AS Portable, T2.EMAIL AS Email  
+        $sql = "SELECT CLI.TIERS AS Tiers, CLI.NOM AS RaisonSociale,T2.TIT AS Titre, T2.NOM AS Nom, T2.PRENOM AS Prenom, T2.TEL AS Telephone, T2.TELGSM AS Portable, T2.EMAIL AS Email
         FROM T2
         INNER JOIN CLI ON CLI.TIERS = T2.TIERS AND CLI.DOS = T2.DOS
         WHERE T2.NOM LIKE '%$nom%' AND T2.DOS IN($dossier)";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function getClientLhermitteByCommercial():array
+    public function getClientLhermitteByCommercial(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT VRP.NOM AS Commercial, VRP.TIERS AS Id, CLI.STAT_0001 AS Famille, VRP.EMAIL AS Mail, CLI.WEB AS Web,
@@ -36,32 +35,31 @@ class ClientLhermitteByCommercialRepository extends ServiceEntityRepository
         LEFT JOIN VRP ON CLI.DOS = VRP.DOS AND CLI.REPR_0001 = VRP.TIERS
         WHERE CLI.DOS = 1 AND CLI.HSDT IS NULL";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function getContactsClient($tiers):array
+    public function getContactsClient($tiers): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT T2.LIB AS Fonction, T2.CONTACT AS Id, T2.NOM AS Nom, T2.PRENOM AS Prenom, T2.TEL AS Telephone, T2.TELGSM AS Portable, T2.EMAIL AS Email 
+        $sql = "SELECT T2.LIB AS Fonction, T2.CONTACT AS Id, T2.NOM AS Nom, T2.PRENOM AS Prenom, T2.TEL AS Telephone, T2.TELGSM AS Portable, T2.EMAIL AS Email
         FROM T2 WHERE T2.DOS = 1 AND T2.TIERS = '$tiers' ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
-    
+
     public function getThisClient($tiers)
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT DISTINCT CLI.TIERS AS Tiers, CLI.NOM AS Nom, CLI.STAT_0001 AS Famille, VRP.NOM AS Commercial 
+        $sql = "SELECT DISTINCT CLI.TIERS AS Tiers, CLI.NOM AS Nom, CLI.STAT_0001 AS Famille, VRP.NOM AS Commercial
         FROM CLI
         INNER JOIN VRP ON CLI.DOS = VRP.DOS AND CLI.REPR_0001 = VRP.TIERS
         WHERE CLI.DOS = 1 AND CLI.TIERS = '$tiers' ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative();
     }
-    
 
     public function getClient($tiers)
     {
@@ -69,9 +67,9 @@ class ClientLhermitteByCommercialRepository extends ServiceEntityRepository
         $sql = "SELECT VRP.EMAIL AS Email, CLI.NOM AS Nom
         FROM CLI
         LEFT JOIN VRP ON CLI.DOS = VRP.DOS AND CLI.REPR_0001 = VRP.TIERS
-        WHERE CLI.DOS = 1 AND CLI.HSDT IS NULL AND CLI.TIERS = ?";
+        WHERE CLI.DOS = 1 AND CLI.HSDT IS NULL AND CLI.TIERS = '$tiers'";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$tiers]);
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative();
     }
 }

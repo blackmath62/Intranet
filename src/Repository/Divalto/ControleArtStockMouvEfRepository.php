@@ -57,14 +57,14 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         LEFT JOIN MVTL_STOCK_V ON SART.DOS = MVTL_STOCK_V.DOSSIER AND SART.REF = MVTL_STOCK_V.REFERENCE AND SART.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND SART.SREF2 = MVTL_STOCK_V.SREFERENCE2 AND MVTL_STOCK_V.QTETJSENSTOCK IS NOT NULL
         LEFT JOIN MOUV ON SART.DOS = MOUV.DOS AND SART.REF = MOUV.REF AND SART.SREF1 = MOUV.SREF1 AND SART.SREF2 = MOUV.SREF2 AND (MOUV.CDCE4 IN (1) OR MOUV.BLCE4 IN (1) ) AND MOUV.TICOD IN ('C','F') AND (MOUV.CDNO > 0 OR MOUV.BLNO > 0)
         LEFT JOIN MVTL ON SART.REF = MVTL.REF AND SART.DOS = MVTL.DOS AND MVTL.OP IN ('999') AND MVTL.CE2 = 1 AND SART.SREF1 = MVTL.SREF1 AND SART.SREF2 =  MVTL.SREF2
-        WHERE SART.DOS = 1 AND SART.REF LIKE (?)
+        WHERE SART.DOS = 1 AND SART.REF LIKE ('$search')
         ) reponse
         WHERE Stock IS NOT NULL OR Op IS NOT NULL OR Cmd IS NOT NULL OR QteCmd IS NOT NULL OR Bl IS NOT NULL OR QteBl IS NOT NULL OR Ef IS NOT NULL OR EfQte IS NOT NULL
         GROUP BY Ref, Sref1, Sref2, Designation,ArtFerme,Op, Cmd,QteCmd, Bl, QteBl, Ef, EfQte
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$search]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getControleOneArtStockMouvEf($ref, $sref1, $sref2): array
@@ -109,14 +109,14 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         LEFT JOIN MVTL_STOCK_V ON SART.DOS = MVTL_STOCK_V.DOSSIER AND SART.REF = MVTL_STOCK_V.REFERENCE AND SART.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND SART.SREF2 = MVTL_STOCK_V.SREFERENCE2 AND MVTL_STOCK_V.QTETJSENSTOCK IS NOT NULL
         LEFT JOIN MOUV ON SART.DOS = MOUV.DOS AND SART.REF = MOUV.REF AND SART.SREF1 = MOUV.SREF1 AND SART.SREF2 = MOUV.SREF2 AND (MOUV.CDCE4 IN (1) OR MOUV.BLCE4 IN (1) ) AND MOUV.TICOD IN ('C','F') AND (MOUV.CDNO > 0 OR MOUV.BLNO > 0)
         LEFT JOIN MVTL ON SART.REF = MVTL.REF AND SART.DOS = MVTL.DOS AND MVTL.OP IN ('999') AND MVTL.CE2 = 1 AND SART.SREF1 = MVTL.SREF1 AND SART.SREF2 =  MVTL.SREF2
-        WHERE SART.DOS = 1 AND SART.REF IN (?) AND SART.SREF1 IN (?) AND SART.SREF2 IN (?)
+        WHERE SART.DOS = 1 AND SART.REF IN ('$ref') AND SART.SREF1 IN ('$sref1') AND SART.SREF2 IN ('$sref2')
         ) reponse
         WHERE Stock IS NOT NULL OR Op IS NOT NULL OR Cmd IS NOT NULL OR QteCmd IS NOT NULL OR Bl IS NOT NULL OR QteBl IS NOT NULL OR Ef IS NOT NULL OR EfQte IS NOT NULL
         GROUP BY Identification, Ref, Sref1, Sref2, Designation,ArtFerme
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$ref, $sref1, $sref2]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
     public function getControleAnomaliesArticlesFermes($dossier): array
     {
@@ -175,8 +175,8 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         GROUP BY Ref, Sref1, Sref2, Designation,ArtFerme,Op, Cmd,QteCmd, Bl, QteBl, Ef, EfQte, ArtFam, UserCr, UserMo,ArtDateFermeture, UserModh, CmdDate, BlDate
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getControleSaisieArticlesSrefFermes(): array
@@ -239,8 +239,8 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         GROUP BY Commercial, Identification, Ref, Sref1, Sref2, Designation,ArtFerme,Op, Cmd,QteCmd, Bl, QteBl, ArtFam, Utilisateur, UserMo,ArtDateFermeture, UserModh, CmdDate, BlDate, Email
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // contrôle du régime TVA d'un article sur piéce
@@ -271,8 +271,8 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         WHERE ENT.PIDT > '2022-01-01'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 }

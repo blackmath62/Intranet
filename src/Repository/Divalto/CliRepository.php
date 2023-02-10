@@ -20,7 +20,7 @@ class CliRepository extends ServiceEntityRepository
         parent::__construct($registry, Cli::class);
     }
 
-    public function SurveillanceClientLhermitteReglStatVrpTransVisaTvaPay():array
+    public function SurveillanceClientLhermitteReglStatVrpTransVisaTvaPay(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT RTRIM(LTRIM(CLI.CLI_ID)) AS Identification, RTRIM(LTRIM(CLI.TIERS)) AS TIERS, RTRIM(LTRIM(CLI.NOM)) AS NOM, RTRIM(LTRIM(CLI.REGL)) AS REGL, RTRIM(LTRIM(CLI.STAT_0001)) AS STAT_0001,
@@ -38,15 +38,15 @@ class CliRepository extends ServiceEntityRepository
         FROM CLI
         WHERE CLI.DOS = 1 AND CLI.HSDT IS NULL
         AND (
-        CLI.REGL IS NULL 
+        CLI.REGL IS NULL
         OR CLI.STAT_0001 IS NULL
-        OR CLI.STAT_0002 IS NULL 
-        OR CLI.STAT_0003 IS NULL 
+        OR CLI.STAT_0002 IS NULL
+        OR CLI.STAT_0003 IS NULL
         OR CLI.REPR_0001 IS NULL
         OR CLI.BLMOD IS NULL
         OR CLI.REGL = ''
         OR CLI.STAT_0001 = ''
-        OR CLI.STAT_0001 = '0' 
+        OR CLI.STAT_0001 = '0'
         OR CLI.STAT_0002 = ''
         OR CLI.STAT_0002 = '0'
         OR CLI.STAT_0003 = ''
@@ -60,24 +60,24 @@ class CliRepository extends ServiceEntityRepository
         OR CLI.PAY = '0'
         )";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function SendMailMajCertiphytoClient():array
+    public function SendMailMajCertiphytoClient(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT CLI_ID AS Identification, CLI.TIERS AS Tiers, CLI.NOM AS Nom, VRP.EMAIL AS Email, VRP.SELCOD AS Utilisateur 
+        $sql = "SELECT CLI_ID AS Identification, CLI.TIERS AS Tiers, CLI.NOM AS Nom, VRP.EMAIL AS Email, VRP.SELCOD AS Utilisateur
         FROM CLI
         LEFT JOIN VRP ON VRP.DOS = CLI.DOS AND VRP.TIERS = CLI.REPR_0001
         WHERE CLI.HSDT IS NULL AND CLI.DOS = 1 AND CLI.UP_PH_AUTORISE = 2 AND CLI.UP_PH_DECID_OBLIG = 1 AND CLI.TIERS NOT IN ('C0218400')
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function SendMailProblemePaysRegimeClients():array
+    public function SendMailProblemePaysRegimeClients(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Identification,Tiers, Nom, Pays, RegimeTiers, Dos, Utilisateur, MUSER.EMAIL AS Email
@@ -87,8 +87,8 @@ class CliRepository extends ServiceEntityRepository
         WHEN USERMO IS NOT NULL THEN USERMO
         ELSE USERCR
         END AS Utilisateur
-        FROM CLI 
-        WHERE 
+        FROM CLI
+        WHERE
         CLI.HSDT IS NULL AND CLI.DOS IN (1,3) AND(
         CLI.PAY = 'FR' AND CLI.TVATIE NOT IN ('0','01')
         OR CLI.PAY IN('AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','GR','HR','HU','IRL','IT','IE','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK') AND CLI.TVATIE NOT IN ('1','11','5','51')
@@ -97,22 +97,19 @@ class CliRepository extends ServiceEntityRepository
         INNER JOIN MUSER ON MUSER.DOS = Dos AND MUSER.USERX = Utilisateur
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function MesClients($commercial):array
+    public function MesClients($commercial): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT CLI.TIERS AS codeTier, CLI.NOM AS nom, CLI.RUE AS rue, CLI.CPOSTAL AS cp, CLI.VIL AS ville, CLI.TEL AS tel, CLI.EMAIL AS mail FROM CLI
         WHERE CLI.REPR_0001 = $commercial AND CLI.HSDT IS NULL
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-
-
-    
 }

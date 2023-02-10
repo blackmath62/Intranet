@@ -38,8 +38,8 @@ class EmplRepository extends ServiceEntityRepository
         ORDER BY ref
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Liste des stocks qui continnent un emplacement différent de celui dans info stock
@@ -59,7 +59,7 @@ class EmplRepository extends ServiceEntityRepository
 		ORDER BY ref
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 }

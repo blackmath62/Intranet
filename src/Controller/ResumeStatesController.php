@@ -20,8 +20,8 @@ class ResumeStatesController extends AbstractController
     {
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         $total = '';
         $familleProduit = [];

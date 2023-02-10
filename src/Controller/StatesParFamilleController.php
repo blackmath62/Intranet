@@ -25,8 +25,8 @@ class StatesParFamilleController extends AbstractController
     public function index($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo): Response
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        // $tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
         $states = "";
         $start = "";
         $end = "";
@@ -114,8 +114,8 @@ class StatesParFamilleController extends AbstractController
     public function getClientArticle($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo): Response
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        // $tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
         $states = "";
         $start = "";
         $end = "";
@@ -181,8 +181,8 @@ class StatesParFamilleController extends AbstractController
     public function commerciaux($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume): Response
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        // $tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         $start = "";
         $end = "";
@@ -348,8 +348,8 @@ class StatesParFamilleController extends AbstractController
     public function commercial($dos, $commercial = null, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume): Response
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        // $tracking = $request->attributes->get('_route');
+        // $this->setTracking($tracking);
 
         $start = "";
         $end = "";

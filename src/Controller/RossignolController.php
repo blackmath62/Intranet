@@ -23,8 +23,8 @@ class RossignolController extends AbstractController
     {
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
         if (!$annee) {
             $annee = new DateTime();
             $annee = $annee->format('Y');

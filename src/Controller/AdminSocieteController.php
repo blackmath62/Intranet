@@ -2,15 +2,16 @@
 
 namespace App\Controller;
 
-use DateTime;
 use App\Entity\Main\Societe;
 use App\Form\EditSocieteType;
 use App\Repository\Main\SocieteRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+
 /**
  * @IsGranted("ROLE_ADMIN")
  */
@@ -21,30 +22,30 @@ class AdminSocieteController extends AbstractController
      */
     public function index(Societe $societe = null, Request $request, SocieteRepository $repo, EntityManagerInterface $manager)
     {
-        if(!$societe){
+        if (!$societe) {
             $societe = new Societe();
-            }
-            $form = $this->createFormBuilder($societe)
-                ->add("nom")
-                ->getForm();
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $societe->setCreatedAt(new DateTime());
-                $manager->persist($societe);
-                $manager->flush();
-            }
-            $societes = $repo->findAll();
+        }
+        $form = $this->createFormBuilder($societe)
+            ->add("nom")
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $societe->setCreatedAt(new DateTime());
+            $manager->persist($societe);
+            $manager->flush();
+        }
+        $societes = $repo->findAll();
 
-            // tracking user page for stats
-            $tracking = $request->attributes->get('_route');
-            $this->setTracking($tracking);
+        // tracking user page for stats
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
-            return $this->render('admin_societe/index.html.twig', [
-                'controller_name' => 'AdminSocieteController',
-                'societes' => $societes,
-                'formSociete' => $form->createView(),
-                'title' => "Administration des Sociétés"
-            ]);
+        return $this->render('admin_societe/index.html.twig', [
+            'controller_name' => 'AdminSocieteController',
+            'societes' => $societes,
+            'formSociete' => $form->createView(),
+            'title' => "Administration des Sociétés",
+        ]);
     }
 
     /**
@@ -54,14 +55,14 @@ class AdminSocieteController extends AbstractController
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(Societe::class);
         $societeId = $repository->find($id);
-         
+
         $em = $this->getDoctrine()->getManager();
         $em->remove($societeId);
-        $em->flush();        
+        $em->flush();
 
         // tracking user page for stats
-            $tracking = $request->attributes->get('_route');
-            $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         return $this->redirect($this->generateUrl('app_admin_societe'));
     }
@@ -71,25 +72,25 @@ class AdminSocieteController extends AbstractController
     public function editSociete(Societe $societe, Request $request)
     {
         $form = $this->createForm(EditSocieteType::class, $societe);
-            $form->handleRequest($request);
+        $form->handleRequest($request);
 
-            // tracking user page for stats
-            $tracking = $request->attributes->get('_route');
-            $this->setTracking($tracking);
-            
-            if($form->isSubmitted() && $form->isValid()){
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($societe);
-                $em->flush();
+        // tracking user page for stats
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
-                $this->addFlash('message', 'Société modifié avec succès');
-                return $this->redirectToRoute('app_admin_societe');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($societe);
+            $em->flush();
 
-            }
-            return $this->render('admin_societe/edit_societe.html.twig',[
-                'societeEditForm' => $form->createView(),
-                'societe' => $societe,
-                'title' => 'Edition des Sociétés'
-            ]);
+            $this->addFlash('message', 'Société modifié avec succès');
+            return $this->redirectToRoute('app_admin_societe');
+
+        }
+        return $this->render('admin_societe/edit_societe.html.twig', [
+            'societeEditForm' => $form->createView(),
+            'societe' => $societe,
+            'title' => 'Edition des Sociétés',
+        ]);
     }
 }

@@ -2,10 +2,9 @@
 
 namespace App\Repository\Main;
 
-use DateTime;
 use App\Entity\Main\Holiday;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Holiday|null find($id, $lockMode = null, $lockVersion = null)
@@ -26,17 +25,18 @@ class HolidayRepository extends ServiceEntityRepository
         FROM holiday
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
     // Pour contrôler si l'utilisateur n'a pas déjà posé durant cet interval
-    public function getAlreadyInHolidayInThisPeriod($start, $end, $user, $id = 0){
-        $start = date_format($start,"Y-m-d H:i:s");
-        $end = date_format($end,"Y-m-d H:i:s");
+    public function getAlreadyInHolidayInThisPeriod($start, $end, $user, $id = 0)
+    {
+        $start = date_format($start, "Y-m-d H:i:s");
+        $end = date_format($end, "Y-m-d H:i:s");
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * 
-        FROM holiday 
-        WHERE 
+        $sql = "SELECT *
+        FROM holiday
+        WHERE
         (holiday.start BETWEEN '$start' AND '$end' -- la date début est comprise entre les dates saisies
         OR holiday.end BETWEEN '$start' AND '$end'  -- la date fin est comprise entre les dates saisies
         OR '$start' BETWEEN holiday.start AND holiday.end  -- la date début saisie est comprise entre les dates début et fin
@@ -45,62 +45,63 @@ class HolidayRepository extends ServiceEntityRepository
         AND not holiday.holidayStatus_id IN (4)
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Liste des congés à venir
-    public function getFuturHoliday(){
+    public function getFuturHoliday()
+    {
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * 
+        $sql = "SELECT *
         FROM holiday
         INNER JOIN statusHoliday ON holiday.holidayStatus_id = statusHoliday.id
-        INNER JOIN users ON users.id = holiday.user_id 
-        WHERE 
+        INNER JOIN users ON users.id = holiday.user_id
+        WHERE
         holiday.end >= CURRENT_DATE()
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getUserActuallyHoliday($user)
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT DISTINCT holiday.user_id 
-        FROM holiday 
+        $sql = "SELECT DISTINCT holiday.user_id
+        FROM holiday
         WHERE holiday.start <= NOW() AND holiday.end >= NOW() AND holiday.user_id = $user AND holiday.holidayStatus_id = 3 ORDER BY holiday.user_id";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
-        
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
+
     }
 
     public function getListHoliday()
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * 
+        $sql = "SELECT *
         FROM holiday_users
         INNER JOIN holiday ON holiday.id = holiday_users.holiday_id
         INNER JOIN users ON holiday_users.users_id = users.id
         INNER JOIN services ON services.id = users.service_id
-        ORDER BY holiday.id DESC        
+        ORDER BY holiday.id DESC
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
-        
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+
     }
     public function getMaxHolidayId()
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT MAX(holiday.id) FROM holiday        
+        $sql = "SELECT MAX(holiday.id) FROM holiday
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
-        
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
+
     }
 
     // Chevauchement de congés d'un même service
@@ -123,21 +124,21 @@ class HolidayRepository extends ServiceEntityRepository
         ORDER BY holiday.createdAt
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$start, $end]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getUserIdHoliday($id)
     {
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT holiday.user_id 
+        $sql = "SELECT holiday.user_id
         FROM holiday
-        WHERE holiday.id = ?
+        WHERE holiday.id = $id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
 
     public function getMailDecideurConges()
@@ -147,23 +148,23 @@ class HolidayRepository extends ServiceEntityRepository
         $sql = "SELECT DISTINCT users.email FROM users WHERE users.roles LIKE '%ROLE_CONGES%'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getListeCongesEtServices()
     {
         // congés non dépassés avec les services
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT holiday.id, holiday.start, holiday.end, holiday.holidayStatus_id, users.service_id 
+        $sql = "SELECT holiday.id, holiday.start, holiday.end, holiday.holidayStatus_id, users.service_id
         FROM holiday
         INNER JOIN holiday_users ON holiday_users.holiday_id = holiday.id
         INNER JOIN users ON holiday_users.users_id = users.id
         WHERE holiday.end > NOW()
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getListeCongesDurantPeriode($start, $end)
@@ -184,16 +185,16 @@ class HolidayRepository extends ServiceEntityRepository
         INNER JOIN users us ON us.id = treatmentedBy_id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Liste des types de congés avec des congés acceptés par utilisateurs
     public function getVacationTypeListByUsers($start, $end)
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT pseudo AS pseudo, email AS email, 
-        SUM(conges) AS conges, SUM(rtt) AS rtt, SUM(sansSolde) AS sansSolde, SUM(famille) AS famille, 
+        $sql = "SELECT pseudo AS pseudo, email AS email,
+        SUM(conges) AS conges, SUM(rtt) AS rtt, SUM(sansSolde) AS sansSolde, SUM(famille) AS famille,
         SUM(maternite) AS maternite, SUM(deces) AS deces, SUM(demenagement) AS demenagement,SUM(arretTravail) AS arretTravail, SUM(arretCovid) AS arretCovid, SUM(autre) AS autre, SUM(total) AS total
         FROM(
         SELECT users.pseudo AS pseudo, users.email AS email,
@@ -236,12 +237,11 @@ class HolidayRepository extends ServiceEntityRepository
         GROUP BY pseudo, email
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    // Nombre de jour de congés acceptés pour tous les utilisateurs 
+    // Nombre de jour de congés acceptés pour tous les utilisateurs
     public function getCountCongesAcceptedForAllUsers($start, $end)
     {
 
@@ -255,11 +255,11 @@ class HolidayRepository extends ServiceEntityRepository
         GROUP BY users.pseudo, users.email, holidaytypes.name, holidaytypes.color, holiday.holidayType_id, holiday.holidayStatus_id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    // Nombre de jour de congés acceptés par utilisateur 
+    // Nombre de jour de congés acceptés par utilisateur
     public function getCountCongesAccepted($user, $start, $end)
     {
 
@@ -272,11 +272,11 @@ class HolidayRepository extends ServiceEntityRepository
         GROUP BY holidaytypes.name, holidaytypes.color,statusholiday.name, holiday.holidayType_id, holiday.holidayStatus_id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    // Nombre de jour de congés Refusés par utilisateur 
+    // Nombre de jour de congés Refusés par utilisateur
     public function getCountCongesRefused($user, $start, $end)
     {
         // congés non dépassés avec les services
@@ -289,11 +289,11 @@ class HolidayRepository extends ServiceEntityRepository
         GROUP BY holidaytypes.name, holidaytypes.color,statusholiday.name, holiday.holidayType_id, holiday.holidayStatus_id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    // Nombre de jour de congés en attente par utilisateur 
+    // Nombre de jour de congés en attente par utilisateur
     public function getCountCongesWait($user, $start, $end)
     {
         // congés non dépassés avec les services
@@ -306,11 +306,11 @@ class HolidayRepository extends ServiceEntityRepository
         GROUP BY holidaytypes.name, holidaytypes.color,statusholiday.name, holiday.holidayType_id, holiday.holidayStatus_id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    // Liste des jours de congés en attente par utilisateur 
+    // Liste des jours de congés en attente par utilisateur
     public function getListCongesWait($user, $start, $end)
     {
         // congés non dépassés avec les services
@@ -320,11 +320,11 @@ class HolidayRepository extends ServiceEntityRepository
         WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.user_id = $user AND holiday.holidayStatus_id IN (1,2)
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    // Liste des jours de congés en accepté par utilisateur 
+    // Liste des jours de congés en accepté par utilisateur
     public function getListCongesAccepted($user, $start, $end)
     {
         // congés non dépassés avec les services
@@ -334,11 +334,11 @@ class HolidayRepository extends ServiceEntityRepository
         WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.user_id = $user AND holiday.holidayStatus_id IN (3)
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    // Liste des jours de congés en refusé par utilisateur 
+    // Liste des jours de congés en refusé par utilisateur
     public function getListCongesRefused($user, $start, $end)
     {
         // congés non dépassés avec les services
@@ -348,8 +348,8 @@ class HolidayRepository extends ServiceEntityRepository
         WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.user_id = $user AND holiday.holidayStatus_id IN (4)
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
-    
+
 }

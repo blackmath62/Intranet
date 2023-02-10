@@ -19,7 +19,7 @@ class ControlesAnomaliesRepository extends ServiceEntityRepository
         parent::__construct($registry, ControlesAnomalies::class);
     }
 
-    public function getCountAnomalies():array
+    public function getCountAnomalies(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT controlesanomalies.type AS Type,
@@ -30,36 +30,36 @@ class ControlesAnomaliesRepository extends ServiceEntityRepository
         GROUP BY controlesanomalies.type
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
-    
+
     // /**
     //  * @return ControlesAnomalies[] Returns an array of ControlesAnomalies objects
     //  */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+    return $this->createQueryBuilder('c')
+    ->andWhere('c.exampleField = :val')
+    ->setParameter('val', $value)
+    ->orderBy('c.id', 'ASC')
+    ->setMaxResults(10)
+    ->getQuery()
+    ->getResult()
+    ;
     }
-    */
+     */
 
     /*
-    public function findOneBySomeField($value): ?ControlesAnomalies
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+public function findOneBySomeField($value): ?ControlesAnomalies
+{
+return $this->createQueryBuilder('c')
+->andWhere('c.exampleField = :val')
+->setParameter('val', $value)
+->getQuery()
+->getOneOrNullResult()
+;
+}
+ */
 }

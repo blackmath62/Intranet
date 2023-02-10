@@ -40,7 +40,7 @@ class ContratCommissionnaireController extends AbstractController
         $this->repoMail = $repoMail;
         $this->repoMouv = $repoMouv;
         $this->repoMail = $repoMail;
-        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         //parent::__construct();
     }
 
@@ -52,7 +52,7 @@ class ContratCommissionnaireController extends AbstractController
 
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$this->setTracking($tracking);
 
         $mouvs = "";
         $art = "";

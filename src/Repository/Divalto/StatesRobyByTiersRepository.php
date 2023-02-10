@@ -2,10 +2,9 @@
 
 namespace App\Repository\Divalto;
 
-
 use App\Entity\Divalto\Mouv;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 class StatesRobyByTiersRepository extends ServiceEntityRepository
 {
@@ -14,13 +13,12 @@ class StatesRobyByTiersRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Mouv::class);
     }
-   
 
-    public function getStatesRobyTiersByMonth($annee,$mois):array
+    public function getStatesRobyTiersByMonth($annee, $mois): array
     {
         $N1 = $annee - 1;
         $conn = $this->getEntityManager()
-        ->getConnection();
+            ->getConnection();
         $sql = "SELECT YEAR(DateFacture) AS Annee,LTRIM(RTRIM(Commercial)) AS Commercial,LTRIM(RTRIM(Client)) AS Tiers, LTRIM(RTRIM(nom)) as Nom,LTRIM(RTRIM(Pays)) as Pays,
         LTRIM(RTRIM(Devise)) AS Devise,LTRIM(RTRIM(SUM(montantSign))) AS MontantSign
         FROM -- imbrication d'une requête pour extraire les données à calculer
@@ -40,7 +38,7 @@ class StatesRobyByTiersRepository extends ServiceEntityRepository
         GROUP BY YEAR(DateFacture), Commercial, Client, nom,Pays, Devise
         ORDER BY Tiers";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$annee,$N1,$mois]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 }

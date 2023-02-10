@@ -67,13 +67,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
 
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
-                AND ((MOUV.FADT >= ? AND MOUV.FADT <= ? ) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? )))reponse
+                AND ((MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' )))reponse
                 WHERE SecteurMouvement IN( $metiers )
         GROUP BY Commercial,CommercialId,SecteurMouvement, Periode
         ORDER BY Commercial,SecteurMouvement, Periode";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States Excel par commercial
@@ -162,8 +162,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
         ORDER BY Client";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States Excel par metier
@@ -252,8 +252,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
         ORDER BY Client";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // NOM DU COMMERCIAL
@@ -266,8 +266,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $sql = "SELECT LTRIM(RTRIM(VRP.SELCOD)) AS SELCOD FROM VRP
         WHERE VRP.TIERS = $commercialid AND VRP.DOS = $dossier";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States TOP 10 Familles produits
@@ -306,8 +306,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         GROUP BY Famille_Article
         ORDER BY SUM(MontantSignN) DESC";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Bandeau avec CA du secteur d'extraction
@@ -351,13 +351,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
 
                 AND CLI.STAT_0002 IN( 'EV','HP','RB' ) AND ART.FAM_0002 IN( 'EV','HP','ME','MO', 'RB', 'D', 'RG', 'RL', 'S', 'BL' )
-                AND ((MOUV.FADT >= ? AND MOUV.FADT <= ? ) OR (MOUV.FADT >= ?  AND MOUV.FADT <= ? )))reponse
+                AND ((MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN1'  AND MOUV.FADT <= '$dateFinN1' )))reponse
                 WHERE SecteurMouvement IN( $metiers )
         GROUP BY SecteurMouvement, Periode
         ORDER BY SecteurMouvement, Periode";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getStatesDetailClient($metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier): array
@@ -399,13 +399,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
 
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
-                AND ((MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? )))reponse
+                AND ((MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN') OR (MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' )))reponse
                 WHERE SecteurMouvement IN( $metiers )
         GROUP BY Commercial,commercialId,SecteurMouvement, Tiers, Nom
         ORDER BY Commercial";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // CA Par métiers
@@ -455,12 +455,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
 
                 AND CLI.STAT_0002 IN('EV','HP', 'RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
-                AND ((MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? )))reponse
+                AND ((MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN') OR (MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' )))reponse
         GROUP BY SecteurMouvement, Color,Icon
         ORDER BY SecteurMouvement";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getStatesLhermitteByArticles($tiers, $metiers, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier): array
@@ -524,13 +524,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND MOUV.TIERS = '$tiers'
 
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
-                AND ( (MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ) ))reponse
+                AND ( (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN') OR (MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1') OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ) ))reponse
                 WHERE SecteurMouvement IN( $metiers )
         GROUP BY Mois, Ref, Sref1, Sref2,Uv
         ORDER BY Mois, Ref";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dateDebutN2, $dateFinN2]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // CA bandeau détail client famille produit
@@ -575,13 +575,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND MOUV.TIERS = '$tiers'
 
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
-                AND ( (MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ?) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ) ))reponse
+                AND ( (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN') OR (MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1') OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ) ))reponse
                 WHERE SecteurMouvement IN( $metiers )
         GROUP BY FamArticle
         ORDER BY FamArticle";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dateDebutN2, $dateFinN2]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // CA global du commercial
@@ -626,11 +626,11 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND (CLI.REPR_0001 = $commercial OR CLI.REPR_0002 = $commercial )
 
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
-                AND ( (MOUV.FADT >= ? AND MOUV.FADT <= ? ) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ) OR (MOUV.FADT >= ? AND MOUV.FADT <= ? ) ) )reponse
+                AND ( (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ) ) )reponse
                 WHERE SecteurMouvement IN( $metiers )";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dateDebutN2, $dateFinN2]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States par famille société Roby
@@ -669,8 +669,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         )reponse
         GROUP BY tiers, nom, famille";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States par famille société Roby Totaux
@@ -708,8 +708,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $metier
         )reponse";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States société Roby Total
@@ -737,8 +737,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $metier
         )reponse";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
 
     // States société Roby par clients
@@ -767,8 +767,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         )reponse
         GROUP BY tiers, nom";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States société Roby par produits
@@ -797,8 +797,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         )reponse
         GROUP BY ref, sref1, sref2, designation,uv";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States société Roby par clients/article 2 ans
@@ -838,8 +838,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         )reponse
         GROUP BY $type";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States par famille société Roby Totaux PAR FAMILLE
@@ -879,8 +879,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         GROUP BY famille
         ORDER BY montantN DESC";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States par famille société Roby Totaux PAR FAMILLE produit
@@ -916,8 +916,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         GROUP BY famille
         ORDER BY montantN DESC";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States CA par année sur 6 années
@@ -963,8 +963,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         )reponse
         GROUP BY $type";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States CA par année sur 6 années Commerciaux
@@ -1026,8 +1026,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         GROUP BY commercial
         ORDER BY montantN1 DESC";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // States par client, famille client, famille produit, produit
@@ -1102,8 +1102,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
          ORDER BY montantN1 DESC";
 
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Totaux des states commerciaux
@@ -1164,8 +1164,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
          )reponse";
 
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 }

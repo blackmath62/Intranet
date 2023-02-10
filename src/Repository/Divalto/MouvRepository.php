@@ -46,8 +46,8 @@ class MouvRepository extends ServiceEntityRepository
         INNER JOIN ENT ON dos = ENT.DOS AND tiers = ENT.TIERS AND ENT.PINO = numPiece
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Liste des piéces avec des produits FSC pour tourner à vide
@@ -75,8 +75,8 @@ class MouvRepository extends ServiceEntityRepository
         INNER JOIN ENT ON dos = ENT.DOS AND tiers = ENT.TIERS AND ENT.PINO = numPiece
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getNotreRef($piece, $typePiece, $tiers)
@@ -87,8 +87,8 @@ class MouvRepository extends ServiceEntityRepository
         WHERE ENT.DOS = 3 AND ENT.PINO = $piece AND ENT.TIERS = '$tiers' AND ENT.PICOD = $typePiece
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
 
     // Mouvements sur la piéce
@@ -113,8 +113,8 @@ class MouvRepository extends ServiceEntityRepository
         GROUP BY $dateP, $code, MOUV.PICOD, MOUV.TIERS, MOUV.REF, MOUV.SREF1, MOUV.SREF2, MVTL_STOCK_V.SERIELOT
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Mouvements sur la piéce
@@ -126,8 +126,8 @@ class MouvRepository extends ServiceEntityRepository
         WHERE MOUV.DOS = 3 AND MOUV.TIERS = '$tiers' AND MOUV.REF LIKE 'FSC%' AND MOUV.CDNO = $num
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative();
     }
 
     // Mouvements sur la piéce
@@ -145,8 +145,8 @@ class MouvRepository extends ServiceEntityRepository
         ORDER BY tiers
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Vente des contrats commissionnaires
@@ -167,8 +167,8 @@ class MouvRepository extends ServiceEntityRepository
         GROUP BY reference, designation, uv
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Mouvements FSC
@@ -212,8 +212,8 @@ class MouvRepository extends ServiceEntityRepository
         ORDER BY Ref
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Mouvements FSC pour un Article
@@ -258,8 +258,8 @@ class MouvRepository extends ServiceEntityRepository
             ORDER BY Ref
             ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative();
     }
 
     // Détails Mouvements FSC par article
@@ -309,8 +309,8 @@ class MouvRepository extends ServiceEntityRepository
         ORDER BY Ref
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 // ramener le dernier mouvement avec Type Piéce, numéro piéce et date piéce sur un article FSC
@@ -342,8 +342,8 @@ class MouvRepository extends ServiceEntityRepository
     ORDER BY MaxDate,NumPiece DESC
     ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative();
     }
 
 // ramener les produits en liens avec des factures FSC
@@ -364,8 +364,8 @@ class MouvRepository extends ServiceEntityRepository
     GROUP BY Lien, TypePiece, Factures, Nature
     ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 // Vérifier que les bons codes articles sont utilisés
@@ -403,8 +403,8 @@ class MouvRepository extends ServiceEntityRepository
         ORDER BY Probleme DESC
     ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 // ramener le Détail d'une facture client FSC
@@ -414,11 +414,11 @@ class MouvRepository extends ServiceEntityRepository
         $sql = "SELECT m.TIERS AS tiers, m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, m.OP AS op, m.QTE AS qte, m.SERIE AS lot
     FROM MVTL m
     INNER JOIN ART a ON a.REF = m.REF AND a.DOS = m.DOS
-    WHERE m.DOS = 3 AND m.PINO = ? AND m.TICOD = 'C'
+    WHERE m.DOS = 3 AND m.PINO = $facture AND m.TICOD = 'C'
     ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$facture]);
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 // ramener les BLs Directs
@@ -437,8 +437,8 @@ class MouvRepository extends ServiceEntityRepository
         GROUP BY tiers, numeroBl,dateBl,Utilisateur,MUSER.EMAIL
     ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 // Update Mouvements/entête conduite de travaux
@@ -480,8 +480,8 @@ class MouvRepository extends ServiceEntityRepository
     GROUP BY ENT.ENT_ID
     ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 // détail des articles de la piéce conduite de travaux
@@ -507,8 +507,8 @@ class MouvRepository extends ServiceEntityRepository
     INNER JOIN ENT ON dos = ENT.DOS AND tiers = ENT.TIERS AND num = ENT.PINO AND ENT.TICOD = 'C' AND ENT.PICOD = type AND ENT.ENT_ID = $id
     ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 // achat en cours liés à l'affaire ->  conduite de travaux
@@ -541,8 +541,8 @@ class MouvRepository extends ServiceEntityRepository
     WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'F' AND MOUV.PROJET = '$affaire'
     ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 // Commande et BL de la veille pour les clients feu rouge et orange
@@ -579,8 +579,8 @@ class MouvRepository extends ServiceEntityRepository
         WHERE feu <> 'vert'
     ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl): array
@@ -624,8 +624,8 @@ class MouvRepository extends ServiceEntityRepository
         ";
         }
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getNbeBlEtStockParFamille($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl): array
@@ -668,8 +668,8 @@ class MouvRepository extends ServiceEntityRepository
         ";
         }
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
     // activité métier par produits
     public function getActivitesMetier($dd, $df, $metier): array
@@ -708,8 +708,8 @@ class MouvRepository extends ServiceEntityRepository
             ORDER BY montantSign DESC
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // activité métier par clients
@@ -749,8 +749,8 @@ class MouvRepository extends ServiceEntityRepository
         ORDER BY montantSign DESC
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getTotalActivitesMetier($dd, $df, $metier)
@@ -789,8 +789,8 @@ class MouvRepository extends ServiceEntityRepository
             GROUP BY famille, ref, des)rep
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
 
     public function getActivitesFamilleProduit($dd, $df, $metier): array
@@ -829,8 +829,8 @@ class MouvRepository extends ServiceEntityRepository
             ORDER BY montantSign DESC
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getActivitesFamilleClient($dd, $df, $metier): array
@@ -869,8 +869,8 @@ class MouvRepository extends ServiceEntityRepository
             ORDER BY montantSign DESC
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 }

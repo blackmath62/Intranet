@@ -2,14 +2,14 @@
 
 namespace App\Controller;
 
-use App\Form\CalendarType;
 use App\Entity\Main\Calendar;
+use App\Form\CalendarType;
 use App\Repository\Main\CalendarRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @IsGranted("ROLE_ADMIN")
@@ -17,35 +17,34 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BourseTransportController extends AbstractController
 {
-   
+
     /**
      * @Route("/bourse_transport", name="app_bourse_transport", methods={"GET"})
      */
     public function index(CalendarRepository $calendarRepository, Request $request): Response
     {
-        
+
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         return $this->render('bourse_transport/index.html.twig', [
             'calendars' => $calendarRepository->findAll(),
-            'title' => 'Bourse aux transports'
+            'title' => 'Bourse aux transports',
         ]);
     }
 
     /**
      * @Route("/bourse_transport/new", name="app_calendar_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
-    {
+    function new (Request $request): Response {
         $calendar = new Calendar();
         $form = $this->createForm(CalendarType::class, $calendar);
         $form->handleRequest($request);
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        // $tracking = $request->attributes->get('_route');
+        // $this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
@@ -67,8 +66,8 @@ class BourseTransportController extends AbstractController
     public function show(Calendar $calendar, Request $request): Response
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        // $this->setTracking($tracking);
 
         return $this->render('bourse_transport/show.html.twig', [
             'calendar' => $calendar,
@@ -84,8 +83,8 @@ class BourseTransportController extends AbstractController
         $form->handleRequest($request);
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        // $this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
@@ -104,16 +103,16 @@ class BourseTransportController extends AbstractController
      */
     public function delete(Request $request, Calendar $calendar): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$calendar->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $calendar->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($calendar);
             $entityManager->flush();
         }
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
-        
+        //$tracking = $request->attributes->get('_route');
+        // $this->setTracking($tracking);
+
         return $this->redirectToRoute('app_bourse_transport');
     }
 }

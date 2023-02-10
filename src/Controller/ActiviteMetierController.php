@@ -18,7 +18,7 @@ class ActiviteMetierController extends AbstractController
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$this->setTracking($tracking);
 
         $activites = '';
         $activitesClient = '';

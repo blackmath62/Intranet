@@ -4,10 +4,10 @@ namespace App\Controller;
 
 use App\Form\SearchType;
 use App\Repository\Divalto\ArtRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SrefByArtController extends AbstractController
 {
@@ -17,15 +17,15 @@ class SrefByArtController extends AbstractController
     public function index(Request $request, ArtRepository $repo): Response
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //  $tracking = $request->attributes->get('_route');
+        //  $this->setTracking($tracking);
         $dos = 1;
-        $articles= "";
-        
+        $articles = "";
+
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
-        
-        if($form->isSubmitted() && $form->isValid()){
+
+        if ($form->isSubmitted() && $form->isValid()) {
             $search = $form->getData()['search'];
             $articles = $repo->getSrefByArt($dos, $search);
         }

@@ -16,8 +16,8 @@ class EmplStockDifEmplPieceController extends AbstractController
     public function index(EmplRepository $repo, Request $request): Response
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         return $this->render('empl_stock_dif_empl_piece/index.html.twig', [
             'controller_name' => 'EmplStockDifEmplPieceController',

@@ -4,53 +4,52 @@ namespace App\Controller;
 
 use App\Entity\Main\Logiciel;
 use App\Form\EditLogicielType;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\Main\LogicielRepository;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
-* @IsGranted("ROLE_ADMIN")
-*/
+ * @IsGranted("ROLE_ADMIN")
+ */
 class LogicielController extends AbstractController
 {
     /**
      * @Route("/admin/logiciels", name="app_admin_logiciel")
      */
-   
+
     public function index(Logiciel $logiciel = null, Request $request, LogicielRepository $repo, EntityManagerInterface $manager)
     {
-        if(!$logiciel){
+        if (!$logiciel) {
             $logiciel = new Logiciel();
-            }
-            $form = $this->createFormBuilder($logiciel)
-                ->add("nom")
-                ->add("backgroungColor")
-                ->add("textColor")
-                ->add('icon')
-                ->getForm();
-            $form->handleRequest($request);
+        }
+        $form = $this->createFormBuilder($logiciel)
+            ->add("nom")
+            ->add("backgroungColor")
+            ->add("textColor")
+            ->add('icon')
+            ->getForm();
+        $form->handleRequest($request);
 
-            // tracking user page for stats
-            $tracking = $request->attributes->get('_route');
-            $this->setTracking($tracking);
+        // tracking user page for stats
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
-            if ($form->isSubmitted() && $form->isValid()) {
-                $logiciel->setCreatedAt(new \DateTime());
-                $logiciel->setClosedAt(new \DateTime());
-                $manager->persist($logiciel);
-                $manager->flush();
-            }
-            $logiciels = $repo->findAll();
-            return $this->render('logiciel/index.html.twig', [
-                'controller_name' => 'AdminlogicielController',
-                'logiciels' => $logiciels,
-                'formLogiciel' => $form->createView(),
-                'title' => "Administration des logiciels"
-            ]);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $logiciel->setCreatedAt(new \DateTime());
+            $logiciel->setClosedAt(new \DateTime());
+            $manager->persist($logiciel);
+            $manager->flush();
+        }
+        $logiciels = $repo->findAll();
+        return $this->render('logiciel/index.html.twig', [
+            'controller_name' => 'AdminlogicielController',
+            'logiciels' => $logiciels,
+            'formLogiciel' => $form->createView(),
+            'title' => "Administration des logiciels",
+        ]);
     }
 
     /**
@@ -60,16 +59,15 @@ class LogicielController extends AbstractController
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(Logiciel::class);
         $logicielId = $repository->find($id);
-        
+
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        // $tracking = $request->attributes->get('_route');
+        // $this->setTracking($tracking);
 
         $em = $this->getDoctrine()->getManager();
         $em->remove($logicielId);
-        $em->flush();        
+        $em->flush();
 
-        
         return $this->redirect($this->generateUrl('app_admin_logiciel'));
     }
     /**
@@ -78,25 +76,25 @@ class LogicielController extends AbstractController
     public function editlogiciel(Logiciel $logiciel, Request $request)
     {
         $form = $this->createForm(EditLogicielType::class, $logiciel);
-            $form->handleRequest($request);
+        $form->handleRequest($request);
 
-            // tracking user page for stats
-            $tracking = $request->attributes->get('_route');
-            $this->setTracking($tracking);
-            
-            if($form->isSubmitted() && $form->isValid()){
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($logiciel);
-                $em->flush();
+        // tracking user page for stats
+        //$tracking = $request->attributes->get('_route');
+        // $this->setTracking($tracking);
 
-                $this->addFlash('message', 'Logiciel modifié avec succès');
-                return $this->redirectToRoute('app_admin_logiciel');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($logiciel);
+            $em->flush();
 
-            }
-            return $this->render('logiciel/edit_logiciels.html.twig',[
-                'logicielEditForm' => $form->createView(),
-                'logiciels' => $logiciel,
-                'title' => 'Edition des logiciels'
-            ]);
+            $this->addFlash('message', 'Logiciel modifié avec succès');
+            return $this->redirectToRoute('app_admin_logiciel');
+
+        }
+        return $this->render('logiciel/edit_logiciels.html.twig', [
+            'logicielEditForm' => $form->createView(),
+            'logiciels' => $logiciel,
+            'title' => 'Edition des logiciels',
+        ]);
     }
 }

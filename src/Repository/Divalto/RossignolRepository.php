@@ -34,8 +34,8 @@ class RossignolRepository extends ServiceEntityRepository
         ORDER BY MVTL_STOCK_V.REFERENCE
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getRossignolVenteList($annee): array
@@ -73,8 +73,8 @@ class RossignolRepository extends ServiceEntityRepository
         GROUP BY Tiers, Nom, Commercial, Ref, Sref1, Sref2, Designation, Uv, TAR.TACOD, TAR.TADT, TAR.PUB, TAR.PPAR, PrixPar
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 }

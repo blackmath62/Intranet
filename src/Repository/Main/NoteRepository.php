@@ -25,46 +25,44 @@ class NoteRepository extends ServiceEntityRepository
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('n.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+    return $this->createQueryBuilder('n')
+    ->andWhere('n.exampleField = :val')
+    ->setParameter('val', $value)
+    ->orderBy('n.id', 'ASC')
+    ->setMaxResults(10)
+    ->getQuery()
+    ->getResult()
+    ;
     }
-    */
+     */
 
     // Compter le nombre de notes par commande
-    public function getCountNoteByCmd():array
+    public function getCountNoteByCmd(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Id, SUM(Nbe) AS Nbe
         FROM(
         SELECT note.cmdRobyDelaiAccepteReporte_id AS Id,
-        CASE 
+        CASE
         WHEN note.cmdRobyDelaiAccepteReporte_id > 0 THEN 1
         END AS Nbe
         FROM note)reponse
         GROUP BY Id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
-
-    
 
     /*
-    public function findOneBySomeField($value): ?Note
-    {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+public function findOneBySomeField($value): ?Note
+{
+return $this->createQueryBuilder('n')
+->andWhere('n.exampleField = :val')
+->setParameter('val', $value)
+->getQuery()
+->getOneOrNullResult()
+;
+}
+ */
 }

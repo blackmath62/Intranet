@@ -1,0 +1,28 @@
+{% block content %}
+	<p class='col-12' style="font-size: 15pt;">{{ produit.designation }}</p>
+	<table class="table " cellspacing="0" cellpadding="3" border="1">
+		<thead>
+			<tr class="text-center">
+				<th style="font-size: 15pt;">Ref</th>
+				<th style="font-size: 12pt; min-width:100pt;">Sref 1 :
+					{{ produit.sref1 }}</th>
+				<th style="font-size: 12pt; min-width:100pt;">Sref 2 :
+					{{ produit.sref2 }}</th>
+			</tr>
+		</thead>
+		<tbody style="text-align: center;">
+			<tr class="text-center">
+				<td style="font-size: 12pt;">{{ produit.ref}}</td>
+				<td class="text-center" style="height: 50pt;" colspan="2">{{ ean|raw }}</td>
+			</tr>
+			<tr class="text-center">
+				<td style="font-size: 15pt;">U.V :
+					{{ produit.uv }}
+				</td>
+				<td class="text-center" colspan="2" style="font-size: 15pt;">
+					{{ produit.ean }}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+{% endblock %}

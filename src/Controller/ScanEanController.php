@@ -35,7 +35,7 @@ class ScanEanController extends AbstractController
     {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
-        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         //parent::__construct();
     }
     // Retrait chantier
@@ -77,6 +77,7 @@ class ScanEanController extends AbstractController
             $histo = $repoRetrait->findBy(['chantier' => $chantier, 'sendAt' => null]);
             for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
                 $prod = $repo->getEanStock($dos, $histo[$ligHisto]->getEan());
+                //dd($prod);
                 $historique[$ligHisto]['id'] = $histo[$ligHisto]->getId();
                 $historique[$ligHisto]['ref'] = $prod['ref'];
                 $historique[$ligHisto]['sref1'] = $prod['sref1'];
@@ -107,8 +108,8 @@ class ScanEanController extends AbstractController
         $em->remove($retrait);
         $em->flush();
 
-        $route = $request->attributes->get('_route');
-        $this->setTracking($route);
+        // $route = $request->attributes->get('_route');
+        // $this->setTracking($route);
 
         $this->addFlash('message', 'Article supprimée avec succès');
         return $this->redirectToRoute('app_scan_ean', ['chantier' => $chantier]);
@@ -127,8 +128,8 @@ class ScanEanController extends AbstractController
             $em->flush();
         }
 
-        $route = $request->attributes->get('_route');
-        $this->setTracking($route);
+        //$route = $request->attributes->get('_route');
+        // $this->setTracking($route);
 
         $this->addFlash('message', 'Chantier ' . $chantier . ' supprimée avec succès');
         return $this->redirectToRoute('app_scan_ean');
@@ -141,8 +142,8 @@ class ScanEanController extends AbstractController
     {
         $ns = $repo->getRetraiNonSoumis();
 
-        $route = $request->attributes->get('_route');
-        $this->setTracking($route);
+        // $route = $request->attributes->get('_route');
+        // $this->setTracking($route);
 
         return $this->render('scan_ean/RetraitNonSoumis.html.twig', [
             'title' => 'Retrait produits',
@@ -316,8 +317,8 @@ class ScanEanController extends AbstractController
             $em->flush();
         }
 
-        $route = $request->attributes->get('_route');
-        $this->setTracking($route);
+        // $route = $request->attributes->get('_route');
+        //  $this->setTracking($route);
 
         $this->addFlash('message', 'Emplacement ' . $emplacement . ' supprimée avec succès');
         return $this->redirectToRoute('app_scan_ean_alim_empl');
@@ -333,8 +334,8 @@ class ScanEanController extends AbstractController
         $em->remove($empl);
         $em->flush();
 
-        $route = $request->attributes->get('_route');
-        $this->setTracking($route);
+        //  $route = $request->attributes->get('_route');
+        //  $this->setTracking($route);
 
         $this->addFlash('message', 'Article supprimée avec succès');
         return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
@@ -347,8 +348,8 @@ class ScanEanController extends AbstractController
     {
         $ns = $repo->getEmplacementNonSoumis();
 
-        $route = $request->attributes->get('_route');
-        $this->setTracking($route);
+        //  $route = $request->attributes->get('_route');
+        //  $this->setTracking($route);
 
         return $this->render('scan_ean/alim_empl_scan_ns.html.twig', [
             'title' => 'Empl NS',
@@ -405,7 +406,7 @@ class ScanEanController extends AbstractController
     /**
      * @Route("/emplacement/produit/print/{emplacement}", name="app_scan_emplacement_print")
      */
-    function print($emplacement = null, Request $request, ArtRepository $repo, Barcode $ean) {
+    function print($emplacement = null, Request $request, ArtRepository $repo) {
 
         $dos = 1;
         $produits = "";
@@ -419,26 +420,27 @@ class ScanEanController extends AbstractController
         // instantiate the barcode class
         $barcode = new Barcode();
 
-// generate a barcode
+        // generate a barcode
         $bobj = $barcode->getBarcodeObj(
-            'QRCODE,H', // barcode type and additional comma-separated parameters
-            'https://tecnick.com', // data string to encode
-            -4, // bar width (use absolute or negative value as multiplication factor)
-            -4, // bar height (use absolute or negative value as multiplication factor)
+            'C128A', // barcode type and additional comma-separated parameters
+            '1000000440324', // data string to encode
+            150, // bar width (use absolute or negative value as multiplication factor)
+            30, // bar height (use absolute or negative value as multiplication factor)
             'black', // foreground color
-            array(-2, -2, -2, -2) // padding (use absolute or negative values as multiplication factors)
+            array(0, 0, 0, 0) // padding (use absolute or negative values as multiplication factors)
         )->setBackgroundColor('white'); // background color
 
-// output the barcode as HTML div (see other output formats in the documentation and examples)
-        echo $bobj->getHtmlDiv();
+        // output the barcode as HTML div (see other output formats in the documentation and examples)
+        //echo $bobj->getHtmlDiv();
 
-        $route = $request->attributes->get('_route');
-        $this->setTracking($route);
+        //  $route = $request->attributes->get('_route');
+        // $this->setTracking($route);
 
         return $this->render('scan_ean/print.html.twig', [
             'title' => 'Imprimer',
             'form' => $form->createView(),
             'produits' => $produits,
+            'ean' => $bobj->getHtmlDiv(),
 
         ]);
     }

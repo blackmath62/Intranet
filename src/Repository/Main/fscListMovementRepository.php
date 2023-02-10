@@ -2,10 +2,10 @@
 
 namespace App\Repository\Main;
 
-use DateTime;
 use App\Entity\Main\fscListMovement;
-use Doctrine\Persistence\ManagerRegistry;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method fscListMovement|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,7 +21,7 @@ class fscListMovementRepository extends ServiceEntityRepository
     }
 
     // Compter le nombre de piéce pour la commande ciblé
-    public function getCountTypeDocByOrderFsc($id):array
+    public function getCountTypeDocByOrderFsc($id): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT
@@ -34,12 +34,12 @@ class fscListMovementRepository extends ServiceEntityRepository
         ORDER BY fsclistmovement.id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Compter le nombre de piéce pour toutes les commandes
-    public function getCountTypeDocByOrderFscForAll():array
+    public function getCountTypeDocByOrderFscForAll(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT
@@ -51,35 +51,35 @@ class fscListMovementRepository extends ServiceEntityRepository
         ORDER BY fsclistmovement.id
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
-    
-    public function getListFacture():array
+
+    public function getListFacture(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT documentsfsc.file AS fichier, documentsfsc.fscListMovement_id AS movid, fsclistmovement.numFact 
-        FROM documentsfsc INNER JOIN fsclistmovement ON fsclistmovement.id = documentsfsc.fscListMovement_id 
-        WHERE documentsfsc.TypeDoc_id = 9 
+        $sql = "SELECT documentsfsc.file AS fichier, documentsfsc.fscListMovement_id AS movid, fsclistmovement.numFact
+        FROM documentsfsc INNER JOIN fsclistmovement ON fsclistmovement.id = documentsfsc.fscListMovement_id
+        WHERE documentsfsc.TypeDoc_id = 9
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // pour l'envoi de mail automatique permetant l'alimentation des documents fsc sur les piéces fournisseurs
-    public function getPieceFscAAlimenter():array
+    public function getPieceFscAAlimenter(): array
     {
         $d = new DateTime('2021/01/01');
         $d = $d->format('Y-m-d');
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT * 
+        $sql = "SELECT *
         FROM fsclistmovement
-        WHERE fsclistmovement.probleme = 0 AND (fsclistmovement.dateCmd >= '$d' OR fsclistmovement.dateBl >= '$d' OR fsclistmovement.dateFact >= '$d') 
+        WHERE fsclistmovement.probleme = 0 AND (fsclistmovement.dateCmd >= '$d' OR fsclistmovement.dateBl >= '$d' OR fsclistmovement.dateFact >= '$d')
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // /**
@@ -88,26 +88,26 @@ class fscListMovementRepository extends ServiceEntityRepository
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('f')
-            ->andWhere('f.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('f.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+    return $this->createQueryBuilder('f')
+    ->andWhere('f.exampleField = :val')
+    ->setParameter('val', $value)
+    ->orderBy('f.id', 'ASC')
+    ->setMaxResults(10)
+    ->getQuery()
+    ->getResult()
+    ;
     }
-    */
+     */
 
     /*
-    public function findOneBySomeField($value): ?fscListMovement
-    {
-        return $this->createQueryBuilder('f')
-            ->andWhere('f.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+public function findOneBySomeField($value): ?fscListMovement
+{
+return $this->createQueryBuilder('f')
+->andWhere('f.exampleField = :val')
+->setParameter('val', $value)
+->getQuery()
+->getOneOrNullResult()
+;
+}
+ */
 }

@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\Entity\Main\Prestataire;
 use App\Form\PrestataireType;
 use App\Repository\Main\PrestataireRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @IsGranted("ROLE_ADMIN")
@@ -22,7 +22,7 @@ class AdminPrestataireController extends AbstractController
      */
     public function index(PrestataireRepository $repo, Request $request): Response
     {
-        
+
         $form = $this->createForm(PrestataireType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -36,8 +36,8 @@ class AdminPrestataireController extends AbstractController
         $prestataires = $repo->findAll();
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         return $this->render('admin_prestataire/index.html.twig', [
             'controller_name' => 'AdminPrestataireController',
@@ -54,14 +54,14 @@ class AdminPrestataireController extends AbstractController
     {
         $repository = $this->getDoctrine()->getManager()->getRepository(Prestataire::class);
         $prestataireId = $repository->find($id);
-         
+
         $em = $this->getDoctrine()->getManager();
         $em->remove($prestataireId);
-        $em->flush();        
+        $em->flush();
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         return $this->redirect($this->generateUrl('app_admin_prestataire'));
     }
@@ -71,25 +71,25 @@ class AdminPrestataireController extends AbstractController
     public function editprestataire(Prestataire $prestataire, Request $request)
     {
         $form = $this->createForm(PrestataireType::class, $prestataire);
-            $form->handleRequest($request);
+        $form->handleRequest($request);
 
-            // tracking user page for stats
-            $tracking = $request->attributes->get('_route');
-            $this->setTracking($tracking);
+        // tracking user page for stats
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
-            if($form->isSubmitted() && $form->isValid()){
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($prestataire);
-                $em->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($prestataire);
+            $em->flush();
 
-                $this->addFlash('message', 'Prestataire modifié avec succès');
-                return $this->redirectToRoute('app_admin_prestataire');
+            $this->addFlash('message', 'Prestataire modifié avec succès');
+            return $this->redirectToRoute('app_admin_prestataire');
 
-            }
-            return $this->render('admin_prestataire/edit_prestataire.html.twig',[
-                'prestataireEditForm' => $form->createView(),
-                'prestataire' => $prestataire,
-                'title' => 'Edition des prestataires'
-            ]);
+        }
+        return $this->render('admin_prestataire/edit_prestataire.html.twig', [
+            'prestataireEditForm' => $form->createView(),
+            'prestataire' => $prestataire,
+            'title' => 'Edition des prestataires',
+        ]);
     }
 }

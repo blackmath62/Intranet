@@ -3,10 +3,10 @@
 namespace App\Controller;
 
 use App\Repository\Main\DocumentsRepository;
-use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @IsGranted("ROLE_USER")
@@ -22,13 +22,13 @@ class DocumentsController extends AbstractController
         $documents = $repo->findBy(['societe' => 1]);
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         return $this->render('documents/index.html.twig', [
             'controller_name' => 'DocumentsController',
             'documents' => $documents,
-            'title' => 'Documents Lhermitte'
+            'title' => 'Documents Lhermitte',
         ]);
     }
     /**
@@ -40,13 +40,13 @@ class DocumentsController extends AbstractController
         $documents = $repo->findBy(['societe' => 15]);
 
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         return $this->render('documents/index.html.twig', [
             'controller_name' => 'DocumentsController',
             'documents' => $documents,
-            'title' => 'Documents Roby'
+            'title' => 'Documents Roby',
         ]);
     }
 }

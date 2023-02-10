@@ -48,8 +48,8 @@ class ArtRepository extends ServiceEntityRepository
                     INNER JOIN MUSER ON MUSER.DOS = Dos AND MUSER.USERX = Utilisateur
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getControleStockDirect(): array
@@ -77,8 +77,8 @@ class ArtRepository extends ServiceEntityRepository
         GROUP BY ART.FAM_0002, MVTL_STOCK_V.REFERENCE,MVTL_STOCK_V.DOSSIER, MVTL_STOCK_V.SREFERENCE1 ,MVTL_STOCK_V.SREFERENCE2,MVTL_STOCK_V.ARTICLE_DESIGNATION
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getControleStockDirectFiltre($metier, $dos): array
@@ -106,8 +106,8 @@ class ArtRepository extends ServiceEntityRepository
         WHERE Metier IN( $metier ) AND Dos = $dos
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Controle des articles à fermés tenant compte des réappro
@@ -146,8 +146,8 @@ class ArtRepository extends ServiceEntityRepository
         ORDER BY Ref
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     // Controle des Sous références articles à fermées tenant compte des réappro
@@ -189,8 +189,8 @@ class ArtRepository extends ServiceEntityRepository
         ORDER BY Ref
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function ControleToutesSrefFermeesArticle(): array
@@ -225,8 +225,8 @@ class ArtRepository extends ServiceEntityRepository
             ORDER BY Ref
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function StockBlobMatiereDangeureuse(): array
@@ -243,8 +243,8 @@ class ArtRepository extends ServiceEntityRepository
         ORDER BY a.TIERS
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
     public function getPhyto(): array
     {
@@ -253,8 +253,8 @@ class ArtRepository extends ServiceEntityRepository
         WHERE DOS = 1 AND (ART.REF LIKE ('PPP%') OR ART.REF IN ('MAP65272')) AND ART.HSDT IS NULL
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
     public function getFamilleProduitOuvert(): array
     {
@@ -264,8 +264,8 @@ class ArtRepository extends ServiceEntityRepository
         WHERE ART.HSDT IS NULL AND NOT ART.FAM_0001 IN ('ACCESS','ACOMPTE', 'COMMISSI', 'DIVERS','FIN','NC','PRESTA','REMISE','TAXE','TRANSPOR')
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
     public function getFamilleProduitOuvertParDossier($dos): array
     {
@@ -275,8 +275,8 @@ class ArtRepository extends ServiceEntityRepository
         WHERE ART.HSDT IS NULL AND NOT ART.FAM_0001 IN ('ACCESS','ACOMPTE', 'COMMISSI', 'DIVERS','FIN','NC','PRESTA','REMISE','TAXE','TRANSPOR') AND ART.DOS = '$dos'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getSrefByArt($dos, $prefixe): array
@@ -307,8 +307,8 @@ class ArtRepository extends ServiceEntityRepository
         GROUP BY dos, ref, designation, sref1, sref2, conf, stock, qteCmdCli, qteCmdFou, qteBlCli
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
     public function getEanStock($dos, $ean)
@@ -332,8 +332,8 @@ class ArtRepository extends ServiceEntityRepository
         WHERE ean = '$ean'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative();
     }
 
     public function getEmpl($dos, $emplacement)
@@ -344,8 +344,8 @@ class ArtRepository extends ServiceEntityRepository
         WHERE e.DOS = $dos AND e.LIEU = '$emplacement'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetch();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
     }
 
     public function getSearchArt($dos, $produit): array
@@ -374,8 +374,8 @@ class ArtRepository extends ServiceEntityRepository
         WHERE ref LIKE '%$produit%'
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 }

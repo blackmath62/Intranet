@@ -19,10 +19,10 @@ class FouRepository extends ServiceEntityRepository
         parent::__construct($registry, Fou::class);
     }
 
-    public function getControleRegimeFournisseur():array
+    public function getControleRegimeFournisseur(): array
     {
         $conn = $this->getEntityManager()
-        ->getConnection();
+            ->getConnection();
         $sql = "SELECT Identification,Tiers, Nom, Pays, RegimeTiers, Dos, Utilisateur, MUSER.EMAIL AS Email
         FROM(
         SELECT FOU.FOU_ID AS Identification, FOU.TIERS AS Tiers, FOU.NOM AS Nom, FOU.PAY AS Pays, FOU.TVATIE AS RegimeTiers, FOU.DOS AS Dos,
@@ -30,8 +30,8 @@ class FouRepository extends ServiceEntityRepository
         WHEN USERMO IS NOT NULL THEN USERMO
         ELSE USERCR
         END AS Utilisateur
-        FROM FOU 
-        WHERE 
+        FROM FOU
+        WHERE
         FOU.HSDT IS NULL AND FOU.DOS IN (1,3) AND FOU.CPT = FOU.TIERS
         AND(FOU.PAY = 'FR' AND FOU.TVATIE NOT IN ('0','01')
         OR FOU.PAY IN('AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','GR','HR','HU','IRL','IT','IE','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK') AND FOU.TVATIE NOT IN ('1','11','5','51')
@@ -40,24 +40,24 @@ class FouRepository extends ServiceEntityRepository
         INNER JOIN MUSER ON MUSER.DOS = Dos AND MUSER.USERX = Utilisateur
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function getFournisseurDivalto():array
+    public function getFournisseurDivalto(): array
     {
         $conn = $this->getEntityManager()
-        ->getConnection();
+            ->getConnection();
         $sql = "SELECT LTRIM(RTRIM(FOU.TIERS)) AS tiers, LTRIM(RTRIM(FOU.NOM)) AS nom
         FROM FOU
         WHERE FOU.DOS = 1 AND FOU.HSDT IS NULL
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
-    
-    public function SurveillanceFournisseurLhermitteReglStatVrpTransVisaTvaPay():array
+
+    public function SurveillanceFournisseurLhermitteReglStatVrpTransVisaTvaPay(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT Identification, Dos,TIERS, Nom, Pays, RegimeTVA, RFCCTRCOD,VISA,STAT_0002,SALCOD, Utilisateur, MUSER.EMAIL AS Email
@@ -79,15 +79,15 @@ class FouRepository extends ServiceEntityRepository
         INNER JOIN MUSER ON MUSER.DOS = Dos AND MUSER.USERX = Utilisateur
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function getAllMail($dos, $tiers):array
+    public function getAllMail($dos, $tiers): array
     {
-        
+
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT LTRIM(RTRIM(f.TIERS)) AS tiers, LTRIM(RTRIM(f.NOM)) AS nom, 
+        $sql = "SELECT LTRIM(RTRIM(f.TIERS)) AS tiers, LTRIM(RTRIM(f.NOM)) AS nom,
         CASE
         WHEN f.EMAIL LIKE '%@%' THEN LTRIM(RTRIM(f.EMAIL))
         ELSE ''
@@ -96,7 +96,7 @@ class FouRepository extends ServiceEntityRepository
         WHEN f.WEB LIKE '%@%' THEN LTRIM(RTRIM(f.WEB))
         ELSE ''
         END AS web
-        , 
+        ,
         CASE
         WHEN c.EMAIL LIKE '%@%' THEN LTRIM(RTRIM(c.EMAIL))
         ELSE ''
@@ -107,11 +107,11 @@ class FouRepository extends ServiceEntityRepository
         ORDER BY f.TIERS
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
-    public function getListFou($dos):array
+    public function getListFou($dos): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT LTRIM(RTRIM(f.TIERS)) AS tiers, LTRIM(RTRIM(f.NOM)) AS nom
@@ -120,8 +120,8 @@ class FouRepository extends ServiceEntityRepository
         ORDER BY f.TIERS
         ";
         $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 }

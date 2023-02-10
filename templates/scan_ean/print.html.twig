@@ -49,12 +49,21 @@
 		<div class="card-body">
 			{% for produit in produits %}
 				<div class="callout callout-{{ produit.color }}">
-					<div class="d-flex justify-content-between">
-						<a onclick="imprime_zone('Recette de cuisine', '{{produit.ean}}');" class="text-white btn btn-dark col-12">
-							<i class="nav-icon pr-3 fas fa-barcode text-white"></i>
-							Imprimer l'étiquette
-						</a>
-					</div>
+					{% if produit.ean %}
+						<div class="d-flex justify-content-between">
+							<a href="{{ path('app_send_pdf_etiquette', {'ean' : produit.ean })}}" class="text-white btn btn-dark col-12">
+								<i class="nav-icon pr-3 fas fa-barcode text-white"></i>
+								Imprimer l'étiquette
+							</a>
+						</div>
+					{% else %}
+						<div class="d-flex justify-content-between">
+							<a href="" class="text-white btn btn-danger col-12">
+								<i class="nav-icon pr-3 text-white"></i>
+								Pas de code EAN
+							</a>
+						</div>
+					{% endif %}
 					<div id="{{ produit.ean }}" class="card-footer p-0">
 						<ul class="nav flex-column">
 							<li class="nav-item">
@@ -104,7 +113,7 @@
 									Gencod :
 									<span class="float-right barcode">
 										{% if produit.ean %}
-											{{produit.ean}}
+											{{ ean|raw }}
 										{% else %}
 											Pas de code EAN
 										{% endif %}

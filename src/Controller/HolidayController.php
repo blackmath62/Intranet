@@ -51,8 +51,8 @@ class HolidayController extends AbstractController
         $this->repoStatuts = $repoStatuts;
         $this->repoUser = $repoUser;
         $this->repoMail = $repoMail;
-        $this->mailEnvoi = $this->repoMail->getEmailEnvoi()['email'];
-        $this->mailTreatement = $this->repoMail->getEmailTreatement()['email'];
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
+        $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->mailer = $mailer;
         $this->adminEmailController = $adminEmailController;
     }
@@ -84,7 +84,7 @@ class HolidayController extends AbstractController
 
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$this->setTracking($tracking);
 
         $users = $this->repoUser->findBy(['closedAt' => null]);
 
@@ -172,8 +172,8 @@ class HolidayController extends AbstractController
     {
         $i = 0;
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         $formExportExcel = $this->createForm(HolidayTypeDateDebutFinExcel::class);
         $formExportExcel->handleRequest($request);
@@ -307,7 +307,7 @@ class HolidayController extends AbstractController
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$this->setTracking($tracking);
 
         if ($id) {
             // Si on est pas le dépositaire ou le décideur pas accés à la modification
@@ -455,8 +455,8 @@ class HolidayController extends AbstractController
     public function showHoliday($id, Request $request)
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         $holiday = $this->repoHoliday->findOneBy(['id' => $id]);
 
@@ -573,8 +573,8 @@ class HolidayController extends AbstractController
     public function deleteHoliday($id, Holiday $holiday, Request $request)
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         $holiday = $this->repoHoliday->findOneBy(['id' => $id]);
 
@@ -612,8 +612,8 @@ class HolidayController extends AbstractController
     public function acceptHoliday($id, Request $request)
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         $holiday = $this->repoHoliday->findOneBy(['id' => $id]);
         $statut = $this->repoStatuts->findOneBy(['id' => 3]);
@@ -648,8 +648,8 @@ class HolidayController extends AbstractController
     public function refuseHoliday($id, Request $request)
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         $holiday = $this->repoHoliday->findOneBy(['id' => $id]);
 

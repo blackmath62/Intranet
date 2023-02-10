@@ -3,12 +3,12 @@
 namespace App\Controller;
 
 use App\Form\SearchType;
+use App\Repository\Divalto\ClientLhermitteByCommercialRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use App\Repository\Divalto\ClientLhermitteByCommercialRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @IsGranted("ROLE_USER")
@@ -22,16 +22,16 @@ class SearchTiersController extends AbstractController
     public function index(Request $request, ClientLhermitteByCommercialRepository $repo): Response
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
-        
+        //  $tracking = $request->attributes->get('_route');
+        //   $this->setTracking($tracking);
+
         $dossier = $this->getDossierUser();
-        
+
         $clients = null;
 
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
-        if($form->isSubmitted() && $form->isValid()){
+        if ($form->isSubmitted() && $form->isValid()) {
             $search = $form->getData()['search'];
             $clients = $repo->getClientByContactName($search, $dossier);
         }
@@ -39,7 +39,7 @@ class SearchTiersController extends AbstractController
         return $this->render('search_tiers/index.html.twig', [
             'title' => 'Rechercher client',
             'clients' => $clients,
-            'search' => $form->createView()
+            'search' => $form->createView(),
         ]);
     }
 
@@ -55,7 +55,7 @@ class SearchTiersController extends AbstractController
         if ($this->getUser()->getSociete()->getId() == 20) {
             $dossier = '1,3';
         }
-        if ($this->getUser()->getSociete()->getId() == 16 ) {
+        if ($this->getUser()->getSociete()->getId() == 16) {
             $dossier = '1,3';
         }
         return $dossier;

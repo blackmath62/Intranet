@@ -3,14 +3,12 @@
 namespace App\Controller;
 
 use App\Form\SearchType;
-use App\Form\dateDebutFinType;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Divalto\ControleArtStockMouvEfRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @IsGranted("ROLE_USER")
@@ -24,15 +22,15 @@ class ControleProduitStockMouvEfController extends AbstractController
     public function index(ControleArtStockMouvEfRepository $repo, Request $request): Response
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
-        
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
+
         $controleProduits = "";
 
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid()){
+        if ($form->isSubmitted() && $form->isValid()) {
             $search = $form->getData()['search'];
             $controleProduits = $repo->getControleArtStockMouvEfRepository($search);
         }
@@ -41,7 +39,7 @@ class ControleProduitStockMouvEfController extends AbstractController
             'controller_name' => 'ControleProduitStockMouvEfController',
             'title' => 'Contrôle Produits Fermetures',
             'controleproduits' => $controleProduits,
-            'search' => $form->createView()
+            'search' => $form->createView(),
         ]);
     }
 
@@ -51,8 +49,8 @@ class ControleProduitStockMouvEfController extends AbstractController
     public function getAnomaliesProduitsFermes(ControleArtStockMouvEfRepository $repo, Request $request, SearchTiersController $dos): Response
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         $dossier = $dos->getDossierUser();
 
@@ -61,6 +59,5 @@ class ControleProduitStockMouvEfController extends AbstractController
             'controleproduits' => $repo->getControleAnomaliesArticlesFermes($dossier),
         ]);
     }
-
 
 }

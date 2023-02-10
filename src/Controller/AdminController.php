@@ -2,15 +2,14 @@
 
 namespace App\Controller;
 
-
-use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
-* @IsGranted("ROLE_ADMIN")
-*/
+ * @IsGranted("ROLE_ADMIN")
+ */
 
 class AdminController extends AbstractController
 {
@@ -20,12 +19,12 @@ class AdminController extends AbstractController
     public function index(Request $request)
     {
         // tracking user page for stats
-        $tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);
+        //$tracking = $request->attributes->get('_route');
+        //$this->setTracking($tracking);
 
         return $this->render('admin/index.html.twig', [
             'controller_name' => 'AdminController',
-            'title' => "Administration"
+            'title' => "Administration",
         ]);
     }
 }
