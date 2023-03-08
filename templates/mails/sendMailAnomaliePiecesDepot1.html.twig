@@ -1,0 +1,36 @@
+<p>Bonjour,</p>
+<p>Il est important de corriger toutes les lignes ci dessous car celles ci fausses le stock !</p>
+<p>Voici la liste des
+	{{ piece }}
+	sur lesquels une ou plusieurs lignes sont en dépôt 1 et vous êtes la derniére personne a être intervenue :</p>
+{% if donneesUsers %}
+	<table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+		<thead>
+			<tr class="text-center">
+				<th>{{ piece }}</th>
+				<th>Tiers</th>
+				<th>Référence</th>
+				<th>Sref1</th>
+				<th>Sref2</th>
+				<th>Designation</th>
+				<th>u.v</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for donneesUser in donneesUsers %}
+				<tr>
+					<td>{{ donneesUser.piece}}</td>
+					<td>{{ donneesUser.tiers }}</td>
+					<td>{{ donneesUser.ref }}</td>
+					<td>{{ donneesUser.sref1 }}</td>
+					<td>{{ donneesUser.sref2 }}</td>
+					<td>{{ donneesUser.designation }}</td>
+					<td>{{ donneesUser.uv }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endif %}
+
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

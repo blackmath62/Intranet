@@ -873,4 +873,44 @@ class MouvRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    public function getCmdBlDepot1($typePiece, $user): array
+    {
+
+        if ($typePiece == 2) {
+            $pino = "m.CDNO";
+            $pice4 = "m.CDCE4";
+            $pidt = 'm.CDDT';
+        } elseif ($typePiece == 3) {
+            $pino = "m.BLNO";
+            $pice4 = "m.BLCE4";
+            $pidt = 'm.BLDT';
+        }
+
+        if ($user == null) {
+            $code = 'DISTINCT RTRIM(LTRIM(u.EMAIL)) AS mail';
+            $mailUser = '';
+        } else {
+            $code = 'dos, piece, tiers, op, ref, sref1, sref2, designation, uv, RTRIM(LTRIM(u.EMAIL)) AS mail';
+            $mailUser = "WHERE u.EMAIL = '$user'";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT $code
+        FROM(
+        SELECT RTRIM(LTRIM(m.DOS)) AS dos, $pino AS piece, RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(m.OP)) AS op, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1, RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(m.DES)) AS designation, RTRIM(LTRIM(m.VENUN)) AS uv,
+        CASE
+        WHEN m.USERMO = '' THEN m.USERCR
+        WHEN m.USERMO = '' AND m.USERCR = '' THEN 'JEROME'
+        ELSE m.USERMO
+        END AS utilisateur
+        FROM MOUV m
+        WHERE $pidt > '2023-01-01' AND $pice4 = '1' AND m.DEPO = '1' AND m.TICOD IN ('F', 'C'))reponse
+        INNER JOIN MUSER u ON u.USERX = utilisateur
+        $mailUser
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
 }

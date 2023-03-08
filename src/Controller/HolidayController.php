@@ -414,7 +414,7 @@ class HolidayController extends AbstractController
 
             // récupérer le dernier id de congés
             $lastHoliday = $this->repoHoliday->getLastHoliday();
-            $holiday = $this->repoHoliday->findOneBy(['id' => $lastHoliday['holiday_id']]);
+            $holiday = $this->repoHoliday->findOneBy(['id' => $lastHoliday]);
             // envoie d'un email au dépositaire
             $role = 'depositaire';
             if (!$id) {
@@ -720,6 +720,8 @@ class HolidayController extends AbstractController
             for ($i = 0; $i < count($decisionnairesMails); $i++) {
                 $MailsList[] = new Address($decisionnairesMails[$i]['email']);
             }
+
+            //dd($MailsList);
             $email = (new Email())
                 ->from($this->mailEnvoi)
                 ->to(...$MailsList)
@@ -732,7 +734,7 @@ class HolidayController extends AbstractController
         // envoyer un mail au dépositaire
         if ($role == 'depositaire') {
             // Chercher le mail du dépositaire du congés
-            $userMail = $this->repoUser->getFindEmail($id)['email'];
+            $userMail = $this->repoUser->getFindEmail($id);
             $email = (new Email())
                 ->from($this->mailEnvoi)
                 ->to($userMail)

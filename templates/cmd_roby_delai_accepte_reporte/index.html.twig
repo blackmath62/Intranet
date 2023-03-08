@@ -1,227 +1,299 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ title }}{% endblock %}
-{% block body %}
-<div class="card collapsed-card card-warning">
-    <div class="card-header">
-        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-        </div>
-    </div>
-    <!-- /.card-header -->
-    <div class="card-body">
-                  <p>Liste des commandes en cours Roby, si un délai à été confirmé vous pouvez mettre la commande en Terminée en cliquant sur le cadenas, en cas d'erreur, il est toujours possible de repasser le statut a en cours...</p>
-    <!-- /.card-footer-->
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="card collapsed-card card-dark">
-            <div class="card-header">
-                <h3 class="card-title text-center">Emails d'envoi de la liste des commandes</h3>
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
-                  </button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-           {{ form_start(form)}}
-                <div class="form-group d-flex flex-wrap">
-                    {{ form_widget(form.email) }}
-                    {{ form_widget(form.Ajouter)}}
-                </div>
-            {{ form_end(form)}}
-            {% if listeMails %}
-                <table id="example2" class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th class="text-center"><span>Email actuellement dans la liste</span></th>
-                            <th class="text-center"><span>Action</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for listeMail in listeMails %}
-                            <tr>
-                                <td class="text-center">
-                                    <a class="text-center text-dark">{{ listeMail.email }}</a>
-                                </td>
-                                <td class="text-center">
-                                    <a data-toggle="modal" data-target="#modal-default-{{listeMail.id}}" class="text-center btn btn-xl btn-danger"><i class="fas fa-trash-alt"></i></a>
-                                    <div class="modal fade" id="modal-default-{{listeMail.id}}">
-                                        <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                            <h4 class="modal-title">Voulez vous vraiment supprimer ce mail ?</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                            </div>
-                                            <div class="modal-body">
-                                            <p>Cette action est irréversible !&hellip;</p>
-                                            </div>
-                                            <div class="modal-footer justify-content-between">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                                            <a type="button" href='{{path('app_email_delete_redirect', {'id' : listeMail.id, 'route' : app.request.attributes.get('_route')  } ) }}' class="btn btn-danger">Supprimer</a>
-                                            </div>
-                                        </div>
-                                        <!-- /.modal-content -->
-                                        </div>
-                                        <!-- /.modal-dialog -->
-                                    </div>
-                                    <!-- /.modal -->
-                                </td>
-                            </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-            <div class="col-md-12">
-                <div class="card card-dark">
-                    <div class="card-header d-flex justify-content-between flex-wrap">
-                        <div>
-                            <h2 class="card-title">Liste des commandes en cours Roby<span class="badge badge-info ml-2">{{ commandes|length }} commandes</span></h2>
-                            <h4>Pour un total de {{ total['total'] |format_currency('EUR', locale='fr') }}</h4>
-                        </div>
-                    <div class='ml-auto'>
-                            <a title='Mettre à jour la liste maintenant' href="{{ path('app_cmd_roby_update') }}" class="btn btn-success "><i class="fas fa-redo-alt"></i></a>
-                            <a title='Liste des commandes mise en terminées' href="{{ path('app_cmd_roby_delai_accepte_reporte_close') }}" class="btn btn-danger "><i class="fas fa-lock"></i></a>
-                    </div>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-							{% if commandes %}
-                        <table id="example1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"><span>Tiers</span></th>
-                                    <th class="text-center"><span>Nom</span></th>
-                                    <th class="text-center"><span>Téléphone</span></th>
-                                    <th class="text-center"><span>Numéro commande</span></th>
-                                    <th class="text-center"><span>Date Commande</span></th>
-                                    <th class="text-center"><span>Notre Ref</span></th>
-                                    <th class="text-center"><span>Délai accepté</span></th>
-                                    <th class="text-center"><span>Délai reporté</span></th>
-                                    <th class="text-center"><span>Montant HT</span></th>
-                                    <th class="text-center"><span>Action</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            
-                                {% for commande in commandes %}
-                                        {% set couleur = 'secondary' %}
-                                        {% if commande.delaiReporte %}
-                                            {% set couleur = 'danger' %}
-                                        {% elseif commande.delaiAccepte %}
-                                            {% set couleur = 'success' %}
-                                        {% endif %}
-                                    <tr>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ commande.tiers }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ commande.Nom}}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ commande.Tel}}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-light btn btn-{{ couleur }}">{{ commande.cmd }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ commande.dateCmd|date("d/m/Y") }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ commande.notreRef }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{% if commande.delaiAccepte %}{{ commande.delaiAccepte|date("d/m/Y") }}{% endif %}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{% if commande.delaiReporte %}{{ commande.delaiReporte|date("d/m/Y") }}{% endif %}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{% if commande.ht > 0 %}{{ commande.ht }}{% endif %}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a title="Pour passer la commande en terminée" class="btn btn-success" data-toggle="modal" data-target="#modal-{{commande.id}}"><i class="fas fa-lock-open"></i></a>
-
-                                            <!-- modal -->
-                                            <div class="modal fade" id="modal-{{commande.id}}">
-                                                <div class="modal-dialog modal-xl">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                    <h4 class="modal-title">Souhaitez vous passer cette commande en Terminée ?</h4>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                    </div>
-                                                    <div class="modal-body text-left">
-                                                    <p>Est ce que vous êtes sûr ?</p>
-                                                    </div>
-                                                    <div class="modal-footer justify-content-between">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                                                    <a href='{{ path('app_cmd_roby_status_close', {'id' : commande.id }) }}' type="button" class="btn btn-danger">Passer cette commande en terminée</a>
-                                                    </div>
-                                                </div>
-                                                <!-- /.modal-content -->
-                                                </div>
-                                                <!-- /.modal-dialog -->
-                                            </div>
-                                            <!-- /.modal -->
-                                                {% set Nombre = 0 %}   
-                                                {% for countNote in countNotes %}
-                                                    {% if countNote.Id == commande.id %}
-                                                    {% set Nombre = countNote.Nbe %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                                {% if Nombre > 0 %}
-                                                <a title='Ajouter une note concernant cette commande ou consulter les notes existantes' class="btn btn-info" href='{{ path('app_cmd_roby_status_view_note', {'id' : commande.id }) }}'>
-                                                    <span class='mr-2'>{{ Nombre }}</span><i class="fas fa-comments"></i>
-                                                </a>
-                                                {% else %}
-                                                <a title='Ajouter une note concernant cette commande' class="btn btn-secondary" href='{{ path('app_cmd_roby_status_view_note', {'id' : commande.id }) }}'>
-                                                    <i class="fas fa-comments"></i>
-                                                </a>
-                                                {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th class="text-center"><span>Tiers</span></th>
-                                    <th class="text-center"><span>Nom</span></th>
-                                    <th class="text-center"><span>Téléphone</span></th>
-                                    <th class="text-center"><span>Numéro commande</span></th>
-                                    <th class="text-center"><span>Date Commande</span></th>
-                                    <th class="text-center"><span>Notre Ref</span></th>
-                                    <th class="text-center"><span>Délai accepté</span></th>
-                                    <th class="text-center"><span>Délai reporté</span></th>
-                                    <th class="text-center"><span>Montant HT</span></th>
-                                    <th class="text-center"><span>Action</span></th>
-                                </tr>
-                                </tr>
-                            </tfoot>
-                        </table>
-                                {% else %}
-                                     <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Aucunes commandes actuellement !</h4>
-                            {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
+{% block title %}
+	{{ title }}
 {% endblock %}
+{% block body %}
+	<div class="card collapsed-card card-warning">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-exclamation-triangle"></i>
+				Avertissement</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<p>Liste des commandes en cours Roby, si un délai à été confirmé vous pouvez mettre la commande en Terminée en cliquant sur le cadenas, en cas d'erreur, il est toujours possible de repasser le statut a en cours...</p>
+			<!-- /.card-footer-->
+		</div>
+	</div>
 
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card collapsed-card card-dark">
+				<div class="card-header">
+					<h3 class="card-title text-center">Emails d'envoi de la liste des commandes</h3>
+					<div class="card-tools">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse">
+							<i class="fas fa-minus"></i>
+						</button>
+						<button type="button" class="btn btn-tool" data-card-widget="remove">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+				</div>
+				<!-- /.card-header -->
+				<div class="card-body">
+					{{ form_start(form)}}
+					<div class="form-group d-flex flex-wrap">
+						{{ form_widget(form.email) }}
+						{{ form_widget(form.Ajouter)}}
+					</div>
+					{{ form_end(form)}}
+					{% if listeMails %}
+						<table id="example2" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th class="text-center">
+										<span>Email actuellement dans la liste</span>
+									</th>
+									<th class="text-center">
+										<span>Action</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for listeMail in listeMails %}
+									<tr>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ listeMail.email }}</a>
+										</td>
+										<td class="text-center">
+											<a data-toggle="modal" data-target="#modal-default-{{listeMail.id}}" class="text-center btn btn-xl btn-danger">
+												<i class="fas fa-trash-alt"></i>
+											</a>
+											<div class="modal fade" id="modal-default-{{listeMail.id}}">
+												<div class="modal-dialog">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h4 class="modal-title">Voulez vous vraiment supprimer ce mail ?</h4>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body">
+															<p>Cette action est irréversible !&hellip;</p>
+														</div>
+														<div class="modal-footer justify-content-between">
+															<button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+															<a type="button" href='{{path('app_email_delete_redirect', {'id' : listeMail.id, 'route' : app.request.attributes.get('_route') } ) }}' class="btn btn-danger">Supprimer</a>
+														</div>
+													</div>
+													<!-- /.modal-content -->
+												</div>
+												<!-- /.modal-dialog -->
+											</div>
+											<!-- /.modal -->
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header d-flex justify-content-between flex-wrap">
+					<div>
+						<h2 class="card-title">Liste des commandes en cours Roby<span class="badge badge-info ml-2">{{ commandes|length }}
+								commandes</span>
+						</h2>
+						<h4>Pour un total de
+							{{ total |format_currency('EUR', locale='fr') }}</h4>
+					</div>
+					<div class='ml-auto'>
+						<a title='Mettre à jour la liste maintenant' href="{{ path('app_cmd_roby_update') }}" class="btn btn-success ">
+							<i class="fas fa-redo-alt"></i>
+						</a>
+						<a title='Liste des commandes mise en terminées' href="{{ path('app_cmd_roby_delai_accepte_reporte_close') }}" class="btn btn-danger ">
+							<i class="fas fa-lock"></i>
+						</a>
+					</div>
+				</div>
+				<!-- /.card-header -->
+				<div class="card-body">
+					{% if commandes %}
+						<table id="example1" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th class="text-center">
+										<span>Tiers</span>
+									</th>
+									<th class="text-center">
+										<span>Nom</span>
+									</th>
+									<th class="text-center">
+										<span>Téléphone</span>
+									</th>
+									<th class="text-center">
+										<span>Numéro commande</span>
+									</th>
+									<th class="text-center">
+										<span>Date Commande</span>
+									</th>
+									<th class="text-center">
+										<span>Notre Ref</span>
+									</th>
+									<th class="text-center">
+										<span>Délai accepté</span>
+									</th>
+									<th class="text-center">
+										<span>Délai reporté</span>
+									</th>
+									<th class="text-center">
+										<span>Montant HT</span>
+									</th>
+									<th class="text-center">
+										<span>Action</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+
+								{% for commande in commandes %}
+									{% set couleur = 'secondary' %}
+									{% if commande.delaiReporte %}
+										{% set couleur = 'danger' %}
+									{% elseif commande.delaiAccepte %}
+										{% set couleur = 'success' %}
+									{% endif %}
+									<tr>
+										<td class="text-center">
+											<a class="text-dark">{{ commande.tiers }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ commande.Nom}}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ commande.Tel}}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-light btn btn-{{ couleur }}">{{ commande.cmd }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ commande.dateCmd|date("d/m/Y") }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ commande.notreRef }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">
+												{% if commande.delaiAccepte %}
+													{{ commande.delaiAccepte|date("d/m/Y") }}
+												{% endif %}
+											</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">
+												{% if commande.delaiReporte %}
+													{{ commande.delaiReporte|date("d/m/Y") }}
+												{% endif %}
+											</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">
+												{% if commande.ht > 0 %}
+													{{ commande.ht }}
+												{% endif %}
+											</a>
+										</td>
+										<td class="text-center">
+											<a title="Pour passer la commande en terminée" class="btn btn-success" data-toggle="modal" data-target="#modal-{{commande.id}}">
+												<i class="fas fa-lock-open"></i>
+											</a>
+
+											<!-- modal -->
+											<div class="modal fade" id="modal-{{commande.id}}">
+												<div class="modal-dialog modal-xl">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h4 class="modal-title">Souhaitez vous passer cette commande en Terminée ?</h4>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body text-left">
+															<p>Est ce que vous êtes sûr ?</p>
+														</div>
+														<div class="modal-footer justify-content-between">
+															<button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+															<a href='{{ path('app_cmd_roby_status_close', {'id' : commande.id }) }}' type="button" class="btn btn-danger">Passer cette commande en terminée</a>
+														</div>
+													</div>
+													<!-- /.modal-content -->
+												</div>
+												<!-- /.modal-dialog -->
+											</div>
+											<!-- /.modal -->
+											{% set Nombre = 0 %}
+											{% for countNote in countNotes %}
+												{% if countNote.Id == commande.id %}
+													{% set Nombre = countNote.Nbe %}
+												{% endif %}
+											{% endfor %}
+											{% if Nombre > 0 %}
+												<a title='Ajouter une note concernant cette commande ou consulter les notes existantes' class="btn btn-info" href='{{ path('app_cmd_roby_status_view_note', {'id' : commande.id }) }}'>
+													<span class='mr-2'>{{ Nombre }}</span>
+													<i class="fas fa-comments"></i>
+												</a>
+											{% else %}
+												<a title='Ajouter une note concernant cette commande' class="btn btn-secondary" href='{{ path('app_cmd_roby_status_view_note', {'id' : commande.id }) }}'>
+													<i class="fas fa-comments"></i>
+												</a>
+											{% endif %}
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+							<tfoot>
+								<tr>
+									<th class="text-center">
+										<span>Tiers</span>
+									</th>
+									<th class="text-center">
+										<span>Nom</span>
+									</th>
+									<th class="text-center">
+										<span>Téléphone</span>
+									</th>
+									<th class="text-center">
+										<span>Numéro commande</span>
+									</th>
+									<th class="text-center">
+										<span>Date Commande</span>
+									</th>
+									<th class="text-center">
+										<span>Notre Ref</span>
+									</th>
+									<th class="text-center">
+										<span>Délai accepté</span>
+									</th>
+									<th class="text-center">
+										<span>Délai reporté</span>
+									</th>
+									<th class="text-center">
+										<span>Montant HT</span>
+									</th>
+									<th class="text-center">
+										<span>Action</span>
+									</th>
+								</tr>
+							</tfoot>
+						</tr>
+					</tfoot>
+				</table>
+			{% else %}
+				<h4 class="text-left text-dark">
+					<i class="fas fa-info-circle pr-2 text-primary"></i>Aucunes commandes actuellement !</h4>
+			{% endif %}
+		</div>
+	</div>
+</div></div>{% endblock %}

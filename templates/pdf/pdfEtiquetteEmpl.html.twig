@@ -1,0 +1,16 @@
+{% block content %}
+	<table class="table" cellspacing="0" cellpadding="3" border="1">
+		<thead>
+			<tr class="text-center">
+				<th style="font-size: 15pt;">Emplacement</th>
+				<th style="font-size: 12pt; min-width:100pt;">EAN</th>
+			</tr>
+		</thead>
+		<tbody style="text-align: center;">
+			<tr class="text-center">
+				<td style="font-size: 30pt;">{{ empl.empl}}</td>
+				<td class="text-center" style="height: 60pt;" colspan="2">{{ ean|raw }}</td>
+			</tr>
+		</tbody>
+	</table>
+{% endblock %}

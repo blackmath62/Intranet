@@ -158,6 +158,7 @@ class ControleAnomaliesController extends AbstractController
                     $this->MajCmdRobyAccepteReporte();
                     $this->cmdRobyController->sendMail();
                 }
+                $this->ControlePieces();
             }
             $this->run_auto_wash();
         }
@@ -323,6 +324,45 @@ class ControleAnomaliesController extends AbstractController
         $template = 'mails/sendMailAnomalieDonneesClients.html.twig';
         $subject = 'Erreur ou manquement sur une fiche client';
         $this->Execute($donnees, $libelle, $template, $subject);
+    }
+
+    /**
+     * @Route("/controle/pieces", name="app_controle_pieces")
+     */
+    public function ControlePieces()
+    {
+
+        $donnees = $this->movRepo->getCmdBlDepot1(2, null);
+        foreach ($donnees as $user) {
+            $donneesUsers = $this->movRepo->getCmdBlDepot1(2, $user['mail']);
+            if (count($donneesUsers) > 0) {
+                $template = 'mails/sendMailAnomaliePiecesDepot1.html.twig';
+                // envoyer un mail
+                $html = $this->renderView($template, ['donneesUsers' => $donneesUsers, 'piece' => 'Commandes']);
+                $email = (new Email())
+                    ->from($this->mailEnvoi)
+                    ->to($user['mail']) // $user['mail']
+                    ->subject('Commandes avec Dépôt 1, merci de corriger')
+                    ->html($html);
+                $this->mailer->send($email);
+            }
+        }
+        $donnees = $this->movRepo->getCmdBlDepot1(3, null);
+        foreach ($donnees as $user) {
+            $donneesUsers = $this->movRepo->getCmdBlDepot1(3, $user['mail']);
+            if (count($donneesUsers) > 0) {
+                $template = 'mails/sendMailAnomaliePiecesDepot1.html.twig';
+                // envoyer un mail
+                $html = $this->renderView($template, ['donneesUsers' => $donneesUsers, 'piece' => 'Bons de livraison']);
+                $email = (new Email())
+                    ->from($this->mailEnvoi)
+                    ->to($user['mail']) // $user['mail']
+                    ->subject('Bons de livraison avec Dépôt 1, merci de corriger')
+                    ->html($html);
+                $this->mailer->send($email);
+            }
+        }
+
     }
 
     public function Execute($donnees, $libelle, $template, $subject)

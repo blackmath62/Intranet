@@ -348,6 +348,18 @@ class ArtRepository extends ServiceEntityRepository
         return $resultSet->fetchOne();
     }
 
+    public function gettrancheEmpl($dos, $empl1, $empl2)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(e.LIEU)) AS empl
+        FROM T018 e
+        WHERE e.DOS = $dos AND e.LIEU BETWEEN '$empl1' AND '$empl2'
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     public function getSearchArt($dos, $produit): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -372,6 +384,22 @@ class ArtRepository extends ServiceEntityRepository
         LEFT JOIN MVTL_STOCK_V m ON a.REF = m.REFERENCE AND s.SREF1 = m.SREFERENCE1 AND s.SREF2 = m.SREFERENCE2
         WHERE a.DOS = $dos)reponse
         WHERE ref LIKE '%$produit%'
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getAchatParProduit($dos, $produit, $metier): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT MAX(m.FADT) AS dateFacture, LTRIM(RTRIM(m.REF)) AS ref, LTRIM(RTRIM(m.SREF1)) AS sref1, LTRIM(RTRIM(m.SREF2)) AS sref2, LTRIM(RTRIM(a.DES)) AS designation,  LTRIM(RTRIM(a.VENUN)) AS uv,
+        LTRIM(RTRIM(m.OP)) AS op, LTRIM(RTRIM(m.FAQTE)) AS qte, LTRIM(RTRIM(m.PUSTAT)) AS pa
+        FROM MOUV m
+        INNER JOIN ART a ON a.REF = m.REF AND a.DOS = m.DOS
+        WHERE  m.TICOD = 'F' AND m.PICOD = 4 AND m.DOS = $dos AND YEAR(m.FADT) <= (2022)
+        AND a.FAM_0002 = '$metier' AND m.OP IN ('F','FD') AND m.REF LIKE '$produit%'
+        GROUP BY m.REF, m.SREF1, m.SREF2, a.DES, a.VENUN, m.OP,m.FAQTE, m.PUSTAT
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

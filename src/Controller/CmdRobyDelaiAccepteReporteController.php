@@ -231,7 +231,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         foreach ($search as $value) {
             $donnee = $this->entete->controleStatusOfCmd($value->getCmd());
 
-            if ($donnee['CE4'] != 1) {
+            if ($donnee != 1) {
                 $cmd = $this->cmdRoby->findOneBy(['cmd' => $value->getCmd()]);
                 $cmd->setModifiedBy($this->Users->findOneBy(['id' => 3]))
                     ->setStatut('Terminé')
@@ -239,7 +239,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($cmd);
                 $em->flush();
-                if ($donnee['CE4'] == false) {
+                if ($donnee == false) {
                     $note = new Note();
                     $note->setUser($this->Users->findOneBy(['id' => 3]))
                         ->setContent('Cette commande n\'est plus présente dans le systéme, elle a du être supprimée')
@@ -250,7 +250,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                     $em->persist($note);
                     $em->flush();
                 }
-                if ($donnee['CE4'] != false) {
+                if ($donnee != false) {
                     $note = new Note();
                     $note->setUser($this->Users->findOneBy(['id' => 3]))
                         ->setContent('Cette commande semble avoir été passée en BL, elle n\'est plus en active dans le systéme')

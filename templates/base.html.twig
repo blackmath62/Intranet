@@ -291,17 +291,79 @@
 											<!-- <span class="badge badge-info right">1</span> -->
 										</a>
 									</li>
+								</ul>
+							</li>
+							<li class="nav-item has-treeview">
+								<a href="" class="nav-link">
+									<i class="nav-icon fas fa-barcode"></i>
+									<p>
+										EAN
+										<i class="fas fa-angle-left right"></i>
+									</p>
+								</a>
+								<ul class="nav nav-treeview">
 									<li class="nav-item">
 										<a href="{{ path('app_scan_ean')}}" class="nav-link">
 											<i class="nav-icon fas fa-barcode text-warning"></i>
 											<p>
-												Scan EAN
+												Retrait marchandise
 											</p>
 											<!-- <span class="badge badge-info right">1</span> -->
 										</a>
 									</li>
+									<li class="nav-item">
+										<a href="{{ path('app_scan_ean_alim_empl')}}" class="nav-link">
+											<i class="nav-icon fa fa-plus text-success"></i>
+											<p>
+												Alimenter emplacement
+											</p>
+											<!-- <span class="badge badge-info right">1</span> -->
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{ path('app_print_empl')}}" class="nav-link">
+											<i class="nav-icon fas fa-map-marker-alt text-danger"></i>
+											<p>
+												Imprimer étiquette empl.
+											</p>
+											<!-- <span class="badge badge-info right">1</span> -->
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{ path('app_scan_emplacement_print')}}" class="nav-link">
+											<i class="nav-icon fas fa-box-open text-primary"></i>
+											<p>
+												Imprimer étiquette prod.
+											</p>
+											<!-- <span class="badge badge-info right">1</span> -->
+										</a>
+									</li>
+									{% if is_granted('ROLE_ADMIN') %}
+										<li class="nav-item">
+											<a href="{{ path('app_bat')}}" class="nav-link">
+												<i class="nav-icon fas fa-box-open text-secondary"></i>
+												<p>
+													Test lancement Powershell
+												</p>
+												<!-- <span class="badge badge-info right">1</span> -->
+											</a>
+										</li>
+									{% endif %}
 								</ul>
 							</li>
+
+							{% if is_granted('ROLE_ADMIN') %}
+								<li class="nav-item">
+									<a href="{{ path('app_dernier_achat_par_produit', {'dos' : '1' })}}" class="nav-link">
+										<i class="fas fa-file-signature nav-icon text-light"></i>
+										<p>
+											Aide à l'inventaire comptable
+										</p>
+										<!-- <span class="badge badge-info right">1</span> -->
+									</a>
+								</li>
+							{% endif %}
+
 							<li class="nav-item has-treeview">
 								<a href="" class="nav-link">
 									<i class="nav-icon fas fa-broadcast-tower"></i>
@@ -397,6 +459,14 @@
 														<i class="nav-icon fas fa-shopping-basket text-warning"></i>
 														<p>
 															States achats par article
+														</p>
+													</a>
+												</li>
+												<li class="nav-item">
+													<a href="{{path('app_dernier_achat_par_produit', {'dos' : '1'})}}" class="nav-link">
+														<i class="nav-icon fas fa-th text-info"></i>
+														<p>
+															Factures achats par article
 														</p>
 													</a>
 												</li>

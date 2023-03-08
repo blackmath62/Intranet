@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Main\AlimentationEmplacement;
 use App\Form\AlimentationEmplacementEanType;
 use App\Form\GeneralSearchType;
+use App\Form\PrintEmplType;
 use App\Form\RetraitMarchandiseEanType;
 use App\Repository\Divalto\ArtRepository;
 use App\Repository\Main\AlimentationEmplacementRepository;
@@ -240,7 +241,7 @@ class ScanEanController extends AbstractController
         if ($emplacement) {
             $empl = $repo->getEmpl($dos, $emplacement);
         }
-        return new JsonResponse(['empl' => $empl['empl']]);
+        return new JsonResponse(['empl' => $empl]);
     }
 
     // Alimentation d'emplacement
@@ -442,6 +443,34 @@ class ScanEanController extends AbstractController
             'produits' => $produits,
             'ean' => $bobj->getHtmlDiv(),
 
+        ]);
+    }
+
+    // Impression étiquette d'emplacement
+    /**
+     * @Route("/impression/emplacement", name="app_print_empl")
+     */
+    public function impressionEmplacement(ArtRepository $repo, Request $request, AlimentationEmplacementRepository $repoRetrait, PdfController $pdfController): Response
+    {
+        $dos = 1;
+
+        $form = $this->createForm(PrintEmplType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $empl1 = $repo->getEmpl($dos, $form->getData()['empl1']);
+            $empl2 = $repo->getEmpl($dos, $form->getData()['empl2']);
+            if ($empl1 && $empl2) {
+                $this->addFlash('message', 'Les emplacements sont valides');
+                return $this->redirectToRoute('app_send_pdf_etiquette_emplacement', ['dos' => $dos, 'empl1' => $empl1, 'empl2' => $empl2]);
+            } else {
+                $this->addFlash('danger', 'Emplacement invalide');
+                return $this->redirectToRoute('app_print_empl');
+            }
+
+        }
+        return $this->render('scan_ean/printEmpl.html.twig', [
+            'title' => 'Print Empl',
+            'form' => $form->createView(),
         ]);
     }
 }

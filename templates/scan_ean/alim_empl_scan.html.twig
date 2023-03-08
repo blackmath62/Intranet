@@ -254,7 +254,7 @@ url: "/emplacement/scan/ajax/1/" + emplacement.val(),
 type: "GET"
 }).done(function (data) {
 console.log(data.empl);
-if (data.empl == null) {
+if (data.empl == false) {
 $("#emplacement").attr('class', 'form-control col-12 is-invalid');
 } else {
 $("#emplacement").attr('class', 'form-control col-12 is-valid');
