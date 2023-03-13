@@ -390,16 +390,48 @@ class ArtRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
-    public function getAchatParProduit($dos, $produit, $metier): array
+    public function getAchatParProduit($dos, $produit): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT MAX(m.FADT) AS dateFacture, LTRIM(RTRIM(m.REF)) AS ref, LTRIM(RTRIM(m.SREF1)) AS sref1, LTRIM(RTRIM(m.SREF2)) AS sref2, LTRIM(RTRIM(a.DES)) AS designation,  LTRIM(RTRIM(a.VENUN)) AS uv,
-        LTRIM(RTRIM(m.OP)) AS op, LTRIM(RTRIM(m.FAQTE)) AS qte, LTRIM(RTRIM(m.PUSTAT)) AS pa
+        $sql = "SELECT MAX(m.FADT) AS dateFacture, REPLACE(LTRIM(RTRIM(m.REF)), '/', '#') AS ref, REPLACE(LTRIM(RTRIM(m.SREF1)), '/', '#') AS sref1, REPLACE(LTRIM(RTRIM(m.SREF2)), '/', '#') AS sref2, LTRIM(RTRIM(a.DES)) AS designation,  LTRIM(RTRIM(a.VENUN)) AS uv, LTRIM(RTRIM(a.FAM_0002)) AS metier,
+        LTRIM(RTRIM(m.OP)) AS op, LTRIM(RTRIM(m.FAQTE)) AS qte, LTRIM(RTRIM(m.PUSTAT)) AS pa, m.PUSTAT * m.FAQTE AS montant
         FROM MOUV m
         INNER JOIN ART a ON a.REF = m.REF AND a.DOS = m.DOS
-        WHERE  m.TICOD = 'F' AND m.PICOD = 4 AND m.DOS = $dos AND YEAR(m.FADT) <= (2022)
-        AND a.FAM_0002 = '$metier' AND m.OP IN ('F','FD') AND m.REF LIKE '$produit%'
-        GROUP BY m.REF, m.SREF1, m.SREF2, a.DES, a.VENUN, m.OP,m.FAQTE, m.PUSTAT
+        WHERE  m.TICOD = 'F' AND m.PICOD = 4 AND m.DOS = $dos AND YEAR(m.FADT) <= YEAR(getdate()) -1
+        AND m.OP IN ('F','FD') AND m.REF LIKE '$produit%'
+        GROUP BY m.REF, m.SREF1, m.SREF2, a.DES, a.VENUN, m.OP,m.FAQTE, m.PUSTAT, a.FAM_0002
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getAchatParProduitQteSign($dos, $produit, $sref1, $sref2): array
+    {
+        $code = '';
+        if ($sref1 && !$sref2) {
+            $code = "AND m.SREF1 ='" . $sref1 . "'";
+        }
+        if (!$sref1 && $sref2) {
+            $code = "AND m.SREF2 ='" . $sref2 . "'";
+        }
+        if ($sref1 && $sref2) {
+            $code = "AND m.SREF1 ='" . $sref1 . "'" . "AND m.SREF2 ='" . $sref2 . "'";
+        }
+
+        $produit = str_replace('#', '/', $produit);
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT m.FADT AS dateFacture, REPLACE(LTRIM(RTRIM(m.REF)), '/', '#') AS ref, REPLACE(LTRIM(RTRIM(m.SREF1)), '/', '#') AS sref1, REPLACE(LTRIM(RTRIM(m.SREF2)), '/', '#') AS sref2, LTRIM(RTRIM(m.DES)) AS designation, LTRIM(RTRIM(m.VENUN)) AS uv, LTRIM(RTRIM(m.PUSTAT)) AS pu, LTRIM(RTRIM(a.FAM_0002)) AS metier,
+        CASE
+        WHEN m.OP IN ('F', 'FD') THEN m.FAQTE
+        WHEN m.OP IN ('G', 'GD') THEN -1 * m.FAQTE
+        END AS qte
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        WHERE m.DOS = $dos AND m.PICOD = 4 AND m.TICOD = 'F' AND m.REF = '$produit' AND YEAR(m.FADT) <= YEAR(getdate()) -1 AND m.OP IN ('F', 'G')
+        $code
+        ORDER BY m.FADT DESC
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

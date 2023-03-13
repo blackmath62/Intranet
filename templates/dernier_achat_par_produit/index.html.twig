@@ -25,23 +25,39 @@
 		<div class="col-md-12">
 			<div class="card card-dark">
 				<div class="card-header d-flex justify-content-between">
-					<h3 class="card-title text-center">Dernier achat par produit/métier</h3>
+					<h3 class="card-title text-center">Dernier achat par produit</h3>
 					{{ form_start(form, { 'attr' : { 'class' : 'ml-auto' }}
 					) }}
 					<div class='d-flex'>
 						<div class="p-1">
-							{{ form_row(form.metiers) }}
-						</div>
-						<div class="p-1">
-							{{ form_row(form.produits) }}
+							{{ form_row(form.produits, {'attr' : { 'value' : produit} }) }}
 						</div>
 						<div class="p-1">
 							{{ form_row(form.filtrer)}}
 						</div>
 					</div>
 					{{ form_end(form)}}
+					<a href='{{path('app_import_produit') }}' type="button" class="form-control btn btn-primary col-1 mt-1">Import Excel</a>
 				</div>
 				<!-- /.card-header -->
+				{% if cmp %}
+					<div class='row justify-content-end'>
+						<div class="col-md-3 col-sm-6 col-12 pt-3">
+							<div class="info-box">
+								<span class="info-box-icon bg-info">
+									<i class="far fa-envelope"></i>
+								</span>
+
+								<div class="info-box-content">
+									<span class="info-box-text">CMP Calculé</span>
+									<span class="info-box-number">{{ cmp }}</span>
+								</div>
+								<!-- /.info-box-content -->
+							</div>
+							<!-- /.info-box -->
+						</div>
+					</div>
+				{% endif %}
 				<div class="card-body">
 					<table id="example1" class="table table-bordered table-striped">
 						<thead>
@@ -73,12 +89,16 @@
 								<th class="text-center">
 									<span>Pa</span>
 								</th>
+								<th class="text-center">
+									<span>Total</span>
+								</th>
+								<th class="text-center">
+									<span>Calcul</span>
+								</th>
 							</tr>
 						</thead>
 						<tbody>
 							{% for produit in produits %}
-
-
 								<tr>
 									<td class="text-center">
 										<a class="text-center text-dark">{{ produit.ref }}</a>
@@ -107,45 +127,61 @@
 									<td class="text-center">
 										<a class="text-center text-dark">{{ produit.pa }}</a>
 									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ produit.montant|format_currency('EUR') }}</a>
+									</td>
+									<td class="text-center">
+
+										<form action="{{path('app_dernier_achat_calcul_cmp', {'dos' : 1, 'produit' : produit.ref, 'sref1' : produit.sref1, 'sref2' : produit.sref2 })}}" method="POST">
+											<input type="number" name="qte" step="any"/>
+											<button class="btn btn-info" type="submit">Calc.</button>
+										</form>
+									</td>
 								</tr>
-
-							{% endfor %}
-
+							</td>
 						</tbody>
-						<tfoot>
-							<tr>
-								<th class="text-center">
-									<span>Référence</span>
-								</th>
-								<th class="text-center">
-									<span>Sref1</span>
-								</th>
-								<th class="text-center">
-									<span>Sref2</span>
-								</th>
-								<th class="text-center">
-									<span>Désignation</span>
-								</th>
-								<th class="text-center">
-									<span>U.V</span>
-								</th>
-								<th class="text-center">
-									<span>Op</span>
-								</th>
-								<th class="text-center">
-									<span>Qte</span>
-								</th>
-								<th class="text-center">
-									<span>Date Facture</span>
-								</th>
-								<th class="text-center">
-									<span>Pa</span>
-								</th>
-							</tr>
-						</tfoot>
-					</table>
-				</div>
-			</div>
-		</div>
+					</tr>
+
+				{% endfor %}
+
+			</tbody>
+			<tfoot>
+				<tr>
+					<th class="text-center">
+						<span>Référence</span>
+					</th>
+					<th class="text-center">
+						<span>Sref1</span>
+					</th>
+					<th class="text-center">
+						<span>Sref2</span>
+					</th>
+					<th class="text-center">
+						<span>Désignation</span>
+					</th>
+					<th class="text-center">
+						<span>U.V</span>
+					</th>
+					<th class="text-center">
+						<span>Op</span>
+					</th>
+					<th class="text-center">
+						<span>Qte</span>
+					</th>
+					<th class="text-center">
+						<span>Date Facture</span>
+					</th>
+					<th class="text-center">
+						<span>Pa</span>
+					</th>
+					<th class="text-center">
+						<span>Total</span>
+					</th>
+					<th class="text-center">
+						<span>Calcul</span>
+					</th>
+				</tr>
+			</tfoot>
+		</table>
 	</div>
 {% endblock %}

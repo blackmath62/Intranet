@@ -47,11 +47,16 @@ $MYPRINTER = "\\SRVAD\IMP_EAN_PRODUIT"
 $DEFAULTPRINTER = (Get-CimInstance -ClassName CIM_Printer | WHERE {$_.Default -eq $True}[0])
 $PRINTERTMP = (Get-CimInstance -ClassName CIM_Printer | WHERE {$_.NAme -eq $MYPRINTER}[0])
 #$PRINTERTMP | Invoke-CimMethod -MethodName SetDefaultPrinter | Out-Null
-#Start-Process -FilePath $MYFILE -Verb print -PassThru
+Start-Process -FilePath $MYFILE -Verb print # -PassThru
+
 #$DEFAULTPRINTER | Invoke-CimMethod -MethodName SetDefaultPrinter | Out-Null
 
 #Get-Content -FilePath C:\wamp64\www\Intranet\bin\ean.pdf | Out-Printer "\\SRVAD\IMP_EAN_PRODUIT"
 
 Start-Sleep -Seconds 1
 Remove-item C:\wamp64\www\Intranet\bin\ean.pdf
+
+# afficher l'imprimante par defaut
+#Get-WmiObject win32_printer | WHERE {$_.Default -eq $True}
+#Get-CimInstance -ClassName CIM_Printer | WHERE {$_.Default -eq $True}
 

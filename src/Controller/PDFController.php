@@ -6,6 +6,7 @@ use App\Repository\Divalto\ArtRepository;
 use App\Repository\Main\FAQRepository;
 use App\Repository\Main\MailListRepository;
 use Com\Tecnick\Barcode\Barcode;
+use Knp\Snappy\Image;
 use Knp\Snappy\Pdf;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -94,12 +95,12 @@ class PdfController extends AbstractController
         $pdf->setOption('print-media-type', true);
         //$pdf->setOption('header-font-size', 10);
         $pdf->setOption('zoom', false);
-        $file = 'C:\wamp64\www\Intranet\bin\ean.pdf';
-
+        $file = 'C:/wamp64/www/Intranet/bin/' . $ean . '.pdf';
+        @unlink($file);
         $pdf->generateFromHtml($htmlPdf, $file);
-        $this->bat();
+        //$this->bat();
 
-        //$this->addFlash('message', 'L\'étiquette a été envoyé !');
+        $this->addFlash('message', 'Ajouté à la file d\'attente d\'impression !');
         return $this->redirectToRoute('app_scan_emplacement_print');
 
     }
@@ -108,7 +109,7 @@ class PdfController extends AbstractController
      * @Route("/emplacement/pdf/etiquette/{dos}/{empl1}/{empl2}", name="app_send_pdf_etiquette_emplacement")
      */
 
-    public function SendEtiquetteEmplPdf($dos, $empl1, $empl2, Pdf $pdf, ArtRepository $repo): Response
+    public function SendEtiquetteEmplPdf($dos, $empl1, $empl2, Pdf $pdf, ArtRepository $repo, Image $img): Response
     {
 
         $emplacements = $repo->gettrancheEmpl($dos, $empl1, $empl2);
@@ -139,11 +140,15 @@ class PdfController extends AbstractController
             $pdf->setOption('orientation', 'Portrait');
             $pdf->setOption('print-media-type', true);
             $pdf->setOption('zoom', false);
-            $file = 'C:\wamp64\www\Intranet\bin\ean.pdf';
+            $file = 'C:/wamp64/www/Intranet/bin/' . $empl['empl'] . '.pdf';
+            @unlink($file);
+
             $pdf->generateFromHtml($htmlPdf, $file);
+            //$file = 'C:\wamp64\www\Intranet\bin\ean.jpg';
+            //$img->generateFromHtml($htmlPdf, $file);
             //$this->bat();
         }
-
+        $this->addFlash('message', 'Ajouté à la file d\'attente d\'impression !');
         return $this->redirectToRoute('app_print_empl');
 
     }

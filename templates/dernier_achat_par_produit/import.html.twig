@@ -1,0 +1,174 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block body %}
+
+	<div class="card collapsed-card card-warning">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-exclamation-triangle"></i>
+				Avertissement</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<div class="card-body">
+			<p>Selectionnez le métier, des caractéres présents dans la référence produit et cliquez sur fitrer</p>
+			<p>Cette liste permet de corriger plus rapidement l'inventaire comptable différé</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header d-flex justify-content-between">
+					<h3 class="card-title text-center">Import de tableau Excel</h3>
+					{{ form_start(form, { 'attr' : { 'class' : 'ml-auto' }}
+					) }}
+					<div class='d-flex'>
+						<div class="p-1">
+							{{ form_row(form.file) }}
+						</div>
+						<div class="p-1">
+							{{ form_row(form.importer, { 'attr' : { 'class' : 'form-control col-12' }})}}
+						</div>
+					</div>
+					{{ form_end(form)}}
+				</div>
+				<div class="card-body">
+					<table id="example1" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="text-center">
+									<span>Référence</span>
+								</th>
+								<th class="text-center">
+									<span>Sref1</span>
+								</th>
+								<th class="text-center">
+									<span>Sref2</span>
+								</th>
+								<th class="text-center">
+									<span>Désignation</span>
+								</th>
+								<th class="text-center">
+									<span>Qte</span>
+								</th>
+								<th class="text-center">
+									<span>Pu</span>
+								</th>
+								<th class="text-center">
+									<span>Total Pu</span>
+								</th>
+								<th class="text-center">
+									<span>Pu Corrigé</span>
+								</th>
+								<th class="text-center">
+									<span>Total Pu Corrigé</span>
+								</th>
+								<th class="text-center">
+									<span>Différence</span>
+								</th>
+
+							</tr>
+						</thead>
+						<tbody>
+							{% for produit in produits %}
+								<tr>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ produit.ref }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ produit.sref1 }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ produit.sref2 }}</a>
+									</td>
+									<td class="text-left">
+										<a class="text-left text-dark">{{ produit.designation }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ produit.qte }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ produit.pu}}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">
+											{% if produit.pu %}
+												{{ produit.pu * produit.qte}}
+											{% endif %}
+										</a>
+									</td>
+									{% if produit.puCorrige != 0 and produit.pu != 0 %}
+										{% set var = ((produit.puCorrige / produit.pu) -1)|abs %}
+										{% if var >= 0.01 %}
+											{% set col = 'danger' %}
+										{% elseif produit.puCorrige == produit.pu  %}
+											{% set col = 'success' %}
+										{% endif %}
+									{% else %}
+										{% set col = 'warning' %}
+									{% endif %}
+									<td class="text-center table-{{ col }}">
+										<a class="text-center text-dark">{{ produit.puCorrige }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">
+											{% if produit.puCorrige %}
+												{{ produit.puCorrige * produit.qte}}
+											{% endif %}
+										</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">
+											{% if produit.pu and produit.puCorrige %}
+												{{ (produit.pu * produit.qte) - (produit.puCorrige * produit.qte) }}
+											{% endif %}
+										</a>
+									</td>
+								</tr>
+
+							{% endfor %}
+
+						</tbody>
+						<tfoot>
+							<tr>
+								<th class="text-center">
+									<span>Référence</span>
+								</th>
+								<th class="text-center">
+									<span>Sref1</span>
+								</th>
+								<th class="text-center">
+									<span>Sref2</span>
+								</th>
+								<th class="text-center">
+									<span>Désignation</span>
+								</th>
+								<th class="text-center">
+									<span>Qte</span>
+								</th>
+								<th class="text-center">
+									<span>Pu</span>
+								</th>
+								<th class="text-center">
+									<span>Total Pu</span>
+								</th>
+								<th class="text-center">
+									<span>Pu Corrigé</span>
+								</th>
+								<th class="text-center">
+									<span>Total Pu Corrigé</span>
+								</th>
+								<th class="text-center">
+									<span>Différence</span>
+								</th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			{% endblock %}

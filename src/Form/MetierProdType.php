@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,24 +26,6 @@ class MetierProdType extends AbstractType
                     'class' => 'col-12 form-control',
                     'placeholder' => 'Commence par...',
                 ],
-            ])
-            ->add('metiers', ChoiceType::class, [
-                'choices' => [
-                    'EV' => "EV",
-                    'HP' => "HP",
-                    'ME' => "ME",
-                ],
-                'choice_attr' => [
-                    'EV' => ['class' => 'm-2'],
-                    'HP' => ['class' => 'm-2'],
-                    'ME' => ['class' => 'm-2'],
-                ],
-                'expanded' => false,
-                'multiple' => false,
-                'label_attr' => ['class' => 'd-none'],
-                'label' => 'Métier',
-                'attr' => ['class' => 'form-control'],
-
             ])
             ->add('filtrer', SubmitType::class, [
                 'attr' => ['class' => 'form-control btn btn-success'],
