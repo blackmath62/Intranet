@@ -109,6 +109,23 @@ class ResumeStatesController extends AbstractController
             $sevenMontant[] = $dataSeven[$ligSeven]['montant'];
         }
 
+        // données diagramme famille et type article
+
+        $dataFamilleTypeArt = $repoTiers->getStatesParFamilleTypeArticle($dos, $startN, $endN);
+        $artFamilleTypeTab = array();
+        for ($ligTypeArt = 0; $ligTypeArt < count($dataFamilleTypeArt); $ligTypeArt++) {
+            $ArtFamille[] = $dataFamilleTypeArt[$ligTypeArt]['famille'];
+            $ArtType[] = $dataFamilleTypeArt[$ligTypeArt]['typeArt'];
+            $ArtMontantType[] = $dataFamilleTypeArt[$ligTypeArt]['montant'];
+            $ArtTotalFamille[] = $repoTiers->getStatesTotalParFamille($dos, $startN, $endN, $dataFamilleTypeArt[$ligTypeArt]['famille']);
+
+            $artFamilleTypeTab[] = [$dataFamilleTypeArt[$ligTypeArt]['famille'],
+                $dataFamilleTypeArt[$ligTypeArt]['typeArt'],
+                $dataFamilleTypeArt[$ligTypeArt]['montant'],
+                $repoTiers->getStatesTotalParFamille($dos, $startN, $endN, $dataFamilleTypeArt[$ligTypeArt]['famille']),
+            ];
+
+        }
         // données line par commerciaux sur 6 ans
         $nomCommerciaux = [];
         $donneesCommerciaux = [];
@@ -170,6 +187,11 @@ class ResumeStatesController extends AbstractController
             'anneeCommerciaux' => json_encode($anneeCommerciaux),
             'donneesCommerciaux' => json_encode($donneesCommerciaux),
             'couleurCommercial' => json_encode($couleurCommercial),
+            'artFamille' => json_encode($ArtFamille),
+            'artType' => json_encode($ArtType),
+            'artMontantType' => json_encode($ArtMontantType),
+            'artTotalFamille' => json_encode($ArtTotalFamille),
+            'artFamilleTypetabs' => $artFamilleTypeTab,
         ]);
     }
 

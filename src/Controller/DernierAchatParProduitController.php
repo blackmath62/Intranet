@@ -63,15 +63,6 @@ class DernierAchatParProduitController extends AbstractController
     public function import(IcdRepository $repoIcd, Request $request, SluggerInterface $slugger): Response
     {
 
-        $em = $this->getDoctrine()->getManager();
-        // suppression des anciennes données
-        $produits = $repoIcd->findAll();
-        foreach ($produits as $key => $value) {
-            $em->remove($value);
-
-        }
-        $em->flush();
-
         $form = $this->createForm(OthersDocumentsType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -97,6 +88,15 @@ class DernierAchatParProduitController extends AbstractController
             }
             ini_set('memory_limit', '-1');
             ini_set('max_execution_time', 0);
+
+            $em = $this->getDoctrine()->getManager();
+            // suppression des anciennes données
+            $produits = $repoIcd->findAll();
+            foreach ($produits as $key => $value) {
+                $em->remove($value);
+            }
+            $em->flush();
+
             if ($xlsx = SimpleXLSX::parse($fichier)) {
 
                 foreach ($xlsx->rows() as $key => $r) {
@@ -111,7 +111,36 @@ class DernierAchatParProduitController extends AbstractController
                     } else {
                         $produit->SetPu($r[5]);
                     }
-                    $produit->setPuCorrige($this->getImportCalculCmp(1, $r[0], $r[2], $r[3], $r[4]));
+                    $cmp = $this->getImportCalculCmp(1, $r[0], $r[2], $r[3], $r[4], 'Dépôt');
+                    if ($cmp == 0) {
+                        $cmpDirect = $this->getImportCalculCmp(1, $r[0], $r[2], $r[3], $r[4], 'Direct');
+                        if ($cmpDirect == 0) {
+                            $cmpDernier = $this->getImportCalculCmp(1, $r[0], $r[2], $r[3], $r[4], 'Dernier');
+                            if ($cmpDernier == 0) {
+                                if ($r[5] > 0) {
+                                    $produit->setPuCorrige($r[5]);
+                                    $produit->setCommentaires('Pas achat, j\'ai ramené le pu de l\'ancien ICD');
+                                } else {
+                                    // aucun achat, donc surement uniquement des régularisations internes
+                                    $produit->setPuCorrige(0);
+                                    $produit->setCommentaires('Aucun achat sur ce produit, uniquement des bls internes !');
+                                }
+                            } else {
+                                // il a fallu pendre le dernier prix d'achat
+                                $produit->setPuCorrige($cmpDernier);
+                                $produit->setCommentaires('Les achat Dépôt et Direct ne couvrent pas le stock..... j\'ai ramené le dernier prix d\'achat');
+                            }
+                        } else {
+                            // On pioche dans le direct
+                            $produit->setPuCorrige($cmpDirect);
+                            $produit->setCommentaires('Les achat Dépôt ne couvrent pas le stock, il a fallu piocher dans le Direct');
+                        }
+
+                    } else {
+                        // tout va bien, on a pu récupérer le pu corrigé
+                        $produit->setPuCorrige($cmp);
+                        $produit->setCommentaires('Pu corrigé calculé avec les derniers achats dépôts pour couvrir la quantité(cmp)');
+                    }
                     $em->persist($produit);
 
                 }
@@ -136,9 +165,14 @@ class DernierAchatParProduitController extends AbstractController
      */
     public function getcalculCmp($dos = null, $produit = null, $sref1 = null, $sref2 = null, $qte = null, ArtRepository $repo, Request $request): Response
     {
-        if ($qte == null) {
-            $qte = $request->request->get('qte');
+        if ($sref1 == 'null') {
+            $sref1 = null;
         }
+        if ($sref2 == 'null') {
+            $sref2 = null;
+        }
+
+        $qte = $request->request->get('qte');
         $qteInit = $qte;
         $i = 0;
         $cmp = 0;
@@ -181,13 +215,25 @@ class DernierAchatParProduitController extends AbstractController
         return $this->redirectToRoute('app_dernier_achat_par_produit_with', ['dos' => 1, 'produit' => $produit, 'cmp' => $cmp]);
     }
 
-    public function getImportCalculCmp($dos, $produit, $sref1, $sref2, $qte)
+    public function getImportCalculCmp($dos, $produit, $sref1, $sref2, $qte, $type)
     {
         $qteInit = $qte;
         $i = 0;
         $cmp = 0;
         if ($produit) {
-            $donnees = $this->repoArt->getAchatParProduitQteSign($dos, $produit, $sref1, $sref2);
+            if ($type == 'Dépôt') {
+                $donnees = $this->repoArt->getAchatParProduitQteSign($dos, $produit, $sref1, $sref2);
+            } elseif ($type == 'Direct') {
+                $donnees = $this->repoArt->getAchatParProduitQteSignDepotDirect($dos, $produit, $sref1, $sref2);
+            } elseif ($type == 'Dernier') {
+                $donnees = $this->repoArt->getAchatParProduitQteSignDepotDirectDernier($dos, $produit, $sref1, $sref2);
+                if ($donnees) {
+                    $cmp = $donnees[0]['pu'];
+                } else {
+                    $cmp = 0;
+                }
+                goto dernier;
+            }
             if ($qte) {
                 foreach ($donnees as $prod) {
                     if ($prod['qte'] > $qte && $i == 0) {
@@ -196,15 +242,21 @@ class DernierAchatParProduitController extends AbstractController
                         goto fin;
                     } else {
                         if ($qte > $prod['qte']) {
+                            //if ($prod['qte'] < 0 && $i == 0) {
+                            //} else {
                             // multiplier la quantité max par le pu
                             $cmp += ($prod['qte'] * $prod['pu']);
                             $qte = $qte - $prod['qte'];
                             $i = $i + $prod['qte'];
+                            //}
                         } else {
                             // multiplier par la quantité restante
                             $cmp += ($qte * $prod['pu']);
                             $i = $i + $prod['qte'];
                             //dd($qte);
+                            /*if ($prod['ref'] == 'STABENCH2000-1500MM') {
+                            dd($i);
+                            }*/
 
                             goto fin;
                         }
@@ -227,6 +279,7 @@ class DernierAchatParProduitController extends AbstractController
         } else {
             $cmp = 'Pas de données';
         }
+        dernier:
         return $cmp;
     }
 

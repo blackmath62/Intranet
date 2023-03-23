@@ -131,57 +131,63 @@
 										<a class="text-center text-dark">{{ produit.montant|format_currency('EUR') }}</a>
 									</td>
 									<td class="text-center">
+										{% if produit.sref1 %}
+											{% set sref1 = produit.sref1 %}
+										{% else %}
+											{% set sref1 = 'null' %}
+										{% endif %}
 
-										<form action="{{path('app_dernier_achat_calcul_cmp', {'dos' : 1, 'produit' : produit.ref, 'sref1' : produit.sref1, 'sref2' : produit.sref2 })}}" method="POST">
+										{% if produit.sref2 %}
+											{% set sref2 = produit.sref2 %}
+										{% else %}
+											{% set sref2 = 'null' %}
+										{% endif %}
+
+										<form action="{{path('app_dernier_achat_calcul_cmp', {'dos' : 1, 'produit' : produit.ref, 'sref1' : sref1, 'sref2' : sref2 })}}" method="POST">
 											<input type="number" name="qte" step="any"/>
 											<button class="btn btn-info" type="submit">Calc.</button>
 										</form>
 									</td>
 								</tr>
-							</td>
+							{% endfor %}
 						</tbody>
-					</tr>
-
-				{% endfor %}
-
-			</tbody>
-			<tfoot>
-				<tr>
-					<th class="text-center">
-						<span>Référence</span>
-					</th>
-					<th class="text-center">
-						<span>Sref1</span>
-					</th>
-					<th class="text-center">
-						<span>Sref2</span>
-					</th>
-					<th class="text-center">
-						<span>Désignation</span>
-					</th>
-					<th class="text-center">
-						<span>U.V</span>
-					</th>
-					<th class="text-center">
-						<span>Op</span>
-					</th>
-					<th class="text-center">
-						<span>Qte</span>
-					</th>
-					<th class="text-center">
-						<span>Date Facture</span>
-					</th>
-					<th class="text-center">
-						<span>Pa</span>
-					</th>
-					<th class="text-center">
-						<span>Total</span>
-					</th>
-					<th class="text-center">
-						<span>Calcul</span>
-					</th>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
-{% endblock %}
+						<tfoot>
+							<tr>
+								<th class="text-center">
+									<span>Référence</span>
+								</th>
+								<th class="text-center">
+									<span>Sref1</span>
+								</th>
+								<th class="text-center">
+									<span>Sref2</span>
+								</th>
+								<th class="text-center">
+									<span>Désignation</span>
+								</th>
+								<th class="text-center">
+									<span>U.V</span>
+								</th>
+								<th class="text-center">
+									<span>Op</span>
+								</th>
+								<th class="text-center">
+									<span>Qte</span>
+								</th>
+								<th class="text-center">
+									<span>Date Facture</span>
+								</th>
+								<th class="text-center">
+									<span>Pa</span>
+								</th>
+								<th class="text-center">
+									<span>Total</span>
+								</th>
+								<th class="text-center">
+									<span>Calcul</span>
+								</th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			{% endblock %}

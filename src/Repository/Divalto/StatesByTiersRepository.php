@@ -1168,4 +1168,67 @@ class StatesByTiersRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // States par famille et type Article
+    public function getStatesParFamilleTypeArticle($dossier, $startN, $endN): array
+    {
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT famille, typeArt, SUM(montant) AS montant
+        FROM(
+        SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille, a.TYPEARTCOD AS typeArt,m.OP AS op,
+        CASE
+        WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
+        WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montant
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN'
+        AND m.TICOD = 'C' AND m.PICOD = 4 --AND a.TYPEARTCOD NOT IN ('DIVERS')
+        $metier
+        AND a.REF NOT IN($this->artBan))reponse
+        GROUP BY famille, typeArt
+        ORDER BY famille";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // States montant total par famille produit
+    public function getStatesTotalParFamille($dossier, $startN, $endN, $famille)
+    {
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = " SELECT SUM(montant) AS montant
+        FROM(
+        SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille,m.OP AS op,
+        CASE
+        WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
+        WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montant
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN'
+        AND m.TICOD = 'C' AND m.PICOD = 4 AND a.FAM_0001 = '$famille'
+        $metier
+        AND a.REF NOT IN($this->artBan))reponse
+        GROUP BY famille";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
+    }
+
 }

@@ -214,6 +214,56 @@
 						</div>
 						<!-- /.card -->
 
+						<!-- DONUT CHART -->
+						<div class="card card-danger">
+							<div class="card-header">
+								<h3 class="card-title">Chiffre d'affaire par familles et types articles du
+									{{ dd }}
+									au
+									{{ df }}</h3>
+
+								<div class="card-tools">
+									<button type="button" class="btn btn-tool" data-card-widget="maximize">
+										<i class="fas fa-expand"></i>
+									</button>
+								</div>
+							</div>
+							<div class="card-body">
+								<table id="example1" class="table table-hover">
+									<thead>
+										<tr class='text-center'>
+											<th>Famille</th>
+											<th>Type</th>
+											<th>Montant</th>
+											<th>Part CA du type</th>
+											<th>CA Total Famille</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for artFamilleTypetab in artFamilleTypetabs %}
+											<tr class='text-center'>
+												<td>{{artFamilleTypetab.0}}</td>
+												<td>{{artFamilleTypetab.1}}</td>
+												<td>{{artFamilleTypetab.2}}</td>
+												<td>
+													{% if artFamilleTypetab.2 > 0 and artFamilleTypetab.3 > 0 %}
+														{% set part = (artFamilleTypetab.2 * 100) / artFamilleTypetab.3 %}
+														{{ part|number_format(2, '.', ' ') }}
+														%
+													{% else %}
+														0
+													{% endif %}
+												</td>
+												<td>{{artFamilleTypetab.3}}</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+							<!-- /.card-body -->
+						</div>
+						<!-- /.card -->
+
 
 					</div>
 					<!-- /.col (LEFT) -->
@@ -307,10 +357,11 @@
 
 	<script>
 		$(function () {
+
 /* ChartJS
-     * -------
-     * Here we will create a few charts using ChartJS
-     */
+* -------
+* Here we will create a few charts using ChartJS
+*/
 
 // --------------
 // - AREA CHART -
@@ -522,6 +573,85 @@ min: 0
 }
 }
 }
+});
+	</script>
+
+	<script>
+
+		// ---------------------
+// - STACKED BAR CHART -
+// ---------------------
+
+var stackedBarChartData = $.extend(true, {}, lineChartData);
+
+var stackedBarChartOptions = {
+responsive: true,
+maintainAspectRatio: false,
+scales: {
+xAxes: [
+{
+stacked: true
+}
+],
+yAxes: [
+{
+stacked: true
+}
+]
+}
+};
+
+var stacked = document.getElementById('stackedBarChart').getContext('2d');
+new Chart(stacked, {
+type: 'bar',
+data: stackedBarChartData,
+options: stackedBarChartOptions
+});
+	</script>
+
+	<script>
+		$(function () {
+$("#example1").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+$("#example3").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+$('#example2').DataTable({
+"paging": true,
+"lengthChange": false,
+"searching": false,
+"ordering": false,
+"info": true,
+"autoWidth": false,
+"responsive": true
+});
 });
 	</script>
 

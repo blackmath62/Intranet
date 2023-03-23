@@ -72,6 +72,9 @@
 								<th class="text-center">
 									<span>Différence</span>
 								</th>
+								<th class="text-center">
+									<span>Commentaires</span>
+								</th>
 
 							</tr>
 						</thead>
@@ -126,8 +129,13 @@
 									<td class="text-center">
 										<a class="text-center text-dark">
 											{% if produit.pu and produit.puCorrige %}
-												{{ (produit.pu * produit.qte) - (produit.puCorrige * produit.qte) }}
+												{{ ((produit.puCorrige * produit.qte) - (produit.pu * produit.qte)) }}
 											{% endif %}
+										</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">
+											{{ (produit.commentaires|raw) }}
 										</a>
 									</td>
 								</tr>
@@ -166,6 +174,9 @@
 								</th>
 								<th class="text-center">
 									<span>Différence</span>
+								</th>
+								<th class="text-center">
+									<span>Commentaires</span>
 								</th>
 							</tr>
 						</tfoot>

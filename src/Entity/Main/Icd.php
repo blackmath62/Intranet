@@ -52,6 +52,11 @@ class Icd
      */
     private $pu_corrige;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $commentaires;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +142,18 @@ class Icd
     public function setPuCorrige(?string $pu_corrige): self
     {
         $this->pu_corrige = $pu_corrige;
+
+        return $this;
+    }
+
+    public function getCommentaires(): ?string
+    {
+        return $this->commentaires;
+    }
+
+    public function setCommentaires(?string $commentaires): self
+    {
+        $this->commentaires = $commentaires;
 
         return $this;
     }
