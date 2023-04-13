@@ -123,6 +123,7 @@ class ResumeStatesController extends AbstractController
                 $dataFamilleTypeArt[$ligTypeArt]['typeArt'],
                 $dataFamilleTypeArt[$ligTypeArt]['montant'],
                 $repoTiers->getStatesTotalParFamille($dos, $startN, $endN, $dataFamilleTypeArt[$ligTypeArt]['famille']),
+                $repoTiers->getStatesTotalParType($dos, $startN, $endN, $dataFamilleTypeArt[$ligTypeArt]['typeArt']),
             ];
 
         }

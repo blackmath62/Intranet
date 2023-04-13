@@ -1231,4 +1231,34 @@ class StatesByTiersRepository extends ServiceEntityRepository
         return $resultSet->fetchOne();
     }
 
+    // States montant total par Type produit
+    public function getStatesTotalParType($dossier, $startN, $endN, $type)
+    {
+
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1) {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = " SELECT SUM(montant) AS montant
+        FROM(
+        SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille,m.OP AS op,
+        CASE
+        WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
+        WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montant
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN'
+        AND m.TICOD = 'C' AND m.PICOD = 4 AND a.TYPEARTCOD = '$type'
+        $metier
+        AND a.REF NOT IN($this->artBan))reponse";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
+    }
+
 }

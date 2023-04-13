@@ -232,20 +232,23 @@
 								<table id="example1" class="table table-hover">
 									<thead>
 										<tr class='text-center'>
-											<th>Famille</th>
-											<th>Type</th>
-											<th>Montant</th>
-											<th>Part CA du type</th>
-											<th>CA Total Famille</th>
+											<th class='table-info'>Type</th>
+											<th class='table-info'>Montant</th>
+											<th class='table-info'>Part Type/Famille</th>
+											<th class='table-info'>Part Type/CA Total</th>
+											<th class='table-info'>CA Total Type</th>
+											<th class='table-success'>Famille</th>
+											<th class='table-success'>CA Total Famille</th>
+											<th class='table-success'>Part Famille/CA Total</th>
+											<th class='table-warning'>CA Total</th>
 										</tr>
 									</thead>
 									<tbody>
 										{% for artFamilleTypetab in artFamilleTypetabs %}
 											<tr class='text-center'>
-												<td>{{artFamilleTypetab.0}}</td>
-												<td>{{artFamilleTypetab.1}}</td>
-												<td>{{artFamilleTypetab.2}}</td>
-												<td>
+												<td class='table-info'>{{artFamilleTypetab.1}}</td>
+												<td class='table-info'>{{artFamilleTypetab.2}}</td>
+												<td class='table-info'>
 													{% if artFamilleTypetab.2 > 0 and artFamilleTypetab.3 > 0 %}
 														{% set part = (artFamilleTypetab.2 * 100) / artFamilleTypetab.3 %}
 														{{ part|number_format(2, '.', ' ') }}
@@ -254,7 +257,28 @@
 														0
 													{% endif %}
 												</td>
-												<td>{{artFamilleTypetab.3}}</td>
+												<td class='table-info'>
+													{% if artFamilleTypetab.4 > 0 and total > 0 %}
+														{% set part = (artFamilleTypetab.4 * 100) / total %}
+														{{ part|number_format(2, '.', ' ') }}
+														%
+													{% else %}
+														0
+													{% endif %}
+												</td>
+												<td class='table-info'>{{artFamilleTypetab.4}}</td>
+												<td class='table-success'>{{artFamilleTypetab.0}}</td>
+												<td class='table-success'>{{artFamilleTypetab.3}}</td>
+												<td class='table-success'>
+													{% if artFamilleTypetab.3 > 0 and total > 0 %}
+														{% set part = (artFamilleTypetab.3 * 100) / total %}
+														{{ part|number_format(2, '.', ' ') }}
+														%
+													{% else %}
+														0
+													{% endif %}
+												</td>
+												<td class='table-warning'>{{total}}</td>
 											</tr>
 										{% endfor %}
 									</tbody>
