@@ -3,6 +3,7 @@
 namespace App\Repository\Divalto;
 
 use App\Entity\Divalto\Mouv;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -449,13 +450,13 @@ class MouvRepository extends ServiceEntityRepository
         $sql = "SELECT MAX(dos) AS dos, MAX(tiers) AS tiers, MAX(nom) AS nom, MAX(typePiece) AS typePiece,
     MAX(dateCmd) AS dateCmd, MAX(numCmd) AS numCmd, MAX(dateBl) AS dateBl, MAX(numBl) AS numBl, MAX(dateFacture) AS dateFacture, MAX(numFacture) AS numFacture,
     MAX(ENT.DELDEMDT) AS delaiDemande, MAX(ENT.DELACCDT) AS delaiAccepte, MAX(ENT.DELREPDT) AS delaiReporte,
-    MAX(ENT.BLMOD) AS transport, MAX(ENT.PROJET) AS affaire, MAX(ENT.OP) AS op, ENT.ENT_ID AS id, MAX(utilisateur) AS utilisateur,
+    MAX(LTRIM(RTRIM(ENT.BLMOD))) AS transport, MAX(LTRIM(RTRIM(ENT.PROJET))) AS affaire, MAX(ENT.OP) AS op, ENT.ENT_ID AS id, MAX(utilisateur) AS utilisateur,
     CASE
     WHEN MAX(ENT.ADRCOD_0003) = '' THEN MAX(adressePrincipale)
     ELSE MAX(CONCAT(LTRIM(RTRIM(T1.NOM)), ', ', LTRIM(RTRIM(T1.RUE)), ', ', LTRIM(RTRIM(T1.CPOSTAL)), ' ', LTRIM(RTRIM(T1.VIL)) ) )
     END AS adresseLivraison
     FROM(
-    SELECT MOUV.DOS AS dos, MOUV.TIERS AS tiers, CLI.NOM AS nom, MOUV.PICOD as typePiece,
+    SELECT LTRIM(RTRIM(MOUV.DOS)) AS dos, LTRIM(RTRIM(MOUV.TIERS)) AS tiers, LTRIM(RTRIM(CLI.NOM)) AS nom, MOUV.PICOD as typePiece,
     MOUV.CDDT AS dateCmd, MOUV.CDNO AS numCmd, MOUV.BLDT AS dateBl, MOUV.BLNO AS numBl, MOUV.FADT AS dateFacture, MOUV.FANO AS numFacture,
     CONCAT(LTRIM(RTRIM(CLI.RUE)), ', ', LTRIM(RTRIM(CLI.CPOSTAL)), ' ', LTRIM(RTRIM(CLI.VIL)) ) AS adressePrincipale, MAX(LTRIM(RTRIM(MUSER.NOM))) AS utilisateur,
     CASE
@@ -476,9 +477,11 @@ class MouvRepository extends ServiceEntityRepository
     GROUP BY MOUV.DOS, MOUV.TIERS, CLI.NOM, MOUV.PICOD, MOUV.CDDT, MOUV.CDNO, MOUV.BLDT, MOUV.BLNO, MOUV.FADT, MOUV.FANO, CLI.RUE, CLI.CPOSTAL, CLI.VIL)reponse
     INNER JOIN ENT ON ENT.DOS = dos AND ENT.TIERS = tiers AND ENT.PICOD = typePiece AND ENT.PINO = numPiece AND ENT.TICOD = 'C'
     LEFT JOIN T1 ON tiers = T1.TIERS AND dos = T1.DOS AND  ENT.ADRCOD_0003 = T1.ADRCOD
-    WHERE (datePiece >= '2022-06-01' AND ENT.PROJET <> '' AND NOT numFacture IN ($termine)) OR ( numCmd IN($cmd) OR numBl IN ($bl) OR numFacture IN ($facture) )
+    WHERE (datePiece >= '2022-06-01' AND NOT numFacture IN ($termine)) OR ( numCmd IN($cmd) OR numBl IN ($bl) OR numFacture IN ($facture) )
     GROUP BY ENT.ENT_ID
+    ORDER BY numCmd ASC
     ";
+        // AND ENT.PROJET <> ''
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
@@ -907,6 +910,89 @@ class MouvRepository extends ServiceEntityRepository
         WHERE $pidt > '2023-01-01' AND $pice4 = '1' AND m.DEPO = '1' AND m.TICOD IN ('F', 'C'))reponse
         INNER JOIN MUSER u ON u.USERX = utilisateur
         $mailUser
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getMouvRbue($dd, $df): array
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(m.TIERS)) AS tiers, LTRIM(RTRIM(m.CDDT)) AS dateCmd, LTRIM(RTRIM(e.PIREF)) AS notreRef,LTRIM(RTRIM(m.CDNO)) AS cmd, LTRIM(RTRIM(m.BLNO)) AS bl, LTRIM(RTRIM(m.FANO)) AS facture, LTRIM(RTRIM(m.REF)) AS ref, LTRIM(RTRIM(m.SREF1)) AS sref1, LTRIM(RTRIM(m.SREF2)) AS sref2,
+        LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(a.FAM_0001)) AS famille, LTRIM(RTRIM(m.FAQTE)) AS qte
+        FROM MOUV m
+        INNER JOIN FOU f ON f.DOS = m.DOS AND m.TIERS = f.TIERS
+        INNER JOIN T013 p ON f.PAY = p.PAY
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN ENT e ON e.DOS = m.DOS AND e.PINO = m.CDNO
+        WHERE m.DOS = 3 AND m.TICOD = 'F' AND m.PICOD IN (2,3,4) --AND f.TIERS = 'FJUANCHE'
+        AND p.TVAPAYTYP = 1 AND a.FAM_0001 <> 'TRANSPOR' AND m.REF <> 'DIVERS20%' AND m.CDDT BETWEEN '$dd' AND '$df'
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getVenteClientSur3Ans($dd, $df, $type, $metier): array
+    {
+
+        $ddN1 = new DateTime($dd);
+        $ddN1 = date_modify($ddN1, '-1 Year');
+        $ddN1 = $ddN1->format('Y-m-d');
+        $ddN2 = new DateTime($dd);
+        $ddN2 = date_modify($ddN2, '-2 Year');
+        $ddN2 = $ddN2->format('Y-m-d');
+        $dfN1 = new DateTime($df);
+        $dfN1 = date_modify($dfN1, '-1 Year');
+        $dfN1 = $dfN1->format('Y-m-d');
+        $dfN2 = new DateTime($df);
+        $dfN2 = date_modify($dfN2, '-2 Year');
+        $dfN2 = $dfN2->format('Y-m-d');
+
+        if ($type == 'CLIENT') {
+            $select = 'tiers as tiers, nom AS nom, cp AS cp, famille AS famille';
+            $group = 'tiers, nom,cp, famille';
+        } elseif ($type == 'FAMILLE') {
+            $select = 'famille AS famille';
+            $group = 'famille';
+        }
+
+        if ($metier == 'Tous') {
+            $secteur = '';
+        } elseif ($metier == 'EV') {
+            $secteur = "AND c.STAT_0002 = 'EV' AND a.FAM_0002 IN ('EV','HP')";
+        } elseif ($metier == 'HP') {
+            $secteur = "AND c.STAT_0002 = 'HP' AND a.FAM_0002 IN ('EV','HP')";
+        } elseif ($metier == 'ME') {
+            $secteur = "AND a.FAM_0002 IN ('ME','MO')";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT $select ,SUM(montantN) AS montantN, SUM(montantN1) AS montantN1, SUM(montantN2) AS montantN2
+        FROM(
+            SELECT m.TIERS AS tiers, c.NOM AS nom, c.CPOSTAL AS cp, c.STAT_0001 AS famille ,
+            CASE
+                WHEN m.OP IN ('C', 'CD') AND m.FADT BETWEEN '$dd' AND '$df' THEN m.MONT - m.REMPIEMT_0004
+                WHEN m.OP IN ('D', 'DD') AND m.FADT BETWEEN '$dd' AND '$df' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+            END AS montantN,
+            CASE
+                WHEN m.OP IN ('C', 'CD') AND m.FADT BETWEEN '$ddN1' AND '$dfN1' THEN m.MONT - m.REMPIEMT_0004
+                WHEN m.OP IN ('D', 'DD') AND m.FADT BETWEEN '$ddN1' AND '$dfN1' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+            END AS montantN1,
+            CASE
+                WHEN m.OP IN ('C', 'CD') AND m.FADT BETWEEN '$ddN2' AND '$dfN2' THEN m.MONT - m.REMPIEMT_0004
+                WHEN m.OP IN ('D', 'DD') AND m.FADT BETWEEN '$ddN2' AND '$dfN2' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+            END AS montantN2
+            FROM MOUV m
+            LEFT JOIN CLI c ON m.DOS = c.DOS AND m.TIERS = c.TIERS
+            INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+            WHERE m.DOS = 1 AND m.PICOD = 4 AND m.TICOD = 'C' AND m.OP IN ('C', 'D', 'CD','DD') AND m.MONT > 0
+            AND m.FADT BETWEEN '$ddN2' AND '$df'
+            $secteur
+        )reponse
+        GROUP BY $group
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

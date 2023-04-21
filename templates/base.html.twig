@@ -437,6 +437,12 @@
 													<p>States ventes</p>
 												</a>
 											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_states_par_client_Lh') }}" class="nav-link">
+													<i class="fas fa-globe nav-icon text-warning"></i>
+													<p>States par client sur 3 ans tous métiers</p>
+												</a>
+											</li>
 											{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
 												<li class="nav-item">
 													<a href="{{ path('app_resume_states', {'dos' : '1' }) }}" class="nav-link">
@@ -602,6 +608,12 @@
 									<a href="{{path('app_cmd_roby_delai_accepte_reporte_active')}}" class="nav-link">
 										<i class="nav-icon fas fa-hourglass-half"></i>
 										<p>Commandes</p>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="{{path('app_rbue')}}" class="nav-link">
+										<i class="nav-icon fas fa-arrow-right"></i>
+										<p>Mouvements RBUE</p>
 									</a>
 								</li>
 								<li class="nav-item has-treeview">

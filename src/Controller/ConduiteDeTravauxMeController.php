@@ -397,13 +397,12 @@ class ConduiteDeTravauxMeController extends AbstractController
         $termine = null;
         $listFact = $this->repoConduite->findBy(['etat' => 'Termine']);
         foreach ($listFact as $value) {
-            if ($termine == null && $value->getNumeroFacture() !== null) {
+            if ($termine == null && $value->getNumeroFacture() !== null && $value->getNumeroFacture() != 0) {
                 $termine = $value->getNumeroFacture();
-            } elseif ($termine !== null && $value->getNumeroFacture() !== null) {
+            } elseif ($termine !== null && $value->getNumeroFacture() !== null && $value->getNumeroFacture() != 0) {
                 $termine = $termine . ',' . $value->getNumeroFacture();
             }
         }
-
         $pieces = $this->repoMouv->getUpdateMouvConduiteTravaux($cmd, $bl, $facture, $termine);
         $user = $this->repoUser->findOneBy(['pseudo' => 'intranet']);
         foreach ($pieces as $value) {

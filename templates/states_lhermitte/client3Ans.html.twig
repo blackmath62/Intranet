@@ -1,0 +1,169 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<!-- Content Wrapper. Contains page content -->
+	<div>
+		<!-- Content Header (Page header) -->
+		<section class="content-header">
+			<div class="container-fluid">
+				<div class="row mb-2">
+					<div class="col-sm-6">
+						<h1>Ventes client sur 3 ans pour réponse appel d'offre</h1>
+					</div>
+					{{ form_start(form) }}
+					<div class='d-flex'>
+						<div class="p-1 mt-2">
+							Veuillez selectionner la période :
+						</div>
+						<div class="p-1">
+							{{ form_widget(form.start) }}
+						</div>
+						<div class="p-1">
+							{{ form_widget(form.end) }}
+						</div>
+						<div class="p-1">
+							{{ form_widget(form.Metiers) }}
+						</div>
+						<div class="p-1">
+							{{ form_row(form.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }}
+							) }}
+						</div>
+					</div>
+					{{ form_end(form) }}
+				</div>
+			</div>
+			<!-- /.container-fluid -->
+		</section>
+		<!-- /.content -->
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card card-info">
+					<div class="card-header">
+						<h3 class="card-title text-center">Vente par famille client</h3>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body">
+						{% if familles %}
+							<table id="example2" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th class="text-center">
+											<span>Famille</span>
+										</th>
+										<th class="text-center">
+											<span>Montant N - 2</span>
+										</th>
+										<th class="text-center">
+											<span>Montant N -1</span>
+										</th>
+										<th class="text-center">
+											<span>Montant N</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for famille in familles %}
+										<tr>
+											<td class="text-center">
+												<a class="text-dark">{{ famille.famille}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ famille.montantN2 }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ famille.montantN1}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ famille.montantN}}</a>
+											</td>
+										{% endfor %}
+									</tr>
+								</tbody>
+							</table>
+						{% else %}
+							<h4 class="text-left text-dark">
+								<i class="fas fa-info-circle pr-2 text-primary"></i>Aucune élément à afficher, veuillez selectionner les filtres
+							</h4>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card card-primary">
+					<div class="card-header">
+						<h3 class="card-title text-center">Vente par client</h3>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body">
+						{% if clients %}
+							<table id="example1" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th class="text-center">
+											<span>Tiers</span>
+										</th>
+										<th class="text-center">
+											<span>Nom</span>
+										</th>
+										<th class="text-center">
+											<span>Cp</span>
+										</th>
+										<th class="text-center">
+											<span>Famille</span>
+										</th>
+										<th class="text-center">
+											<span>Montant N - 2</span>
+										</th>
+										<th class="text-center">
+											<span>Montant N -1</span>
+										</th>
+										<th class="text-center">
+											<span>Montant N</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for client in clients %}
+										<tr>
+											<td class="text-center">
+												<a class="text-dark">{{ client.tiers }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ client.nom}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ client.cp}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ client.famille}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ client.montantN2 }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ client.montantN1}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ client.montantN}}</a>
+											</td>
+										{% endfor %}
+									</tr>
+								</tbody>
+							</table>
+						{% else %}
+							<h4 class="text-left text-dark">
+								<i class="fas fa-info-circle pr-2 text-primary"></i>Aucune élément à afficher, veuillez selectionner les filtres
+							</h4>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

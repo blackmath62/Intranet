@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Form\ActivitesMetierType;
 use App\Form\DateDebutFinType;
 use App\Form\DateSecteurLhDebutFinType;
 use App\Form\DateSecteurRbDebutFinType;
+use App\Repository\Divalto\MouvRepository;
 use App\Repository\Divalto\StatesByTiersRepository;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -1578,6 +1580,33 @@ class StatesController extends AbstractController
             'themeColor' => $themeColor,
             'statesTotauxCommercial' => $statesTotauxCommercial,
 
+        ]);
+    }
+
+    /**
+     * @Route("/Lhermitte/states/clients/3/ans/lhermitte", name="app_states_par_client_Lh")
+     */
+    public function statesParClientTroisAns(MouvRepository $repo, Request $request): Response
+    {
+        $clients = '';
+        $familles = '';
+        $form = $this->createForm(ActivitesMetierType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $dd = $form->getData()['start']->format('Y-m-d');
+            $df = $form->getData()['end']->format('Y-m-d');
+            $metier = $form->getData()['Metiers'];
+
+            $clients = $repo->getVenteClientSur3Ans($dd, $df, 'CLIENT', $metier);
+            $familles = $repo->getVenteClientSur3Ans($dd, $df, 'FAMILLE', $metier);
+        }
+
+        return $this->render('states_lhermitte/client3Ans.html.twig', [
+            'form' => $form->createView(),
+            'title' => 'States client 3 ans tous métiers',
+            'clients' => $clients,
+            'familles' => $familles,
         ]);
     }
 
