@@ -362,6 +362,11 @@ class ConduiteDeTravauxMeController extends AbstractController
     public function update()
     {
 
+        ini_set('memory_limit', '1024M');
+        ini_set('max_execution_time', 0);
+        // désactiver le Garbage Collector
+        gc_disable();
+
         //TODO retirer toutes les piéces qui sont déjà Terminés pour réduire le délai de traitement à revoir le dernier essaie n'a pas fonctionné
         $cmd = null;
         $bl = null;
