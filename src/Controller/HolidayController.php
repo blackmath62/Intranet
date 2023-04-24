@@ -110,6 +110,7 @@ class HolidayController extends AbstractController
                 'id' => $event->getId(),
                 'start' => $start,
                 'end' => $end,
+                'url' => 'http://192.168.50.244/holiday/show/' . $id,
                 'title' => 'Congés ' . $pseudo . ' du ' . $event->getStart()->format('d-m-Y') . ' au ' . $event->getEnd()->format('d-m-Y'),
                 'backgroundColor' => $color,
                 'borderColor' => '#FFFFFF',
