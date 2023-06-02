@@ -1,0 +1,171 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block body %}
+	<div class="card collapsed-card card-info">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-info-circle"></i>
+				Info</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<p>Dans le haut à droite, vous pouvez modifier l'état de la piéce.</p>
+		</div>
+	</div>
+
+
+	<div class="row">
+		<div class="col-sm-3 col-6">
+			<div class="description-block border-right">
+				<h5 class="description-header">Affaire</h5>
+				<div class='d-flex flex-column'>
+					<span class="description-text">{{ affaire.code }}</span>
+					<span class="description-text">{{ affaire.libelle}}</span>
+				</div>
+			</div>
+			<!-- /.description-block -->
+		</div>
+		<!-- /.col -->
+		<div class="col-sm-3 col-6">
+			<div class="description-block border-right">
+				<h5 class="description-header">Client</h5>
+				<div class='d-flex flex-column'>
+					<span class="description-text">{{ affaire.tiers}}</span>
+					<span class="description-text">{{affaire.nom}}</span>
+				</div>
+			</div>
+			<!-- /.description-block -->
+		</div>
+		<!-- /.col -->
+		<div class="col-sm-3 col-6">
+			<div class="description-block border-right">
+				<h5 class="description-header">Piéce</h5>
+				<div class='d-flex flex-column'>
+					{% if app.request.attributes.get('type') == 2 %}
+						{% set typeP = 'Commande' %}
+					{% elseif app.request.attributes.get('type') == 3 %}
+						{% set typeP = 'Bon de livraison' %}
+					{% elseif app.request.attributes.get('type') == 4 %}
+						{% set typeP = 'Facture' %}
+					{% else %}
+						{% set typeP = 'ERREUR' %}
+					{% endif %}
+					<span class="description-text">{{ typeP }}</span>
+					<span class="description-text">{{app.request.attributes.get('piece')}}</span>
+				</div>
+			</div>
+			<!-- /.description-block -->
+		</div>
+		<!-- /.col -->
+		<div class="col-sm-3 col-6">
+			<div class="description-block">
+				{% set color = 'success' %}
+				{% if id.etat == 'En attente' %}
+					{% set color = 'warning text-dark' %}
+					{% set icone = "fa fa-pause" %}
+				{% elseif id.etat == 'Nouvelle' %}
+					{% set color = 'info text-white' %}
+					{% set icone = "fa fa-inbox" %}
+				{% elseif id.etat == 'En cours' %}
+					{% set color = 'primary text-white' %}
+					{% set icone = "fa fa-spinner" %}
+				{% elseif id.etat == 'A finir' %}
+					{% set color = 'secondary text-white' %}
+					{% set icone = "fa fa-battery-half" %}
+				{% elseif id.etat == 'Termine' %}
+					{% set color = 'success text-white' %}
+					{% set icone = "fa fa-check" %}
+				{% elseif id.etat == 'Litige' %}
+					{% set color = 'danger text-white' %}
+					{% set icone = "fa fa-triangle-exclamation" %}
+				{% endif %}
+
+				<div class="btn-group">
+					<a class="btn btn-{{ color}}">
+						<i class="{{icone}}" aria-hidden="true"></i>
+					</a>
+					<div class="btn-group">
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'Litige' } ) }}'>Litige</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'En attente' } ) }}'>En attente</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'A finir' } ) }}'>A finir</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'En cours' } ) }}'>En cours</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'Termine' } ) }}'>Termine</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<!-- /.description-block -->
+		</div>
+	</div>
+	<!-- /.row -->
+	<div class="card">
+		<div class="card-header">
+			<h2 class="card-title">Détail de la piéce</h2>
+
+
+			<div class="card-tools">
+				<a href='{{path('app_affaire_me_nok' ) }}' class="ml-2 text-light btn btn-xl btn-primary">
+					Retourner à la liste des affaires
+				</a>
+				<a title='Affaires à traiter !' href="{{ path('app_piece_affaire_nok', {'affaire' : affaire.code}) }}" class="btn btn-success text-white">
+					Retourner sur l'affaire
+				</a>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<table class="table table-bordered table-striped" id="example1">
+				<thead>
+					<tr>
+						<th style="width: 10px">#</th>
+						<th>Ref</th>
+						<th>Sref1</th>
+						<th>Sref2</th>
+						<th>Désignation</th>
+						<th>U.V</th>
+						<th class="text-center">Op</th>
+						<th class="text-center">Qte</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% set i = 1 %}
+					{% for piece in pieces %}
+						<tr>
+							<td>{{ i }}</td>
+							<td>{{ piece.ref}}</td>
+							<td>{{ piece.sref1 }}</td>
+							<td>{{ piece.sref2 }}</td>
+							<td>{{ piece.designation}}</td>
+							<td>{{ piece.uv}}</td>
+							<td>{{ piece.op}}</td>
+							<td>{{ piece.qte}}</td>
+						</tr>
+						{% set i = i + 1 %}
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endblock %}

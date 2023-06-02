@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\OthersDocumentsType;
+use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\OthersDocumentsRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,7 +18,7 @@ class AuditAfnorController extends AbstractController
     /**
      * @Route("/audit/afnor", name="app_audit_afnor")
      */
-    public function index(Request $request, OthersDocumentsRepository $repo, SluggerInterface $slugger): Response
+    public function index(Request $request, OthersDocumentsRepository $repo, SluggerInterface $slugger, MouvRepository $repoMouv): Response
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
@@ -30,7 +31,7 @@ class AuditAfnorController extends AbstractController
             $table = $tracking;
             if ($file) {
                 $d = new DateTime();
-
+                //dd($file->getOriginalName());
                 $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                 // this is needed to safely include the file name as part of the URL
                 $safeFilename = $slugger->slug($originalFilename);
@@ -65,8 +66,11 @@ class AuditAfnorController extends AbstractController
 
         $docs = $repo->findBy(['tables' => $tracking]);
 
+        $listephytos = $repoMouv->getListePhytos();
+
         return $this->render('audit_afnor/index.html.twig', [
             'form' => $form->createView(),
+            'listephytos' => $listephytos,
             'docs' => $docs,
             'title' => 'Documents Audit Afnor',
         ]);
@@ -97,11 +101,7 @@ class AuditAfnorController extends AbstractController
     public function DocsReferentielAfnorDelete(int $id, OthersDocumentsRepository $repo, Request $request)
     {
         $doc = $repo->findOneBy(['id' => $id]);
-
-        // tracking user page for stats
-        //$tracking = $request->attributes->get('_route');
-        //$this->setTracking($tracking);
-
+        unlink('doc/Lhermitte_freres/Afnor/' . $doc->getFile());
         $em = $this->getDoctrine()->getManager();
         $em->remove($doc);
         $em->flush();

@@ -82,6 +82,19 @@ class fscListMovementRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // Extraction des factures d'achat d'une période
+    public function getExtractPeriod($start, $end): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT *
+        FROM fsclistmovement a
+        WHERE a.dateFact BETWEEN '$start' AND '$end'
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     // /**
     //  * @return fscListMovement[] Returns an array of fscListMovement objects
     //  */

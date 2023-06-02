@@ -64,6 +64,16 @@ class MovBillFsc
      */
     private $ventilations;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $dateBl;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $bl;
+
     public function __construct()
     {
         $this->ventilations = new ArrayCollection();
@@ -190,6 +200,30 @@ class MovBillFsc
     public function removeVentilation(fscListMovement $ventilation): self
     {
         $this->ventilations->removeElement($ventilation);
+
+        return $this;
+    }
+
+    public function getDateBl(): ?\DateTimeInterface
+    {
+        return $this->dateBl;
+    }
+
+    public function setDateBl(?\DateTimeInterface $dateBl): self
+    {
+        $this->dateBl = $dateBl;
+
+        return $this;
+    }
+
+    public function getBl(): ?int
+    {
+        return $this->bl;
+    }
+
+    public function setBl(?int $bl): self
+    {
+        $this->bl = $bl;
 
         return $this;
     }

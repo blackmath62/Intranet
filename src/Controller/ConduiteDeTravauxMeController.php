@@ -541,4 +541,48 @@ class ConduiteDeTravauxMeController extends AbstractController
 
         return $this->redirectToRoute('app_conduite_de_travaux_me_nok');
     }
+
+    /**
+     * @Route("/Lhermitte/conduite/travaux/num/ajout/ajax/{num}/{type}",name="app_conduite_de_travaux_me_add_num_piece")
+     */
+    /*
+    public function addNumPiece($num, $type): Response
+    {
+
+    $numPiece = new ConduiteTravauxAddPiece();
+    $numPiece->setNumPiece(trim(strip_tags($num)))
+    ->setCreatedAt(new DateTime)
+    ->setCreatedBy($this->getUser())
+    ->setType($type);
+    $entityManager = $this->getDoctrine()->getManager();
+    $entityManager->persist($numPiece);
+    $entityManager->flush();
+    $id = $numPiece->getId();
+    return new JsonResponse(['id' => $id]);
+
+    }
+     */
+
+    /**
+     * @Route("/Lhermitte/conduite/travaux/change/etat/{id}/{etat}",name="app_conduite_de_travaux_me_change_etat")
+     */
+    /*
+public function changeEtat($id, $etat): Response
+{
+// tracking user page for stats
+//$tracking = $request->attributes->get('_route');
+//$this->setTracking($tracking);
+
+$piece = $this->repoConduite->findOneBy(['entId' => $id]);
+$piece->setEtat($etat);
+$entityManager = $this->getDoctrine()->getManager();
+$entityManager->persist($piece);
+$entityManager->flush();
+
+$this->addFlash('message', 'Mise à jour effectuée avec succés');
+return $this->redirectToRoute('app_conduite_de_travaux_me_nok');
+
+}
+ */
+
 }

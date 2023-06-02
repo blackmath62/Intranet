@@ -1,0 +1,421 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block body %}
+	<div class="card collapsed-card card-info">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-info-circle"></i>
+				Info</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<p>Sur cette page, dans la partie mise à jour, vous pouvez apporter des modifications à l'affaire.</p>
+			<p>Sur chaque ligne qui représente une piéce, vous pouvez modifier l'état de la piéce.</p>
+		</div>
+	</div>
+	<div class='row'>
+		<div class="card collapsed-card card-navy col-12 col-sm-6" style="box-shadow: none" ;>
+			<div class=" card-header">
+				<h3 class="card-title">
+					<i class="icon fas fa-download"></i>
+					Piéces jointes
+				</h3>
+				<div class="card-tools">
+					<span class="badge bg-primary">{{random(20)}}</span>
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-minus"></i>
+					</button>
+				</div>
+			</div>
+			<!-- /.card-header -->
+			<div class="card-body">
+				{{ form_start(formFiles, { attr: { 'accept-charset' : 'utf-8' }}) }}
+				<div class="input-group">
+					<div class="custom-file">
+
+						{{ form_label(formFiles.file) }}
+						{{ form_widget(formFiles.file) }}
+					</div>
+					<div class="input-group-append">
+						{{ form_widget(formFiles.importer, {'label': "Télécharger des fichiers", 'attr' : { 'class': 'text-white btn btn-dark btn-outline-secondary mb-3' }}) }}
+					</div>
+				</div>
+				{{ form_rest(formFiles) }}
+				{{ form_errors(formFiles.file) }}
+				{{ form_end(formFiles) }}
+
+				<div class="col-md-6">
+
+
+					<div class="card">
+						<div class="card-header">
+							<h3 class="card-title">Condensed Full Width Table</h3>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body p-0">
+							<table class="table table-sm">
+								{% set p = 1 %}
+								<thead>
+									<tr>
+										<th style="width: 10px">#</th>
+										<th>Fichiers</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for doc in docs %}
+										<tr>
+											<td>{{ p }}</td>
+											<td>{{ doc.file }}</td>
+											<td>
+												<span>à voir</span>
+											</td>
+										</tr>
+										{% set p = p + 1 %}
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+				<!-- /.col -->
+
+
+			</div>
+		</div>
+		<div class="card collapsed-card card-olive col-12 col-sm-6" style="box-shadow: none" ;>
+			<div class="card-header">
+				<h3 class="card-title">
+					<i class="icon fas fa-comment"></i>
+					Commentaires
+				</h3>
+				<div class="card-tools">
+					<span class="badge bg-primary">{{random(20)}}</span>
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-minus"></i>
+					</button>
+				</div>
+			</div>
+			<!-- /.card-header -->
+			<div class="card-body"></div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-sm-4 col-12">
+			<div class="description-block border-right">
+				<h5 class="description-header">Affaire</h5>
+				<div class='d-flex flex-column'>
+					<span class="description-text">{{ affaire.code }}</span>
+					<span class="description-text">{{ affaire.libelle}}</span>
+				</div>
+			</div>
+			<!-- /.description-block -->
+		</div>
+		<!-- /.col -->
+		<div class="col-sm-4 col-12">
+			<div class="description-block border-right">
+				<h5 class="description-header">Client</h5>
+				<div class='d-flex flex-column'>
+					<span class="description-text">{{ affaire.tiers}}</span>
+					<span class="description-text">{{affaire.nom}}</span>
+				</div>
+			</div>
+			<!-- /.description-block -->
+		</div>
+		<!-- /.col -->
+		<div class="col-sm-4 col-12">
+			<div class="description-block border-right">
+				<h5 class="description-header">{{ piecesAffaires|length }}</h5>
+				<span class="description-text">Nbe Piéces</span>
+			</div>
+			<!-- /.description-block -->
+		</div>
+	</div>
+
+	<div class="col-12">
+		<div class="card card-orange">
+			<div class="card-header">
+				<h3 class="card-title text-white">Mettre à jour</h3>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-sm-4 col-12">
+						<div class="description-block border-right">
+							{{ form_start(form, { attr: { 'accept-charset' : 'utf-8' }}) }}
+
+							<strong class="pr-2">
+								<i class="fa fa-clock mr-1"></i>
+								Etat de l'affaire
+							</strong>
+							{% set color = 'success' %}
+							{% if affaire.etat == 'En attente' %}
+								{% set color = 'warning text-dark' %}
+								{% set icone = "fa fa-pause" %}
+							{% elseif affaire.etat == 'Nouvelle' %}
+								{% set color = 'info text-white' %}
+								{% set icone = "fa fa-inbox" %}
+							{% elseif affaire.etat == 'En cours' %}
+								{% set color = 'primary text-white' %}
+								{% set icone = "fa fa-spinner" %}
+							{% elseif affaire.etat == 'A finir' %}
+								{% set color = 'secondary text-white' %}
+								{% set icone = "fa fa-battery-half" %}
+							{% elseif affaire.etat == 'Termine' %}
+								{% set color = 'success text-white' %}
+								{% set icone = "fa fa-check" %}
+							{% elseif affaire.etat == 'Litige' %}
+								{% set color = 'danger text-white' %}
+								{% set icone = "fa fa-triangle-exclamation" %}
+							{% endif %}
+
+							<div class="btn-group">
+								<a class="btn btn-{{ color}}">
+									<i class="{{icone}} pr-2" aria-hidden="true"></i>
+									{{ affaire.etat }}
+								</a>
+								<div class="btn-group">
+									<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
+									<ul class="dropdown-menu">
+										<li>
+											<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
+										</li>
+										<li>
+											<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Litige' } ) }}'>Litige</a>
+										</li>
+										<li>
+											<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En attente' } ) }}'>En attente</a>
+										</li>
+										<li>
+											<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'A finir' } ) }}'>A finir</a>
+										</li>
+										<li>
+											<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En cours' } ) }}'>En cours</a>
+										</li>
+										<li>
+											<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Termine' } ) }}'>Termine</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<hr>
+							<div class='d-flex justify-content-around'>
+								<div>
+									<strong>
+										<i class="fa fa-clock mr-1"></i>
+										Durée des travaux
+									</strong>
+									<p>
+										<span class="text-muted">Actuellement :{{affaire.duration}}</span>
+									</p>
+								</div>
+								{{ form_widget(form.duration, { 'attr': {'value': affaire.duration} } ) }}
+							</div>
+							<hr>
+							<div class='d-flex justify-content-around'>
+								<div>
+									<strong>
+										<i class="fa fa-clock mr-1"></i>
+										Progression
+									</strong>
+								</div>
+								{{ form_widget(form.progress, { 'attr': {'value': affaire.progress} } ) }}
+								<strong>%</strong>
+							</div>
+						</div>
+						<!-- /.description-block -->
+					</div>
+					<!-- /.col -->
+					<div class="col-sm-4 col-12 text-center">
+						<div class="description-block border-right">
+							<strong>
+								<i class="fa fa-calendar mr-1"></i>
+								Date de chantier</strong>
+							<p class="text-muted">
+								Date début actuelle :
+								{% if affaire.start %}
+									{{ affaire.start|date("d-m-Y H:i") }}
+								{% else %}
+									Aucune date
+								{% endif %}
+							</p>
+							{{ form_widget(form.start) }}
+							{{ form_errors(form.start) }}
+							<p class="text-muted">
+								Date fin actuelle :
+								{% if affaire.end %}
+									{{ affaire.end|date("d-m-Y H:i") }}
+								{% else %}
+									Aucune date
+								{% endif %}
+							</p>
+							{{ form_widget(form.end) }}
+							{{ form_errors(form.end) }}
+
+						</div>
+						<!-- /.description-block -->
+					</div>
+					<!-- /.col -->
+					<!-- /.col -->
+					<div class="col-sm-4 col-12">
+						<div class="description-block">
+							<strong>
+								<i class="fa fa-paint-brush mr-1"></i>
+								Couleurs actuels de l'affaire</strong>
+							{% if affaire.backgroundColor and affaire.textColor %}
+								<div class="d-flex flex-row btn btn-xl" style="background-color: {{ affaire.backgroundColor }}; color: {{ affaire.textColor }}" ;>
+								{% else %}
+									<div class="d-flex flex-row btn btn-xl" style="background-color: '#000000'; color: '#FFFFFF'" ;>
+									{% endif %}
+									<div class="m-2">
+										<p>Couleur fond</p>
+										{{ form_widget(form.backgroundColor, { 'attr': {'value': affaire.backgroundColor} } ) }}
+									</div>
+									<div class="m-2">
+										<p>Couleur texte</p>
+										{{ form_widget(form.textColor, { 'attr': {'value': affaire.textColor} } ) }}
+									</div>
+								</div>
+							</div>
+							<!-- /.description-block -->
+							{{ form_widget(form.modifier) }}
+							{{ form_end(form) }}
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+
+		<!-- /.row -->
+		<div class="card">
+			<div class="card-header">
+				{% if app.request.attributes.get('_route')  == 'app_piece_affaire_ok' %}
+					<h2 class="card-title">Liste des Piéces Affaires traitées</h2>
+				{% elseif app.request.attributes.get('_route')  == 'app_piece_affaire_nok' %}
+					<h2 class="card-title">Liste des Piéces Affaires à traiter</h2>
+				{% endif %}
+
+
+				<div class="card-tools">
+					<a href='{{path('app_affaire_me_nok' ) }}' class="ml-2 text-light btn btn-xl btn-primary">
+						Retourner à la liste des affaires
+					</a>
+					{% if app.request.attributes.get('_route')  == 'app_piece_affaire_ok' %}
+						<a title='Affaires à traiter !' href="{{ path('app_piece_affaire_nok', {'affaire' : affaire.code}) }}" class="btn btn-warning text-dark">
+							<i class="fas fa-thumbs-down pr-2"></i>Voir les piéces affaires à traitrer</a>
+					{% else %}
+						<a title='Affaires traitées !' href="{{ path('app_piece_affaire_ok', {'affaire' : affaire.code}) }}" class="btn btn-success">
+							<i class="fas fa-thumbs-up pr-2"></i>Voir les piéces affaires traitées</a>
+					{% endif %}
+				</div>
+			</div>
+			<!-- /.card-header -->
+			<div class="card-body p-0">
+				<table class="table">
+					<thead>
+						<tr>
+							<th style="width: 10px">#</th>
+							<th>Adresse du Chantier</th>
+							<th>Type Piéce</th>
+							<th>Piece</th>
+							<th>OP</th>
+							<th>Mode Transport</th>
+							<th class="text-center">Etat Pieces</th>
+							<th class="text-center">Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% set i = 1 %}
+						{% for piecesAffaire in piecesAffaires %}
+							<tr>
+								<td>{{ i }}</td>
+								<td>{{ piecesAffaire.adresse}}</td>
+								{% if piecesAffaire.typePiece == 2 %}
+									{% set type = 'Cmd' %}
+								{% elseif piecesAffaire.typePiece == 1 %}
+									{% set type = 'Devis' %}
+								{% elseif piecesAffaire.typePiece == 3 %}
+									{% set type = 'Bl' %}
+								{% elseif piecesAffaire.typePiece == 4 %}
+									{% set type = 'Fact' %}
+								{% endif %}
+								<td>{{ type }}</td>
+								<td>{{ piecesAffaire.piece}}</td>
+								<td>C</td>
+								<td>NPDC</td>
+								<td class="text-center">
+									{% set color = 'success' %}
+									{% if piecesAffaire.etat == 'En attente' %}
+										{% set color = 'warning text-dark' %}
+										{% set icone = "fa fa-pause" %}
+									{% elseif piecesAffaire.etat == 'Nouvelle' %}
+										{% set color = 'info text-white' %}
+										{% set icone = "fa fa-inbox" %}
+									{% elseif piecesAffaire.etat == 'En cours' %}
+										{% set color = 'primary text-white' %}
+										{% set icone = "fa fa-spinner" %}
+									{% elseif piecesAffaire.etat == 'A finir' %}
+										{% set color = 'secondary text-white' %}
+										{% set icone = "fa fa-battery-half" %}
+									{% elseif piecesAffaire.etat == 'Termine' %}
+										{% set color = 'success text-white' %}
+										{% set icone = "fa fa-check" %}
+									{% elseif piecesAffaire.etat == 'Litige' %}
+										{% set color = 'danger text-white' %}
+										{% set icone = "fa fa-triangle-exclamation" %}
+									{% endif %}
+
+									<div class="btn-group">
+										<a class="btn btn-{{ color}}">
+											<i class="{{icone}}" aria-hidden="true"></i>
+										</a>
+										<div class="btn-group">
+											<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
+											<ul class="dropdown-menu">
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'Litige' } ) }}'>Litige</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'En attente' } ) }}'>En attente</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'A finir' } ) }}'>A finir</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'En cours' } ) }}'>En cours</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'Termine' } ) }}'>Termine</a>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</td>
+								<td class="text-center">
+									<a type="button" class="ml-2 text-light btn btn-info" href='{{path('app_detail_piece_affaire', {'affaire' : affaire.code, 'type' : piecesAffaire.typePiece , 'piece' : piecesAffaire.piece } ) }}'>
+										<i class="fas fa-eye"></i>
+									</a>
+
+								</td>
+							</tr>
+							{% set i = i + 1 %}
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{% endblock %}

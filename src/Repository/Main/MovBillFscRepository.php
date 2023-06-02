@@ -55,6 +55,20 @@ class MovBillFscRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // Extraction des factures de ventes sur une période
+    public function getExtractPeriod($start, $end): array
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT *
+        FROM movbillfsc v
+        WHERE v.dateFact BETWEEN '$start' AND '$end'
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     // /**
     //  * @return MovBillFsc[] Returns an array of MovBillFsc objects
     //  */

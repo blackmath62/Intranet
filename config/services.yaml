@@ -6,6 +6,7 @@
 parameters:
     images_directory: '%kernel.project_dir%/public/doc/Roby/Fsc'
     doc_lhermitte: '%kernel.project_dir%/public/doc/Lhermitte_freres'
+    doc_lhermitte_affaires: '%kernel.project_dir%/public/doc/Lhermitte_freres/Affaires'
     doc_roby: '%kernel.project_dir%/public/doc/Roby'
     doc: '%kernel.project_dir%/public/doc'
     doc_axis: '%kernel.project_dir%/public/doc/Axis'

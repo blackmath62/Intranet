@@ -1,0 +1,205 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<!-- Content Wrapper. Contains page content -->
+	<div>
+		<!-- Content Header (Page header) -->
+		<section class="content-header">
+			<div class="container-fluid">
+				<div class="row mb-2">
+					<div class="col-sm-6">
+						<h1>Extraction achat vente sur période
+						</h1>
+					</div>
+					{{ form_start(form) }}
+					<div class='d-flex'>
+						<div class="p-1 mt-2">
+							Veuillez selectionner la période :
+						</div>
+						<div class="p-1">
+							{{ form_widget(form.startDate) }}
+						</div>
+						<div class="p-1">
+							{{ form_widget(form.endDate) }}
+						</div>
+						<div class="p-1">
+							{{ form_row(form.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }}
+							) }}
+						</div>
+					</div>
+					{{ form_end(form) }}
+				</div>
+			</div>
+			<!-- /.container-fluid -->
+		</section>
+	</div>
+	<div class="row">
+		{% if achats %}
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">Achats</h3>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body p-0">
+						<table class="table table-sm">
+							<thead>
+								<tr>
+									<th style="width: 10px">#</th>
+									<th>Type FSC</th>
+									<th>Quantité</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% set a = 1 %}
+								{% for achat in achats %}
+									<tr>
+										<td>{{a}}</td>
+										<td>{{ achat.typeFsc }}</td>
+										<td>{{ achat.qte }}</td>
+									</tr>
+									{% set a = a + 1 %}
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+					<!-- /.card-body -->
+				</div>
+				<!-- /.card -->
+			</div>
+			<!-- /.col -->
+		{% endif %}
+		{% if ventes %}
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">Ventes</h3>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body p-0">
+						<table class="table table-sm">
+							<thead>
+								<tr>
+									<th style="width: 10px">#</th>
+									<th>Type FSC</th>
+									<th>Quantité</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% set v = 1 %}
+								{% for vente in ventes %}
+									<tr>
+										<td>{{v}}</td>
+										<td>{{ vente.typeFsc }}</td>
+										<td>{{ vente.qte }}</td>
+									</tr>
+									{% set v = v + 1 %}
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+					<!-- /.card-body -->
+				</div>
+			</div>
+			<!-- /.card -->
+		{% endif %}
+	</div>
+
+	<div class="row">
+		{% if detailAchats %}
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">Détail Achats</h3>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body">
+						<table id="example1" class="table table-sm">
+							<thead>
+								<tr>
+									<th style="width: 10px">#</th>
+									<th>Type FSC</th>
+									<th>Ref</th>
+									<th>Sref1</th>
+									<th>Sref2</th>
+									<th>Désignation</th>
+									<th>U.v</th>
+									<th>Quantité</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% set a = 1 %}
+								{% for detailAchat in detailAchats %}
+									<tr>
+										<td>{{a}}</td>
+										<td>{{ detailAchat.typeFsc }}</td>
+										<td>{{ detailAchat.ref }}</td>
+										<td>{{ detailAchat.sref1 }}</td>
+										<td>{{ detailAchat.sref2 }}</td>
+										<td>{{ detailAchat.designation }}</td>
+										<td>{{ detailAchat.uv }}</td>
+										<td>{{ detailAchat.qte }}</td>
+									</tr>
+									{% set a = a + 1 %}
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+					<!-- /.card-body -->
+				</div>
+				<!-- /.card -->
+			</div>
+			<!-- /.col -->
+		{% endif %}
+		{% if ventes %}
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">Détail Ventes</h3>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body">
+						<table id="example3" class="table table-sm">
+							<thead>
+								<tr>
+									<th style="width: 10px">#</th>
+									<th>Type FSC</th>
+									<th>Ref</th>
+									<th>Sref1</th>
+									<th>Sref2</th>
+									<th>Désignation</th>
+									<th>U.v</th>
+									<th>Quantité</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% set v = 1 %}
+								{% for detailVente in detailVentes %}
+									<tr>
+										<td>{{v}}</td>
+										<td>{{ detailVente.typeFsc }}</td>
+										<td>{{ detailVente.ref }}</td>
+										<td>{{ detailVente.sref1 }}</td>
+										<td>{{ detailVente.sref2 }}</td>
+										<td>{{ detailVente.designation }}</td>
+										<td>{{ detailVente.uv }}</td>
+										<td>{{ detailVente.qte }}</td>
+									</tr>
+									{% set v = v + 1 %}
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+					<!-- /.card-body -->
+				</div>
+			</div>
+			<!-- /.card -->
+		{% endif %}
+	</div>
+
+
+{% endblock %}

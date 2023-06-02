@@ -1,71 +1,68 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}
+	{{ title }}
+{% endblock %}
 {% block body %}
-<div class="card collapsed-card card-info">
-    <div class="card-header">
-        <h3 class="card-title"><i class="icon fas fa-info-circle"></i> Info</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-        </div>
-    </div>
-    <!-- /.card-header -->
-    <div class="card-body">
-        
-    </div>
-</div>
+	<div class="card collapsed-card card-info">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-info-circle"></i>
+				Info</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body"></div>
+	</div>
 
-{% if articles %}
-<div class='row'>
-<!-- /.col -->
-<div class="col-md-12">
-<div class="card card-dark">
-    <div class="card-header">
-    <h3 class="card-title">Liste des Matiéres dangeureuses présentent dans l'entrepôt</h3>
-    </div>
-    <!-- /.card-header -->
-    <div class="card-body">
-    <table id="example1" class="table table-striped">
-        <thead>
-        <tr>
-            <th class='text-center'>Référence</th>
-            <th class='text-center'>Sref1</th>
-            <th class='text-center'>Sref2</th>
-            <th class='text-left'>Désignation</th>
-            <th class='text-center'>Uv</th>
-            <th class='text-center'>Fournisseur</th>
-            <th class='text-center'>Stock</th>
-            <th class='text-left' style="width: 80px">Note</th>
-            <th class='text-center'>FT</th>
-            <th class='text-center'>FDS</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for article in articles %}
-            <tr>
-                <td class='text-center'>{{ article.ref }}</td>
-                <td class='text-center'>{{ article.sref1 }}</td>
-                <td class='text-center'>{{ article.sref2 }}</td>
-                <td class='text-left'>{{ article.designation }}</td>
-                <td class='text-center'>{{ article.uv }}</td>
-                <td class='text-center'>{{ article.fournisseur }}</td>
-                <td class='text-center'>{{ article.stock }}</td>
-                <td class='text-center' style="width: 80px">{{ article.blob }}</td>
-                <td class='text-center'></td>
-                <td class='text-center'></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    </div>
-    <!-- /.card-body -->
-</div>
-<!-- /.card -->
-</div>
-<!-- /.col -->
-</div>
+	{% if articles %}
+		<div
+			class='row'>
+			<!-- /.col -->
+			<div class="col-md-12">
+				<div class="card card-dark">
+					<div class="card-header">
+						<h3 class="card-title">Liste des Matiéres dangeureuses présentent dans l'entrepôt</h3>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body">
+						<table id="example1" class="table table-striped">
+							<thead>
+								<tr>
+									<th class='text-center'>Référence</th>
+									<th class='text-center'>Sref1</th>
+									<th class='text-center'>Sref2</th>
+									<th class='text-left'>Désignation</th>
+									<th class='text-center'>Uv</th>
+									<th class='text-center'>Fournisseur</th>
+									<th class='text-center'>Stock</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for article in articles %}
+									<tr>
+										<td class='text-center'>{{ article.ref }}</td>
+										<td class='text-center'>{{ article.sref1 }}</td>
+										<td class='text-center'>{{ article.sref2 }}</td>
+										<td class='text-left'>{{ article.designation }}</td>
+										<td class='text-center'>{{ article.uv }}</td>
+										<td class='text-center'>{{ article.fournisseur }}</td>
+										<td class='text-center'>{{ article.stock }}</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+					<!-- /.card-body -->
+				</div>
+				<!-- /.card -->
+			</div>
+			<!-- /.col -->
+		</div>
 
-{% endif %}
+	{% endif %}
 
 {% endblock %}
-
-

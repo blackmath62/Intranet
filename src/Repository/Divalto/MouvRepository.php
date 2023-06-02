@@ -131,7 +131,7 @@ class MouvRepository extends ServiceEntityRepository
         return $resultSet->fetchAssociative();
     }
 
-    // Mouvements sur la piéce
+    // Mouvements sur la piéce client
     public function getLastMouvCli($dos)
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -143,6 +143,40 @@ class MouvRepository extends ServiceEntityRepository
         WHERE CLI.DOS IN ($dos) AND CLI.HSDT IS NULL)reponse
         LEFT JOIN MOUV ON tiers = MOUV.TIERS AND dos = MOUV.DOS
         GROUP BY commercial,tiers, nom
+        ORDER BY tiers
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // Liste des produits phytos ouverts et leurs stocks dans Divalto
+    public function getListePhytos()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ref, designation, uv, amm, SUM(stock) AS stock FROM(
+            SELECT a.REF AS ref, a.DES AS designation, a.VENUN AS uv, a.UP_CODEAMM AS amm, s.QTETJSENSTOCK AS stock
+            FROM ART a
+            LEFT JOIN MVTL_STOCK_V s ON a.REF = s.REFERENCE AND a.DOS = s.DOSSIER
+            WHERE a.REF LIKE 'PPP%' AND a.DOS = 1 AND a.HSDT IS NULL)reponse
+            GROUP BY ref, designation, uv, amm
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // Mouvements sur la piéce Fournisseur
+    public function getLastMouvFou($dos)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT tiers AS tiers, nom AS nom, MAX(MOUV.CDDT) AS dernCmd, MAX(MOUV.BLDT) AS dernBl, MAX(MOUV.FADT) AS dernFact
+        FROM(
+        SELECT FOU.DOS AS dos, RTRIM(LTRIM(FOU.TIERS)) AS tiers, RTRIM(LTRIM(FOU.NOM)) AS nom
+        FROM FOU
+        WHERE FOU.DOS IN ($dos) AND FOU.HSDT IS NULL)reponse
+        LEFT JOIN MOUV ON tiers = MOUV.TIERS AND dos = MOUV.DOS
+        GROUP BY tiers, nom
         ORDER BY tiers
         ";
         $stmt = $conn->prepare($sql);
@@ -422,6 +456,50 @@ class MouvRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+// Extraction des factures de ventes ou d'achat sur une période résumé par type FSC
+    public function getExtractPeriodByTypeFsc($start, $end, $tiers, $type): array
+    {
+        if ($tiers == 'C') {
+            $opPositive = "'C','CD'";
+            $opNegative = "'D','DD'";
+        } elseif ($tiers == 'F') {
+            $opPositive = "'F','FD'";
+            $opNegative = "'G','GD'";
+        }
+
+        if ($type == 'resume') {
+            $selectType = " typeFsc,SUM(qte) AS qte";
+            $groupType = " typeFsc";
+        } elseif ($type == 'detail') {
+            $selectType = " typeFsc, ref,sref1,sref2,designation,uv, SUM(qte) AS qte";
+            $groupType = " typeFsc, ref,sref1,sref2,designation,uv";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT $selectType
+                    FROM(
+                        SELECT m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, m.VENUN AS uv, m.BLNO AS bl, m.BLDT AS dateBl, BLQTE AS qteBl, m.FANO AS facture, m.FADT AS dateFact,
+                        CASE
+                        WHEN m.OP IN ($opPositive) THEN m.FAQTE
+                        WHEN m.OP IN ($opNegative) THEN -1 * m.FAQTE
+                        END AS qte,
+                        CASE
+                        WHEN m.DES LIKE '%FSC 100%' THEN 'fsc 100 %'
+                        WHEN m.DES LIKE '%FSC MIX CREDIT%' THEN 'fsc mix crédit'
+                        WHEN m.DES LIKE '%FSC MIX%' AND m.DES NOT LIKE '%MIX%' THEN 'fsc mix'
+                        END AS typeFsc
+                        FROM MOUV m
+                        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+                        WHERE m.DOS = 3 AND m.TICOD = '$tiers'
+                        AND m.BLDT BETWEEN '$start' AND '$end' AND m.REF LIKE '%FSC%'
+                    )reponse
+                GROUP BY $groupType
+                ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
 // ramener les BLs Directs
     public function getListBlDirect(): array
     {
@@ -436,6 +514,67 @@ class MouvRepository extends ServiceEntityRepository
         WHERE MOUV.BLCE4 = '1' AND MOUV.OP IN ('CD', 'DD', 'FD', 'GD') AND MOUV.BLDT > '2022-05-05')reponse
         INNER JOIN MUSER ON Utilisateur = MUSER.USERX
         GROUP BY tiers, numeroBl,dateBl,Utilisateur,MUSER.EMAIL
+    ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // Liste des Affaires NOUVELLE VERSION !!!
+    public function getAffaires(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT p.AFFAIRE AS affaire, p.LIB80 AS libelle, p.TIERS AS tiers, c.NOM AS nom
+        FROM PRJAP p
+        INNER JOIN CLI c ON p.DOS = c.DOS AND p.TIERS = c.TIERS
+        WHERE p.DOS = 1
+    ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // Liste des Pieces liées aux Affaires NOUVELLE VERSION !!!
+    public function getPiecesAffaires($affaire): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT e.PROJET AS affaire, e.ENT_ID AS id,e.PICOD AS typeP, e.PINO AS piece, e.OP AS op,e.MODEEXP AS transport,
+        CASE
+            WHEN e.ADRCOD_0003 = '' THEN CONCAT(LTRIM(RTRIM(c.RUE)), ', ', LTRIM(RTRIM(c.CPOSTAL)), ' ', LTRIM(RTRIM(c.VIL)) )
+            ELSE CONCAT(LTRIM(RTRIM(T1.NOM)), ', ', LTRIM(RTRIM(T1.RUE)), ', ', LTRIM(RTRIM(T1.CPOSTAL)), ' ', LTRIM(RTRIM(T1.VIL)) )
+        END AS adresse
+        FROM ENT e
+        INNER JOIN CLI c ON c.DOS = e.DOS AND c.TIERS = e.TIERS
+        LEFT JOIN T1 ON e.TIERS = T1.TIERS AND e.DOS = T1.DOS AND  e.ADRCOD_0003 = T1.ADRCOD
+        WHERE e.DOS = 1 AND e.PROJET = '$affaire' AND e.CE4 = '1' AND e.PICOD IN ('2','3','4')
+    ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // Detail des Pieces liées aux Affaires NOUVELLE VERSION !!!
+    public function getDetailPiecesAffaires($type, $piece): array
+    {
+        if ($type == 2) {
+            $qte = 'm.CDQTE AS qte';
+            $num = 'm.CDNO =' . $piece;
+        } elseif ($type == 1) {
+            $qte = 'm.DVQTE AS qte';
+            $num = 'm.DVNO =' . $piece;
+        } elseif ($type == 3) {
+            $qte = 'm.BLQTE AS qte';
+            $num = 'm.BLNO =' . $piece;
+        } elseif ($type == 4) {
+            $qte = 'm.FAQTE AS qte';
+            $num = 'm.FANO =' . $piece;
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, m.DES AS designation, m.VENUN AS uv,m.OP AS op, $qte
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF AND a.SREF1 = m.SREF1 AND m.SREF2 = a.SREF2
+        WHERE m.TICOD = 'C' AND $num
     ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
@@ -474,6 +613,7 @@ class MouvRepository extends ServiceEntityRepository
     INNER JOIN ART ON MOUV.DOS = ART.DOS AND MOUV.REF = ART.REF
 	INNER JOIN MUSER ON MOUV.DOS = MUSER.DOS AND MOUV.USERCR = MUSER.USERX
     WHERE MOUV.DOS = 1 AND MOUV.TICOD = 'C' AND ART.FAM_0002 IN ('ME','MO') AND MOUV.PICOD IN (2,3,4) AND MOUV.TIERS <> ('C0160500')
+    AND MUSER.MUSER_ID IN (4, 13, 16, 61)
     GROUP BY MOUV.DOS, MOUV.TIERS, CLI.NOM, MOUV.PICOD, MOUV.CDDT, MOUV.CDNO, MOUV.BLDT, MOUV.BLNO, MOUV.FADT, MOUV.FANO, CLI.RUE, CLI.CPOSTAL, CLI.VIL)reponse
     INNER JOIN ENT ON ENT.DOS = dos AND ENT.TIERS = tiers AND ENT.PICOD = typePiece AND ENT.PINO = numPiece AND ENT.TICOD = 'C'
     LEFT JOIN T1 ON tiers = T1.TIERS AND dos = T1.DOS AND  ENT.ADRCOD_0003 = T1.ADRCOD

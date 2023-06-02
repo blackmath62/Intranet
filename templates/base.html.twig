@@ -211,7 +211,7 @@
 							<li class="nav-item">
 								<a href="{{path('app_dernieres_pieces_ par_client')}}" class="nav-link">
 									<i class="nav-icon fab fa-audible"></i>
-									<p>Derniéres intéractions client</p>
+									<p>Derniéres intéractions Tiers</p>
 								</a>
 							</li>
 							{% if is_granted('ROLE_INFORMATIQUE') %}
@@ -234,6 +234,12 @@
 											<a href="{{ path('app_audit_afnor')}}" class="nav-link">
 												<i class="nav-icon fas fa-certificate text-warning"></i>
 												<p>Audit AFNOR</p>
+											</a>
+										</li>
+										<li class="nav-item">
+											<a href="{{ path('app_matiere_dangeureuse')}}" class="nav-link">
+												<i class="nav-icon fas fa-skull-crossbones text-danger"></i>
+												<p>D9 - Matiéres Dangeureuses</p>
 											</a>
 										</li>
 									</ul>
@@ -512,6 +518,14 @@
 										</p>
 									</a>
 								</li>
+								<li class="nav-item">
+									<a href="{{path('app_affaire_me_nok')}}" class="nav-link">
+										<i class="nav-icon fa fa-car"></i>
+										<p>
+											Prototype Affaire
+										</p>
+									</a>
+								</li>
 
 								{% if (is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL')) and app.user.commercial %}
 									<li class="nav-item">
@@ -637,6 +651,14 @@
 											<a href="{{path('app_movement_fsc_view_list')}}" class="nav-link">
 												<i class="nav-icon fab fa-product-hunt text-success"></i>
 												<p>Mouvements articles FSC</p>
+											</a>
+										</li>
+									</ul>
+									<ul class="nav nav-treeview">
+										<li class="nav-item">
+											<a href="{{path('app_fsc_extract_periode')}}" class="nav-link">
+												<i class="nav-icon fas fa-download text-warning"></i>
+												<p>Extraction Période</p>
 											</a>
 										</li>
 									</ul>
