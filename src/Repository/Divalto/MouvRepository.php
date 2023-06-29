@@ -524,10 +524,10 @@ class MouvRepository extends ServiceEntityRepository
     public function getAffaires(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT p.AFFAIRE AS affaire, p.LIB80 AS libelle, p.TIERS AS tiers, c.NOM AS nom
-        FROM PRJAP p
-        INNER JOIN CLI c ON p.DOS = c.DOS AND p.TIERS = c.TIERS
-        WHERE p.DOS = 1
+        $sql = "SELECT LTRIM(RTRIM(p.AFFAIRE)) AS affaire, LTRIM(RTRIM(p.LIB80)) AS libelle, LTRIM(RTRIM(p.TIERS)) AS tiers, LTRIM(RTRIM(c.NOM)) AS nom, LTRIM(RTRIM(p.USERCRDH)) AS dateCreation
+       FROM PRJAP p
+       INNER JOIN CLI c ON p.DOS = c.DOS AND p.TIERS = c.TIERS
+       WHERE p.DOS = 1
     ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
@@ -538,7 +538,7 @@ class MouvRepository extends ServiceEntityRepository
     public function getPiecesAffaires($affaire): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT e.PROJET AS affaire, e.ENT_ID AS id,e.PICOD AS typeP, e.PINO AS piece, e.OP AS op,e.MODEEXP AS transport,
+        $sql = "SELECT LTRIM(RTRIM(e.PROJET)) AS affaire, LTRIM(RTRIM(e.ENT_ID)) AS id, LTRIM(RTRIM(e.PICOD)) AS typeP, LTRIM(RTRIM(e.PINO)) AS piece, LTRIM(RTRIM(e.OP)) AS op, LTRIM(RTRIM(e.BLMOD)) AS transport,
         CASE
             WHEN e.ADRCOD_0003 = '' THEN CONCAT(LTRIM(RTRIM(c.RUE)), ', ', LTRIM(RTRIM(c.CPOSTAL)), ' ', LTRIM(RTRIM(c.VIL)) )
             ELSE CONCAT(LTRIM(RTRIM(T1.NOM)), ', ', LTRIM(RTRIM(T1.RUE)), ', ', LTRIM(RTRIM(T1.CPOSTAL)), ' ', LTRIM(RTRIM(T1.VIL)) )
@@ -554,27 +554,43 @@ class MouvRepository extends ServiceEntityRepository
     }
 
     // Detail des Pieces liées aux Affaires NOUVELLE VERSION !!!
-    public function getDetailPiecesAffaires($type, $piece): array
+    public function getDetailPiecesAffaires($id): array
     {
-        if ($type == 2) {
-            $qte = 'm.CDQTE AS qte';
-            $num = 'm.CDNO =' . $piece;
-        } elseif ($type == 1) {
-            $qte = 'm.DVQTE AS qte';
-            $num = 'm.DVNO =' . $piece;
-        } elseif ($type == 3) {
-            $qte = 'm.BLQTE AS qte';
-            $num = 'm.BLNO =' . $piece;
-        } elseif ($type == 4) {
-            $qte = 'm.FAQTE AS qte';
-            $num = 'm.FANO =' . $piece;
-        }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, m.DES AS designation, m.VENUN AS uv,m.OP AS op, $qte
-        FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF AND a.SREF1 = m.SREF1 AND m.SREF2 = a.SREF2
-        WHERE m.TICOD = 'C' AND $num
+        $sql = "SELECT e.ENT_ID AS idEnt, dos, idMouv,picod, ticod,piece, tiers, ref, sref1, sref2, designation, uv, op, qte, cmdFou, stock, ean, fermeture
+        FROM(
+        SELECT dos, idMouv,ticod, picod,piece,tiers, ref, sref1, sref2, designation, uv, op, qte, cmdFou, stock,
+                CASE
+                WHEN codeSref = 1 THEN LTRIM(RTRIM(artEan))
+                WHEN codeSref = 2 THEN LTRIM(RTRIM(sr.EAN))
+                END AS ean,
+                CASE
+                WHEN codeSref = 1 AND ferme <> '' THEN LTRIM(RTRIM(ferme))
+                WHEN codeSref = 2 AND sr.CONF = 'Usrd' THEN LTRIM(RTRIM(sr.USERMODH))
+                ELSE 'Ouvert'
+                END AS fermeture
+                FROM(
+                SELECT  m.MOUV_ID AS idMouv, m.DOS as dos, m.TIERS AS tiers, m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, m.DES AS designation, m.VENUN AS uv,m.OP AS op, a.CDEFOQTE AS cmdFou,
+                SUM(s.QTETJSENSTOCK) AS stock, a.SREFCOD AS codeSref, a.EAN as artEan, a.HSDT AS ferme, m.TICOD AS ticod, m.PICOD AS picod,
+                CASE
+                WHEN m.PICOD = 2 THEN m.CDQTE
+                WHEN m.PICOD = 3 THEN m.BLQTE
+                WHEN m.PICOD = 4 THEN m.FAQTE
+                END AS qte,
+                CASE
+                WHEN m.PICOD = 2 THEN m.CDNO
+                WHEN m.PICOD = 3 THEN m.BLNO
+                WHEN m.PICOD = 4 THEN m.FANO
+                END AS piece
+                FROM MOUV m
+                INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF AND a.SREF1 = m.SREF1 AND m.SREF2 = a.SREF2
+                LEFT JOIN MVTL_STOCK_V s ON a.DOS = s.DOSSIER AND m.REF = s.REFERENCE AND m.SREF1 = s.SREFERENCE1 AND m.SREF2 = s.SREFERENCE2
+                WHERE m.TICOD = 'C'
+                GROUP BY m.MOUV_ID, m.MOUV_ID , m.TIERS, m.PICOD, m.DOS, m.REF, m.SREF1, m.SREF2, m.DES, m.VENUN, m.OP,m.CDQTE,m.BLQTE, m.FAQTE,m.CDNO,m.BLNO, m.FANO, a.CDEFOQTE, a.SREFCOD, a.EAN, a.HSDT, m.TICOD, m.PICOD)reponse
+                LEFT JOIN SART sr ON dos = sr.DOS AND ref = sr.REF)rep
+                INNER JOIN ENT e ON e.DOS = dos AND e.TICOD = ticod AND e.TIERS = tiers AND e.PICOD = picod AND e.PINO = piece
+                WHERE e.ENT_ID IN ($id)
     ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

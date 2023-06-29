@@ -54,10 +54,12 @@ class AffairesRepository extends ServiceEntityRepository
     public function findNotFinish()
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT a.id AS id, a.code AS code, a.libelle AS libelle, a.tiers AS tiers, a.nom AS nom, a.start AS start, a.end AS end, a.progress AS progress, a.duration AS duration, a.etat AS etat, a.backgroundColor AS backgroundColor, a.textColor AS textColor, COUNT(p.entId) AS nbe
+        $sql = "SELECT a.id AS id, a.code AS code, a.libelle AS libelle, a.tiers AS tiers, a.nom AS nom, a.start AS start,
+         a.end AS end, a.progress AS progress, a.duration AS duration, a.etat AS etat, a.backgroundColor AS backgroundColor,
+          a.textColor AS textColor, COUNT(p.entId) AS nbe
         FROM affairepiece p
         INNER JOIN affaires a ON a.code = p.affaire
-        WHERE p.etat <> 'Termine' AND a.etat <> 'Termine'
+        WHERE a.etat <> 'Termine' AND p.etat <> 'Termine'
         GROUP BY affaire
         ";
         $stmt = $conn->prepare($sql);
@@ -68,7 +70,11 @@ class AffairesRepository extends ServiceEntityRepository
     public function findFinish()
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT a.id AS id, a.code AS code, a.libelle AS libelle, a.tiers AS tiers, a.nom AS nom, a.start AS start, a.end AS end, a.progress AS progress, a.duration AS duration, a.etat AS etat, a.backgroundColor AS backgroundColor, a.textColor AS textColor, COUNT(p.entId) AS nbe
+        $sql = "SELECT a.id AS id, a.code AS code, a.libelle AS libelle,
+        a.tiers AS tiers, a.nom AS nom, a.start AS start, a.end AS end,
+        a.progress AS progress, a.duration AS duration, a.etat AS etat,
+        a.backgroundColor AS backgroundColor, a.textColor AS textColor,
+        COUNT(p.entId) AS nbe
         FROM affairepiece p
         INNER JOIN affaires a ON a.code = p.affaire
         WHERE a.etat IN ('Termine')

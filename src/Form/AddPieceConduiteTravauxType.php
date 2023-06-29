@@ -2,13 +2,12 @@
 
 namespace App\Form;
 
-use Symfony\Component\Form\AbstractType;
 use App\Entity\Main\ConduiteTravauxAddPiece;
 use Doctrine\ORM\EntityRepository;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class AddPieceConduiteTravauxType extends AbstractType
 {
@@ -18,9 +17,9 @@ class AddPieceConduiteTravauxType extends AbstractType
             ->add('numPieceCmd', EntityType::class, [
                 'class' => ConduiteTravauxAddPiece::class,
                 'choice_label' => 'numPiece',
-                'query_builder' => function(EntityRepository $er){
+                'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('ct')
-                    ->where('ct.type = 2');
+                        ->where('ct.type = 2');
                 },
                 'choice_name' => 'id',
                 'multiple' => true,
@@ -35,9 +34,9 @@ class AddPieceConduiteTravauxType extends AbstractType
             ->add('numPieceBL', EntityType::class, [
                 'class' => ConduiteTravauxAddPiece::class,
                 'choice_label' => 'numPiece',
-                'query_builder' => function(EntityRepository $er){
+                'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('ct')
-                    ->where('ct.type = 3');
+                        ->where('ct.type = 3');
                 },
                 'choice_name' => 'id',
                 'multiple' => true,
@@ -46,16 +45,16 @@ class AddPieceConduiteTravauxType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'class' => 'select-Piece-BL form-control',
-                    'data-dropdown-css-class' => "select2-purple"
+                    'data-dropdown-css-class' => "select2-purple",
                 ],
                 'label' => false,
             ])
             ->add('numPieceFacture', EntityType::class, [
                 'class' => ConduiteTravauxAddPiece::class,
                 'choice_label' => 'numPiece',
-                'query_builder' => function(EntityRepository $er){
+                'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('ct')
-                    ->where('ct.type = 4');
+                        ->where('ct.type = 4');
                 },
                 'choice_name' => 'id',
                 'multiple' => true,
@@ -67,7 +66,7 @@ class AddPieceConduiteTravauxType extends AbstractType
                 ],
                 'label' => false,
             ])
-            
+
         ;
     }
 

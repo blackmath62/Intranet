@@ -47,6 +47,11 @@ class OthersDocuments
      */
     private $identifiant;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $Parametre;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -108,6 +113,18 @@ class OthersDocuments
     public function setIdentifiant(int $identifiant): self
     {
         $this->identifiant = $identifiant;
+
+        return $this;
+    }
+
+    public function getParametre(): ?string
+    {
+        return $this->Parametre;
+    }
+
+    public function setParametre(?string $Parametre): self
+    {
+        $this->Parametre = $Parametre;
 
         return $this;
     }

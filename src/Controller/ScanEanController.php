@@ -473,4 +473,57 @@ class ScanEanController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    /**
+     * @Route("/impression/imprimante", name="app_imprimante_ajax")
+     */
+    public function checkPrinter($dos = null, $ean = null, ArtRepository $repo, Request $request): JsonResponse
+    {
+        $result = ['success' => false, 'response' => 'Erreur exécution...'];
+
+        $workingFolder = 'C:\wamp64\www\Intranet\bin\\';
+
+        $fileContent = file_get_contents($workingFolder . 'file_attente.txt');
+        $decodedContent = mb_convert_encoding($fileContent, 'UTF-8', 'UTF-16LE');
+
+        $result['success'] = true;
+
+        $tableau = [];
+        $cut = explode(PHP_EOL, $decodedContent);
+
+        $n_line = 0;
+        foreach ($cut as $key => $line) {
+            if (trim($line) !== '' & strlen(trim($line)) > 3) {
+                $n_line++;
+                if (1 === $n_line) {
+                    $rows = explode('    ', $line);
+                    foreach ($rows as $row => $cell) {
+                        $tableau[$key][$row] = trim($cell);
+                    }
+                } else {
+                    if (2 !== $n_line) {
+                        $col[1] = explode(' ', $line)[0];
+                        $col[2] = explode(' ', $line)[1];
+                        $col[3] = explode('        ', $line)[2];
+                        $col[4] = explode('     ', explode('... ', $line)[1])[0];
+                        $col[5] = explode('  ', explode('      ', $line)[2])[0];
+                        $col[6] = explode('  ', explode('      ', $line)[2])[1];
+                        $col[7] = '';
+                        $col[8] = explode('  ', explode('      ', $line)[2])[2];
+                        $tableau[$key] = $col;
+                    }
+                }
+            }
+        }
+
+        $response = $this->render('scan_ean/printQueue.html.twig', [
+            'content' => $tableau,
+        ]);
+
+        $result['response'] = $response->getContent();
+        // En cas de bug tableau faire :
+        // $result['response'] = $decodedContent;
+
+        return new JsonResponse($result, 200);
+    }
 }

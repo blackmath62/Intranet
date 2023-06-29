@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block body %}
+	<div class="card collapsed-card card-info">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-info-circle"></i>
+				Info</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body"></div>
+	</div>
+
+	{% if clients %}
+		<div
+			class='row'>
+			<!-- /.col -->
+			<div class="col-md-12">
+				<div class="card card-dark">
+					<div class="card-header">
+						<h3 class="card-title">Coupé Mise à jour Station Chargeur Via Export CSV envoyer à
+							<a href='mailto:sandrine.pierre@coupe.fr'>sandrine.pierre@coupe.fr</a>
+						</h3>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body">
+						<table id="example4" class="table table-striped">
+							<thead>
+								<tr>
+									<th class='text-center'>CdDestinataire</th>
+									<th class='text-center'>CdInseePays</th>
+									<th class='text-center'>Nom</th>
+									<th class='text-left'>MotDirecteur</th>
+									<th class='text-left'>Adresse1</th>
+									<th class='text-center'>Adresse2</th>
+									<th class='text-center'>CdPostal</th>
+									<th class='text-center'>Ville</th>
+									<th class='text-center'>Telephone</th>
+									<th class='text-center'>InstructionLiv</th>
+									<th class='text-center'>Email</th>
+									<th class='text-center'>sService</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for client in clients %}
+									<tr>
+										<td class='text-center'>{{ client.CdDestinataire }}</td>
+										<td class='text-center'>{{ client.CdInseePays }}</td>
+										<td class='text-center'>{{ client.Nom }}</td>
+										<td class='text-center'>{{ client.MotDirecteur }}</td>
+										<td class='text-left'>{{ client.Adresse1 }}</td>
+										<td class='text-center'>{{ client.Adresse2 }}</td>
+										<td class='text-center'>{{ client.CdPostal }}</td>
+										<td class='text-center'>{{ client.Ville }}</td>
+										<td class='text-center'>{{ client.Telephone }}</td>
+										<td class='text-center'>{{ client.InstructionLiv|raw }}</td>
+										<td class='text-center'>{{ client.Email }}</td>
+										<td class='text-center'>{{ client.sService }}</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+					<!-- /.card-body -->
+				</div>
+				<!-- /.card -->
+			</div>
+			<!-- /.col -->
+		</div>
+
+	{% endif %}
+
+{% endblock %}

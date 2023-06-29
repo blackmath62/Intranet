@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}
+	{{ title }}
+{% endblock %}
 
 {% block body %}
 
@@ -71,9 +73,7 @@
 				</div>
 				<!-- /.card-body -->
 				<div class="card-footer">
-
 					{{ form_start(ChatsForm)}}
-
 					<div class="input-group">
 						{{ form_row(ChatsForm.content, {'attr' : {'type' : "text", 'name' : "message", 'placeholder' : "Votre message ..." ,'class' : "form-group"}})}}
 						<span class="input-group-append">
@@ -81,8 +81,8 @@
 						</span>
 					</div>
 					<!-- /.card-footer-->
+					{{ form_end(ChatsForm)}}
 				</div>
-				{{ form_end(ChatsForm)}}
 				<!--/.direct-chat -->
 			</div>
 			<!-- /.card-footer-->
@@ -91,7 +91,8 @@
 
 		<!-- /.col -->
 
-		<div class="col-md-3">
+		<div
+			class="col-md-3">
 			<!-- USERS LIST -->
 			<div class="card">
 				<div class="card-header">
@@ -100,11 +101,11 @@
 				<!-- /.card-header -->
 				<div class="card-body p-0">
 					<ul class="users-list clearfix">
-						{% for user in users %}	
+						{% for user in users %}
 							<li>
-							<!--object-fit: cover; -->
+								<!--object-fit: cover; -->
 								<img src="{{ asset(asset('img/profile/' ~ user.img))}}" class="img-users-circle">
-								<a class="users-list-name" >{{ user.pseudo }}</a>
+								<a class="users-list-name">{{ user.pseudo }}</a>
 							</li>
 						{% endfor %}
 					</ul>

@@ -98,7 +98,7 @@ class PdfController extends AbstractController
         $file = 'C:/wamp64/www/Intranet/bin/' . $ean . '.pdf';
         @unlink($file);
         $pdf->generateFromHtml($htmlPdf, $file);
-        //$this->bat();
+        //$this->runPowerShell();
 
         $this->addFlash('message', 'Ajouté à la file d\'attente d\'impression !');
         return $this->redirectToRoute('app_scan_emplacement_print');
@@ -142,29 +142,28 @@ class PdfController extends AbstractController
             $pdf->setOption('zoom', false);
             $file = 'C:/wamp64/www/Intranet/bin/' . $empl['empl'] . '.pdf';
             @unlink($file);
-
             $pdf->generateFromHtml($htmlPdf, $file);
             //$file = 'C:\wamp64\www\Intranet\bin\ean.jpg';
             //$img->generateFromHtml($htmlPdf, $file);
-            //$this->bat();
         }
+        //$this->runPowerShell();
         $this->addFlash('message', 'Ajouté à la file d\'attente d\'impression !');
         return $this->redirectToRoute('app_print_empl');
 
     }
 
     /**
-     * @Route("/bat", name="app_bat")
+     * @Route("/power/shell", name="app_power_shell")
      */
-    public function bat(): Response
+    public function runPowerShell(): Response
     {
 
-        $route = 'C:\wamp64\www\Intranet\bin\print.ps1';
+        $route = 'C:\wamp64\www\Intranet\bin\printEtiquette.ps1';
         //$route = 'C:\wamp64\www\Intranet\bin\defautPrint.ps1';
         $process = new Process(['powershell', $route]);
         $process->mustRun();
         // executes after the command finishes
-        dd($process->getOutput());
+        //dd($process->getOutput());
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }

@@ -39,6 +39,7 @@
 									<th class='text-center'>Uv</th>
 									<th class='text-center'>Fournisseur</th>
 									<th class='text-center'>Stock</th>
+									<th class='text-center'>UN</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -51,6 +52,7 @@
 										<td class='text-center'>{{ article.uv }}</td>
 										<td class='text-center'>{{ article.fournisseur }}</td>
 										<td class='text-center'>{{ article.stock }}</td>
+										<td class='text-center'>{{ article.blob|raw }}</td>
 									</tr>
 								{% endfor %}
 							</tbody>

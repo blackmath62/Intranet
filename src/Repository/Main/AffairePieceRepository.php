@@ -62,19 +62,20 @@ class AffairePieceRepository extends ServiceEntityRepository
     // /**
     //  * @return AffairePiece[] Returns an array of AffairePiece objects
     //  */
-    /*
-    public function findByExampleField($value)
+
+    public function findPieceNotFinish($affaire)
     {
-    return $this->createQueryBuilder('a')
-    ->andWhere('a.exampleField = :val')
-    ->setParameter('val', $value)
-    ->orderBy('a.id', 'ASC')
-    ->setMaxResults(10)
-    ->getQuery()
-    ->getResult()
-    ;
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.affaire = :val')
+            ->andWhere('a.etat != :etat')
+            ->setParameter('val', $affaire)
+            ->setParameter('etat', 'Termine')
+        //->orderBy('a.id', 'ASC')
+        //->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
     }
-     */
 
     /*
 public function findOneBySomeField($value): ?AffairePiece

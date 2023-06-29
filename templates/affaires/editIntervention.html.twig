@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block body %}
+
+	<div class="row">
+		<div class="card card-navy col-12 p-0">
+			<div class="card-header">
+				<h2>Modification d'une intervention</h2>
+				<div class="card-tools">
+					<a href='{{path('app_affaire_me_nok' ) }}' class="ml-2 text-light btn btn-xl btn-primary">
+						Retourner à la liste des affaires
+					</a>
+					<a title='Affaires à traiter !' href="{{ path('app_piece_affaire_nok', {'affaire' : app.request.attributes.get('affaire') }) }}" class="btn btn-success text-white">
+						Retourner sur l'affaire
+					</a>
+				</div>
+			</div>
+			<div class="card-body">
+				{{ form_start(InterventionsMonteursForm)}}
+				<div class="row">
+					<div class="col-12 col-sm-6">
+						<div class="col-12 col-sm-6 d-flex">
+							<div class="m-2">
+								<p>Couleur fond</p>
+								{{ form_widget(InterventionsMonteursForm.backgroundColor, {'type' : 'color' } ) }}
+							</div>
+							<div class="m-2">
+								<p>Couleur texte</p>
+								{{ form_widget(InterventionsMonteursForm.textColor, {'type' : 'color' } ) }}
+							</div>
+						</div>
+						{{ form_label(InterventionsMonteursForm.adresse) }}
+						{{ form_widget(InterventionsMonteursForm.adresse) }}
+						{{ form_errors(InterventionsMonteursForm.adresse) }}
+					</div>
+
+					<div class="col-12 col-sm-6">
+						{{ form_label(InterventionsMonteursForm.Equipes) }}
+						{{ form_widget(InterventionsMonteursForm.Equipes) }}
+						{{ form_errors(InterventionsMonteursForm.Equipes) }}
+						{{ form_label(InterventionsMonteursForm.pieces) }}
+						{{ form_widget(InterventionsMonteursForm.pieces) }}
+						{{ form_errors(InterventionsMonteursForm.pieces) }}
+						{{ form_label(InterventionsMonteursForm.start) }}
+						{{ form_widget(InterventionsMonteursForm.start) }}
+						{{ form_errors(InterventionsMonteursForm.start) }}
+						{{ form_label(InterventionsMonteursForm.end) }}
+						{{ form_widget(InterventionsMonteursForm.end) }}
+						{{ form_errors(InterventionsMonteursForm.end) }}
+					</div>
+				</div>
+				{{ form_widget(InterventionsMonteursForm.ajouter , {'label': "Modifier l'intervention" }) }}
+				{{ form_rest(InterventionsMonteursForm) }}
+				{{ form_end(InterventionsMonteursForm)}}
+			</div>
+			<!-- /.card-body -->
+		</div>
+	</div>
+
+{% endblock %}

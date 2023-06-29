@@ -77,6 +77,30 @@ class CliRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    public function getClient(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT RTRIM(LTRIM(c.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,RTRIM(LTRIM(c.RUE)) AS rue, RTRIM(LTRIM(c.CPOSTAL)) AS cp, RTRIM(LTRIM(c.VIL)) AS ville
+        FROM CLI c
+        WHERE c.DOS = 1 AND c.HSDT IS NULL
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getThisCodeClient($code): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT RTRIM(LTRIM(c.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,RTRIM(LTRIM(c.RUE)) AS rue, RTRIM(LTRIM(c.CPOSTAL)) AS cp, RTRIM(LTRIM(c.VIL)) AS ville
+        FROM CLI c
+        WHERE c.DOS = 1 AND c.HSDT IS NULL AND c.TIERS = '$code'
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative();
+    }
+
     public function SendMailProblemePaysRegimeClients(): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -106,6 +130,55 @@ class CliRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT CLI.TIERS AS codeTier, CLI.NOM AS nom, CLI.RUE AS rue, CLI.CPOSTAL AS cp, CLI.VIL AS ville, CLI.TEL AS tel, CLI.EMAIL AS mail FROM CLI
         WHERE CLI.REPR_0001 = $commercial AND CLI.HSDT IS NULL
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getClientsForCoupe(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT CONCAT(LTRIM(RTRIM(c.TIERS)), 'AD00' ) AS CdDestinataire, REPLACE(LTRIM(RTRIM(c.PAY)),';',',') AS CdInseePays, REPLACE(LTRIM(RTRIM(c.NOM)),';',',') AS Nom, REPLACE(LTRIM(RTRIM(c.ADRCPL1)),';',',') AS Adresse1,
+        REPLACE(LTRIM(RTRIM(c.RUE)),';',',') AS Adresse2,
+		CONVERT(VARCHAR,REPLACE(LTRIM(RTRIM(c.CPOSTAL)),';',',')) AS CdPostal, REPLACE(LTRIM(RTRIM(c.VIL)),';',',') AS Ville, REPLACE(LTRIM(RTRIM(c.TEL)),';',',') AS Telephone,
+        CASE
+        WHEN c.TEXCOD_0003 <> '' THEN convert(varchar(max), convert(varbinary(max), n.NOTEBLOB))
+        ELSE ''
+        END AS InstructionLiv
+        ,
+        CASE
+        WHEN c.EMAIL LIKE '%@%' AND c.EMAIL NOT LIKE '%;%' THEN REPLACE(LTRIM(RTRIM(c.EMAIL)),';',',')
+        END AS Email,
+         REPLACE(LTRIM(RTRIM(c.ADRCPL2)),';',',') AS sService
+        FROM CLI c
+        LEFT JOIN T041 note ON c.DOS = note.DOS AND c.TEXCOD_0003 = note.TEXCOD
+        LEFT JOIN MNOTE AS n ON note.NOTE = n.NOTE
+        WHERE c.DOS = 1 AND c.HSDT IS NULL AND c.TIERS NOT IN ('CodeTier', 'C0160500', 'C0000001')
+
+        UNION
+
+        SELECT CONCAT(LTRIM(RTRIM(a.TIERS)), 'AD' ,a.ADRCOD ) AS CdDestinataire,
+		CASE
+		WHEN a.PAY = '' THEN REPLACE(LTRIM(RTRIM(c.PAY)),';',',')
+		WHEN NOT a.PAY = '' THEN REPLACE(LTRIM(RTRIM(a.PAY)),';',',')
+		END AS CdInseePays,
+		REPLACE(LTRIM(RTRIM(a.NOM)),';',',') AS Nom, REPLACE(LTRIM(RTRIM(a.ADRCPL1)),';',',') AS Adresse1,
+        REPLACE(LTRIM(RTRIM(a.RUE)),';',',') AS Adresse2,
+		convert(VARCHAR,REPLACE(LTRIM(RTRIM(a.CPOSTAL)),';',',')) AS CdPostal, REPLACE(LTRIM(RTRIM(a.VIL)),';',',') AS Ville, REPLACE(LTRIM(RTRIM(a.TEL)),';',',') AS Telephone,
+        CASE
+        WHEN c.TEXCOD_0003 <> '' THEN convert(varchar(max), convert(varbinary(max), n.NOTEBLOB))
+        ELSE ''
+        END AS InstructionLiv
+        ,CASE
+        WHEN a.EMAIL LIKE '%@%' AND a.EMAIL NOT LIKE '%;%' THEN REPLACE(LTRIM(RTRIM(a.EMAIL)),';',',')
+        END AS Email,
+        REPLACE(LTRIM(RTRIM(a.ADRCPL2)),';',',') AS sService
+        FROM T1 a
+        INNER JOIN CLI c ON a.DOS = c.DOS AND a.TIERS = c.TIERS AND c.TIERS NOT IN ('CodeTier', 'C0160500', 'C0000001')
+        LEFT JOIN T041 note ON a.DOS = note.DOS AND c.TEXCOD_0003 = note.TEXCOD
+        LEFT JOIN MNOTE AS n ON note.NOTE = n.NOTE
+        WHERE a.DOS = 1 AND c.HSDT IS NULL
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

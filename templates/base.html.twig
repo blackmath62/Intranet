@@ -297,6 +297,15 @@
 											<!-- <span class="badge badge-info right">1</span> -->
 										</a>
 									</li>
+									<li class="nav-item">
+										<a href="{{ path('app_coupe_station_chargeur_maj')}}" class="nav-link">
+											<i class="nav-icon fas fa-truck-moving text-success"></i>
+											<p>
+												Csv Client Coupé
+											</p>
+											<!-- <span class="badge badge-info right">1</span> -->
+										</a>
+									</li>
 								</ul>
 							</li>
 							<li class="nav-item has-treeview">
@@ -313,6 +322,15 @@
 											<i class="nav-icon fas fa-barcode text-warning"></i>
 											<p>
 												Retrait marchandise
+											</p>
+											<!-- <span class="badge badge-info right">1</span> -->
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{ path('app_affaire_me_nok')}}" class="nav-link">
+											<i class="nav-icon fas fa-barcode text-dark"></i>
+											<p>
+												Interventions
 											</p>
 											<!-- <span class="badge badge-info right">1</span> -->
 										</a>
@@ -344,17 +362,6 @@
 											<!-- <span class="badge badge-info right">1</span> -->
 										</a>
 									</li>
-									{% if is_granted('ROLE_ADMIN') %}
-										<li class="nav-item">
-											<a href="{{ path('app_bat')}}" class="nav-link">
-												<i class="nav-icon fas fa-box-open text-secondary"></i>
-												<p>
-													Test lancement Powershell
-												</p>
-												<!-- <span class="badge badge-info right">1</span> -->
-											</a>
-										</li>
-									{% endif %}
 								</ul>
 							</li>
 
@@ -933,14 +940,7 @@ $("#example1").DataTable({
 "order": [
 [0, "desc"]
 ],
-"buttons": [
-"copy",
-"csv",
-"excel",
-"pdf",
-"print",
-"colvis"
-]
+"buttons": ["copy", "csv", "excel", "pdf"]
 }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 $("#example3").DataTable({
 "responsive": true,
@@ -949,14 +949,7 @@ $("#example3").DataTable({
 "order": [
 [0, "desc"]
 ],
-"buttons": [
-"copy",
-"csv",
-"excel",
-"pdf",
-"print",
-"colvis"
-]
+"buttons": ["copy", "csv", "excel", "pdf",]
 }).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
 $('#example2').DataTable({
 "paging": true,
@@ -967,6 +960,32 @@ $('#example2').DataTable({
 "autoWidth": false,
 "responsive": true
 });
+$('#example4').DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+dom: 'Bftrip',
+buttons: [
+{
+extend: 'csvHtml5',
+text: 'Exporter en CSV avec séparateur point virgule',
+fieldBoundary: '',
+fieldSeparator: ';'
+},
+]
+});
+$("#example5").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": ["copy", "csv", "excel", "pdf"]
+}).buttons().container().appendTo('#example5_wrapper .col-md-6:eq(0)');
 });
 				</script>
 				<script>
@@ -982,6 +1001,7 @@ $('.select2bs4').select2({theme: 'bootstrap4'})
 					$('#reservation').daterangepicker()
 				</script>
 
+				<!-- Disparition automatique de message alert -->
 				<!-- Disparition automatique de message alert -->
 				<script>
 					jQuery(function ($) {
@@ -1019,3 +1039,4 @@ $('[data-toggle="tooltip"]').tooltip()
 			{% endblock %}
 		</body>
 	</html>
+</body></html>

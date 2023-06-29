@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SignatureElectronique index{% endblock %}
+
+{% block body %}
+    <h1>SignatureElectronique index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>SignatureId</th>
+                <th>DocumentId</th>
+                <th>SignerId</th>
+                <th>PdfSansSignature</th>
+                <th>CreatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for signature_electronique in signature_electroniques %}
+            <tr>
+                <td>{{ signature_electronique.id }}</td>
+                <td>{{ signature_electronique.signatureId }}</td>
+                <td>{{ signature_electronique.documentId }}</td>
+                <td>{{ signature_electronique.signerId }}</td>
+                <td>{{ signature_electronique.pdfSansSignature }}</td>
+                <td>{{ signature_electronique.createdAt ? signature_electronique.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_signature_electronique_show', {'id': signature_electronique.id}) }}">show</a>
+                    <a href="{{ path('app_signature_electronique_edit', {'id': signature_electronique.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_signature_electronique_new') }}">Create new</a>
+{% endblock %}

@@ -48,17 +48,17 @@
 			<div class="description-block border-right">
 				<h5 class="description-header">Piéce</h5>
 				<div class='d-flex flex-column'>
-					{% if app.request.attributes.get('type') == 2 %}
+					{% if produits[0].picod == 2 %}
 						{% set typeP = 'Commande' %}
-					{% elseif app.request.attributes.get('type') == 3 %}
+					{% elseif produits[0].picod == 3 %}
 						{% set typeP = 'Bon de livraison' %}
-					{% elseif app.request.attributes.get('type') == 4 %}
+					{% elseif produits[0].picod == 4 %}
 						{% set typeP = 'Facture' %}
 					{% else %}
 						{% set typeP = 'ERREUR' %}
 					{% endif %}
 					<span class="description-text">{{ typeP }}</span>
-					<span class="description-text">{{app.request.attributes.get('piece')}}</span>
+					<span class="description-text">{{produits[0].piece}}</span>
 				</div>
 			</div>
 			<!-- /.description-block -->
@@ -67,22 +67,22 @@
 		<div class="col-sm-3 col-6">
 			<div class="description-block">
 				{% set color = 'success' %}
-				{% if id.etat == 'En attente' %}
+				{% if piece.etat == 'En attente' %}
 					{% set color = 'warning text-dark' %}
 					{% set icone = "fa fa-pause" %}
-				{% elseif id.etat == 'Nouvelle' %}
+				{% elseif piece.etat == 'Nouvelle' %}
 					{% set color = 'info text-white' %}
 					{% set icone = "fa fa-inbox" %}
-				{% elseif id.etat == 'En cours' %}
+				{% elseif piece.etat == 'En cours' %}
 					{% set color = 'primary text-white' %}
 					{% set icone = "fa fa-spinner" %}
-				{% elseif id.etat == 'A finir' %}
+				{% elseif piece.etat == 'A finir' %}
 					{% set color = 'secondary text-white' %}
 					{% set icone = "fa fa-battery-half" %}
-				{% elseif id.etat == 'Termine' %}
+				{% elseif piece.etat == 'Termine' %}
 					{% set color = 'success text-white' %}
 					{% set icone = "fa fa-check" %}
-				{% elseif id.etat == 'Litige' %}
+				{% elseif piece.etat == 'Litige' %}
 					{% set color = 'danger text-white' %}
 					{% set icone = "fa fa-triangle-exclamation" %}
 				{% endif %}
@@ -95,22 +95,22 @@
 						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
 						<ul class="dropdown-menu">
 							<li>
-								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piece.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'Litige' } ) }}'>Litige</a>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piece.id, 'etat' : 'Litige' } ) }}'>Litige</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'En attente' } ) }}'>En attente</a>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piece.id, 'etat' : 'En attente' } ) }}'>En attente</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'A finir' } ) }}'>A finir</a>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piece.id, 'etat' : 'A finir' } ) }}'>A finir</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'En cours' } ) }}'>En cours</a>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piece.id, 'etat' : 'En cours' } ) }}'>En cours</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : id.id, 'etat' : 'Termine' } ) }}'>Termine</a>
+								<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piece.id, 'etat' : 'Termine' } ) }}'>Termine</a>
 							</li>
 						</ul>
 					</div>
@@ -147,20 +147,42 @@
 						<th>U.V</th>
 						<th class="text-center">Op</th>
 						<th class="text-center">Qte</th>
+						<th class="text-center">Empl.</th>
+						<th class="text-center">Ean.</th>
+						<th class="text-center">Cmd Fou.</th>
+						<th class="text-center">Stock</th>
+						<th class="text-center">Date Ferm.</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% set i = 1 %}
-					{% for piece in pieces %}
+					{% for produit in produits %}
 						<tr>
 							<td>{{ i }}</td>
-							<td>{{ piece.ref}}</td>
-							<td>{{ piece.sref1 }}</td>
-							<td>{{ piece.sref2 }}</td>
-							<td>{{ piece.designation}}</td>
-							<td>{{ piece.uv}}</td>
-							<td>{{ piece.op}}</td>
-							<td>{{ piece.qte}}</td>
+							<td>{{ produit.ref}}</td>
+							<td>{{ produit.sref1 }}</td>
+							<td>{{ produit.sref2 }}</td>
+							<td>{{ produit.designation}}</td>
+							<td class="text-center">{{ produit.uv}}</td>
+							<td class="text-center">{{ produit.op}}</td>
+							<td class="text-center">{{ produit.qte}}</td>
+							<td class="text-center">à venir....</td>
+							<td class="text-center">
+								{% if produit.ean %}
+									{{ produit.ean}}{% else %}aucun
+								{% endif %}
+							</td>
+							<td class="text-center">
+								{% if produit.cmdFou != 0 %}
+									{{ produit.cmdFou}}
+								{% endif %}
+							</td>
+							<td class="text-center">
+								{% if produit.stock %}
+									{{ produit.stock}}
+								{% endif %}
+							</td>
+							<td class="text-center">{{ produit.fermeture}}</td>
 						</tr>
 						{% set i = i + 1 %}
 					{% endfor %}

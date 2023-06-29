@@ -224,6 +224,36 @@ class Users implements UserInterface
      */
     private $alimentationEmplacements;
 
+    /**
+     * @ORM\OneToMany(targetEntity=InterventionMonteurs::class, mappedBy="UserCr")
+     */
+    private $interventionMonteurs;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $interne;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $exterieur;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $fonction;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $portable;
+
+    /**
+     * @ORM\OneToMany(targetEntity=SignatureElectronique::class, mappedBy="createdBy")
+     */
+    private $signatureElectroniques;
+
     public function __construct()
     {
         $this->documents = new ArrayCollection();
@@ -251,6 +281,8 @@ class Users implements UserInterface
         $this->conduiteTravauxAddPieces = new ArrayCollection();
         $this->retraitMarchandisesEans = new ArrayCollection();
         $this->alimentationEmplacements = new ArrayCollection();
+        $this->interventionMonteurs = new ArrayCollection();
+        $this->signatureElectroniques = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1118,6 +1150,114 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($alimentationEmplacement->getCreatedBy() === $this) {
                 $alimentationEmplacement->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InterventionMonteurs>
+     */
+    public function getInterventionMonteurs(): Collection
+    {
+        return $this->interventionMonteurs;
+    }
+
+    public function addInterventionMonteur(InterventionMonteurs $interventionMonteur): self
+    {
+        if (!$this->interventionMonteurs->contains($interventionMonteur)) {
+            $this->interventionMonteurs[] = $interventionMonteur;
+            $interventionMonteur->setUserCr($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInterventionMonteur(InterventionMonteurs $interventionMonteur): self
+    {
+        if ($this->interventionMonteurs->removeElement($interventionMonteur)) {
+            // set the owning side to null (unless already changed)
+            if ($interventionMonteur->getUserCr() === $this) {
+                $interventionMonteur->setUserCr(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getInterne(): ?string
+    {
+        return $this->interne;
+    }
+
+    public function setInterne(?string $interne): self
+    {
+        $this->interne = $interne;
+
+        return $this;
+    }
+
+    public function getExterieur(): ?string
+    {
+        return $this->exterieur;
+    }
+
+    public function setExterieur(?string $exterieur): self
+    {
+        $this->exterieur = $exterieur;
+
+        return $this;
+    }
+
+    public function getFonction(): ?string
+    {
+        return $this->fonction;
+    }
+
+    public function setFonction(?string $fonction): self
+    {
+        $this->fonction = $fonction;
+
+        return $this;
+    }
+
+    public function getPortable(): ?string
+    {
+        return $this->portable;
+    }
+
+    public function setPortable(?string $portable): self
+    {
+        $this->portable = $portable;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SignatureElectronique>
+     */
+    public function getSignatureElectroniques(): Collection
+    {
+        return $this->signatureElectroniques;
+    }
+
+    public function addSignatureElectronique(SignatureElectronique $signatureElectronique): self
+    {
+        if (!$this->signatureElectroniques->contains($signatureElectronique)) {
+            $this->signatureElectroniques[] = $signatureElectronique;
+            $signatureElectronique->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSignatureElectronique(SignatureElectronique $signatureElectronique): self
+    {
+        if ($this->signatureElectroniques->removeElement($signatureElectronique)) {
+            // set the owning side to null (unless already changed)
+            if ($signatureElectronique->getCreatedBy() === $this) {
+                $signatureElectronique->setCreatedBy(null);
             }
         }
 

@@ -40,16 +40,6 @@ class AffaireType extends AbstractType
                 'attr' => ['class' => 'form-control col-6',
                     'placeholder' => "modifier Durée travaux"],
             ])
-            ->add('backgroundColor', TextType::class, [
-                'required' => false,
-                'attr' => ['class' => 'form-control my-colorpicker2 m-2',
-                    'placeholder' => "Couleur du fond"],
-            ])
-            ->add('textColor', TextType::class, [
-                'required' => false,
-                'attr' => ['class' => 'form-control my-colorpicker2 m-2',
-                    'placeholder' => "Couleur du texte"],
-            ])
             ->add('modifier', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-secondary mt-3 float-right'],
                 'label' => 'Mettre à jour l\'affaire',

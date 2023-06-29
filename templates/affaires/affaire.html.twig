@@ -20,32 +20,116 @@
 			<p>Vous pouvez également gérer et créer les équipes</p>
 		</div>
 	</div>
+	{% if interventionsActuels %}
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card card-default">
+					<div class="card-header">
+						<h3 class="card-title">
+							<i class="fas fa-exclamation-triangle"></i>
+							Interventions du moment
+						</h3>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body d-flex flex-wrap justify-content-evenly col-12 text-center">
 
-
-	<div class="card">
-		<div class="card-header">
-			{% if app.request.attributes.get('_route')  == 'app_affaire_me_ok' %}
-				<h2 class="card-title">Liste des Affaires traitées</h2>
-			{% elseif app.request.attributes.get('_route')  == 'app_affaire_me_nok' %}
-				<h2 class="card-title">Liste des Affaires à traiter</h2>
-			{% endif %}
-			<div class="card-tools">
-				<a class="btn btn-xl btn-secondary" href='{{path('app_update_affaires') }}'>
-					<i class="fas fa-redo-alt pr-2"></i>Mettre à jour</a>
-				<a class="btn btn-xl btn-primary" href='{{path('app_equipe') }}'>Equipes</a>
-				{% if app.request.attributes.get('_route')  == 'app_affaire_me_ok' %}
-					<a title='Affaires à traiter !' href="{{ path('app_affaire_me_nok') }}" class="btn btn-warning text-dark">
-						<i class="fas fa-thumbs-down pr-2"></i>Voir les affaires à traitrer</a>
-				{% else %}
-					<a title='Affaires traitées !' href="{{ path('app_affaire_me_ok') }}" class="btn btn-success">
-						<i class="fas fa-thumbs-up pr-2"></i>Voir les affaires traitées</a>
-				{% endif %}
-
+						{% for interventionsActuel in interventionsActuels %}
+							<a href='{{path('app_affaire_show_intervention', {'id' : interventionsActuel.id } ) }}'>
+								<div class="col-12 text-dark">
+									<div class="info-box">
+										<span class=" info-box-icon" style=" background-color: {{ interventionsActuel.backgroundColor }} ; color: {{ interventionsActuel.textColor }} " ;>
+											<i class=" fas fa-binoculars"></i>
+										</span>
+										<div class="info-box-content">
+											<h5 class="">{{ interventionsActuel.code.Libelle}}</h5>
+											<span class="m-1">
+												Du
+												{{interventionsActuel.start|date("d/m/Y H:i", "Europe/Paris") }}
+												au
+												{{interventionsActuel.end|date("d/m/Y H:i", "Europe/Paris") }}
+											</span>
+											<div class="d-flex justify-content-around flex-wrap">
+												<p class="m-1">
+													<ul>
+														<li style="list-style-type: none;">
+															<u>Equipe :</u>
+														</li>
+														{% for monteur in interventionsActuel.Equipes %}
+															<li>
+																{{ monteur.Pseudo }}
+															</li>
+														{% endfor %}
+													</ul>
+												</p>
+												<p class="m-1 d-flex flex-row">
+													<ul>
+														<li style="list-style-type: none;">
+															<u>Piéce(s) :</u>
+														</li>
+														{% for pieces in interventionsActuel.pieces %}
+															<li>
+																{{ pieces.piece }}
+															</li>
+														{% endfor %}
+													</ul>
+												</p>
+											</div>
+										</div>
+										<!-- /.info-box-content -->
+									</div>
+									<!-- /.info-box -->
+								</div>
+							</a>
+						{% endfor %}
+					</div>
+				</div>
 			</div>
 		</div>
-		<!-- /.card-header -->
-		<div class="card-body p-0">
-			<table class="table">
+	{% endif %}
+	<div class="card">
+		<div class="card-header d-flex flex-column m-0">
+			<div class="card-tools">
+				<a class="btn btn-xl btn-secondary col-sm-1 col-12 m-1 float-right" href='{{path('app_update_affaires') }}'>
+					<i class="fas fa-redo-alt"></i>
+				</a>
+				<a class="btn btn-xl btn-primary col-sm-1 col-12 m-1 float-right" data-toggle="modal" data-target="#modal-lg">
+					<i class="fas fa-plus"></i>
+				</a>
+				<div class="modal fade" id="modal-lg">
+					<div class="modal-dialog modal-lg">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h4 class="modal-title">Création d'un chantier hors Affaire</h4>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								{{ form_start(form) }}
+								{{ form_end(form) }}
+							</div>
+						</div>
+						<!-- /.modal-content -->
+					</div>
+					<!-- /.modal-dialog -->
+				</div>
+				{% if app.request.attributes.get('_route')  == 'app_affaire_me_ok' %}
+					<a title='Affaires à traiter !' href="{{ path('app_affaire_me_nok') }}" class="btn btn-warning text-dark col-sm-1 col-12 m-1 float-right">
+						<i class="fas fa-thumbs-down"></i>
+					</a>
+				{% else %}
+					<a title='Affaires traitées !' href="{{ path('app_affaire_me_ok') }}" class="btn btn-success col-sm-1 col-12 m-1 float-right">
+						<i class="fas fa-thumbs-up"></i>
+					</a>
+				{% endif %}
+			</div>
+			{% if app.request.attributes.get('_route')  == 'app_affaire_me_ok' %}
+				<h1 class="card-title">Affaires traitées</h1>
+			{% elseif app.request.attributes.get('_route')  == 'app_affaire_me_nok' %}
+				<h1 class="card-title">Affaires à traiter</h1>
+			{% endif %}
+		</div><!-- /.card-header --><div class="card-body">
+			<table id="example1" class="table table-bordered table-striped">
 				<thead>
 					<tr>
 						<th style="width: 10px">#</th>
@@ -56,9 +140,8 @@
 						<th>Date Début</th>
 						<th>Date Fin</th>
 						<th>Durée Chantier</th>
-						<th>Equipe</th>
-						<th style="width: 40px">%</th>
-						<th style="width: 40px">nb Pieces</th>
+						<th>%</th>
+						<th>nb Pieces</th>
 						<th class="text-center">Etat</th>
 						<th class="text-center">Action</th>
 					</tr>
@@ -85,12 +168,12 @@
 									{{ affaire.duration}}
 								{% endif %}
 							</td>
-							<td>2 équipes</td>
 							<td>
 								<span class="badge bg-danger">
 									{% if affaire.progress %}
 										{{ affaire.progress}}{% else %}0
-									{% endif %}%</span>
+									{% endif %}%
+								</span>
 							</td>
 							<td>
 								<span class="badge bg-primary">{{affaire.nbe}}</span>
@@ -112,13 +195,16 @@
 								{% elseif affaire.etat == 'Termine' %}
 									{% set color = 'success text-white' %}
 									{% set icone = "fa fa-check" %}
+								{% elseif affaire.etat == 'Planifiee' %}
+									{% set color = 'primary active text-white' %}
+									{% set icone = "far fa-calendar-alt" %}
 								{% elseif affaire.etat == 'Litige' %}
 									{% set color = 'danger text-white' %}
 									{% set icone = "fa fa-triangle-exclamation" %}
 								{% endif %}
 
 								<div class="btn-group">
-									<a class="btn btn-{{ color}}">
+									<a class="btn btn-{{ color }}">
 										<i class="{{icone}}" aria-hidden="true"></i>
 									</a>
 									<div class="btn-group">
@@ -137,12 +223,36 @@
 												<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'A finir' } ) }}'>A finir</a>
 											</li>
 											<li>
+												<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Planifiee' } ) }}'>Planifiée</a>
+											</li>
+											<li>
 												<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En cours' } ) }}'>En cours</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Termine' } ) }}'>Termine</a>
+												<a class="dropdown-item" data-toggle="modal" data-target="#modal-lg-termine">Termine</a>
 											</li>
 										</ul>
+										<div class="modal fade" id="modal-lg-termine">
+											<div class="modal-dialog modal-lg">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h4 class="modal-title">Basculer cette affaire en Terminé ?</h4>
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+															<span aria-hidden="true">&times;</span>
+														</button>
+													</div>
+													<div class="modal-body">
+														<p>Si vous basculer cette affaire en Terminé, toutes les piéces liées à cette affaire vont automatiquement passer en Terminées</p>
+													</div>
+													<div class="modal-footer justify-content-between">
+														<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+														<a type="button" class="btn btn-primary" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Termine' } ) }}'>Terminer cette affaire</a>
+													</div>
+												</div>
+												<!-- /.modal-content -->
+											</div>
+											<!-- /.modal-dialog -->
+										</div>
 									</div>
 								</div>
 							</td>
@@ -152,10 +262,104 @@
 								</a>
 							</td>
 						</tr>
-					</tbody>
+						{% set i = i + 1 %}
+					{% endfor %}
 				</tbody>
-			</tr>
-			{% set i = i + 1 %}
-		{% endfor %}
-	</tbody>
-</table></div><!-- /.card-body --></div><!-- /.card -->{% endblock %}
+			</table>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header d-flex">
+					<h3 class="card-title text-center">Calendrier des congés validés</h3>
+				</div>
+				<div class="card-body">
+					<div>
+						<!-- THE CALENDAR -->
+						<div id="external-events"></div>
+						<div id="calendar"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block javascripts %}<!-- tables --><script>
+		$(function () {
+$("#example1").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print"
+]
+}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+$("#example3").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+]
+}).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+$('#example2').DataTable({
+"paging": true,
+"lengthChange": false,
+"searching": false,
+"ordering": false,
+"info": true,
+"autoWidth": false,
+"responsive": true
+});
+});
+	</script><!-- fullCalendar --><script>
+		/* initialize the calendar
+     -----------------------------------------------------------------*/
+window.onload = () => {
+let calendarElt = document.querySelector("#calendar")
+let calendar = new FullCalendar.Calendar(calendarElt, {
+weekNumbers: true, // numéro de semaine
+weekNumberCalculation: 'ISO',
+initialView: 'dayGridMonth',
+locale: 'fr',
+timeZone: 'Europe/Paris',
+headerToolbar: {
+left: 'prev,next today',
+center: 'title',
+right: 'dayGridMonth,timeGridWeek,timeGridDay'
+},
+buttonText: {
+today: 'Aujourd\'hui',
+month: 'Mois',
+day: 'Jour',
+week: 'Semaine'
+},
+events: {{ data|raw }}
+})
+calendar.render()
+};
+	</script>
+	<script>
+		$(function () { // Initialize Select2 Elements
+$('.select2').select2({placeholder: "Selectionnez les données"})
+
+// Initialize Select2 Elements
+$('.select2bs4').select2({theme: 'bootstrap4'})
+})
+	</script>
+{% endblock %}

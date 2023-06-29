@@ -3,8 +3,8 @@
 namespace App\Entity\Main;
 
 use App\Entity\Main\Societe;
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Main\AnnuaireRepository;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
@@ -60,89 +60,89 @@ class Annuaire
      */
     private $societe;
 
-    public function getId(): ?int
+    public function getId():  ? int
     {
         return $this->id;
     }
 
-    public function getInterne(): ?int
+    public function getInterne() :  ? int
     {
         return $this->interne;
     }
 
-    public function setInterne(?int $interne): self
+    public function setInterne( ? int $interne) : self
     {
         $this->interne = $interne;
 
         return $this;
     }
 
-    public function getNom(): ?string
+    public function getNom() :  ? string
     {
         return $this->nom;
     }
 
-    public function setNom(string $nom): self
+    public function setNom(string $nom) : self
     {
         $this->nom = $nom;
 
         return $this;
     }
 
-    public function getExterieur(): ?string
+    public function getExterieur():  ? string
     {
         return $this->exterieur;
     }
 
-    public function setExterieur(?string $exterieur): self
+    public function setExterieur( ? string $exterieur) : self
     {
         $this->exterieur = $exterieur;
 
         return $this;
     }
 
-    public function getMail(): ?string
+    public function getMail() :  ? string
     {
         return $this->mail;
     }
 
-    public function setMail(?string $mail): self
+    public function setMail( ? string $mail) : self
     {
         $this->mail = $mail;
 
         return $this;
     }
 
-    public function getFonction(): ?string
+    public function getFonction() :  ? string
     {
         return $this->fonction;
     }
 
-    public function setFonction(?string $fonction): self
+    public function setFonction( ? string $fonction) : self
     {
         $this->fonction = $fonction;
 
         return $this;
     }
 
-    public function getPortable(): ?string
+    public function getPortable() :  ? string
     {
         return $this->portable;
     }
 
-    public function setPortable(?string $portable): self
+    public function setPortable( ? string $portable) : self
     {
         $this->portable = $portable;
 
         return $this;
     }
 
-    public function getSociete(): ?Societe
+    public function getSociete() :  ? Societe
     {
         return $this->societe;
     }
 
-    public function setSociete(?Societe $societe): self
+    public function setSociete( ? Societe $societe) : self
     {
         $this->societe = $societe;
 

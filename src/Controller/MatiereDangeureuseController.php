@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Repository\Divalto\ArtRepository;
+use RtfHtmlPhp\Document;
+use RtfHtmlPhp\Html\HtmlFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,23 +18,46 @@ class MatiereDangeureuseController extends AbstractController
     {
         $articles = $repo->StockBlobMatiereDangeureuse();
 
-        /*foreach ($articles as $key => $value) {
-            dd($value['blob']);
-        }*/
+        foreach ($articles as $value) {
+            $document = '';
+            $formatter = new HtmlFormatter();
+            try {
+                $document = new Document($value['blob']);
+            } catch (\Throwable $th) {
+            }
+            if (!$document) {
+                $arts[] = [
+                    'ref' => $value['ref'],
+                    'sref1' => $value['sref1'],
+                    'sref2' => $value['sref2'],
+                    'designation' => $value['designation'],
+                    'uv' => $value['uv'],
+                    'code' => $value['code'],
+                    'fournisseur' => $value['fournisseur'],
+                    'stock' => $value['stock'],
+                    'note' => $value['note'],
+                    'blob' => 'Rien à afficher',
+                ];
+            } else {
+                $arts[] = [
+                    'ref' => $value['ref'],
+                    'sref1' => $value['sref1'],
+                    'sref2' => $value['sref2'],
+                    'designation' => $value['designation'],
+                    'uv' => $value['uv'],
+                    'code' => $value['code'],
+                    'fournisseur' => $value['fournisseur'],
+                    'stock' => $value['stock'],
+                    'note' => $value['note'],
+                    'blob' => $formatter->Format($document),
+                ];
+            }
+        }
+        //dd($arts);
 
         return $this->render('matiere_dangeureuse/index.html.twig', [
-            'articles' => $articles,
-            'title' => 'Matiéres Dangeureuses'
+            'articles' => $arts,
+            'title' => 'Matiéres Dangeureuses',
         ]);
-    }
-
-    private function blobToString($data): string
-    {
-        $details = '';
-        while(!feof($data)){
-            $details.= fread($data, 1024);
-        }
-        rewind($data);
-        return $details;
     }
 }

@@ -32,11 +32,23 @@
 		</div>
 		<!-- /.card -->
 	</div>
-
+	<div class='card card-navy'>
+		<div class="card-body" id="result"></div>
+	</div>
 {% endblock %}
 {% block javascripts %}
+	{# {{  parent() }} /// {% if app.request.get('_route') == 'nom_de_ma_route' %} #}
 	<script>
-		var monAlert = $('#alert');
+		setInterval(function () {
+$.ajax({url: "/impression/imprimante", type: "GET"}).done(function (data) {
+console.log(data);
+if (data.success === true) {
+$('#result').html(data.response);
+}
+});
+}, 1000);
+
+var monAlert = $('#alert');
 console.log(monAlert);
 if (monAlert.length > 0) {
 monAlert.delay(3000).slideUp();

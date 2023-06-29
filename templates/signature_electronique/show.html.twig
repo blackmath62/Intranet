@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SignatureElectronique{% endblock %}
+
+{% block body %}
+    <h1>SignatureElectronique</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ signature_electronique.id }}</td>
+            </tr>
+            <tr>
+                <th>SignatureId</th>
+                <td>{{ signature_electronique.signatureId }}</td>
+            </tr>
+            <tr>
+                <th>DocumentId</th>
+                <td>{{ signature_electronique.documentId }}</td>
+            </tr>
+            <tr>
+                <th>SignerId</th>
+                <td>{{ signature_electronique.signerId }}</td>
+            </tr>
+            <tr>
+                <th>PdfSansSignature</th>
+                <td>{{ signature_electronique.pdfSansSignature }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ signature_electronique.createdAt ? signature_electronique.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_signature_electronique_index') }}">back to list</a>
+
+    <a href="{{ path('app_signature_electronique_edit', {'id': signature_electronique.id}) }}">edit</a>
+
+    {{ include('signature_electronique/_delete_form.html.twig') }}
+{% endblock %}
