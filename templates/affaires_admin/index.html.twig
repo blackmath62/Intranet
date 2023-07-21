@@ -1,0 +1,369 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block body %}
+	<div class="row mb-2">
+		<h1>{{ title}}</h1>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card collapsed-card card-dark">
+				<div class="card-header">
+					<h3 class="card-title text-center">Emails d'envoi des nouveaux commentaires et nouvelles affaires</h3>
+					<div class="card-tools">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse">
+							<i class="fas fa-minus"></i>
+						</button>
+						<button type="button" class="btn btn-tool" data-card-widget="remove">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+				</div>
+				<!-- /.card-header -->
+				<div class="card-body">
+					{{ form_start(form)}}
+					<div class="form-group d-flex flex-wrap">
+						{{ form_widget(form.email) }}
+						{{ form_widget(form.Ajouter)}}
+					</div>
+					{{ form_end(form)}}
+					{% if listeMails %}
+						<table id="example2" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th class="text-center">
+										<span>Email actuellement dans la liste</span>
+									</th>
+									<th class="text-center">
+										<span>Action</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for listeMail in listeMails %}
+									<tr>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ listeMail.email }}</a>
+										</td>
+										<td class="text-center">
+											<a data-toggle="modal" data-target="#modal-default-{{listeMail.id}}" class="text-center btn btn-xl btn-danger">
+												<i class="fas fa-trash-alt"></i>
+											</a>
+											<div class="modal fade" id="modal-default-{{listeMail.id}}">
+												<div class="modal-dialog">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h4 class="modal-title">Voulez vous vraiment supprimer ce mail ?</h4>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body">
+															<p>Cette action est irréversible !&hellip;</p>
+														</div>
+														<div class="modal-footer justify-content-between">
+															<button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+															<a type="button" href='{{path('app_email_delete_redirect', {'id' : listeMail.id, 'route' : app.request.attributes.get('_route') } ) }}' class="btn btn-danger">Supprimer</a>
+														</div>
+													</div>
+													<!-- /.modal-content -->
+												</div>
+												<!-- /.modal-dialog -->
+											</div>
+											<!-- /.modal -->
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-2 col-6">
+					<div class="small-box bg-info">
+						<div class="inner">
+							<h3>{{ fichesNonVerrouillees|length }}</h3>
+
+							<p>Non Verrouillée(s)</p>
+						</div>
+						<div class="icon">
+							<i class="ion ion-bag"></i>
+						</div>
+					</div>
+				</div>
+				<!-- ./col -->
+				<div class="col-lg-2 col-6">
+					<div class="small-box bg-success">
+						<div class="inner">
+							<h3>{{ fichesAttenteValidations|length }}<sup style="font-size: 20px"></sup>
+							</h3>
+
+							<p>En attente de validation</p>
+						</div>
+						<div class="icon">
+							<i class="ion ion-stats-bars"></i>
+						</div>
+					</div>
+				</div>
+				<!-- ./col -->
+				<div class="col-lg-2 col-6">
+					<div class="small-box bg-warning">
+						<div class="inner">
+							<h3>{{ fichesManquantes|length}}</h3>
+
+							<p>Manquante(s)</p>
+						</div>
+						<div class="icon">
+							<i class="ion ion-person-add"></i>
+						</div>
+					</div>
+				</div>
+				<!-- ./col -->
+				<div class="col-lg-2 col-6">
+					<div class="small-box bg-danger">
+						<div class="inner">
+							<h3>{{ fichesSansHeures|length }}</h3>
+
+							<p>Sans heure(s)</p>
+						</div>
+						<div class="icon">
+							<i class="ion ion-pie-graph"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-6">
+					<div class="small-box bg-primary">
+						<div class="inner">
+							<h3>{{ fichesDatesIncoherentes|length }}</h3>
+
+							<p>Dates incohérentes</p>
+						</div>
+						<div class="icon">
+							<i class="ion ion-pie-graph"></i>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-2 col-6">
+					<div class="small-box bg-secondary">
+						<div class="inner">
+							<h3>??</h3>
+
+							<p>Champs libre</p>
+						</div>
+						<div class="icon">
+							<i class="ion ion-pie-graph"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="content">
+		<div class="row">
+			{% if fichesNonVerrouillees %}
+				<div class="col-md-6">
+					<div class="card card-info">
+						<div class="card-header">
+							<h3 class="card-title">Fiche(s) non Verrouillée(s)</h3>
+						</div>
+						<div class="card-body text-center">
+							<table id="example1" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th>Intervenant</th>
+										<th>Date</th>
+										<th>Nbes Heures</th>
+										<th>Affaire</th>
+										<th>Intervention</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for fichesNonVerrouillee in fichesNonVerrouillees %}
+										<tr>
+											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Intervenant.pseudo }}</td>
+											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
+											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Heures|length }}</td>
+											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Intervention.code.code }}</td>
+											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Intervention.start|date("d/m/Y", "Europe/Paris") }}
+												au
+												{{ fichesNonVerrouillee.Intervention.end|date("d/m/Y", "Europe/Paris") }}
+											</td>
+											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>
+												<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fichesNonVerrouillee.Intervention.id, 'ficheId' : fichesNonVerrouillee.id } ) }}'>
+													<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
+												</a>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+			{% if fichesAttenteValidations %}
+				<div class="col-md-6">
+					<div class="card card-success">
+						<div class="card-header">
+							<h3 class="card-title">Fiche(s) en attente de validation</h3>
+						</div>
+						<div class="card-body text-center">
+							<table id="example11" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th>Intervenant</th>
+										<th>Date</th>
+										<th>Nbes Heures</th>
+										<th>Affaire</th>
+										<th>Intervention</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for fichesAttenteValidation in fichesAttenteValidations %}
+										<tr>
+											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>{{ fichesAttenteValidation.Intervenant.pseudo }}</td>
+											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>{{ fichesAttenteValidation.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
+											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>{{ fichesAttenteValidation.Heures|length }}</td>
+											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>{{ fichesAttenteValidation.Intervention.code.code }}</td>
+											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>{{ fichesAttenteValidation.Intervention.start|date("d/m/Y", "Europe/Paris") }}
+												au
+												{{ fichesAttenteValidation.Intervention.end|date("d/m/Y", "Europe/Paris") }}
+											</td>
+											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>
+												<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fichesAttenteValidation.Intervention.id, 'ficheId' : fichesAttenteValidation.id } ) }}'>
+													<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
+												</a>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+			{% if fichesManquantes %}
+				<div class="col-md-6">
+					<div class="card card-warning">
+						<div class="card-header">
+							<h3 class="card-title">Fiche(s) Manquante(s)</h3>
+						</div>
+						<div class="card-body text-center">
+							<table id="example12" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th>Intervenant</th>
+										<th>Date</th>
+										<th>Affaire</th>
+										<th>Intervention</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% set f = 1 %}
+									{% for fichesManquante in fichesManquantes %}
+										<tr>
+											<td>{{ fichesManquante.intervenant.pseudo }}</td>
+											<td>{{ fichesManquante.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
+											<td>{{ fichesManquante.intervention.code.code }}</td>
+											<td>{{ fichesManquante.intervention.start|date("d/m/Y", "Europe/Paris") }}
+												au
+												{{ fichesManquante.intervention.end|date("d/m/Y", "Europe/Paris") }}
+											</td>
+											<td>
+												<a data-toggle="modal" data-target="#modal-creer-{{f}}">
+													<i class="nav-icon fas fa-plus fa-2x text-secondary m-2"></i>
+												</a>
+											</td>
+											<div class="modal fade" id="modal-creer-{{f}}">
+												<div class="modal-dialog modal-sm">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h4 class="modal-title">Voulez vous vraiment créer cette fiche ?</h4>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body">
+															<p>Pour
+																{{ fichesManquante.intervenant.pseudo }}</p>
+															<p>Pour le
+																{{ fichesManquante.createdAt|date("d/m/Y", "Europe/Paris") }}</p>
+															<p>Affaire
+																{{ fichesManquante.intervention.code.code }}</p>
+															<p>Intervention du
+																{{ fichesManquante.intervention.start|date("d/m/Y", "Europe/Paris") }}
+																au
+																{{ fichesManquante.intervention.end|date("d/m/Y", "Europe/Paris") }}</p>
+														</div>
+														<div class="modal-footer justify-content-between">
+															<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+															<a href='{{path('app_affaire_creer_fiche_intervention', {'id' : fichesManquante.intervention.id, 'intervenant' : fichesManquante.intervenant.id, 'createdAt' : fichesManquante.createdAt|date("Y-m-d", "Europe/Paris") } ) }}' type="button" class="btn btn-primary">Créer</a>
+														</div>
+													</div>
+													<!-- /.modal-content -->
+												</div>
+												<!-- /.modal-dialog -->
+											</div>
+										</tr>
+										{% set f = f + 1 %}
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+			{% if fichesDatesIncoherentes %}
+				<div class="col-md-6">
+					<div class="card card-primary">
+						<div class="card-header">
+							<h3 class="card-title">Fiche(s) date(s) incohérente(s)</h3>
+						</div>
+						<div class="card-body text-center">
+							<table id="example14" class="table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th>Intervenant</th>
+										<th>Date</th>
+										<th>Affaire</th>
+										<th>Intervention</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for fichesDatesIncoherente in fichesDatesIncoherentes %}
+										<tr>
+											<td>{{ fichesDatesIncoherente.pseudo }}</td>
+											<td>{{ fichesDatesIncoherente.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
+											<td>{{ fichesDatesIncoherente.code }}</td>
+											<td>{{ fichesDatesIncoherente.start|date("d/m/Y", "Europe/Paris") }}
+												au
+												{{ fichesDatesIncoherente.end|date("d/m/Y", "Europe/Paris") }}
+											</td>
+											<td>
+												<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fichesDatesIncoherente.intId, 'ficheId' : fichesDatesIncoherente.ficheId } ) }}'>
+													<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
+												</a>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</section>
+{% endblock %}

@@ -246,6 +246,36 @@ class ArtRepository extends ServiceEntityRepository
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
+
+    public function ArticlesOuvertBlob($search = null, $fous = null): array
+    {
+        if ($search) {
+            $andSearch = "AND a.REF LIKE '$search%'";
+        } else {
+            $andSearch = "";
+        }
+
+        if ($fous) {
+            $andFous = "AND a.TIERS IN ($fous)";
+        } else {
+            $andFous = "";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT a.TIERS AS tiers, a.REF AS ref, s.SREF1 AS sref1, s.SREF2 AS sref2, a.DES AS designation, a.VENUN AS uv, a.FAM_0001 AS famille, a.FAM_0002 AS metier,a.TVAART AS tva, n.NOTEBLOB AS blob, s.CONF AS conf, a.HSDT AS dateFermeture, SUM(st.QTETJSENSTOCK) AS stock
+        FROM ART a
+        LEFT JOIN SART s ON a.DOS = s.DOS AND a.REF = s.REF
+        LEFT JOIN LART l ON a.DOS = l.DOS AND a.REF = l.REF AND s.SREF1 = l.SREF1 AND s.SREF2 = l.SREF2
+        LEFT JOIN MNOTE n ON l.NOTE_0010 = n.NOTE
+        LEFT JOIN MVTL_STOCK_V st ON a.REF = st.REFERENCE AND l.SREF1 = st.SREFERENCE1 AND l.SREF2 = st.SREFERENCE2
+        WHERE a.DOS = 1 AND a.HSDT IS NULL  $andFous $andSearch
+        GROUP BY a.TIERS, a.REF, s.SREF1, s.SREF2, a.DES, a.VENUN, n.NOTEBLOB, s.CONF, a.HSDT, a.FAM_0001, a.FAM_0002, a.TVAART
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     public function getPhyto(): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -360,12 +390,18 @@ class ArtRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
-    public function getSearchArt($dos, $produit): array
+    public function getSearchArt($dos, $produit, $type): array
     {
+        if ($type == 'EAN') {
+            $where = "ean = '$produit'";
+        } elseif ($type == 'REF') {
+            $where = "ref LIKE '%$produit%'";
+        }
+
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT ref AS ref, sref1 AS sref1, sref2 AS sref2, designation AS designation, uv AS uv, stock AS stock, ean AS ean, ferme AS ferme, color AS color
+        $sql = "SELECT ref AS ref, sref1 AS sref1, sref2 AS sref2, designation AS designation, uv AS uv, SUM(stock) AS stock, ean AS ean, ferme AS ferme, color AS color
         FROM(
-        SELECT LTRIM(RTRIM(a.REF)) AS ref, LTRIM(RTRIM(s.SREF1)) AS sref1, LTRIM(RTRIM(s.SREF2)) AS sref2, LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(a.VENUN)) AS uv, LTRIM(RTRIM(m.QTETJSENSTOCK)) AS stock,
+        SELECT LTRIM(RTRIM(a.REF)) AS ref, LTRIM(RTRIM(s.SREF1)) AS sref1, LTRIM(RTRIM(s.SREF2)) AS sref2, LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(a.VENUN)) AS uv, m.QTETJSENSTOCK AS stock,
         CASE
         WHEN a.SREFCOD = 1 THEN LTRIM(RTRIM(a.EAN))
         WHEN a.SREFCOD = 2 THEN LTRIM(RTRIM(s.EAN)) --, a.HSDT AS ferme, s.EAN AS sean, s.USERMODH AS fermeSref
@@ -383,7 +419,8 @@ class ArtRepository extends ServiceEntityRepository
         LEFT JOIN SART s ON a.DOS = s.DOS AND a.REF = s.REF
         LEFT JOIN MVTL_STOCK_V m ON a.REF = m.REFERENCE AND s.SREF1 = m.SREFERENCE1 AND s.SREF2 = m.SREFERENCE2
         WHERE a.DOS = $dos)reponse
-        WHERE ref LIKE '%$produit%'
+        WHERE $where
+        GROUP BY ref, sref1, sref2, designation, uv, ean, ferme, color
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

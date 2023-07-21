@@ -1,219 +1,276 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des congés{% endblock %}
+{% block title %}Liste des congés
+{% endblock %}
 
 {% block body %}
-<div class="row">
-    <div class="col-md-12">
-        <div class="card card-dark">
-            <div class="card-header d-flex">
-                <h3 class="card-title text-center">Liste des congés</h3>
-                {% if is_granted('ROLE_CONGES') %}
-                <a href="{{ path('app_holiday_new_closing') }}" class="badge badge-success ml-auto">administration des congés</a>
-                {% endif %}
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-                <table id="example1" class="table table-bordered table-striped">
-                    <thead>
-                        <tr class="text-center">
-                            <th>Id</th>
-                            <th>Statuts</th>
-                            <th>Utilisateur</th>
-                            <th>Services</th>
-                            <th>Date de Début</th>
-                            <th>Date de Fin</th>
-                            <th>Nb jour(s)</th>
-                            <th>Type</th>
-                            <th>Demande déposé</th>
-                            <th>Date de traitement</th>
-                            <th>Traité par</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-center">
-                    {% for holiday in holidays %}
-                        <tr>
-                            <td>{{ holiday.id }}</td>
-                            <td>
-                            {% if holiday.holidayStatus.id == 1 %}
-                                <a class="btn btn-light btn-xl text-dark" data-toggle="dropdown">
-                                <i class="far fa-hourglass"></i>
-                                <span class="badge badge-success navbar-badge">0</span>
-                            </a>
-                            {% endif %}
-                            {% if holiday.holidayStatus.id == 2 %}
-                            <a class="btn btn-light btn-xl text-dark" data-toggle="dropdown">
-                                <i class="far fa-hourglass"></i>
-                                <span class="badge badge-warning navbar-badge">10</span>
-                            </a>
-                            {% endif %}
-                            {% if holiday.holidayStatus.id == 3 %}
-                                <div><i class="fas fa-check fa-2x text-success"></i></div>
-                            {% endif %}
-                            {% if holiday.holidayStatus.id == 4 %}
-                                <div><i class="fas fa-times fa-2x text-danger"></i></div>
-                            {% endif %}
-                            </td>
-                                <td>{{ holiday.user.pseudo }}</td>
-                                <td><div class="btn" style="background-color: {{ holiday.user.service.color }}; color: {{ holiday.user.service.textColor }}"><i class='pr-2 fa {{ holiday.user.service.fa }}'></i>{{ holiday.user.service.title }}</div></td>
-                            {% if holiday.sliceStart == 'AM' %}{% set trancheStart = 'Matin' %}{% elseif holiday.sliceStart == 'PM' %}{% set trancheStart = 'Aprés midi' %}{% else %}{% set trancheStart = 'Journée' %}{% endif %}
-                            <td>{{ holiday.start ? holiday.start|date('d-m-Y') : '' }} {{ trancheStart }}</td>
-                            {% if holiday.sliceEnd == 'AM' %}{% set trancheEnd = 'Matin' %}{% elseif holiday.sliceEnd == 'PM' %}{% set trancheEnd = 'Aprés midi' %}{% else %}{% set trancheEnd = 'Journée' %}{% endif %}
-                            <td>{{ holiday.end ? holiday.end|date('d-m-Y') : '' }} {{ trancheEnd }}</td>
-                            <td>{{ holiday.nbJours }}</td>
-                            <td>{% if holiday.user.id == app.user.id or is_granted('ROLE_CONGES') %}
-                                {{ holiday.holidayType.name }}
-                            {% endif %}</td>
-                            <td>{{ holiday.createdAt|time_diff }}</td>
-                            <td>{{ holiday.treatmentedAt ? holiday.treatmentedAt|date('d-m-Y H:i:s') : '' }}</td>
-                            <td>
-                                {% if holiday.treatmentedBy %}
-                                    {{ holiday.treatmentedBy.pseudo }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if holiday.user.id == app.user.id or is_granted('ROLE_CONGES') %}
-                                    <a class='btn btn-info' title="Voir" href="{{ path('app_holiday_show', {'id': holiday.id}) }}"><i class="fas fa-eye"></i></a>
-                                    <a class='btn btn-warning' title="Modifier" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}"><i class="fas fa-edit"></i></a>
-                                {% endif %}
-                            {% if is_granted('ROLE_CONGES') %}
-                                {% if holiday.holidayStatus.id != 3 %}
-                                <a class='btn btn-success' title="Accepter" data-toggle="modal" data-target="#modal-accepte-{{holiday.id}}" ><i class="fas fa-check"></i></a>
-                                    <div class="modal fade" id="modal-accepte-{{holiday.id}}">
-                                        <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                            <h4 class="modal-title">Voulez vous vraiment Accepter ce congés ?</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                            </div>
-                                            <div class="modal-body">
-                                            <p>Vous êtes sûr de sûr ? l'utilisateur va recevoir un email !&hellip;</p>
-                                            </div>
-                                            <div class="modal-footer justify-content-between">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                                            <a type="button" href="{{ path('app_holiday_accept', {'id': holiday.id}) }}" class="btn btn-success">Accepter</a>
-                                            </div>
-                                        </div>
-                                        <!-- /.modal-content -->
-                                        </div>
-                                        <!-- /.modal-dialog -->
-                                    </div>
-                                    <!-- /.modal -->
-                                {% endif %}
-                                {% if holiday.holidayStatus.id != 4 %}
-                                <a class='btn btn-danger' title="Refuser" data-toggle="modal" data-target="#modal-refuse-{{holiday.id}}"><i class="fas fa-times"></i></a>
-                                    <div class="modal fade" id="modal-refuse-{{holiday.id}}">
-                                        <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                            <h4 class="modal-title">Voulez vous vraiment Refuser ce congés ?</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                            </div>
-                                            <div class="modal-body">
-                                            <p>Vous êtes sûr de sûr ? l'utilisateur va recevoir un email !&hellip;</p>
-                                            </div>
-                                            <div class="modal-footer justify-content-between">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                                            <a type="button" href="{{ path('app_holiday_refuse', {'id': holiday.id}) }}" class="btn btn-danger">Refuser</a>
-                                            </div>
-                                        </div>
-                                        <!-- /.modal-content -->
-                                        </div>
-                                        <!-- /.modal-dialog -->
-                                    </div>
-                                    <!-- /.modal -->
-                                {% endif %}
-                            {% endif %}
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="10">Pas de données à afficher</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header d-flex">
+					<h3 class="card-title text-center">Liste des congés</h3>
+					{% if is_granted('ROLE_CONGES') %}
+						<a href="{{ path('app_holiday_new_closing') }}" class="badge badge-success ml-auto">administration des congés</a>
+					{% endif %}
+				</div>
+				<!-- /.card-header -->
+				<div class="card-body">
+					<table id="example1" class="table table-bordered table-striped">
+						<thead>
+							<tr class="text-center">
+								<th>Id</th>
+								<th>Statuts</th>
+								<th>Utilisateur</th>
+								<th>Services</th>
+								<th>Date de Début</th>
+								<th>Date de Fin</th>
+								<th>Nb jour(s)</th>
+								<th>Type</th>
+								<th>Demande déposé</th>
+								<th>Date de traitement</th>
+								<th>Traité par</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody class="text-center">
+							{% for holiday in holidays %}
+								<tr>
+									<td>{{ holiday.id }}</td>
+									<td>
+										{% if holiday.holidayStatus.id == 1 %}
+											<a class="btn btn-light btn-xl text-dark" data-toggle="dropdown">
+												<i class="far fa-hourglass"></i>
+												<span class="badge badge-success navbar-badge">0</span>
+											</a>
+										{% endif %}
+										{% if holiday.holidayStatus.id == 2 %}
+											<a class="btn btn-light btn-xl text-dark" data-toggle="dropdown">
+												<i class="far fa-hourglass"></i>
+												<span class="badge badge-warning navbar-badge">10</span>
+											</a>
+										{% endif %}
+										{% if holiday.holidayStatus.id == 3 %}
+											<div>
+												<i class="fas fa-check fa-2x text-success"></i>
+											</div>
+										{% endif %}
+										{% if holiday.holidayStatus.id == 4 %}
+											<div>
+												<i class="fas fa-times fa-2x text-danger"></i>
+											</div>
+										{% endif %}
+									</td>
+									<td>{{ holiday.user.pseudo }}</td>
+									<td>
+										<div class="btn" style="background-color: {{ holiday.user.service.color }}; color: {{ holiday.user.service.textColor }}">
+											<i class='pr-2 fa {{ holiday.user.service.fa }}'></i>
+											{{ holiday.user.service.title }}</div>
+									</td>
+									{% if holiday.sliceStart == 'AM' %}
+										{% set trancheStart = 'Matin' %}
+									{% elseif holiday.sliceStart == 'PM' %}
+										{% set trancheStart = 'Aprés midi' %}
+									{% else %}
+										{% set trancheStart = 'Journée' %}
+									{% endif %}
+									<td>{{ holiday.start ? holiday.start|date('d-m-Y') : '' }}
+										{{ trancheStart }}</td>
+									{% if holiday.sliceEnd == 'AM' %}
+										{% set trancheEnd = 'Matin' %}
+									{% elseif holiday.sliceEnd == 'PM' %}
+										{% set trancheEnd = 'Aprés midi' %}
+									{% else %}
+										{% set trancheEnd = 'Journée' %}
+									{% endif %}
+									<td>{{ holiday.end ? holiday.end|date('d-m-Y') : '' }}
+										{{ trancheEnd }}</td>
+									<td>{{ holiday.nbJours }}</td>
+									<td>
+										{% if holiday.user.id == app.user.id or is_granted('ROLE_CONGES') %}
+											{{ holiday.holidayType.name }}
+										{% endif %}
+									</td>
+									<td>{{ holiday.createdAt|time_diff }}</td>
+									<td>{{ holiday.treatmentedAt ? holiday.treatmentedAt|date('d-m-Y H:i:s') : '' }}</td>
+									<td>
+										{% if holiday.treatmentedBy %}
+											{{ holiday.treatmentedBy.pseudo }}
+										{% endif %}
+									</td>
+									<td>
+										{% if holiday.user.id == app.user.id or is_granted('ROLE_CONGES') %}
+											<a class='btn btn-info' title="Voir" href="{{ path('app_holiday_show', {'id': holiday.id}) }}">
+												<i class="fas fa-eye"></i>
+											</a>
+											<a class='btn btn-warning' title="Modifier" href="{{ path('app_holiday_edit', {'id': holiday.id}) }}">
+												<i class="fas fa-edit"></i>
+											</a>
+										{% endif %}
+										{% if is_granted('ROLE_CONGES') %}
+											{% if holiday.holidayStatus.id != 3 %}
+												<a class='btn btn-success' title="Accepter" data-toggle="modal" data-target="#modal-accepte-{{holiday.id}}">
+													<i class="fas fa-check"></i>
+												</a>
+												<div class="modal fade" id="modal-accepte-{{holiday.id}}">
+													<div class="modal-dialog">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h4 class="modal-title">Voulez vous vraiment Accepter ce congés ?</h4>
+																<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																	<span aria-hidden="true">&times;</span>
+																</button>
+															</div>
+															<div class="modal-body">
+																<p>Vous êtes sûr de sûr ? l'utilisateur va recevoir un email !&hellip;</p>
+															</div>
+															<div class="modal-footer justify-content-between">
+																<button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+																<a type="button" href="{{ path('app_holiday_accept', {'id': holiday.id}) }}" class="btn btn-success">Accepter</a>
+															</div>
+														</div>
+														<!-- /.modal-content -->
+													</div>
+													<!-- /.modal-dialog -->
+												</div>
+												<!-- /.modal -->
+											{% endif %}
+											{% if holiday.holidayStatus.id != 4 %}
+												<a class='btn btn-danger' title="Refuser" data-toggle="modal" data-target="#modal-refuse-{{holiday.id}}">
+													<i class="fas fa-times"></i>
+												</a>
+												<div class="modal fade" id="modal-refuse-{{holiday.id}}">
+													<div class="modal-dialog">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h4 class="modal-title">Voulez vous vraiment Refuser ce congés ?</h4>
+																<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																	<span aria-hidden="true">&times;</span>
+																</button>
+															</div>
+															<div class="modal-body">
+																<p>Vous êtes sûr de sûr ? l'utilisateur va recevoir un email !&hellip;</p>
+															</div>
+															<div class="modal-footer justify-content-between">
+																<button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+																<a type="button" href="{{ path('app_holiday_refuse', {'id': holiday.id}) }}" class="btn btn-danger">Refuser</a>
+															</div>
+														</div>
+														<!-- /.modal-content -->
+													</div>
+													<!-- /.modal-dialog -->
+												</div>
+												<!-- /.modal -->
+											{% endif %}
+										{% endif %}
+									</td>
+								</tr>
+							{% else %}
+								<tr>
+									<td colspan="10">Pas de données à afficher</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
 
-                <a class='btn btn-dark float-right mt-3' href="{{ path('app_holiday_new') }}">Déposer une demande de congés</a>
-            </div>
-        </div>
-    </div>
-</div>
+					<a class='btn btn-primary float-right mt-3 col-12 col-sm-2' href="{{ path('app_holiday_new') }}">Déposer une demande de congés</a>
+				</div>
+			</div>
+		</div>
+	</div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card card-dark">
-            <div class="card-header d-flex">
-                <h3 class="card-title text-center">Calendrier des congés validés</h3>
-            </div>
-            <div class="card-body">
-                    <div >
-                    <!-- THE CALENDAR -->
-                    <div id="external-events"></div>
-                    <div id="calendar"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header d-flex">
+					<h3 class="card-title text-center">Calendrier des congés validés</h3>
+				</div>
+				<div class="card-body">
+					<div>
+						<!-- THE CALENDAR -->
+						<div id="external-events"></div>
+						<div id="calendar"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
 {% block javascripts %}
-<!-- tables -->
-<script>
-  $(function () {
-    $("#example1").DataTable({
-      "responsive": true, "lengthChange": false, "autoWidth": false,"order": [[ 0, "desc" ]],
-      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-	$("#example3").DataTable({
-      "responsive": true, "lengthChange": false, "autoWidth": false,"order": [[ 0, "desc" ]],
-      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-    }).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": false,
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
-    });
-  });
-</script>
+	<!-- tables -->
+	<script>
+		$(function () {
+$("#example1").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+$("#example3").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
+$('#example2').DataTable({
+"paging": true,
+"lengthChange": false,
+"searching": false,
+"ordering": false,
+"info": true,
+"autoWidth": false,
+"responsive": true
+});
+});
+	</script>
 
-<!-- fullCalendar -->
-<script>
-    /* initialize the calendar
+	<!-- fullCalendar -->
+	<script>
+		/* initialize the calendar
      -----------------------------------------------------------------*/
-     window.onload = ()=> {
-        let calendarElt = document.querySelector("#calendar")
-        let calendar = new FullCalendar.Calendar(calendarElt, {
-          weekNumbers: true, // numéro de semaine
-          weekNumberCalculation: 'ISO',
-          initialView:'dayGridMonth',
-          locale: 'fr',
-          timeZone: 'Europe/Paris',
-          headerToolbar:{
-            left  : 'prev,next today',
-            center: 'title',
-            right : 'dayGridMonth,timeGridWeek,timeGridDay'
-          },
-          buttonText: {
-            today: 'Aujourd\'hui',
-            month: 'Mois',
-            day: 'Jour',
-            week: 'Semaine'
-        },
-          events    : {{ data|raw }},   
-        })      
-        calendar.render()
-      };
-</script>
-<!-- End Calendrier -->
+window.onload = () => {
+let calendarElt = document.querySelector("#calendar")
+let calendar = new FullCalendar.Calendar(calendarElt, {
+weekNumbers: true, // numéro de semaine
+weekNumberCalculation: 'ISO',
+initialView: 'dayGridMonth',
+locale: 'fr',
+timeZone: 'Europe/Paris',
+headerToolbar: {
+left: 'prev,next today',
+center: 'title',
+right: 'dayGridMonth,timeGridWeek,timeGridDay'
+},
+buttonText: {
+today: 'Aujourd\'hui',
+month: 'Mois',
+day: 'Jour',
+week: 'Semaine'
+},
+events: {{ data|raw }}
+})
+calendar.render()
+};
+	</script>
+	<!-- End Calendrier -->
 
 {% endblock %}

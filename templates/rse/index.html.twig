@@ -1,0 +1,1234 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<div>
+		<section class="content-header">
+			<div class="container-fluid">
+				<div class="row mb-2">
+					<div class="col-sm-6">
+						<h1>States RSE du
+							{{ dd }}
+							au
+							{{ df }}
+						</h1>
+					</div>
+					{{ form_start(form) }}
+					<div class='d-flex'>
+						<div class="p-1 mt-2">
+							Veuillez selectionner la période :
+						</div>
+						<div class="p-1">
+							{{ form_widget(form.startDate) }}
+						</div>
+						<div class="p-1">
+							{{ form_widget(form.endDate) }}
+						</div>
+						<div class="p-1">
+							{{ form_row(form.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }}
+							) }}
+						</div>
+					</div>
+					{{ form_end(form) }}
+				</div>
+			</div>
+			<!-- /.container-fluid -->
+		</section>
+		<div class="row">
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span>
+						<strong>GLOBAL</strong>
+					</span>
+					<h5 class="description-header">Tiers :</h5>
+					<span class="description-header">CLIENT</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span class="description-percentage text-warning">
+						<i class="fas fa-caret-left"></i>
+						0%</span>
+					<h5 class="description-header">{{gloClis[0].montantN3|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -3 }}
+					</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta23 = ((gloClis[0].montantN2 - gloClis[0].montantN3) / gloClis[0].montantN3)* 100 %}
+					{% set colorDelta23 = 'warning' %}
+					{% set caretDelta23 = 'left' %}
+					{% if delta23 > 0 %}
+						{% set colorDelta23 = 'success' %}
+						{% set caretDelta23 = 'up' %}
+					{% endif %}
+					{% if delta23 < 0 %}
+						{% set colorDelta23 = 'danger' %}
+						{% set caretDelta23 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta23}}">
+						<i class="fas fa-caret-{{caretDelta23}}"></i>
+						{{ delta23|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{gloClis[0].montantN2|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta12 = ((gloClis[0].montantN1 - gloClis[0].montantN2) / gloClis[0].montantN2)* 100 %}
+					{% set colorDelta12 = 'warning' %}
+					{% set caretDelta12 = 'left' %}
+					{% if delta12 > 0 %}
+						{% set colorDelta12 = 'success' %}
+						{% set caretDelta12 = 'up' %}
+					{% endif %}
+					{% if delta12 < 0 %}
+						{% set colorDelta12 = 'danger' %}
+						{% set caretDelta12 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta12}}">
+						<i class="fas fa-caret-{{caretDelta12}}"></i>
+						{{ delta12|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{gloClis[0].montantN1|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block">
+					{% set delta01 = ((gloClis[0].montantN - gloClis[0].montantN1) / gloClis[0].montantN1)* 100 %}
+					{% set colorDelta01 = 'warning' %}
+					{% set caretDelta01 = 'left' %}
+					{% if delta01 > 0 %}
+						{% set colorDelta01 = 'success' %}
+						{% set caretDelta01 = 'up' %}
+					{% endif %}
+					{% if delta01 < 0 %}
+						{% set colorDelta01 = 'danger' %}
+						{% set caretDelta01 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta01}}">
+						<i class="fas fa-caret-{{caretDelta01}}"></i>
+						{{ delta01|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{gloClis[0].montantN|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-Y") }}
+						au
+						{{ df|date("d-m-Y") }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+		</div>
+		<div class="card">
+			<div class="card-header border-transparent">
+				<h2 class="card-title">Détail par départements pour les clients</h2>
+				<p class="card-text">
+					<small>Objectif : Priviléger/Augmenter les clients locaux afin de limiter l'impact carbone</small>
+				</p>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-tool" data-card-widget="remove">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table id='example1' class="table table-sm">
+						<thead>
+							<tr>
+								<th>Pays</th>
+								<th>Départements</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -3 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for depCli in depClis %}
+								<tr>
+									<td>{{ depCli.pays }}</td>
+									<td>{{ depCli.departement }}</td>
+									<td>{{ depCli.montantN3 }}
+										{% if depCli.montantN3 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * depCli.montantN3 ) / gloClis[0].montantN3))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ depCli.montantN2 }}
+										{% if depCli.montantN2 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * depCli.montantN2 ) / gloClis[0].montantN2))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ depCli.montantN1 }}
+										{% if depCli.montantN1 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * depCli.montantN1 ) / gloClis[0].montantN1))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ depCli.montantN }}
+										{% if depCli.montantN > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * depCli.montantN ) / gloClis[0].montantN))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class='card-footer'>
+				<small>Montants HT pourcentage calculés sur la CA Total</small>
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span>
+						<strong>GLOBAL</strong>
+					</span>
+					<h5 class="description-header">Tiers :</h5>
+					<span class="description-header">FOURNISSEUR</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span class="description-percentage text-warning">
+						<i class="fas fa-caret-left"></i>
+						0%</span>
+					<h5 class="description-header">{{gloFous[0].montantN3|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -3 }}
+					</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta23 = ((gloFous[0].montantN2 - gloFous[0].montantN3) / gloFous[0].montantN3)* 100 %}
+					{% set colorDelta23 = 'warning' %}
+					{% set caretDelta23 = 'left' %}
+					{% if delta23 > 0 %}
+						{% set colorDelta23 = 'success' %}
+						{% set caretDelta23 = 'up' %}
+					{% endif %}
+					{% if delta23 < 0 %}
+						{% set colorDelta23 = 'danger' %}
+						{% set caretDelta23 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta23}}">
+						<i class="fas fa-caret-{{caretDelta23}}"></i>
+						{{ delta23|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{gloFous[0].montantN2|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta12 = ((gloFous[0].montantN1 - gloFous[0].montantN2) / gloFous[0].montantN2)* 100 %}
+					{% set colorDelta12 = 'warning' %}
+					{% set caretDelta12 = 'left' %}
+					{% if delta12 > 0 %}
+						{% set colorDelta12 = 'success' %}
+						{% set caretDelta12 = 'up' %}
+					{% endif %}
+					{% if delta12 < 0 %}
+						{% set colorDelta12 = 'danger' %}
+						{% set caretDelta12 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta12}}">
+						<i class="fas fa-caret-{{caretDelta12}}"></i>
+						{{ delta12|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{gloFous[0].montantN1|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block">
+					{% set delta01 = ((gloFous[0].montantN - gloFous[0].montantN1) / gloFous[0].montantN1)* 100 %}
+					{% set colorDelta01 = 'warning' %}
+					{% set caretDelta01 = 'left' %}
+					{% if delta01 > 0 %}
+						{% set colorDelta01 = 'success' %}
+						{% set caretDelta01 = 'up' %}
+					{% endif %}
+					{% if delta01 < 0 %}
+						{% set colorDelta01 = 'danger' %}
+						{% set caretDelta01 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta01}}">
+						<i class="fas fa-caret-{{caretDelta01}}"></i>
+						{{ delta01|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{gloFous[0].montantN|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-Y") }}
+						au
+						{{ df|date("d-m-Y") }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+		</div>
+
+		<div class="card">
+			<div class="card-header border-transparent">
+				<div>
+					<h2 class="card-title">Détail par départements pour les Fournisseurs</h2>
+					<p class="card-text">
+						<small>Objectif : Priviléger/Augmenter les fournisseurs locaux afin de limiter l'impact carbone</small>
+					</p>
+				</div>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-tool" data-card-widget="remove">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table id='example3' class="table table-sm">
+						<thead>
+							<tr>
+								<th>Pays</th>
+								<th>Départements</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -3 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for depFou in depFous %}
+								<tr>
+									<td>{{ depFou.pays }}</td>
+									<td>{{ depFou.departement }}</td>
+									<td>{{ depFou.montantN3 }}
+										{% if depFou.montantN3 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * depFou.montantN3 ) / gloFous[0].montantN3))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ depFou.montantN2 }}
+										{% if depFou.montantN2 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * depFou.montantN2 ) / gloFous[0].montantN2))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ depFou.montantN1 }}
+										{% if depFou.montantN1 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * depFou.montantN1 ) / gloFous[0].montantN1))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ depFou.montantN }}
+										{% if depFou.montantN > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * depFou.montantN ) / gloFous[0].montantN))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class='card-footer'>
+				<small>Montants HT pourcentage calculés sur la CA Total</small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span>
+						<strong>PAILLAGE ET ENGRAIS</strong>
+					</span>
+					<h5 class="description-header">Tiers :</h5>
+					<span class="description-header">CLIENT</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span class="description-percentage text-warning">
+						<i class="fas fa-caret-left"></i>
+						0%</span>
+					<h5 class="description-header">{{paillageEngraisGloClis[0].montantN3|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -3 }}
+					</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta23 = ((paillageEngraisGloClis[0].montantN2 - paillageEngraisGloClis[0].montantN3) / paillageEngraisGloClis[0].montantN3)* 100 %}
+					{% set colorDelta23 = 'warning' %}
+					{% set caretDelta23 = 'left' %}
+					{% if delta23 > 0 %}
+						{% set colorDelta23 = 'success' %}
+						{% set caretDelta23 = 'up' %}
+					{% endif %}
+					{% if delta23 < 0 %}
+						{% set colorDelta23 = 'danger' %}
+						{% set caretDelta23 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta23}}">
+						<i class="fas fa-caret-{{caretDelta23}}"></i>
+						{{ delta23|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{paillageEngraisGloClis[0].montantN2|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta12 = ((paillageEngraisGloClis[0].montantN1 - paillageEngraisGloClis[0].montantN2) / paillageEngraisGloClis[0].montantN2)* 100 %}
+					{% set colorDelta12 = 'warning' %}
+					{% set caretDelta12 = 'left' %}
+					{% if delta12 > 0 %}
+						{% set colorDelta12 = 'success' %}
+						{% set caretDelta12 = 'up' %}
+					{% endif %}
+					{% if delta12 < 0 %}
+						{% set colorDelta12 = 'danger' %}
+						{% set caretDelta12 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta12}}">
+						<i class="fas fa-caret-{{caretDelta12}}"></i>
+						{{ delta12|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{paillageEngraisGloClis[0].montantN1|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block">
+					{% set delta01 = ((paillageEngraisGloClis[0].montantN - paillageEngraisGloClis[0].montantN1) / paillageEngraisGloClis[0].montantN1)* 100 %}
+					{% set colorDelta01 = 'warning' %}
+					{% set caretDelta01 = 'left' %}
+					{% if delta01 > 0 %}
+						{% set colorDelta01 = 'success' %}
+						{% set caretDelta01 = 'up' %}
+					{% endif %}
+					{% if delta01 < 0 %}
+						{% set colorDelta01 = 'danger' %}
+						{% set caretDelta01 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta01}}">
+						<i class="fas fa-caret-{{caretDelta01}}"></i>
+						{{ delta01|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{paillageEngraisGloClis[0].montantN|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-Y") }}
+						au
+						{{ df|date("d-m-Y") }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+		</div>
+		<div class="card">
+			<div class="card-header border-transparent">
+				<div>
+					<h2 class="card-title">Détail Paillage et Engrais par Taux de TVA pour les Clients</h2>
+					<p class="card-text">
+						<small>Objectif : Priviléger/Augmenter les produits à TVA réduire et donc les produits UAB BIO</small>
+					</p>
+				</div>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-tool" data-card-widget="remove">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table id='example6' class="table table-sm">
+						<thead>
+							<tr>
+								<th>Famille</th>
+								<th>TVA</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -3 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for paillageEngraisFamCli in paillageEngraisFamClis %}
+								<tr>
+									<td>{{ paillageEngraisFamCli.famille }}</td>
+									<td>
+										{% if paillageEngraisFamCli.tva == 1 %}
+											20 %
+										{% elseif paillageEngraisFamCli.tva == 2 %}
+											10 %
+										{% elseif paillageEngraisFamCli.tva == 7 %}
+											5.5 %
+										{% endif %}
+									</td>
+									<td>{{ paillageEngraisFamCli.montantN3 }}
+										{% if paillageEngraisFamCli.montantN3 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * paillageEngraisFamCli.montantN3 ) / paillageEngraisGloClis[0].montantN3))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ paillageEngraisFamCli.montantN2 }}
+										{% if paillageEngraisFamCli.montantN2 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * paillageEngraisFamCli.montantN2 ) / paillageEngraisGloClis[0].montantN2))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ paillageEngraisFamCli.montantN1 }}
+										{% if paillageEngraisFamCli.montantN1 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * paillageEngraisFamCli.montantN1 ) / paillageEngraisGloClis[0].montantN1))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ paillageEngraisFamCli.montantN }}
+										{% if paillageEngraisFamCli.montantN > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * paillageEngraisFamCli.montantN ) / paillageEngraisGloClis[0].montantN))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class='card-footer'>
+				<small>Montants HT pourcentage calculés sur la CA Total Paillage et Engrais</small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span>
+						<strong>PAILLAGE ET ENGRAIS</strong>
+					</span>
+					<h5 class="description-header">Tiers :</h5>
+					<span class="description-header">FOURNISSEUR</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span class="description-percentage text-warning">
+						<i class="fas fa-caret-left"></i>
+						0%</span>
+					<h5 class="description-header">{{paillageEngraisGloFous[0].montantN3|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -3 }}
+					</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta23 = ((paillageEngraisGloFous[0].montantN2 - paillageEngraisGloFous[0].montantN3) / paillageEngraisGloFous[0].montantN3)* 100 %}
+					{% set colorDelta23 = 'warning' %}
+					{% set caretDelta23 = 'left' %}
+					{% if delta23 > 0 %}
+						{% set colorDelta23 = 'success' %}
+						{% set caretDelta23 = 'up' %}
+					{% endif %}
+					{% if delta23 < 0 %}
+						{% set colorDelta23 = 'danger' %}
+						{% set caretDelta23 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta23}}">
+						<i class="fas fa-caret-{{caretDelta23}}"></i>
+						{{ delta23|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{paillageEngraisGloFous[0].montantN2|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta12 = ((paillageEngraisGloFous[0].montantN1 - paillageEngraisGloFous[0].montantN2) / paillageEngraisGloFous[0].montantN2)* 100 %}
+					{% set colorDelta12 = 'warning' %}
+					{% set caretDelta12 = 'left' %}
+					{% if delta12 > 0 %}
+						{% set colorDelta12 = 'success' %}
+						{% set caretDelta12 = 'up' %}
+					{% endif %}
+					{% if delta12 < 0 %}
+						{% set colorDelta12 = 'danger' %}
+						{% set caretDelta12 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta12}}">
+						<i class="fas fa-caret-{{caretDelta12}}"></i>
+						{{ delta12|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{paillageEngraisGloFous[0].montantN1|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block">
+					{% set delta01 = ((paillageEngraisGloFous[0].montantN - paillageEngraisGloFous[0].montantN1) / paillageEngraisGloFous[0].montantN1)* 100 %}
+					{% set colorDelta01 = 'warning' %}
+					{% set caretDelta01 = 'left' %}
+					{% if delta01 > 0 %}
+						{% set colorDelta01 = 'success' %}
+						{% set caretDelta01 = 'up' %}
+					{% endif %}
+					{% if delta01 < 0 %}
+						{% set colorDelta01 = 'danger' %}
+						{% set caretDelta01 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta01}}">
+						<i class="fas fa-caret-{{caretDelta01}}"></i>
+						{{ delta01|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{paillageEngraisGloFous[0].montantN|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-Y") }}
+						au
+						{{ df|date("d-m-Y") }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+		</div>
+		<div class="card">
+			<div class="card-header border-transparent">
+				<div>
+					<h2 class="card-title">Détail Paillage et Engrais par Taux de TVA pour les Fournisseurs</h2>
+					<p class="card-text">
+						<small>Objectif : Priviléger/Augmenter les produits à TVA réduire et donc les produits UAB BIO</small>
+					</p>
+				</div>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-tool" data-card-widget="remove">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table id='example2' class="table table-sm">
+						<thead>
+							<tr>
+								<th>Famille</th>
+								<th>TVA</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -3 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for paillageEngraisFamFou in paillageEngraisFamFous %}
+								<tr>
+									<td>{{ paillageEngraisFamFou.famille }}</td>
+									<td>
+										{% if paillageEngraisFamFou.tva == 1 %}
+											20 %
+										{% elseif paillageEngraisFamFou.tva == 2 %}
+											10 %
+										{% elseif paillageEngraisFamFou.tva == 7 %}
+											5.5 %
+										{% endif %}
+									</td>
+									<td>{{ paillageEngraisFamFou.montantN3 }}
+										{% if paillageEngraisFamFou.montantN3 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * paillageEngraisFamFou.montantN3 ) / paillageEngraisGloFous[0].montantN3))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ paillageEngraisFamFou.montantN2 }}
+										{% if paillageEngraisFamFou.montantN2 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * paillageEngraisFamFou.montantN2 ) / paillageEngraisGloFous[0].montantN2))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ paillageEngraisFamFou.montantN1 }}
+										{% if paillageEngraisFamFou.montantN1 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * paillageEngraisFamFou.montantN1 ) / paillageEngraisGloFous[0].montantN1))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ paillageEngraisFamFou.montantN }}
+										{% if paillageEngraisFamFou.montantN > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * paillageEngraisFamFou.montantN ) / paillageEngraisGloFous[0].montantN))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class='card-footer'>
+				<small>Montants HT pourcentage calculés sur la CA Total Paillage et Engrais</small>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span>
+						<strong>PHYTO ET BIOCONTROLE</strong>
+					</span>
+					<h5 class="description-header">Tiers :</h5>
+					<span class="description-header">CLIENT</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span class="description-percentage text-warning">
+						<i class="fas fa-caret-left"></i>
+						0%</span>
+					<h5 class="description-header">{{phytoBiocontroleGloClis[0].montantN3|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -3 }}
+					</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta23 = ((phytoBiocontroleGloClis[0].montantN2 - phytoBiocontroleGloClis[0].montantN3) / phytoBiocontroleGloClis[0].montantN3)* 100 %}
+					{% set colorDelta23 = 'warning' %}
+					{% set caretDelta23 = 'left' %}
+					{% if delta23 > 0 %}
+						{% set colorDelta23 = 'success' %}
+						{% set caretDelta23 = 'up' %}
+					{% endif %}
+					{% if delta23 < 0 %}
+						{% set colorDelta23 = 'danger' %}
+						{% set caretDelta23 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta23}}">
+						<i class="fas fa-caret-{{caretDelta23}}"></i>
+						{{ delta23|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{phytoBiocontroleGloClis[0].montantN2|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta12 = ((phytoBiocontroleGloClis[0].montantN1 - phytoBiocontroleGloClis[0].montantN2) / phytoBiocontroleGloClis[0].montantN2)* 100 %}
+					{% set colorDelta12 = 'warning' %}
+					{% set caretDelta12 = 'left' %}
+					{% if delta12 > 0 %}
+						{% set colorDelta12 = 'success' %}
+						{% set caretDelta12 = 'up' %}
+					{% endif %}
+					{% if delta12 < 0 %}
+						{% set colorDelta12 = 'danger' %}
+						{% set caretDelta12 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta12}}">
+						<i class="fas fa-caret-{{caretDelta12}}"></i>
+						{{ delta12|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{phytoBiocontroleGloClis[0].montantN1|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block">
+					{% set delta01 = ((phytoBiocontroleGloClis[0].montantN - phytoBiocontroleGloClis[0].montantN1) / phytoBiocontroleGloClis[0].montantN1)* 100 %}
+					{% set colorDelta01 = 'warning' %}
+					{% set caretDelta01 = 'left' %}
+					{% if delta01 > 0 %}
+						{% set colorDelta01 = 'success' %}
+						{% set caretDelta01 = 'up' %}
+					{% endif %}
+					{% if delta01 < 0 %}
+						{% set colorDelta01 = 'danger' %}
+						{% set caretDelta01 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta01}}">
+						<i class="fas fa-caret-{{caretDelta01}}"></i>
+						{{ delta01|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{phytoBiocontroleGloClis[0].montantN|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-Y") }}
+						au
+						{{ df|date("d-m-Y") }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+		</div>
+		<div class="card">
+			<div class="card-header border-transparent">
+				<div>
+					<h2 class="card-title">Détail Phyto et Biocontrôle pour les Clients</h2>
+					<p class="card-text">
+						<small>Objectif : Priviléger/Augmenter les produits Biocontrôle</small>
+					</p>
+				</div>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-tool" data-card-widget="remove">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table id='example6' class="table table-sm">
+						<thead>
+							<tr>
+								<th>Famille</th>
+								<th>TVA</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -3 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for phytoBiocontroleFamCli in phytoBiocontroleFamClis %}
+								<tr>
+									<td>{{ phytoBiocontroleFamCli.famille }}</td>
+									<td>
+										{% if phytoBiocontroleFamCli.tva == 1 %}
+											20 %
+										{% elseif phytoBiocontroleFamCli.tva == 2 %}
+											10 %
+										{% elseif phytoBiocontroleFamCli.tva == 7 %}
+											5.5 %
+										{% endif %}
+									</td>
+									<td>{{ phytoBiocontroleFamCli.montantN3 }}
+										{% if phytoBiocontroleFamCli.montantN3 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * phytoBiocontroleFamCli.montantN3 ) / phytoBiocontroleGloClis[0].montantN3))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ phytoBiocontroleFamCli.montantN2 }}
+										{% if phytoBiocontroleFamCli.montantN2 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * phytoBiocontroleFamCli.montantN2 ) / phytoBiocontroleGloClis[0].montantN2))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ phytoBiocontroleFamCli.montantN1 }}
+										{% if phytoBiocontroleFamCli.montantN1 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * phytoBiocontroleFamCli.montantN1 ) / phytoBiocontroleGloClis[0].montantN1))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ phytoBiocontroleFamCli.montantN }}
+										{% if phytoBiocontroleFamCli.montantN > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * phytoBiocontroleFamCli.montantN ) / phytoBiocontroleGloClis[0].montantN))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class='card-footer'>
+				<small>Montants HT pourcentage calculés sur la CA Total Phyto et Biocontrôle</small>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span>
+						<strong>PHYTO ET BIOCONTROLE</strong>
+					</span>
+					<h5 class="description-header">Tiers :</h5>
+					<span class="description-header">FOURNISSEUR</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					<span class="description-percentage text-warning">
+						<i class="fas fa-caret-left"></i>
+						0%</span>
+					<h5 class="description-header">{{phytoBiocontroleGloFous[0].montantN3|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -3 }}
+					</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta23 = ((phytoBiocontroleGloFous[0].montantN2 - phytoBiocontroleGloFous[0].montantN3) / phytoBiocontroleGloFous[0].montantN3)* 100 %}
+					{% set colorDelta23 = 'warning' %}
+					{% set caretDelta23 = 'left' %}
+					{% if delta23 > 0 %}
+						{% set colorDelta23 = 'success' %}
+						{% set caretDelta23 = 'up' %}
+					{% endif %}
+					{% if delta23 < 0 %}
+						{% set colorDelta23 = 'danger' %}
+						{% set caretDelta23 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta23}}">
+						<i class="fas fa-caret-{{caretDelta23}}"></i>
+						{{ delta23|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{phytoBiocontroleGloFous[0].montantN2|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block border-right">
+					{% set delta12 = ((phytoBiocontroleGloFous[0].montantN1 - phytoBiocontroleGloFous[0].montantN2) / phytoBiocontroleGloFous[0].montantN2)* 100 %}
+					{% set colorDelta12 = 'warning' %}
+					{% set caretDelta12 = 'left' %}
+					{% if delta12 > 0 %}
+						{% set colorDelta12 = 'success' %}
+						{% set caretDelta12 = 'up' %}
+					{% endif %}
+					{% if delta12 < 0 %}
+						{% set colorDelta12 = 'danger' %}
+						{% set caretDelta12 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta12}}">
+						<i class="fas fa-caret-{{caretDelta12}}"></i>
+						{{ delta12|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{phytoBiocontroleGloFous[0].montantN1|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+						au
+						{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+			<div class="col-sm-2 col-12">
+				<div class="description-block">
+					{% set delta01 = ((phytoBiocontroleGloFous[0].montantN - phytoBiocontroleGloFous[0].montantN1) / phytoBiocontroleGloFous[0].montantN1)* 100 %}
+					{% set colorDelta01 = 'warning' %}
+					{% set caretDelta01 = 'left' %}
+					{% if delta01 > 0 %}
+						{% set colorDelta01 = 'success' %}
+						{% set caretDelta01 = 'up' %}
+					{% endif %}
+					{% if delta01 < 0 %}
+						{% set colorDelta01 = 'danger' %}
+						{% set caretDelta01 = 'down' %}
+					{% endif %}
+					<span class="description-percentage text-{{colorDelta01}}">
+						<i class="fas fa-caret-{{caretDelta01}}"></i>
+						{{ delta01|number_format(2, '.', ' ') }}%
+					</span>
+					<h5 class="description-header">{{phytoBiocontroleGloFous[0].montantN|format_currency('EUR', locale='fr') }}</h5>
+					<span class="description-text">du
+						{{ dd|date("d-m-Y") }}
+						au
+						{{ df|date("d-m-Y") }}</span>
+				</div>
+				<!-- /.description-block -->
+			</div>
+			<!-- /.col -->
+		</div>
+		<div class="card">
+			<div class="card-header border-transparent">
+				<div>
+					<h2 class="card-title">Détail Phyto et Biocontrôle pour les Fournisseurs</h2>
+					<p class="card-text">
+						<small>Objectif : Priviléger/Augmenter les produits Biocontrôle</small>
+					</p>
+				</div>
+				<div class="card-tools">
+					<button type="button" class="btn btn-tool" data-card-widget="collapse">
+						<i class="fas fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-tool" data-card-widget="remove">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="table-responsive">
+					<table id='example2' class="table table-sm">
+						<thead>
+							<tr>
+								<th>Famille</th>
+								<th>TVA</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -3 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -3 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -2 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -2 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") -1 }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") -1 }}</th>
+								<th>du
+									{{ dd|date("d-m-") }}{{ dd|date("Y") }}
+									au
+									{{ df|date("d-m-") }}{{ df|date("Y") }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for phytoBiocontroleFamFou in phytoBiocontroleFamFous %}
+								<tr>
+									<td>{{ phytoBiocontroleFamFou.famille }}</td>
+									<td>
+										{% if phytoBiocontroleFamFou.tva == 1 %}
+											20 %
+										{% elseif phytoBiocontroleFamFou.tva == 2 %}
+											10 %
+										{% elseif phytoBiocontroleFamFou.tva == 7 %}
+											5.5 %
+										{% endif %}
+									</td>
+									<td>{{ phytoBiocontroleFamFou.montantN3 }}
+										{% if phytoBiocontroleFamFou.montantN3 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * phytoBiocontroleFamFou.montantN3 ) / phytoBiocontroleGloFous[0].montantN3))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ phytoBiocontroleFamFou.montantN2 }}
+										{% if phytoBiocontroleFamFou.montantN2 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * phytoBiocontroleFamFou.montantN2 ) / phytoBiocontroleGloFous[0].montantN2))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ phytoBiocontroleFamFou.montantN1 }}
+										{% if phytoBiocontroleFamFou.montantN1 > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * phytoBiocontroleFamFou.montantN1 ) / phytoBiocontroleGloFous[0].montantN1))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+									<td>{{ phytoBiocontroleFamFou.montantN }}
+										{% if phytoBiocontroleFamFou.montantN > 0 %}
+											<span class="badge bg-success">
+												{{ ((( 100 * phytoBiocontroleFamFou.montantN ) / phytoBiocontroleGloFous[0].montantN))|number_format(2, '.', ' ') }}
+												%
+											</span>
+										{% endif %}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class='card-footer'>
+				<small>Montants HT pourcentage calculés sur la CA Total Phyto et Biocontrôle</small>
+			</div>
+		</div>
+
+
+	</div>
+{% endblock %}

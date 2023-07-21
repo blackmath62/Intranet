@@ -1,0 +1,512 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block body %}
+	<div class="card collapsed-card card-info">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-info-circle"></i>
+				Info</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<p>Dans le haut à droite, vous pouvez modifier l'état de la piéce.</p>
+		</div>
+	</div>
+	{% if app.request.attributes.get('ficheId') %}
+		<a class="btn btn-warning col-12" href='{{path('app_affaire_saisie_fiche_intervention', {'id' : app.request.attributes.get('id') } ) }}'>
+			<i class="fas fa-plus mr-1"></i>
+			Créer une nouvelle fiche</a>
+	{% endif %}
+	<a class="btn btn-success col-12 mt-2" href='{{path('app_affaire_show_intervention', {'id' : app.request.attributes.get('id') } ) }}'>
+		<i class="fas fa-eye mr-1"></i>
+		Voir l'intervention</a>
+	<a href='{{path('app_affaire_me_nok' ) }}' class="text-light btn btn-xl btn-primary col-12 mt-2">
+		<i class="fas fa-share mr-1"></i>
+		Affaires
+	</a>
+	{% if fiche and fiche.lockedAt %}
+		{% else %}
+			<div class="card mt-2">
+				<div class="card-header d-flex flex-wrap flex-column">
+					<h3 class="card-title">Saisie fiche intervention</h3>
+					<small>pour
+						{{intervention.code.libelle }}</small>
+					<small>du
+						{{ intervention.start|date("d-m-Y H:i", "Europe/Paris") }}
+						au
+						{{ intervention.end|date("d-m-Y H:i", "Europe/Paris") }}
+					</small>
+				</div>
+				<div class="card-body">
+					{% if app.request.attributes.get('ficheId') %}
+						<a class="btn btn-info col-12 mt-2" data-toggle="modal" data-target="#modal-commentaire">
+							<i class="fas fa-comments mr-2"></i>Ajouter un commentaire
+						</a>
+						<div class="modal fade" id="modal-commentaire">
+							<div class="modal-dialog modal-sm">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h4 class="modal-title">Déposer un commentaire pour cette fiche</h4>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									{{ form_start(formCommentaire)}}
+									<div class="modal-body text-center">
+										{{ form_row(formCommentaire.comment )}}
+									</div>
+									<div class="modal-footer justify-content-between">
+										<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+										{{ form_row(formCommentaire.ajouter)}}
+									</div>
+									{{ form_end(formCommentaire)}}
+								</div>
+							</div>
+						</div>
+						<a class="btn btn-secondary col-12 col-sm-12 mt-2" data-toggle="modal" data-target="#modal-heures">
+							<i class="fa-solid fa-truck pr-2"></i>Déclarer Heures Déplac et Travaux<i class="fa-solid fa-hammer pl-2"></i>
+						</a>
+						<div class="modal fade" id="modal-heures">
+							<div class="modal-dialog modal-sm">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h4 class="modal-title">Déclarer des heures</h4>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									{{ form_start(formHeureIntervention)}}
+									<div class="modal-body text-center">
+										{{ form_row(formHeureIntervention.type)}}
+										{{ form_row(formHeureIntervention.start)}}
+										{{ form_row(formHeureIntervention.end)}}
+									</div>
+									<div class="modal-footer justify-content-between">
+										<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+										{{ form_row(formHeureIntervention.envoyer)}}
+									</div>
+									{{ form_end(formHeureIntervention)}}
+								</div>
+							</div>
+						</div>
+					{% endif %}
+					{{ form_start(formFicheIntervention)}}
+					{% if app.request.attributes.get('ficheId') %}
+						{{ form_row(formFicheIntervention.intervenant, { 'attr' : { 'class' : 'd-none' } } ) }}
+						<input class='form-control col-12 mt-3 text-center' type="text" placeholder="{{fiche.intervenant.pseudo}}" disabled>
+						{{ form_row(formFicheIntervention.createdAt, { 'attr' : { 'class' : 'd-none' } } ) }}
+						<input class='form-control col-12 mt-3 text-center' type="text" placeholder='{{fiche.createdAt|date("d/m/Y", "Europe/Paris")}}' disabled>
+					{% else %}
+						{{ form_row(formFicheIntervention.intervenant ) }}
+						{{ form_errors(formFicheIntervention.intervenant ) }}
+						{{ form_row(formFicheIntervention.createdAt ) }}
+						{{ form_errors(formFicheIntervention.createdAt ) }}
+					{% endif %}
+					{{ form_row(formFicheIntervention.pension) }}
+					{% if app.request.attributes.get('ficheId') %}
+						{{ form_widget(formFicheIntervention.envoyer, {'label' : 'Mettre à jour la fiche'}) }}
+					{% else %}
+						{{ form_widget(formFicheIntervention.envoyer, {'label' : 'Créer la fiche'}) }}
+					{% endif %}
+					{{ form_end(formFicheIntervention)}}
+				</div>
+			</div>
+	{% endif %}
+	{% if fiche and fiche.lockedAt %}
+		{% else %}
+			{% if heures %}
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">Heures enregistrées pour cette intervention</h3>
+					</div>
+					<div class="card-body">
+						<table id="example2" class="table text-center table-bordered">
+							<thead>
+								<tr>
+									<th>Type</th>
+									<th>Heures</th>
+									<th>Temps</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for heure in heures %}
+									<tr>
+										<td>
+											{{ heure.type }}
+										</td>
+										<td>
+											{{ heure.start|date("H:i", "Europe/Paris")}}
+											-
+											{{ heure.end|date("H:i", "Europe/Paris") }}
+										</td>
+										<td>
+											{% set diff = date(heure.start|date("H:i", "Europe/Paris")).diff(date(heure.end|date("H:i", "Europe/Paris"))) %}
+											{{ diff.h }}
+											H
+											{{ diff.i}}
+										</td>
+										<td>
+											<a data-toggle="modal" data-target="#modal-lg-{{ heure.id }}">
+												<i class="fas fa-trash-alt fa-2x text-secondary m-2"></i>
+											</a>
+										</td>
+										<div class="modal fade" id="modal-lg-{{ heure.id }}">
+											<div class="modal-dialog modal-sm">
+												<div class="modal-content">
+													<div class="modal-header">
+														<div class="d-flex flex-column">
+															<h4 class="modal-title">Suppression de l'horaire du
+																{{ heure.start|date("H:i", "Europe/Paris")}}
+																-
+																{{ heure.end|date("H:i", "Europe/Paris")}}
+																pour
+																{{ heure.interventionFicheMonteur.intervenant.pseudo }}
+															</h4>
+															<span class="text-left">du chantier
+																{{ heure.interventionFicheMonteur.intervention.code.libelle }}
+															</span>
+														</div>
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+															<span aria-hidden="true">&times;</span>
+														</button>
+													</div>
+													<div class="modal-body">
+														<p>Voulez vous vraiment supprimer cet horaire ? cette action est irréversible !</p>
+													</div>
+													<div class="modal-footer justify-content-between">
+														<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
+														<a href='{{path('app_affaire_remove_heure_intervention', {'id' : app.request.attributes.get('id'),'ficheId' : app.request.attributes.get('ficheId'), 'heureId' : heure.id } ) }}' type="button" class="btn btn-danger">Supprimer cet horaire</a>
+													</div>
+												</div>
+												<!-- /.modal-content -->
+											</div>
+											<!-- /.modal-dialog -->
+										</div>
+									</tr>
+
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			{% endif %}
+	{% endif %}
+	{% if app.request.attributes.get('ficheId') %}
+		<div class="card mt-2">
+			<div class="card-header">
+				{% if fiche and fiche.lockedAt %}
+					<h3 class="card-title">Compte rendu Verrouillé par
+						{{ fiche.lockedBy.pseudo}}
+						le
+						{{ fiche.lockedAt|date("d-m-Y", "Europe/Paris")}}
+					</h3>
+				{% else %}
+					<h3 class="card-title">Compte rendu à valider pour traitement</h3>
+				{% endif %}
+			</div>
+			<div>
+				<ul>
+					<li>
+						<strong>Date :
+						</strong>
+						{{fiche.createdAt|date("d/m/Y", "Europe/Paris")}}</li>
+					<li>
+						<strong>Saisie par :</strong>
+						{{ fiche.createdBy.pseudo }}
+					</li>
+					<li>
+						<strong>Intervenant :</strong>
+						{{ fiche.intervenant.pseudo }}
+					</li>
+					<li>
+						<strong>Pension :</strong>
+						{% for pension in fiche.pension %}
+							{{ pension }}
+							,
+
+						{% endfor %}
+					</li>
+					<li>
+						<strong>Déplacements :</strong>
+						<ul>
+							{% for heure in heures %}
+								{% if heure.type == "deplacement" %}
+									<li>{{ heure.start|date("H:i", "Europe/Paris")}}
+										-
+										{{ heure.end|date("H:i", "Europe/Paris")}}
+									</li>
+								{% endif %}
+							{% endfor %}
+						</ul>
+					</li>
+					<li>
+						<strong>Travaux :</strong>
+						<ul>
+							{% for heure in heures %}
+								{% if heure.type == "Travaux" %}
+									<li>{{ heure.start|date("H:i", "Europe/Paris")}}
+										-
+										{{ heure.end|date("H:i", "Europe/Paris")}}
+									</li>
+								{% endif %}
+							{% endfor %}
+						</ul>
+					</li>
+					<li>
+						<strong>Commentaires :</strong>
+						{% if fiche.comment %}
+							{{ fiche.comment|raw }}
+						{% endif %}
+					</li>
+					<li>
+						<strong>Affaire :</strong>
+						{{ fiche.intervention.code.libelle }}
+					</li>
+					<li>
+						<strong>Adresse :</strong>
+						{{ fiche.intervention.adresse }}
+					</li>
+					<li>
+						<strong>Intervention :</strong>
+						du
+						{{ fiche.intervention.start|date("d-m-Y", "Europe/Paris") }}
+						au
+						{{ fiche.intervention.end|date("d-m-Y", "Europe/Paris") }}
+					</li>
+				</ul>
+			</div>
+			{% if fiche and fiche.lockedAt %}
+				{% else %}
+					<div class="card-footer">
+						<a class="btn btn-success col-12 mt-2" data-toggle="modal" data-target="#modal-verrou">
+							<i class="fas fa-lock mr-2"></i>
+							Verrouiler cette fiche
+						</a>
+						<div class="modal fade" id="modal-verrou">
+							<div class="modal-dialog modal-sm">
+								<div class="modal-content">
+									<div class="modal-header">
+										<div class="d-flex flex-column">
+											<h4 class="modal-title">
+												Voulez vous vraiment verrouiller cette fiche ?
+											</h4>
+
+										</div>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+										<p>Le verrouillage de fiche est indispensable pour partir en pointage des heures.</p>
+										<p>Vous ne pourrez plus modifier votre fiche aprés verrouillage, assurez vous qu'elle soit correcte !</p>
+									</div>
+									<div class="modal-footer justify-content-between">
+										<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
+										<a href='{{path('app_affaire_verrouiller_fiche_intervention', {'id' : app.request.attributes.get('id'), 'ficheId' : app.request.attributes.get('ficheId')} ) }}' type="button" class="btn btn-danger">Verrouiller cette fiche</a>
+									</div>
+								</div>
+								<!-- /.modal-content -->
+							</div>
+							<!-- /.modal-dialog -->
+						</div>
+					</div>
+			{% endif %}
+		</div>
+	{% endif %}
+	{% if fiches %}
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-header d-flex p-0">
+						<h3 class="card-title p-3">Fiches</h3>
+						<ul class="nav nav-pills ml-auto p-2">
+							<li class="nav-item">
+								<a class="nav-link active" href="#lock" data-toggle="tab">
+									<i class="fas fa-lock-open"></i>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#unlock" data-toggle="tab">
+									<i class="fas fa-lock"></i>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="card-body">
+						<div class="tab-content">
+							<div class="tab-pane active" id="lock">
+								<table id="example3" class="table table-sm">
+									<thead>
+										<tr class="text-center">
+											<th>Date</th>
+											<th>Intervenant</th>
+											<th style="width: 60px">Statut</th>
+											<th>Vérrouillé par</th>
+											<th>Saisie par</th>
+											<th>Chantier</th>
+											<th style="width: 10px">Validation</th>
+											<th>Validé par</th>
+											<th style="width: 80px">Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for fiche in fiches %}
+											{% if fiche.lockedAt == null %}
+												<tr class="text-center">
+													<td>{{ fiche.createdAt|date("d/m/Y", "Europe/Paris")}}</td>
+													<td>{{ fiche.Intervenant.pseudo }}</td>
+													<td class='text-center' style="width: 60px">
+														{% if fiche and fiche.lockedAt %}
+															<i class="fas fa-lock text-success"></i>
+														{% else %}
+															<i class="fas fa-lock-open text-warning"></i>
+														{% endif %}
+													</td>
+													<td>
+														{% if fiche and fiche.lockedBy %}
+															{{ fiche.lockedBy.pseudo}}
+														{% endif %}
+													</td>
+													<td>{{ fiche.createdBy.pseudo }}</td>
+													<td>{{ fiche.intervention.code.libelle}}</td>
+													<td class='text-center' style="width: 10px">
+														{% if fiche.validedAt %}
+															<i class="fas fa-check text-success"></i>
+														{% else %}
+															<i class="far fa-hourglass text-warning"></i>
+														{% endif %}
+													</td>
+													<td>
+														{% if fiche.validedBy %}
+															{{ fiche.validedBy.pseudo}}
+														{% endif %}
+													</td>
+													<td style="width: 80px">
+														<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fiche.intervention.id, 'ficheId' : fiche.id } ) }}'>
+															<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
+														</a>
+														{% if fiche and fiche.lockedAt %}
+															<a>
+																<i class="fas fa-trash-alt fa-2x text-danger m-2"></i>
+															</a>
+														{% else %}
+															<a data-toggle="modal" data-target="#modal-lg-{{ fiche.id }}">
+																<i class="fas fa-trash-alt fa-2x text-secondary m-2"></i>
+															</a>
+														{% endif %}
+														<div class="modal fade" id="modal-lg-{{ fiche.id }}">
+															<div class="modal-dialog modal-lg">
+																<div class="modal-content">
+																	<div class="modal-header">
+																		<div class="d-flex flex-column">
+																			<h4 class="modal-title">Suppression de la fiche du
+																				{{ fiche.createdAt|date("d/m/Y", "Europe/Paris")}}
+																				pour
+																				{{ fiche.Intervenant.pseudo }}
+																			</h4>
+																			<span class="text-left">du chantier
+																				{{ fiche.intervention.code.libelle }}
+																			</span>
+																		</div>
+																		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																			<span aria-hidden="true">&times;</span>
+																		</button>
+																	</div>
+																	<div class="modal-body">
+																		<p>Voulez vous vraiment supprimer cette fiche ainsi que toutes les heures saisies en rapport avec cette fiche ? cette action est irréversible !</p>
+																	</div>
+																	<div class="modal-footer justify-content-between">
+																		<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
+																		<a href='{{path('app_affaire_remove_fiche_intervention', {'id' : fiche.intervention.id, 'fiche' : fiche.id } ) }}' type="button" class="btn btn-danger">Supprimer la fiche</a>
+																	</div>
+																</div>
+																<!-- /.modal-content -->
+															</div>
+															<!-- /.modal-dialog -->
+														</div>
+													</td>
+												</tr>
+											{% endif %}
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+							<div class="tab-pane" id="unlock">
+								<table id="example1" class="table table-sm">
+									<thead>
+										<tr class="text-center">
+											<th>Date</th>
+											<th>Intervenant</th>
+											<th style="width: 60px">Statut</th>
+											<th>Vérrouillé par</th>
+											<th>Saisie par</th>
+											<th>Chantier</th>
+											<th style="width: 10px">Validation</th>
+											<th>Validé par</th>
+											<th style="width: 80px">Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for fiche in fiches %}
+											{% if fiche.lockedAt %}
+												<tr class="text-center">
+													<td>{{ fiche.createdAt|date("d/m/Y", "Europe/Paris")}}</td>
+													<td>{{ fiche.Intervenant.pseudo }}</td>
+													<td class='text-center' style="width: 60px">
+														{% if fiche and fiche.lockedAt %}
+															<i class="fas fa-lock text-success"></i>
+														{% else %}
+															<i class="fas fa-lock-open text-warning"></i>
+														{% endif %}
+													</td>
+													<td>
+														{% if fiche and fiche.lockedBy %}
+															{{ fiche.lockedBy.pseudo}}
+														{% endif %}
+													</td>
+													<td>{{ fiche.createdBy.pseudo }}</td>
+													<td>{{ fiche.intervention.code.libelle}}</td>
+													<td class='text-center' style="width: 10px">
+														{% if fiche.validedAt %}
+															<i class="fas fa-check text-success"></i>
+														{% else %}
+															<i class="far fa-hourglass text-warning"></i>
+														{% endif %}
+													</td>
+													<td>
+														{% if fiche.validedBy %}
+															{{ fiche.validedBy.pseudo}}
+														{% endif %}
+													</td>
+													<td style="width: 80px">
+														<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fiche.intervention.id, 'ficheId' : fiche.id } ) }}'>
+															<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
+														</a>
+													</td>
+												</tr>
+											{% endif %}
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
+{% block javascripts %}
+{{  parent() }}
+<script>
+	<script>
+
+		{% endblock %}

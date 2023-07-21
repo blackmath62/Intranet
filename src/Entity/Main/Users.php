@@ -3,14 +3,12 @@
 namespace App\Entity\Main;
 
 use App\Entity\Main\FAQ;
-use App\Entity\Main\FinDeJournee;
 use App\Entity\Main\RetraitMarchandisesEan;
 use App\Entity\Main\Trackings;
 use App\Repository\Main\UsersRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Proxies\__CG__\App\Entity\Main\IdeaBox;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -76,11 +74,6 @@ class Users implements UserInterface
     private $documents;
 
     /**
-     * @ORM\OneToMany(targetEntity=Permissions::class, mappedBy="user", orphanRemoval=true)
-     */
-    private $permissions;
-
-    /**
      * @ORM\OneToMany(targetEntity=Chats::class, mappedBy="user")
      */
     private $chats;
@@ -110,10 +103,6 @@ class Users implements UserInterface
      */
     private $bornAt;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Documents::class, mappedBy="user")
-     */
-    private $ideaBoxs;
     /**
      * @ORM\OneToMany(targetEntity=Trackings::class, mappedBy="user")
      */
@@ -185,19 +174,9 @@ class Users implements UserInterface
     private $updatePerimetreBoisFsc;
 
     /**
-     * @ORM\OneToMany(targetEntity=ConduiteDeTravauxMe::class, mappedBy="updatedBy")
-     */
-    private $conduiteDeTravauxMes;
-
-    /**
      * @ORM\OneToMany(targetEntity=OthersDocuments::class, mappedBy="user")
      */
     private $othersDocuments;
-
-    /**
-     * @ORM\OneToMany(targetEntity=ConduiteTravauxAddPiece::class, mappedBy="createdBy")
-     */
-    private $conduiteTravauxAddPieces;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -254,13 +233,35 @@ class Users implements UserInterface
      */
     private $signatureElectroniques;
 
+    /**
+     * @ORM\OneToMany(targetEntity=InterventionFicheMonteur::class, mappedBy="createdBy")
+     */
+    private $interventionFicheMonteurs;
+
+    /**
+     * @ORM\OneToMany(targetEntity=InterventionFichesMonteursHeures::class, mappedBy="createdBy")
+     */
+    private $interventionFichesMonteursHeures;
+
+    /**
+     * @ORM\OneToMany(targetEntity=InterventionFicheMonteur::class, mappedBy="validedBy")
+     */
+    private $InterventionFicheMonteursValidedBy;
+
+    /**
+     * @ORM\OneToMany(targetEntity=InterventionFicheMonteur::class, mappedBy="lockedBy")
+     */
+    private $interventionFicheMonteursLockedBy;
+
+    /**
+     * @ORM\OneToMany(targetEntity=InterventionMonteurs::class, mappedBy="lockedBy")
+     */
+    private $interventionMonteursLockedBy;
+
     public function __construct()
     {
         $this->documents = new ArrayCollection();
-        $this->ideaBoxs = new ArrayCollection();
         $this->trackings = new ArrayCollection();
-        $this->finDeJournee = new ArrayCollection();
-        $this->permissions = new ArrayCollection();
         $this->chats = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->tickets = new ArrayCollection();
@@ -276,116 +277,119 @@ class Users implements UserInterface
         $this->paysBanFscs = new ArrayCollection();
         $this->movBillFscs = new ArrayCollection();
         $this->updatePerimetreBoisFsc = new ArrayCollection();
-        $this->conduiteDeTravauxMes = new ArrayCollection();
         $this->othersDocuments = new ArrayCollection();
-        $this->conduiteTravauxAddPieces = new ArrayCollection();
         $this->retraitMarchandisesEans = new ArrayCollection();
         $this->alimentationEmplacements = new ArrayCollection();
         $this->interventionMonteurs = new ArrayCollection();
         $this->signatureElectroniques = new ArrayCollection();
+        $this->interventionFicheMonteurs = new ArrayCollection();
+        $this->interventionFichesMonteursHeures = new ArrayCollection();
+        $this->InterventionFicheMonteursValidedBy = new ArrayCollection();
+        $this->interventionFicheMonteursLockedBy = new ArrayCollection();
+        $this->interventionMonteursLockedBy = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId():  ? int
     {
         return $this->id;
     }
 
-    public function getEmail(): ?string
+    public function getEmail() :  ? string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail(string $email) : self
     {
         $this->email = $email;
 
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getPassword():  ? string
     {
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(string $password) : self
     {
         $this->password = $password;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt():  ? \DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getToken(): ?string
+    public function getToken():  ? string
     {
         return $this->token;
     }
 
-    public function setToken(?string $token): self
+    public function setToken( ? string $token) : self
     {
         $this->token = $token;
 
         return $this;
     }
 
-    public function getPseudo(): ?string
+    public function getPseudo() :  ? string
     {
         return $this->pseudo;
     }
 
-    public function setPseudo(?string $pseudo): self
+    public function setPseudo( ? string $pseudo) : self
     {
         $this->pseudo = $pseudo;
 
         return $this;
     }
 
-    public function getCommercial(): ?string
+    public function getCommercial() :  ? string
     {
         return $this->commercial;
     }
 
-    public function setCommercial(?string $commercial): self
+    public function setCommercial( ? string $commercial) : self
     {
         $this->commercial = $commercial;
 
         return $this;
     }
 
-    public function getImg(): ?string
+    public function getImg() :  ? string
     {
         return $this->img;
     }
 
-    public function setImg(?string $img): self
+    public function setImg( ? string $img) : self
     {
         $this->img = $img;
 
         return $this;
     }
 
-    public function getSociete(): ?Societe
+    public function getSociete() :  ? Societe
     {
         return $this->societe;
     }
 
-    public function setSociete(?Societe $societe): self
+    public function setSociete( ? Societe $societe) : self
     {
         $this->societe = $societe;
 
         return $this;
     }
-    public function setRoles(?array $roles): self
+    public function setRoles( ? array $roles) : self
     {
         $this->roles = $roles;
 
@@ -393,16 +397,9 @@ class Users implements UserInterface
     }
 
     /**
-     * @return Collection|IdeaBox[]
-     */
-    public function getIdeaBox(): Collection
-    {
-        return $this->ideaBoxs;
-    }
-    /**
      * @return Collection|Trackings[]
      */
-    public function getTrackings(): Collection
+    public function getTrackings() : Collection
     {
         return $this->trackings;
     }
@@ -432,37 +429,6 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($document->getUser() === $this) {
                 $document->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Permissions[]
-     */
-    public function getPermissions(): Collection
-    {
-        return $this->permissions;
-    }
-
-    public function addPermission(Permissions $permission): self
-    {
-        if (!$this->permissions->contains($permission)) {
-            $this->permissions[] = $permission;
-            $permission->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removePermission(Permissions $permission): self
-    {
-        if ($this->permissions->contains($permission)) {
-            $this->permissions->removeElement($permission);
-            // set the owning side to null (unless already changed)
-            if ($permission->getUser() === $this) {
-                $permission->setUser(null);
             }
         }
 
@@ -634,12 +600,12 @@ class Users implements UserInterface
         //
     }
 
-    public function getBornAt(): ?\DateTimeInterface
+    public function getBornAt():  ? \DateTimeInterface
     {
         return $this->bornAt;
     }
 
-    public function setBornAt(?\DateTimeInterface $bornAt): self
+    public function setBornAt( ? \DateTimeInterface $bornAt) : self
     {
         $this->bornAt = $bornAt;
 
@@ -649,7 +615,7 @@ class Users implements UserInterface
     /**
      * @return Collection|Holiday[]
      */
-    public function getUserTreatmentholidays(): Collection
+    public function getUserTreatmentholidays() : Collection
     {
         return $this->UserTreatmentholidays;
     }
@@ -676,12 +642,12 @@ class Users implements UserInterface
         return $this;
     }
 
-    public function getService(): ?Services
+    public function getService():  ? Services
     {
         return $this->service;
     }
 
-    public function setService(?Services $service): self
+    public function setService( ? Services $service) : self
     {
         $this->service = $service;
 
@@ -691,7 +657,7 @@ class Users implements UserInterface
     /**
      * @return Collection|News[]
      */
-    public function getNews(): Collection
+    public function getNews() : Collection
     {
         return $this->news;
     }
@@ -718,12 +684,12 @@ class Users implements UserInterface
         return $this;
     }
 
-    public function getClosedAt(): ?\DateTimeInterface
+    public function getClosedAt():  ? \DateTimeInterface
     {
         return $this->closedAt;
     }
 
-    public function setClosedAt(?\DateTimeInterface $closedAt): self
+    public function setClosedAt( ? \DateTimeInterface $closedAt) : self
     {
         $this->closedAt = $closedAt;
 
@@ -733,7 +699,7 @@ class Users implements UserInterface
     /**
      * @return Collection|ListCmdTraite[]
      */
-    public function getListCmdTraites(): Collection
+    public function getListCmdTraites() : Collection
     {
         return $this->listCmdTraites;
     }
@@ -971,36 +937,6 @@ class Users implements UserInterface
     }
 
     /**
-     * @return Collection|ConduiteDeTravauxMe[]
-     */
-    public function getConduiteDeTravauxMes(): Collection
-    {
-        return $this->conduiteDeTravauxMes;
-    }
-
-    public function addConduiteDeTravauxMe(ConduiteDeTravauxMe $conduiteDeTravauxMe): self
-    {
-        if (!$this->conduiteDeTravauxMes->contains($conduiteDeTravauxMe)) {
-            $this->conduiteDeTravauxMes[] = $conduiteDeTravauxMe;
-            $conduiteDeTravauxMe->setUpdatedBy($this);
-        }
-
-        return $this;
-    }
-
-    public function removeConduiteDeTravauxMe(ConduiteDeTravauxMe $conduiteDeTravauxMe): self
-    {
-        if ($this->conduiteDeTravauxMes->removeElement($conduiteDeTravauxMe)) {
-            // set the owning side to null (unless already changed)
-            if ($conduiteDeTravauxMe->getUpdatedBy() === $this) {
-                $conduiteDeTravauxMe->setUpdatedBy(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection|OthersDocuments[]
      */
     public function getOthersDocuments(): Collection
@@ -1030,66 +966,36 @@ class Users implements UserInterface
         return $this;
     }
 
-    /**
-     * @return Collection|ConduiteTravauxAddPiece[]
-     */
-    public function getConduiteTravauxAddPieces(): Collection
-    {
-        return $this->conduiteTravauxAddPieces;
-    }
-
-    public function addConduiteTravauxAddPiece(ConduiteTravauxAddPiece $conduiteTravauxAddPiece): self
-    {
-        if (!$this->conduiteTravauxAddPieces->contains($conduiteTravauxAddPiece)) {
-            $this->conduiteTravauxAddPieces[] = $conduiteTravauxAddPiece;
-            $conduiteTravauxAddPiece->setCreatedBy($this);
-        }
-
-        return $this;
-    }
-
-    public function removeConduiteTravauxAddPiece(ConduiteTravauxAddPiece $conduiteTravauxAddPiece): self
-    {
-        if ($this->conduiteTravauxAddPieces->removeElement($conduiteTravauxAddPiece)) {
-            // set the owning side to null (unless already changed)
-            if ($conduiteTravauxAddPiece->getCreatedBy() === $this) {
-                $conduiteTravauxAddPiece->setCreatedBy(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getEv(): ?bool
+    public function getEv():  ? bool
     {
         return $this->ev;
     }
 
-    public function setEv(?bool $ev): self
+    public function setEv( ? bool $ev) : self
     {
         $this->ev = $ev;
 
         return $this;
     }
 
-    public function getHp(): ?bool
+    public function getHp() :  ? bool
     {
         return $this->hp;
     }
 
-    public function setHp(?bool $hp): self
+    public function setHp( ? bool $hp) : self
     {
         $this->hp = $hp;
 
         return $this;
     }
 
-    public function getMe(): ?bool
+    public function getMe() :  ? bool
     {
         return $this->me;
     }
 
-    public function setMe(?bool $me): self
+    public function setMe( ? bool $me) : self
     {
         $this->me = $me;
 
@@ -1099,7 +1005,7 @@ class Users implements UserInterface
     /**
      * @return Collection|RetraitMarchandisesEan[]
      */
-    public function getRetraitMarchandisesEans(): Collection
+    public function getRetraitMarchandisesEans() : Collection
     {
         return $this->retraitMarchandisesEans;
     }
@@ -1186,48 +1092,48 @@ class Users implements UserInterface
         return $this;
     }
 
-    public function getInterne(): ?string
+    public function getInterne():  ? string
     {
         return $this->interne;
     }
 
-    public function setInterne(?string $interne): self
+    public function setInterne( ? string $interne) : self
     {
         $this->interne = $interne;
 
         return $this;
     }
 
-    public function getExterieur(): ?string
+    public function getExterieur() :  ? string
     {
         return $this->exterieur;
     }
 
-    public function setExterieur(?string $exterieur): self
+    public function setExterieur( ? string $exterieur) : self
     {
         $this->exterieur = $exterieur;
 
         return $this;
     }
 
-    public function getFonction(): ?string
+    public function getFonction() :  ? string
     {
         return $this->fonction;
     }
 
-    public function setFonction(?string $fonction): self
+    public function setFonction( ? string $fonction) : self
     {
         $this->fonction = $fonction;
 
         return $this;
     }
 
-    public function getPortable(): ?string
+    public function getPortable() :  ? string
     {
         return $this->portable;
     }
 
-    public function setPortable(?string $portable): self
+    public function setPortable( ? string $portable) : self
     {
         $this->portable = $portable;
 
@@ -1237,7 +1143,7 @@ class Users implements UserInterface
     /**
      * @return Collection<int, SignatureElectronique>
      */
-    public function getSignatureElectroniques(): Collection
+    public function getSignatureElectroniques() : Collection
     {
         return $this->signatureElectroniques;
     }
@@ -1258,6 +1164,156 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($signatureElectronique->getCreatedBy() === $this) {
                 $signatureElectronique->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InterventionFicheMonteur>
+     */
+    public function getInterventionFicheMonteurs(): Collection
+    {
+        return $this->interventionFicheMonteurs;
+    }
+
+    public function addInterventionFicheMonteur(InterventionFicheMonteur $interventionFicheMonteur): self
+    {
+        if (!$this->interventionFicheMonteurs->contains($interventionFicheMonteur)) {
+            $this->interventionFicheMonteurs[] = $interventionFicheMonteur;
+            $interventionFicheMonteur->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInterventionFicheMonteur(InterventionFicheMonteur $interventionFicheMonteur): self
+    {
+        if ($this->interventionFicheMonteurs->removeElement($interventionFicheMonteur)) {
+            // set the owning side to null (unless already changed)
+            if ($interventionFicheMonteur->getCreatedBy() === $this) {
+                $interventionFicheMonteur->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InterventionFichesMonteursHeures>
+     */
+    public function getInterventionFichesMonteursHeures(): Collection
+    {
+        return $this->interventionFichesMonteursHeures;
+    }
+
+    public function addInterventionFichesMonteursHeure(InterventionFichesMonteursHeures $interventionFichesMonteursHeure): self
+    {
+        if (!$this->interventionFichesMonteursHeures->contains($interventionFichesMonteursHeure)) {
+            $this->interventionFichesMonteursHeures[] = $interventionFichesMonteursHeure;
+            $interventionFichesMonteursHeure->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInterventionFichesMonteursHeure(InterventionFichesMonteursHeures $interventionFichesMonteursHeure): self
+    {
+        if ($this->interventionFichesMonteursHeures->removeElement($interventionFichesMonteursHeure)) {
+            // set the owning side to null (unless already changed)
+            if ($interventionFichesMonteursHeure->getCreatedBy() === $this) {
+                $interventionFichesMonteursHeure->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InterventionFicheMonteur>
+     */
+    public function getInterventionFicheMonteursValidedBy(): Collection
+    {
+        return $this->InterventionFicheMonteursValidedBy;
+    }
+
+    public function addInterventionFicheMonteursValidedBy(InterventionFicheMonteur $interventionFicheMonteursValidedBy): self
+    {
+        if (!$this->InterventionFicheMonteursValidedBy->contains($interventionFicheMonteursValidedBy)) {
+            $this->InterventionFicheMonteursValidedBy[] = $interventionFicheMonteursValidedBy;
+            $interventionFicheMonteursValidedBy->setValidedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInterventionFicheMonteursValidedBy(InterventionFicheMonteur $interventionFicheMonteursValidedBy): self
+    {
+        if ($this->InterventionFicheMonteursValidedBy->removeElement($interventionFicheMonteursValidedBy)) {
+            // set the owning side to null (unless already changed)
+            if ($interventionFicheMonteursValidedBy->getValidedBy() === $this) {
+                $interventionFicheMonteursValidedBy->setValidedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InterventionFicheMonteur>
+     */
+    public function getInterventionFicheMonteursLockedBy(): Collection
+    {
+        return $this->interventionFicheMonteursLockedBy;
+    }
+
+    public function addInterventionFicheMonteursLockedBy(InterventionFicheMonteur $interventionFicheMonteursLockedBy): self
+    {
+        if (!$this->interventionFicheMonteursLockedBy->contains($interventionFicheMonteursLockedBy)) {
+            $this->interventionFicheMonteursLockedBy[] = $interventionFicheMonteursLockedBy;
+            $interventionFicheMonteursLockedBy->setLockedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInterventionFicheMonteursLockedBy(InterventionFicheMonteur $interventionFicheMonteursLockedBy): self
+    {
+        if ($this->interventionFicheMonteursLockedBy->removeElement($interventionFicheMonteursLockedBy)) {
+            // set the owning side to null (unless already changed)
+            if ($interventionFicheMonteursLockedBy->getLockedBy() === $this) {
+                $interventionFicheMonteursLockedBy->setLockedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InterventionMonteurs>
+     */
+    public function getInterventionMonteursLockedBy(): Collection
+    {
+        return $this->interventionMonteursLockedBy;
+    }
+
+    public function addInterventionMonteursLockedBy(InterventionMonteurs $interventionMonteursLockedBy): self
+    {
+        if (!$this->interventionMonteursLockedBy->contains($interventionMonteursLockedBy)) {
+            $this->interventionMonteursLockedBy[] = $interventionMonteursLockedBy;
+            $interventionMonteursLockedBy->setLockedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInterventionMonteursLockedBy(InterventionMonteurs $interventionMonteursLockedBy): self
+    {
+        if ($this->interventionMonteursLockedBy->removeElement($interventionMonteursLockedBy)) {
+            // set the owning side to null (unless already changed)
+            if ($interventionMonteursLockedBy->getLockedBy() === $this) {
+                $interventionMonteursLockedBy->setLockedBy(null);
             }
         }
 

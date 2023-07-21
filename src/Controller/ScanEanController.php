@@ -235,9 +235,6 @@ class ScanEanController extends AbstractController
     {
         $dos = 1;
         $empl = "";
-        // tracking user page for stats
-        /*$tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);*/
         if ($emplacement) {
             $empl = $repo->getEmpl($dos, $emplacement);
         }
@@ -407,7 +404,7 @@ class ScanEanController extends AbstractController
     /**
      * @Route("/emplacement/produit/print/{emplacement}", name="app_scan_emplacement_print")
      */
-    function print($emplacement = null, Request $request, ArtRepository $repo) {
+    public function print($emplacement = null, Request $request, ArtRepository $repo) {
 
         $dos = 1;
         $produits = "";
@@ -415,7 +412,12 @@ class ScanEanController extends AbstractController
         $form = $this->createForm(GeneralSearchType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $produits = $repo->getSearchArt($dos, $form->getData()['search']);
+            if (is_numeric($form->getData()['search']) && strlen($form->getData()['search']) == 13) {
+                $produits = $repo->getSearchArt($dos, $form->getData()['search'], 'EAN');
+                //dd($produits);
+            } else {
+                $produits = $repo->getSearchArt($dos, $form->getData()['search'], 'REF');
+            }
         }
 
         // instantiate the barcode class
@@ -493,7 +495,7 @@ class ScanEanController extends AbstractController
 
         $n_line = 0;
         foreach ($cut as $key => $line) {
-            if (trim($line) !== '' & strlen(trim($line)) > 3) {
+            if (trim($line) !== ''&strlen(trim($line)) > 3) {
                 $n_line++;
                 if (1 === $n_line) {
                     $rows = explode('    ', $line);

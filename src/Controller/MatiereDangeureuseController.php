@@ -53,7 +53,6 @@ class MatiereDangeureuseController extends AbstractController
                 ];
             }
         }
-        //dd($arts);
 
         return $this->render('matiere_dangeureuse/index.html.twig', [
             'articles' => $arts,

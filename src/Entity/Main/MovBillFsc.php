@@ -74,6 +74,11 @@ class MovBillFsc
      */
     private $bl;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $anomalie;
+
     public function __construct()
     {
         $this->ventilations = new ArrayCollection();
@@ -224,6 +229,18 @@ class MovBillFsc
     public function setBl(?int $bl): self
     {
         $this->bl = $bl;
+
+        return $this;
+    }
+
+    public function getAnomalie(): ?bool
+    {
+        return $this->anomalie;
+    }
+
+    public function setAnomalie(?bool $anomalie): self
+    {
+        $this->anomalie = $anomalie;
 
         return $this;
     }

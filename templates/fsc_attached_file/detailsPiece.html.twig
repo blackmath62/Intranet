@@ -310,7 +310,7 @@
 												{% for piecesclient in piecesclients %}
 													<tr>
 														<td class="text-center">
-															<a class="btn btn-xl btn-info" href='{{path('app_movement_bill_fsc_show', {'id' : piecesclient.id } ) }}'>{{ piecesclient.numFact }}<i class="fas fa-eye pl-2"></i>
+															<a class="btn btn-xl btn-info" href='{{path('app_fsc_piece_client_show', {'id' : piecesclient.id } ) }}'>{{ piecesclient.numFact }}<i class="fas fa-eye pl-2"></i>
 															</a>
 														</td>
 														<td class="text-center">

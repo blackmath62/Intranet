@@ -19,952 +19,460 @@
 			<p>Dans le haut à droite, vous pouvez modifier l'état de la piéce.</p>
 		</div>
 	</div>
-	<div class="d-flex flex-wrap justify-content-end flex-row">
-		<a title='Affaires à traiter !' data-toggle="modal" data-target="#feuilleInterventionOne" class="m-1 btn btn-warning text-white col-12 col-sm-2">
+	<div class="d-flex flex-wrap justify-content-around flex-row mb-1">
+		<a title='Affaires à traiter !' href="{{ path('app_affaire_saisie_fiche_intervention', {'id' : intervention.id }) }}" class="btn btn-warning text-white col-12 col-sm-3 my-2">
 			<i class="fas fa-user mr-1"></i>
-			Feuilles d'intervention saisie indiv.
+			Créer fiche
 		</a>
-		<div class="modal fade" id="feuilleInterventionOne">
-			<div class="modal-dialog modal-lg">
-				<div class="modal-content">
-					<div class="modal-header">
-						<div class="d-flex flex-wrap">
-							<h4 class="modal-title">Fiches d'interventions un intervenant</h4>
-							<small>(inconvéniant, chacun doit se connecter et la logique voudrait plutôt que le signataire signe la fiche avec tous les intervenants)</small>
-						</div>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="card-body">
-							<h2>Antony Martinage</h2>
-							<div class="col-sm-12">
-								<div class="form-group">
-									<label>Date</label>
-									<input type="date" class="form-control" placeholder="0">
-								</div>
-							</div>
-							<form>
-								<div class="row">
-									<div class="col-sm-6 d-flex flex-wrap justify-content-around">
-										<div class="form-group">
-											<label>Présence</label>
-											<div class="form-check">
-												<input class="form-check-input" type="radio" name="radio3" checked>
-												<label class="form-check-label">Présent</label>
-											</div>
-											<div class="form-check">
-												<input class="form-check-input" type="radio" name="radio3">
-												<label class="form-check-label">Absent</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label>Hotel</label>
-											<div class="form-check">
-												<input class="form-check-input" type="radio" name="radio4" checked>
-												<label class="form-check-label">Non</label>
-											</div>
-											<div class="form-check">
-												<input class="form-check-input" type="radio" name="radio4">
-												<label class="form-check-label">Oui</label>
-											</div>
-										</div>
-									</div>
-									<div class="col-sm-6 d-flex flex-wrap justify-content-around">
-										<div class="col-sm-6">
-											<div class="form-group">
-												<label>Repas Midi</label>
-												<div class="form-check">
-													<input class="form-check-input" type="radio" name="radio1" checked>
-													<label class="form-check-label">Pas de repas</label>
-												</div>
-												<div class="form-check">
-													<input class="form-check-input" type="radio" name="radio1">
-													<label class="form-check-label">Panier</label>
-												</div>
-												<div class="form-check">
-													<input class="form-check-input" type="radio" name="radio1">
-													<label class="form-check-label">Restaurant</label>
-												</div>
-												<div class="form-check">
-													<input class="form-check-input" type="radio" name="radio1">
-													<label class="form-check-label">Client</label>
-												</div>
-											</div>
-										</div>
-										<div class="col-sm-6">
-											<div class="form-group">
-												<label>Repas Midi</label>
-												<div class="form-check">
-													<input class="form-check-input" type="radio" name="radio2" checked>
-													<label class="form-check-label">Pas de repas</label>
-												</div>
-												<div class="form-check">
-													<input class="form-check-input" type="radio" name="radio2">
-													<label class="form-check-label">Panier</label>
-												</div>
-												<div class="form-check">
-													<input class="form-check-input" type="radio" name="radio2">
-													<label class="form-check-label">Restaurant</label>
-												</div>
-												<div class="form-check">
-													<input class="form-check-input" type="radio" name="radio2">
-													<label class="form-check-label">Client</label>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class='card'>
-									<div class="card-header">
-										<h2>Déplacements</h2>
-									</div>
-									<div class="card-body text-center">
-										<h3>Matin</h3>
-										<div class="row">
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label>Début</label>
-													<input type="time" class="form-control">
-												</div>
-											</div>
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label>Fin</label>
-													<input type="time" class="form-control">
-												</div>
-											</div>
-										</div>
-										<h3>Aprés midi</h3>
-										<div class="row">
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label>Début</label>
-													<input type="time" class="form-control">
-												</div>
-											</div>
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label>Fin</label>
-													<input type="time" class="form-control">
-												</div>
-											</div>
-										</div>
-										<h3>Soir</h3>
-										<div class="row">
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label>Début</label>
-													<input type="time" class="form-control">
-												</div>
-											</div>
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label>Fin</label>
-													<input type="time" class="form-control">
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-sm-12">
-										<div class="form-group">
-											<label>Km</label>
-											<input type="number" class="form-control" placeholder="0">
-										</div>
-									</div>
-								</div>
-								<div class='card'>
-									<div class="card-header">
-										<h2>Travaux</h2>
-									</div>
-									<div class="card-body text-center">
-										<h3>Matin</h3>
-										<div class="row">
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label>Début</label>
-													<input type="time" class="form-control">
-												</div>
-											</div>
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label>Fin</label>
-													<input type="time" class="form-control">
-												</div>
-											</div>
-										</div>
-										<h3>Aprés midi</h3>
-										<div class="row">
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label>Début</label>
-													<input type="time" class="form-control">
-												</div>
-											</div>
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label>Fin</label>
-													<input type="time" class="form-control">
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div
-										class="col-sm-12">
-										<!-- textarea -->
-										<div class="form-group">
-											<label>Commentaire</label>
-											<textarea class="form-control" rows="3" placeholder="Entrez votre commentaire ..."></textarea>
-										</div>
-									</div>
-								</div>
-							</form>
-						</div>
-					</div>
-					<div class="modal-footer justify-content-between">
-						<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
-						<button type="button" class="btn btn-primary">Enregistrer</button>
-					</div>
-				</div>
-				<!-- /.modal-content -->
-			</div>
-			<!-- /.modal-dialog -->
-		</div>
-
-		<a title='Affaires à traiter !' data-toggle="modal" data-target="#feuilleInterventionAll" class="m-1 btn btn-warning text-white col-12 col-sm-2">
-			<i class="fas fa-users mr-1"></i>
-			Feuilles d'intervention saisie All
-		</a>
-		<div class="modal fade" id="feuilleInterventionAll">
-			<div class="modal-dialog modal-xl">
-				<div class="modal-content">
-					<div class="modal-header">
-						<div class="d-flex flex-wrap flex-row col-12">
-							<h4 class="modal-title">Fiches d'interventions tous les intervenants</h4>
-							<div class="col-sm-12">
-								<div class="form-group">
-									<label>Date</label>
-									<input type="date" class="form-control" placeholder="0">
-								</div>
-							</div>
-						</div>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div id="accordion">
-							{% for intervenant in intervenants %}
-								<div class="card card-dark">
-									<div class="card-header">
-										<h4 class="card-title w-100">
-											<a class="d-block w-100" data-toggle="collapse" href="#{{ intervenant }}">
-												{{ intervenant }}
-											</a>
-										</h4>
-									</div>
-									<div id="{{ intervenant }}" class="collapse" data-parent="#accordion">
-										<div class="card-body">
-											<form>
-												<div class="row">
-													<div class="col-sm-6 d-flex flex-wrap justify-content-around">
-														<div class="form-group">
-															<label>Présence</label>
-															<div class="form-check">
-																<input class="form-check-input" type="radio" name="radio3" checked>
-																<label class="form-check-label">Présent</label>
-															</div>
-															<div class="form-check">
-																<input class="form-check-input" type="radio" name="radio3">
-																<label class="form-check-label">Absent</label>
-															</div>
-														</div>
-														<div class="form-group">
-															<label>Hotel</label>
-															<div class="form-check">
-																<input class="form-check-input" type="radio" name="radio4" checked>
-																<label class="form-check-label">Non</label>
-															</div>
-															<div class="form-check">
-																<input class="form-check-input" type="radio" name="radio4">
-																<label class="form-check-label">Oui</label>
-															</div>
-														</div>
-													</div>
-													<div class="col-sm-6 d-flex flex-wrap justify-content-around">
-														<div class="col-sm-6">
-															<div class="form-group">
-																<label>Repas Midi</label>
-																<div class="form-check">
-																	<input class="form-check-input" type="radio" name="radio1" checked>
-																	<label class="form-check-label">Pas de repas</label>
-																</div>
-																<div class="form-check">
-																	<input class="form-check-input" type="radio" name="radio1">
-																	<label class="form-check-label">Panier</label>
-																</div>
-																<div class="form-check">
-																	<input class="form-check-input" type="radio" name="radio1">
-																	<label class="form-check-label">Restaurant</label>
-																</div>
-																<div class="form-check">
-																	<input class="form-check-input" type="radio" name="radio1">
-																	<label class="form-check-label">Client</label>
-																</div>
-															</div>
-														</div>
-														<div class="col-sm-6">
-															<div class="form-group">
-																<label>Repas Midi</label>
-																<div class="form-check">
-																	<input class="form-check-input" type="radio" name="radio2" checked>
-																	<label class="form-check-label">Pas de repas</label>
-																</div>
-																<div class="form-check">
-																	<input class="form-check-input" type="radio" name="radio2">
-																	<label class="form-check-label">Panier</label>
-																</div>
-																<div class="form-check">
-																	<input class="form-check-input" type="radio" name="radio2">
-																	<label class="form-check-label">Restaurant</label>
-																</div>
-																<div class="form-check">
-																	<input class="form-check-input" type="radio" name="radio2">
-																	<label class="form-check-label">Client</label>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-												<div class='card'>
-													<div class="card-header">
-														<h2>Déplacements</h2>
-													</div>
-													<div class="card-body text-center">
-														<h3>Matin</h3>
-														<div class="row">
-															<div class="col-sm-6">
-																<div class="form-group">
-																	<label>Début</label>
-																	<input type="time" class="form-control">
-																</div>
-															</div>
-															<div class="col-sm-6">
-																<div class="form-group">
-																	<label>Fin</label>
-																	<input type="time" class="form-control">
-																</div>
-															</div>
-														</div>
-														<h3>Aprés midi</h3>
-														<div class="row">
-															<div class="col-sm-6">
-																<div class="form-group">
-																	<label>Début</label>
-																	<input type="time" class="form-control">
-																</div>
-															</div>
-															<div class="col-sm-6">
-																<div class="form-group">
-																	<label>Fin</label>
-																	<input type="time" class="form-control">
-																</div>
-															</div>
-														</div>
-														<h3>Soir</h3>
-														<div class="row">
-															<div class="col-sm-6">
-																<div class="form-group">
-																	<label>Début</label>
-																	<input type="time" class="form-control">
-																</div>
-															</div>
-															<div class="col-sm-6">
-																<div class="form-group">
-																	<label>Fin</label>
-																	<input type="time" class="form-control">
-																</div>
-															</div>
-														</div>
-													</div>
-													<div class="col-sm-12">
-														<div class="form-group">
-															<label>Km</label>
-															<input type="number" class="form-control" placeholder="0">
-														</div>
-													</div>
-												</div>
-												<div class='card'>
-													<div class="card-header">
-														<h2>Travaux</h2>
-													</div>
-													<div class="card-body text-center">
-														<h3>Matin</h3>
-														<div class="row">
-															<div class="col-sm-6">
-																<div class="form-group">
-																	<label>Début</label>
-																	<input type="time" class="form-control">
-																</div>
-															</div>
-															<div class="col-sm-6">
-																<div class="form-group">
-																	<label>Fin</label>
-																	<input type="time" class="form-control">
-																</div>
-															</div>
-														</div>
-														<h3>Aprés midi</h3>
-														<div class="row">
-															<div class="col-sm-6">
-																<div class="form-group">
-																	<label>Début</label>
-																	<input type="time" class="form-control">
-																</div>
-															</div>
-															<div class="col-sm-6">
-																<div class="form-group">
-																	<label>Fin</label>
-																	<input type="time" class="form-control">
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-												<div class="row">
-													<div
-														class="col-sm-12">
-														<!-- textarea -->
-														<div class="form-group">
-															<label>Commentaire</label>
-															<textarea class="form-control" rows="3" placeholder="Entrez votre commentaire ..."></textarea>
-														</div>
-													</div>
-												</div>
-											</form>
-										</div>
-									</div>
-								</div>
-							{% endfor %}
-						</div>
-
-
-					</div>
-					<div class="modal-footer justify-content-between">
-						<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
-						<button type="button" class="btn btn-dark">Enregistrer</button>
-					</div>
-				</div>
-				<!-- /.modal-content -->
-			</div>
-			<!-- /.modal-dialog -->
-		</div>
-
-
-		<a title='Affaires à traiter !' data-toggle="modal" data-target="#feuilleIntervention" class="m-1 btn btn-warning text-white col-12 col-sm-2">
-			<i class="fas fa-camera mr-1"></i>
-			Feuilles d'intervention Photo
-		</a>
-		<div class="modal fade" id="feuilleIntervention">
-			<div class="modal-dialog modal-lg">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h4 class="modal-title">Fiches d'interventions Photo</h4>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						{{ form_start(formDepotFeuilleIntervention)}}
-						{{ form_widget(formDepotFeuilleIntervention.file)}}
-						{{ form_widget(formDepotFeuilleIntervention.importer)}}
-						{{ form_end(formDepotFeuilleIntervention)}}
-					</div>
-					<div class="modal-footer justify-content-between">
-						<table>
-							<thead>
-								<tr>
-									<th>Fichiers</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for FichesInterv in FichesIntervs %}
-									<tr>
-										<td>
-											<div class="d-flex flex-column">
-												<div>
-													<a target="_blank" href="{{ asset('doc/Lhermitte_freres/Affaires/' ~ FichesInterv.file)}}">{{ FichesInterv.file }}</a>
-												</div>
-												<div>
-													<i>
-														<span class="float-left">{{ FichesInterv.user.Pseudo}}</span>
-													</i>
-													<i>
-														<span class="float-right">{{ FichesInterv.createdAt|date("d-m-Y H:i")}}</span>
-													</i>
-												</div>
-											</div>
-										</td>
-									</tr>
-								{% endfor %}
-							</tbody>
-						</tboby>
-					</tbody>
-				</table>
-			</div>
-		</div>
-		<!-- /.modal-content -->
-	</div>
-	<!-- /.modal-dialog -->
-</div>
-<a title='Affaires à traiter !' href="{{ path('app_piece_affaire_nok', {'affaire' : intervention.code.code }) }}" class="m-1 btn btn-success text-white col-12 col-sm-2">
-	<i class="fas fa-eye mr-1"></i>
-	Consulter l'affaire
-</a>
-<a href='{{path('app_affaire_me_nok' ) }}' class="m-1 text-light btn btn-xl btn-primary col-12 col-sm-2">
-	<i class="fas fa-share mr-1"></i>
-	Affaires
-</a></div><div class="col-12 text-dark">
-<div class="info-box">
-	<span class=" info-box-icon" style=" background-color: {{ intervention.backgroundColor }} ; color: {{ intervention.textColor }} " ;>
-		<i class=" fas fa-binoculars"></i>
-	</span>
-	<div class="info-box-content">
-		<h5 class="">{{ intervention.code.Libelle}}</h5>
-		<span class="m-1">
-			Du
-			{{intervention.start|date("d/m/Y H:i", "Europe/Paris") }}
-			au
-			{{intervention.end|date("d/m/Y H:i", "Europe/Paris") }}
-		</span>
-		<div class="d-flex justify-content-around flex-wrap">
-			<p class="m-1">
-				<ul>
-					<li style="list-style-type: none;">
-						<u>Equipe :</u>
-					</li>
-					{% for monteur in intervention.Equipes %}
-						<li>
-							{{ monteur.Pseudo }}
-						</li>
-					{% endfor %}
-				</ul>
-			</p>
-			<p class="m-1 d-flex flex-row">
-				<ul>
-					<li style="list-style-type: none;">
-						<u>Piéce(s) :</u>
-					</li>
-					{% for pieces in intervention.pieces %}
-						<li>
-							{{ pieces.piece }}
-						</li>
-					{% endfor %}
-				</ul>
-			</p>
-			<p class="m-1 d-flex flex-row">
-				<ul>
-					<li style="list-style-type: none;">
-						<u>Adresse :</u>
-					</li>
-					<li>
-						{{ intervention.adresse }}
-					</li>
-				</ul>
-			</p>
-		</div>
-	</div>
-	<!-- /.info-box-content -->
-</div>
-<!-- /.info-box --></div><div class="card">
-<div class="card-header p-2">
-	<ul class="nav nav-pills">
-		<li class="nav-item">
-			<a class="nav-link active" href="#comInterventions" data-toggle="tab">
-				<i class="fas fa-comments fa-2x" aria-hidden="true"></i>
-				Interv.
-				{% set chatInt = 0 %}
-				{% for chat in chats %}
-					{% if chat.tables == intervention.id %}
-						{% set chatInt = chatInt + 1 %}
-					{% endif %}
-				{% endfor %}
-				<span class="badge bg-secondary pl-1">{{ chatInt }}</span>
+		{% if is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted('ROLE_ME') %}
+			<a title='Affaires à traiter !' href="{{ path('app_piece_affaire_nok', {'affaire' : intervention.code.code }) }}" class="btn btn-success text-white col-12 col-sm-3 my-2">
+				<i class="fas fa-eye mr-1"></i>
+				Consulter l'affaire
 			</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" href="#comAffaire" data-toggle="tab">
-				<i class="fas fa-comments fa-2x" aria-hidden="true"></i>
-				Affaire
-				<span class="badge bg-secondary pl-1">{{chats|length}}</span>
-			</a>
-		</li>
-	</ul>
-</div>
-<div class="card-body">
-	<div class="tab-content">
-		<div class="active tab-pane" id="comInterventions">
-			<div class="card direct-chat direct-chat-warning">
-				<div class="card-header">
-					<h3 class="card-title">Commentaires de cette intervention</h3>
-					<div class="card-tools">
-						<button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
-							<i class="fas fa-phone"></i>
-						</button>
-					</div>
-				</div>
-				<!-- /.card-header -->
-				<div class="card-body">
-					<div class="direct-chat-messages">
-						{% set i = 0 %}
-						{% if chats %}
-							{% for chat in chats %}
-								{% if chat.tables == intervention.id %}
-									{% set i = i + 1 %}
-									{% if app.user.id == chat.user.id %}
-										<div class="direct-chat-msg">
-											<div class="direct-chat-infos clearfix">
-												<span class="direct-chat-name float-left">{{ chat.user.pseudo }}</span>
-												<span class="direct-chat-timestamp float-right">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
-											</div>
-											<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
-											<div class="direct-chat-text">
-												{{ chat.content }}
-											</div>
-										</div>
-									{% else %}
-										<div class="direct-chat-msg right">
-											<div class="direct-chat-infos clearfix">
-												<span class="direct-chat-name float-right">{{ chat.user.pseudo }}</span>
-												<span class="direct-chat-timestamp float-left">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
-											</div>
-											<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
-											<div class="direct-chat-text">
-												{{ chat.content }}
-											</div>
-										</div>
-									{% endif %}
-								{% endif %}
-							{% endfor %}
-							{% if i == 0 %}
-								<div class="direct-chat-msg m-2">
-									<div class="direct-chat-infos clearfix">
-										<span class="direct-chat-name float-left">Intranet</span>
-										<span class="direct-chat-timestamp float-right">15/06/2023 16:34</span>
-									</div>
-									<img class="direct-chat-img" src="{{ asset(asset('img/profile/AdminLTELogo.png'))}}" alt="message user image">
-									<div class="direct-chat-text">
-										C'est ici que les commentaires apparaissent .....
-									</div>
-								</div>
-							{% endif %}
-						{% else %}
-							<div class="direct-chat-msg m-2">
-								<div class="direct-chat-infos clearfix">
-									<span class="direct-chat-name float-left">Intranet</span>
-									<span class="direct-chat-timestamp float-right">15/06/2023 16:34</span>
-								</div>
-								<img class="direct-chat-img" src="{{ asset(asset('img/profile/AdminLTELogo.png'))}}" alt="message user image">
-								<div class="direct-chat-text">
-									C'est ici que les commentaires apparaissent .....
-								</div>
-							</div>
-						{% endif %}
-					</div>
-					<!-- Contacts are loaded here -->
-					<div class="direct-chat-contacts">
-						<ul class="contacts-list">
-							{% for usersMe in usersMes %}
-								<li>
-									<a href="#">
-										<img class="contacts-list-img" src="{{ asset(asset('img/profile/' ~ usersMe.img))}}" alt="User Avatar">
-
-										<div class="contacts-list-info">
-											<span class="contacts-list-name">
-												{{ usersMe.pseudo }}
-												<small class="contacts-list-date float-right">{{ usersMe.createdAt|date("d-m-Y") }}</small>
-											</span>
-											<a href='tel:{{usersMe.portable|replace({' ': ""})}}' class="contacts-list-msg">{{usersMe.portable}}</a>
-										</div>
-										<!-- /.contacts-list-info -->
-									</a>
-								</li>
-							{% endfor %}
-						</ul>
-						<!-- /.contacts-list -->
-					</div>
-					<!-- /.direct-chat-pane -->
-				</div>
-			</div>
-		</div>
-		<div class="tab-pane" id="comAffaire">
-			<div class="card direct-chat direct-chat-warning">
-				<div class="card-header">
-					<h3 class="card-title">Commentaires de cette affaire</h3>
-					<div class="card-tools">
-						<button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
-							<i class="fas fa-phone"></i>
-						</button>
-					</div>
-				</div>
-				<!-- /.card-header -->
-				<div class="card-body">
-					<div class="direct-chat-messages">
-						{% if chats %}
-							{% for chat in chats %}
-								{% if app.user.id == chat.user.id %}
-									<div class="direct-chat-msg">
-										<div class="direct-chat-infos clearfix">
-											<span class="direct-chat-name float-left">{{ chat.user.pseudo }}</span>
-											<span class="direct-chat-timestamp float-right">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
-										</div>
-										<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
-										<div class="direct-chat-text">
-											{{ chat.content }}
-										</div>
-									</div>
-								{% else %}
-									<div class="direct-chat-msg right">
-										<div class="direct-chat-infos clearfix">
-											<span class="direct-chat-name float-right">{{ chat.user.pseudo }}</span>
-											<span class="direct-chat-timestamp float-left">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
-										</div>
-										<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
-										<div class="direct-chat-text">
-											{{ chat.content }}
-										</div>
-									</div>
-								{% endif %}
-							{% endfor %}
-						{% else %}
-							<div class="direct-chat-msg m-2">
-								<div class="direct-chat-infos clearfix">
-									<span class="direct-chat-name float-left">Intranet</span>
-									<span class="direct-chat-timestamp float-right">15/06/2023 16:34</span>
-								</div>
-								<img class="direct-chat-img" src="{{ asset(asset('img/profile/AdminLTELogo.png'))}}" alt="message user image">
-								<div class="direct-chat-text">
-									C'est ici que les commentaires apparaissent .....
-								</div>
-							</div>
-						{% endif %}
-					</div>
-					<!-- Contacts are loaded here -->
-					<div class="direct-chat-contacts">
-						<ul class="contacts-list">
-							{% for usersMe in usersMes %}
-								<li>
-									<a href="#">
-										<img class="contacts-list-img" src="{{ asset(asset('img/profile/' ~ usersMe.img))}}" alt="User Avatar">
-
-										<div class="contacts-list-info">
-											<span class="contacts-list-name">
-												{{ usersMe.pseudo }}
-												<small class="contacts-list-date float-right">{{ usersMe.createdAt|date("d-m-Y") }}</small>
-											</span>
-											<a href='tel:{{usersMe.portable|replace({' ': ""})}}' class="contacts-list-msg">{{usersMe.portable}}</a>
-										</div>
-										<!-- /.contacts-list-info -->
-									</a>
-								</li>
-							{% endfor %}
-						</ul>
-						<!-- /.contacts-list -->
-					</div>
-					<!-- /.direct-chat-pane -->
-				</div>
-			</div>
-		</div>
-		<div class="card-footer p-0">
-			{{ form_start(ChatsForm)}}
-			<div class="input-group">
-				{{ form_widget(ChatsForm.content, {'attr' : {'class' : "form-control"}})}}
-				<span class="input-group-append">
-					{{ form_widget(ChatsForm.Envoyer, {'attr' : {'class' : "btn btn-warning"}})}}
-				</span>
-			</div>
-			{{ form_end(ChatsForm)}}
-		</div>
-	</div>
-</div></div><div class="card">
-<div class="card-header p-2">
-	<ul class="nav nav-pills">
-		<li class="nav-item">
-			<a class="nav-link active" href="#docInterventions" data-toggle="tab">
-				<i class="fas fa-copy fa-2x" aria-hidden="true"></i>
-				Interv.
-				{% set docsInt = 0 %}
-				{% for doc in docs %}
-					{% if doc.Parametre == intervention.id %}
-						{% set docsInt = docsInt + 1 %}
-					{% endif %}
-				{% endfor %}
-				<span class="badge bg-secondary pl-1">{{ docsInt }}</span>
-			</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" href="#docAffaire" data-toggle="tab">
-				<i class="fas fa-copy fa-2x" aria-hidden="true"></i>
-				Affaire
-				<span class="badge bg-secondary pl-1">{{ docs|length}}</span>
-			</a>
-		</li>
-	</ul>
-</div>
-<div class="card-body">
-	<div class="tab-content">
-		<div class="active tab-pane" id="docInterventions">
-			<div class="card direct-chat">
-				<div class="card-header">
-					<h3 class="card-title">Documents de cette intervention</h3>
-				</div>
-				<!-- /.card-header -->
-				<div class="card-body">
-					{% if docs %}
-						<table id="example2" class="table">
-							<tbody>
-								{% for doc in docs %}
-									{% if doc.Parametre == intervention.id %}
-										<tr>
-											<td>
-												<div class="d-flex flex-column">
-													<div>
-														<a target="_blank" href="{{ asset('doc/Lhermitte_freres/Affaires/' ~ doc.file)}}">{{ doc.file }}</a>
-													</div>
-													<div>
-														<i>
-															<span class="float-left">{{ doc.user.Pseudo}}</span>
-														</i>
-														<i>
-															<span class="float-right">{{ doc.createdAt|date("d-m-Y H:i")}}</span>
-														</i>
-													</div>
-												</div>
-											</td>
-										</tr>
-									{% endif %}
-								{% endfor %}
-							</tbody>
-						</table>
-
-					{% else %}
-						<h4 class="text-left text-dark m-2">
-							<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de documents pour cette intervention....
-						</h4>
-					{% endif %}
-				</div>
-			</div>
-		</div>
-		<div class="tab-pane" id="docAffaire">
-			<div class="card direct-chat">
-				<div class="card-header">
-					<h3 class="card-title">Documents de cette affaire</h3>
-				</div>
-				<!-- /.card-header -->
-				<div class="card-body">
-					{% if docs %}
-						<table id="example3" class="table">
-							<tbody>
-								{% for doc in docs %}
-									<tr>
-										<td>
-											<div class="d-flex flex-column">
-												<div>
-													<a target="_blank" href="{{ asset('doc/Lhermitte_freres/Affaires/' ~ doc.file)}}">{{ doc.file }}</a>
-												</div>
-												<div>
-													<i>
-														<span class="float-left">{{ doc.user.Pseudo}}</span>
-													</i>
-													<i>
-														<span class="float-right">{{ doc.createdAt|date("d-m-Y H:i")}}</span>
-													</i>
-												</div>
-											</div>
-										</td>
-									</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-					{% else %}
-						<h4 class="text-left text-dark m-2">
-							<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de documents pour cette intervention....
-						</h4>
-					{% endif %}
-				</div>
-			</div>
-		</div>
-		<div class="card-footer p-0">
-			{{ form_start(formFiles, { attr: { 'accept-charset' : 'utf-8', 'type' : 'file' }}) }}
-			<div class="input-group mb-2">
-				{{ form_label(formFiles.file) }}
-				{{ form_widget(formFiles.file, {'attr' : { 'class': 'form-control' }, 'type' : 'file' })}}
-				{{ form_widget(formFiles.importer, {'label': "Télécharger", 'attr' : { 'class': 'text-white btn btn-dark btn-outline-secondary' }})}}
-			</div>
-			{{ form_end(formFiles) }}
-		</div>
-	</div>
-</div></div><div class="card">
-<div class="card-header">
-	<h2 class="card-title">Détail de l'intervention</h2>
-</div>
-<!-- /.card-header -->
-<div class="card-body">
-	{% if produits %}
-		<table class="table table-bordered table-striped" id="example1">
-			<thead>
-				<tr>
-					<th>Désignation</th>
-					<th class="text-center">Qte</th>
-					<th>Ref</th>
-					<th>Sref1</th>
-					<th>Sref2</th>
-					<th>U.V</th>
-					<th class="text-center">Op</th>
-					<th class="text-center">Empl.</th>
-					<th class="text-center">Ean.</th>
-					<th class="text-center">Cmd Fou.</th>
-					<th class="text-center">Stock</th>
-					<th class="text-center">Date Ferm.</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for produit in produits %}
-					<tr>
-						<td>{{ produit.designation}}</td>
-						<td class="text-center">{{ produit.qte}}</td>
-						<td>{{ produit.ref}}</td>
-						<td>{{ produit.sref1 }}</td>
-						<td>{{ produit.sref2 }}</td>
-						<td class="text-center">{{ produit.uv}}</td>
-						<td class="text-center">{{ produit.op}}</td>
-						<td class="text-center">à venir....</td>
-						<td class="text-center">
-							{% if produit.ean %}
-								{{ produit.ean}}{% else %}aucun
-							{% endif %}
-						</td>
-						<td class="text-center">
-							{% if produit.cmdFou != 0 %}
-								{{ produit.cmdFou}}
-							{% endif %}
-						</td>
-						<td class="text-center">
-							{% if produit.stock %}
-								{{ produit.stock}}
-							{% endif %}
-						</td>
-						<td class="text-center">{{ produit.fermeture}}</td>
-					</tr>
-				{% endfor %}
-		{% else %}
-			</tbody>
-			<h4 class="text-left text-dark">
-				<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de piéces pour cette intervention....
-			</h4>
 		{% endif %}
-	</table>
-</div></div>{% endblock %}
+		<a href='{{path('app_affaire_me_nok' ) }}' class="text-light btn btn-xl btn-primary col-12 col-sm-3 my-2">
+			<i class="fas fa-share mr-1"></i>
+			Affaires
+		</a>
+	</div>
+	<div class="text-dark">
+		<div class="info-box">
+			<span class=" info-box-icon" style=" background-color: {{ intervention.backgroundColor }} ; color: {{ intervention.textColor }} " ;>
+				<i class=" fas fa-binoculars"></i>
+			</span>
+			<div class="info-box-content">
+				<h5 class="">{{ intervention.code.Libelle}}</h5>
+				<span class="m-1">
+					Du
+					{{intervention.start|date("d/m/Y H:i", "Europe/Paris") }}
+					au
+					{{intervention.end|date("d/m/Y H:i", "Europe/Paris") }}
+				</span>
+				<div class="d-flex justify-content-around flex-wrap">
+					<p class="m-1">
+						<ul>
+							<li style="list-style-type: none;">
+								<u>Equipe :</u>
+							</li>
+							{% for monteur in intervention.Equipes %}
+								<li>
+									{{ monteur.Pseudo }}
+								</li>
+							{% endfor %}
+						</ul>
+					</p>
+					<p class="m-1 d-flex flex-row">
+						<ul>
+							<li style="list-style-type: none;">
+								<u>Adresse :</u>
+							</li>
+							<li>
+								{{ intervention.adresse }}
+							</li>
+						</ul>
+					</p>
+				</div>
+			</div>
+			<!-- /.info-box-content -->
+		</div>
+		<!-- /.info-box -->
+	</div>
+	<div class="card">
+		<div class="card-header p-2">
+			<ul class="nav nav-pills">
+				<li class="nav-item">
+					<a class="nav-link active" href="#comInterventions" data-toggle="tab">
+						<i class="fas fa-comments fa-2x" aria-hidden="true"></i>
+						Interv.
+						{% set chatInt = 0 %}
+						{% for chat in chats %}
+							{% if chat.tables == intervention.id %}
+								{% set chatInt = chatInt + 1 %}
+							{% endif %}
+						{% endfor %}
+						<span class="badge bg-secondary pl-1">{{ chatInt }}</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#comAffaire" data-toggle="tab">
+						<i class="fas fa-comments fa-2x" aria-hidden="true"></i>
+						Affaire
+						<span class="badge bg-secondary pl-1">{{chats|length}}</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<div class="card-body">
+			<div class="tab-content">
+				<div class="active tab-pane" id="comInterventions">
+					<div class="card direct-chat direct-chat-warning">
+						<div class="card-header">
+							<h3 class="card-title">Commentaires de cette intervention</h3>
+							<div class="card-tools">
+								<button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
+									<i class="fas fa-phone"></i>
+								</button>
+							</div>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<div class="direct-chat-messages">
+								{% set i = 0 %}
+								{% if chats %}
+									{% for chat in chats %}
+										{% if chat.tables == intervention.id %}
+											{% set i = i + 1 %}
+											{% if app.user.id == chat.user.id %}
+												<div class="direct-chat-msg">
+													<div class="direct-chat-infos clearfix">
+														<span class="direct-chat-name float-left">{{ chat.user.pseudo }}</span>
+														<span class="direct-chat-timestamp float-right">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
+													</div>
+													<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
+													<div class="direct-chat-text">
+														{{ chat.content }}
+													</div>
+												</div>
+											{% else %}
+												<div class="direct-chat-msg right">
+													<div class="direct-chat-infos clearfix">
+														<span class="direct-chat-name float-right">{{ chat.user.pseudo }}</span>
+														<span class="direct-chat-timestamp float-left">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
+													</div>
+													<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
+													<div class="direct-chat-text">
+														{{ chat.content }}
+													</div>
+												</div>
+											{% endif %}
+										{% endif %}
+									{% endfor %}
+									{% if i == 0 %}
+										<div class="direct-chat-msg m-2">
+											<div class="direct-chat-infos clearfix">
+												<span class="direct-chat-name float-left">Intranet</span>
+												<span class="direct-chat-timestamp float-right">15/06/2023 16:34</span>
+											</div>
+											<img class="direct-chat-img" src="{{ asset(asset('img/profile/AdminLTELogo.png'))}}" alt="message user image">
+											<div class="direct-chat-text">
+												C'est ici que les commentaires apparaissent .....
+											</div>
+										</div>
+									{% endif %}
+								{% else %}
+									<div class="direct-chat-msg m-2">
+										<div class="direct-chat-infos clearfix">
+											<span class="direct-chat-name float-left">Intranet</span>
+											<span class="direct-chat-timestamp float-right">15/06/2023 16:34</span>
+										</div>
+										<img class="direct-chat-img" src="{{ asset(asset('img/profile/AdminLTELogo.png'))}}" alt="message user image">
+										<div class="direct-chat-text">
+											C'est ici que les commentaires apparaissent .....
+										</div>
+									</div>
+								{% endif %}
+							</div>
+							<!-- Contacts are loaded here -->
+							<div class="direct-chat-contacts">
+								<ul class="contacts-list">
+									{% for usersMe in usersMes %}
+										<li>
+											<a href="#">
+												<img class="contacts-list-img" src="{{ asset(asset('img/profile/' ~ usersMe.img))}}" alt="User Avatar">
+
+												<div class="contacts-list-info">
+													<span class="contacts-list-name">
+														{{ usersMe.pseudo }}
+														<small class="contacts-list-date float-right">{{ usersMe.createdAt|date("d-m-Y") }}</small>
+													</span>
+													<a href='tel:{{usersMe.portable|replace({' ': ""})}}' class="contacts-list-msg">{{usersMe.portable}}</a>
+												</div>
+												<!-- /.contacts-list-info -->
+											</a>
+										</li>
+									{% endfor %}
+								</ul>
+								<!-- /.contacts-list -->
+							</div>
+							<!-- /.direct-chat-pane -->
+						</div>
+					</div>
+				</div>
+				<div class="tab-pane" id="comAffaire">
+					<div class="card direct-chat direct-chat-warning">
+						<div class="card-header">
+							<h3 class="card-title">Commentaires de cette affaire</h3>
+							<div class="card-tools">
+								<button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
+									<i class="fas fa-phone"></i>
+								</button>
+							</div>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<div class="direct-chat-messages">
+								{% if chats %}
+									{% for chat in chats %}
+										{% if app.user.id == chat.user.id %}
+											<div class="direct-chat-msg">
+												<div class="direct-chat-infos clearfix">
+													<span class="direct-chat-name float-left">{{ chat.user.pseudo }}</span>
+													<span class="direct-chat-timestamp float-right">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
+												</div>
+												<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
+												<div class="direct-chat-text">
+													{{ chat.content }}
+												</div>
+											</div>
+										{% else %}
+											<div class="direct-chat-msg right">
+												<div class="direct-chat-infos clearfix">
+													<span class="direct-chat-name float-right">{{ chat.user.pseudo }}</span>
+													<span class="direct-chat-timestamp float-left">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
+												</div>
+												<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
+												<div class="direct-chat-text">
+													{{ chat.content }}
+												</div>
+											</div>
+										{% endif %}
+									{% endfor %}
+								{% else %}
+									<div class="direct-chat-msg m-2">
+										<div class="direct-chat-infos clearfix">
+											<span class="direct-chat-name float-left">Intranet</span>
+											<span class="direct-chat-timestamp float-right">15/06/2023 16:34</span>
+										</div>
+										<img class="direct-chat-img" src="{{ asset(asset('img/profile/AdminLTELogo.png'))}}" alt="message user image">
+										<div class="direct-chat-text">
+											C'est ici que les commentaires apparaissent .....
+										</div>
+									</div>
+								{% endif %}
+							</div>
+							<!-- Contacts are loaded here -->
+							<div class="direct-chat-contacts">
+								<ul class="contacts-list">
+									{% for usersMe in usersMes %}
+										<li>
+											<a href="#">
+												<img class="contacts-list-img" src="{{ asset(asset('img/profile/' ~ usersMe.img))}}" alt="User Avatar">
+
+												<div class="contacts-list-info">
+													<span class="contacts-list-name">
+														{{ usersMe.pseudo }}
+														<small class="contacts-list-date float-right">{{ usersMe.createdAt|date("d-m-Y") }}</small>
+													</span>
+													<a href='tel:{{usersMe.portable|replace({' ': ""})}}' class="contacts-list-msg">{{usersMe.portable}}</a>
+												</div>
+												<!-- /.contacts-list-info -->
+											</a>
+										</li>
+									{% endfor %}
+								</ul>
+								<!-- /.contacts-list -->
+							</div>
+							<!-- /.direct-chat-pane -->
+						</div>
+					</div>
+				</div>
+				<div class="card-footer p-0">
+					{{ form_start(ChatsForm)}}
+					<div class="input-group">
+						{{ form_widget(ChatsForm.content, {'attr' : {'class' : "form-control"}})}}
+						<span class="input-group-append">
+							{{ form_widget(ChatsForm.Envoyer, {'attr' : {'class' : "btn btn-warning"}})}}
+						</span>
+					</div>
+					{{ form_end(ChatsForm)}}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="card">
+		<div class="card-header p-2">
+			<ul class="nav nav-pills">
+				<li class="nav-item">
+					<a class="nav-link active" href="#docInterventions" data-toggle="tab">
+						<i class="fas fa-copy fa-2x" aria-hidden="true"></i>
+						Interv.
+						{% set docsInt = 0 %}
+						{% for doc in docs %}
+							{% if doc.Parametre == intervention.id %}
+								{% set docsInt = docsInt + 1 %}
+							{% endif %}
+						{% endfor %}
+						<span class="badge bg-secondary pl-1">{{ docsInt }}</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#docAffaire" data-toggle="tab">
+						<i class="fas fa-copy fa-2x" aria-hidden="true"></i>
+						Affaire
+						<span class="badge bg-secondary pl-1">{{ docs|length}}</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<div class="card-body">
+			<div class="tab-content">
+				<div class="active tab-pane" id="docInterventions">
+					<div class="card direct-chat">
+						<div class="card-header">
+							<h3 class="card-title">Documents de cette intervention</h3>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							{% if docs %}
+								<table id="example11" class="table">
+									<tbody>
+										{% for doc in docs %}
+											{% if doc.Parametre == intervention.id %}
+												<tr>
+													<td>
+														<div class="d-flex flex-column">
+															<div>
+																<a target="_blank" href="{{ asset('doc/Lhermitte_freres/Affaires/' ~ doc.file)}}">{{ doc.file }}</a>
+															</div>
+															<div>
+																<i>
+																	<span class="float-left">{{ doc.user.Pseudo}}</span>
+																</i>
+																<i>
+																	<span class="float-right">{{ doc.createdAt|date("d-m-Y H:i")}}</span>
+																</i>
+															</div>
+														</div>
+													</td>
+												</tr>
+											{% endif %}
+										{% endfor %}
+									</tbody>
+								</table>
+
+							{% else %}
+								<h4 class="text-left text-dark m-2">
+									<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de documents pour cette intervention....
+								</h4>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="tab-pane" id="docAffaire">
+					<div class="card direct-chat">
+						<div class="card-header">
+							<h3 class="card-title">Documents de cette affaire</h3>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							{% if docs %}
+								<table id="example12" class="table">
+									<tbody>
+										{% for doc in docs %}
+											<tr>
+												<td>
+													<div class="d-flex flex-column">
+														<div>
+															<a target="_blank" href="{{ asset('doc/Lhermitte_freres/Affaires/' ~ doc.file)}}">{{ doc.file }}</a>
+														</div>
+														<div>
+															<i>
+																<span class="float-left">{{ doc.user.Pseudo}}</span>
+															</i>
+															<i>
+																<span class="float-right">{{ doc.createdAt|date("d-m-Y H:i")}}</span>
+															</i>
+														</div>
+													</div>
+												</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							{% else %}
+								<h4 class="text-left text-dark m-2">
+									<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de documents pour cette intervention....
+								</h4>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="card-footer p-0">
+					{{ form_start(formFiles, { attr: { 'accept-charset' : 'utf-8', 'type' : 'file' }}) }}
+					<div class="input-group mb-2">
+						{{ form_label(formFiles.file) }}
+						{{ form_widget(formFiles.file, {'attr' : { 'class': 'form-control' }, 'type' : 'file' })}}
+						{{ form_widget(formFiles.importer, {'label': "Télécharger", 'attr' : { 'class': 'text-white btn btn-dark btn-outline-secondary' }})}}
+					</div>
+					{{ form_end(formFiles) }}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="card">
+		<div class="card-header">
+			<h2 class="card-title">Détail de l'intervention</h2>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			{% if produits %}
+				<table class="table table-bordered table-striped" id="example1">
+					<thead>
+						<tr>
+							<th>Désignation</th>
+							<th class="text-center">Qte</th>
+							<th>Ref</th>
+							<th>Sref1</th>
+							<th>Sref2</th>
+							<th>U.V</th>
+							<th class="text-center">Op</th>
+							<th class="text-center">Empl.</th>
+							<th class="text-center">Ean.</th>
+							<th class="text-center">Cmd Fou.</th>
+							<th class="text-center">Stock</th>
+							<th class="text-center">Date Ferm.</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for produit in produits %}
+							<tr>
+								<td>{{ produit.designation}}</td>
+								<td class="text-center">{{ produit.qte}}</td>
+								<td>{{ produit.ref}}</td>
+								<td>{{ produit.sref1 }}</td>
+								<td>{{ produit.sref2 }}</td>
+								<td class="text-center">{{ produit.uv}}</td>
+								<td class="text-center">{{ produit.op}}</td>
+								<td class="text-center">{{ produit.lieu }}</td>
+								<td class="text-center">
+									{% if produit.ean %}
+										{{ produit.ean}}{% else %}aucun
+									{% endif %}
+								</td>
+								<td class="text-center">
+									{% if produit.cmdFou != 0 %}
+										{{ produit.cmdFou}}
+									{% endif %}
+								</td>
+								<td class="text-center">
+									{% if produit.stock %}
+										{{ produit.stock}}
+									{% endif %}
+								</td>
+								<td class="text-center">{{ produit.fermeture}}</td>
+							</tr>
+						{% endfor %}
+				{% else %}
+					</tbody>
+					<h4 class="text-left text-dark">
+						<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de piéces pour cette intervention....
+					</h4>
+				{% endif %}
+			</table>
+		</div>
+	</div>
+{% endblock %}
+{% block javascripts %}
+	{{  parent() }}
+	<script></script>
+{% endblock %}

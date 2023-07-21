@@ -89,6 +89,7 @@ class InterventionsMonteursType extends AbstractType
                 'by_reference' => false,
                 'required' => false,
                 'attr' => [
+                    'id' => 'pieces',
                     'class' => 'form-control select2',
                 ],
                 'label' => "Piéces",

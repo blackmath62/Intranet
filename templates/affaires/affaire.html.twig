@@ -31,53 +31,28 @@
 						</h3>
 					</div>
 					<!-- /.card-header -->
-					<div class="card-body d-flex flex-wrap justify-content-evenly col-12 text-center">
+					<div class="card-body d-flex flex-wrap justify-content-start col-12 text-center">
 
 						{% for interventionsActuel in interventionsActuels %}
-							<a href='{{path('app_affaire_show_intervention', {'id' : interventionsActuel.id } ) }}'>
-								<div class="col-12 text-dark">
-									<div class="info-box">
-										<span class=" info-box-icon" style=" background-color: {{ interventionsActuel.backgroundColor }} ; color: {{ interventionsActuel.textColor }} " ;>
-											<i class=" fas fa-binoculars"></i>
-										</span>
-										<div class="info-box-content">
-											<h5 class="">{{ interventionsActuel.code.Libelle}}</h5>
-											<span class="m-1">
-												Du
-												{{interventionsActuel.start|date("d/m/Y H:i", "Europe/Paris") }}
-												au
-												{{interventionsActuel.end|date("d/m/Y H:i", "Europe/Paris") }}
-											</span>
-											<div class="d-flex justify-content-around flex-wrap">
-												<p class="m-1">
-													<ul>
-														<li style="list-style-type: none;">
-															<u>Equipe :</u>
-														</li>
-														{% for monteur in interventionsActuel.Equipes %}
-															<li>
-																{{ monteur.Pseudo }}
-															</li>
-														{% endfor %}
-													</ul>
-												</p>
-												<p class="m-1 d-flex flex-row">
-													<ul>
-														<li style="list-style-type: none;">
-															<u>Piéce(s) :</u>
-														</li>
-														{% for pieces in interventionsActuel.pieces %}
-															<li>
-																{{ pieces.piece }}
-															</li>
-														{% endfor %}
-													</ul>
-												</p>
-											</div>
-										</div>
-										<!-- /.info-box-content -->
-									</div>
-									<!-- /.info-box -->
+							<a class="col-12 col-sm-4" href='{{path('app_affaire_show_intervention', {'id' : interventionsActuel.id } ) }}'>
+								<div class="callout text-dark p-2" style=" border-color: {{ interventionsActuel.backgroundColor }}">
+									<h5>{{ interventionsActuel.code.Libelle}}</h5>
+
+									<p>Du
+										{{interventionsActuel.start|date("d/m/Y H:i", "Europe/Paris") }}
+										au
+										{{interventionsActuel.end|date("d/m/Y H:i", "Europe/Paris") }}</p>
+									<p>
+										<u>Equipe :</u>
+										{% for monteur in interventionsActuel.Equipes %}
+											{{ monteur.Pseudo }}
+											|
+										{% endfor %}
+									</p>
+									<p>
+										<u>Adresse :</u>
+										{{ interventionsActuel.adresse }}
+									</p>
 								</div>
 							</a>
 						{% endfor %}
@@ -86,198 +61,435 @@
 			</div>
 		</div>
 	{% endif %}
-	<div class="card">
-		<div class="card-header d-flex flex-column m-0">
-			<div class="card-tools">
-				<a class="btn btn-xl btn-secondary col-sm-1 col-12 m-1 float-right" href='{{path('app_update_affaires') }}'>
-					<i class="fas fa-redo-alt"></i>
-				</a>
-				<a class="btn btn-xl btn-primary col-sm-1 col-12 m-1 float-right" data-toggle="modal" data-target="#modal-lg">
-					<i class="fas fa-plus"></i>
-				</a>
-				<div class="modal fade" id="modal-lg">
-					<div class="modal-dialog modal-lg">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h4 class="modal-title">Création d'un chantier hors Affaire</h4>
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<div class="modal-body">
-								{{ form_start(form) }}
-								{{ form_end(form) }}
-							</div>
+	{% if fichesManquantes %}
+		<div class="row">
+			<div class="col-12">
+				<div class="card collapsed-card card-warning">
+					<div class="card-header">
+						<h3 class="card-title">Fiche(s) à saisir</h3>
+						<div class="card-tools">
+							<span class="badge bg-secondary">
+								{{ fichesManquantes|length }}
+							</span>
+							<button type="button" class="btn btn-tool" data-card-widget="collapse">
+								<i class="fas fa-minus"></i>
+							</button>
 						</div>
-						<!-- /.modal-content -->
 					</div>
-					<!-- /.modal-dialog -->
-				</div>
-				{% if app.request.attributes.get('_route')  == 'app_affaire_me_ok' %}
-					<a title='Affaires à traiter !' href="{{ path('app_affaire_me_nok') }}" class="btn btn-warning text-dark col-sm-1 col-12 m-1 float-right">
-						<i class="fas fa-thumbs-down"></i>
-					</a>
-				{% else %}
-					<a title='Affaires traitées !' href="{{ path('app_affaire_me_ok') }}" class="btn btn-success col-sm-1 col-12 m-1 float-right">
-						<i class="fas fa-thumbs-up"></i>
-					</a>
-				{% endif %}
-			</div>
-			{% if app.request.attributes.get('_route')  == 'app_affaire_me_ok' %}
-				<h1 class="card-title">Affaires traitées</h1>
-			{% elseif app.request.attributes.get('_route')  == 'app_affaire_me_nok' %}
-				<h1 class="card-title">Affaires à traiter</h1>
-			{% endif %}
-		</div><!-- /.card-header --><div class="card-body">
-			<table id="example1" class="table table-bordered table-striped">
-				<thead>
-					<tr>
-						<th style="width: 10px">#</th>
-						<th>Code affaire</th>
-						<th>Libéllé</th>
-						<th>Tiers</th>
-						<th>Nom</th>
-						<th>Date Début</th>
-						<th>Date Fin</th>
-						<th>Durée Chantier</th>
-						<th>%</th>
-						<th>nb Pieces</th>
-						<th class="text-center">Etat</th>
-						<th class="text-center">Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% set i = 1 %}
-					{% for affaire in affaires %}
-						<tr>
-							<td>{{ i }}</td>
-							<td>{{ affaire.code}}</td>
-							<td>{{ affaire.libelle}}</td>
-							<td>{{ affaire.tiers}}</td>
-							<td>{{ affaire.nom}}</td>
-							<td>
-								{% if affaire.start %}
-									{{ affaire.start|date("d/m/Y")}}</td>
-							{% endif %}
-							<td>
-								{% if affaire.end %}
-									{{ affaire.end|date("d/m/Y")}}</td>
-							{% endif %}
-							<td>
-								{% if affaire.duration %}
-									{{ affaire.duration}}
-								{% endif %}
-							</td>
-							<td>
-								<span class="badge bg-danger">
-									{% if affaire.progress %}
-										{{ affaire.progress}}{% else %}0
-									{% endif %}%
-								</span>
-							</td>
-							<td>
-								<span class="badge bg-primary">{{affaire.nbe}}</span>
-							</td>
-							<td class="text-center">
-								{% set color = 'success' %}
-								{% if affaire.etat == 'En attente' %}
-									{% set color = 'warning text-dark' %}
-									{% set icone = "fa fa-pause" %}
-								{% elseif affaire.etat == 'Nouvelle' %}
-									{% set color = 'info text-white' %}
-									{% set icone = "fa fa-inbox" %}
-								{% elseif affaire.etat == 'En cours' %}
-									{% set color = 'primary text-white' %}
-									{% set icone = "fa fa-spinner" %}
-								{% elseif affaire.etat == 'A finir' %}
-									{% set color = 'secondary text-white' %}
-									{% set icone = "fa fa-battery-half" %}
-								{% elseif affaire.etat == 'Termine' %}
-									{% set color = 'success text-white' %}
-									{% set icone = "fa fa-check" %}
-								{% elseif affaire.etat == 'Planifiee' %}
-									{% set color = 'primary active text-white' %}
-									{% set icone = "far fa-calendar-alt" %}
-								{% elseif affaire.etat == 'Litige' %}
-									{% set color = 'danger text-white' %}
-									{% set icone = "fa fa-triangle-exclamation" %}
-								{% endif %}
+					<div class="card-body text-center">
+						<table id="example12" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>Intervenant</th>
+									<th>Date</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% set f = 1 %}
+								{% for fichesManquante in fichesManquantes %}
+									<tr>
+										<td>{{ fichesManquante.intervenant.pseudo }}</td>
+										<td>{{ fichesManquante.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
+										<td>
+											<a data-toggle="modal" data-target="#modal-creer-{{f}}">
+												<i class="nav-icon fas fa-plus-circle text-success fa-2x"></i>
+											</a>
 
-								<div class="btn-group">
-									<a class="btn btn-{{ color }}">
-										<i class="{{icone}}" aria-hidden="true"></i>
-									</a>
-									<div class="btn-group">
-										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
-										<ul class="dropdown-menu">
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
-											</li>
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Litige' } ) }}'>Litige</a>
-											</li>
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En attente' } ) }}'>En attente</a>
-											</li>
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'A finir' } ) }}'>A finir</a>
-											</li>
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Planifiee' } ) }}'>Planifiée</a>
-											</li>
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En cours' } ) }}'>En cours</a>
-											</li>
-											<li>
-												<a class="dropdown-item" data-toggle="modal" data-target="#modal-lg-termine">Termine</a>
-											</li>
-										</ul>
-										<div class="modal fade" id="modal-lg-termine">
-											<div class="modal-dialog modal-lg">
+										</td>
+										<div class="modal fade" id="modal-creer-{{f}}">
+											<div class="modal-dialog modal-sm">
 												<div class="modal-content">
 													<div class="modal-header">
-														<h4 class="modal-title">Basculer cette affaire en Terminé ?</h4>
+														<h4 class="modal-title">Voulez vous vraiment créer cette fiche ?</h4>
 														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 															<span aria-hidden="true">&times;</span>
 														</button>
 													</div>
 													<div class="modal-body">
-														<p>Si vous basculer cette affaire en Terminé, toutes les piéces liées à cette affaire vont automatiquement passer en Terminées</p>
+														<p>Pour
+															<strong>{{ fichesManquante.intervenant.pseudo }}
+															</strong>
+														</p>
+														<p>Date du :
+															<strong>{{ fichesManquante.createdAt|date("d/m/Y", "Europe/Paris") }}</strong>
+														</p>
+														<p>Affaire :
+															<strong>{{ fichesManquante.intervention.code.code }}</strong>
+														</p>
+														<p>Intervention du
+															<strong>{{ fichesManquante.intervention.start|date("d/m/Y", "Europe/Paris") }}</strong>
+															au
+															<strong>{{ fichesManquante.intervention.end|date("d/m/Y", "Europe/Paris") }}</strong>
+														</p>
 													</div>
 													<div class="modal-footer justify-content-between">
 														<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-														<a type="button" class="btn btn-primary" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Termine' } ) }}'>Terminer cette affaire</a>
+														<a href='{{path('app_affaire_creer_fiche_intervention', {'id' : fichesManquante.intervention.id, 'intervenant' : fichesManquante.intervenant.id, 'createdAt' : fichesManquante.createdAt|date("Y-m-d", "Europe/Paris") } ) }}' type="button" class="btn btn-primary">Créer</a>
 													</div>
 												</div>
 												<!-- /.modal-content -->
 											</div>
 											<!-- /.modal-dialog -->
 										</div>
-									</div>
-								</div>
-							</td>
-							<td>
-								<a href='{{path('app_piece_affaire_nok', {'affaire' : affaire.code } ) }}' class="ml-2 text-light btn btn-xl btn-info">
-									<i class="fas fa-eye"></i>
-								</a>
-							</td>
-						</tr>
-						{% set i = i + 1 %}
-					{% endfor %}
-				</tbody>
-			</table>
+									</tr>
+									{% set f = f + 1 %}
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
 		</div>
-	</div>
+	{% endif %}
+	{% if fichesNonVerrouillees %}
+		<div class="row">
+			<div class="col-12">
+				<div class="card collapsed-card card-primary">
+					<div class="card-header">
+						<h3 class="card-title">Fiche(s) non Verrouillée(s)</h3>
+						<div class="card-tools">
+							<span class="badge bg-dark">
+								{{ fichesNonVerrouillees|length }}
+							</span>
+							<button type="button" class="btn btn-tool" data-card-widget="collapse">
+								<i class="fas fa-minus"></i>
+							</button>
+						</div>
+					</div>
+					<div class="card-body text-center">
+						<table id="example1" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>Intervenant</th>
+									<th>Date</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for fichesNonVerrouillee in fichesNonVerrouillees %}
+									<tr>
+										<td>{{ fichesNonVerrouillee.Intervenant.pseudo }}</td>
+										<td>{{ fichesNonVerrouillee.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
+										<td>
+											<a data-toggle="modal" data-target="#modal-nv-{{fichesNonVerrouillee.id}}">
+												<i class="nav-icon fas fa-eye fa-2x text-info m-2"></i>
+											</a>
+										</td>
+										<div class="modal fade" id="modal-nv-{{fichesNonVerrouillee.id}}">
+											<div class="modal-dialog modal-sm">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h4 class="modal-title">Compte rendu</h4>
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+															<span aria-hidden="true">&times;</span>
+														</button>
+													</div>
+													<div class="modal-body">
+														<p>
+															Date :
+															<strong>
+																{{fichesNonVerrouillee.createdAt|date("d/m/Y", "Europe/Paris")}}
+															</strong>
+														</p>
+														<p>
+															Saisie par :
+															<strong>
+																{{ fichesNonVerrouillee.createdBy.pseudo }}
+															</strong>
+														</p>
+														<p>
+															Intervenant :
+															<strong>
+																{{ fichesNonVerrouillee.intervenant.pseudo }}
+															</strong>
+														</p>
+														<p>
+															Pension :
+															<strong>
+																{% if fichesNonVerrouillee.pension %}
+																	{% for pension in fichesNonVerrouillee.pension %}
+																		{{ pension }}
+																		,
+
+																	{% endfor %}
+																{% else %}
+																	Aucune pension déclarée
+																{% endif %}
+															</strong>
+														</p>
+														<p>
+															Heures :
+															<strong>
+																{% if fichesNonVerrouillee.heures|length %}
+																	<ul>
+																		{% for heure in fichesNonVerrouillee.heures %}
+																			<li>{{ heure.type }}
+																				-->
+																				{{ heure.start|date("H:i", "Europe/Paris")}}
+																				-
+																				{{ heure.end|date("H:i", "Europe/Paris")}}
+																			</li>
+																		{% endfor %}
+																	</ul>
+																{% else %}
+																	<p class="text-danger">
+																		Pas d'heures déclarées, merci d'y remédier en cliquant sur modifier !</p>
+																{% endif %}
+															</strong>
+														</p>
+														{% if fichesNonVerrouillee.comment %}
+															<p>
+																Commentaires :
+																<strong>
+																	{{ fichesNonVerrouillee.comment|raw }}
+																</strong>
+															</p>
+														{% endif %}
+														<p>
+															Affaire :
+															<strong>
+																{{ fichesNonVerrouillee.intervention.code.libelle }}
+															</strong>
+														</p>
+													</p>
+													<p>
+														Adresse :
+														<strong>
+															{{ fichesNonVerrouillee.intervention.adresse }}
+														</strong>
+													</p>
+													<p>
+														Intervention :
+														<strong>
+															du
+															{{ fichesNonVerrouillee.intervention.start|date("d-m-Y", "Europe/Paris") }}
+															au
+															{{ fichesNonVerrouillee.intervention.end|date("d-m-Y", "Europe/Paris") }}
+														</strong>
+													</p>
+												</div>
+												<div class="modal-footer justify-content-between">
+													<a type="button" data-dismiss="modal">
+														<i class="fa-solid fa-xmark fa-3x text-secondary"></i>
+													</a>
+													<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fichesNonVerrouillee.Intervention.id, 'ficheId' : fichesNonVerrouillee.id } ) }}' type="button">
+														<i class="fa-solid fa-edit fa-3x text-warning"></i>
+													</a>
+													{% if fichesNonVerrouillee.heures|length %}
+														<div class="form-group d-flex align-items-center justify-content-between col-12">
+															<div class="form-check">
+																<input type="checkbox" id="maCase{{fichesNonVerrouillee.id}}">
+																<label class="form-check-label" for="maCase{{fichesNonVerrouillee.id}}">Verrouiller cette fiche</label>
+															</div>
+															<a href="#" data-href='{{path('app_affaire_verrouiller_fiche_intervention', {'id' : fichesNonVerrouillee.intervention.id, 'ficheId' : fichesNonVerrouillee.id } ) }}' class="monLien" id="lien{{fichesNonVerrouillee.id}}">
+																<i class="fa-solid fa-lock fa-3x text-secondary"></i>
+															</a><br>
+														</div>
+													{% endif %}
+												</div>
+											</div>
+											<!-- /.modal-content -->
+										</div>
+										<!-- /.modal-dialog -->
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+	{% if is_granted('ROLE_ADMIN_MONTEUR') %}
+		<div class="card">
+			<div class="card-header d-flex flex-column m-0">
+				<div class="card-tools">
+					<a class="btn btn-xl btn-warning col-sm-1 col-12 m-1 float-right" href='{{path('app_affaires_admin') }}'>
+						<strong>Admin</strong>
+					</a>
+					<a class="btn btn-xl btn-secondary col-sm-1 col-12 m-1 float-right" href='{{path('app_update_affaires') }}'>
+						<i class="fas fa-redo-alt"></i>
+					</a>
+					<a class="btn btn-xl btn-primary col-sm-1 col-12 m-1 float-right" data-toggle="modal" data-target="#modal-lg">
+						<i class="fas fa-plus"></i>
+					</a>
+					<div class="modal fade" id="modal-lg">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title">Création d'un chantier hors Affaire</h4>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body">
+									{{ form_start(form) }}
+									{{ form_end(form) }}</div>
+							</div><!-- /.modal-content --></div><!-- /.modal-dialog --></div>
+					{% if app.request.attributes.get('_route')  == 'app_affaire_me_ok' %}
+						<a title='Affaires à traiter !' href="{{ path('app_affaire_me_nok') }}" class="btn btn-warning text-dark col-sm-1 col-12 m-1 float-right">
+							<i class="fas fa-thumbs-down"></i>
+						</a>
+					{% else %}
+						<a title='Affaires traitées !' href="{{ path('app_affaire_me_ok') }}" class="btn btn-success col-sm-1 col-12 m-1 float-right">
+							<i class="fas fa-thumbs-up"></i>
+						</a>
+					{% endif %}
+				</div>
+				{% if app.request.attributes.get('_route')  == 'app_affaire_me_ok' %}
+					<h1 class="card-title">Affaires traitées</h1>
+				{% elseif app.request.attributes.get('_route')  == 'app_affaire_me_nok' %}
+					<h1 class="card-title">Affaires à traiter</h1>
+				{% endif %}
+			</div><!-- /.card-header --><div class="card-body">
+				<table id="example11" class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th style="width: 10px">#</th>
+							<th>Code affaire</th>
+							<th>Libéllé</th>
+							<th>Tiers</th>
+							<th>Nom</th>
+							<th>Date Début</th>
+							<th>Date Fin</th>
+							<th>Durée Chantier</th>
+							<th>%</th>
+							<th>nb Pieces</th>
+							<th class="text-center">Etat</th>
+							<th class="text-center">Action</th>
+						</tr>
+					</thead>
+					<tbody>{% set i = 1 %}
+						{% for affaire in affaires %}
+							<tr>
+								<td>{{ i }}</td>
+								<td>{{ affaire.code}}</td>
+								<td>{{ affaire.libelle}}</td>
+								<td>{{ affaire.tiers}}</td>
+								<td>{{ affaire.nom}}</td>
+								<td>
+									{% if affaire.start %}
+										{{ affaire.start|date("Y-m-d")}}</td>
+								{% endif %}
+								<td>
+									{% if affaire.end %}
+										{{ affaire.end|date("Y-m-d")}}</td>
+								{% endif %}
+								<td>
+									{% if affaire.duration %}
+										{{ affaire.duration}}
+									{% endif %}
+								</td>
+								<td>
+									<span class="badge bg-danger">
+										{% if affaire.progress %}
+											{{ affaire.progress}}{% else %}0
+										{% endif %}%
+									</span>
+								</td>
+								<td>
+									<span class="badge bg-primary">{{affaire.nbe}}</span>
+								</td>
+								<td class="text-center">
+									{% set color = 'success' %}
+									{% if affaire.etat == 'En attente' %}
+										{% set color = 'warning text-dark' %}
+										{% set icone = "fa fa-pause" %}
+									{% elseif affaire.etat == 'Nouvelle' %}
+										{% set color = 'info text-white' %}
+										{% set icone = "fa fa-inbox" %}
+									{% elseif affaire.etat == 'En cours' %}
+										{% set color = 'primary text-white' %}
+										{% set icone = "fa fa-spinner" %}
+									{% elseif affaire.etat == 'A finir' %}
+										{% set color = 'secondary text-white' %}
+										{% set icone = "fa fa-battery-half" %}
+									{% elseif affaire.etat == 'Termine' %}
+										{% set color = 'success text-white' %}
+										{% set icone = "fa fa-check" %}
+									{% elseif affaire.etat == 'Planifiee' %}
+										{% set color = 'primary active text-white' %}
+										{% set icone = "far fa-calendar-alt" %}
+									{% elseif affaire.etat == 'Litige' %}
+										{% set color = 'danger text-white' %}
+										{% set icone = "fa fa-triangle-exclamation" %}
+									{% endif %}
+
+									<div class="btn-group">
+										<a class="btn btn-{{ color }}">
+											<i class="{{icone}}" aria-hidden="true"></i>
+										</a>
+										<div class="btn-group">
+											<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
+											<ul class="dropdown-menu">
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Litige' } ) }}'>Litige</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En attente' } ) }}'>En attente</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'A finir' } ) }}'>A finir</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Planifiee' } ) }}'>Planifiée</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En cours' } ) }}'>En cours</a>
+												</li>
+												<li>
+													<a class="dropdown-item" data-toggle="modal" data-target="#modal-lg-termine">Termine</a>
+												</li>
+											</ul>
+											<div class="modal fade" id="modal-lg-termine">
+												<div class="modal-dialog modal-lg">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h4 class="modal-title">Basculer cette affaire en Terminé ?</h4>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body">
+															<p>Si vous basculer cette affaire en Terminé, toutes les piéces liées à cette affaire vont automatiquement passer en Terminées</p>
+														</div>
+														<div class="modal-footer justify-content-between">
+															<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+															<a type="button" class="btn btn-primary" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Termine' } ) }}'>Terminer cette affaire</a>
+														</div>
+													</div>
+													<!-- /.modal-content -->
+												</div>
+												<!-- /.modal-dialog -->
+											</div>
+										</div>
+									</div>
+								</td>
+								<td>
+									<a href='{{path('app_piece_affaire_nok', {'affaire' : affaire.code } ) }}' class="ml-2 text-light btn btn-xl btn-info">
+										<i class="fas fa-eye"></i>
+									</a>
+								</td>
+							</tr>
+							{% set i = i + 1 %}
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{% endif %}
 	<div class="row">
 		<div class="col-md-12">
 			<div class="card card-dark">
 				<div class="card-header d-flex">
-					<h3 class="card-title text-center">Calendrier des congés validés</h3>
+					<h3 class="card-title text-center">Calendrier des Interventions</h3>
 				</div>
 				<div class="card-body">
-					<div>
-						<!-- THE CALENDAR -->
-						<div id="external-events"></div>
+					<div><!-- THE CALENDAR --><div id="external-events"></div>
 						<div id="calendar"></div>
 					</div>
 				</div>
@@ -285,52 +497,9 @@
 		</div>
 	</div>
 {% endblock %}
-{% block javascripts %}<!-- tables --><script>
-		$(function () {
-$("#example1").DataTable({
-"responsive": true,
-"lengthChange": false,
-"autoWidth": false,
-"order": [
-[0, "desc"]
-],
-"buttons": [
-"copy",
-"csv",
-"excel",
-"pdf",
-"print"
-]
-}).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-$("#example3").DataTable({
-"responsive": true,
-"lengthChange": false,
-"autoWidth": false,
-"order": [
-[0, "desc"]
-],
-"buttons": [
-"copy",
-"csv",
-"excel",
-"pdf",
-"print",
-]
-}).buttons().container().appendTo('#example3_wrapper .col-md-6:eq(0)');
-$('#example2').DataTable({
-"paging": true,
-"lengthChange": false,
-"searching": false,
-"ordering": false,
-"info": true,
-"autoWidth": false,
-"responsive": true
-});
-});
-	</script><!-- fullCalendar --><script>
-		/* initialize the calendar
-     -----------------------------------------------------------------*/
-window.onload = () => {
+{% block javascripts %}
+	{{  parent() }}<!-- fullCalendar --><script>
+		window.onload = () => {
 let calendarElt = document.querySelector("#calendar")
 let calendar = new FullCalendar.Calendar(calendarElt, {
 weekNumbers: true, // numéro de semaine
@@ -354,12 +523,55 @@ events: {{ data|raw }}
 calendar.render()
 };
 	</script>
+	<script type="text/javascript">
+		function ChangeStatut(formulaire) {
+if (formulaire.regagree.checked == true) {
+formulaire.validation.disabled = false
+}
+if (formulaire.regagree.checked == false) {
+formulaire.validation.disabled = true
+}
+}
+	</script>
 	<script>
-		$(function () { // Initialize Select2 Elements
-$('.select2').select2({placeholder: "Selectionnez les données"})
+		document.addEventListener("DOMContentLoaded", function () {
+const maCase = document.getElementById("maCase");
+const monBouton = document.getElementById("monBouton");
 
-// Initialize Select2 Elements
-$('.select2bs4').select2({theme: 'bootstrap4'})
-})
+maCase.addEventListener("change", function () {
+monBouton.disabled = ! maCase.checked;
+});
+});
+	</script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+const cases = document.querySelectorAll('input[type="checkbox"]');
+const liens = document.querySelectorAll(".monLien");
+const monIcone = document.querySelectorAll('.monLien i');
+
+// Désactiver tous les liens au chargement de la page
+liens.forEach(lien => lien.removeAttribute("href"));
+
+function updateColor(index) {
+if (cases[index].checked) {
+liens[index].setAttribute("href", liens[index].getAttribute("data-href"));
+monIcone[index].classList.remove("text-secondary");
+monIcone[index].classList.add("text-success");
+} else {
+liens[index].removeAttribute("href");
+monIcone[index].classList.remove("text-success");
+monIcone[index].classList.add("text-secondary");
+}
+}
+
+cases.forEach((caseElement, index) => {
+caseElement.addEventListener("change", function () {
+updateColor(index);
+});
+
+// Appel initial pour mettre à jour la couleur de l'icône selon l'état initial de la case
+updateColor(index);
+});
+});
 	</script>
 {% endblock %}

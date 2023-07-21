@@ -6,9 +6,9 @@ use App\Controller\AdminEmailController;
 use App\Controller\ClientFeuRougeOrangeController;
 use App\Controller\CmdRobyDelaiAccepteReporteController;
 use App\Controller\ComptaAnalytiqueController;
-use App\Controller\ConduiteDeTravauxMeController;
 use App\Controller\ContratCommissionnaireController;
 use App\Controller\FscAttachedFileController;
+use App\Controller\FscPieceClientController;
 use App\Controller\HolidayController;
 use App\Controller\MovementBillFscController;
 use App\Entity\Main\CmdRobyDelaiAccepteReporte;
@@ -52,7 +52,6 @@ class ControleAnomaliesController extends AbstractController
     private $cmdRobyController;
     private $fscAttachedFileController;
     private $contratCommissionnaireController;
-    private $conduiteDeTravauxMeController;
     private $movementBillFscController;
     private $movRepo;
     private $repoMail;
@@ -64,7 +63,7 @@ class ControleAnomaliesController extends AbstractController
     private $clientFeuRougeOrangeController;
     private $holidayController;
 
-    public function __construct(HolidayController $holidayController, ClientFeuRougeOrangeController $clientFeuRougeOrangeController, ComptaAnalytiqueController $comptaAnalytiqueController, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovementBillFscController $movementBillFscController, MouvRepository $movRepo, ConduiteDeTravauxMeController $conduiteDeTravauxMeController, ContratCommissionnaireController $contratCommissionnaireController, FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes, MailerInterface $mailer, ControlesAnomaliesRepository $anomalies, ControleComptabiliteRepository $compta)
+    public function __construct(HolidayController $holidayController, ClientFeuRougeOrangeController $clientFeuRougeOrangeController, ComptaAnalytiqueController $comptaAnalytiqueController, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, FscPieceClientController $movementBillFscController, MouvRepository $movRepo, ContratCommissionnaireController $contratCommissionnaireController, FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes, MailerInterface $mailer, ControlesAnomaliesRepository $anomalies, ControleComptabiliteRepository $compta)
     {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -78,7 +77,6 @@ class ControleAnomaliesController extends AbstractController
         $this->cmdRobyController = $cmdRobyController;
         $this->fscAttachedFileController = $fscAttachedFileController;
         $this->contratCommissionnaireController = $contratCommissionnaireController;
-        $this->conduiteDeTravauxMeController = $conduiteDeTravauxMeController;
         $this->movRepo = $movRepo;
         $this->movementBillFscController = $movementBillFscController;
         $this->repoMail = $repoMail;
@@ -151,7 +149,6 @@ class ControleAnomaliesController extends AbstractController
             $this->ControleArticle();
             $this->ControlStockDirect(); // j'ai mis Utilisateur
             $this->movementBillFscController->update(); // Envoyer les mails à la référente sur les ventes FSC.
-            $this->conduiteDeTravauxMeController->update(); // envoyer les mails conduite de travaux
             if ($heure >= 8 && $heure < 20) {
                 $this->fscAttachedFileController->majFscOrderListFromDivalto();
                 if ($jour == 5 || $jour == 1) {

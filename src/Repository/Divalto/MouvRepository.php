@@ -471,25 +471,26 @@ class MouvRepository extends ServiceEntityRepository
             $selectType = " typeFsc,SUM(qte) AS qte";
             $groupType = " typeFsc";
         } elseif ($type == 'detail') {
-            $selectType = " typeFsc, ref,sref1,sref2,designation,uv, SUM(qte) AS qte";
-            $groupType = " typeFsc, ref,sref1,sref2,designation,uv";
+            $selectType = " typeFsc, serie, ref,sref1,sref2,designation,uv, SUM(qte) AS qte";
+            $groupType = " typeFsc, serie, ref,sref1,sref2,designation,uv";
         }
 
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT $selectType
                     FROM(
-                        SELECT m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, m.VENUN AS uv, m.BLNO AS bl, m.BLDT AS dateBl, BLQTE AS qteBl, m.FANO AS facture, m.FADT AS dateFact,
+                        SELECT m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, m.VENUN AS uv, m.BLNO AS bl, m.BLDT AS dateBl, BLQTE AS qteBl, m.FANO AS facture, m.FADT AS dateFact, v.SERIE AS serie,
                         CASE
                         WHEN m.OP IN ($opPositive) THEN m.FAQTE
                         WHEN m.OP IN ($opNegative) THEN -1 * m.FAQTE
                         END AS qte,
                         CASE
-                        WHEN m.DES LIKE '%FSC 100%' THEN 'fsc 100 %'
-                        WHEN m.DES LIKE '%FSC MIX CREDIT%' THEN 'fsc mix crédit'
-                        WHEN m.DES LIKE '%FSC MIX%' AND m.DES NOT LIKE '%MIX%' THEN 'fsc mix'
+                        WHEN m.REF LIKE '%FSC100%' THEN 'fsc 100 %'
+                        WHEN m.REF LIKE '%FSCMIXCREDIT%' THEN 'fsc mix crédit'
+                        WHEN m.REF LIKE '%FSCMIX%' AND m.REF NOT LIKE '%CREDIT%' THEN 'fsc mix'
                         END AS typeFsc
                         FROM MOUV m
                         INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+                        INNER JOIN MVTL v ON m.DOS = v.DOS AND m.ENRNO = v.ENRNO
                         WHERE m.DOS = 3 AND m.TICOD = '$tiers'
                         AND m.BLDT BETWEEN '$start' AND '$end' AND m.REF LIKE '%FSC%'
                     )reponse
@@ -558,9 +559,9 @@ class MouvRepository extends ServiceEntityRepository
     {
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT e.ENT_ID AS idEnt, dos, idMouv,picod, ticod,piece, tiers, ref, sref1, sref2, designation, uv, op, qte, cmdFou, stock, ean, fermeture
+        $sql = "SELECT e.ENT_ID AS idEnt, dos, idMouv,picod, ticod,piece, tiers, ref, sref1, sref2, designation, uv, op, qte, cmdFou, stock, ean, fermeture, lieu
         FROM(
-        SELECT dos, idMouv,ticod, picod,piece,tiers, ref, sref1, sref2, designation, uv, op, qte, cmdFou, stock,
+        SELECT dos, idMouv,ticod, picod,piece,tiers, ref, sref1, sref2, designation, uv, op, qte, cmdFou, stock, lieu,
                 CASE
                 WHEN codeSref = 1 THEN LTRIM(RTRIM(artEan))
                 WHEN codeSref = 2 THEN LTRIM(RTRIM(sr.EAN))
@@ -572,7 +573,7 @@ class MouvRepository extends ServiceEntityRepository
                 END AS fermeture
                 FROM(
                 SELECT  m.MOUV_ID AS idMouv, m.DOS as dos, m.TIERS AS tiers, m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, m.DES AS designation, m.VENUN AS uv,m.OP AS op, a.CDEFOQTE AS cmdFou,
-                SUM(s.QTETJSENSTOCK) AS stock, a.SREFCOD AS codeSref, a.EAN as artEan, a.HSDT AS ferme, m.TICOD AS ticod, m.PICOD AS picod,
+                SUM(s.QTETJSENSTOCK) AS stock, a.SREFCOD AS codeSref, a.EAN as artEan, a.HSDT AS ferme, m.TICOD AS ticod, m.PICOD AS picod,v.LIEU AS lieu,
                 CASE
                 WHEN m.PICOD = 2 THEN m.CDQTE
                 WHEN m.PICOD = 3 THEN m.BLQTE
@@ -586,8 +587,9 @@ class MouvRepository extends ServiceEntityRepository
                 FROM MOUV m
                 INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF AND a.SREF1 = m.SREF1 AND m.SREF2 = a.SREF2
                 LEFT JOIN MVTL_STOCK_V s ON a.DOS = s.DOSSIER AND m.REF = s.REFERENCE AND m.SREF1 = s.SREFERENCE1 AND m.SREF2 = s.SREFERENCE2
+                INNER JOIN MVTL v ON m.DOS = v.DOS AND m.ENRNO = v.ENRNO
                 WHERE m.TICOD = 'C'
-                GROUP BY m.MOUV_ID, m.MOUV_ID , m.TIERS, m.PICOD, m.DOS, m.REF, m.SREF1, m.SREF2, m.DES, m.VENUN, m.OP,m.CDQTE,m.BLQTE, m.FAQTE,m.CDNO,m.BLNO, m.FANO, a.CDEFOQTE, a.SREFCOD, a.EAN, a.HSDT, m.TICOD, m.PICOD)reponse
+                GROUP BY m.MOUV_ID, m.MOUV_ID , m.TIERS, m.PICOD, m.DOS, m.REF, m.SREF1, m.SREF2, m.DES, m.VENUN, m.OP,m.CDQTE,m.BLQTE, m.FAQTE,m.CDNO,m.BLNO, m.FANO, a.CDEFOQTE, a.SREFCOD, a.EAN, a.HSDT, m.TICOD, m.PICOD, v.LIEU)reponse
                 LEFT JOIN SART sr ON dos = sr.DOS AND ref = sr.REF)rep
                 INNER JOIN ENT e ON e.DOS = dos AND e.TICOD = ticod AND e.TIERS = tiers AND e.PICOD = picod AND e.PINO = piece
                 WHERE e.ENT_ID IN ($id)
@@ -1149,6 +1151,138 @@ class MouvRepository extends ServiceEntityRepository
             $secteur
         )reponse
         GROUP BY $group
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getRseCartographieAchatVente($dd, $df, $type, $tiers, $dos): array
+    {
+
+        $ddN1 = new DateTime($dd);
+        $ddN1 = date_modify($ddN1, '-1 Year');
+        $ddN1 = $ddN1->format('Y-m-d');
+        $ddN2 = new DateTime($dd);
+        $ddN2 = date_modify($ddN2, '-2 Year');
+        $ddN2 = $ddN2->format('Y-m-d');
+        $ddN3 = new DateTime($dd);
+        $ddN3 = date_modify($ddN3, '-3 Year');
+        $ddN3 = $ddN3->format('Y-m-d');
+        $dfN1 = new DateTime($df);
+        $dfN1 = date_modify($dfN1, '-1 Year');
+        $dfN1 = $dfN1->format('Y-m-d');
+        $dfN2 = new DateTime($df);
+        $dfN2 = date_modify($dfN2, '-2 Year');
+        $dfN2 = $dfN2->format('Y-m-d');
+        $dfN3 = new DateTime($df);
+        $dfN3 = date_modify($dfN3, '-3 Year');
+        $dfN3 = $dfN3->format('Y-m-d');
+
+        if ($type == 'DEPARTEMENT') {
+            $select = 'pays, departement,';
+            $group = 'GROUP BY pays, departement';
+        } elseif ($type == 'GLOBAL') {
+            $select = '';
+            $group = '';
+        }
+        if ($tiers == 'CLI') {
+            $avoir = 'D';
+        } elseif ($tiers == 'FOU') {
+            $avoir = 'G';
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT $select SUM(montantN) AS montantN, SUM(montantN1) AS montantN1, SUM(montantN2) AS montantN2, SUM(montantN3) AS montantN3
+        FROM(
+        SELECT LEFT(RTRIM(LTRIM(c.CPOSTAL)),2) AS departement, RTRIM(LTRIM(c.PAY)) AS pays,
+        CASE
+            WHEN m.OP IN ('$tiers[0]', '$tiers[0]D') AND m.FADT BETWEEN '$dd' AND '$df' THEN m.MONT - m.REMPIEMT_0004
+            WHEN m.OP IN ('$avoir', '$avoir . D') AND m.FADT BETWEEN '$dd' AND '$df' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montantN,
+        CASE
+            WHEN m.OP IN ('$tiers[0]', '$tiers[0]D') AND m.FADT BETWEEN '$ddN1' AND '$dfN1' THEN m.MONT - m.REMPIEMT_0004
+            WHEN m.OP IN ('$avoir', '$avoir . D') AND m.FADT BETWEEN '$ddN1' AND '$dfN1' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montantN1,
+        CASE
+            WHEN m.OP IN ('$tiers[0]', '$tiers[0]D') AND m.FADT BETWEEN '$ddN2' AND '$dfN2' THEN m.MONT - m.REMPIEMT_0004
+            WHEN m.OP IN ('$avoir', '$avoir . D') AND m.FADT BETWEEN '$ddN2' AND '$dfN2' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montantN2,
+        CASE
+            WHEN m.OP IN ('$tiers[0]', '$tiers[0]D') AND m.FADT BETWEEN '$ddN3' AND '$dfN3' THEN m.MONT - m.REMPIEMT_0004
+            WHEN m.OP IN ('$avoir', '$avoir . D') AND m.FADT BETWEEN '$ddN3' AND '$dfN3' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montantN3
+        FROM MOUV m
+        INNER JOIN $tiers c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dos AND m.TICOD = '$tiers[0]' AND m.PICOD = 4 AND m.FADT BETWEEN '$ddN3' AND '$df')REPONSE
+        $group
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // Paillage / Engrais / 5.5%, 10 % et 20 %
+    public function getRseFamilleArticleTvaAchatVente($dd, $df, $type, $tiers, $famille, $dos): array
+    {
+
+        $ddN1 = new DateTime($dd);
+        $ddN1 = date_modify($ddN1, '-1 Year');
+        $ddN1 = $ddN1->format('Y-m-d');
+        $ddN2 = new DateTime($dd);
+        $ddN2 = date_modify($ddN2, '-2 Year');
+        $ddN2 = $ddN2->format('Y-m-d');
+        $ddN3 = new DateTime($dd);
+        $ddN3 = date_modify($ddN3, '-3 Year');
+        $ddN3 = $ddN3->format('Y-m-d');
+        $dfN1 = new DateTime($df);
+        $dfN1 = date_modify($dfN1, '-1 Year');
+        $dfN1 = $dfN1->format('Y-m-d');
+        $dfN2 = new DateTime($df);
+        $dfN2 = date_modify($dfN2, '-2 Year');
+        $dfN2 = $dfN2->format('Y-m-d');
+        $dfN3 = new DateTime($df);
+        $dfN3 = date_modify($dfN3, '-3 Year');
+        $dfN3 = $dfN3->format('Y-m-d');
+
+        if ($type == 'FAMILLE') {
+            $select = 'famille, tva,';
+            $group = 'GROUP BY famille, tva';
+        } elseif ($type == 'GLOBAL') {
+            $select = '';
+            $group = '';
+        }
+
+        if ($tiers == 'CLI') {
+            $avoir = 'D';
+        } elseif ($tiers == 'FOU') {
+            $avoir = 'G';
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT $select SUM(montantN) AS montantN, SUM(montantN1) AS montantN1, SUM(montantN2) AS montantN2, SUM(montantN3) AS montantN3
+        FROM(
+        SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille, RTRIM(LTRIM(a.TVAART)) AS tva,
+        CASE
+            WHEN m.OP IN ('$tiers[0]', '$tiers[0]D') AND m.FADT BETWEEN '$dd' AND '$df' THEN m.MONT - m.REMPIEMT_0004
+            WHEN m.OP IN ('$avoir', '$avoir . D') AND m.FADT BETWEEN '$dd' AND '$df' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montantN,
+        CASE
+            WHEN m.OP IN ('$tiers[0]', '$tiers[0]D') AND m.FADT BETWEEN '$ddN1' AND '$dfN1' THEN m.MONT - m.REMPIEMT_0004
+            WHEN m.OP IN ('$avoir', '$avoir . D') AND m.FADT BETWEEN '$ddN1' AND '$dfN1' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montantN1,
+        CASE
+            WHEN m.OP IN ('$tiers[0]', '$tiers[0]D') AND m.FADT BETWEEN '$ddN2' AND '$dfN2' THEN m.MONT - m.REMPIEMT_0004
+            WHEN m.OP IN ('$avoir', '$avoir . D') AND m.FADT BETWEEN '$ddN2' AND '$dfN2' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montantN2,
+        CASE
+            WHEN m.OP IN ('$tiers[0]', '$tiers[0]D') AND m.FADT BETWEEN '$ddN3' AND '$dfN3' THEN m.MONT - m.REMPIEMT_0004
+            WHEN m.OP IN ('$avoir', '$avoir . D') AND m.FADT BETWEEN '$ddN3' AND '$dfN3' THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        END AS montantN3
+        FROM MOUV m
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+        WHERE m.DOS = $dos AND m.TICOD = '$tiers[0]' AND m.PICOD = 4 AND m.FADT BETWEEN '$ddN3' AND '$df'AND a.FAM_0001 IN($famille))REPONSE
+        $group
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

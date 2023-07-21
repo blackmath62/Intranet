@@ -3,6 +3,7 @@
 namespace App\Repository\Main;
 
 use App\Entity\Main\InterventionMonteurs;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -65,19 +66,19 @@ class InterventionMonteursRepository extends ServiceEntityRepository
     // /**
     //  * @return InterventionMonteurs[] Returns an array of InterventionMonteurs objects
     //  */
-    /*
-    public function findByExampleField($value)
+
+    public function findInterventionDuMoment()
     {
-    return $this->createQueryBuilder('i')
-    ->andWhere('i.exampleField = :val')
-    ->setParameter('val', $value)
-    ->orderBy('i.id', 'ASC')
-    ->setMaxResults(10)
-    ->getQuery()
-    ->getResult()
-    ;
+        return $this->createQueryBuilder('i')
+            ->where('i.start > :now')
+            ->orWhere('i.end > :now')
+            ->setParameter('now', new DateTime())
+            ->orderBy('i.start', 'ASC')
+            ->setMaxResults(6)
+            ->getQuery()
+            ->getResult()
+        ;
     }
-     */
 
     /*
 public function findOneBySomeField($value): ?InterventionMonteurs

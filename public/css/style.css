@@ -30,3 +30,8 @@ html { font-size: 1rem; }
     font-family: 'Code 128', sans-serif;
                                                 
 }
+
+.disabled {
+    pointer-events: none;
+    color: #999;
+}

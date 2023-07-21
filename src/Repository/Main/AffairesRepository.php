@@ -61,6 +61,7 @@ class AffairesRepository extends ServiceEntityRepository
         INNER JOIN affaires a ON a.code = p.affaire
         WHERE a.etat <> 'Termine' AND p.etat <> 'Termine'
         GROUP BY affaire
+        ORDER BY start
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
@@ -79,6 +80,7 @@ class AffairesRepository extends ServiceEntityRepository
         INNER JOIN affaires a ON a.code = p.affaire
         WHERE a.etat IN ('Termine')
         GROUP BY affaire
+        ORDER BY start
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

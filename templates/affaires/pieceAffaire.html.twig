@@ -22,562 +22,483 @@
 		</div>
 	</div>
 
+	<a href='{{path('app_affaire_me_nok' ) }}' class=" text-light btn btn-xl btn-primary col-12">
+		<i class="fas fa-share mr-1"></i>
+		Affaires
+	</a>
+
 	<div class="row">
-		<div class="col-12 col-sm-12">
-			<div class="card card-warning card-tabs">
-				<div class="card-header p-0 pt-1">
-					<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
-						<li class="nav-item">
-							<a class="nav-link active" id="custom-tabs-one-info-tab" data-toggle="pill" href="#custom-tabs-one-info" role="tab" aria-controls="custom-tabs-one-info" aria-selected="true">
-								<i class="fas fa-info-circle fa-2x text-secondary" aria-hidden="true"></i>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" id="custom-tabs-one-chat-tab" data-toggle="pill" href="#custom-tabs-one-chat" role="tab" aria-controls="custom-tabs-one-chat" aria-selected="false">
-								<i class="fas fa-comments fa-2x text-secondary" aria-hidden="true"></i>
-								<span class="badge bg-secondary pl-1">{{ chats|length }}</span>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" id="custom-tabs-one-files-tab" data-toggle="pill" href="#custom-tabs-one-files" role="tab" aria-controls="custom-tabs-one-files" aria-selected="false">
-								<i class="nav-icon fas fa-copy fa-2x text-secondary" aria-hidden="true"></i>
-								<span class="badge bg-secondary pl-1">{{docs|length}}</span>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" id="custom-tabs-one-settings-tab" data-toggle="pill" href="#custom-tabs-one-settings" role="tab" aria-controls="custom-tabs-one-settings" aria-selected="false">
-								<i class="fas fa-edit fa-2x text-secondary" aria-hidden="true"></i>
-							</a>
-						</li>
-					</ul>
+		<div class="col-sm-4 col-12">
+			<div class="description-block">
+				<h5 class="description-header">Affaire</h5>
+				<div class='d-flex flex-column'>
+					<span class="description-text">{{ affaire.code }}</span>
+					<span class="description-text">
+						<span class="description-text">{{ affaire.libelle}}</span>
+					</span>
 				</div>
-				<div class="card-body">
-					<div class="tab-content" id="custom-tabs-one-tabContent">
-						<div class="tab-pane fade show active" id="custom-tabs-one-info" role="tabpanel" aria-labelledby="custom-tabs-one-info-tab">
-							<div class="row">
-								<div class="col-sm-4 col-12">
-									<div class="description-block">
-										<h5 class="description-header">Affaire</h5>
-										<div class='d-flex flex-column'>
-											<span class="description-text">{{ affaire.code }}</span>
-											<span class="description-text">
-												<span class="description-text">{{ affaire.libelle}}</span>
-											</span>
-										</div>
-									</div>
+			</div>
 
-								</div>
-								<div class="col-sm-4 col-12">
-									<div class="description-block">
-										<h5 class="description-header">Client</h5>
-										<div class='d-flex flex-column'>
-											<span class="description-text">{{ affaire.tiers}}</span>
-											<span class="description-text">{{affaire.nom}}</span>
-										</div>
-									</div>
-								</div>
-								<div class="col-sm-4 col-12">
-									<div class="description-block">
-										<h5 class="description-header">Dates et durée</h5>
-										<div class='d-flex flex-column'>
-											<span class="description-text">Début :
-												{{ affaire.start|date("d-m-Y H:i")}}
-											</span>
-											{% if affaire.end %}
-												<span class="description-text">
-													Fin :
-													{{ affaire.end|date("d-m-Y H:i")}}
-												</span>
-											{% endif %}
-											{% if affaire.duration %}
-												<span class="description-text">pour
-													{{ affaire.duration}}
-												</span>
-											{% endif %}
-											{% if affaire.progress %}
-												<span class="description-text">Progression
-													{{ affaire.progress}}
-													%
-												</span>
-											{% endif %}
-										</div>
-									</div>
-								</div>
-								<div class="col-sm-4 col-12">
-									<div class="description-block">
-										<h5 class="description-header">Nbe Piéces</h5>
-										<span class="description-text">{{ piecesAffaires|length }}</span>
-									</div>
+		</div>
+		<div class="col-sm-4 col-12">
+			<div class="description-block">
+				<h5 class="description-header">Client</h5>
+				<div class='d-flex flex-column'>
+					<span class="description-text">{{ affaire.tiers}}</span>
+					<span class="description-text">{{affaire.nom}}</span>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-4 col-12">
+			<div class="description-block">
+				<h5 class="description-header">Dates et durée</h5>
+				<div class='d-flex flex-column'>
+					<span class="description-text">Début :
+						{{ affaire.start|date("d-m-Y H:i")}}
+					</span>
+					{% if affaire.end %}
+						<span class="description-text">
+							Fin :
+							{{ affaire.end|date("d-m-Y H:i")}}
+						</span>
+					{% endif %}
+					{% if affaire.duration %}
+						<span class="description-text">pour
+							{{ affaire.duration}}
+						</span>
+					{% endif %}
+					{% if affaire.progress %}
+						<span class="description-text">Progression
+							{{ affaire.progress}}
+							%
+						</span>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-4 col-12">
+			<div class="description-block">
+				<h5 class="description-header">Nbe Piéces</h5>
+				<span class="description-text">{{ piecesAffaires|length }}</span>
+			</div>
 
-								</div>
-							</div>
+		</div>
+	</div>
+
+	<!-- Ajouter gérer les interventions -->
+	<div class="card">
+		<div class="card-header">
+			<h3 class="card-title">Gestion d'Affaire et interventions</h3>
+		</div>
+		<div class="card-body">
+			<div id="accordion">
+				{% if Interventions %}
+					<div class="card card-secondary">
+						<div class="card-header">
+							<h4 class="card-title w-100">
+								<a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
+									Interventions Planifiées
+									<span class="badge bg-dark">
+										{{ Interventions|length}}
+									</span>
+								</a>
+							</h4>
 						</div>
+						<div id="collapseOne" class="collapse" data-parent="#accordion">
+							<div class="card-body">
 
-						<div class="tab-pane fade" id="custom-tabs-one-chat" role="tabpanel" aria-labelledby="custom-tabs-one-chat-tab">
-							<div class="card direct-chat direct-chat-warning">
-								<div class="card-header">
-									<h3 class="card-title">Commentaires</h3>
-									<div class="card-tools">
-										<button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
-											<i class="fas fa-phone"></i>
-										</button>
-									</div>
-								</div>
-								<!-- /.card-header -->
-								<div class="card-body">
-									<div class="direct-chat-messages">
-										{% if chats %}
-											{% for chat in chats %}
-												{% if app.user.id == chat.user.id %}
-													<div class="direct-chat-msg">
-														<div class="direct-chat-infos clearfix">
-															<span class="direct-chat-name float-left">{{ chat.user.pseudo }}</span>
-															<span class="direct-chat-timestamp float-right">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
-														</div>
-														<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
-														<div class="direct-chat-text">
-															{{ chat.content }}
-														</div>
-													</div>
-												{% else %}
-													<div class="direct-chat-msg right">
-														<div class="direct-chat-infos clearfix">
-															<span class="direct-chat-name float-right">{{ chat.user.pseudo }}</span>
-															<span class="direct-chat-timestamp float-left">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
-														</div>
-														<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
-														<div class="direct-chat-text">
-															{{ chat.content }}
-														</div>
-													</div>
-												{% endif %}
-											{% endfor %}
-										{% else %}
-											<div class="direct-chat-msg m-2">
-												<div class="direct-chat-infos clearfix">
-													<span class="direct-chat-name float-left">Intranet</span>
-													<span class="direct-chat-timestamp float-right">15/06/2023 16:34</span>
-												</div>
-												<img class="direct-chat-img" src="{{ asset(asset('img/profile/AdminLTELogo.png'))}}" alt="message user image">
-												<div class="direct-chat-text">
-													C'est ici que les commentaires apparaissent .....
-												</div>
-											</div>
-										{% endif %}
-									</div>
-									<!-- Contacts are loaded here -->
-									<div class="direct-chat-contacts">
-										<ul class="contacts-list">
-											{% for usersMe in usersMes %}
-												<li>
-													<a href="#">
-														<img class="contacts-list-img" src="{{ asset(asset('img/profile/' ~ usersMe.img))}}" alt="User Avatar">
 
-														<div class="contacts-list-info">
-															<span class="contacts-list-name">
-																{{ usersMe.pseudo }}
-																<small class="contacts-list-date float-right">{{ usersMe.createdAt|date("d-m-Y") }}</small>
-															</span>
-															<a href='tel:{{usersMe.portable|replace({' ': ""})}}' class="contacts-list-msg">{{usersMe.portable}}</a>
-														</div>
-														<!-- /.contacts-list-info -->
+								<table id="example2" class="table">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>date</th>
+											<th>Adresse</th>
+											<th>Créateur</th>
+											<th>Composition</th>
+											<th>Piéces</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% set i = 1 %}
+										{% for Intervention in Interventions %}
+											<tr>
+												<td>{{i}}</td>
+												<td>{{ Intervention.start|date("d-m-Y H:i") }}
+													-
+													{{ Intervention.end|date("d-m-Y H:i") }}</td>
+												<td>
+													{{ Intervention.adresse }}
+												</td>
+												<td>
+													{{ Intervention.userCr.Pseudo }}
+													<small>
+														le
+														{{ Intervention.createdAt|date("d-m-Y") }}
+													</small>
+												</td>
+												<td>
+													<ul>
+														{% for monteur in Intervention.Equipes %}
+															<li>{{ monteur.Pseudo }}</li>
+														{% endfor %}
+													</ul>
+												</td>
+												<td>
+													<ul>
+														{% for piece in Intervention.pieces %}
+															{% if piece.piece == 99999999 %}
+																{% else %}
+																	<li>
+																		<a href='{{path('app_detail_piece_affaire', {'affaire' : Intervention.code.code, 'id' : piece.entId } ) }}'>{{ piece.piece }}</a>
+																	</li>
+															{% endif %}
+														{% endfor %}
+													</ul>
+												</td>
+												<td>
+													<a href='{{path('app_affaire_show_intervention', {'id' : Intervention.id } ) }}'>
+														<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
 													</a>
-												</li>
-											{% endfor %}
-										</ul>
-										<!-- /.contacts-list -->
-									</div>
-									<!-- /.direct-chat-pane -->
-								</div>
-								<!-- /.card-body -->
-								<div class="card-footer">
-									{{ form_start(ChatsForm)}}
-									<div class="input-group">
-										{{ form_widget(ChatsForm.content, {'attr' : {'class' : "form-control"}})}}
-										<span class="input-group-append">
-											{{ form_widget(ChatsForm.Envoyer, {'attr' : {'class' : "btn btn-warning"}})}}
-										</span>
-									</div>
-									{{ form_end(ChatsForm)}}
-								</div>
-							</div>
-						</div>
-
-						<div class="tab-pane fade" id="custom-tabs-one-files" role="tabpanel" aria-labelledby="custom-tabs-one-files-tab">
-
-							{{ form_start(formFiles, { attr: { 'accept-charset' : 'utf-8', 'type' : 'file' }}) }}
-							<div class="input-group mb-2">
-								{{ form_label(formFiles.file) }}
-								{{ form_widget(formFiles.file, {'attr' : { 'class': 'form-control' }, 'type' : 'file' })}}
-								{{ form_widget(formFiles.importer, {'label': "Télécharger", 'attr' : { 'class': 'text-white btn btn-dark btn-outline-secondary' }})}}
-							</div>
-							{{ form_end(formFiles) }}
-							{% if docs %}
-								<div class="card">
-									<div class="card-header"></div>
-									<div class="card-body">
-										<table id="example3" class="table">
-											<thead>
-												<tr>
-													<th>Fichiers</th>
-												</tr>
-											</thead>
-											<tbody>
-												{% for doc in docs %}
-													<tr>
-														<td>
-															<div class="d-flex flex-column">
-																<div>
-																	<a target="_blank" href="{{ asset('doc/Lhermitte_freres/Affaires/' ~ doc.file)}}">{{ doc.file }}</a>
+													<a href='{{path('app_affaire_edit_intervention', {'id' : Intervention.id,'affaire' : Intervention.code.code } ) }}'>
+														<i class="nav-icon fas fa-edit fa-2x text-secondary m-2"></i>
+													</a>
+													<a data-toggle="modal" data-target="#modal-lg-{{ Intervention.id }}">
+														<i class="fas fa-trash-alt fa-2x text-secondary m-2"></i>
+													</a>
+													<div class="modal fade" id="modal-lg-{{ Intervention.id }}">
+														<div class="modal-dialog modal-lg">
+															<div class="modal-content">
+																<div class="modal-header">
+																	<h4 class="modal-title">Suppression d'intervention
+																		{{ Intervention.id}}</h4>
+																	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																		<span aria-hidden="true">&times;</span>
+																	</button>
 																</div>
-																<div>
-																	<i>
-																		<span class="float-left">{{ doc.user.Pseudo}}</span>
-																	</i>
-																	<i>
-																		<span class="float-right">{{ doc.createdAt|date("d-m-Y H:i")}}</span>
-																	</i>
+																<div class="modal-body">
+																	<p>Voulez vous vraiment supprimer cette intervention ? cette action est irréversible !</p>
+																</div>
+																<div class="modal-footer justify-content-between">
+																	<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
+																	<a href='{{path('app_affaire_remove_intervention', {'id' : Intervention.id } ) }}' type="button" class="btn btn-danger">Supprimer l'intervention</a>
 																</div>
 															</div>
-														</td>
-													</tr>
-												{% endfor %}
-											</tbody>
-										</table>
-									</div>
-								</div>
-							{% endif %}
+															<!-- /.modal-content -->
+														</div>
+														<!-- /.modal-dialog -->
+													</div>
+												</td>
+											</tr>
+											{% set i = i + 1 %}
+										{% endfor %}
+									</tbody>
+								</table>
+
+
+							</div>
 						</div>
-						<div
-							class="tab-pane fade" id="custom-tabs-one-settings" role="tabpanel" aria-labelledby="custom-tabs-one-settings-tab">
+					</div>
+				{% endif %}
 
-							<!-- Ajouter gérer les interventions -->
-
-							<div class="card">
-								<div class="card-header">
-									<h3 class="card-title">Gestion d'Affaire et interventions</h3>
-								</div>
-								<!-- /.card-header -->
-								<div
-									class="card-body">
-									<!-- we are adding the accordion ID so Bootstrap's collapse plugin detects it -->
-									<div id="accordion">
-										{% set ajout = 'show' %}
-										{% if Interventions %}
-											{% set ajout = '' %}
-											<div class="card card-secondary">
-												<div class="card-header">
-													<h4 class="card-title w-100">
-														<a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
-															Interventions Planifiées
-														</a>
-													</h4>
+				<div class="card card-navy">
+					<div class="card-header">
+						<h4 class="card-title w-100">
+							<a class="d-block w-100" data-toggle="collapse" href="#collapseTwo">
+								Ajouter une intervention
+							</a>
+						</h4>
+					</div>
+					<div id="collapseTwo" class="collapse" data-parent="#accordion">
+						<div class="card-body">
+							<div class="">
+								<div class="">
+									{{ form_start(InterventionsMonteursForm)}}
+									<div class="row">
+										<div class="col-12 col-sm-6">
+											<div class="col-12 col-sm-6 d-flex">
+												<div class="m-2">
+													<p>Couleur fond</p>
+													{{ form_widget(InterventionsMonteursForm.backgroundColor, {'attr': {'value': '#5D5B5B' },'type' : 'color' } ) }}
 												</div>
-												<div id="collapseOne" class="collapse show" data-parent="#accordion">
-													<div class="card-body">
-
-
-														<table id="example2" class="table">
-															<thead>
-																<tr>
-																	<th>#</th>
-																	<th>date</th>
-																	<th>Adresse</th>
-																	<th>Créateur</th>
-																	<th>Composition</th>
-																	<th>Piéces</th>
-																	<th>Actions</th>
-																</tr>
-															</thead>
-															<tbody>
-																{% set i = 1 %}
-																{% for Intervention in Interventions %}
-																	<tr>
-																		<td>{{i}}</td>
-																		<td>{{ Intervention.start|date("d-m-Y H:i") }}
-																			-
-																			{{ Intervention.end|date("d-m-Y H:i") }}</td>
-																		<td>
-																			{{ Intervention.adresse }}
-																		</td>
-																		<td>
-																			{{ Intervention.userCr.Pseudo }}
-																			<small>
-																				le
-																				{{ Intervention.createdAt|date("d-m-Y") }}
-																			</small>
-																		</td>
-																		<td>
-																			<ul>
-																				{% for monteur in Intervention.Equipes %}
-																					<li>{{ monteur.Pseudo }}</li>
-																				{% endfor %}
-																			</ul>
-																		</td>
-																		<td>
-																			<ul>
-																				{% for piece in Intervention.pieces %}
-																					{% if piece.piece == 99999999 %}
-																						{% else %}
-																							<li>
-																								<a href='{{path('app_detail_piece_affaire', {'affaire' : Intervention.code.code, 'id' : piece.entId } ) }}'>{{ piece.piece }}</a>
-																							</li>
-																					{% endif %}
-																				{% endfor %}
-																			</ul>
-																		</td>
-																		<td>
-																			<a href='{{path('app_affaire_show_intervention', {'id' : Intervention.id } ) }}'>
-																				<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
-																			</a>
-																			<a href='{{path('app_affaire_edit_intervention', {'id' : Intervention.id,'affaire' : Intervention.code.code } ) }}'>
-																				<i class="nav-icon fas fa-edit fa-2x text-secondary m-2"></i>
-																			</a>
-																			<a data-toggle="modal" data-target="#modal-lg-{{ Intervention.id }}">
-																				<i class="fas fa-trash-alt fa-2x text-secondary m-2"></i>
-																			</a>
-																			<div class="modal fade" id="modal-lg-{{ Intervention.id }}">
-																				<div class="modal-dialog modal-lg">
-																					<div class="modal-content">
-																						<div class="modal-header">
-																							<h4 class="modal-title">Suppression d'intervention
-																								{{ Intervention.id}}</h4>
-																							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-																								<span aria-hidden="true">&times;</span>
-																							</button>
-																						</div>
-																						<div class="modal-body">
-																							<p>Voulez vous vraiment supprimer cette intervention ? cette action est irréversible !</p>
-																						</div>
-																						<div class="modal-footer justify-content-between">
-																							<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
-																							<a href='{{path('app_affaire_remove_intervention', {'id' : Intervention.id } ) }}' type="button" class="btn btn-danger">Supprimer l'intervention</a>
-																						</div>
-																					</div>
-																					<!-- /.modal-content -->
-																				</div>
-																				<!-- /.modal-dialog -->
-																			</div>
-																		</td>
-																	</tr>
-																	{% set i = i + 1 %}
-																{% endfor %}
-															</tbody>
-														</table>
-
-
-													</div>
+												<div class="m-2">
+													<p>Couleur texte</p>
+													{{ form_widget(InterventionsMonteursForm.textColor, {'attr': {'value': '#FFFFFF' },'type' : 'color' } ) }}
 												</div>
 											</div>
-										{% endif %}
-
-										<div class="card card-navy">
-											<div class="card-header">
-												<h4 class="card-title w-100">
-													<a class="d-block w-100" data-toggle="collapse" href="#collapseTwo">
-														Ajouter une intervention
-													</a>
-												</h4>
-											</div>
-											<div id="collapseTwo" class="collapse {{ ajout }}" data-parent="#accordion">
-												<div class="card-body">
-													<div class="">
-														<div class="">
-															{{ form_start(InterventionsMonteursForm)}}
-															<div class="row">
-																<div class="col-12 col-sm-6">
-																	<div class="col-12 col-sm-6 d-flex">
-																		<div class="m-2">
-																			<p>Couleur fond</p>
-																			{{ form_widget(InterventionsMonteursForm.backgroundColor, {'attr': {'value': '#5D5B5B' },'type' : 'color' } ) }}
-																		</div>
-																		<div class="m-2">
-																			<p>Couleur texte</p>
-																			{{ form_widget(InterventionsMonteursForm.textColor, {'attr': {'value': '#FFFFFF' },'type' : 'color' } ) }}
-																		</div>
-																	</div>
-																	{{ form_label(InterventionsMonteursForm.adresse) }}
-																	{{ form_widget(InterventionsMonteursForm.adresse,{ 'attr': {'rows': '2'}}) }}
-																	{{ form_errors(InterventionsMonteursForm.adresse) }}
-																</div>
-																<div class="col-12 col-sm-6">
-																	{{ form_label(InterventionsMonteursForm.Equipes) }}
-																	{{ form_widget(InterventionsMonteursForm.Equipes) }}
-																	{{ form_errors(InterventionsMonteursForm.Equipes) }}
-																	{{ form_label(InterventionsMonteursForm.pieces) }}
-																	{{ form_widget(InterventionsMonteursForm.pieces) }}
-																	{{ form_errors(InterventionsMonteursForm.pieces) }}
-																	{{ form_label(InterventionsMonteursForm.start) }}
-																	{{ form_widget(InterventionsMonteursForm.start) }}
-																	{{ form_errors(InterventionsMonteursForm.start) }}
-																	{{ form_label(InterventionsMonteursForm.end) }}
-																	{{ form_widget(InterventionsMonteursForm.end) }}
-																	{{ form_errors(InterventionsMonteursForm.end) }}
-																</div>
-															</div>
-															{{ form_widget(InterventionsMonteursForm.ajouter) }}
-															{{ form_rest(InterventionsMonteursForm) }}
-															{{ form_end(InterventionsMonteursForm)}}
-														</div>
-														<!-- /.card-body -->
-													</div>
-												</div>
-											</div>
+											{{ form_label(InterventionsMonteursForm.adresse) }}
+											{{ form_widget(InterventionsMonteursForm.adresse,{ 'attr': {'rows': '2'}}) }}
+											{{ form_errors(InterventionsMonteursForm.adresse) }}
 										</div>
-
-
-										<div class="card card-warning">
-											<div class="card-header">
-												<h4 class="card-title w-100">
-													<a class="d-block w-100" data-toggle="collapse" href="#collapseThree">
-														Paramétres généraux
-													</a>
-												</h4>
-											</div>
-											<div id="collapseThree" class="collapse" data-parent="#accordion">
-												<div class="card-body">
-													<div class="">
-														<div class="">
-															{{ form_start(form, { attr: { 'accept-charset' : 'utf-8' }}) }}
-															<div class="row">
-																<div class="col-12 col-sm-6">
-																	<div class='d-flex flex-wrap justify-content-around col-12'>
-																		<strong class="col-12">
-																			<i class="fa fa-clock mr-1"></i>
-																			Etat de l'affaire
-																		</strong>
-																		{% set color = 'success' %}
-																		{% if affaire.etat == 'En attente' %}
-																			{% set color = 'warning text-dark' %}
-																			{% set icone = "fa fa-pause" %}
-																		{% elseif affaire.etat == 'Nouvelle' %}
-																			{% set color = 'info text-white' %}
-																			{% set icone = "fa fa-inbox" %}
-																		{% elseif affaire.etat == 'En cours' %}
-																			{% set color = 'primary text-white' %}
-																			{% set icone = "fa fa-spinner" %}
-																		{% elseif affaire.etat == 'A finir' %}
-																			{% set color = 'secondary text-white' %}
-																			{% set icone = "fa fa-battery-half" %}
-																		{% elseif affaire.etat == 'Termine' %}
-																			{% set color = 'success text-white' %}
-																			{% set icone = "fa fa-check" %}
-																		{% elseif affaire.etat == 'Planifiee' %}
-																			{% set color = 'primary active text-white' %}
-																			{% set icone = "far fa-calendar-alt" %}
-																		{% elseif affaire.etat == 'Litige' %}
-																			{% set color = 'danger text-white' %}
-																			{% set icone = "fa fa-triangle-exclamation" %}
-																		{% endif %}
-
-																		<div class="btn-group col-12">
-																			<a class="btn btn-{{ color}}">
-																				<i class="{{icone}} pr-2" aria-hidden="true"></i>
-																				{{ affaire.etat }}
-																			</a>
-																			<div class="btn-group">
-																				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
-																				<ul class="dropdown-menu">
-																					<li>
-																						<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
-																					</li>
-																					<li>
-																						<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Litige' } ) }}'>Litige</a>
-																					</li>
-																					<li>
-																						<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En attente' } ) }}'>En attente</a>
-																					</li>
-																					<li>
-																						<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'A finir' } ) }}'>A finir</a>
-																					</li>
-																					<li>
-																						<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Planifiee' } ) }}'>Planifiée</a>
-																					</li>
-																					<li>
-																						<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En cours' } ) }}'>En cours</a>
-																					</li>
-																					<li>
-																						<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Termine' } ) }}'>Termine</a>
-																					</li>
-																				</ul>
-																			</div>
-																		</div>
-																	</div>
-																	<div class='d-flex flex-wrap justify-content-around m-1 col-12'>
-																		<div>
-																			<strong>
-																				<i class="fa fa-clock col-12"></i>
-																				Durée
-																			</strong>
-																		</div>
-																		{{ form_widget(form.duration, { 'attr': {'value': affaire.duration, 'class' : 'col-12 text-center'} } ) }}
-																	</div>
-																	<div class='d-flex flex-wrap justify-content-around m-1 col-12'>
-																		<div>
-																			<strong>
-																				<i class="fa fa-clock mr-1"></i>
-																				Progression
-																			</strong>
-																		</div>
-																		{{ form_widget(form.progress, { 'attr': {'value': affaire.progress, 'class' : 'col-12 text-center'} } ) }}
-																		<strong>%</strong>
-																	</div>
-																</div>
-																<div class="col-12 col-sm-6">
-																	<div class="description-block">
-																		<strong>
-																			<i class="fa fa-calendar mr-1"></i>
-																			Date de chantier</strong>
-																		<p class="text-muted">
-																			Date début actuelle :
-																			{% if affaire.start %}
-																				{{ affaire.start|date("d-m-Y H:i") }}
-																			{% else %}
-																				Aucune date
-																			{% endif %}
-																		</p>
-																		{{ form_widget(form.start, { 'attr': {'value': affaire.start|date("d-m-Y H:i"), 'class': 'col-12'} }) }}
-																		{{ form_errors(form.start, { 'attr': {'class': 'col-12'} }) }}
-																		<p class="text-muted">
-																			Date fin actuelle :
-																			{% if affaire.end %}
-																				{{ affaire.end|date("d-m-Y H:i") }}
-																			{% else %}
-																				Aucune date
-																			{% endif %}
-																		</p>
-																		{{ form_widget(form.end, { 'attr': {'class': 'col-12'} }) }}
-																		{{ form_errors(form.end, { 'attr': {'class': 'col-12'} }) }}
-
-																	</div>
-																</div>
-															</div>
-															{{ form_widget(form.modifier) }}
-															{{ form_end(form) }}
-														</div>
-														<!-- /.card-body -->
-													</div>
-												</div>
-											</div>
+										<div class="col-12 col-sm-6">
+											{{ form_label(InterventionsMonteursForm.Equipes) }}
+											{{ form_widget(InterventionsMonteursForm.Equipes) }}
+											{{ form_errors(InterventionsMonteursForm.Equipes) }}
+											{{ form_label(InterventionsMonteursForm.pieces) }}
+											{{ form_widget(InterventionsMonteursForm.pieces) }}
+											{{ form_errors(InterventionsMonteursForm.pieces) }}
+											{{ form_label(InterventionsMonteursForm.start) }}
+											{{ form_widget(InterventionsMonteursForm.start) }}
+											{{ form_errors(InterventionsMonteursForm.start) }}
+											{{ form_label(InterventionsMonteursForm.end) }}
+											{{ form_widget(InterventionsMonteursForm.end) }}
+											{{ form_errors(InterventionsMonteursForm.end) }}
 										</div>
 									</div>
+									{{ form_widget(InterventionsMonteursForm.ajouter) }}
+									{{ form_rest(InterventionsMonteursForm) }}
+									{{ form_end(InterventionsMonteursForm)}}
 								</div>
 								<!-- /.card-body -->
 							</div>
-							<!-- /.card -->
 						</div>
 					</div>
 				</div>
-				<!-- /.card -->
+
+
+				<div class="card card-primary">
+					<div class="card-header">
+						<h4 class="card-title w-100">
+							<a class="d-block w-100" data-toggle="collapse" href="#collapseThree">
+								Paramétres généraux
+							</a>
+						</h4>
+					</div>
+					<div id="collapseThree" class="collapse" data-parent="#accordion">
+						<div class="card-body">
+							<div class="">
+								<div class="">
+									{{ form_start(form, { attr: { 'accept-charset' : 'utf-8' }}) }}
+									<div class="row">
+										<div class="col-12 col-sm-6">
+											<div class='d-flex flex-wrap justify-content-around col-12'>
+												<strong class="col-12">
+													<i class="fa fa-clock mr-1"></i>
+													Etat de l'affaire
+												</strong>
+												{% set color = 'success' %}
+												{% if affaire.etat == 'En attente' %}
+													{% set color = 'warning text-dark' %}
+													{% set icone = "fa fa-pause" %}
+												{% elseif affaire.etat == 'Nouvelle' %}
+													{% set color = 'info text-white' %}
+													{% set icone = "fa fa-inbox" %}
+												{% elseif affaire.etat == 'En cours' %}
+													{% set color = 'primary text-white' %}
+													{% set icone = "fa fa-spinner" %}
+												{% elseif affaire.etat == 'A finir' %}
+													{% set color = 'secondary text-white' %}
+													{% set icone = "fa fa-battery-half" %}
+												{% elseif affaire.etat == 'Termine' %}
+													{% set color = 'success text-white' %}
+													{% set icone = "fa fa-check" %}
+												{% elseif affaire.etat == 'Planifiee' %}
+													{% set color = 'primary active text-white' %}
+													{% set icone = "far fa-calendar-alt" %}
+												{% elseif affaire.etat == 'Litige' %}
+													{% set color = 'danger text-white' %}
+													{% set icone = "fa fa-triangle-exclamation" %}
+												{% endif %}
+
+												<div class="btn-group col-12">
+													<a class="btn btn-{{ color}}">
+														<i class="{{icone}} pr-2" aria-hidden="true"></i>
+														{{ affaire.etat }}
+													</a>
+													<div class="btn-group">
+														<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
+														<ul class="dropdown-menu">
+															<li>
+																<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
+															</li>
+															<li>
+																<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Litige' } ) }}'>Litige</a>
+															</li>
+															<li>
+																<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En attente' } ) }}'>En attente</a>
+															</li>
+															<li>
+																<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'A finir' } ) }}'>A finir</a>
+															</li>
+															<li>
+																<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Planifiee' } ) }}'>Planifiée</a>
+															</li>
+															<li>
+																<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En cours' } ) }}'>En cours</a>
+															</li>
+															<li>
+																<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'Termine' } ) }}'>Termine</a>
+															</li>
+														</ul>
+													</div>
+												</div>
+											</div>
+											<div class='d-flex flex-wrap justify-content-around m-1 col-12'>
+												<div>
+													<strong>
+														<i class="fa fa-clock col-12"></i>
+														Durée
+													</strong>
+												</div>
+												{{ form_widget(form.duration, { 'attr': {'value': affaire.duration, 'class' : 'col-12 text-center'} } ) }}
+											</div>
+											<div class='d-flex flex-wrap justify-content-around m-1 col-12'>
+												<div>
+													<strong>
+														<i class="fa fa-clock mr-1"></i>
+														Progression
+													</strong>
+												</div>
+												{{ form_widget(form.progress, { 'attr': {'value': affaire.progress, 'class' : 'col-12 text-center'} } ) }}
+												<strong>%</strong>
+											</div>
+										</div>
+										<div class="col-12 col-sm-6">
+											<div class="description-block">
+												<strong>
+													<i class="fa fa-calendar mr-1"></i>
+													Date de chantier</strong>
+												<p class="text-muted">
+													Date début actuelle :
+													{% if affaire.start %}
+														{{ affaire.start|date("d-m-Y H:i") }}
+													{% else %}
+														Aucune date
+													{% endif %}
+												</p>
+												{{ form_widget(form.start, { 'attr': {'value': affaire.start|date("d-m-Y H:i"), 'class': 'col-12'} }) }}
+												{{ form_errors(form.start, { 'attr': {'class': 'col-12'} }) }}
+												<p class="text-muted">
+													Date fin actuelle :
+													{% if affaire.end %}
+														{{ affaire.end|date("d-m-Y H:i") }}
+													{% else %}
+														Aucune date
+													{% endif %}
+												</p>
+												{{ form_widget(form.end, { 'attr': {'class': 'col-12'} }) }}
+												{{ form_errors(form.end, { 'attr': {'class': 'col-12'} }) }}
+
+											</div>
+										</div>
+									</div>
+									{{ form_widget(form.modifier) }}
+									{{ form_end(form) }}
+								</div>
+								<!-- /.card-body -->
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{% if docs %}
+					<div class="card card-success">
+						<div class="card-header">
+							<a class="d-block w-100" data-toggle="collapse" href="#collapseFour">
+								Fichiers
+								<span class="badge bg-dark">
+									{{ docs|length}}
+								</span>
+							</a>
+						</div>
+						<div id="collapseFour" class="collapse" data-parent="#accordion">
+							<div class="card-body">
+								<table id="example3" class="table">
+									<thead>
+										<tr>
+											<th>Fichiers</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for doc in docs %}
+											<tr>
+												<td>
+													<div class="d-flex flex-column">
+														<div>
+															<a target="_blank" href="{{ asset('doc/Lhermitte_freres/Affaires/' ~ doc.file)}}">{{ doc.file }}</a>
+														</div>
+														<div>
+															<i>
+																<span class="float-left">{{ doc.user.Pseudo}}</span>
+															</i>
+															<i>
+																<span class="float-right">{{ doc.createdAt|date("d-m-Y H:i")}}</span>
+															</i>
+														</div>
+													</div>
+												</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				{% endif %}
+				{% if chats %}
+					<div class="card card-warning direct-chat direct-chat-warning">
+						<div class="card-header">
+							<a class="d-block w-100" data-toggle="collapse" href="#collapseFive">
+								Commentaires
+								<span class="badge bg-dark">
+									{{ chats|length}}
+								</span>
+							</a>
+						</div>
+						<div id="collapseFive" class="collapse" data-parent="#accordion">
+							<div class="card-body">
+								<div class="direct-chat-messages">
+									{% if chats %}
+										{% for chat in chats %}
+											{% if app.user.id == chat.user.id %}
+												<div class="direct-chat-msg">
+													<div class="direct-chat-infos clearfix">
+														<span class="direct-chat-name float-left">{{ chat.user.pseudo }}</span>
+														<span class="direct-chat-timestamp float-right">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
+													</div>
+													<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
+													<div class="direct-chat-text">
+														{{ chat.content }}
+													</div>
+												</div>
+											{% else %}
+												<div class="direct-chat-msg right">
+													<div class="direct-chat-infos clearfix">
+														<span class="direct-chat-name float-right">{{ chat.user.pseudo }}</span>
+														<span class="direct-chat-timestamp float-left">{{ chat.createdAt|date("d/m/Y H:i") }}</span>
+													</div>
+													<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
+													<div class="direct-chat-text">
+														{{ chat.content }}
+													</div>
+												</div>
+											{% endif %}
+										{% endfor %}
+									{% else %}
+										<div class="direct-chat-msg m-2">
+											<div class="direct-chat-infos clearfix">
+												<span class="direct-chat-name float-left">Intranet</span>
+												<span class="direct-chat-timestamp float-right">15/06/2023 16:34</span>
+											</div>
+											<img class="direct-chat-img" src="{{ asset(asset('img/profile/AdminLTELogo.png'))}}" alt="message user image">
+											<div class="direct-chat-text">
+												C'est ici que les commentaires apparaissent .....
+											</div>
+										</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
+				{% endif %}
 			</div>
 		</div>
+		<!-- /.card-body -->
 	</div>
 	<div class="card">
 		<div class="card-header">
 			<div class="card-tools col-12 col-sm-2">
-				<a href='{{path('app_affaire_me_nok' ) }}' class=" text-light btn btn-xl btn-primary col-12 m-1">
-					Affaires
-				</a>
 				{% if app.request.attributes.get('_route')  == 'app_piece_affaire_ok' %}
 					<a title='Affaires à traiter !' href="{{ path('app_piece_affaire_nok', {'affaire' : affaire.code}) }}" class="btn btn-warning text-dark col-12 m-1">
 						<i class="fas fa-thumbs-down pr-2"></i>Piéces à traitrer</a>
@@ -587,14 +508,14 @@
 				{% endif %}
 			</div>
 			{% if app.request.attributes.get('_route')  == 'app_piece_affaire_ok' %}
-				<h2 class="card-title">Affaires traitées</h2>
+				<h2 class="card-title">Piéce(s) traitée(s)</h2>
 			{% elseif app.request.attributes.get('_route')  == 'app_piece_affaire_nok' %}
-				<h2 class="card-title">Affaires à traiter</h2>
+				<h2 class="card-title">Piéce(s) à traiter</h2>
 			{% endif %}
 		</div>
 		<!-- /.card-header -->
 		<div class="card-body">
-			<table id="example1" class="table table-bordered table-striped">
+			<table class="table table-bordered table-hover">
 				<thead>
 					<tr>
 						<th style="width: 10px">#</th>
@@ -604,93 +525,150 @@
 						<th>OP</th>
 						<th>Mode Transport</th>
 						<th class="text-center">Etat Pieces</th>
-						<th class="text-center">Action</th>
 					</tr>
 				</thead>
-				<tbody>
-					{% set i = 1 %}
-					{% for piecesAffaire in piecesAffaires %}
-						<tr>
-							<td>{{ i }}</td>
-							<td>{{ piecesAffaire.adresse}}</td>
-							{% if piecesAffaire.typePiece == 2 %}
-								{% set type = 'Cmd' %}
-							{% elseif piecesAffaire.typePiece == 1 %}
-								{% set type = 'Devis' %}
-							{% elseif piecesAffaire.typePiece == 3 %}
-								{% set type = 'Bl' %}
-							{% elseif piecesAffaire.typePiece == 4 %}
-								{% set type = 'Fact' %}
-							{% endif %}
-							<td>{{ type }}</td>
-							<td>{{ piecesAffaire.piece}}</td>
-							<td>{{ piecesAffaire.op}}</td>
-							<td>{{ piecesAffaire.transport}}</td>
-							<td class="text-center">
-								{% set color = 'success' %}
-								{% if piecesAffaire.etat == 'En attente' %}
-									{% set color = 'warning text-dark' %}
-									{% set icone = "fa fa-pause" %}
-								{% elseif piecesAffaire.etat == 'Nouvelle' %}
-									{% set color = 'info text-white' %}
-									{% set icone = "fa fa-inbox" %}
-								{% elseif piecesAffaire.etat == 'En cours' %}
-									{% set color = 'primary text-white' %}
-									{% set icone = "fa fa-spinner" %}
-								{% elseif piecesAffaire.etat == 'A finir' %}
-									{% set color = 'secondary text-white' %}
-									{% set icone = "fa fa-battery-half" %}
-								{% elseif piecesAffaire.etat == 'Termine' %}
-									{% set color = 'success text-white' %}
-									{% set icone = "fa fa-check" %}
-								{% elseif piecesAffaire.etat == 'Litige' %}
-									{% set color = 'danger text-white' %}
-									{% set icone = "fa fa-triangle-exclamation" %}
+				{% if piecesAffaires %}
+					<tbody>
+						{% for piecesAffaire in piecesAffaires %}
+							<tr id="{{piecesAffaire.piece}}" data-widget="expandable-table" aria-expanded="false">
+								<td>
+									{% if piecesAffaire.produits %}
+										<i class="fa-solid fa-sort-down"></i>
+									{% endif %}
+								</td>
+								<td>{{ piecesAffaire.adresse}}</td>
+								{% if piecesAffaire.typePiece == 2 %}
+									{% set type = 'Cmd' %}
+								{% elseif piecesAffaire.typePiece == 1 %}
+									{% set type = 'Devis' %}
+								{% elseif piecesAffaire.typePiece == 3 %}
+									{% set type = 'Bl' %}
+								{% elseif piecesAffaire.typePiece == 4 %}
+									{% set type = 'Fact' %}
 								{% endif %}
+								<td>{{ type }}</td>
+								<td>{{ piecesAffaire.piece}}</td>
+								<td>{{ piecesAffaire.op}}</td>
+								<td>{{ piecesAffaire.transport}}</td>
+								<td class="text-center">
+									{% set color = 'success' %}
+									{% if piecesAffaire.etat == 'En attente' %}
+										{% set color = 'warning text-dark' %}
+										{% set icone = "fa fa-pause" %}
+									{% elseif piecesAffaire.etat == 'Nouvelle' %}
+										{% set color = 'info text-white' %}
+										{% set icone = "fa fa-inbox" %}
+									{% elseif piecesAffaire.etat == 'En cours' %}
+										{% set color = 'primary text-white' %}
+										{% set icone = "fa fa-spinner" %}
+									{% elseif piecesAffaire.etat == 'A finir' %}
+										{% set color = 'secondary text-white' %}
+										{% set icone = "fa fa-battery-half" %}
+									{% elseif piecesAffaire.etat == 'Termine' %}
+										{% set color = 'success text-white' %}
+										{% set icone = "fa fa-check" %}
+									{% elseif piecesAffaire.etat == 'Litige' %}
+										{% set color = 'danger text-white' %}
+										{% set icone = "fa fa-triangle-exclamation" %}
+									{% endif %}
 
-								<div class="btn-group">
-									<a class="btn btn-{{ color}}">
-										<i class="{{icone}}" aria-hidden="true"></i>
-									</a>
 									<div class="btn-group">
-										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
-										<ul class="dropdown-menu">
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
-											</li>
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'Litige' } ) }}'>Litige</a>
-											</li>
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'En attente' } ) }}'>En attente</a>
-											</li>
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'A finir' } ) }}'>A finir</a>
-											</li>
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'En cours' } ) }}'>En cours</a>
-											</li>
-											<li>
-												<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'Termine' } ) }}'>Termine</a>
-											</li>
-										</ul>
+										<a class="btn btn-{{ color}}">
+											<i class="{{icone}}" aria-hidden="true"></i>
+										</a>
+										<div class="btn-group">
+											<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
+											<ul class="dropdown-menu">
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'Nouvelle' } ) }}'>Nouvelle</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'Litige' } ) }}'>Litige</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'En attente' } ) }}'>En attente</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'A finir' } ) }}'>A finir</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'En cours' } ) }}'>En cours</a>
+												</li>
+												<li>
+													<a class="dropdown-item" href='{{path('app_affaire_piece_change_etat', {'id' : piecesAffaire.id, 'etat' : 'Termine' } ) }}'>Termine</a>
+												</li>
+											</ul>
+										</div>
 									</div>
-								</div>
-							</td>
-							<td class="text-center">
-								{% if piecesAffaire.piece == 99999999 %}
-									<a type="button" class="ml-2 text-light btn btn-danger disabled">
-										<i class="fas fa-eye"></i>
-									</a>
-								{% else %}
-									<a type="button" class="ml-2 text-light btn btn-info" href='{{path('app_detail_piece_affaire', {'affaire' : affaire.code, 'id' : piecesAffaire.entId } ) }}'>
-										<i class="fas fa-eye"></i>
-									</a>
-								{% endif %}
-							</td>
-						</tr>
-						{% set i = i + 1 %}
-					{% endfor %}
+								</td>
+							</tr>
+							{% if piecesAffaire.produits %}
+								<tr class="expandable-body m-0">
+									<td colspan="7">
+										<table class="table table-bordered table-striped">
+											<thead>
+												<tr>
+													<th style="width: 10px">#</th>
+													<th>Ref</th>
+													<th>Sref1</th>
+													<th>Sref2</th>
+													<th>Désignation</th>
+													<th>U.V</th>
+													<th class="text-center">Op</th>
+													<th class="text-center">Qte</th>
+													<th class="text-center">Empl.</th>
+													<th class="text-center">Ean.</th>
+													<th class="text-center">Cmd Fou.</th>
+													<th class="text-center">Stock</th>
+													<th class="text-center">Date Ferm.</th>
+												</tr>
+											</thead>
+											<tbody>
+												{% set i = 1 %}
+												{% for produit in piecesAffaire.produits %}
+													<tr>
+														<td>{{ i }}</td>
+														<td>{{ produit.ref}}</td>
+														<td>{{ produit.sref1 }}</td>
+														<td>{{ produit.sref2 }}</td>
+														<td>{{ produit.designation}}</td>
+														<td class="text-center">{{ produit.uv}}</td>
+														<td class="text-center">{{ produit.op}}</td>
+														<td class="text-center">{{ produit.qte}}</td>
+														<td class="text-center">{{ produit.lieu}}</td>
+														<td class="text-center">
+															{% if produit.ean %}
+																{{ produit.ean}}{% else %}aucun
+															{% endif %}
+														</td>
+														<td class="text-center">
+															{% if produit.cmdFou != 0 %}
+																{{ produit.cmdFou}}
+															{% endif %}
+														</td>
+														<td class="text-center">
+															{% if produit.stock %}
+																{{ produit.stock}}
+															{% endif %}
+														</td>
+														<td class="text-center">{{ produit.fermeture}}</td>
+													</tr>
+													{% set i = i + 1 %}
+												{% endfor %}
+											</tbody>
+										</table>
+									</td>
+								</tr>
+							{% endif %}
+						{% endfor %}
+					{% else %}
+						<td colspan="7">
+							<div class='row'>
+								<i class="fa-solid fa-circle-info text-primary fa-2x"></i>
+								<h3 class="ml-2">Pas de piéce</h3>
+							</div>
+						</td>
+					{% endif %}
 				</tbody>
 			</table>
 		</div>

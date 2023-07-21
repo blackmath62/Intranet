@@ -75,11 +75,27 @@ class InterventionMonteurs
      */
     private $signatureElectroniques;
 
+    /**
+     * @ORM\OneToMany(targetEntity=InterventionFicheMonteur::class, mappedBy="intervention")
+     */
+    private $interventionFicheMonteurs;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="interventionMonteursLockedBy")
+     */
+    private $lockedBy;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lockedAt;
+
     public function __construct()
     {
         $this->Equipes = new ArrayCollection();
         $this->pieces = new ArrayCollection();
         $this->signatureElectroniques = new ArrayCollection();
+        $this->interventionFicheMonteurs = new ArrayCollection();
     }
 
     public function getId():  ? int
@@ -257,6 +273,60 @@ class InterventionMonteurs
                 $signatureElectronique->setIntervention(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InterventionFicheMonteur>
+     */
+    public function getInterventionFicheMonteurs(): Collection
+    {
+        return $this->interventionFicheMonteurs;
+    }
+
+    public function addInterventionFicheMonteur(InterventionFicheMonteur $interventionFicheMonteur): self
+    {
+        if (!$this->interventionFicheMonteurs->contains($interventionFicheMonteur)) {
+            $this->interventionFicheMonteurs[] = $interventionFicheMonteur;
+            $interventionFicheMonteur->setIntervention($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInterventionFicheMonteur(InterventionFicheMonteur $interventionFicheMonteur): self
+    {
+        if ($this->interventionFicheMonteurs->removeElement($interventionFicheMonteur)) {
+            // set the owning side to null (unless already changed)
+            if ($interventionFicheMonteur->getIntervention() === $this) {
+                $interventionFicheMonteur->setIntervention(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLockedBy(): ?Users
+    {
+        return $this->lockedBy;
+    }
+
+    public function setLockedBy(?Users $lockedBy): self
+    {
+        $this->lockedBy = $lockedBy;
+
+        return $this;
+    }
+
+    public function getLockedAt(): ?\DateTimeInterface
+    {
+        return $this->lockedAt;
+    }
+
+    public function setLockedAt(?\DateTimeInterface $lockedAt): self
+    {
+        $this->lockedAt = $lockedAt;
 
         return $this;
     }
