@@ -437,6 +437,26 @@
 							<!-- Fin Table Commune -->
 							<!-- Table Menu Lhermitte-->
 
+							{% if is_granted('ROLE_RSE') %}
+								<li class="nav-header">RSE</li>
+								<li class="nav-item">
+									<a href="{{ path('app_rse', {'dos' : '1' }) }}" class="nav-link">
+										<i class="nav-icon fas fa-chart-pie text-primary"></i>
+										<p>
+											RSE Lhermitte
+										</p>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="{{ path('app_rse', {'dos' : '3' }) }}" class="nav-link">
+										<i class="nav-icon fas fa-chart-pie text-danger"></i>
+										<p>
+											RSE Roby
+										</p>
+									</a>
+								</li>
+							{% endif %}
+
 							<li class="nav-header">Lhermitte</li>
 							{% if is_granted('ROLE_LHERMITTE') %}
 
@@ -450,16 +470,6 @@
 											</p>
 										</a>
 										<ul class="nav nav-treeview">
-											{% if is_granted('ROLE_CONGES') %}
-												<li class="nav-item">
-													<a href="{{ path('app_rse', {'dos' : '1' }) }}" class="nav-link">
-														<i class="nav-icon fas fa-chart-pie text-info"></i>
-														<p>
-															RSE
-														</p>
-													</a>
-												</li>
-											{% endif %}
 											<li class="nav-item">
 												<a href="{{ path('app_states_lhermitte') }}" class="nav-link">
 													<i class="fas fa-globe nav-icon text-primary"></i>
@@ -506,6 +516,12 @@
 													</a>
 												</li>
 											{% endif %}
+											<li class="nav-item">
+												<a href="{{ path('app_tarif_vente_divalto') }}" class="nav-link">
+													<i class="fas fa-dollar nav-icon text-warning"></i>
+													<p>Prix de vente Divalto</p>
+												</a>
+											</li>
 										</ul>
 									</li>
 								{% endif %}
@@ -608,16 +624,6 @@
 										</p>
 									</a>
 									<ul class="nav nav-treeview">
-										{% if is_granted('ROLE_CONGES') %}
-											<li class="nav-item">
-												<a href="{{ path('app_rse', {'dos' : '3' }) }}" class="nav-link">
-													<i class="nav-icon fas fa-chart-pie text-info"></i>
-													<p>
-														RSE
-													</p>
-												</a>
-											</li>
-										{% endif %}
 										<li class="nav-item">
 											<a href="{{path('app_states_roby')}}" class="nav-link">
 												<i class="nav-icon fas fa-tree text-success"></i>
@@ -1076,6 +1082,7 @@ $('[data-toggle="tooltip"]').tooltip()
 
 					{% endblock %}
 				</body>
-			</html>
+			</body>
 		</body>
 	</html>
+</body></html>

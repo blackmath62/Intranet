@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Controller\AffairesAdminController;
 use App\Entity\Main\AffairePiece;
 use App\Entity\Main\Affaires;
+use App\Entity\Main\Chats;
 use App\Entity\Main\InterventionFicheMonteur;
 use App\Entity\Main\InterventionFichesMonteursHeures;
 use App\Entity\Main\InterventionMonteurs;
@@ -248,8 +249,6 @@ class AffairesController extends AbstractController
         $table = 'affaire';
         $id = $this->repoAffaires->findOneBy(['code' => $affaire])->getId();
 
-        $docs = $this->repoDocs->findBy(['tables' => 'affaire', 'identifiant' => $id]);
-
         $affaire = $this->repoAffaires->findOneBy(['code' => $affaire]);
 
         $intervention = new InterventionMonteurs();
@@ -257,6 +256,7 @@ class AffairesController extends AbstractController
         $InterventionsMonteursForm->handleRequest($request);
 
         if ($InterventionsMonteursForm->isSubmitted() && $InterventionsMonteursForm->isValid()) {
+            //dd($InterventionsMonteursForm->getData());
             $intervention->setCreatedAt(new DateTime())
                 ->setUserCr($this->getUser())
                 ->setCode($affaire);
@@ -283,12 +283,56 @@ class AffairesController extends AbstractController
             $entityManager->persist($intervention);
             $entityManager->flush();
 
+            // Ajouter les fichiers joints
+            $files = $InterventionsMonteursForm->get('files')->getData();
+            // On boucle sur les images
+            if ($files) {
+                foreach ($files as $file) {
+                    // On génère un nouveau nom de fichier
+                    $d = new DateTime();
+                    $d = $d->format('Y-m-d H-i-s');
+                    $filename = $file->getClientOriginalName();
+                    $fichier = $filename . $d . '.' . $file->guessExtension();
+
+                    // On copie le fichier dans le dossier uploads
+                    $file->move(
+                        $this->getParameter('doc_lhermitte_affaires'),
+                        $fichier
+                    );
+                    // On crée l'image dans la base de données
+                    $doc = new OthersDocuments();
+                    $doc->setFile($fichier);
+                    $doc->setTables('affaire');
+                    $doc->setParametre($intervention->getId());
+                    $doc->setCreatedAt(new DateTime);
+                    $doc->setUser($this->getUser());
+                    $doc->setIdentifiant($intervention->getCode()->getId());
+                    $this->addFlash('message', 'Fichier ' . $filename . ' ajouté avec succés');
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->persist($doc);
+                    $entityManager->flush();
+                }
+            }
+
+            if ($InterventionsMonteursForm->get('comment')->getData()) {
+                $chat = new Chats;
+                $chat->setCreatedAt(new \DateTime())
+                    ->setUser($this->getUser())
+                    ->setContent($InterventionsMonteursForm->get('comment')->getData())
+                    ->setFonction('chatAffaire')
+                    ->setIdentifiant($intervention->getCode()->getId())
+                    ->setTables($intervention->getId());
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($chat);
+                $entityManager->flush();
+            }
+
             $this->changeEtat($affaire->getId(), 'Planifiee');
 
         }
-
         $Interventions = $this->repoIntervertionsMonteurs->findBy(['code' => $affaire]);
         $chats = $this->repoChats->findBy(['fonction' => 'chatAffaire', 'identifiant' => $affaire->getId()], ['createdAt' => 'DESC']);
+        $docs = $this->repoDocs->findBy(['tables' => 'affaire', 'identifiant' => $id]);
 
         return $this->render('affaires/pieceAffaire.html.twig', [
             // todo à voir pour filtrer l'état en fonction de la page affichée
@@ -300,22 +344,6 @@ class AffairesController extends AbstractController
             'chats' => $chats,
             'InterventionsMonteursForm' => $InterventionsMonteursForm->createView(),
             'Interventions' => $Interventions,
-        ]);
-    }
-    /**
-     * @Route("/Lhermitte/detail/piece/affaire/{{affaire}}/{{id}}", name="app_detail_piece_affaire")
-     */
-    public function detailPieceAffaire($affaire, $id, Request $request): Response
-    {
-
-        $affaire = $this->repoAffaires->findOneBy(['code' => $affaire]);
-        $produits = $this->repoMouv->getDetailPiecesAffaires($id);
-        $piece = $this->repoAffairePiece->findOneBy(['affaire' => $affaire->getCode(), 'entId' => $id]);
-        return $this->render('affaires/detailPieceAffaire.html.twig', [
-            'produits' => $produits,
-            'title' => 'Détail de la piece',
-            'affaire' => $affaire,
-            'piece' => $piece,
         ]);
     }
 
@@ -452,6 +480,27 @@ class AffairesController extends AbstractController
     public function removeIntervention($id): Response
     {
         $intervention = $this->repoIntervertionsMonteurs->findOneBy(['id' => $id]);
+        // suppression des fichiers de cette intervention
+        $fichiers = $this->repoDocs->findBy(['tables' => 'affaire', 'Parametre' => $id, 'identifiant' => $intervention->getCode()->getId()]);
+        if ($fichiers) {
+            foreach ($fichiers as $fichier) {
+                $chemin = $this->getParameter('doc_lhermitte_affaires') . '/' . $fichier->getFile();
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->remove($fichier);
+                $entityManager->flush();
+                unset($chemin);
+            }
+        }
+
+        // suppression des commentaires de cette intervention
+        $commentaires = $this->repoChats->findBy(['fonction' => 'chatAffaire', 'identifiant' => $intervention->getCode()->getId(), 'tables' => $id]);
+        if ($commentaires) {
+            foreach ($commentaires as $commentaire) {
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->remove($commentaire);
+                $entityManager->flush();
+            }
+        }
         $affaire = $intervention->getCode()->getCode();
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($intervention);
@@ -520,7 +569,6 @@ class AffairesController extends AbstractController
         $intervention = $this->repoIntervertionsMonteurs->findOneBy(['id' => $id]);
         $ChatsForm = $this->createForm(ChatsType::class);
         $ChatsForm->handleRequest($request);
-        $intervenants = ['Anthony_Martinage', 'Bruno_Debonne', 'Bruno_Lefebvre', 'Alexandre_Deschodt'];
 
         if ($ChatsForm->isSubmitted() && $ChatsForm->isValid()) {
             $chat = $ChatsForm->getData();
@@ -601,7 +649,6 @@ class AffairesController extends AbstractController
             'formFiles' => $formFiles->createView(),
             'chats' => $chats,
             'ChatsForm' => $ChatsForm->createView(),
-            'intervenants' => $intervenants,
         ]);
     }
 
@@ -613,6 +660,7 @@ class AffairesController extends AbstractController
         $fiche = new InterventionFicheMonteur;
         $fiche->setCreatedAt(new DateTime($createdAt))
             ->setCreatedBy($this->getUser())
+            ->setHere(true)
             ->setIntervenant($this->repoUsers->findOneBy(['id' => $intervenant]))
             ->setIntervention($this->repoIntervertionsMonteurs->findOneBy(['id' => $id]));
         $entityManager = $this->getDoctrine()->getManager();
@@ -753,7 +801,7 @@ class AffairesController extends AbstractController
     {
         $fiche = $this->repoInterventionFicheMonteur->findOneBy(['id' => $ficheId]);
         $heures = $this->repoInterventionFichesMonteursHeures->findBy(['interventionFicheMonteur' => $ficheId]);
-        if ($heures) {
+        if ($heures || $fiche->getHere() == false) {
             $fiche->setLockedAt(new DateTime())
                 ->setLockedBy($this->getUser());
             $entityManager = $this->getDoctrine()->getManager();
@@ -773,8 +821,6 @@ class AffairesController extends AbstractController
         $lesPieces = [];
         foreach ($pieces as $piece) {
             $produits = $this->repoMouv->getDetailPiecesAffaires($piece->getEntId());
-            //$interventions = $this->repoIntervertionsMonteurs->findAll();
-            //dd($interventions[0]->getPieces());
             $lesPieces[] = $piece = [
                 'id' => $piece->getId(),
                 'entId' => $piece->getEntId(),
@@ -786,6 +832,7 @@ class AffairesController extends AbstractController
                 'etat' => $piece->getEtat(),
                 'affaire' => $piece->getAffaire(),
                 'produits' => $produits,
+                'interventions' => $piece->getInterventionMonteurs(),
             ];
         }
         return $lesPieces;

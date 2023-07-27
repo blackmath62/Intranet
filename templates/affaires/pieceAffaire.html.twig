@@ -148,12 +148,9 @@
 												<td>
 													<ul>
 														{% for piece in Intervention.pieces %}
-															{% if piece.piece == 99999999 %}
-																{% else %}
-																	<li>
-																		<a href='{{path('app_detail_piece_affaire', {'affaire' : Intervention.code.code, 'id' : piece.entId } ) }}'>{{ piece.piece }}</a>
-																	</li>
-															{% endif %}
+															<li>
+																{{ piece.piece }}
+															</li>
 														{% endfor %}
 													</ul>
 												</td>
@@ -217,19 +214,18 @@
 									{{ form_start(InterventionsMonteursForm)}}
 									<div class="row">
 										<div class="col-12 col-sm-6">
-											<div class="col-12 col-sm-6 d-flex">
-												<div class="m-2">
-													<p>Couleur fond</p>
-													{{ form_widget(InterventionsMonteursForm.backgroundColor, {'attr': {'value': '#5D5B5B' },'type' : 'color' } ) }}
-												</div>
-												<div class="m-2">
-													<p>Couleur texte</p>
-													{{ form_widget(InterventionsMonteursForm.textColor, {'attr': {'value': '#FFFFFF' },'type' : 'color' } ) }}
-												</div>
+											<div class="col-12 col-sm-12 d-flex flex-colum justify-content-around">
+												{{ form_label(InterventionsMonteursForm.backgroundColor ) }}
+												{{ form_widget(InterventionsMonteursForm.backgroundColor, {'attr': {'value': '#5D5B5B', 'class': 'col-4 form-control' },'type' : 'color' } ) }}
+												{{ form_label(InterventionsMonteursForm.textColor ) }}
+												{{ form_widget(InterventionsMonteursForm.textColor, {'attr': {'value': '#FFFFFF', 'class': 'col-4 form-control' },'type' : 'color' } ) }}
 											</div>
 											{{ form_label(InterventionsMonteursForm.adresse) }}
 											{{ form_widget(InterventionsMonteursForm.adresse,{ 'attr': {'rows': '2'}}) }}
 											{{ form_errors(InterventionsMonteursForm.adresse) }}
+											{{ form_label(InterventionsMonteursForm.files) }}
+											{{ form_widget(InterventionsMonteursForm.files,{ 'attr': {'class': 'my-2 form-control'}}) }}
+											{{ form_errors(InterventionsMonteursForm.files) }}
 										</div>
 										<div class="col-12 col-sm-6">
 											{{ form_label(InterventionsMonteursForm.Equipes) }}
@@ -244,6 +240,10 @@
 											{{ form_label(InterventionsMonteursForm.end) }}
 											{{ form_widget(InterventionsMonteursForm.end) }}
 											{{ form_errors(InterventionsMonteursForm.end) }}
+										</div>
+										<div class="col-12">
+											{{ form_label(InterventionsMonteursForm.comment) }}
+											{{ form_widget(InterventionsMonteursForm.comment) }}
 										</div>
 									</div>
 									{{ form_widget(InterventionsMonteursForm.ajouter) }}
@@ -459,7 +459,7 @@
 													</div>
 													<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
 													<div class="direct-chat-text">
-														{{ chat.content }}
+														{{ chat.content|raw }}
 													</div>
 												</div>
 											{% else %}
@@ -518,7 +518,6 @@
 			<table class="table table-bordered table-hover">
 				<thead>
 					<tr>
-						<th style="width: 10px">#</th>
 						<th>Adresse du Chantier</th>
 						<th>Type Piéce</th>
 						<th>Piece</th>
@@ -530,13 +529,39 @@
 				{% if piecesAffaires %}
 					<tbody>
 						{% for piecesAffaire in piecesAffaires %}
-							<tr id="{{piecesAffaire.piece}}" data-widget="expandable-table" aria-expanded="false">
+							{% set rowColor = '' %}
+							{% if piecesAffaire.interventions|length %}
+								{% set rowColor = 'table-success' %}
+							{% endif %}
+							<tr id="{{piecesAffaire.piece}}" data-widget="expandable-table" aria-expanded="false" class="{{rowColor}}">
 								<td>
-									{% if piecesAffaire.produits %}
-										<i class="fa-solid fa-sort-down"></i>
+									<i class="fas fa-caret-right fa-fw"></i>
+									{{ piecesAffaire.adresse}}
+									{% if piecesAffaire.interventions|length %}
+										<ul>
+											{% for intervention in piecesAffaire.interventions %}
+												<li>
+													<div class="d-flex flex-column">
+														<div>
+															<span>Intervention du
+																{{ intervention.start|date("d/m/Y H:i") }}
+																au
+																{{ intervention.end|date("d/m/Y H:i") }}
+															</span>
+														</div>
+														<div>
+															<span>Intervenants :
+																{% for user in intervention.equipes %}
+																	{{ user.pseudo}},
+																{% endfor %}
+															</span>
+														</div>
+													</div>
+												</li>
+											{% endfor %}
+										</ul>
 									{% endif %}
 								</td>
-								<td>{{ piecesAffaire.adresse}}</td>
 								{% if piecesAffaire.typePiece == 2 %}
 									{% set type = 'Cmd' %}
 								{% elseif piecesAffaire.typePiece == 1 %}
@@ -604,7 +629,7 @@
 							</tr>
 							{% if piecesAffaire.produits %}
 								<tr class="expandable-body m-0">
-									<td colspan="7">
+									<td colspan="6">
 										<table class="table table-bordered table-striped">
 											<thead>
 												<tr>

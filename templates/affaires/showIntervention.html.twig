@@ -130,7 +130,7 @@
 													</div>
 													<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
 													<div class="direct-chat-text">
-														{{ chat.content }}
+														{{ chat.content|raw }}
 													</div>
 												</div>
 											{% else %}
@@ -141,7 +141,7 @@
 													</div>
 													<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
 													<div class="direct-chat-text">
-														{{ chat.content }}
+														{{ chat.content|raw }}
 													</div>
 												</div>
 											{% endif %}
@@ -221,7 +221,7 @@
 												</div>
 												<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
 												<div class="direct-chat-text">
-													{{ chat.content }}
+													{{ chat.content|raw }}
 												</div>
 											</div>
 										{% else %}
@@ -232,7 +232,7 @@
 												</div>
 												<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ chat.user.img))}}" alt="message user image">
 												<div class="direct-chat-text">
-													{{ chat.content }}
+													{{ chat.content|raw }}
 												</div>
 											</div>
 										{% endif %}

@@ -395,7 +395,7 @@ class ArtRepository extends ServiceEntityRepository
         if ($type == 'EAN') {
             $where = "ean = '$produit'";
         } elseif ($type == 'REF') {
-            $where = "ref LIKE '%$produit%'";
+            $where = "(ref LIKE '%$produit%' OR designation LIKE '%$produit%')";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -533,6 +533,18 @@ class ArtRepository extends ServiceEntityRepository
         WHERE m.DOS = $dos AND m.PICOD = 4 AND m.TICOD = 'F' AND m.REF = '$produit' AND YEAR(m.FADT) <= YEAR(getdate()) -1 AND m.OP IN ('F', 'G', 'FD','GD')
         $code
         ORDER BY m.FADT DESC
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getListCode()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(TACOD)) AS tacod
+        FROM T014
+        WHERE T014.DOS = 1 AND TICOD = 'C'
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

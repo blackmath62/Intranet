@@ -60,15 +60,20 @@ class InterventionFicheType extends AbstractType
                     'data-placeholder' => 'Selectionnez la pension',
                 ],
             ])
-            /*->add('commentaire', TextareaType::class, [
-        'required' => false,
-        'label_attr' => ['class' => 'col-12 text-center mt-3'],
-        'attr' => [
-        'class' => 'col-12 form-control textarea',
-        'placeholder' => 'Vous pouvez saisir un commentaire',
-        ],
-        'label' => 'Commentaire',
-        ])*/
+            ->add('here', ChoiceType::class, [
+                'choices' => [
+                    'Présent' => true,
+                    'Absence (Maladie ou autre)' => false,
+                ],
+                'expanded' => false,
+                'multiple' => false,
+                'required' => true,
+                'label' => 'Présence',
+                'attr' => [
+                    'class' => 'form-control col-12 select2bs4',
+                    'data-placeholder' => 'Etiez vous présent ?',
+                ],
+            ])
             ->add('envoyer', SubmitType::class, [
                 'attr' => ['class' => 'col-12 form-control btn btn-dark mt-3'],
             ])

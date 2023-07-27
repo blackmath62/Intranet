@@ -110,6 +110,7 @@ class EditUsersType extends AbstractType
                     'INFORMATIQUE' => "ROLE_INFORMATIQUE",
                     'RESPONSABLE SECTEUR' => "ROLE_RESPONSABLE_SECTEUR",
                     'COMMERCIAL' => "ROLE_COMMERCIAL",
+                    'RSE' => "ROLE_RSE",
                 ],
                 'expanded' => false,
                 'multiple' => true,

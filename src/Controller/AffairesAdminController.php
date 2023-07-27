@@ -7,10 +7,12 @@ use App\Form\AddEmailType;
 use App\Repository\Main\InterventionFicheMonteurRepository;
 use App\Repository\Main\InterventionMonteursRepository;
 use App\Repository\Main\MailListRepository;
+use App\Repository\Main\UsersRepository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
 use DateTimeInterface;
+use Knp\Snappy\Pdf;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -18,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -29,12 +32,13 @@ class AffairesAdminController extends AbstractController
     private $mailer;
     private $repoMail;
     private $mailEnvoi;
+    private $repoUsers;
     private $mailTreatement;
     private $adminEmailController;
     private $repoFiche;
     private $repoIntervention;
 
-    public function __construct(InterventionMonteursRepository $repoIntervention, InterventionFicheMonteurRepository $repoFiche, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
+    public function __construct(UsersRepository $repoUsers, InterventionMonteursRepository $repoIntervention, InterventionFicheMonteurRepository $repoFiche, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
     {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
@@ -43,6 +47,7 @@ class AffairesAdminController extends AbstractController
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
         $this->repoIntervention = $repoIntervention;
+        $this->repoUsers = $repoUsers;
 
         //parent::__construct();
     }
@@ -89,6 +94,25 @@ class AffairesAdminController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/Lhermitte/affaires/admin/valider/fiche/{id}", name="app_affaire_valider_fiche_intervention")
+     */
+    public function validerFiche($id)
+    {
+
+        $fiche = $this->repoFiche->findOneBy(['id' => $id]);
+        $fiche->setValidedBy($this->getUser())
+            ->setValidedAt(new DateTime);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($fiche);
+        $em->flush();
+
+        $this->addFlash('message', 'La fiche a été validée avec succés !');
+        return $this->redirectToRoute('app_affaires_admin');
+
+    }
+
     // Vérifier que le jour est hors férier et weekend
     public function controlDay($day)
     {
@@ -116,12 +140,16 @@ class AffairesAdminController extends AbstractController
 
     public function recupFichesManquantes()
     {
+        // lancer à chaque fois que la page affaire ou admin affaire est ouverte
+
         // pour chaque interventions
+        $fichesManquantes = [];
         $interventions = $this->repoIntervention->findBy(['lockedAt' => null]);
         foreach ($interventions as $intervention) {
             // Pour chaque interval de date hors férier et weekend
             $interval = DateInterval::createFromDateString('1 day');
             $days = new DatePeriod($intervention->getStart(), $interval, $intervention->getEnd());
+            $status = true;
 
             /** @var DateTimeInterface $day */
             foreach ($days as $day) {
@@ -130,6 +158,7 @@ class AffairesAdminController extends AbstractController
                     if ($valid == false) {
                         // Pour chaque intervenant de cette intervention pour ce jour
                         foreach ($intervention->getEquipes() as $intervenant) {
+                            $day = new DateTime($day->format('Y-m-d'));
                             $fiche = $this->repoFiche->findBy(['intervenant' => $intervenant, 'createdAt' => $day]);
                             if (!$fiche) {
                                 // liste des fiches manquantes
@@ -139,12 +168,58 @@ class AffairesAdminController extends AbstractController
                                     'intervention' => $intervention,
 
                                 ];
+                                // s'il manque une fiche on ne verrouillera pas l'intervention
+                                $status = false;
+                            } elseif (!$fiche[0]->getValidedBy()) {
+                                // si la fiche n'a pas été validé, on ne verrouille pas l'intervention
+                                $status = false;
                             }
                         }
                     }
                 }
             }
+            // on verrouille l'intervention si toutes les fiches sont renseignées et validées
+            if ($status == true) {
+                $intervention->setLockedAt(new DateTime)
+                    ->setLockedBy($this->repoUsers->findOneBy(['id' => 3]));
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($intervention);
+                $em->flush();
+            }
         }
         return $fichesManquantes;
     }
+
+    /**
+     * @Route("/Lhermitte/affaires/admin/signature", name="app_affaire_signature")
+     */
+    public function envoyerPourSignature(MailerInterface $mailer, Pdf $pdf)
+    {
+        $interventions = $this->repoIntervention->findBy(['lockedBy' => $this->repoUsers->findOneBy(['id' => 3]), 'sendAt' => null]);
+        //dd($interventions[0]->getCode()->getCode());
+
+        foreach ($interventions as $intervention) {
+            // construire un PDF pour la demande de signature
+            $htmlPdf = $this->renderView('affaires_admin/pdf/pdfSignature.html.twig', ['intervention' => $intervention]);
+            //dd($htmlPdf);
+            $html = 'Voici une la fiche d\'intervention à valider';
+            $pdf = $pdf->getOutputFromHtml($htmlPdf);
+            // envoyer le PDF par email au mail renseigné sur la fiche client
+            $email = (new Email())
+                ->from($this->mailEnvoi)
+                ->to($this->getUser()->getEmail())
+                ->subject('Signature fiche d\'intervention')
+                ->html($html)
+                ->attach($pdf, $intervention->getCode()->getCode() . ' - ' . $intervention->getStart()->format('d-m-Y') . ' - ' . $intervention->getEnd()->format('d-m-Y') . '.pdf');
+            $mailer->send($email);
+            /*
+        // noter sur l'intervention que le mail a bien été envoyé
+        $intervention->setSendAt(new DateTime);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($intervention);
+        $em->flush();*/
+        }
+
+    }
+
 }

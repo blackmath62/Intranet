@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Fiche d'intervention</title>
+	</head>
+	{% block content %}
+		<img height="200" src="{{ asset("dist/img/AdminLTELogo.png")}}"/>
+		<row>
+			<columns>
+				<h1 class='text-center col-12'>Fiche d'intervention</h1>
+			</columns>
+		</row>
+		<row>
+			<columns>
+				<p></p>
+			</columns>
+		</row>
+		<row>
+			<columns>
+				<center>
+					<spacer size="20"></spacer>
+					<p>pour plus d'information contacter
+						<a href="mailto:jpochet@lhermitte.fr">Jpochet</a>
+					</p>
+					<spacer size="20"></spacer>
+				</center>
+			</columns>
+		</row>
+	{% endblock %}
+</html>

@@ -9,7 +9,9 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -46,16 +48,18 @@ class InterventionsMonteursType extends AbstractType
             ])
             ->add('adresse', TextType::class, [
                 'required' => false,
-                'attr' => ['class' => 'form-control form-control-sm',
+                'attr' => ['class' => 'form-control form-control',
                     'placeholder' => "Adresse si différente ? "],
             ])
             ->add('backgroundColor', TextType::class, [
                 'required' => false,
+                'label' => "Fond : ",
                 'attr' => ['class' => 'form-control form-control-color m-2',
                     'placeholder' => "Couleur du fond"],
             ])
             ->add('textColor', TextType::class, [
                 'required' => false,
+                'label' => "Texte : ",
                 'attr' => ['class' => 'form-control form-control-color m-2',
                     'placeholder' => "Couleur du fond"],
             ])
@@ -94,8 +98,25 @@ class InterventionsMonteursType extends AbstractType
                 ],
                 'label' => "Piéces",
             ])
+            ->add('comment', TextareaType::class, [
+                'attr' => [
+                    'class' => 'col-12 form-control textarea',
+                    'placeholder' => 'Vous pouvez saisir un commentaire ici....',
+                ],
+                'label' => 'Ajouter un commentaire...',
+                'required' => false,
+                'mapped' => false,
+            ])
+            ->add('files', FileType::class, [
+
+                'label' => 'Ajout de fichiers',
+                'multiple' => true,
+                'mapped' => false,
+                'required' => false,
+                'attr' => ['class' => 'form-control col-12 text-center'],
+            ])
             ->add('ajouter', SubmitType::class, [
-                'attr' => ['class' => 'btn btn-primary mt-3 float-right col-12 col-sm-3'],
+                'attr' => ['class' => 'btn btn-success mt-3 float-right col-12 col-sm-3'],
                 'label' => 'Ajouter une intervention',
             ])
         ;

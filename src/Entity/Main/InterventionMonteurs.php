@@ -90,6 +90,11 @@ class InterventionMonteurs
      */
     private $lockedAt;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $sendAt;
+
     public function __construct()
     {
         $this->Equipes = new ArrayCollection();
@@ -327,6 +332,18 @@ class InterventionMonteurs
     public function setLockedAt(?\DateTimeInterface $lockedAt): self
     {
         $this->lockedAt = $lockedAt;
+
+        return $this;
+    }
+
+    public function getSendAt(): ?\DateTimeInterface
+    {
+        return $this->sendAt;
+    }
+
+    public function setSendAt(?\DateTimeInterface $sendAt): self
+    {
+        $this->sendAt = $sendAt;
 
         return $this;
     }

@@ -111,13 +111,20 @@ class FouRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // Raméne les fournisseurs qui ont au moins un article ouvert et compte le nombre de produit (pas de sous référence)
     public function getListFou($dos): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT LTRIM(RTRIM(f.TIERS)) AS tiers, LTRIM(RTRIM(f.NOM)) AS nom
-        FROM FOU f
-        WHERE f.HSDT IS NULL AND f.DOS = $dos
-        ORDER BY f.TIERS
+        $sql = "SELECT tiers, nom, SUM(nbeProd) AS nbeProd
+        FROM(
+        SELECT LTRIM(RTRIM(f.TIERS)) AS tiers, LTRIM(RTRIM(f.NOM)) AS nom,
+        CASE
+        WHEN NOT a.REF IS NULL THEN 1
+        END AS nbeProd
+        FROM ART a
+        INNER JOIN FOU f ON f.DOS = a.DOS AND f.TIERS = a.TIERS
+        WHERE a.HSDT IS NULL AND a.DOS = $dos)x
+        GROUP BY tiers, nom
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

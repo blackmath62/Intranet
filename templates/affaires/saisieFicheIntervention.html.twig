@@ -70,9 +70,11 @@
 								</div>
 							</div>
 						</div>
-						<a class="btn btn-secondary col-12 col-sm-12 mt-2" data-toggle="modal" data-target="#modal-heures">
-							<i class="fa-solid fa-truck pr-2"></i>Déclarer Heures Déplac et Travaux<i class="fa-solid fa-hammer pl-2"></i>
-						</a>
+						{% if fiche.here == 1 %}
+							<a class="btn btn-secondary col-12 col-sm-12 mt-2" data-toggle="modal" data-target="#modal-heures">
+								<i class="fa-solid fa-truck pr-2"></i>Déclarer Heures Déplac et Travaux<i class="fa-solid fa-hammer pl-2"></i>
+							</a>
+						{% endif %}
 						<div class="modal fade" id="modal-heures">
 							<div class="modal-dialog modal-sm">
 								<div class="modal-content">
@@ -98,6 +100,7 @@
 						</div>
 					{% endif %}
 					{{ form_start(formFicheIntervention)}}
+					{{ form_row(formFicheIntervention.here) }}
 					{% if app.request.attributes.get('ficheId') %}
 						{{ form_row(formFicheIntervention.intervenant, { 'attr' : { 'class' : 'd-none' } } ) }}
 						<input class='form-control col-12 mt-3 text-center' type="text" placeholder="{{fiche.intervenant.pseudo}}" disabled>
@@ -218,6 +221,13 @@
 						<strong>Date :
 						</strong>
 						{{fiche.createdAt|date("d/m/Y", "Europe/Paris")}}</li>
+					<li>
+						<strong>Présence :</strong>
+						{% if fiche.here == 0 %}Absence (Maladie ou autre)
+						{% else %}
+							Présence
+						{% endif %}
+					</li>
 					<li>
 						<strong>Saisie par :</strong>
 						{{ fiche.createdBy.pseudo }}

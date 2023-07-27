@@ -240,10 +240,111 @@
 												{{ fichesAttenteValidation.Intervention.end|date("d/m/Y", "Europe/Paris") }}
 											</td>
 											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>
-												<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fichesAttenteValidation.Intervention.id, 'ficheId' : fichesAttenteValidation.id } ) }}'>
-													<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
+												<a data-toggle="modal" data-target="#modal-valider-{{fichesAttenteValidation.id}}">
+													<i class="nav-icon fas fa-check-circle text-success fa-2x m-2"></i>
 												</a>
 											</td>
+											<div class="modal fade" id="modal-valider-{{fichesAttenteValidation.id}}">
+												<div class="modal-dialog modal-lg">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h4 class="modal-title">Voulez vous vraiment valider cette fiche ?</h4>
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+														</div>
+														<div class="modal-body">
+															<div>
+																<p>
+																	<strong>Affaire :</strong>
+																	{{ fichesAttenteValidation.intervention.code.libelle }}
+																</p>
+																<p>
+																	<strong>Adresse :</strong>
+																	{{ fichesAttenteValidation.intervention.adresse }}
+																</p>
+																<p>
+																	<strong>Intervention :</strong>
+																	du
+																	{{ fichesAttenteValidation.intervention.start|date("d-m-Y", "Europe/Paris") }}
+																	au
+																	{{ fichesAttenteValidation.intervention.end|date("d-m-Y", "Europe/Paris") }}
+																</p>
+																<p>
+																	<strong>Date :
+																	</strong>
+																	{{fichesAttenteValidation.createdAt|date("d/m/Y", "Europe/Paris")}}
+																</p>
+																<p>
+																	<strong>Présence :</strong>
+																	{% if fichesAttenteValidation.here == 0 %}Absence (Maladie ou autre)
+																	{% else %}
+																		Présence
+																	{% endif %}
+																</p>
+																<p>
+																	<strong>Saisie par :</strong>
+																	{{ fichesAttenteValidation.createdBy.pseudo }}
+																</p>
+																<p>
+																	<strong>Intervenant :</strong>
+																	{{ fichesAttenteValidation.intervenant.pseudo }}
+																</p>
+																{% if fichesAttenteValidation.pension %}
+																	<p>
+																		<strong>Pension :</strong>
+																		{% for pension in fichesAttenteValidation.pension %}
+																			{{ pension }}
+																			,
+
+																		{% endfor %}
+																	</p>
+																{% endif %}
+																<p>
+																	<strong>Déplacements :</strong>
+
+																	{% for heure in fichesAttenteValidation.heures %}
+																		{% if heure.type == "deplacement" %}
+																			<p>{{ heure.start|date("H:i", "Europe/Paris")}}
+																				-
+																				{{ heure.end|date("H:i", "Europe/Paris")}}
+																			</p>
+																		{% endif %}
+																	{% endfor %}
+
+																</p>
+																<p>
+																	<strong>Travaux :</strong>
+
+																	{% for heure in fichesAttenteValidation.heures %}
+																		{% if heure.type == "Travaux" %}
+																			<p>{{ heure.start|date("H:i", "Europe/Paris")}}
+																				-
+																				{{ heure.end|date("H:i", "Europe/Paris")}}
+																			</p>
+																		{% endif %}
+																	{% endfor %}
+
+																</p>
+																{% if fichesAttenteValidation.comment %}
+																	<p>
+																		<strong>Commentaires :</strong>
+																		{% if fichesAttenteValidation.comment %}
+																			{{ fichesAttenteValidation.comment|raw }}
+																		{% endif %}
+																	</p>
+																{% endif %}
+															</div>
+														</div>
+														<div class="modal-footer justify-content-between">
+															<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+															<a href='{{path('app_affaire_valider_fiche_intervention', {'id' : fichesAttenteValidation.id } ) }}' type="button" class="btn btn-success">Valider</a>
+														</div>
+													</div>
+													<!-- /.modal-content -->
+												</div>
+												<!-- /.modal-dialog -->
+											</div>
 										</tr>
 									{% endfor %}
 								</tbody>
@@ -282,7 +383,7 @@
 											</td>
 											<td>
 												<a data-toggle="modal" data-target="#modal-creer-{{f}}">
-													<i class="nav-icon fas fa-plus fa-2x text-secondary m-2"></i>
+													<i class="nav-icon fas fa-plus-circle text-success fa-2x m-2"></i>
 												</a>
 											</td>
 											<div class="modal fade" id="modal-creer-{{f}}">

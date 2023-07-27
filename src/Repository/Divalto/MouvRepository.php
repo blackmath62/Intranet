@@ -2,6 +2,7 @@
 
 namespace App\Repository\Divalto;
 
+use App\Controller\StatsAchatController;
 use App\Entity\Divalto\Mouv;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -15,10 +16,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class MouvRepository extends ServiceEntityRepository
 {
+    private $statsAchatController;
 
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, StatsAchatController $statsAchatController)
     {
         parent::__construct($registry, Mouv::class);
+        $this->statsAchatController = $statsAchatController;
 
     }
 
@@ -1284,6 +1287,68 @@ class MouvRepository extends ServiceEntityRepository
         WHERE m.DOS = $dos AND m.TICOD = '$tiers[0]' AND m.PICOD = 4 AND m.FADT BETWEEN '$ddN3' AND '$df'AND a.FAM_0001 IN($famille))REPONSE
         $group
         ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // Export des tarifs de vente de Divalto
+    public function tarifsVentesDivalto($prefixe = null, $fous = null, $familles = null, $codes = null): array
+    {
+        $pref = "";
+        $fou = "";
+        $famille = '';
+        $cases = "";
+        $max = "";
+        if ($prefixe) {
+            $pref = "AND t.REF LIKE '$prefixe%'";
+        }
+        if ($fous) {
+            $fou = "AND a.TIERS IN ($fous)";
+        }
+        if ($familles) {
+            $famille = "AND a.FAM_0001 IN ($familles)";
+        }
+        if ($codes) {
+            $lesCodes = $this->statsAchatController->miseEnForme($codes);
+            $code = "AND t.TACOD IN ($lesCodes)";
+            foreach ($codes as $value) {
+                $cases = $cases . ",CASE
+                WHEN x.TACOD = '$value' THEN x.TADT
+                END AS date" . $value . "
+                ,CASE
+                WHEN x.TACOD = '$value' THEN x.PUB
+                END AS prix$value
+                ,CASE
+                WHEN x.TACOD = '$value' THEN x.PPAR
+                END AS ppar" . $value;
+                $max = $max . ",MAX(date$value) AS date$value,MAX(prix$value) AS prix$value,MAX(ppar$value) AS ppar$value ";
+            }
+        }
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT tiers, ref, sref1, sref2, designation, uv, dos, conf, famille $max FROM(
+        SELECT LTRIM(RTRIM(a.TIERS)) AS tiers, LTRIM(RTRIM(x.REF)) AS ref, LTRIM(RTRIM(x.SREF1)) AS sref1,
+        LTRIM(RTRIM(x.SREF2)) AS sref2, LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(x.VENUN)) AS uv,
+        LTRIM(RTRIM(x.DOS)) AS dos, LTRIM(RTRIM(a.FAM_0001)) AS famille,
+        CASE
+        WHEN s.CONF = 'Usrd' AND a.SREFCOD = 2 THEN 'Usrd'
+        ELSE ''
+        END AS conf
+        $cases
+        FROM
+        ( SELECT *, ROW_NUMBER() OVER(PARTITION BY t.TACOD, t.REF, t.SREF1, t.SREF2 ORDER BY t.TADT DESC) AS sort
+        FROM TAR t
+        WHERE t.DOS = 1 $pref $code ) x
+        INNER JOIN ART a ON x.REF = a.REF AND a.DOS = x.DOS
+        INNER JOIN SART s ON x.REF = s.REF AND s.DOS = x.DOS AND s.SREF1 = x.SREF1 AND s.SREF2 = x.SREF2
+        WHERE sort = 1 AND a.HSDT IS NULL $fou $famille
+        --GROUP BY a.TIERS, x.REF, x.SREF1, x.SREF2, a.DES, x.VENUN, x.DOS, s.CONF, a.FAM_0001
+        )reponse
+        WHERE conf <> 'Usrd'
+        GROUP BY tiers, ref, sref1, sref2, designation, uv, dos, conf, famille
+        ORDER BY ref
+        ";
+        //dd($sql);
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();

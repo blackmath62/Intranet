@@ -66,7 +66,9 @@
 			<div class="col-12">
 				<div class="card collapsed-card card-warning">
 					<div class="card-header">
-						<h3 class="card-title">Fiche(s) à saisir</h3>
+						<h3 class="card-title">
+							<i class="fa-solid fa-edit"></i>
+							Fiche(s) à saisir</h3>
 						<div class="card-tools">
 							<span class="badge bg-secondary">
 								{{ fichesManquantes|length }}
@@ -125,7 +127,7 @@
 													</div>
 													<div class="modal-footer justify-content-between">
 														<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-														<a href='{{path('app_affaire_creer_fiche_intervention', {'id' : fichesManquante.intervention.id, 'intervenant' : fichesManquante.intervenant.id, 'createdAt' : fichesManquante.createdAt|date("Y-m-d", "Europe/Paris") } ) }}' type="button" class="btn btn-primary">Créer</a>
+														<a href='{{path('app_affaire_creer_fiche_intervention', {'id' : fichesManquante.intervention.id, 'intervenant' : fichesManquante.intervenant.id, 'createdAt' : fichesManquante.createdAt|date("Y-m-d", "Europe/Paris") } ) }}' type="button" class="btn btn-primary ">Créer</a>
 													</div>
 												</div>
 												<!-- /.modal-content -->
@@ -147,7 +149,9 @@
 			<div class="col-12">
 				<div class="card collapsed-card card-primary">
 					<div class="card-header">
-						<h3 class="card-title">Fiche(s) non Verrouillée(s)</h3>
+						<h3 class="card-title">
+							<i class="fas fa-lock-open" aria-hidden="true"></i>
+							Fiche(s) non Verrouillée(s)</h3>
 						<div class="card-tools">
 							<span class="badge bg-dark">
 								{{ fichesNonVerrouillees|length }}
@@ -193,6 +197,16 @@
 															</strong>
 														</p>
 														<p>
+															Présence :
+															<strong>
+																{% if fichesNonVerrouillee.here == 0 %}
+																	<p class="text-danger">Absence (Maladie ou autre)</p>
+																{% else %}
+																	<p class="text-success">Présent</p>
+																{% endif %}
+															</strong>
+														</p>
+														<p>
 															Saisie par :
 															<strong>
 																{{ fichesNonVerrouillee.createdBy.pseudo }}
@@ -233,8 +247,15 @@
 																		{% endfor %}
 																	</ul>
 																{% else %}
-																	<p class="text-danger">
-																		Pas d'heures déclarées, merci d'y remédier en cliquant sur modifier !</p>
+																	{% if fichesNonVerrouillee.here == true %}
+																		<p class="text-danger">
+																			Pas d'heures déclarées, merci d'y remédier en cliquant sur modifier !
+																		</p>
+																	{% else %}
+																		<p class="text-secondary">
+																			Vous êtes absent toute la journée
+																		</p>
+																	{% endif %}
 																{% endif %}
 															</strong>
 														</p>
@@ -276,7 +297,7 @@
 													<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fichesNonVerrouillee.Intervention.id, 'ficheId' : fichesNonVerrouillee.id } ) }}' type="button">
 														<i class="fa-solid fa-edit fa-3x text-warning"></i>
 													</a>
-													{% if fichesNonVerrouillee.heures|length %}
+													{% if fichesNonVerrouillee.heures|length or fichesNonVerrouillee.here == false %}
 														<div class="form-group d-flex align-items-center justify-content-between col-12">
 															<div class="form-check">
 																<input type="checkbox" id="maCase{{fichesNonVerrouillee.id}}">
@@ -289,9 +310,7 @@
 													{% endif %}
 												</div>
 											</div>
-											<!-- /.modal-content -->
 										</div>
-										<!-- /.modal-dialog -->
 									</tr>
 								{% endfor %}
 							</tbody>

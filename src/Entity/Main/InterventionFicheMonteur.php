@@ -79,6 +79,11 @@ class InterventionFicheMonteur
      */
     private $comment;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $here;
+
     public function __construct()
     {
         $this->heures = new ArrayCollection();
@@ -247,6 +252,18 @@ class InterventionFicheMonteur
     public function setComment(?string $comment): self
     {
         $this->comment = $comment;
+
+        return $this;
+    }
+
+    public function getHere(): ?bool
+    {
+        return $this->here;
+    }
+
+    public function setHere(bool $here): self
+    {
+        $this->here = $here;
 
         return $this;
     }
