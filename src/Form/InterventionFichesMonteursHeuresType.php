@@ -19,6 +19,7 @@ class InterventionFichesMonteursHeuresType extends AbstractType
                 'choices' => [
                     'Déplacement' => "deplacement",
                     'Travaux' => "Travaux",
+                    'Dépôt' => "Depot",
                 ],
                 'expanded' => false,
                 'multiple' => false,

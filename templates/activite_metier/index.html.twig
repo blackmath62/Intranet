@@ -148,8 +148,6 @@
 							</tbody>
 						</table>
 					</div>
-				</div>
-				<div class="card-body">
 
 					<div class="card card-olive">
 						<div class="card-header d-flex bd-highlight">
@@ -162,7 +160,7 @@
 								</h3>
 							</div>
 						</div>
-						<table id="example2" class="table table-bordered table-striped">
+						<table id="example12" class="table table-bordered table-striped">
 							<thead>
 								<tr class="text-center">
 									<th>Famille client</th>
@@ -182,6 +180,49 @@
 											<td>{{ activiteClient.montantSign }}</td>
 											{% if total %}
 												{% set tot = activiteClient.montantSign * 100 / total %}
+												<td>{{ tot|number_format(2, '.', ' ') }}</td>
+											{% endif %}
+										</tr>
+									{% endfor %}
+								{% else %}
+									<tr>
+										<td colspan="10">Pas de données à afficher</td>
+									</tr>
+								{% endif %}
+							</tbody>
+						</table>
+					</div>
+					<div class="card card-warning">
+						<div class="card-header d-flex bd-highlight">
+							<div class="p-2 flex-grow-1 bd-highlight">
+								<h3 class="card-title text-center">Activité Fournisseurs par Métier
+									{% if totalFou %}
+										{{ totalFou }}
+										€
+									{% endif %}
+								</h3>
+							</div>
+						</div>
+						<table id="example3" class="table table-bordered table-striped">
+							<thead>
+								<tr class="text-center">
+									<th>Famille Fourn</th>
+									<th>Code Fourn</th>
+									<th>Nom</th>
+									<th>Montant</th>
+									<th>%</th>
+								</tr>
+							</thead>
+							<tbody class="text-center">
+								{% if activiteFournisseurs %}
+									{% for activiteFournisseur in activiteFournisseurs %}
+										<tr>
+											<td>{{ activiteFournisseur.famille }}</td>
+											<td>{{ activiteFournisseur.tiers }}</td>
+											<td class="text-left">{{ activiteFournisseur.nom }}</td>
+											<td>{{ activiteFournisseur.montantSign }}</td>
+											{% if total %}
+												{% set tot = activiteFournisseur.montantSign * 100 / totalFou %}
 												<td>{{ tot|number_format(2, '.', ' ') }}</td>
 											{% endif %}
 										</tr>
@@ -219,6 +260,38 @@ $("#example1").DataTable({
 "colvis"
 ]
 }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+$("#example11").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[3, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example11_wrapper .col-md-6:eq(0)');
+$("#example12").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[3, "desc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example12_wrapper .col-md-6:eq(0)');
 $("#example3").DataTable({
 "responsive": true,
 "lengthChange": false,

@@ -72,7 +72,7 @@
 						</div>
 						{% if fiche.here == 1 %}
 							<a class="btn btn-secondary col-12 col-sm-12 mt-2" data-toggle="modal" data-target="#modal-heures">
-								<i class="fa-solid fa-truck pr-2"></i>Déclarer Heures Déplac et Travaux<i class="fa-solid fa-hammer pl-2"></i>
+								<i class="fa-solid fa-truck pr-2"></i>Déclarer Heures Déplac, Dépôt et Travaux<i class="fa-solid fa-hammer pl-2"></i>
 							</a>
 						{% endif %}
 						<div class="modal fade" id="modal-heures">
@@ -271,6 +271,19 @@
 						</ul>
 					</li>
 					<li>
+						<strong>Dépôt :</strong>
+						<ul>
+							{% for heure in heures %}
+								{% if heure.type == "Depot" %}
+									<li>{{ heure.start|date("H:i", "Europe/Paris")}}
+										-
+										{{ heure.end|date("H:i", "Europe/Paris")}}
+									</li>
+								{% endif %}
+							{% endfor %}
+						</ul>
+					</li>
+					<li>
 						<strong>Commentaires :</strong>
 						{% if fiche.comment %}
 							{{ fiche.comment|raw }}
@@ -329,188 +342,6 @@
 						</div>
 					</div>
 			{% endif %}
-		</div>
-	{% endif %}
-	{% if fiches %}
-		<div class="row">
-			<div class="col-12">
-				<div class="card">
-					<div class="card-header d-flex p-0">
-						<h3 class="card-title p-3">Fiches</h3>
-						<ul class="nav nav-pills ml-auto p-2">
-							<li class="nav-item">
-								<a class="nav-link active" href="#lock" data-toggle="tab">
-									<i class="fas fa-lock-open"></i>
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" href="#unlock" data-toggle="tab">
-									<i class="fas fa-lock"></i>
-								</a>
-							</li>
-						</ul>
-					</div>
-					<div class="card-body">
-						<div class="tab-content">
-							<div class="tab-pane active" id="lock">
-								<table id="example3" class="table table-sm">
-									<thead>
-										<tr class="text-center">
-											<th>Date</th>
-											<th>Intervenant</th>
-											<th style="width: 60px">Statut</th>
-											<th>Vérrouillé par</th>
-											<th>Saisie par</th>
-											<th>Chantier</th>
-											<th style="width: 10px">Validation</th>
-											<th>Validé par</th>
-											<th style="width: 80px">Actions</th>
-										</tr>
-									</thead>
-									<tbody>
-										{% for fiche in fiches %}
-											{% if fiche.lockedAt == null %}
-												<tr class="text-center">
-													<td>{{ fiche.createdAt|date("d/m/Y", "Europe/Paris")}}</td>
-													<td>{{ fiche.Intervenant.pseudo }}</td>
-													<td class='text-center' style="width: 60px">
-														{% if fiche and fiche.lockedAt %}
-															<i class="fas fa-lock text-success"></i>
-														{% else %}
-															<i class="fas fa-lock-open text-warning"></i>
-														{% endif %}
-													</td>
-													<td>
-														{% if fiche and fiche.lockedBy %}
-															{{ fiche.lockedBy.pseudo}}
-														{% endif %}
-													</td>
-													<td>{{ fiche.createdBy.pseudo }}</td>
-													<td>{{ fiche.intervention.code.libelle}}</td>
-													<td class='text-center' style="width: 10px">
-														{% if fiche.validedAt %}
-															<i class="fas fa-check text-success"></i>
-														{% else %}
-															<i class="far fa-hourglass text-warning"></i>
-														{% endif %}
-													</td>
-													<td>
-														{% if fiche.validedBy %}
-															{{ fiche.validedBy.pseudo}}
-														{% endif %}
-													</td>
-													<td style="width: 80px">
-														<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fiche.intervention.id, 'ficheId' : fiche.id } ) }}'>
-															<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
-														</a>
-														{% if fiche and fiche.lockedAt %}
-															<a>
-																<i class="fas fa-trash-alt fa-2x text-danger m-2"></i>
-															</a>
-														{% else %}
-															<a data-toggle="modal" data-target="#modal-lg-{{ fiche.id }}">
-																<i class="fas fa-trash-alt fa-2x text-secondary m-2"></i>
-															</a>
-														{% endif %}
-														<div class="modal fade" id="modal-lg-{{ fiche.id }}">
-															<div class="modal-dialog modal-lg">
-																<div class="modal-content">
-																	<div class="modal-header">
-																		<div class="d-flex flex-column">
-																			<h4 class="modal-title">Suppression de la fiche du
-																				{{ fiche.createdAt|date("d/m/Y", "Europe/Paris")}}
-																				pour
-																				{{ fiche.Intervenant.pseudo }}
-																			</h4>
-																			<span class="text-left">du chantier
-																				{{ fiche.intervention.code.libelle }}
-																			</span>
-																		</div>
-																		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-																			<span aria-hidden="true">&times;</span>
-																		</button>
-																	</div>
-																	<div class="modal-body">
-																		<p>Voulez vous vraiment supprimer cette fiche ainsi que toutes les heures saisies en rapport avec cette fiche ? cette action est irréversible !</p>
-																	</div>
-																	<div class="modal-footer justify-content-between">
-																		<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
-																		<a href='{{path('app_affaire_remove_fiche_intervention', {'id' : fiche.intervention.id, 'fiche' : fiche.id } ) }}' type="button" class="btn btn-danger">Supprimer la fiche</a>
-																	</div>
-																</div>
-																<!-- /.modal-content -->
-															</div>
-															<!-- /.modal-dialog -->
-														</div>
-													</td>
-												</tr>
-											{% endif %}
-										{% endfor %}
-									</tbody>
-								</table>
-							</div>
-							<div class="tab-pane" id="unlock">
-								<table id="example1" class="table table-sm">
-									<thead>
-										<tr class="text-center">
-											<th>Date</th>
-											<th>Intervenant</th>
-											<th style="width: 60px">Statut</th>
-											<th>Vérrouillé par</th>
-											<th>Saisie par</th>
-											<th>Chantier</th>
-											<th style="width: 10px">Validation</th>
-											<th>Validé par</th>
-											<th style="width: 80px">Actions</th>
-										</tr>
-									</thead>
-									<tbody>
-										{% for fiche in fiches %}
-											{% if fiche.lockedAt %}
-												<tr class="text-center">
-													<td>{{ fiche.createdAt|date("d/m/Y", "Europe/Paris")}}</td>
-													<td>{{ fiche.Intervenant.pseudo }}</td>
-													<td class='text-center' style="width: 60px">
-														{% if fiche and fiche.lockedAt %}
-															<i class="fas fa-lock text-success"></i>
-														{% else %}
-															<i class="fas fa-lock-open text-warning"></i>
-														{% endif %}
-													</td>
-													<td>
-														{% if fiche and fiche.lockedBy %}
-															{{ fiche.lockedBy.pseudo}}
-														{% endif %}
-													</td>
-													<td>{{ fiche.createdBy.pseudo }}</td>
-													<td>{{ fiche.intervention.code.libelle}}</td>
-													<td class='text-center' style="width: 10px">
-														{% if fiche.validedAt %}
-															<i class="fas fa-check text-success"></i>
-														{% else %}
-															<i class="far fa-hourglass text-warning"></i>
-														{% endif %}
-													</td>
-													<td>
-														{% if fiche.validedBy %}
-															{{ fiche.validedBy.pseudo}}
-														{% endif %}
-													</td>
-													<td style="width: 80px">
-														<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fiche.intervention.id, 'ficheId' : fiche.id } ) }}'>
-															<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
-														</a>
-													</td>
-												</tr>
-											{% endif %}
-										{% endfor %}
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 		</div>
 	{% endif %}
 {% endblock %}

@@ -180,6 +180,7 @@
 									<tr>
 										<th>Intervenant</th>
 										<th>Date</th>
+										<th>Présence</th>
 										<th>Nbes Heures</th>
 										<th>Affaire</th>
 										<th>Intervention</th>
@@ -191,6 +192,13 @@
 										<tr>
 											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Intervenant.pseudo }}</td>
 											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
+											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>
+												{% if fichesNonVerrouillee.here == 0 %}
+													<strong>Absent</strong>
+												{% else %}
+													Présent
+												{% endif %}
+											</td>
 											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Heures|length }}</td>
 											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Intervention.code.code }}</td>
 											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Intervention.start|date("d/m/Y", "Europe/Paris") }}
@@ -222,6 +230,7 @@
 									<tr>
 										<th>Intervenant</th>
 										<th>Date</th>
+										<th>Présence</th>
 										<th>Nbes Heures</th>
 										<th>Affaire</th>
 										<th>Intervention</th>
@@ -233,6 +242,13 @@
 										<tr>
 											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>{{ fichesAttenteValidation.Intervenant.pseudo }}</td>
 											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>{{ fichesAttenteValidation.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
+											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>
+												{% if fichesAttenteValidation.here == 0 %}
+													<strong>Absent</strong>
+												{% else %}
+													Présent
+												{% endif %}
+											</td>
 											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>{{ fichesAttenteValidation.Heures|length }}</td>
 											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>{{ fichesAttenteValidation.Intervention.code.code }}</td>
 											<td {% if fichesAttenteValidation.Heures|length == 0 %} class="card-danger" {% endif %}>{{ fichesAttenteValidation.Intervention.start|date("d/m/Y", "Europe/Paris") }}
@@ -465,6 +481,156 @@
 					</div>
 				</div>
 			{% endif %}
+		</div>
+	</section>
+
+	<section class="content">
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title">Pointage d'heures par salarié</h3>
+				<div>
+					{{ form_start(formFiches) }}
+					<div class="d-flex justify-content-end">
+						<div class="col-12 col-sm-2">Date de Début :
+						</div>
+						{{ form_widget(formFiches.startDate) }}
+						<div class="col-12 col-sm-2">Date de Fin :
+						</div>
+						{{ form_widget(formFiches.endDate) }}
+						{{ form_widget(formFiches.filtrer) }}
+					</div>
+					{{ form_end(formFiches) }}
+				</div>
+			</div>
+			<div class="card-body">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">Pointage des salariés pour cette période</h3>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body">
+						<table id="example1" class="table table-bordered table-hover text-center">
+							<thead>
+								<tr>
+									<th>Salariés</th>
+									<th>Semaine</th>
+									<th>Date</th>
+									<th>Pension</th>
+									<th>Heures</th>
+								</tr>
+							</thead>
+							<tbody>
+								{# Initialise les tableaux vides pour chaque type d'heures #}
+								{% set deplacement_hours = [] %}
+								{% set depot_hours = [] %}
+								{% set travaux_hours = [] %}
+								{% for tabPointage in tabPointages %}
+									<tr>
+										<td>{{ tabPointage.intervenant.pseudo }}</td>
+										<td>{{ tabPointage.createdAt|date("W", "Europe/Paris") }}</td>
+										<td>{{ tabPointage.createdAt|date("d/m/Y", "Europe/Paris") }}</td>
+										<td>
+											{% for pension in tabPointage.pension %}
+												{{ pension }}
+												|
+											{% endfor %}
+										</td>
+										<td>
+											<ul>
+												{% for heure in tabPointage.heures %}
+													<li>
+														{{ heure.type }}
+														-
+														{{ heure.start|date("H:i", "Europe/Paris") }}
+														-
+														{{ heure.end|date("H:i", "Europe/Paris") }}
+														{% set difference = heure.end|date("U") - heure.start|date("U") %}
+														-
+														{% set hours = (difference // 3600) %}
+														{% set minutes = ((difference % 3600) // 60) %}
+														{{ hours }}
+														h
+														{{ minutes }}
+													</li>
+													{# Ajouter les heures et les minutes au tableau approprié #}
+													{% if heure.type == 'deplacement' %}
+														{% set deplacement_hours = deplacement_hours|merge([{'hours': hours, 'minutes': minutes}]) %}
+													{% elseif heure.type == 'Depot' %}
+														{% set depot_hours = depot_hours|merge([{'hours': hours, 'minutes': minutes}]) %}
+													{% elseif heure.type == 'Travaux' %}
+														{% set travaux_hours = travaux_hours|merge([{'hours': hours, 'minutes': minutes}]) %}
+													{% endif %}
+												{% endfor %}
+											</ul>
+										</td>
+									</tr>
+								{% endfor %}
+
+								{# Calculer les totaux pour chaque type d'heures #}
+								{% set total_deplacement_hours = 0 %}
+								{% set total_deplacement_minutes = 0 %}
+								{% set total_depot_hours = 0 %}
+								{% set total_depot_minutes = 0 %}
+								{% set total_travaux_hours = 0 %}
+								{% set total_travaux_minutes = 0 %}
+
+								{% for hour in deplacement_hours %}
+									{% set total_deplacement_hours = total_deplacement_hours + hour.hours %}
+									{% set total_deplacement_minutes = total_deplacement_minutes + hour.minutes %}
+								{% endfor %}
+
+								{% for hour in depot_hours %}
+									{% set total_depot_hours = total_depot_hours + hour.hours %}
+									{% set total_depot_minutes = total_depot_minutes + hour.minutes %}
+								{% endfor %}
+
+								{% for hour in travaux_hours %}
+									{% set total_travaux_hours = total_travaux_hours + hour.hours %}
+									{% set total_travaux_minutes = total_travaux_minutes + hour.minutes %}
+								{% endfor %}
+
+								{# Effectuer le report des minutes excédentaires dans les heures pour chaque type #}
+								{% set carry_deplacement_hours = total_deplacement_minutes // 60 %}
+								{% set total_deplacement_hours = total_deplacement_hours + carry_deplacement_hours %}
+								{% set total_deplacement_minutes = total_deplacement_minutes % 60 %}
+
+								{% set carry_depot_hours = total_depot_minutes // 60 %}
+								{% set total_depot_hours = total_depot_hours + carry_depot_hours %}
+								{% set total_depot_minutes = total_depot_minutes % 60 %}
+
+								{% set carry_travaux_hours = total_travaux_minutes // 60 %}
+								{% set total_travaux_hours = total_travaux_hours + carry_travaux_hours %}
+								{% set total_travaux_minutes = total_travaux_minutes % 60 %}
+
+								{# Afficher les totaux pour chaque type d'heures #}
+								<div class="row">
+									<div>
+										Total Déplacement pour cette période :
+										{{total_deplacement_hours}}
+										heures et
+										{{ total_deplacement_minutes }}
+										minutes
+									</div>
+									<div>
+										total dépôt pour cette période :
+										{{ total_depot_hours }}
+										heures et
+										{{ total_depot_minutes }}
+										minutes
+									</div>
+									<div>
+										total travaux pour cette période :
+										{{ total_travaux_hours }}
+										heures et
+										{{ total_travaux_minutes }}
+										minutes
+									</div>
+								</tbody>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
 		</div>
 	</section>
 {% endblock %}

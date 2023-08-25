@@ -181,7 +181,7 @@ class HolidayRepository extends ServiceEntityRepository
         INNER JOIN users u ON u.id = h.user_id
         INNER JOIN holidaytypes ht ON ht.id = h.holidayType_id
         INNER JOIN statusholiday sh ON sh.id = h.holidayStatus_id
-        WHERE h.start BETWEEN '$start' AND '$end' AND h.end BETWEEN '$start' AND '$end' AND h.holidayStatus_id = 3)reponse
+        WHERE ((DATE(h.start) BETWEEN '$start' AND '$end') OR (DATE(h.end) BETWEEN '$start' AND '$end')) AND h.holidayStatus_id = 3)reponse
         INNER JOIN users us ON us.id = treatmentedBy_id
         ";
         $stmt = $conn->prepare($sql);
@@ -233,7 +233,7 @@ class HolidayRepository extends ServiceEntityRepository
         END AS total
         FROM holiday
         INNER JOIN users ON users.id = holiday.user_id
-        WHERE holiday.start BETWEEN '$start' AND '$end' AND holiday.end BETWEEN '$start' AND '$end' AND holiday.holidayStatus_id = 3)reponse
+        WHERE ((DATE(holiday.start) BETWEEN '$start' AND '$end') OR (DATE(holiday.end) BETWEEN '$start' AND '$end')) AND holiday.holidayStatus_id = 3)reponse
         GROUP BY pseudo, email
         ";
         $stmt = $conn->prepare($sql);

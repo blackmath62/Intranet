@@ -16,6 +16,7 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
@@ -272,7 +273,7 @@ class HolidayController extends AbstractController
                     ->html($html);
 
                 $this->mailerInterface->send($email);
-                end:;
+                end: ;
             }
             if ($i > 1) {
                 $this->addFlash('message', 'Les congés ont bien été enregistrés');
@@ -282,12 +283,65 @@ class HolidayController extends AbstractController
         }
         $users = $this->repoUser->findAll();
         $listCountConges = '';
+        $formattedData = [];
         $formDates = $this->createForm(StatesDateFilterType::class);
         $formDates->handleRequest($request);
         if ($formDates->isSubmitted() && $formDates->isValid()) {
             $start = $formDates->getData()['startDate']->format('Y-m-d');
             $end = $formDates->getData()['endDate']->format('Y-m-d');
-            $listCountConges = $this->repoHoliday->getVacationTypeListByUsers($start, $end);
+
+            $listCountConges = $this->repoHoliday->getListeCongesDurantPeriode($start, $end);
+            // TODO Modifier la page fermeture pour qu'elle utilise le même procédé (ajouter des colonnes)
+
+            for ($d = 0; $d < count($listCountConges); $d++) {
+
+                $sd = $this->sliceTraduct($listCountConges[$d]['sliceStart']);
+                $se = $this->sliceTraduct($listCountConges[$d]['sliceEnd']);
+                $compter = $this->countDaysIntoThisPeriod($start, $listCountConges[$d]["startCp"], $sd, $end, $listCountConges[$d]['endCp'], $se);
+                // les dates du formulaire
+                $listCountConges[$d]['sliceStart'] = $sd;
+                $listCountConges[$d]['sliceEnd'] = $se;
+                $listCountConges[$d]['periodeStart'] = $start;
+                $listCountConges[$d]['periodeEnd'] = $end;
+                // le nombre de jours comptés
+                $listCountConges[$d]['NbeJoursPeriode'] = $compter;
+            }
+
+            // Types de congé
+            $typesDeConge = [
+                'Congés Payés',
+                'RTT',
+                'Sans Solde',
+                'Familiale',
+                'Maternité',
+                'Décès',
+                'Déménagement',
+                'Arrêt de travail',
+                'Arrêt Covid',
+                'Autre',
+            ];
+
+            // Initialisation des types de congé pour chaque nom
+            foreach ($listCountConges as $conge) {
+                $nom = $conge['nom'];
+
+                if (!isset($formattedData[$nom])) {
+                    $formattedData[$nom] = array_fill_keys($typesDeConge, 0);
+                    $formattedData[$nom]['total'] = 0; // Ajout de la colonne "Total"
+                }
+            }
+
+            // Remplissage des types de congé avec les valeurs réelles et calcul du total
+            foreach ($listCountConges as $conge) {
+                $nom = $conge['nom'];
+                $type = $conge['typeCp'];
+                $nbeJours = $conge['NbeJoursPeriode'];
+
+                if (isset($formattedData[$nom][$type])) {
+                    $formattedData[$nom][$type] += $nbeJours;
+                    $formattedData[$nom]['total'] += $nbeJours; // Calcul du total
+                }
+            }
         }
 
         return $this->render('holiday/closing.html.twig', [
@@ -295,7 +349,8 @@ class HolidayController extends AbstractController
             'users' => $users,
             'formDates' => $formDates->createView(),
             'formExportExcel' => $formExportExcel->createView(),
-            'listCountConges' => $listCountConges,
+            'listCountConges' => $formattedData,
+            'typesDeConge' => $typesDeConge,
         ]);
     }
 
@@ -677,6 +732,62 @@ class HolidayController extends AbstractController
         return $this->redirectToRoute('app_holiday_list');
     }
 
+    public function countDaysIntoThisPeriod($start, $startCp, $ss, $end, $endCp, $se)
+    {
+        $sStart = false;
+        $sEnd = false;
+
+        if ($ss == 'Journée' | $ss == 'Matin') {
+            $sStart = true;
+        }
+        if ($se == 'Journée' | $se == 'Aprés Midi') {
+            $sEnd = true;
+        }
+        $vacationDays = 0;
+        $holidays = [];
+        $jsonUrl = "https://etalab.github.io/jours-feries-france-data/json/metropole.json";
+        $ferierJson = file_get_contents($jsonUrl);
+        $ferierData = json_decode($ferierJson, true);
+        $holidays = array_keys($ferierData);
+
+        $vacationDays = $this->countVacationDays($start, $startCp, $sStart, $end, $endCp, $sEnd, $holidays);
+
+        return $vacationDays;
+    }
+
+    public function isWeekend($date)
+    {
+        return (date('N', strtotime($date)) >= 6); // 6 corresponds to Saturday, 7 to Sunday
+    }
+
+    public function countVacationDays($start, $startCp, $ss, $end, $endCp, $se, $holidays)
+    {
+        $start = (new DateTime($start))->format('Y-m-d');
+        $end = (new DateTime($end))->format('Y-m-d');
+        $startCp = (new DateTime($startCp))->format('Y-m-d');
+        $endCp = (new DateTime($endCp))->format('Y-m-d');
+        $currentDay = (new DateTime($startCp))->format('Y-m-d');
+        $vacationDays = 0;
+        while ($currentDay <= $endCp) {
+            if (!$this->isWeekend($currentDay) && !in_array($currentDay, $holidays)) {
+                if ($currentDay >= $start && $currentDay <= $end) {
+                    if (($currentDay == $startCp && $ss == false) | ($currentDay == $endCp && $se == false)) {
+                        if ($startCp == $endCp && $currentDay == $startCp) {
+                            $vacationDays = $vacationDays + 0.5;
+                        } elseif ($startCp != $endCp) {
+                            $vacationDays = $vacationDays + 0.5;
+                        }
+                    } else {
+                        $vacationDays = $vacationDays + 1;
+                    }
+                }
+            }
+            $currentDay = (new DateTime($currentDay))->modify('+1 day')->format('Y-m-d');
+        }
+
+        return $vacationDays;
+    }
+
     // Contrôle d'accés, Si on est pas le dépositaire ou le décideur pas accés
     public function holiday_access($holidayId)
     {
@@ -755,6 +866,19 @@ class HolidayController extends AbstractController
         $donnees = [];
 
         $donnees = $this->repoHoliday->getVacationTypeListByUsers($start, $end);
+        // Créer un nouveau tableau contenant des enregistrements uniques basés sur "nom" et "email"
+        $donnees = array_reduce($donnees, function ($carry, $item) {
+            $key = $item['pseudo'] . '_' . $item['email'];
+
+            if (!isset($carry[$key])) {
+                $carry[$key] = array(
+                    "pseudo" => $item['pseudo'],
+                    "email" => $item['email'],
+                );
+            }
+
+            return $carry;
+        }, []);
 
         for ($d = 0; $d < count($donnees); $d++) {
 
@@ -762,20 +886,21 @@ class HolidayController extends AbstractController
             $list[] = [
                 $donnee['pseudo'],
                 $donnee['email'],
-                $donnee['conges'],
-                $donnee['rtt'],
-                $donnee['sansSolde'],
-                $donnee['famille'],
-                $donnee['maternite'],
-                $donnee['deces'],
-                $donnee['demenagement'],
-                $donnee['arretTravail'],
-                $donnee['arretCovid'],
-                $donnee['autre'],
-                $donnee['total'],
             ];
         }
         return $list;
+    }
+
+    // Mise en forme des slices
+    public function sliceTraduct($slice)
+    {
+        if ($slice == 'DAY') {
+            return 'Journée';
+        } elseif ($slice == 'AM') {
+            return 'Matin';
+        } elseif ($slice == 'PM') {
+            return 'Aprés Midi';
+        }
     }
 
     // générer un fichier Excel qui sera envoyé par mail à l'utilisateur
@@ -785,24 +910,21 @@ class HolidayController extends AbstractController
         $donnees = [];
 
         $donnees = $this->repoHoliday->getListeCongesDurantPeriode($start, $end);
+        // TODO Modifier la page fermeture pour qu'elle utilise le même procédé (ajouter des colonnes)
 
         for ($d = 0; $d < count($donnees); $d++) {
 
             $donnee = $donnees[$d];
-            if ($donnee['sliceStart'] == 'DAY') {
-                $sd = 'Journée';
-            } elseif ($donnee['sliceStart'] == 'AM') {
-                $sd = 'Matin';
-            } elseif ($donnee['sliceStart'] == 'PM') {
-                $sd = 'Aprés Midi';
-            }
-            if ($donnee['sliceEnd'] == 'DAY') {
-                $se = 'Journée';
-            } elseif ($donnee['sliceEnd'] == 'AM') {
-                $se = 'Matin';
-            } elseif ($donnee['sliceEnd'] == 'PM') {
-                $se = 'Aprés Midi';
-            }
+            $sd = $this->sliceTraduct($donnee['sliceStart']);
+            $se = $this->sliceTraduct($donnee['sliceEnd']);
+
+            $compter = $this->countDaysIntoThisPeriod($start, $donnee["startCp"], $sd, $end, $donnee['endCp'], $se);
+            // les dates du formulaire
+            $donnee['periodeStart'] = $start;
+            $donnee['periodeEnd'] = $end;
+            // le nombre de jours comptés
+            $donnee['NbeJoursPeriode'] = $compter;
+
             $list[] = [
                 $donnee['nom'],
                 $donnee['startCp'],
@@ -815,7 +937,10 @@ class HolidayController extends AbstractController
                 $donnee['nbJours'],
                 $donnee['typeCp'],
                 $donnee['statut'],
-                $donnee['details'],
+                strip_tags($donnee['details']), // pour ne pas avoir les balises HTML
+                $donnee['periodeStart'],
+                $donnee['periodeEnd'],
+                $donnee['NbeJoursPeriode'],
             ];
         }
         return $list;
@@ -842,6 +967,9 @@ class HolidayController extends AbstractController
         $sheet->getCell('J5')->setValue('Type');
         $sheet->getCell('K5')->setValue('Statut');
         $sheet->getCell('L5')->setValue('Détails');
+        $sheet->getCell('M5')->setValue('Période début interrogée');
+        $sheet->getCell('N5')->setValue('Période fin interrogée');
+        $sheet->getCell('O5')->setValue('Nbe Jours période interrogée');
 
         // Increase row cursor after header write
         $sheet->fromArray($this->getDataListConges($start, $end), null, 'A6', true);
@@ -856,6 +984,7 @@ class HolidayController extends AbstractController
         $sheet->getCell('A1')->setValue($nomFichier);
         $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
         $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
+
         // Le style du tableau
         $styleArray = [
             'font' => [
@@ -876,7 +1005,7 @@ class HolidayController extends AbstractController
                 ],
             ],
         ];
-        $spreadsheet->getActiveSheet()->getStyle("A5:L{$dernLign}")->applyFromArray($styleArray);
+        $spreadsheet->getActiveSheet()->getStyle("A5:O{$dernLign}")->applyFromArray($styleArray);
 
         // Le style de l'entête
         $styleEntete = [
@@ -899,13 +1028,13 @@ class HolidayController extends AbstractController
             ],
         ];
 
-        $spreadsheet->getActiveSheet()->getStyle("A5:L5")->applyFromArray($styleEntete);
+        $spreadsheet->getActiveSheet()->getStyle("A5:O5")->applyFromArray($styleEntete);
 
-        $sheet->getStyle("A1:L{$dernLign}")
+        $sheet->getStyle("A5:O{$dernLign}")
             ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         // Espacement automatique sur toutes les colonnes sauf la A
-        $sheet->setAutoFilter("A5:L{$dernLign}");
-        $sheet->getColumnDimension('A')->setWidth(15, 'pt');
+        $sheet->setAutoFilter("A5:O{$dernLign}");
+        $sheet->getColumnDimension('A')->setWidth(90, 'pt');
         $sheet->getColumnDimension('B')->setAutoSize(true);
         $sheet->getColumnDimension('C')->setAutoSize(true);
         $sheet->getColumnDimension('D')->setAutoSize(true);
@@ -917,6 +1046,9 @@ class HolidayController extends AbstractController
         $sheet->getColumnDimension('J')->setAutoSize(true);
         $sheet->getColumnDimension('K')->setAutoSize(true);
         $sheet->getColumnDimension('L')->setAutoSize(true);
+        $sheet->getColumnDimension('M')->setAutoSize(true);
+        $sheet->getColumnDimension('N')->setAutoSize(true);
+        $sheet->getColumnDimension('O')->setAutoSize(true);
 
         // Create a new worksheet called "My Data"
         $myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'resume');
@@ -929,7 +1061,7 @@ class HolidayController extends AbstractController
         // Entête de colonne
         $sheetResume->getCell('A5')->setValue('Pseudo');
         $sheetResume->getCell('B5')->setValue('Email');
-        $sheetResume->getCell('C5')->setValue('Congés Payé');
+        $sheetResume->getCell('C5')->setValue('Congés Payés');
         $sheetResume->getCell('D5')->setValue('RTT');
         $sheetResume->getCell('E5')->setValue('Sans Solde');
         $sheetResume->getCell('F5')->setValue('Familiale');
@@ -941,8 +1073,36 @@ class HolidayController extends AbstractController
         $sheetResume->getCell('L5')->setValue('Autre');
         $sheetResume->getCell('M5')->setValue('Total');
 
-        $sheetResume->fromArray($this->getDataRecapConges($start, $end), null, 'A6', true);
-        $dernLignResume = count($this->getDataRecapConges($start, $end)) + 5;
+        // Extraire les valeurs uniques de la colonne spécifiée
+        $donnees = $this->repoHoliday->getVacationTypeListByUsers($start, $end);
+        $donnees = array_reduce($donnees, function ($carry, $item) {
+            $key = $item['pseudo'] . '_' . $item['email'];
+
+            if (!isset($carry[$key])) {
+                $carry[$key] = array(
+                    "pseudo" => $item['pseudo'],
+                    "email" => $item['email'],
+                );
+            }
+
+            return $carry;
+        }, []);
+        $sheetResume->fromArray($donnees, null, 'A6', true);
+        $dernLignResume = count($donnees) + 5;
+
+        for ($i = 6; $i <= $dernLignResume; $i++) {
+            $sheetResume->setCellValue("C" . $i, "=SUMIFS(detail!O:O,detail!J:J,C5,detail!A:A,A" . $i . ")"); // Congés Payés
+            $sheetResume->setCellValue("D" . $i, "=SUMIFS(detail!O:O,detail!J:J,D5,detail!A:A,A" . $i . ")"); // RTT
+            $sheetResume->setCellValue("E" . $i, "=SUMIFS(detail!O:O,detail!J:J,E5,detail!A:A,A" . $i . ")"); // Sans Solde
+            $sheetResume->setCellValue("F" . $i, "=SUMIFS(detail!O:O,detail!J:J,F5,detail!A:A,A" . $i . ")"); // Familiale
+            $sheetResume->setCellValue("G" . $i, "=SUMIFS(detail!O:O,detail!J:J,G5,detail!A:A,A" . $i . ")"); // Maternité
+            $sheetResume->setCellValue("H" . $i, "=SUMIFS(detail!O:O,detail!J:J,H5,detail!A:A,A" . $i . ")"); // Décés
+            $sheetResume->setCellValue("I" . $i, "=SUMIFS(detail!O:O,detail!J:J,I5,detail!A:A,A" . $i . ")"); // Déménagement
+            $sheetResume->setCellValue("J" . $i, "=SUMIFS(detail!O:O,detail!J:J,J5,detail!A:A,A" . $i . ")"); // Arrêt de travail
+            $sheetResume->setCellValue("K" . $i, "=SUMIFS(detail!O:O,detail!J:J,K5,detail!A:A,A" . $i . ")"); // Arrêt Covid
+            $sheetResume->setCellValue("L" . $i, "=SUMIFS(detail!O:O,detail!J:J,L5,detail!A:A,A" . $i . ")"); // Autre
+            $sheetResume->setCellValue("M" . $i, "=SUM(C" . $i . ":L" . $i . ")"); // Total
+        }
 
         $nomFichierResume = 'Résumé des congés du ' . $dd . ' au ' . $df . ' le ' . $dateTime;
 
@@ -998,7 +1158,7 @@ class HolidayController extends AbstractController
         $sheet->getStyle("A1:M{$dernLignResume}")
             ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-        $sheetResume->getColumnDimension('A')->setWidth(15, 'pt');
+        $sheetResume->getColumnDimension('A')->setWidth(90, 'pt');
         $sheetResume->getColumnDimension('B')->setAutoSize(true);
         $sheetResume->getColumnDimension('C')->setAutoSize(true);
         $sheetResume->getColumnDimension('D')->setAutoSize(true);
@@ -1011,6 +1171,9 @@ class HolidayController extends AbstractController
         $sheetResume->getColumnDimension('K')->setAutoSize(true);
         $sheetResume->getColumnDimension('L')->setAutoSize(true);
         $sheetResume->getColumnDimension('M')->setAutoSize(true);
+
+        $sheetResume->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
         $writer = new Xlsx($spreadsheet);
         // Create a Temporary file in the system

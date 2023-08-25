@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ActivitesMetierType extends AbstractType
+class ActivitesMetierRobyType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -30,16 +30,10 @@ class ActivitesMetierType extends AbstractType
             ])
             ->add('Metiers', ChoiceType::class, [
                 'choices' => [
-                    'EV' => "EV",
-                    'HP' => "HP",
-                    'ME' => "ME",
-                    'Tous' => "Tous",
+                    'RB' => "RB",
                 ],
                 'choice_attr' => [
-                    'EV' => ['class' => 'm-2'],
-                    'HP' => ['class' => 'm-2'],
-                    'ME' => ['class' => 'm-2'],
-                    'Tous' => ['class' => 'm-2'],
+                    'RB' => ['class' => 'm-2'],
                 ],
                 'expanded' => false,
                 'multiple' => false,

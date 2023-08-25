@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Fiche d'intervention montage Lhermitte Frères</title>
+	</head>
+	{% block content %}
+		<row class='text-center col-12'>
+			<columns>
+				<h1>Fiche d'intervention montage Lhermitte Frères</h1>
+			</columns>
+		</row>
+		<row>
+			<columns>
+				<p>Intervention du
+					{{ intervention.start|date("d/m/Y", "Europe/Paris") }}
+					au
+					{{ intervention.end|date("d/m/Y", "Europe/Paris") }}
+					en rapport avec l'affaire :
+					{{ intervention.code.code }}
+					-
+					{{ intervention.code.libelle }}
+				</p>
+				<p>Adresse :
+					{{ intervention.adresse }}
+				</p>
+			</columns>
+			<columns>
+				<p>Les salariés suivants ont déclarés ces heures de travaux (hors Déplacements) :
+				</p>
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Intervenant</th>
+							<th>Date</th>
+							<th>Heures</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							{% for interventions in intervention.interventionFicheMonteurs %}
+								<td>{{interventions.intervenant.pseudo}}</td>
+								<td>{{interventions.createdAt|date("d/m/Y", "Europe/Paris")}}</td>
+								<td>
+									<ul>
+										{% for heure in interventions.heures  %}
+											<li>{{heure.type }}
+												{{heure.start|date("H:i", "Europe/Paris") }}
+												{{heure.end|date("H:i", "Europe/Paris") }}
+												{% set diff = date(heure.start|date("H:i", "Europe/Paris")).diff(date(heure.end|date("H:i", "Europe/Paris"))) %}
+
+												{{ diff.h }}
+												H
+												{{ diff.i}}
+											</li>
+										{% endfor %}
+									</ul>
+								</td>
+							{% endfor %}
+						</tr>
+					</tbody>
+				</table>
+			</columns>
+		</row>
+		<row>
+			<columns>
+				<center>
+					<spacer size="20"></spacer>
+					<p>pour plus d'information contacter
+						<a href="mailto:adeschodt@lhermitte.fr">Alexandre Deschodt</a>
+					</p>
+					<spacer size="20"></spacer>
+				</center>
+			</columns>
+		</row>
+	{% endblock %}
+</html>

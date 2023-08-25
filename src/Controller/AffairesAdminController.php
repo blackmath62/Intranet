@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Main\MailList;
 use App\Form\AddEmailType;
+use App\Form\StatesDateFilterType;
 use App\Repository\Main\InterventionFicheMonteurRepository;
 use App\Repository\Main\InterventionMonteursRepository;
 use App\Repository\Main\MailListRepository;
@@ -58,6 +59,8 @@ class AffairesAdminController extends AbstractController
     public function index(Request $request): Response
     {
         $tracking = $request->attributes->get('_route');
+        $tabPointages = [];
+        $tabAffaires = [];
         unset($form);
         $form = $this->createForm(AddEmailType::class);
         $form->handleRequest($request);
@@ -82,6 +85,17 @@ class AffairesAdminController extends AbstractController
         $fichesDatesIncoherentes = $this->repoFiche->findFicheDatesIncohérentes();
         $fichesManquantes = $this->recupFichesManquantes();
 
+        $formFiches = $this->createForm(StatesDateFilterType::class);
+        $formFiches->handleRequest($request);
+        if ($formFiches->isSubmitted() && $formFiches->isValid()) {
+
+            $start = $formFiches->getData()['startDate']->format('Y-m-d');
+            $end = $formFiches->getData()['endDate']->format('Y-m-d');
+            $tabPointages = $this->repoFiche->findPointagePeriode($start, $end);
+            $tabAffaires = [];
+            //dd($tabPointages);
+
+        }
         return $this->render('affaires_admin/index.html.twig', [
             'form' => $form->createView(),
             'listeMails' => $this->repoMail->findBy(['page' => $tracking]),
@@ -91,6 +105,9 @@ class AffairesAdminController extends AbstractController
             'fichesSansHeures' => $fichesSansHeures,
             'fichesManquantes' => $fichesManquantes,
             'fichesDatesIncoherentes' => $fichesDatesIncoherentes,
+            'tabAffaire' => $tabAffaires,
+            'tabPointages' => $tabPointages,
+            'formFiches' => $formFiches->createView(),
         ]);
     }
 
@@ -195,10 +212,11 @@ class AffairesAdminController extends AbstractController
      */
     public function envoyerPourSignature(MailerInterface $mailer, Pdf $pdf)
     {
+        // récupérer les interventions qui sont n'ont pas été envoyé et qui ont été verouillé par l'intranet
         $interventions = $this->repoIntervention->findBy(['lockedBy' => $this->repoUsers->findOneBy(['id' => 3]), 'sendAt' => null]);
-        //dd($interventions[0]->getCode()->getCode());
 
         foreach ($interventions as $intervention) {
+            //dd($intervention);
             // construire un PDF pour la demande de signature
             $htmlPdf = $this->renderView('affaires_admin/pdf/pdfSignature.html.twig', ['intervention' => $intervention]);
             //dd($htmlPdf);

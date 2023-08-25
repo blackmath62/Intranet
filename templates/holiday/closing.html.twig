@@ -102,14 +102,9 @@
 
 	<div class="row">
 		<div class="col-md-12">
-			<div class="card card-dark collapsed-card">
+			<div class="card card-dark">
 				<div class="card-header">
 					<h3 class="card-title text-center">Nombres de jours de congés acceptés pour chaque salariés</h3>
-					<div class="card-tools">
-						<button type="button" class="btn btn-tool" data-card-widget="collapse">
-							<i class="fas fa-minus"></i>
-						</button>
-					</div>
 				</div>
 				<!-- /.card-header -->
 				<div class="card-body">
@@ -132,7 +127,6 @@
 							<thead>
 								<tr class='text-center'>
 									<th>Utilisateur</th>
-									<th>Mail</th>
 									<th>Congés Payés</th>
 									<th>RTT</th>
 									<th>Sans Solde</th>
@@ -147,29 +141,18 @@
 								</tr>
 							</thead>
 							<tbody>
-								{% for listCountConge in listCountConges %}
+								{% for nom, data in listCountConges %}
 									<tr class='text-center'>
-										<td>{{listCountConge.pseudo}}</td>
-										<td>
-											<a href='mailto:{{listCountConge.email}}'>{{listCountConge.email}}</a>
-										</td>
-										<td class="table-info">{{listCountConge.conges}}</td>
-										<td class="table-light">{{listCountConge.rtt}}</td>
-										<td class="table-info">{{listCountConge.sansSolde}}</td>
-										<td class="table-light">{{listCountConge.famille}}</td>
-										<td class="table-info">{{listCountConge.maternite}}</td>
-										<td class="table-light">{{listCountConge.deces}}</td>
-										<td class="table-info">{{listCountConge.demenagement}}</td>
-										<td class="table-light">{{listCountConge.arretTravail}}</td>
-										<td class="table-info">{{listCountConge.arretCovid}}</td>
-										<td class="table-light">{{listCountConge.autre}}</td>
-										<td class="table-primary">{{listCountConge.total}}</td>
+										<td>{{nom}}</td>
+										{% for type in typesDeConge %}
+											<td>{{ data[type] }}</td>
+										{% endfor %}
+										<td>{{ data['total'] }}</td>
 									</tr>
+
 								{% endfor %}
 							</tbody>
 						</table>
-
-
 					{% else %}
 						<h5 class="text-left text-dark">
 							<i class="fas fa-info-circle pr-2 text-info"></i>Pas de Congés Acceptés pour cette période !</h5>

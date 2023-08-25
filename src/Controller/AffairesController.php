@@ -739,14 +739,14 @@ class AffairesController extends AbstractController
             $this->addFlash('message', 'Commentaire déposé avec succès');
             return $this->redirectToRoute('app_affaire_edit_fiche_intervention', ['id' => $id, 'ficheId' => $fiche->getId()]);
         }
-        $fiches = $this->repoInterventionFicheMonteur->findAll();
+        //$fiches = $this->repoInterventionFicheMonteur->findAll();
         $fiche = $this->repoInterventionFicheMonteur->findOneBy(['id' => $ficheId]);
         $intervention = $this->repoIntervertionsMonteurs->findOneBy(['id' => $id]);
         $heures = $this->repoInterventionFichesMonteursHeures->findBy(['interventionFicheMonteur' => $ficheId]);
         return $this->render('affaires/saisieFicheIntervention.html.twig', [
             'title' => "Fiche d'intervention",
             'formFicheIntervention' => $formFicheIntervention->createView(),
-            'fiches' => $fiches,
+            //'fiches' => $fiches,
             'formHeureIntervention' => $formHeureIntervention->createView(),
             'formCommentaire' => $formCommentaire->createView(),
             'heures' => $heures,

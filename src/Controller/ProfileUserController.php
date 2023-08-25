@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Form\ProfileUserType;
+use App\Form\StatesDateFilter2Type;
 use App\Form\StatesDateFilterType;
 use App\Repository\Main\HolidayRepository;
+use App\Repository\Main\InterventionFicheMonteurRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -21,20 +23,21 @@ class ProfileUserController extends AbstractController
     /**
      * @Route("/profile/user", name="app_profile_user")
      */
-    public function index(Request $request, SluggerInterface $slugger, HolidayRepository $repoHoliday)
+    public function index(Request $request, SluggerInterface $slugger, HolidayRepository $repoHoliday, InterventionFicheMonteurRepository $repoInterventions)
     {
-        $user = $this->getUser();
-        $form = $this->createForm(ProfileUserType::class, $user);
-        $form->handleRequest($request);
-
         // tracking user page for stats
         // $tracking = $request->attributes->get('_route');
         // $this->setTracking($tracking);
+        $interventions = '';
+        $user = $this->getUser();
+        $form = $this->createForm(ProfileUserType::class, $user);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // On récupére le fichier dans le formulaire
             $userImg = $form->getData();
             $file = $form->get('img')->getData();
+            //dd($file);
 
             if ($file) {
                 $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -85,7 +88,14 @@ class ProfileUserController extends AbstractController
             $detailsRefuses = $repoHoliday->getListCongesRefused($this->getUser()->getid(), $start, $end);
             $detailsAcceptes = $repoHoliday->getListCongesAccepted($this->getUser()->getid(), $start, $end);
         }
-
+        $formFiches = $this->createForm(StatesDateFilter2Type::class);
+        $formFiches->handleRequest($request);
+        if ($formFiches->isSubmitted() && $formFiches->isValid()) {
+            $start = $formFiches->getData()['startDate']->format('Y-m-d');
+            $end = $formFiches->getData()['endDate']->format('Y-m-d');
+            $interventions = $repoInterventions->findFichePeriode($this->getUser()->getId(), $start, $end);
+        }
+        //dd($interventions);
         return $this->render('profile_user/index.html.twig', [
             'controller_name' => 'ProfileUserController',
             'title' => 'gestion de compte',
@@ -97,7 +107,9 @@ class ProfileUserController extends AbstractController
             'detailsAttentes' => $detailsAttentes,
             'detailsRefuses' => $detailsRefuses,
             'detailsAcceptes' => $detailsAcceptes,
+            'formFiches' => $formFiches->createView(),
             'formDates' => $formDates->createView(),
+            'interventions' => $interventions,
         ]);
     }
 

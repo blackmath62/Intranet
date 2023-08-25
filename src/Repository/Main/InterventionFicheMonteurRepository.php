@@ -101,6 +101,36 @@ class InterventionFicheMonteurRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findFichePeriode($user, $start, $end)
+    {
+        return $this->createQueryBuilder('i')
+            ->where('f.intervenant = :user')
+            ->andWhere('f.validedBy is not null')
+            ->andWhere('f.createdAt between :start and :end')
+            ->setParameter('user', $user)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('f.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findPointagePeriode($start, $end)
+    {
+        return $this->createQueryBuilder('f')
+            ->innerJoin('f.intervention', 'i')
+            ->Where('i.createdAt between :start and :end')
+            ->andWhere('f.validedBy is not null')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('i.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+
+    }
+
     /*$queryBuilder->select('rm')
     ->from('App:Room', 'rm')
     ->leftJoin('rm.reservations', 'r', 'WITH', $queryBuilder->expr()->andX(

@@ -128,7 +128,7 @@ class MaillingController extends AbstractController
                 if (!!!empty($value['mail'])) {
                     try {
                         $email = (new Email())
-                            ->from('information@lhermitte.fr')
+                            ->from('jpochet@groupe-axis.fr')
                             //->to('jpochet@groupe-axis.fr')
                             ->to($value['mail'])
                             ->priority(Email::PRIORITY_HIGH)

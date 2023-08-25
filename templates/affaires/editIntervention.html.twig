@@ -34,6 +34,9 @@
 						{{ form_label(InterventionsMonteursForm.adresse) }}
 						{{ form_widget(InterventionsMonteursForm.adresse) }}
 						{{ form_errors(InterventionsMonteursForm.adresse) }}
+						{{ form_label(InterventionsMonteursForm.files) }}
+						{{ form_widget(InterventionsMonteursForm.files) }}
+						{{ form_errors(InterventionsMonteursForm.files) }}
 					</div>
 
 					<div class="col-12 col-sm-6">
@@ -49,6 +52,11 @@
 						{{ form_label(InterventionsMonteursForm.end) }}
 						{{ form_widget(InterventionsMonteursForm.end) }}
 						{{ form_errors(InterventionsMonteursForm.end) }}
+					</div>
+					<div class="col-12">
+						{{ form_label(InterventionsMonteursForm.comment) }}
+						{{ form_widget(InterventionsMonteursForm.comment) }}
+						{{ form_errors(InterventionsMonteursForm.comment) }}
 					</div>
 				</div>
 				{{ form_widget(InterventionsMonteursForm.ajouter , {'label': "Modifier l'intervention" }) }}

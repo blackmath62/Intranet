@@ -518,6 +518,7 @@
 			<table class="table table-bordered table-hover">
 				<thead>
 					<tr>
+						<th>Id (nbe Art.)</th>
 						<th>Adresse du Chantier</th>
 						<th>Type Piéce</th>
 						<th>Piece</th>
@@ -534,6 +535,10 @@
 								{% set rowColor = 'table-success' %}
 							{% endif %}
 							<tr id="{{piecesAffaire.piece}}" data-widget="expandable-table" aria-expanded="false" class="{{rowColor}}">
+								<td>{{ piecesAffaire.entId }}
+									(
+									{{piecesAffaire.produits|length}}
+									)</td>
 								<td>
 									<i class="fas fa-caret-right fa-fw"></i>
 									{{ piecesAffaire.adresse}}
@@ -629,7 +634,7 @@
 							</tr>
 							{% if piecesAffaire.produits %}
 								<tr class="expandable-body m-0">
-									<td colspan="6">
+									<td colspan="7">
 										<table class="table table-bordered table-striped">
 											<thead>
 												<tr>

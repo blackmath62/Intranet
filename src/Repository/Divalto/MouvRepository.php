@@ -836,7 +836,7 @@ class MouvRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
     // activité métier par produits
-    public function getActivitesMetier($dd, $df, $metier): array
+    public function getActivitesMetier($dos, $dd, $df, $metier): array
     {
         $code = '';
         if ($metier == 'EV') {
@@ -847,6 +847,8 @@ class MouvRepository extends ServiceEntityRepository
             $code = "AND a.FAM_0002 IN ('ME', 'MO')";
         } elseif ($metier == 'Tous') {
             $code = "AND a.FAM_0002 IN ('EV', 'HP', 'ME', 'MO')";
+        } elseif ($metier == 'RB') {
+            $code = "";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -864,7 +866,7 @@ class MouvRepository extends ServiceEntityRepository
             FROM MOUV m
             INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
             INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-            WHERE m.DOS = 1 AND m.FADT BETWEEN '$dd' AND '$df'
+            WHERE m.DOS = $dos AND m.FADT BETWEEN '$dd' AND '$df'
             $code
             AND m.TICOD = 'C' AND m.PICOD = 4
             AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP'))reponse
@@ -877,7 +879,7 @@ class MouvRepository extends ServiceEntityRepository
     }
 
     // activité métier par clients
-    public function getActivitesMetierClient($dd, $df, $metier): array
+    public function getActivitesMetierClient($dos, $dd, $df, $metier, $type): array
     {
         $code = '';
         if ($metier == 'EV') {
@@ -888,6 +890,16 @@ class MouvRepository extends ServiceEntityRepository
             $code = "AND a.FAM_0002 IN ('ME', 'MO')";
         } elseif ($metier == 'Tous') {
             $code = "AND a.FAM_0002 IN ('EV', 'HP', 'ME', 'MO')";
+        } elseif ($metier == 'RB') {
+            $code = "";
+        }
+
+        if ($type == 'CLI') {
+            $op = "'C' , 'CD'";
+            $nop = "'D' , 'DD'";
+        } elseif ($type == 'FOU') {
+            $op = "'F' , 'FD'";
+            $nop = "'G' , 'GD'";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -895,29 +907,30 @@ class MouvRepository extends ServiceEntityRepository
         FROM(
         SELECT RTRIM(LTRIM(c.STAT_0001)) AS famille, c.TIERS AS tiers, c.NOM AS nom,
         CASE
-        WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
-        WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        WHEN m.OP IN ($op) THEN m.MONT - m.REMPIEMT_0004
+        WHEN m.OP IN ($nop) THEN (-1 * m.MONT) + m.REMPIEMT_0004
         END AS montant,
         CASE
-        WHEN m.OP IN ('C','CD') THEN m.FAQTE
-        WHEN m.OP IN ('D','DD') THEN (-1 * m.FAQTE)
+        WHEN m.OP IN ($op) THEN m.FAQTE
+        WHEN m.OP IN ($nop) THEN (-1 * m.FAQTE)
         END AS qte
         FROM MOUV m
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        INNER JOIN $type c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
         INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        WHERE m.DOS = 1 AND m.FADT BETWEEN '$dd' AND '$df'
+        WHERE m.DOS = $dos AND m.FADT BETWEEN '$dd' AND '$df'
         $code
-        AND m.TICOD = 'C' AND m.PICOD = 4
+        AND m.TICOD = '$type[0]' AND m.PICOD = 4
         AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP'))reponse
         GROUP BY famille, tiers, nom
         ORDER BY montantSign DESC
         ";
+        //dd($sql);
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
 
-    public function getTotalActivitesMetier($dd, $df, $metier)
+    public function getTotalActivitesMetier($dos, $dd, $df, $metier, $type)
     {
         $code = '';
         if ($metier == 'EV') {
@@ -928,6 +941,15 @@ class MouvRepository extends ServiceEntityRepository
             $code = "AND a.FAM_0002 IN ('ME', 'MO')";
         } elseif ($metier == 'Tous') {
             $code = "AND a.FAM_0002 IN ('EV', 'HP', 'ME', 'MO')";
+        } elseif ($metier == 'RB') {
+            $code = "";
+        }
+        if ($type == 'CLI') {
+            $op = "'C' , 'CD'";
+            $nop = "'D' , 'DD'";
+        } elseif ($type == 'FOU') {
+            $op = "'F' , 'FD'";
+            $nop = "'G' , 'GD'";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -936,28 +958,29 @@ class MouvRepository extends ServiceEntityRepository
             FROM(
             SELECT a.FAM_0001 AS famille, m.REF AS ref, m.DES AS des,
                 CASE
-                    WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
-                    WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+                    WHEN m.OP IN ($op) THEN m.MONT - m.REMPIEMT_0004
+                    WHEN m.OP IN ($nop) THEN (-1 * m.MONT) + m.REMPIEMT_0004
                 END AS montant,
                 CASE
-                    WHEN m.OP IN ('C','CD') THEN m.FAQTE
-                    WHEN m.OP IN ('D','DD') THEN (-1 * m.FAQTE)
+                    WHEN m.OP IN ($op) THEN m.FAQTE
+                    WHEN m.OP IN ($nop) THEN (-1 * m.FAQTE)
                 END AS qte
             FROM MOUV m
-            INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+            INNER JOIN $type c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
             INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-            WHERE m.DOS = 1 AND m.FADT BETWEEN '$dd' AND '$df'
+            WHERE m.DOS = $dos AND m.FADT BETWEEN '$dd' AND '$df'
             $code
-            AND m.TICOD = 'C' AND m.PICOD = 4
+            AND m.TICOD = '$type[0]' AND m.PICOD = 4
             AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP'))reponse
             GROUP BY famille, ref, des)rep
         ";
+        //dd($sql);
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchOne();
     }
 
-    public function getActivitesFamilleProduit($dd, $df, $metier): array
+    public function getActivitesFamilleProduit($dos, $dd, $df, $metier): array
     {
         $code = '';
         if ($metier == 'EV') {
@@ -968,6 +991,8 @@ class MouvRepository extends ServiceEntityRepository
             $code = "AND a.FAM_0002 IN ('ME', 'MO')";
         } elseif ($metier == 'Tous') {
             $code = "AND a.FAM_0002 IN ('EV', 'HP', 'ME', 'MO')";
+        } elseif ($metier == 'RB') {
+            $code = "";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -985,7 +1010,7 @@ class MouvRepository extends ServiceEntityRepository
             FROM MOUV m
             INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
             INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-            WHERE m.DOS = 1 AND m.FADT BETWEEN '$dd' AND '$df'
+            WHERE m.DOS = $dos AND m.FADT BETWEEN '$dd' AND '$df'
             $code
             AND m.TICOD = 'C' AND m.PICOD = 4
             AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP'))reponse
@@ -997,7 +1022,7 @@ class MouvRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
-    public function getActivitesFamilleClient($dd, $df, $metier): array
+    public function getActivitesFamilleClient($dos, $dd, $df, $metier): array
     {
         $code = '';
         if ($metier == 'EV') {
@@ -1008,6 +1033,8 @@ class MouvRepository extends ServiceEntityRepository
             $code = "AND a.FAM_0002 IN ('ME', 'MO')";
         } elseif ($metier == 'Tous') {
             $code = "AND a.FAM_0002 IN ('EV', 'HP', 'ME', 'MO')";
+        } elseif ($metier == 'RB') {
+            $code = "";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -1025,7 +1052,7 @@ class MouvRepository extends ServiceEntityRepository
             FROM MOUV m
             INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
             INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-            WHERE m.DOS = 1 AND m.FADT BETWEEN '$dd' AND '$df'
+            WHERE m.DOS = $dos AND m.FADT BETWEEN '$dd' AND '$df'
             $code
             AND m.TICOD = 'C' AND m.PICOD = 4
             AND a.REF NOT IN('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP'))reponse

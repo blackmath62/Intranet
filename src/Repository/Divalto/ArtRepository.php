@@ -344,9 +344,9 @@ class ArtRepository extends ServiceEntityRepository
     public function getEanStock($dos, $ean)
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT ref AS ref, sref1 AS sref1, sref2 AS sref2, designation AS designation, uv AS uv, stock AS stock, ean AS ean, ferme AS ferme
+        $sql = "SELECT ref AS ref, sref1 AS sref1, sref2 AS sref2, designation AS designation, uv AS uv, ean AS ean, ferme AS ferme, SUM(stock) AS stock
         FROM(
-        SELECT LTRIM(RTRIM(a.REF)) AS ref, LTRIM(RTRIM(s.SREF1)) AS sref1, LTRIM(RTRIM(s.SREF2)) AS sref2, LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(a.VENUN)) AS uv, LTRIM(RTRIM(m.QTETJSENSTOCK)) AS stock,
+        SELECT LTRIM(RTRIM(a.REF)) AS ref, LTRIM(RTRIM(s.SREF1)) AS sref1, LTRIM(RTRIM(s.SREF2)) AS sref2, LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(a.VENUN)) AS uv, m.QTETJSENSTOCK AS stock,
         CASE
         WHEN a.SREFCOD = 1 THEN LTRIM(RTRIM(a.EAN))
         WHEN a.SREFCOD = 2 THEN LTRIM(RTRIM(s.EAN)) --, a.HSDT AS ferme, s.EAN AS sean, s.USERMODH AS fermeSref
@@ -358,8 +358,9 @@ class ArtRepository extends ServiceEntityRepository
         FROM ART a
         LEFT JOIN SART s ON a.DOS = s.DOS AND a.REF = s.REF
         LEFT JOIN MVTL_STOCK_V m ON a.REF = m.REFERENCE AND s.SREF1 = m.SREFERENCE1 AND s.SREF2 = m.SREFERENCE2
-        WHERE a.DOS = $dos)reponse
+        WHERE a.DOS = $dos AND m.NATURESTOCK IN ('N','O'))reponse
         WHERE ean = '$ean'
+		GROUP BY ref, sref1, sref2, designation, uv, ean, ferme
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
