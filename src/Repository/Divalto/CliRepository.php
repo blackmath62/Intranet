@@ -77,12 +77,24 @@ class CliRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // Récupérer toutes les adresses de tous les clients ouverts
     public function getClient(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT RTRIM(LTRIM(c.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,RTRIM(LTRIM(c.RUE)) AS rue, RTRIM(LTRIM(c.CPOSTAL)) AS cp, RTRIM(LTRIM(c.VIL)) AS ville
+        $sql = "SELECT *
+        FROM(
+        SELECT RTRIM(LTRIM(c.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,RTRIM(LTRIM(c.RUE)) AS rue,
+        RTRIM(LTRIM(c.CPOSTAL)) AS cp, RTRIM(LTRIM(c.VIL)) AS ville
         FROM CLI c
         WHERE c.DOS = 1 AND c.HSDT IS NULL
+        UNION
+        SELECT RTRIM(LTRIM(c.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,RTRIM(LTRIM(a.RUE)) AS rue,
+        RTRIM(LTRIM(a.CPOSTAL)) AS cp, RTRIM(LTRIM(a.VIL)) AS ville
+        FROM T1 a
+        INNER JOIN CLI c ON c.TIERS = a.TIERS AND c.DOS = a.DOS
+        WHERE a.DOS = 1 AND c.HSDT IS NULL AND (a.RUE <> '' OR (a.CPOSTAL <> '' AND a.VIL <> ''))
+        )reponse
+        ORDER BY nom
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

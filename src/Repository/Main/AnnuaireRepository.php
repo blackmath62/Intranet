@@ -39,6 +39,22 @@ class AnnuaireRepository extends ServiceEntityRepository
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
+    public function getAnnuaire()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = " SELECT CONCAT('U' ,u.id) AS id, u.societe_id AS societe, u.interne AS interne, u.pseudo AS nom, u.exterieur AS exterieur, u.email AS mail, u.fonction AS fonction, u.portable AS portable, s.nom AS societe
+        FROM users u
+        INNER JOIN societe s ON u.societe_id = s.id
+        WHERE u.closedAt IS NULL
+        UNION
+        SELECT a.id AS id, a.societe_id AS societe, a.interne AS interne, a.nom AS nom, a.exterieur AS exterieur, a.mail AS mail, a.fonction AS fonction, a.portable AS portable, s.nom AS societe
+        FROM annuaire a
+        INNER JOIN societe s ON a.societe_id = s.id
+         ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
 
     /*
     public function findByNom(int $value):array

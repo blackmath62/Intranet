@@ -103,7 +103,7 @@ class InterventionFicheMonteurRepository extends ServiceEntityRepository
 
     public function findFichePeriode($user, $start, $end)
     {
-        return $this->createQueryBuilder('i')
+        return $this->createQueryBuilder('f')
             ->where('f.intervenant = :user')
             ->andWhere('f.validedBy is not null')
             ->andWhere('f.createdAt between :start and :end')

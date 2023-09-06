@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-  		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		{% block stylesheets %}
 			<!-- Font Awesome -->
@@ -30,55 +30,49 @@
 			<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 		{% endblock %}
 	</head>
-	<body class="hold-transition login-page">
-	{# read and display all flash messages #}          
+	<body
+		class="hold-transition login-page">
+		{# read and display all flash messages #}
 		{% for message in app.flashes('message') %}
-					<div class="alert alert-success" role="alert" id="alert">
-						{{ message }}
-						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-				{% endfor %}
-				{% for message in app.flashes('info') %}
-					<div class="card alert alert-info alert-dismissible fade show text-right" role="alert" id="alert">
-						{{ message }}
-						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-				{% endfor %}
-				{% for message in app.flashes('danger') %}
-					<div class="alert alert-danger" role="alert" id="alert">
-						{{ message }}
-						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-				{% endfor %}
-				{% for message in app.flashes('warning') %}
-					<div class="alert alert-warning text-align-right" role="alert" id="alert">
-						{{ message }}
-						<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-				{% endfor %}
-	
-		<div class="login-box">
-			<div class="login-logo">
-				<a>
-					<b>Intranet</b>
-					Axis
-				</a>
+			<div class="alert alert-success" role="alert" id="alert">
+				{{ message }}
+				<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
 			</div>
-			{% block body %}{% endblock %}
-		</div>
-<!-- jQuery -->
-<script src="{{ asset("plugins/jquery/jquery.min.js") }}"></script>
-<!-- Bootstrap 4 -->
-<script src="{{ asset("plugins/bootstrap/js/bootstrap.bundle.min.js")}}"></script>
-<!-- AdminLTE App -->
-<script src="{{ asset("dist/js/adminlte.min.js")}}"></script>	
-	</body>
-</html>
+		{% endfor %}
+		{% for message in app.flashes('info') %}
+			<div class="card alert alert-info alert-dismissible fade show text-right" role="alert" id="alert">
+				{{ message }}
+				<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		{% endfor %}
+		{% for message in app.flashes('danger') %}
+			<div class="alert alert-danger" role="alert" id="alert">
+				{{ message }}
+				<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		{% endfor %}
+		{% for message in app.flashes('warning') %}
+			<div class="alert alert-warning text-align-right" role="alert" id="alert">
+				{{ message }}
+				<button type="button" class="close ml-5" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		{% endfor %}
+
+		<div class="login-box"> {% block body %}{% endblock %}
+			</div>
+			<!-- jQuery -->
+			<script src="{{ asset("plugins/jquery/jquery.min.js") }}"></script>
+			<!-- Bootstrap 4 -->
+			<script src="{{ asset("plugins/bootstrap/js/bootstrap.bundle.min.js")}}"></script>
+			<!-- AdminLTE App -->
+			<script src="{{ asset("dist/js/adminlte.min.js")}}"></script>
+		</body>
+	</html>

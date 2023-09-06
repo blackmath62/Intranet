@@ -703,5 +703,43 @@
 			</table>
 		</div>
 	</div>
+	{% if retraits %}
+		<div class="card">
+			<div class="card-header">
+				<h2 class="card-title">Liste des retraits de Marchandise pour cette affaire</h2>
+			</div>
+			<!-- /.card-header -->
+			<div class="card-body">
+				<table id="example13" class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th>Désignation</th>
+							<th class="text-center">Qte</th>
+							<th>Ref</th>
+							<th>Sref1</th>
+							<th>Sref2</th>
+							<th>U.V</th>
+							<th class="text-center">Retiré par</th>
+							<th class="text-center">Retiré le</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for retrait in retraits %}
+							<tr>
+								<td>{{ retrait.designation}}</td>
+								<td class="text-center">{{ retrait.qte}}</td>
+								<td>{{ retrait.ref}}</td>
+								<td>{{ retrait.sref1 }}</td>
+								<td>{{ retrait.sref2 }}</td>
+								<td class="text-center">{{ retrait.uv}}</td>
+								<td class="text-center">{{ retrait.createdBy.pseudo}}</td>
+								<td class="text-center">{{ retrait.createdAt|date("d-m-Y H:i") }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{% endif %}
 
 {% endblock %}

@@ -48,7 +48,7 @@ class MovBillFscRepository extends ServiceEntityRepository
             FROM movbillfsc
             LEFT JOIN movbillfsc_fsclistmovement ON movbillfsc.id = movbillfsc_fsclistmovement.movbillfsc_id
             GROUP BY movbillfsc.id)reponse
-            WHERE liaison = 0 AND DATE_FORMAT(dateFact, '%Y' '-' '%m' '-' '%d') > DATE_FORMAT(DATE_ADD(now(), INTERVAL - 5 YEAR), '%Y' '-' '%m' '-' '%d')
+            WHERE liaison = 0 AND DATE_FORMAT(dateFact, '%Y' '-' '%m' '-' '%d') > DATE_FORMAT(DATE_ADD(now(), INTERVAL - 5 YEAR), '%Y' '-' '%m' '-' '%d') AND movbillfsc.anomalie = false
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

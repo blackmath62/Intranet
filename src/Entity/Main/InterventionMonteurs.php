@@ -95,6 +95,8 @@ class InterventionMonteurs
      */
     private $sendAt;
 
+    private $champTemporaire;
+
     public function __construct()
     {
         $this->Equipes = new ArrayCollection();
@@ -103,17 +105,17 @@ class InterventionMonteurs
         $this->interventionFicheMonteurs = new ArrayCollection();
     }
 
-    public function getId():  ? int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUserCr() :  ? Users
+    public function getUserCr(): ?Users
     {
         return $this->UserCr;
     }
 
-    public function setUserCr( ? Users $UserCr) : self
+    public function setUserCr(?Users $UserCr): self
     {
         $this->UserCr = $UserCr;
 
@@ -123,7 +125,7 @@ class InterventionMonteurs
     /**
      * @return Collection<int, Users>
      */
-    public function getEquipes() : Collection
+    public function getEquipes(): Collection
     {
         return $this->Equipes;
     }
@@ -144,7 +146,7 @@ class InterventionMonteurs
         return $this;
     }
 
-    public function getStart():  ? \DateTimeInterface
+    public function getStart(): ?\DateTimeInterface
     {
         return $this->start;
     }
@@ -156,7 +158,7 @@ class InterventionMonteurs
         return $this;
     }
 
-    public function getEnd():  ? \DateTimeInterface
+    public function getEnd(): ?\DateTimeInterface
     {
         return $this->end;
     }
@@ -168,48 +170,48 @@ class InterventionMonteurs
         return $this;
     }
 
-    public function getAdresse():  ? string
+    public function getAdresse(): ?string
     {
         return $this->adresse;
     }
 
-    public function setAdresse( ? string $adresse) : self
+    public function setAdresse(?string $adresse): self
     {
         $this->adresse = $adresse;
 
         return $this;
     }
 
-    public function getBackgroundColor() :  ? string
+    public function getBackgroundColor(): ?string
     {
         return $this->backgroundColor;
     }
 
-    public function setBackgroundColor( ? string $backgroundColor) : self
+    public function setBackgroundColor(?string $backgroundColor): self
     {
         $this->backgroundColor = $backgroundColor;
 
         return $this;
     }
 
-    public function getTextColor() :  ? string
+    public function getTextColor(): ?string
     {
         return $this->textColor;
     }
 
-    public function setTextColor( ? string $textColor) : self
+    public function setTextColor(?string $textColor): self
     {
         $this->textColor = $textColor;
 
         return $this;
     }
 
-    public function getCreatedAt() :  ? \DateTimeInterface
+    public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt( ? \DateTimeInterface $createdAt) : self
+    public function setCreatedAt(?\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -329,7 +331,7 @@ class InterventionMonteurs
         return $this->lockedAt;
     }
 
-    public function setLockedAt(?\DateTimeInterface $lockedAt): self
+    public function setLockedAt(?\DateTimeInterface $lockedAt) : self
     {
         $this->lockedAt = $lockedAt;
 
@@ -341,10 +343,20 @@ class InterventionMonteurs
         return $this->sendAt;
     }
 
-    public function setSendAt(?\DateTimeInterface $sendAt): self
+    public function setSendAt(?\DateTimeInterface $sendAt) : self
     {
         $this->sendAt = $sendAt;
 
         return $this;
+    }
+
+    public function getChampTemporaire()
+    {
+        return $this->champTemporaire;
+    }
+
+    public function setChampTemporaire($champTemporaire)
+    {
+        $this->champTemporaire = $champTemporaire;
     }
 }

@@ -233,13 +233,13 @@ class ArtRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT l.REF AS ref, l.SREF1 AS sref1, l.SREF2 AS sref2, a.DES AS designation, a.VENUN AS uv, l.EDCOD_0001 AS code,
-        a.TIERS AS fournisseur,SUM(s.QTETJSENSTOCK) AS stock, l.NOTE_0001 AS note, n.NOTEBLOB AS blob
+        a.TIERS AS fournisseur, a.FAM_0001 AS famille, a.POIB AS poib, a.POIN AS poin,SUM(s.QTETJSENSTOCK) AS stock, l.NOTE_0001 AS note, n.NOTEBLOB AS blob
         FROM LART l
         INNER JOIN ART a ON a.REF = l.REF AND a.DOS = l.DOS
         INNER JOIN MNOTE n ON n.NOTE = l.NOTE_0001
         LEFT JOIN MVTL_STOCK_V s ON a.REF = s.REFERENCE AND l.SREF1 = s.SREFERENCE1 AND l.SREF2 = s.SREFERENCE2
         WHERE l.EDCOD_0001 <> '' AND l.DOS = 1 AND a.HSDT IS NULL
-        GROUP BY l.REF, l.SREF1, l.SREF2, a.DES, a.VENUN, l.EDCOD_0001, a.TIERS, l.NOTE_0001, n.NOTEBLOB
+        GROUP BY l.REF, l.SREF1, l.SREF2, a.DES, a.VENUN,a.FAM_0001, a.POIB, a.POIN, l.EDCOD_0001, a.TIERS, l.NOTE_0001, n.NOTEBLOB
         ORDER BY a.TIERS
         ";
         $stmt = $conn->prepare($sql);
@@ -357,8 +357,8 @@ class ArtRepository extends ServiceEntityRepository
         END AS ferme
         FROM ART a
         LEFT JOIN SART s ON a.DOS = s.DOS AND a.REF = s.REF
-        LEFT JOIN MVTL_STOCK_V m ON a.REF = m.REFERENCE AND s.SREF1 = m.SREFERENCE1 AND s.SREF2 = m.SREFERENCE2
-        WHERE a.DOS = $dos AND m.NATURESTOCK IN ('N','O'))reponse
+        LEFT JOIN MVTL_STOCK_V m ON a.REF = m.REFERENCE AND s.SREF1 = m.SREFERENCE1 AND s.SREF2 = m.SREFERENCE2 AND m.NATURESTOCK IN ('N','O')
+        WHERE a.DOS = $dos)reponse
         WHERE ean = '$ean'
 		GROUP BY ref, sref1, sref2, designation, uv, ean, ferme
         ";

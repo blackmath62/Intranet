@@ -32,6 +32,7 @@
 						<table id="example1" class="table table-striped">
 							<thead>
 								<tr>
+									<th class='text-center'>Famille</th>
 									<th class='text-center'>Référence</th>
 									<th class='text-center'>Sref1</th>
 									<th class='text-center'>Sref2</th>
@@ -39,12 +40,14 @@
 									<th class='text-center'>Uv</th>
 									<th class='text-center'>Fournisseur</th>
 									<th class='text-center'>Stock</th>
+									<th class='text-center'>Poids/Uv</th>
 									<th class='text-center'>UN</th>
 								</tr>
 							</thead>
 							<tbody>
 								{% for article in articles %}
 									<tr>
+										<td class='text-center'>{{ article.famille }}</td>
 										<td class='text-center'>{{ article.ref }}</td>
 										<td class='text-center'>{{ article.sref1 }}</td>
 										<td class='text-center'>{{ article.sref2 }}</td>
@@ -52,6 +55,7 @@
 										<td class='text-center'>{{ article.uv }}</td>
 										<td class='text-center'>{{ article.fournisseur }}</td>
 										<td class='text-center'>{{ article.stock }}</td>
+										<td class='text-center'>{{ article.poin }}</td>
 										<td class='text-center'>{{ article.blob|raw }}</td>
 									</tr>
 								{% endfor %}

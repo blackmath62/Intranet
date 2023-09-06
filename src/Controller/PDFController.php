@@ -84,6 +84,7 @@ class PdfController extends AbstractController
         //echo $bobj->getHtmlDiv();
 
         $produit = $repo->getEanStock($dos, $ean);
+        //dd($produit);
         $htmlPdf = $this->renderView('pdf/pdfEtiquette.html.twig', ['produit' => $produit, 'ean' => $bobj->getHtmlDiv()]);
         $pdf->setOption('page-height', '40mm');
         $pdf->setOption('page-width', '90mm');

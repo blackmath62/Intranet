@@ -18,6 +18,7 @@ use App\Form\InterventionFichesMonteursHeuresType;
 use App\Form\InterventionFicheType;
 use App\Form\InterventionsMonteursType;
 use App\Form\OthersDocumentsMultipleType;
+use App\Repository\Divalto\ArtRepository;
 use App\Repository\Divalto\CliRepository;
 use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\AffairePieceRepository;
@@ -28,7 +29,9 @@ use App\Repository\Main\InterventionFicheMonteurRepository;
 use App\Repository\Main\InterventionFichesMonteursHeuresRepository;
 use App\Repository\Main\InterventionMonteursRepository;
 use App\Repository\Main\OthersDocumentsRepository;
+use App\Repository\Main\RetraitMarchandisesEanRepository;
 use App\Repository\Main\UsersRepository;
+use App\Service\EmailTreatementService;
 use DateTime;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
@@ -47,6 +50,7 @@ class AffairesController extends AbstractController
 {
 
     private $repoMouv;
+    private $repoArt;
     private $repoCli;
     private $repoAffaires;
     private $repoAffairePiece;
@@ -60,8 +64,14 @@ class AffairesController extends AbstractController
     private $repoInterventionFichesMonteursHeures;
     private $affaireAdminController;
     private $repoFiche;
+    private $repoRetrait;
+    private $adminEmailController;
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailTreatement;
+    private $emailTreatementService;
 
-    public function __construct(InterventionFicheMonteurRepository $repoFiche, AffairesAdminController $affaireAdminController, InterventionFichesMonteursHeuresRepository $repoInterventionFichesMonteursHeures, InterventionFicheMonteurRepository $repoInterventionFicheMonteur, InterventionMonteursRepository $repoIntervertionsMonteurs, CliRepository $repoCli, UsersRepository $repoUsers, ChatsRepository $repoChats, AffairePieceRepository $repoAffairePiece, OthersDocumentsRepository $repoDocs, MailerInterface $mailer, CommentairesRepository $repoComments, AffairesRepository $repoAffaires, MouvRepository $repoMouv)
+    public function __construct(EmailTreatementService $emailTreatementService, AdminEmailController $adminEmailController, ArtRepository $repoArt, RetraitMarchandisesEanRepository $repoRetrait, InterventionFicheMonteurRepository $repoFiche, AffairesAdminController $affaireAdminController, InterventionFichesMonteursHeuresRepository $repoInterventionFichesMonteursHeures, InterventionFicheMonteurRepository $repoInterventionFicheMonteur, InterventionMonteursRepository $repoIntervertionsMonteurs, CliRepository $repoCli, UsersRepository $repoUsers, ChatsRepository $repoChats, AffairePieceRepository $repoAffairePiece, OthersDocumentsRepository $repoDocs, MailerInterface $mailer, CommentairesRepository $repoComments, AffairesRepository $repoAffaires, MouvRepository $repoMouv)
     {
         $this->repoMouv = $repoMouv;
         $this->repoIntervertionsMonteurs = $repoIntervertionsMonteurs;
@@ -77,6 +87,9 @@ class AffairesController extends AbstractController
         $this->repoInterventionFicheMonteur = $repoInterventionFicheMonteur;
         $this->affaireAdminController = $affaireAdminController;
         $this->repoFiche = $repoFiche;
+        $this->repoRetrait = $repoRetrait;
+        $this->repoArt = $repoArt;
+        $this->emailTreatementService = $emailTreatementService;
         //parent::__construct();
     }
 
@@ -146,44 +159,103 @@ class AffairesController extends AbstractController
         }
 
         $data = json_encode($rdvs);
-
+        // création d'un nouveau chantier en Urgence
         $form = $this->createForm(CreationChantierAffaireType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $chantier = $this->repoAffaires->findOneBy(['code' => $data->getCode()]);
-            if ($chantier) {
+            $chantierManu = $this->repoAffaires->findOneBy(['code' => $data['code'] . 'Manuelle']);
+            if ($chantierManu) {
                 $this->addFlash('danger', 'Ce code chantier est déjà utilisé, veuillez en choisir un autre');
                 return $this->redirectToRoute('app_affaire_me_nok');
             } else {
-                $cli = $this->repoCli->getThisCodeClient($data->getTiers());
+                //Création du chantier
                 $chantier = new Affaires();
-                $chantier->setCode($data->getCode() . 'Manuelle')
-                    ->setLibelle($data->getLibelle())
-                    ->setTiers($data->getTiers())
-                    ->setNom($cli['nom']);
+                $chantier->setCode($data['code'] . 'Manuelle')
+                    ->setLibelle($data['libelle'])
+                    ->setTiers($data['tiers'])
+                    ->setNom($data['tiers']);
                 $chantier->setStart(new DateTime())
-                    ->setEtat('Nouvelle')
-                    ->setDuration($data->getDuration())
-                ;
+                    ->setEtat('Nouvelle');
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($chantier);
                 $em->flush();
+                // Création de la piéce de ce chantier
                 $pieceChantier = new AffairePiece();
                 $pieceChantier->setEntId('999999')
                     ->setTypePiece('2')
                     ->setPiece('99999999')
                     ->setOp('C')
                     ->setEtat('Nouvelle')
-                    ->setAffaire($data->getCode() . 'Manuelle')
-                    ->setAdresse($cli['rue'] . ' ' . $cli['cp'] . ' ' . $cli['ville']);
+                    ->setAffaire($data['code'] . 'Manuelle');
+                if ($data['adresse']) {
+                    $pieceChantier->setAdresse($data['adresse']);
+                } else {
+                    $pieceChantier->setAdresse($data['tiers']);
+                }
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($pieceChantier);
                 $em->flush();
 
-                $this->addFlash('message', 'Votre chantier a été créé avec succés !');
-                return $this->redirectToRoute('app_affaire_me_nok');
+                // création de l'intervention pour ce chantier
+                $intervention = new InterventionMonteurs();
+                $intervention->setCreatedAt(new DateTime())
+                    ->setUserCr($this->getUser())
+                    ->setStart($data['start'])
+                    ->setEnd($data['end'])
+                    ->addPiece($pieceChantier)
+                    ->setBackgroundColor('#c40000')
+                    ->setTextColor('#ffffff')
+                    ->setCode($chantier);
+                foreach ($data['Equipes'] as $monteur) {
+                    $intervention->addEquipe($monteur);
+                }
+                if ($data['adresse']) {
+                    $intervention->setAdresse($data['adresse']);
+                } else {
+                    $intervention->setAdresse($data['tiers']);
+                }
             }
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($intervention);
+            $entityManager->flush();
+            // on ajoute le commentaire s'il y en a un
+            if ($data['comment']) {
+                $chat = new Chats;
+                $chat->setCreatedAt(new \DateTime())
+                    ->setUser($this->getUser())
+                    ->setContent($data['comment'])
+                    ->setFonction('chatAffaire')
+                    ->setIdentifiant($intervention->getCode()->getId())
+                    ->setTables($intervention->getId());
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($chat);
+                $entityManager->flush();
+
+            }
+
+            $subjet = "Un chantier en Urgence à été déposé => " . $intervention->getCode()->getLibelle();
+            $donnees = $intervention;
+            if ($data['comment']) {
+                $donnees->setChampTemporaire($data['comment']);
+            }
+            $emails = null;
+            $equipes = $intervention->getEquipes();
+            if ($equipes) {
+                $equipesArray = $equipes->toArray(); // Convertir la collection en un tableau
+                $emails = array_map(function ($equipe) {
+                    return $equipe->getEmail();
+                }, $equipesArray);
+            }
+            $pageUrl = "affaires/mails/mailChantierUrgence.html.twig";
+            $mails = $this->emailTreatementService->treatementMails('app_affaires_admin', null, $emails);
+            $urlFiles = [];
+            $this->emailTreatementService->sendMail($subjet, $donnees, $pageUrl, $mails, $urlFiles);
+
+            $this->changeEtat($chantier->getId(), 'Planifiee');
+            $this->addFlash('message', 'Votre chantier a été créé avec succés !');
+            return $this->redirectToRoute('app_affaire_me_nok');
+
         }
         if ($request->attributes->get('_route') == 'app_affaire_me_ok') {
             $affaires = $this->repoAffaires->findFinish();
@@ -325,6 +397,7 @@ class AffairesController extends AbstractController
                 $entityManager = $this->getDoctrine()->getManager();
                 $entityManager->persist($chat);
                 $entityManager->flush();
+
             }
 
             $this->changeEtat($affaire->getId(), 'Planifiee');
@@ -333,6 +406,19 @@ class AffairesController extends AbstractController
         $Interventions = $this->repoIntervertionsMonteurs->findBy(['code' => $affaire]);
         $chats = $this->repoChats->findBy(['fonction' => 'chatAffaire', 'identifiant' => $affaire->getId()], ['createdAt' => 'DESC']);
         $docs = $this->repoDocs->findBy(['tables' => 'affaire', 'identifiant' => $id]);
+        $retraits = $this->repoRetrait->findBy(['chantier' => $affaire->getCode()]);
+        foreach ($retraits as $retrait) {
+            $r = $this->repoArt->getEanStock(1, $retrait->getEan());
+
+            // Définir les données récupérées comme propriétés supplémentaires sur l'objet $retrait
+            // Ce code fontionne, c'est VisualStudio qui ne comprends pas.
+            $retrait->ref = $r['ref'];
+            $retrait->sref1 = $r['sref1'];
+            $retrait->sref2 = $r['sref2'];
+            $retrait->designation = $r['designation'];
+            $retrait->uv = $r['uv'];
+            $retrait->stock = $r['stock'];
+        }
 
         return $this->render('affaires/pieceAffaire.html.twig', [
             // todo à voir pour filtrer l'état en fonction de la page affichée
@@ -342,6 +428,7 @@ class AffairesController extends AbstractController
             'form' => $form->createView(),
             'docs' => $docs,
             'chats' => $chats,
+            'retraits' => $retraits,
             'InterventionsMonteursForm' => $InterventionsMonteursForm->createView(),
             'Interventions' => $Interventions,
         ]);
@@ -366,6 +453,13 @@ class AffairesController extends AbstractController
                 $entityManager = $this->getDoctrine()->getManager();
                 $entityManager->persist($affaire);
                 $entityManager->flush();
+
+                $subjet = "Une nouvelle affaire a été créé => " . $affaire->getLibelle();
+                $donnees = $affaire;
+                $pageUrl = "affaires/mails/mailNewAffaire.html.twig";
+                $mails = $this->emailTreatementService->treatementMails('app_affaires_admin', null, null);
+                $urlFiles = [];
+                $this->emailTreatementService->sendMail($subjet, $donnees, $pageUrl, $mails, $urlFiles);
             }
         }
 
@@ -581,6 +675,23 @@ class AffairesController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($chat);
             $entityManager->flush();
+
+            $subjet = "Un commentaire à été déposé => " . $intervention->getCode()->getLibelle();
+            $donnees = $this->repoChats->findBy(['fonction' => 'chatAffaire', 'identifiant' => $intervention->getCode()->getId(), 'tables' => $intervention->getId()], ['createdAt' => 'DESC']);
+            $emails = null;
+            $equipes = $intervention->getEquipes();
+            if ($equipes) {
+                $equipesArray = $equipes->toArray(); // Convertir la collection en un tableau
+                $emails = array_map(function ($equipe) {
+                    return $equipe->getEmail();
+                }, $equipesArray);
+            }
+            $pageUrl = "affaires/mails/mailNewCommentaire.html.twig";
+            $mails = $this->emailTreatementService->treatementMails('app_affaires_admin', null, $emails);
+            $urlFiles = [];
+            // envoie du mail
+            $this->emailTreatementService->sendMail($subjet, $donnees, $pageUrl, $mails, $urlFiles);
+
             $this->addFlash('message', 'Commentaire ajouté avec succès');
             return $this->redirectToRoute('app_affaire_show_intervention', ['id' => $id]);
 
@@ -640,6 +751,20 @@ class AffairesController extends AbstractController
         if ($i > 0) {
             $produits = $this->repoMouv->getDetailPiecesAffaires($ids);
         }
+        $retraits = $this->repoRetrait->findBy(['chantier' => $intervention->getCode()->getCode()]);
+        foreach ($retraits as $retrait) {
+            $r = $this->repoArt->getEanStock(1, $retrait->getEan());
+
+            // Définir les données récupérées comme propriétés supplémentaires sur l'objet $retrait
+            // Ce code fontionne, c'est VisualStudio qui ne comprends pas.
+            $retrait->ref = $r['ref'];
+            $retrait->sref1 = $r['sref1'];
+            $retrait->sref2 = $r['sref2'];
+            $retrait->designation = $r['designation'];
+            $retrait->uv = $r['uv'];
+            $retrait->stock = $r['stock'];
+        }
+
         return $this->render('affaires/showIntervention.html.twig', [
             'title' => "Voir intervention",
             'intervention' => $intervention,
@@ -648,6 +773,7 @@ class AffairesController extends AbstractController
             'docs' => $docs,
             'formFiles' => $formFiles->createView(),
             'chats' => $chats,
+            'retraits' => $retraits,
             'ChatsForm' => $ChatsForm->createView(),
         ]);
     }

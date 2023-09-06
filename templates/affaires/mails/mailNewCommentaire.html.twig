@@ -1,0 +1,60 @@
+{% extends 'minimum.html.twig' %}
+{% block body %}
+	<style>
+		.comment-container {
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		.comment-table {
+			width: 100%;
+		}
+
+		.comment-row {
+			display: table-row;
+		}
+
+		.comment-cell {
+			display: table-cell;
+			padding: 10px;
+			border: 1px solid #ccc;
+		}
+
+		.comment-text {
+			padding: 10px;
+			margin-bottom: 5px;
+		}
+
+		.comment-meta {
+			font-size: 12px;
+			text-align: center;
+		}
+
+		/* Styles pour le côté avec le pseudo et la date */
+		.comment-meta-bg {
+			background-color: #e0a800;
+			color: white;
+			padding: 5px;
+		}
+	</style>
+	<div class="container mt-5 comment-container">
+		<h1 class="mb-4">Commentaires</h1>
+		<table class="comment-table">
+			{% for donnee in donnees %}
+				<tr class="comment-row">
+					<td class="comment-cell">
+						<div class="comment-text">{{ donnee.content|raw }}</div>
+					</td>
+					<td class="comment-cell" style="background-color: #e0a800; color: white; width: 1em;">
+						<div class="comment-meta">{{ donnee.user.pseudo }}</div>
+						<div class="comment-meta text-muted">{{ donnee.createdAt|date("d/m/Y H:i") }}</div>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+		<p>
+			<a href="http://192.168.50.244/Lhermitte/affaire/show/intervention/{{ donnees[0].tables }}">Cliquez ici pour plus d'informations</a>
+		</p>
+		<hr>
+		<p>Intranet Axis</p>
+	{% endblock %}

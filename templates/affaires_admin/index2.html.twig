@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block body %}
+	<div>
+		{% for intervention in interventions %}
+			<pre>
+				{{ dump(intervention.interventionFicheMonteurs) }}
+			</pre>
+		{% endfor %}
+	</div>
+{% endblock %}

@@ -283,6 +283,7 @@ class HolidayController extends AbstractController
         }
         $users = $this->repoUser->findAll();
         $listCountConges = '';
+        $typesDeConge = [];
         $formattedData = [];
         $formDates = $this->createForm(StatesDateFilterType::class);
         $formDates->handleRequest($request);

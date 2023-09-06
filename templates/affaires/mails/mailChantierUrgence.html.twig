@@ -1,0 +1,46 @@
+{% extends 'minimum.html.twig' %}
+{% block body %}
+	<h3>
+		<u>{{ donnees.code.libelle }}</u>
+	</br>
+	créé par
+	{{ donnees.UserCr.pseudo }}
+	le
+	{{ donnees.createdAt|date("d/m/Y H:i", "Europe/Paris") }}
+</h3>
+<hr>
+<p>
+	<u>Clients :</u>
+	{{ donnees.code.nom }}
+</p>
+<p>
+	<u>Equipes :</u>
+	<ul>
+		{% for monteur in donnees.Equipes %}
+			<li>{{ monteur.pseudo }}</li>
+		{% endfor %}
+	</ul>
+</p>
+<p>
+	<u>Adresse du chantier :</u>
+	{{ donnees.adresse }}
+</p>
+<p>
+	<u>dates :</u>
+	du
+	{{ donnees.start|date("d/m/Y H:i", "Europe/Paris") }}
+	au
+	{{ donnees.end|date("d/m/Y H:i", "Europe/Paris") }}</p>
+<p>
+	{% if donnees.champTemporaire %}
+		<p>
+			<u>Commentaire :</u>
+			{{ donnees.champTemporaire|raw }}
+		</p>
+	{% endif %}
+</p>
+<p>
+	<a href='http://192.168.50.244/Lhermitte/affaire/show/intervention/{{donnees.id}}'>Pour plus d'information, merci d'aller consulter l'intervention en cliqnant ici !</a>
+</p>
+<hr>
+<p>Intranet Axis</p>{% endblock %}

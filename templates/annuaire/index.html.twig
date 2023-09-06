@@ -1,69 +1,99 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}
+	{{ title }}
+{% endblock %}
 {% block body %}
-<div class="row">
-            <div class="col-md-12">
-                <div class="card card-dark">
-                    <div class="card-header">
-                        <h3 class="card-title text-center">Annuaire des sociétés</h3>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <table id="example1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"><span>interne</span></th>
-                                    <th class="text-center"><span>Nom</span></th>
-                                    <th class="text-center"><span>Extérieur</span></th>
-                                    <th class="text-center"><span>mail</span></th>
-                                    <th class="text-center"><span>Fonction</span></th>
-                                    <th class="text-center"><span>Société</span></th>
-                                    <th class="text-center"><span>Portable</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for annuaire in annuaires %}
-                                    <tr id="<?= $id ?>">
-                                        <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center text-dark" style="max-width: 40px;">{{annuaire.interne}}</a>
-                                        </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center text-dark">{{annuaire.nom}}</a>
-                                        </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center text-dark">{{ annuaire.exterieur}}</a>
-                                        </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center text-dark">{{annuaire.mail}}</a>
-                                        </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center text-dark">{{annuaire.fonction}}</a>
-                                        </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center text-dark">{{ annuaire.societe.nom }}</a>
-                                        </td>
-                                        <td class="text-center" id="{{ annuaire.id }}">
-                                            <a class="text-center text-dark">{{annuaire.portable}}</a>
-                                        </td>
-                                    {% endfor %}
-                                    </tr>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header">
+					<h3 class="card-title text-center">Annuaire des sociétés</h3>
+				</div>
+				<!-- /.card-header -->
+				<div class="card-body">
+					<table id="example1" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="text-center">
+									<span>interne</span>
+								</th>
+								<th class="text-center">
+									<span>Nom</span>
+								</th>
+								<th class="text-center">
+									<span>Extérieur</span>
+								</th>
+								<th class="text-center">
+									<span>mail</span>
+								</th>
+								<th class="text-center">
+									<span>Fonction</span>
+								</th>
+								<th class="text-center">
+									<span>Société</span>
+								</th>
+								<th class="text-center">
+									<span>Portable</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for annuaire in annuaires %}
+								<tr id="<?= $id ?>">
+									<td class="text-center" id="{{ annuaire.id }}">
+										<a class="text-center text-dark" style="max-width: 40px;">{{annuaire.interne}}</a>
+									</td>
+									<td class="text-center" id="{{ annuaire.id }}">
+										<a class="text-center text-dark">{{annuaire.nom}}</a>
+									</td>
+									<td class="text-center" id="{{ annuaire.id }}">
+										<a class="text-center text-dark">{{ annuaire.exterieur}}</a>
+									</td>
+									<td class="text-center" id="{{ annuaire.id }}">
+										<a class="text-center text-dark">{{annuaire.mail}}</a>
+									</td>
+									<td class="text-center" id="{{ annuaire.id }}">
+										<a class="text-center text-dark">{{annuaire.fonction}}</a>
+									</td>
+									<td class="text-center" id="{{ annuaire.id }}">
+										<a class="text-center text-dark">{{ annuaire.societe }}</a>
+									</td>
+									<td class="text-center" id="{{ annuaire.id }}">
+										<a class="text-center text-dark">{{annuaire.portable}}</a>
+									</td>
+								{% endfor %}
+							</tr>
 
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th class="text-center"><span>interne</span></th>
-                                    <th class="text-center"><span>Nom</span></th>
-                                    <th class="text-center"><span>Extérieur</span></th>
-                                    <th class="text-center"><span>mail</span></th>
-                                    <th class="text-center"><span>Fonction</span></th>
-                                    <th class="text-center"><span>Société</span></th>
-                                    <th class="text-center"><span>Portable</span></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+						</tbody>
+						<tfoot>
+							<tr>
+								<th class="text-center">
+									<span>interne</span>
+								</th>
+								<th class="text-center">
+									<span>Nom</span>
+								</th>
+								<th class="text-center">
+									<span>Extérieur</span>
+								</th>
+								<th class="text-center">
+									<span>mail</span>
+								</th>
+								<th class="text-center">
+									<span>Fonction</span>
+								</th>
+								<th class="text-center">
+									<span>Société</span>
+								</th>
+								<th class="text-center">
+									<span>Portable</span>
+								</th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
 
 {% endblock %}

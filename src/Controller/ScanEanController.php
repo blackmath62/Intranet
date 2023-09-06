@@ -183,11 +183,10 @@ class ScanEanController extends AbstractController
             if (count($historique) > 0) {
                 // envoyer un mail
                 $html = $this->renderView('mails/listeRetraitProduits.html.twig', ['historiques' => $historique, 'commentaire' => $request->request->get('ta'), 'chantier' => $chantier]);
-                // TODO Remettre marina en destinataire des mails.
                 $d = new DateTime();
                 $email = (new Email())
                     ->from($this->mailEnvoi)
-                    ->to('jpochet@groupe-axis.fr')
+                    ->to('adeschodt@lhermitte.fr')
                     ->subject('Liste des produits retiré pour ' . $chantier . " par " . $this->getUser()->getPseudo() . " le " . $d->format('d-m-Y H:i:s'))
                     ->html($html);
                 $this->mailer->send($email);
@@ -404,7 +403,8 @@ class ScanEanController extends AbstractController
     /**
      * @Route("/emplacement/produit/print/{emplacement}", name="app_scan_emplacement_print")
      */
-    public function print($emplacement = null, Request $request, ArtRepository $repo) {
+    public function print($emplacement = null, Request $request, ArtRepository $repo)
+    {
 
         $dos = 1;
         $produits = "";
@@ -495,7 +495,7 @@ class ScanEanController extends AbstractController
 
         $n_line = 0;
         foreach ($cut as $key => $line) {
-            if (trim($line) !== ''&strlen(trim($line)) > 3) {
+            if (trim($line) !== '' & strlen(trim($line)) > 3) {
                 $n_line++;
                 if (1 === $n_line) {
                     $rows = explode('    ', $line);

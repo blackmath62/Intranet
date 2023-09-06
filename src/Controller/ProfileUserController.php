@@ -95,7 +95,6 @@ class ProfileUserController extends AbstractController
             $end = $formFiches->getData()['endDate']->format('Y-m-d');
             $interventions = $repoInterventions->findFichePeriode($this->getUser()->getId(), $start, $end);
         }
-        //dd($interventions);
         return $this->render('profile_user/index.html.twig', [
             'controller_name' => 'ProfileUserController',
             'title' => 'gestion de compte',

@@ -27,7 +27,12 @@ class AnnuaireController extends AbstractController
     public function index(AnnuaireRepository $repo, Request $request)
     {
 
-        $annuaires = $repo->findAll();
+        $annuaires = $repo->getAnnuaire();
+        /*
+        SELECT u.societe_id AS societe, u.interne AS interne, u.pseudo AS nom, u.exterieur AS exterieur, u.email AS email, u.fonction AS fonction, u.portable AS portable
+        FROM users u
+        WHERE u.closedAt IS NULL
+         */
 
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');

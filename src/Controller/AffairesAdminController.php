@@ -9,6 +9,7 @@ use App\Repository\Main\InterventionFicheMonteurRepository;
 use App\Repository\Main\InterventionMonteursRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\UsersRepository;
+use App\Service\EmailTreatementService;
 use DateInterval;
 use DatePeriod;
 use DateTime;
@@ -38,8 +39,9 @@ class AffairesAdminController extends AbstractController
     private $adminEmailController;
     private $repoFiche;
     private $repoIntervention;
+    private $emailTreatementService;
 
-    public function __construct(UsersRepository $repoUsers, InterventionMonteursRepository $repoIntervention, InterventionFicheMonteurRepository $repoFiche, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
+    public function __construct(EmailTreatementService $emailTreatementService, UsersRepository $repoUsers, InterventionMonteursRepository $repoIntervention, InterventionFicheMonteurRepository $repoFiche, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
     {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
@@ -49,6 +51,7 @@ class AffairesAdminController extends AbstractController
         $this->adminEmailController = $adminEmailController;
         $this->repoIntervention = $repoIntervention;
         $this->repoUsers = $repoUsers;
+        $this->emailTreatementService = $emailTreatementService;
 
         //parent::__construct();
     }
@@ -210,32 +213,41 @@ class AffairesAdminController extends AbstractController
     /**
      * @Route("/Lhermitte/affaires/admin/signature", name="app_affaire_signature")
      */
+    // TODO CETTE PARTIE PLUS COMPLEXE EST A FAIRE
+    // CREER LE PDF POUR QU'IL PRESENTE BIEN ET METTRE LES CGV EN DERNIERE PAGE
+    // CONNECTER CELA AVEC YOUSIGN
+    // PEUT ÊTRE CREER UNE PAGE COMPTE RENDU
+
     public function envoyerPourSignature(MailerInterface $mailer, Pdf $pdf)
     {
-        // récupérer les interventions qui sont n'ont pas été envoyé et qui ont été verouillé par l'intranet
+        // Récupérer les interventions qui n'ont pas été envoyées et qui ont été verrouillées par l'intranet
         $interventions = $this->repoIntervention->findBy(['lockedBy' => $this->repoUsers->findOneBy(['id' => 3]), 'sendAt' => null]);
 
         foreach ($interventions as $intervention) {
-            //dd($intervention);
-            // construire un PDF pour la demande de signature
+            // Construire un PDF pour la demande de signature
+
             $htmlPdf = $this->renderView('affaires_admin/pdf/pdfSignature.html.twig', ['intervention' => $intervention]);
-            //dd($htmlPdf);
-            $html = 'Voici une la fiche d\'intervention à valider';
-            $pdf = $pdf->getOutputFromHtml($htmlPdf);
-            // envoyer le PDF par email au mail renseigné sur la fiche client
+
+            // Envoyer le PDF par email à l'adresse renseignée sur la fiche client
+            $pdfContent = $pdf->getOutputFromHtml($htmlPdf);
+
+            // Créer l'email avec le PDF attaché
             $email = (new Email())
                 ->from($this->mailEnvoi)
                 ->to($this->getUser()->getEmail())
                 ->subject('Signature fiche d\'intervention')
-                ->html($html)
-                ->attach($pdf, $intervention->getCode()->getCode() . ' - ' . $intervention->getStart()->format('d-m-Y') . ' - ' . $intervention->getEnd()->format('d-m-Y') . '.pdf');
+                ->text('Voici la fiche d\'intervention à valider.')
+                ->attach($pdfContent, $intervention->getCode()->getCode() . ' - ' . $intervention->getStart()->format('d-m-Y') . ' - ' . $intervention->getEnd()->format('d-m-Y') . '.pdf');
+
+            // Envoyer l'email
             $mailer->send($email);
             /*
-        // noter sur l'intervention que le mail a bien été envoyé
-        $intervention->setSendAt(new DateTime);
+        // Marquer l'intervention comme envoyée
+        $intervention->setSendAt(new DateTime());
         $em = $this->getDoctrine()->getManager();
         $em->persist($intervention);
-        $em->flush();*/
+        $em->flush();
+         */
         }
 
     }

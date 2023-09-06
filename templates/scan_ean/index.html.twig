@@ -7,9 +7,15 @@
 {% block body %}
 	<!-- general form elements disabled -->
 	<div class="card card-navy">
-		<div class="card-header d-flex">
+		<div class="card-header">
 			<h3 class="card-title">Sortie de stock</h3>
-			<a href="{{ path('app_scan_ean_ns') }}" class="badge badge-danger ml-auto">Retrait non soumis</a>
+			<div class="card-tools">
+				<a href='{{path('app_affaire_me_nok' ) }}' class="badge badge-primary">
+					<i class="fas fa-share mr-1"></i>
+					Affaires
+				</a>
+				<a href="{{ path('app_scan_ean_ns') }}" class="badge badge-danger ml-auto">Retrait non soumis</a>
+			</div>
 		</div>
 		<!-- /.card-header -->
 		<div class="card-body">
@@ -162,7 +168,7 @@
 								<td class="align-middle">{{ historique.qte }}</td>
 								<td class="text-align align-middle">
 									<a data-toggle="modal" data-target={{"#modal-sm#{historique.id}"}} class="text-dark">
-										<i class="fas fa-trash-alt"></i>
+										<i class="fa-solid fa-trash-can fa-bounce"></i>
 									</a>
 									<div class="modal fade" id={{"modal-sm#{historique.id}"}}>
 										<div class="modal-dialog modal-sm">

@@ -18,7 +18,9 @@
 				<div class="callout callout-warning">
 					<div class="d-flex justify-content-between">
 						<h5>{{ n.chantier }}</h5>
-						<a href="{{path('app_scan_ean', {'chantier' : n.chantier })}}" class="text-white btn btn-info">Voir</a>
+						<a href="{{path('app_scan_ean', {'chantier' : n.chantier })}}">
+							<i class="fa-solid fa-eye fa-bounce fa-2xl"></i>
+						</a>
 					</div>
 					<i>
 						<p>Saisie par
