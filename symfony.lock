@@ -129,9 +129,6 @@
             "./config/packages/fos_ckeditor.yaml"
         ]
     },
-    "fzaninotto/faker": {
-        "version": "v1.9.1"
-    },
     "h4cc/wkhtmltoimage-amd64": {
         "version": "0.12.4"
     },
