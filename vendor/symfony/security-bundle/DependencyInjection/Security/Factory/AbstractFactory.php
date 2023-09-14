@@ -99,7 +99,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * Subclasses must return the id of a service which implements the
      * AuthenticationProviderInterface.
      *
-     * @return string never null, the id of the authentication provider
+     * @return string
      */
     abstract protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId);
 
@@ -164,13 +164,13 @@ abstract class AbstractFactory implements SecurityFactoryInterface
 
         if (isset($config['success_handler'])) {
             $successHandler = $container->setDefinition($successHandlerId, new ChildDefinition('security.authentication.custom_success_handler'));
-            $successHandler->replaceArgument(0, new Reference($config['success_handler']));
+            $successHandler->replaceArgument(0, new ChildDefinition($config['success_handler']));
             $successHandler->replaceArgument(1, $options);
             $successHandler->replaceArgument(2, $id);
         } else {
             $successHandler = $container->setDefinition($successHandlerId, new ChildDefinition('security.authentication.success_handler'));
             $successHandler->addMethodCall('setOptions', [$options]);
-            $successHandler->addMethodCall('setProviderKey', [$id]);
+            $successHandler->addMethodCall('setFirewallName', [$id]);
         }
 
         return $successHandlerId;
@@ -183,7 +183,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
 
         if (isset($config['failure_handler'])) {
             $failureHandler = $container->setDefinition($id, new ChildDefinition('security.authentication.custom_failure_handler'));
-            $failureHandler->replaceArgument(0, new Reference($config['failure_handler']));
+            $failureHandler->replaceArgument(0, new ChildDefinition($config['failure_handler']));
             $failureHandler->replaceArgument(1, $options);
         } else {
             $failureHandler = $container->setDefinition($id, new ChildDefinition('security.authentication.failure_handler'));

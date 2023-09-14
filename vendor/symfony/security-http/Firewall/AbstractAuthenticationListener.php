@@ -31,6 +31,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', AbstractAuthenticationListener::class);
+
 /**
  * The AbstractAuthenticationListener is the preferred base class for all
  * browser-/HTTP-based authentication requests.
@@ -47,6 +49,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 abstract class AbstractAuthenticationListener extends AbstractListener
 {
@@ -129,12 +133,14 @@ abstract class AbstractAuthenticationListener extends AbstractListener
                 throw new SessionUnavailableException('Your session has timed out, or you have disabled cookies.');
             }
 
+            $previousToken = $this->tokenStorage->getToken();
+
             if (null === $returnValue = $this->attemptAuthentication($request)) {
                 return;
             }
 
             if ($returnValue instanceof TokenInterface) {
-                $this->sessionStrategy->onAuthentication($request, $returnValue);
+                $this->migrateSession($request, $returnValue, $previousToken);
 
                 $response = $this->onSuccess($request, $returnValue);
             } elseif ($returnValue instanceof Response) {
@@ -179,7 +185,7 @@ abstract class AbstractAuthenticationListener extends AbstractListener
         }
 
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
+        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getFirewallName()) {
             $this->tokenStorage->setToken(null);
         }
 
@@ -195,7 +201,8 @@ abstract class AbstractAuthenticationListener extends AbstractListener
     private function onSuccess(Request $request, TokenInterface $token): Response
     {
         if (null !== $this->logger) {
-            $this->logger->info('User has been authenticated successfully.', ['username' => $token->getUsername()]);
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
+            $this->logger->info('User has been authenticated successfully.', ['username' => method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername()]);
         }
 
         $this->tokenStorage->setToken($token);
@@ -220,5 +227,19 @@ abstract class AbstractAuthenticationListener extends AbstractListener
         }
 
         return $response;
+    }
+
+    private function migrateSession(Request $request, TokenInterface $token, ?TokenInterface $previousToken)
+    {
+        if ($previousToken) {
+            $user = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername();
+            $previousUser = method_exists($previousToken, 'getUserIdentifier') ? $previousToken->getUserIdentifier() : $previousToken->getUsername();
+
+            if ('' !== ($user ?? '') && $user === $previousUser) {
+                return;
+            }
+        }
+
+        $this->sessionStrategy->onAuthentication($request, $token);
     }
 }

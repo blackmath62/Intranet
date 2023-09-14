@@ -25,6 +25,7 @@ use Symfony\Bundle\MakerBundle\Security\SecurityConfigUpdater;
 use Symfony\Bundle\MakerBundle\Security\UserClassBuilder;
 use Symfony\Bundle\MakerBundle\Security\UserClassConfiguration;
 use Symfony\Bundle\MakerBundle\Util\ClassSourceManipulator;
+use Symfony\Bundle\MakerBundle\Util\UseStatementGenerator;
 use Symfony\Bundle\MakerBundle\Util\YamlManipulationFailedException;
 use Symfony\Bundle\MakerBundle\Validator;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -32,12 +33,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
-use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -48,13 +49,9 @@ use Symfony\Component\Yaml\Yaml;
 final class MakeUser extends AbstractMaker
 {
     private $fileManager;
-
     private $userClassBuilder;
-
     private $configUpdater;
-
     private $entityClassGenerator;
-
     private $doctrineHelper;
 
     public function __construct(FileManager $fileManager, UserClassBuilder $userClassBuilder, SecurityConfigUpdater $configUpdater, EntityClassGenerator $entityClassGenerator, DoctrineHelper $doctrineHelper)
@@ -76,7 +73,7 @@ final class MakeUser extends AbstractMaker
         return 'Creates a new security user class';
     }
 
-    public function configureCommand(Command $command, InputConfiguration $inputConf)
+    public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
             ->addArgument('name', InputArgument::OPTIONAL, 'The name of the security user class (e.g. <fg=yellow>User</>)')
@@ -86,10 +83,10 @@ final class MakeUser extends AbstractMaker
             ->addOption('use-argon2', null, InputOption::VALUE_NONE, 'Use the Argon2i password encoder? (deprecated)')
             ->setHelp(file_get_contents(__DIR__.'/../Resources/help/MakeUser.txt'));
 
-        $inputConf->setArgumentAsNonInteractive('name');
+        $inputConfig->setArgumentAsNonInteractive('name');
     }
 
-    public function interact(InputInterface $input, ConsoleStyle $io, Command $command)
+    public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
         if (null === $input->getArgument('name')) {
             $name = $io->ask(
@@ -120,21 +117,9 @@ final class MakeUser extends AbstractMaker
         $io->text('Will this app need to hash/check user passwords? Choose <comment>No</comment> if passwords are not needed or will be checked/hashed by some other system (e.g. a single sign-on server).');
         $userWillHavePassword = $io->confirm('Does this app need to hash/check user passwords?');
         $input->setOption('with-password', $userWillHavePassword);
-
-        $symfonyGte53 = class_exists(NativePasswordHasher::class);
-        if ($symfonyGte53) {
-            return;
-        }
-
-        if ($userWillHavePassword && !class_exists(NativePasswordEncoder::class) && Argon2iPasswordEncoder::isSupported()) {
-            $io->writeln('The newer <comment>Argon2i</comment> password hasher requires PHP 7.2, libsodium or paragonie/sodium_compat. Your system DOES support this algorithm.');
-            $io->writeln('You should use <comment>Argon2i</comment> unless your production system will not support it.');
-            $useArgon2Encoder = $io->confirm('Use <comment>Argon2i</comment> as your password hasher (bcrypt will be used otherwise)?');
-            $input->setOption('use-argon2', $useArgon2Encoder);
-        }
     }
 
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
+    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $userClassConfiguration = new UserClassConfiguration(
             $input->getOption('is-entity'),
@@ -156,7 +141,7 @@ final class MakeUser extends AbstractMaker
             $classPath = $this->entityClassGenerator->generateEntityClass(
                 $userClassNameDetails,
                 false, // api resource
-                $userClassConfiguration->hasPassword() && interface_exists(PasswordUpgraderInterface::class) // security user
+                $userClassConfiguration->hasPassword() // security user
             );
         } else {
             $classPath = $generator->generateClass($userClassNameDetails->getFullName(), 'Class.tpl.php');
@@ -164,7 +149,7 @@ final class MakeUser extends AbstractMaker
         // need to write changes early so we can modify the contents below
         $generator->writeChanges();
 
-        $useAttributesForDoctrineMapping = $userClassConfiguration->isEntity() && $this->doctrineHelper->isDoctrineSupportingAttributes() && $this->doctrineHelper->doesClassUsesAttributes($userClassNameDetails->getFullName());
+        $useAttributesForDoctrineMapping = $userClassConfiguration->isEntity() && ($this->doctrineHelper->isDoctrineSupportingAttributes()) && $this->doctrineHelper->doesClassUsesAttributes($userClassNameDetails->getFullName());
 
         // B) Implement UserInterface
         $manipulator = new ClassSourceManipulator(
@@ -184,13 +169,22 @@ final class MakeUser extends AbstractMaker
         // C) Generate a custom user provider, if necessary
         if (!$userClassConfiguration->isEntity()) {
             $userClassConfiguration->setUserProviderClass($generator->getRootNamespace().'\\Security\\UserProvider');
+
+            $useStatements = new UseStatementGenerator([
+                UnsupportedUserException::class,
+                UserNotFoundException::class,
+                PasswordAuthenticatedUserInterface::class,
+                PasswordUpgraderInterface::class,
+                UserInterface::class,
+                UserProviderInterface::class,
+            ]);
+
             $customProviderPath = $generator->generateClass(
                 $userClassConfiguration->getUserProviderClass(),
                 'security/UserProvider.tpl.php',
                 [
-                    'uses_user_identifier' => class_exists(UserNotFoundException::class),
+                    'use_statements' => $useStatements,
                     'user_short_name' => $userClassNameDetails->getShortName(),
-                    'use_legacy_password_upgrader_type' => !interface_exists(PasswordAuthenticatedUserInterface::class),
                 ]
             );
         }
@@ -248,7 +242,7 @@ final class MakeUser extends AbstractMaker
         $io->text($nextSteps);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies, InputInterface $input = null)
+    public function configureDependencies(DependencyBuilder $dependencies, InputInterface $input = null): void
     {
         // checking for SecurityBundle guarantees security.yaml is present
         $dependencies->addClassDependency(

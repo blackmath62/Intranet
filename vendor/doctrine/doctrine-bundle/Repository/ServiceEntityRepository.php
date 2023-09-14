@@ -22,14 +22,13 @@ use function sprintf;
  *     }
  * }
  *
- * @template T
+ * @template T of object
  * @template-extends EntityRepository<T>
  */
 class ServiceEntityRepository extends EntityRepository implements ServiceEntityRepositoryInterface
 {
     /**
      * @param string $entityClass The class name of the entity this repository manages
-     *
      * @psalm-param class-string<T> $entityClass
      */
     public function __construct(ManagerRegistry $registry, string $entityClass)

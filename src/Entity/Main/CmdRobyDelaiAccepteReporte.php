@@ -40,7 +40,7 @@ class CmdRobyDelaiAccepteReporte
     private $modifiedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="cmdRobyDelaiAccepteReportes")
+     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="cmdRobyDelaiAccepteReportesModifiedBy")
      */
     private $modifiedBy;
 
@@ -133,7 +133,7 @@ class CmdRobyDelaiAccepteReporte
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -145,7 +145,7 @@ class CmdRobyDelaiAccepteReporte
         return $this->modifiedAt;
     }
 
-    public function setModifiedAt(?\DateTimeInterface $modifiedAt): self
+    public function setModifiedAt(?\DateTimeInterface $modifiedAt) : self
     {
         $this->modifiedAt = $modifiedAt;
 
@@ -193,7 +193,7 @@ class CmdRobyDelaiAccepteReporte
         return $this->dateCmd;
     }
 
-    public function setDateCmd(\DateTimeInterface $dateCmd): self
+    public function setDateCmd(\DateTimeInterface $dateCmd) : self
     {
         $this->dateCmd = $dateCmd;
 
@@ -217,7 +217,7 @@ class CmdRobyDelaiAccepteReporte
         return $this->delaiAccepte;
     }
 
-    public function setDelaiAccepte(?\DateTimeInterface $delaiAccepte): self
+    public function setDelaiAccepte(?\DateTimeInterface $delaiAccepte) : self
     {
         $this->delaiAccepte = $delaiAccepte;
 
@@ -229,7 +229,7 @@ class CmdRobyDelaiAccepteReporte
         return $this->delaiReporte;
     }
 
-    public function setDelaiReporte(?\DateTimeInterface $delaiReporte): self
+    public function setDelaiReporte(?\DateTimeInterface $delaiReporte) : self
     {
         $this->delaiReporte = $delaiReporte;
 

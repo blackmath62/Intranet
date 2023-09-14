@@ -2,11 +2,9 @@
 
 namespace <?= $namespace; ?>;
 
-<?= ($cacheable_interface = interface_exists('Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface')) ? "use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;\n" : '' ?>
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+<?= $use_statements; ?>
 
-class <?= $class_name ?> implements NormalizerInterface<?= $cacheable_interface ? ', CacheableSupportsMethodInterface' : '' ?><?= "\n" ?>
+class <?= $class_name ?> implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     private $normalizer;
 
@@ -15,24 +13,22 @@ class <?= $class_name ?> implements NormalizerInterface<?= $cacheable_interface 
         $this->normalizer = $normalizer;
     }
 
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, string $format = null, array $context = []): array
     {
         $data = $this->normalizer->normalize($object, $format, $context);
 
-        // Here: add, edit, or delete some data
+        // TODO: add, edit, or delete some data
 
         return $data;
     }
 
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof \App\Entity\<?= str_replace('Normalizer', null, $class_name) ?>;
     }
-<?php if ($cacheable_interface): ?>
 
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
     }
-<?php endif; ?>
 }

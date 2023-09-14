@@ -12,19 +12,26 @@
 namespace Symfony\Bridge\Doctrine\Test;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\EventManager;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
+use Doctrine\ORM\ORMSetup;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\Driver\SymfonyFileLocator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarExporter\LazyGhostTrait;
 
 /**
  * Provides utility functions needed in tests.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since Symfony 5.3
  */
 class DoctrineTestHelper
 {
@@ -39,6 +46,10 @@ class DoctrineTestHelper
             TestCase::markTestSkipped('Extension pdo_sqlite is required.');
         }
 
+        if (__CLASS__ === static::class) {
+            trigger_deprecation('symfony/doctrine-bridge', '5.3', '"%s" is deprecated and will be removed in 6.0.', __CLASS__);
+        }
+
         if (null === $config) {
             $config = self::createTestConfiguration();
         }
@@ -48,7 +59,13 @@ class DoctrineTestHelper
             'memory' => true,
         ];
 
-        return EntityManager::create($params, $config);
+        if (!(new \ReflectionMethod(EntityManager::class, '__construct'))->isPublic()) {
+            return EntityManager::create($params, $config);
+        }
+
+        $eventManager = new EventManager();
+
+        return new EntityManager(DriverManager::getConnection($params, $config, $eventManager), $config, $eventManager);
     }
 
     /**
@@ -56,14 +73,27 @@ class DoctrineTestHelper
      */
     public static function createTestConfiguration()
     {
-        $config = new Configuration();
+        if (__CLASS__ === static::class) {
+            trigger_deprecation('symfony/doctrine-bridge', '5.3', '"%s" is deprecated and will be removed in 6.0.', __CLASS__);
+        }
+
+        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
         $config->setEntityNamespaces(['SymfonyTestsDoctrine' => 'Symfony\Bridge\Doctrine\Tests\Fixtures']);
         $config->setAutoGenerateProxyClasses(true);
         $config->setProxyDir(sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
-        $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
-        $config->setQueryCacheImpl(new ArrayCache());
-        $config->setMetadataCacheImpl(new ArrayCache());
+        if (\PHP_VERSION_ID >= 80000 && class_exists(AttributeDriver::class)) {
+            $config->setMetadataDriverImpl(new AttributeDriver([__DIR__.'/../Tests/Fixtures' => 'Symfony\Bridge\Doctrine\Tests\Fixtures'], true));
+        } else {
+            $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), null, true));
+        }
+        if (class_exists(DefaultSchemaManagerFactory::class)) {
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        }
+
+        if (\PHP_VERSION_ID >= 80100 && method_exists(Configuration::class, 'setLazyGhostObjectEnabled') && trait_exists(LazyGhostTrait::class)) {
+            $config->setLazyGhostObjectEnabled(true);
+        }
 
         return $config;
     }
@@ -73,6 +103,10 @@ class DoctrineTestHelper
      */
     public static function createTestConfigurationWithXmlLoader()
     {
+        if (__CLASS__ === static::class) {
+            trigger_deprecation('symfony/doctrine-bridge', '5.3', '"%s" is deprecated and will be removed in 6.0.', __CLASS__);
+        }
+
         $config = static::createTestConfiguration();
 
         $driverChain = new MappingDriverChain();
@@ -80,7 +114,9 @@ class DoctrineTestHelper
             new XmlDriver(
                 new SymfonyFileLocator(
                     [__DIR__.'/../Tests/Resources/orm' => 'Symfony\\Bridge\\Doctrine\\Tests\\Fixtures'], '.orm.xml'
-                )
+                ),
+                '.orm.xml',
+                true
             ),
             'Symfony\\Bridge\\Doctrine\\Tests\\Fixtures'
         );

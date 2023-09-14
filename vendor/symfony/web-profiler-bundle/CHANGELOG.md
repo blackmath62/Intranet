@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+5.4
+---
+
+ * Add a "preview" tab in mailer profiler for HTML email
+
+5.2.0
+-----
+
+ * added session usage
+
 5.0.0
 -----
 
@@ -28,7 +38,7 @@ CHANGELOG
 -----
 
  * added information about orphaned events
- * made the toolbar auto-update with info from ajax reponses when they set the 
+ * made the toolbar auto-update with info from ajax reponses when they set the
    `Symfony-Debug-Toolbar-Replace header` to `1`
 
 4.0.0

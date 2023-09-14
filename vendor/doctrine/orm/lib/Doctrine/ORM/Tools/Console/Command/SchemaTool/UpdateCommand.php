@@ -24,9 +24,7 @@ class UpdateCommand extends AbstractCommand
     /** @var string */
     protected $name = 'orm:schema-tool:update';
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @return void */
     protected function configure()
     {
         $this->setName($this->name)
@@ -63,13 +61,19 @@ described by any metadata. Not passing that option is deprecated.
 by the ORM, you can use a DBAL functionality to filter the tables and sequences down
 on a global level:
 
-    $config->setFilterSchemaAssetsExpression($regexp);
+    $config->setSchemaAssetsFilter(function (string|AbstractAsset $assetName): bool {
+        if ($assetName instanceof AbstractAsset) {
+            $assetName = $assetName->getName();
+        }
+
+        return !str_starts_with($assetName, 'audit_');
+    });
 EOT
              );
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function executeSchemaCommand(InputInterface $input, OutputInterface $output, SchemaTool $schemaTool, array $metadatas, SymfonyStyle $ui)
     {
@@ -79,7 +83,10 @@ EOT
         $saveMode = ! $input->getOption('complete');
 
         if ($saveMode) {
-            $notificationUi->warning('Not passing the "--complete" option to "orm:schema-tool:update" is deprecated and will not be supported when using doctrine/dbal 4');
+            $notificationUi->warning(sprintf(
+                'Not passing the "--complete" option to "%s" is deprecated and will not be supported when using doctrine/dbal 4',
+                $this->getName() ?? $this->name
+            ));
         }
 
         $sqls = $schemaTool->getUpdateSchemaSql($metadatas, $saveMode);

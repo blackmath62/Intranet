@@ -25,8 +25,10 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @internal
  */
-class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface, EntryPointFactoryInterface
+class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {
+    public const PRIORITY = -30;
+
     public function __construct()
     {
         $this->addOption('username_parameter', '_username');
@@ -35,14 +37,20 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         $this->addOption('csrf_token_id', 'authenticate');
         $this->addOption('enable_csrf', false);
         $this->addOption('post_only', true);
+        $this->addOption('form_only', false);
     }
 
-    public function getPosition()
+    public function getPriority(): int
+    {
+        return self::PRIORITY;
+    }
+
+    public function getPosition(): string
     {
         return 'form';
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'form-login';
     }
@@ -58,12 +66,12 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         ;
     }
 
-    protected function getListenerId()
+    protected function getListenerId(): string
     {
         return 'security.authentication.listener.form';
     }
 
-    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId)
+    protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string
     {
         if ($config['enable_csrf'] ?? false) {
             throw new InvalidConfigurationException('The "enable_csrf" option of "form_login" is only available when "security.enable_authenticator_manager" is set to "true", use "csrf_token_generator" instead.');
@@ -92,12 +100,7 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
         return $listenerId;
     }
 
-    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId)
-    {
-        return $this->registerEntryPoint($container, $id, $config);
-    }
-
-    public function registerEntryPoint(ContainerBuilder $container, string $id, array $config): string
+    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, ?string $defaultEntryPointId): ?string
     {
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container
@@ -118,12 +121,16 @@ class FormLoginFactory extends AbstractFactory implements AuthenticatorFactoryIn
 
         $authenticatorId = 'security.authenticator.form_login.'.$firewallName;
         $options = array_intersect_key($config, $this->options);
-        $container
+        $authenticator = $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.form_login'))
             ->replaceArgument(1, new Reference($userProviderId))
             ->replaceArgument(2, new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)))
             ->replaceArgument(3, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
             ->replaceArgument(4, $options);
+
+        if ($options['use_forward'] ?? false) {
+            $authenticator->addMethodCall('setHttpKernel', [new Reference('http_kernel')]);
+        }
 
         return $authenticatorId;
     }

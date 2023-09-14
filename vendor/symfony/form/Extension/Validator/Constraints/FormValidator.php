@@ -24,6 +24,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class FormValidator extends ConstraintValidator
 {
+    /**
+     * @var \SplObjectStorage<FormInterface, array<int, string|string[]|GroupSequence>>
+     */
     private $resolvedGroups;
 
     /**
@@ -110,7 +113,7 @@ class FormValidator extends ConstraintValidator
                 foreach ($constraints as $constraint) {
                     // For the "Valid" constraint, validate the data in all groups
                     if ($constraint instanceof Valid) {
-                        if (\is_object($data)) {
+                        if (\is_object($data) || \is_array($data)) {
                             $validator->atPath('data')->validate($data, $constraint, $groups);
                         }
 
@@ -168,7 +171,7 @@ class FormValidator extends ConstraintValidator
             // child.
             // See also https://github.com/symfony/symfony/issues/4359
             if ($childrenSynchronized) {
-                $clientDataAsString = is_scalar($form->getViewData())
+                $clientDataAsString = \is_scalar($form->getViewData())
                     ? (string) $form->getViewData()
                     : get_debug_type($form->getViewData());
 
@@ -203,7 +206,7 @@ class FormValidator extends ConstraintValidator
     /**
      * Returns the validation groups of the given form.
      *
-     * @return string|GroupSequence|(string|GroupSequence)[] The validation groups
+     * @return string|GroupSequence|array<string|GroupSequence>
      */
     private function getValidationGroups(FormInterface $form)
     {
@@ -242,9 +245,9 @@ class FormValidator extends ConstraintValidator
     /**
      * Post-processes the validation groups option for a given form.
      *
-     * @param string|GroupSequence|(string|GroupSequence)[]|callable $groups The validation groups
+     * @param string|GroupSequence|array<string|GroupSequence>|callable $groups The validation groups
      *
-     * @return GroupSequence|(string|GroupSequence)[] The validation groups
+     * @return GroupSequence|array<string|GroupSequence>
      */
     private static function resolveValidationGroups($groups, FormInterface $form)
     {
@@ -261,8 +264,16 @@ class FormValidator extends ConstraintValidator
 
     private static function getConstraintsInGroups($constraints, $group)
     {
-        return array_filter($constraints, static function (Constraint $constraint) use ($group) {
-            return \in_array($group, $constraint->groups, true);
+        $groups = (array) $group;
+
+        return array_filter($constraints, static function (Constraint $constraint) use ($groups) {
+            foreach ($groups as $group) {
+                if (\in_array($group, $constraint->groups, true)) {
+                    return true;
+                }
+            }
+
+            return false;
         });
     }
 }

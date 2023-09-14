@@ -15,16 +15,14 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Notifier\Channel\ChannelInterface;
 use Symfony\Component\Notifier\Channel\ChannelPolicy;
 use Symfony\Component\Notifier\Channel\ChannelPolicyInterface;
+use Symfony\Component\Notifier\Channel\SmsChannel;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\Recipient\AdminRecipient;
 use Symfony\Component\Notifier\Recipient\NoRecipient;
-use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Component\Notifier\Recipient\RecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 final class Notifier implements NotifierInterface
 {
@@ -41,7 +39,7 @@ final class Notifier implements NotifierInterface
         $this->policy = $policy;
     }
 
-    public function send(Notification $notification, Recipient ...$recipients): void
+    public function send(Notification $notification, RecipientInterface ...$recipients): void
     {
         if (!$recipients) {
             $recipients = [new NoRecipient()];
@@ -54,20 +52,20 @@ final class Notifier implements NotifierInterface
         }
     }
 
-    public function addAdminRecipient(AdminRecipient $recipient): void
+    public function addAdminRecipient(RecipientInterface $recipient): void
     {
         $this->adminRecipients[] = $recipient;
     }
 
     /**
-     * @return AdminRecipient[]
+     * @return RecipientInterface[]
      */
     public function getAdminRecipients(): array
     {
         return $this->adminRecipients;
     }
 
-    private function getChannels(Notification $notification, Recipient $recipient): iterable
+    private function getChannels(Notification $notification, RecipientInterface $recipient): iterable
     {
         $channels = $notification->getChannels($recipient);
         if (!$channels) {
@@ -90,6 +88,10 @@ final class Notifier implements NotifierInterface
 
             if (null === $channel = $this->getChannel($channelName)) {
                 throw new LogicException(sprintf('The "%s" channel does not exist.', $channelName));
+            }
+
+            if ($channel instanceof SmsChannel && $recipient instanceof NoRecipient) {
+                throw new LogicException(sprintf('The "%s" channel needs a Recipient.', $channelName));
             }
 
             if (!$channel->supports($notification, $recipient)) {

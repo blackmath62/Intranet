@@ -2,28 +2,25 @@
 
 namespace App\Security;
 
-
 use App\Controller\SecurityController;
 use App\Repository\Main\UsersRepository;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
-    
-    
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+
 class LoginFormAuthenticator extends AbstractAuthenticator
 {
     /**
@@ -42,7 +39,6 @@ class LoginFormAuthenticator extends AbstractAuthenticator
         $this->flashBag = $flashBag;
     }
 
-
     /**
      * Does the authenticator support the given Request?
      *
@@ -53,7 +49,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator
     public function supports(Request $request): ?bool
     {
         return $request->attributes->get('_route') === 'app_login'
-            && $request->isMethod('POST');
+        && $request->isMethod('POST');
     }
 
     /**
@@ -69,23 +65,23 @@ class LoginFormAuthenticator extends AbstractAuthenticator
      *
      * @throws AuthenticationException
      */
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
-        $user = $this->usersRepository->findOneBy(['email' => $request->request->get('email') , 'closedAt' => NULL]);
-        $request->getSession()->set(SecurityController:: LAST_EMAIL, $request->request->get('email'));
+        $user = $this->usersRepository->findOneBy(['email' => $request->request->get('email'), 'closedAt' => null]);
+        $request->getSession()->set(SecurityController::LAST_EMAIL, $request->request->get('email'));
 
         if (!$user) {
             throw new CustomUserMessageAuthenticationException('Connexion impossible !');
         }
 
-        if ($user->getToken()){
+        if ($user->getToken()) {
             throw new CustomUserMessageAuthenticationException('Validation de votre compte obligatoire !');
         }
-        return new Passport($user, new PasswordCredentials($request->request->get('password')), [
+        $userBadge = new UserBadge($request->request->get('email'));
+        return new Passport($userBadge, new PasswordCredentials($request->request->get('password')), [
 
             new CsrfTokenBadge('login_form', $request->request->get('csrf_token')),
-            new RememberMeBadge
-            // todo voir vidéo 1h01
+            new RememberMeBadge,
             //new PasswordUpgradeBadge($request->get('password'), $this->usersRepository)
         ]);
     }
@@ -102,7 +98,6 @@ class LoginFormAuthenticator extends AbstractAuthenticator
      * @param PassportInterface $passport The passport returned from authenticate()
      */
     //public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface;
-    
 
     /**
      * Called when authentication executed and was successful!
@@ -129,7 +124,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        // todo mise en place du message flash 
+        // todo mise en place du message flash
         $this->flashBag->add('error', 'Identifiant ou mot de passe invalide !');
         return new RedirectResponse($this->urlGenerator->generate('app_login'));
     }

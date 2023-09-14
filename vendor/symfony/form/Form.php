@@ -22,6 +22,7 @@ use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
@@ -65,6 +66,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, FormInterface>
  */
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
@@ -79,12 +82,14 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $parent;
 
     /**
-     * @var FormInterface[]|OrderedHashMap A map of FormInterface instances
+     * A map of FormInterface instances.
+     *
+     * @var OrderedHashMap<string, FormInterface>
      */
     private $children;
 
     /**
-     * @var FormError[] An array of FormError instances
+     * @var FormError[]
      */
     private $errors = [];
 
@@ -94,7 +99,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $submitted = false;
 
     /**
-     * @var FormInterface|ClickableInterface|null The button that was used to submit the form
+     * The button that was used to submit the form.
+     *
+     * @var FormInterface|ClickableInterface|null
      */
     private $clickedButton;
 
@@ -114,12 +121,16 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $viewData;
 
     /**
-     * @var array The submitted values that don't belong to any children
+     * The submitted values that don't belong to any children.
+     *
+     * @var array
      */
     private $extraData = [];
 
     /**
-     * @var TransformationFailedException|null The transformation failure generated during submission, if any
+     * The transformation failure generated during submission, if any.
+     *
+     * @var TransformationFailedException|null
      */
     private $transformationFailure;
 
@@ -150,7 +161,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $name = '';
 
     /**
-     * @var bool Whether the form inherits its underlying data from its parent
+     * Whether the form inherits its underlying data from its parent.
+     *
+     * @var bool
      */
     private $inheritData;
 
@@ -343,7 +356,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         // Treat data as strings unless a transformer exists
-        if (is_scalar($modelData) && !$this->config->getViewTransformers() && !$this->config->getModelTransformers()) {
+        if (\is_scalar($modelData) && !$this->config->getViewTransformers() && !$this->config->getModelTransformers()) {
             $modelData = (string) $modelData;
         }
 
@@ -526,14 +539,14 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         // and radio buttons with empty values.
         if (false === $submittedData) {
             $submittedData = null;
-        } elseif (is_scalar($submittedData)) {
+        } elseif (\is_scalar($submittedData)) {
             $submittedData = (string) $submittedData;
         } elseif ($this->config->getRequestHandler()->isFileUpload($submittedData)) {
             if (!$this->config->getOption('allow_file_upload')) {
                 $submittedData = null;
                 $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, file upload given.');
             }
-        } elseif (\is_array($submittedData) && !$this->config->getCompound() && !$this->config->hasOption('multiple')) {
+        } elseif (\is_array($submittedData) && !$this->config->getCompound() && !$this->config->getOption('multiple', false)) {
             $submittedData = null;
             $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
         }
@@ -809,8 +822,6 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
     /**
      * {@inheritdoc}
-     *
-     * @return $this
      */
     public function clearErrors(bool $deep = false): self
     {
@@ -864,7 +875,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $options['auto_initialize'] = false;
 
             if (null === $type && null === $this->config->getDataClass()) {
-                $type = 'Symfony\Component\Form\Extension\Core\Type\TextType';
+                $type = TextType::class;
             }
 
             if (null === $type) {
@@ -954,6 +965,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($name)
     {
         return $this->has($name);
@@ -964,10 +976,11 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @param string $name The name of the child
      *
-     * @return FormInterface The child form
+     * @return FormInterface
      *
      * @throws OutOfBoundsException if the named child does not exist
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($name)
     {
         return $this->get($name);
@@ -979,11 +992,14 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      * @param string        $name  Ignored. The name of the child is used
      * @param FormInterface $child The child to be added
      *
+     * @return void
+     *
      * @throws AlreadySubmittedException if the form has already been submitted
      * @throws LogicException            when trying to add a child to a non-compound form
      *
      * @see self::add()
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($name, $child)
     {
         $this->add($child);
@@ -994,8 +1010,11 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @param string $name The name of the child to remove
      *
+     * @return void
+     *
      * @throws AlreadySubmittedException if the form has already been submitted
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($name)
     {
         $this->remove($name);
@@ -1004,8 +1023,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the iterator for this group.
      *
-     * @return \Traversable|FormInterface[]
+     * @return \Traversable<string, FormInterface>
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return $this->children;
@@ -1014,8 +1034,9 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the number of form children (implements the \Countable interface).
      *
-     * @return int The number of embedded form children
+     * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return \count($this->children);
@@ -1044,9 +1065,36 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $view->children[$name] = $child->createView($view);
         }
 
+        $this->sort($view->children);
+
         $type->finishView($view, $this, $options);
 
         return $view;
+    }
+
+    /**
+     * Sorts view fields based on their priority value.
+     */
+    private function sort(array &$children): void
+    {
+        $c = [];
+        $i = 0;
+        $needsSorting = false;
+        foreach ($children as $name => $child) {
+            $c[$name] = ['p' => $child->vars['priority'] ?? 0, 'i' => $i++];
+
+            if (0 !== $c[$name]['p']) {
+                $needsSorting = true;
+            }
+        }
+
+        if (!$needsSorting) {
+            return;
+        }
+
+        uksort($children, static function ($a, $b) use ($c): int {
+            return [$c[$b]['p'], $c[$a]['i']] <=> [$c[$a]['p'], $c[$b]['i']];
+        });
     }
 
     /**
@@ -1106,7 +1154,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         // compound forms is passed to the data mapper and thus should
         // not be converted to a string before.
         if (!($transformers = $this->config->getViewTransformers()) && !$this->config->getCompound()) {
-            return null === $value || is_scalar($value) ? (string) $value : $value;
+            return null === $value || \is_scalar($value) ? (string) $value : $value;
         }
 
         try {

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -20,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @final
  */
-class Security
+class Security implements AuthorizationCheckerInterface
 {
     public const ACCESS_DENIED_ERROR = '_security.403_error';
     public const AUTHENTICATION_ERROR = '_security.last_error';
@@ -41,10 +42,8 @@ class Security
         }
 
         $user = $token->getUser();
-        if (!\is_object($user)) {
-            return null;
-        }
 
+        // @deprecated since Symfony 5.4, $user will always be a UserInterface instance
         if (!$user instanceof UserInterface) {
             return null;
         }

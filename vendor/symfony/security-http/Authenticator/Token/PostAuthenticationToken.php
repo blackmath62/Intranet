@@ -27,20 +27,22 @@ class PostAuthenticationToken extends AbstractToken
     {
         parent::__construct($roles);
 
-        if (empty($firewallName)) {
+        if ('' === $firewallName) {
             throw new \InvalidArgumentException('$firewallName must not be empty.');
         }
 
         $this->setUser($user);
         $this->firewallName = $firewallName;
 
-        // this token is meant to be used after authentication success, so it is always authenticated
-        // you could set it as non authenticated later if you need to
-        $this->setAuthenticated(true);
+        // @deprecated since Symfony 5.4
+        if (method_exists($this, 'setAuthenticated')) {
+            // this token is meant to be used after authentication success, so it is always authenticated
+            $this->setAuthenticated(true, false);
+        }
     }
 
     /**
-     * This is meant to be only an authenticated token, where credentials
+     * This is meant to be only a token, where credentials
      * have already been used and are thus cleared.
      *
      * {@inheritdoc}

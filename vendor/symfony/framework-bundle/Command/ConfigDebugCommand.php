@@ -12,6 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,6 +36,7 @@ use Symfony\Component\Yaml\Yaml;
 class ConfigDebugCommand extends AbstractConfigCommand
 {
     protected static $defaultName = 'debug:config';
+    protected static $defaultDescription = 'Dump the current configuration for an extension';
 
     /**
      * {@inheritdoc}
@@ -44,7 +48,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
             ])
-            ->setDescription('Dumps the current configuration for an extension')
+            ->setDescription(self::$defaultDescription)
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the current configuration for an
 extension/bundle.
@@ -73,14 +77,7 @@ EOF
 
         if (null === $name = $input->getArgument('name')) {
             $this->listBundles($errorIo);
-
-            $kernel = $this->getApplication()->getKernel();
-            if ($kernel instanceof ExtensionInterface
-                && ($kernel instanceof ConfigurationInterface || $kernel instanceof ConfigurationExtensionInterface)
-                && $kernel->getAlias()
-            ) {
-                $errorIo->table(['Kernel Extension'], [[$kernel->getAlias()]]);
-            }
+            $this->listNonBundleExtensions($errorIo);
 
             $errorIo->comment('Provide the name of a bundle as the first argument of this command to dump its configuration. (e.g. <comment>debug:config FrameworkBundle</comment>)');
             $errorIo->comment('For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>debug:config FrameworkBundle serializer</comment> to dump the <comment>framework.serializer</comment> configuration)');
@@ -89,26 +86,14 @@ EOF
         }
 
         $extension = $this->findExtension($name);
+        $extensionAlias = $extension->getAlias();
         $container = $this->compileContainer();
 
-        $extensionAlias = $extension->getAlias();
-        $extensionConfig = [];
-        foreach ($container->getCompilerPassConfig()->getPasses() as $pass) {
-            if ($pass instanceof ValidateEnvPlaceholdersPass) {
-                $extensionConfig = $pass->getExtensionConfig();
-                break;
-            }
-        }
-
-        if (!isset($extensionConfig[$extensionAlias])) {
-            throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
-        }
-
-        $config = $container->resolveEnvPlaceholders($extensionConfig[$extensionAlias]);
+        $config = $this->getConfig($extension, $container);
 
         if (null === $path = $input->getArgument('path')) {
             $io->title(
-                sprintf('Current configuration for %s', ($name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name)))
+                sprintf('Current configuration for %s', $name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name))
             );
 
             $io->writeln(Yaml::dump([$extensionAlias => $config], 10));
@@ -147,9 +132,9 @@ EOF
     /**
      * Iterate over configuration until the last step of the given path.
      *
-     * @throws LogicException If the configuration does not exist
-     *
      * @return mixed
+     *
+     * @throws LogicException If the configuration does not exist
      */
     private function getConfigForPath(array $config, string $path, string $alias)
     {
@@ -164,5 +149,98 @@ EOF
         }
 
         return $config;
+    }
+
+    private function getConfigForExtension(ExtensionInterface $extension, ContainerBuilder $container): array
+    {
+        $extensionAlias = $extension->getAlias();
+
+        $extensionConfig = [];
+        foreach ($container->getCompilerPassConfig()->getPasses() as $pass) {
+            if ($pass instanceof ValidateEnvPlaceholdersPass) {
+                $extensionConfig = $pass->getExtensionConfig();
+                break;
+            }
+        }
+
+        if (isset($extensionConfig[$extensionAlias])) {
+            return $extensionConfig[$extensionAlias];
+        }
+
+        // Fall back to default config if the extension has one
+
+        if (!$extension instanceof ConfigurationExtensionInterface && !$extension instanceof ConfigurationInterface) {
+            throw new \LogicException(sprintf('The extension with alias "%s" does not have configuration.', $extensionAlias));
+        }
+
+        $configs = $container->getExtensionConfig($extensionAlias);
+        $configuration = $extension instanceof ConfigurationInterface ? $extension : $extension->getConfiguration($configs, $container);
+        $this->validateConfiguration($extension, $configuration);
+
+        return (new Processor())->processConfiguration($configuration, $configs);
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('name')) {
+            $suggestions->suggestValues($this->getAvailableExtensions());
+            $suggestions->suggestValues($this->getAvailableBundles());
+
+            return;
+        }
+
+        if ($input->mustSuggestArgumentValuesFor('path') && null !== $name = $input->getArgument('name')) {
+            try {
+                $config = $this->getConfig($this->findExtension($name), $this->compileContainer());
+                $paths = array_keys(self::buildPathsCompletion($config));
+                $suggestions->suggestValues($paths);
+            } catch (LogicException $e) {
+            }
+        }
+    }
+
+    private function getAvailableExtensions(): array
+    {
+        $kernel = $this->getApplication()->getKernel();
+
+        $extensions = [];
+        foreach ($this->getContainerBuilder($kernel)->getExtensions() as $alias => $extension) {
+            $extensions[] = $alias;
+        }
+
+        return $extensions;
+    }
+
+    private function getAvailableBundles(): array
+    {
+        $availableBundles = [];
+        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
+            $availableBundles[] = $bundle->getName();
+        }
+
+        return $availableBundles;
+    }
+
+    private function getConfig(ExtensionInterface $extension, ContainerBuilder $container)
+    {
+        return $container->resolveEnvPlaceholders(
+            $container->getParameterBag()->resolveValue(
+                $this->getConfigForExtension($extension, $container)
+            )
+        );
+    }
+
+    private static function buildPathsCompletion(array $paths, string $prefix = ''): array
+    {
+        $completionPaths = [];
+        foreach ($paths as $key => $values) {
+            if (\is_array($values)) {
+                $completionPaths = $completionPaths + self::buildPathsCompletion($values, $prefix.$key.'.');
+            } else {
+                $completionPaths[$prefix.$key] = null;
+            }
+        }
+
+        return $completionPaths;
     }
 }

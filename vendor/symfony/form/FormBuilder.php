@@ -15,11 +15,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * A builder for creating {@link Form} instances.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @implements \IteratorAggregate<string, FormBuilderInterface>
  */
 class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormBuilderInterface
 {
@@ -87,7 +90,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if (null === $type && null === $this->getDataClass()) {
-            $type = 'Symfony\Component\Form\Extension\Core\Type\TextType';
+            $type = TextType::class;
         }
 
         if (null !== $type) {
@@ -160,6 +163,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         if ($this->locked) {
@@ -212,8 +216,9 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * {@inheritdoc}
      *
-     * @return FormBuilderInterface[]|\Traversable
+     * @return \Traversable<string, FormBuilderInterface>
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         if ($this->locked) {

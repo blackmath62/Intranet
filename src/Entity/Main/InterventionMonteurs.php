@@ -21,12 +21,12 @@ class InterventionMonteurs
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="interventionMonteurs")
+     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="interventionMonteursUserCr")
      */
     private $UserCr;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Users::class, inversedBy="interventionMonteurs")
+     * @ORM\ManyToMany(targetEntity=Users::class, inversedBy="interventionMonteursEquipes")
      */
     private $Equipes;
 

@@ -37,8 +37,8 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     private $file;
     private $keys;
     private $values;
-    private $createCacheItem;
 
+    private static $createCacheItem;
     private static $valuesCache = [];
 
     /**
@@ -49,7 +49,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     {
         $this->file = $file;
         $this->pool = $fallbackPool;
-        $this->createCacheItem = \Closure::bind(
+        self::$createCacheItem ?? self::$createCacheItem = \Closure::bind(
             static function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
@@ -142,9 +142,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
             }
         }
 
-        $f = $this->createCacheItem;
-
-        return $f($key, $value, $isHit);
+        return (self::$createCacheItem)($key, $value, $isHit);
     }
 
     /**
@@ -347,7 +345,7 @@ EOF;
                     $isStaticValue = false;
                 }
                 $value = var_export($value, true);
-            } elseif (!is_scalar($value)) {
+            } elseif (!\is_scalar($value)) {
                 throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable "%s" value.', $key, get_debug_type($value)));
             } else {
                 $value = var_export($value, true);
@@ -407,7 +405,7 @@ EOF;
 
     private function generateItems(array $keys): \Generator
     {
-        $f = $this->createCacheItem;
+        $f = self::$createCacheItem;
         $fallbackKeys = [];
 
         foreach ($keys as $key) {

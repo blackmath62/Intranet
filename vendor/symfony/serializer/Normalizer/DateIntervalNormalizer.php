@@ -36,9 +36,9 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      *
-     * @throws InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws InvalidArgumentException
      */
     public function normalize($object, string $format = null, array $context = [])
     {
@@ -68,10 +68,10 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      *
+     * @return \DateInterval
+     *
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     *
-     * @return \DateInterval
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
@@ -96,7 +96,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
                 $dateIntervalFormat = substr($dateIntervalFormat, 2);
                 break;
         }
-        $valuePattern = '/^'.$signPattern.preg_replace('/%([yYmMdDhHiIsSwW])(\w)/', '(?P<$1>\d+)$2', $dateIntervalFormat).'$/';
+        $valuePattern = '/^'.$signPattern.preg_replace('/%([yYmMdDhHiIsSwW])(\w)/', '(?:(?P<$1>\d+)$2)?', preg_replace('/(T.*)$/', '($1)?', $dateIntervalFormat)).'$/';
         if (!preg_match($valuePattern, $data)) {
             throw new UnexpectedValueException(sprintf('Value "%s" contains intervals not accepted by format "%s".', $data, $dateIntervalFormat));
         }

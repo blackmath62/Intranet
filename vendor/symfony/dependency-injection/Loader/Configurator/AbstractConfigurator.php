@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -24,7 +26,7 @@ abstract class AbstractConfigurator
     public const FACTORY = 'unknown';
 
     /**
-     * @var callable(mixed $value, bool $allowService)|null
+     * @var callable(mixed, bool)|null
      */
     public static $valuePreProcessor;
 
@@ -40,6 +42,9 @@ abstract class AbstractConfigurator
         throw new \BadMethodCallException(sprintf('Call to undefined method "%s::%s()".', static::class, $method));
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
@@ -73,7 +78,9 @@ abstract class AbstractConfigurator
         }
 
         if ($value instanceof ReferenceConfigurator) {
-            return new Reference($value->id, $value->invalidBehavior);
+            $reference = new Reference($value->id, $value->invalidBehavior);
+
+            return $value instanceof ClosureReferenceConfigurator ? new ServiceClosureArgument($reference) : $reference;
         }
 
         if ($value instanceof InlineServiceConfigurator) {
@@ -83,13 +90,17 @@ abstract class AbstractConfigurator
             return $def;
         }
 
+        if ($value instanceof ParamConfigurator) {
+            return (string) $value;
+        }
+
         if ($value instanceof self) {
             throw new InvalidArgumentException(sprintf('"%s()" can be used only at the root of service configuration files.', $value::FACTORY));
         }
 
         switch (true) {
             case null === $value:
-            case is_scalar($value):
+            case \is_scalar($value):
                 return $value;
 
             case $value instanceof ArgumentInterface:

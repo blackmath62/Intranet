@@ -814,7 +814,7 @@ class EntityManager implements EntityManagerInterface
                     $entityName
                 );
             } else {
-                NotSupported::createForPersistence3(sprintf(
+                throw NotSupported::createForPersistence3(sprintf(
                     'Using short namespace alias "%s" when calling %s',
                     $entityName,
                     __METHOD__
@@ -951,6 +951,14 @@ class EntityManager implements EntityManagerInterface
     public function initializeObject($obj)
     {
         $this->unitOfWork->initializeObject($obj);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isUninitializedObject($obj): bool
+    {
+        return $this->unitOfWork->isUninitializedObject($obj);
     }
 
     /**

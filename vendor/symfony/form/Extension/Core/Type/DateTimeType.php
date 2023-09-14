@@ -209,7 +209,7 @@ class DateTimeType extends AbstractType
     {
         $view->vars['widget'] = $options['widget'];
 
-        // Change the input to a HTML5 datetime input if
+        // Change the input to an HTML5 datetime input if
         //  * the widget is set to "single_text"
         //  * the format matches the one expected by HTML5
         //  * the html5 is set to true
@@ -273,6 +273,11 @@ class DateTimeType extends AbstractType
                 return $options['compound'] ? [] : '';
             },
             'input_format' => 'Y-m-d H:i:s',
+            'invalid_message' => function (Options $options, $previousValue) {
+                return ($options['legacy_error_messages'] ?? true)
+                    ? $previousValue
+                    : 'Please enter a valid date and time.';
+            },
         ]);
 
         // Don't add some defaults in order to preserve the defaults

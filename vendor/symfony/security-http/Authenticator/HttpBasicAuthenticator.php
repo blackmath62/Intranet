@@ -17,11 +17,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
@@ -32,7 +31,6 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @final
- * @experimental in 5.1
  */
 class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
 {
@@ -40,7 +38,7 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
     private $userProvider;
     private $logger;
 
-    public function __construct(string $realmName, UserProviderInterface $userProvider, ?LoggerInterface $logger = null)
+    public function __construct(string $realmName, UserProviderInterface $userProvider, LoggerInterface $logger = null)
     {
         $this->realmName = $realmName;
         $this->userProvider = $userProvider;
@@ -66,12 +64,18 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
         $username = $request->headers->get('PHP_AUTH_USER');
         $password = $request->headers->get('PHP_AUTH_PW', '');
 
-        $user = $this->userProvider->loadUserByUsername($username);
-        if (!$user instanceof UserInterface) {
-            throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
+        // @deprecated since Symfony 5.3, change to $this->userProvider->loadUserByIdentifier() in 6.0
+        $method = 'loadUserByIdentifier';
+        if (!method_exists($this->userProvider, 'loadUserByIdentifier')) {
+            trigger_deprecation('symfony/security-core', '5.3', 'Not implementing method "loadUserByIdentifier()" in user provider "%s" is deprecated. This method will replace "loadUserByUsername()" in Symfony 6.0.', get_debug_type($this->userProvider));
+
+            $method = 'loadUserByUsername';
         }
 
-        $passport = new Passport($user, new PasswordCredentials($password));
+        $passport = new Passport(
+            new UserBadge($username, [$this->userProvider, $method]),
+            new PasswordCredentials($password)
+        );
         if ($this->userProvider instanceof PasswordUpgraderInterface) {
             $passport->addBadge(new PasswordUpgradeBadge($password, $this->userProvider));
         }
@@ -80,11 +84,18 @@ class HttpBasicAuthenticator implements AuthenticatorInterface, AuthenticationEn
     }
 
     /**
-     * @param Passport $passport
+     * @deprecated since Symfony 5.4, use {@link createToken()} instead
      */
     public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
     {
-        return new UsernamePasswordToken($passport->getUser(), null, $firewallName, $passport->getUser()->getRoles());
+        trigger_deprecation('symfony/security-http', '5.4', 'Method "%s()" is deprecated, use "%s::createToken()" instead.', __METHOD__, __CLASS__);
+
+        return $this->createToken($passport, $firewallName);
+    }
+
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
+    {
+        return new UsernamePasswordToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles());
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response

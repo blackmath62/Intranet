@@ -67,29 +67,21 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     public function __construct(int $scale = null, ?bool $grouping = false, ?int $roundingMode = \NumberFormatter::ROUND_HALFUP, string $locale = null)
     {
-        if (null === $grouping) {
-            $grouping = false;
-        }
-
-        if (null === $roundingMode) {
-            $roundingMode = \NumberFormatter::ROUND_HALFUP;
-        }
-
         $this->scale = $scale;
-        $this->grouping = $grouping;
-        $this->roundingMode = $roundingMode;
+        $this->grouping = $grouping ?? false;
+        $this->roundingMode = $roundingMode ?? \NumberFormatter::ROUND_HALFUP;
         $this->locale = $locale;
     }
 
     /**
      * Transforms a number type into localized number.
      *
-     * @param int|float $value Number value
+     * @param int|float|null $value Number value
      *
-     * @return string Localized value
+     * @return string
      *
      * @throws TransformationFailedException if the given value is not numeric
-     *                                       or if the value can not be transformed
+     *                                       or if the value cannot be transformed
      */
     public function transform($value)
     {
@@ -119,10 +111,10 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param string $value The localized value
      *
-     * @return int|float The numeric value
+     * @return int|float|null
      *
      * @throws TransformationFailedException if the given value is not a string
-     *                                       or if the value can not be transformed
+     *                                       or if the value cannot be transformed
      */
     public function reverseTransform($value)
     {
@@ -151,7 +143,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $value = str_replace(',', $decSep, $value);
         }
 
-        if (false !== strpos($value, $decSep)) {
+        if (str_contains($value, $decSep)) {
             $type = \NumberFormatter::TYPE_DOUBLE;
         } else {
             $type = \PHP_INT_SIZE === 8
@@ -231,7 +223,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param int|float $number A number
      *
-     * @return int|float The rounded number
+     * @return int|float
      */
     private function round($number)
     {

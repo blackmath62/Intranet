@@ -2,17 +2,7 @@
 
 namespace <?= $namespace ?>;
 
-use <?= $entity_full_class_name ?>;
-use <?= $form_full_class_name ?>;
-<?php if (isset($repository_full_class_name)): ?>
-use <?= $repository_full_class_name ?>;
-<?php else: ?>
-use Doctrine\ORM\EntityManagerInterface;
-<?php endif; ?>
-use Symfony\Bundle\FrameworkBundle\Controller\<?= $parent_class_name ?>;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+<?= $use_statements; ?>
 
 <?php if ($use_attributes) { ?>
 #[Route('<?= $route_path ?>')]
@@ -21,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @Route("<?= $route_path ?>")
  */
 <?php } ?>
-class <?= $class_name ?> extends <?= $parent_class_name; ?><?= "\n" ?>
+class <?= $class_name ?> extends AbstractController
 {
 <?= $generator->generateRouteForControllerMethod('/', sprintf('%s_index', $route_name), ['GET']) ?>
 <?php if (isset($repository_full_class_name)): ?>
@@ -57,7 +47,8 @@ class <?= $class_name ?> extends <?= $parent_class_name; ?><?= "\n" ?>
 
 <?php if (isset($repository_full_class_name) && $generator->repositoryHasAddRemoveMethods($repository_full_class_name)) { ?>
         if ($form->isSubmitted() && $form->isValid()) {
-            $<?= $repository_var ?>->add($<?= $entity_var_singular ?>);
+            $<?= $repository_var ?>->add($<?= $entity_var_singular ?>, true);
+
             return $this->redirectToRoute('<?= $route_name ?>_index', [], Response::HTTP_SEE_OTHER);
         }
 <?php } else { ?>
@@ -102,7 +93,8 @@ class <?= $class_name ?> extends <?= $parent_class_name; ?><?= "\n" ?>
 
 <?php if (isset($repository_full_class_name) && $generator->repositoryHasAddRemoveMethods($repository_full_class_name)) { ?>
         if ($form->isSubmitted() && $form->isValid()) {
-            $<?= $repository_var ?>->add($<?= $entity_var_singular ?>);
+            $<?= $repository_var ?>->add($<?= $entity_var_singular ?>, true);
+
             return $this->redirectToRoute('<?= $route_name ?>_index', [], Response::HTTP_SEE_OTHER);
         }
 <?php } else { ?>
@@ -135,7 +127,7 @@ class <?= $class_name ?> extends <?= $parent_class_name; ?><?= "\n" ?>
     {
 <?php if (isset($repository_full_class_name) && $generator->repositoryHasAddRemoveMethods($repository_full_class_name)) { ?>
         if ($this->isCsrfTokenValid('delete'.$<?= $entity_var_singular ?>->get<?= ucfirst($entity_identifier) ?>(), $request->request->get('_token'))) {
-            $<?= $repository_var ?>->remove($<?= $entity_var_singular ?>);
+            $<?= $repository_var ?>->remove($<?= $entity_var_singular ?>, true);
         }
 <?php } else { ?>
         if ($this->isCsrfTokenValid('delete'.$<?= $entity_var_singular ?>->get<?= ucfirst($entity_identifier) ?>(), $request->request->get('_token'))) {

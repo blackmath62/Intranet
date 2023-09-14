@@ -129,9 +129,6 @@
             "./config/packages/fos_ckeditor.yaml"
         ]
     },
-    "fzaninotto/faker": {
-        "version": "v1.9.1"
-    },
     "h4cc/wkhtmltoimage-amd64": {
         "version": "0.12.4"
     },
@@ -654,18 +651,6 @@
     },
     "symfony/yaml": {
         "version": "v5.1.3"
-    },
-    "twig/extensions": {
-        "version": "1.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "1.0",
-            "ref": "a86723ee8d8b2f9437c8ce60a5546a1c267da5ed"
-        },
-        "files": [
-            "./config/packages/twig_extensions.yaml"
-        ]
     },
     "twig/extra-bundle": {
         "version": "v3.0.5"

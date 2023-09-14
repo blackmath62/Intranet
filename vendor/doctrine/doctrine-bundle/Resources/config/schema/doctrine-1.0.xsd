@@ -52,6 +52,7 @@
         <xsd:attribute name="user" type="xsd:string" />
         <xsd:attribute name="password" type="xsd:string" />
         <xsd:attribute name="override-url" type="xsd:boolean" />
+        <xsd:attribute name="dbname-suffix" type="xsd:string" />
         <xsd:attribute name="application-name" type="xsd:string" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="unix-socket" type="xsd:string" />
@@ -211,6 +212,7 @@
             <xsd:element name="filter" type="filter" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="entity-listeners" type="entity_listeners" minOccurs="0" maxOccurs="1" />
             <xsd:element name="second-level-cache" type="second-level-cache" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="schema-ignore-class" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
     </xsd:group>
 

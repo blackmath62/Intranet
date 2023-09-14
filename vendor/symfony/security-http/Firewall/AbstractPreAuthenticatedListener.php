@@ -25,6 +25,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+trigger_deprecation('symfony/security-http', '5.3', 'The "%s" class is deprecated, use the new authenticator system instead.', AbstractPreAuthenticatedListener::class);
+
 /**
  * AbstractPreAuthenticatedListener is the base class for all listener that
  * authenticates users based on a pre-authenticated request (like a certificate
@@ -33,6 +35,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @internal
+ *
+ * @deprecated since Symfony 5.3, use the new authenticator system instead
  */
 abstract class AbstractPreAuthenticatedListener extends AbstractListener
 {
@@ -83,7 +87,8 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
         }
 
         if (null !== $token = $this->tokenStorage->getToken()) {
-            if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getProviderKey() && $token->isAuthenticated() && $token->getUsername() === $user) {
+            // @deprecated since Symfony 5.3, change to $token->getUserIdentifier() in 6.0
+            if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getFirewallName() && $token->isAuthenticated() && (method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername()) === $user) {
                 return;
             }
         }
@@ -93,13 +98,14 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
         }
 
         try {
+            $previousToken = $token;
             $token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
 
             if (null !== $this->logger) {
                 $this->logger->info('Pre-authentication successful.', ['token' => (string) $token]);
             }
 
-            $this->migrateSession($request, $token);
+            $this->migrateSession($request, $token, $previousToken);
 
             $this->tokenStorage->setToken($token);
 
@@ -128,7 +134,7 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
     private function clearToken(AuthenticationException $exception)
     {
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey()) {
+        if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getFirewallName()) {
             $this->tokenStorage->setToken(null);
 
             if (null !== $this->logger) {
@@ -144,10 +150,19 @@ abstract class AbstractPreAuthenticatedListener extends AbstractListener
      */
     abstract protected function getPreAuthenticatedData(Request $request);
 
-    private function migrateSession(Request $request, TokenInterface $token)
+    private function migrateSession(Request $request, TokenInterface $token, ?TokenInterface $previousToken)
     {
         if (!$this->sessionStrategy || !$request->hasSession() || !$request->hasPreviousSession()) {
             return;
+        }
+
+        if ($previousToken) {
+            $user = method_exists($token, 'getUserIdentifier') ? $token->getUserIdentifier() : $token->getUsername();
+            $previousUser = method_exists($previousToken, 'getUserIdentifier') ? $previousToken->getUserIdentifier() : $previousToken->getUsername();
+
+            if ('' !== ($user ?? '') && $user === $previousUser) {
+                return;
+            }
         }
 
         $this->sessionStrategy->onAuthentication($request, $token);

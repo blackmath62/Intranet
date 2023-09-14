@@ -14,8 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class SecurityController extends AbstractController
@@ -47,7 +47,7 @@ class SecurityController extends AbstractController
     /**
      * @Route("/register", name="app_register", methods={"GET","POST"})
      */
-    public function register(Request $request, EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder, MailerInterface $mailerInterface, SluggerInterface $slugger): Response
+    public function register(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder, MailerInterface $mailerInterface, SluggerInterface $slugger): Response
     {
         $form = $this->createForm(UserRegistrationFormType::class);
         $form->handleRequest($request);
@@ -56,7 +56,7 @@ class SecurityController extends AbstractController
             $plainPassword = $form['plainPassword']->getData();
             $user->setCreatedAt(new \DateTime())
                 ->setRoles(["ROLE_USER"])
-                ->setPassword($passwordEncoder->encodePassword($user, $plainPassword))
+                ->setPassword($passwordEncoder->hashPassword($user, $plainPassword))
                 ->setToken(md5(uniqid()));
 
             $file = $form->get('img')->getData();
@@ -170,7 +170,7 @@ class SecurityController extends AbstractController
     /**
      * @Route("/changePassword/{token}", name="app_change_password")
      */
-    public function changePassword($token, Request $request, EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder, UsersRepository $usersRepo)
+    public function changePassword($token, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder, UsersRepository $usersRepo)
     {
         $form = $this->createForm(ModifiedPasswordType::class);
         $form->handleRequest($request);
@@ -188,7 +188,7 @@ class SecurityController extends AbstractController
             //dd($user);
             // Modification du mot de passe de l'utilisateur
             $plainPassword = $form['plainPassword']->getData();
-            $user->setPassword($passwordEncoder->encodePassword($user, $plainPassword))
+            $user->setPassword($passwordEncoder->hashPassword($user, $plainPassword))
             // on supprime le token
                 ->setToken(null);
             $em->persist($user);

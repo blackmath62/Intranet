@@ -14,12 +14,14 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\AccessMapInterface;
+use Symfony\Component\Security\Http\Authentication\NoopAuthenticationManager;
 use Symfony\Component\Security\Http\Event\LazyResponseEvent;
 
 /**
@@ -31,20 +33,28 @@ use Symfony\Component\Security\Http\Event\LazyResponseEvent;
  */
 class AccessListener extends AbstractListener
 {
-    public const PUBLIC_ACCESS = 'PUBLIC_ACCESS';
-
     private $tokenStorage;
     private $accessDecisionManager;
     private $map;
     private $authManager;
     private $exceptionOnNoToken;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager, bool $exceptionOnNoToken = true)
+    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, /* bool */ $exceptionOnNoToken = true)
     {
+        if ($exceptionOnNoToken instanceof AuthenticationManagerInterface) {
+            trigger_deprecation('symfony/security-http', '5.4', 'The $authManager argument of "%s" is deprecated.', __METHOD__);
+            $authManager = $exceptionOnNoToken;
+            $exceptionOnNoToken = \func_num_args() > 4 ? func_get_arg(4) : true;
+        }
+
+        if (false !== $exceptionOnNoToken) {
+            trigger_deprecation('symfony/security-http', '5.4', 'Not setting the $exceptionOnNoToken argument of "%s" to "false" is deprecated.', __METHOD__);
+        }
+
         $this->tokenStorage = $tokenStorage;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->map = $map;
-        $this->authManager = $authManager;
+        $this->authManager = $authManager ?? (class_exists(AuthenticationManagerInterface::class) ? new NoopAuthenticationManager() : null);
         $this->exceptionOnNoToken = $exceptionOnNoToken;
     }
 
@@ -56,7 +66,14 @@ class AccessListener extends AbstractListener
         [$attributes] = $this->map->getPatterns($request);
         $request->attributes->set('_access_control_attributes', $attributes);
 
-        return $attributes && ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] !== $attributes && [self::PUBLIC_ACCESS] !== $attributes) ? true : null;
+        if ($attributes && (
+            (\defined(AuthenticatedVoter::class.'::IS_AUTHENTICATED_ANONYMOUSLY') ? [AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] !== $attributes : true)
+            && [AuthenticatedVoter::PUBLIC_ACCESS] !== $attributes
+        )) {
+            return true;
+        }
+
+        return null;
     }
 
     /**
@@ -76,7 +93,10 @@ class AccessListener extends AbstractListener
         $attributes = $request->attributes->get('_access_control_attributes');
         $request->attributes->remove('_access_control_attributes');
 
-        if (!$attributes || ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] === $attributes && $event instanceof LazyResponseEvent)) {
+        if (!$attributes || ((
+            (\defined(AuthenticatedVoter::class.'::IS_AUTHENTICATED_ANONYMOUSLY') ? [AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] === $attributes : false)
+            || [AuthenticatedVoter::PUBLIC_ACCESS] === $attributes
+        ) && $event instanceof LazyResponseEvent)) {
             return;
         }
 
@@ -89,24 +109,17 @@ class AccessListener extends AbstractListener
                 throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
             }
 
-            if ([AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY] === $attributes) {
-                trigger_deprecation('symfony/security-http', '5.1', 'Using "IS_AUTHENTICATED_ANONYMOUSLY" in your access_control rules when using the authenticator Security system is deprecated, use "PUBLIC_ACCESS" instead.');
-
-                return;
-            }
-
-            if ([self::PUBLIC_ACCESS] !== $attributes) {
-                throw $this->createAccessDeniedException($request, $attributes);
-            }
+            $token = new NullToken();
         }
 
-        if ([self::PUBLIC_ACCESS] === $attributes) {
-            return;
-        }
+        // @deprecated since Symfony 5.4
+        if (method_exists($token, 'isAuthenticated') && !$token->isAuthenticated(false)) {
+            trigger_deprecation('symfony/core', '5.4', 'Returning false from "%s::isAuthenticated()" is deprecated, return null from "getUser()" instead.', get_debug_type($token));
 
-        if (!$token->isAuthenticated()) {
-            $token = $this->authManager->authenticate($token);
-            $this->tokenStorage->setToken($token);
+            if ($this->authManager) {
+                $token = $this->authManager->authenticate($token);
+                $this->tokenStorage->setToken($token);
+            }
         }
 
         if (!$this->accessDecisionManager->decide($token, $attributes, $request, true)) {
@@ -121,5 +134,10 @@ class AccessListener extends AbstractListener
         $exception->setSubject($request);
 
         return $exception;
+    }
+
+    public static function getPriority(): int
+    {
+        return -255;
     }
 }

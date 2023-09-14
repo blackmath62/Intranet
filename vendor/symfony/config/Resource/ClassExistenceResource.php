@@ -32,27 +32,21 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
 
     /**
      * @param string    $resource The fully-qualified class name
-     * @param bool|null $exists   Boolean when the existency check has already been done
+     * @param bool|null $exists   Boolean when the existence check has already been done
      */
     public function __construct(string $resource, bool $exists = null)
     {
         $this->resource = $resource;
         if (null !== $exists) {
-            $this->exists = [(bool) $exists, null];
+            $this->exists = [$exists, null];
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString(): string
     {
         return $this->resource;
     }
 
-    /**
-     * @return string The file path to the resource
-     */
     public function getResource(): string
     {
         return $this->resource;

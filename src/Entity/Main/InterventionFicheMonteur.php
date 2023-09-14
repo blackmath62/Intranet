@@ -25,12 +25,12 @@ class InterventionFicheMonteur
     private $createdAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="interventionFicheMonteurs")
+     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="interventionFicheMonteursCreatedBy")
      */
     private $createdBy;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="interventionFicheMonteurs")
+     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="interventionFicheMonteursIntervenant")
      */
     private $intervenant;
 
@@ -99,7 +99,7 @@ class InterventionFicheMonteur
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -201,7 +201,7 @@ class InterventionFicheMonteur
         return $this->validedAt;
     }
 
-    public function setValidedAt(?\DateTimeInterface $validedAt): self
+    public function setValidedAt(?\DateTimeInterface $validedAt) : self
     {
         $this->validedAt = $validedAt;
 
@@ -225,7 +225,7 @@ class InterventionFicheMonteur
         return $this->lockedAt;
     }
 
-    public function setLockedAt(?\DateTimeInterface $lockedAt): self
+    public function setLockedAt(?\DateTimeInterface $lockedAt) : self
     {
         $this->lockedAt = $lockedAt;
 
@@ -266,5 +266,10 @@ class InterventionFicheMonteur
         $this->here = $here;
 
         return $this;
+    }
+
+    public function isHere(): ?bool
+    {
+        return $this->here;
     }
 }

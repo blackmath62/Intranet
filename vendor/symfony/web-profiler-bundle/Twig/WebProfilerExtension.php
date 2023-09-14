@@ -44,8 +44,8 @@ class WebProfilerExtension extends ProfilerExtension
 
     public function __construct(HtmlDumper $dumper = null)
     {
-        $this->dumper = $dumper ?: new HtmlDumper();
-        $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
+        $this->dumper = $dumper ?? new HtmlDumper();
+        $this->dumper->setOutput($this->output = fopen('php://memory', 'r+'));
     }
 
     public function enter(Profile $profile): void
@@ -56,7 +56,7 @@ class WebProfilerExtension extends ProfilerExtension
     public function leave(Profile $profile): void
     {
         if (0 === --$this->stackLevel) {
-            $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
+            $this->dumper->setOutput($this->output = fopen('php://memory', 'r+'));
         }
     }
 
@@ -90,13 +90,19 @@ class WebProfilerExtension extends ProfilerExtension
         $message = twig_escape_filter($env, $message);
         $message = preg_replace('/&quot;(.*?)&quot;/', '&quot;<b>$1</b>&quot;', $message);
 
-        if (null === $context || false === strpos($message, '{')) {
+        $replacements = [];
+        foreach ($context ?? [] as $k => $v) {
+            $k = '{'.twig_escape_filter($env, $k).'}';
+            if (str_contains($message, $k)) {
+                $replacements[$k] = $v;
+            }
+        }
+
+        if (!$replacements) {
             return '<span class="dump-inline">'.$message.'</span>';
         }
 
-        $replacements = [];
-        foreach ($context as $k => $v) {
-            $k = '{'.twig_escape_filter($env, $k).'}';
+        foreach ($replacements as $k => $v) {
             $replacements['&quot;<b>'.$k.'</b>&quot;'] = $replacements['&quot;'.$k.'&quot;'] = $replacements[$k] = $this->dumpData($env, $v);
         }
 
