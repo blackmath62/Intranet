@@ -9,11 +9,6 @@ doctrine:
                 driver: 'pdo_mysql'
                 server_version: '5.7'
                 charset: utf8mb4
-            #divaltosvg:
-                # configure these for your database server
-                #url: '%env(resolve:DATABASE_DIVALTO_SVG_URL)%'
-                #driver: 'sqlsrv'
-                #charset: UTF-8
                 
             divaltoreel:
                 # configure these for your database server
@@ -32,15 +27,6 @@ doctrine:
                         dir: '%kernel.project_dir%/src/Entity/Main'
                         prefix: 'App\Entity\Main'
                         alias: Main
-            #divaltosvg:
-                #connection: divaltosvg
-                #mappings:
-                    #divaltosvg:
-                        #is_bundle: false
-                        #type: annotation
-                        #dir: '%kernel.project_dir%/src/Entity/Divalto'
-                        #prefix: 'App\Entity\Divalto'
-                        #alias: divaltosvg
             divaltoreel:
                 connection: divaltoreel
                 mappings:
@@ -50,3 +36,29 @@ doctrine:
                         dir: '%kernel.project_dir%/src/Entity/Divalto'
                         prefix: 'App\Entity\Divalto'
                         alias: divaltoreel
+
+when@test:
+    doctrine:
+        dbal:
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            auto_generate_proxy_classes: false
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

@@ -41,6 +41,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @IsGranted("ROLE_MONTEUR")
@@ -97,7 +98,7 @@ class AffairesController extends AbstractController
      * @Route("/Lhermitte/affaire/me/ok", name="app_affaire_me_ok")
      * @Route("/Lhermitte/affaire/me/nok", name="app_affaire_me_nok")
      */
-    public function affaire(Request $request): Response
+    public function affaire(UrlGeneratorInterface $urlGenerator, Request $request): Response
     {
 
         $tracking = $request->attributes->get('_route');
@@ -131,7 +132,7 @@ class AffairesController extends AbstractController
                     'id' => $event->getId(),
                     'start' => $start,
                     'end' => $end,
-                    'url' => 'http://192.168.50.244/Lhermitte/affaire/show/intervention/' . $id,
+                    'url' => $urlGenerator->generate('app_affaire_show_intervention', ['id' => $id]),
                     'title' => 'Affaire : ' . $libelle . ' du ' . $event->getStart()->format('d-m-Y H:i') . ' au ' . $event->getEnd()->format('d-m-Y H:i'),
                     'backgroundColor' => $color,
                     'borderColor' => '#FFFFFF',

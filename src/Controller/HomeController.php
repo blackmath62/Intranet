@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @IsGranted("ROLE_USER")
@@ -32,7 +33,7 @@ class HomeController extends AbstractController
     /**
      * @Route("/", name="app_home")
      */
-    public function index(Request $request, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews)
+    public function index(Request $request, UrlGeneratorInterface $urlGenerator, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews)
     {
 
         // tracking user page for stats
@@ -70,12 +71,11 @@ class HomeController extends AbstractController
                 $start = $event->getStart()->format('Y-m-d');
                 $end = $event->getEnd()->format('Y-m-d');
             }
-
             $rdvs[] = [
                 'id' => $event->getId(),
                 'start' => $start,
                 'end' => $end,
-                'url' => 'http://192.168.50.244/holiday/show/' . $id,
+                'url' => $urlGenerator->generate('app_holiday_show', ['id' => $id]),
                 'title' => 'Congés ' . $pseudo . ' du ' . $event->getStart()->format('d-m-Y') . ' au ' . $event->getEnd()->format('d-m-Y'),
                 'backgroundColor' => $color,
                 'borderColor' => '#FFFFFF',

@@ -27,6 +27,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @IsGranted("ROLE_USER")
@@ -79,7 +80,7 @@ class HolidayController extends AbstractController
     /**
      * @Route("/holiday", name="app_holiday_list")
      */
-    public function index(Request $request)
+    public function index(UrlGeneratorInterface $urlGenerator, Request $request)
     {
         $holidays = $this->repoHoliday->findAll();
 
@@ -111,7 +112,7 @@ class HolidayController extends AbstractController
                 'id' => $event->getId(),
                 'start' => $start,
                 'end' => $end,
-                'url' => 'http://192.168.50.244/holiday/show/' . $id,
+                'url' => $urlGenerator->generate('app_holiday_show', ['id' => $id]),
                 'title' => 'Congés ' . $pseudo . ' du ' . $event->getStart()->format('d-m-Y') . ' au ' . $event->getEnd()->format('d-m-Y'),
                 'backgroundColor' => $color,
                 'borderColor' => '#FFFFFF',
