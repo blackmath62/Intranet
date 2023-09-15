@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @IsGranted("ROLE_USER")
  */
 
-class PdfController extends AbstractController
+class PDFController extends AbstractController
 {
     private $repoMail;
     private $mailEnvoi;
