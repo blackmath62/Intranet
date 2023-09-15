@@ -18,4 +18,5 @@ return [
     Knp\Bundle\SnappyBundle\KnpSnappyBundle::class => ['all' => true],
     Cron\CronBundle\CronCronBundle::class => ['all' => true],
     Rewieer\TaskSchedulerBundle\RewieerTaskSchedulerBundle::class => ['all' => true],
+    Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
 ];
