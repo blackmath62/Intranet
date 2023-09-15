@@ -33,6 +33,13 @@
         <env name="APP_SECRET" value="4313af889a25b31607b16dfc60bc3879"/>
         <!-- ###- symfony/framework-bundle ### -->
 >>>>>>> theirs
+<<<<<<< ours
+=======
+
+        <!-- ###+ symfony/mailer ### -->
+        <!-- MAILER_DSN=null://null -->
+        <!-- ###- symfony/mailer ### -->
+>>>>>>> theirs
     </php>
 
     <testsuites>
