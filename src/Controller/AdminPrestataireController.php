@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Main\Prestataire;
 use App\Form\PrestataireType;
 use App\Repository\Main\PrestataireRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AdminPrestataireController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/prestataire", name="app_admin_prestataire")
      */
@@ -29,7 +37,7 @@ class AdminPrestataireController extends AbstractController
             $prestataire = new Prestataire();
             $prestataire = $form->getData();
             $prestataire->setImg('unnamed.png');
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($prestataire);
             $em->flush();
         }
@@ -52,10 +60,10 @@ class AdminPrestataireController extends AbstractController
      */
     public function deletePrestataire($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(Prestataire::class);
+        $repository = $this->entityManager->getRepository(Prestataire::class);
         $prestataireId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($prestataireId);
         $em->flush();
 
@@ -78,7 +86,7 @@ class AdminPrestataireController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($prestataire);
             $em->flush();
 

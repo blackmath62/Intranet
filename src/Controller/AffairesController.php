@@ -33,6 +33,7 @@ use App\Repository\Main\RetraitMarchandisesEanRepository;
 use App\Repository\Main\UsersRepository;
 use App\Service\EmailTreatementService;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -71,8 +72,9 @@ class AffairesController extends AbstractController
     private $mailEnvoi;
     private $mailTreatement;
     private $emailTreatementService;
+    private $entityManager;
 
-    public function __construct(EmailTreatementService $emailTreatementService, AdminEmailController $adminEmailController, ArtRepository $repoArt, RetraitMarchandisesEanRepository $repoRetrait, InterventionFicheMonteurRepository $repoFiche, AffairesAdminController $affaireAdminController, InterventionFichesMonteursHeuresRepository $repoInterventionFichesMonteursHeures, InterventionFicheMonteurRepository $repoInterventionFicheMonteur, InterventionMonteursRepository $repoIntervertionsMonteurs, CliRepository $repoCli, UsersRepository $repoUsers, ChatsRepository $repoChats, AffairePieceRepository $repoAffairePiece, OthersDocumentsRepository $repoDocs, MailerInterface $mailer, CommentairesRepository $repoComments, AffairesRepository $repoAffaires, MouvRepository $repoMouv)
+    public function __construct(ManagerRegistry $registry, EmailTreatementService $emailTreatementService, AdminEmailController $adminEmailController, ArtRepository $repoArt, RetraitMarchandisesEanRepository $repoRetrait, InterventionFicheMonteurRepository $repoFiche, AffairesAdminController $affaireAdminController, InterventionFichesMonteursHeuresRepository $repoInterventionFichesMonteursHeures, InterventionFicheMonteurRepository $repoInterventionFicheMonteur, InterventionMonteursRepository $repoIntervertionsMonteurs, CliRepository $repoCli, UsersRepository $repoUsers, ChatsRepository $repoChats, AffairePieceRepository $repoAffairePiece, OthersDocumentsRepository $repoDocs, MailerInterface $mailer, CommentairesRepository $repoComments, AffairesRepository $repoAffaires, MouvRepository $repoMouv)
     {
         $this->repoMouv = $repoMouv;
         $this->repoIntervertionsMonteurs = $repoIntervertionsMonteurs;
@@ -91,6 +93,7 @@ class AffairesController extends AbstractController
         $this->repoRetrait = $repoRetrait;
         $this->repoArt = $repoArt;
         $this->emailTreatementService = $emailTreatementService;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -178,7 +181,7 @@ class AffairesController extends AbstractController
                     ->setNom($data['tiers']);
                 $chantier->setStart(new DateTime())
                     ->setEtat('Nouvelle');
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($chantier);
                 $em->flush();
                 // Création de la piéce de ce chantier
@@ -194,7 +197,7 @@ class AffairesController extends AbstractController
                 } else {
                     $pieceChantier->setAdresse($data['tiers']);
                 }
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($pieceChantier);
                 $em->flush();
 
@@ -217,7 +220,7 @@ class AffairesController extends AbstractController
                     $intervention->setAdresse($data['tiers']);
                 }
             }
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($intervention);
             $entityManager->flush();
             // on ajoute le commentaire s'il y en a un
@@ -229,7 +232,7 @@ class AffairesController extends AbstractController
                     ->setFonction('chatAffaire')
                     ->setIdentifiant($intervention->getCode()->getId())
                     ->setTables($intervention->getId());
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->persist($chat);
                 $entityManager->flush();
 
@@ -313,7 +316,7 @@ class AffairesController extends AbstractController
             if ($data->getTextColor()) {
                 $affaire->setTextColor($data->getTextColor());
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($affaire);
             $em->flush();
             $this->addFlash('message', 'Mise à jour effectuée avec succés');
@@ -352,7 +355,7 @@ class AffairesController extends AbstractController
                 }
                 $intervention->setAdresse($adresse);
             }
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($intervention);
             $entityManager->flush();
 
@@ -381,7 +384,7 @@ class AffairesController extends AbstractController
                     $doc->setUser($this->getUser());
                     $doc->setIdentifiant($intervention->getCode()->getId());
                     $this->addFlash('message', 'Fichier ' . $filename . ' ajouté avec succés');
-                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager = $this->entityManager;
                     $entityManager->persist($doc);
                     $entityManager->flush();
                 }
@@ -395,7 +398,7 @@ class AffairesController extends AbstractController
                     ->setFonction('chatAffaire')
                     ->setIdentifiant($intervention->getCode()->getId())
                     ->setTables($intervention->getId());
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->persist($chat);
                 $entityManager->flush();
 
@@ -451,7 +454,7 @@ class AffairesController extends AbstractController
                     ->setNom($value['nom'])
                     ->setStart(new Datetime($value['dateCreation']))
                     ->setEtat('Nouvelle');
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->persist($affaire);
                 $entityManager->flush();
 
@@ -489,14 +492,14 @@ class AffairesController extends AbstractController
                         ->setOp($p['op'])
                         ->setTransport($p['transport'])
                         ->setEtat('Nouvelle');
-                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager = $this->entityManager;
                     $entityManager->persist($piece);
                     $entityManager->flush();
 
                     if ($affaire->getEnd()) {
                         $affaire->setEnd(null)
                             ->setEtat('A finir');
-                        $entityManager = $this->getDoctrine()->getManager();
+                        $entityManager = $this->entityManager;
                         $entityManager->persist($affaire);
                         $entityManager->flush();
                     }
@@ -509,7 +512,7 @@ class AffairesController extends AbstractController
                         ->setPiece($p['piece'])
                         ->setOp($p['op'])
                         ->setTransport($p['transport']);
-                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager = $this->entityManager;
                     $entityManager->persist($piece);
                     $entityManager->flush();
                 }
@@ -537,7 +540,7 @@ class AffairesController extends AbstractController
         } else {
             $affaire->setEnd(null);
         }
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->persist($affaire);
         $entityManager->flush();
 
@@ -559,7 +562,7 @@ class AffairesController extends AbstractController
         } else {
             $piece->setClosedAt(null);
         }
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->persist($piece);
         $entityManager->flush();
 
@@ -580,7 +583,7 @@ class AffairesController extends AbstractController
         if ($fichiers) {
             foreach ($fichiers as $fichier) {
                 $chemin = $this->getParameter('doc_lhermitte_affaires') . '/' . $fichier->getFile();
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->remove($fichier);
                 $entityManager->flush();
                 unset($chemin);
@@ -591,13 +594,13 @@ class AffairesController extends AbstractController
         $commentaires = $this->repoChats->findBy(['fonction' => 'chatAffaire', 'identifiant' => $intervention->getCode()->getId(), 'tables' => $id]);
         if ($commentaires) {
             foreach ($commentaires as $commentaire) {
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->remove($commentaire);
                 $entityManager->flush();
             }
         }
         $affaire = $intervention->getCode()->getCode();
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->remove($intervention);
         $entityManager->flush();
 
@@ -639,7 +642,7 @@ class AffairesController extends AbstractController
                 }
                 $intervention->setAdresse($adresse);
             }
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($intervention);
             $entityManager->flush();
             $this->addFlash('message', 'Intervention modifiée avec succés');
@@ -673,7 +676,7 @@ class AffairesController extends AbstractController
                 ->setFonction('chatAffaire')
                 ->setIdentifiant($intervention->getCode()->getId())
                 ->setTables($intervention->getId());
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($chat);
             $entityManager->flush();
 
@@ -724,7 +727,7 @@ class AffairesController extends AbstractController
                     $doc->setUser($this->getUser());
                     $doc->setIdentifiant($intervention->getCode()->getId());
                     $this->addFlash('message', 'Fichier ' . $filename . ' ajouté avec succés');
-                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager = $this->entityManager;
                     $entityManager->persist($doc);
                     $entityManager->flush();
                 } else {
@@ -790,7 +793,7 @@ class AffairesController extends AbstractController
             ->setHere(true)
             ->setIntervenant($this->repoUsers->findOneBy(['id' => $intervenant]))
             ->setIntervention($this->repoIntervertionsMonteurs->findOneBy(['id' => $id]));
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->persist($fiche);
         $entityManager->flush();
 
@@ -832,7 +835,7 @@ class AffairesController extends AbstractController
                 //$fiche->setCreatedAt(new DateTime($fiche['createdAt']));
                 $fiche->setCreatedBy($this->getUser());
             }
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($fiche);
             $entityManager->flush();
             if ($request->attributes->get('_route') == 'app_affaire_saisie_fiche_intervention') {
@@ -849,7 +852,7 @@ class AffairesController extends AbstractController
             $heure->setCreatedAt(new DateTime())
                 ->setCreatedBy($this->getUser())
                 ->setInterventionFicheMonteur($fiche);
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($heure);
             $entityManager->flush();
             $this->addFlash('message', 'Heures déposée avec succès');
@@ -859,7 +862,7 @@ class AffairesController extends AbstractController
         $formCommentaire = $this->createForm(InterventionFicheCommentType::class, $fiche);
         $formCommentaire->handleRequest($request);
         if ($formCommentaire->isSubmitted() && $formCommentaire->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($fiche);
             $entityManager->flush();
 
@@ -890,13 +893,13 @@ class AffairesController extends AbstractController
         // suppression des heures en rapport avec la fiche monteur
         $heures = $this->repoInterventionFichesMonteursHeures->findBy(['interventionFicheMonteur' => $fiche]);
         foreach ($heures as $heure) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->remove($heure);
             $entityManager->flush();
         }
         // suppression de la fiche monteur
         $fiche = $this->repoInterventionFicheMonteur->findOneBy(['id' => $fiche]);
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->remove($fiche);
         $entityManager->flush();
 
@@ -912,7 +915,7 @@ class AffairesController extends AbstractController
     public function removeHeureIntervention($id, $ficheId, $heureId, Request $request): Response
     {
         $heure = $this->repoInterventionFichesMonteursHeures->findOneBy(['id' => $heureId]);
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->remove($heure);
         $entityManager->flush();
 
@@ -931,7 +934,7 @@ class AffairesController extends AbstractController
         if ($heures || $fiche->getHere() == false) {
             $fiche->setLockedAt(new DateTime())
                 ->setLockedBy($this->getUser());
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($fiche);
             $entityManager->flush();
 

@@ -6,6 +6,7 @@ use App\Entity\Main\Priorities;
 use App\Form\EditPrioritiesType;
 use App\Repository\Main\PrioritiesRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AdminPrioritiesController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/priorities", name="app_admin_priorities")
      */
@@ -56,10 +64,10 @@ class AdminPrioritiesController extends AbstractController
      */
     public function deletepriorities($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(priorities::class);
+        $repository = $this->entityManager->getRepository(priorities::class);
         $prioritiesId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($prioritiesId);
         $em->flush();
 
@@ -82,7 +90,7 @@ class AdminPrioritiesController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($priorities);
             $em->flush();
 

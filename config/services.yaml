@@ -13,6 +13,7 @@ parameters:
     doc_francial: '%kernel.project_dir%/public/doc/Francial'
     doc_tickets: '%kernel.project_dir%/public/doc/tickets'
     doc_profiles: '%kernel.project_dir%/public/img/profile'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -27,21 +28,9 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-<<<<<<< ours
             - '../src/Tests/'
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
     App\Controller\:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
-=======
->>>>>>> theirs
-
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-
-
-
-   
-   
-   

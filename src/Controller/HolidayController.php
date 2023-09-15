@@ -15,6 +15,7 @@ use App\Repository\Main\UsersRepository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -45,8 +46,9 @@ class HolidayController extends AbstractController
     private $mailTreatement;
     private $mailer;
     private $adminEmailController;
+    private $entityManager;
 
-    public function __construct(AdminEmailController $adminEmailController, MailListRepository $repoMail, MailerInterface $mailer, MailerInterface $mailerInterface, HolidayRepository $repoHoliday, statusHolidayRepository $repoStatuts, UsersRepository $repoUser)
+    public function __construct(ManagerRegistry $registry, AdminEmailController $adminEmailController, MailListRepository $repoMail, MailerInterface $mailer, MailerInterface $mailerInterface, HolidayRepository $repoHoliday, statusHolidayRepository $repoStatuts, UsersRepository $repoUser)
     {
         $this->mailerInterface = $mailerInterface;
         $this->repoHoliday = $repoHoliday;
@@ -57,6 +59,7 @@ class HolidayController extends AbstractController
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->mailer = $mailer;
         $this->adminEmailController = $adminEmailController;
+        $this->entityManager = $registry->getManager();
     }
 
     public function sendMailSummerForAllUsers()
@@ -248,7 +251,7 @@ class HolidayController extends AbstractController
                     ->setTreatmentedBy($this->getUser())
                     ->setTreatmentedAt(new DateTime())
                     ->setUser($value);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($holiday);
                 $em->flush();
                 $majHoliday = $this->repoHoliday->findOneBy(['id' => $this->repoHoliday->getLastHoliday()]);
@@ -259,7 +262,7 @@ class HolidayController extends AbstractController
                 }
                 $nbJ = $nbJours['nbjours'];
                 $majHoliday->setNbJours($nbJ);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($majHoliday);
                 $em->flush();
                 $i++;
@@ -412,7 +415,7 @@ class HolidayController extends AbstractController
                 if ($overlaps[$ligOverlaps]['statutId'] == 2) {
                     $statut = $this->repoStatuts->findOneBy(['id' => 1]);
                     $holiday->setHolidayStatus($statut);
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($holiday);
                     $em->flush();
                 }
@@ -466,7 +469,7 @@ class HolidayController extends AbstractController
                 ->setNbJours($nbJ)
                 ->setHolidayStatus($statut)
                 ->setUser($utilisateur);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($holiday);
             $em->flush();
 
@@ -655,7 +658,7 @@ class HolidayController extends AbstractController
         $mail = $this->holiday_send_mail($role, $id, $object, $html);
 
         // Supprimer le congés
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->remove($holiday);
         $entityManager->flush();
 
@@ -679,7 +682,7 @@ class HolidayController extends AbstractController
         $holiday->setTreatmentedAt(new DateTime())
             ->setTreatmentedBy($this->getUser())
             ->setHolidayStatus($statut);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($holiday);
         $em->flush();
 
@@ -714,7 +717,7 @@ class HolidayController extends AbstractController
         $holiday->setTreatmentedAt(new DateTime())
             ->setTreatmentedBy($this->getUser())
             ->setHolidayStatus($this->repoStatuts->findOneBy(['id' => 4]));
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($holiday);
         $em->flush();
 
@@ -812,7 +815,7 @@ class HolidayController extends AbstractController
     public function holiday_lock($holidayId)
     {
         $lock = false;
-        $repo = $this->getDoctrine()->getRepository(Holiday::class);
+        $repo = $this->entityManager->getRepository(Holiday::class);
         $holiday = $repo->find($holidayId);
 
         if ($holiday->getTreatmentedBy() != null) {

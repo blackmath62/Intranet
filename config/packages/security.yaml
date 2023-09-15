@@ -1,16 +1,12 @@
 security:
-<<<<<<< ours
-    encoders:
-        App\Entity\Main\Users: auto
-    
-    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
-=======
-    enable_authenticator_manager: true
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
->>>>>>> theirs
+
+
+    # enable_authenticator_manager: true
+    # password_hashers:
+    #     Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
     providers:
         app_user_provider:
             entity:
@@ -26,29 +22,21 @@ security:
 
             form_login:
                 login_path: app_login
-            
+
             logout:
                 path: app_logout
-                
+
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 3600 #604800 # 1 week in seconds
                 path: /
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-            custom_authenticators: 
+            custom_authenticators:
                 - App\Security\LoginFormAuthenticator
 
     enable_authenticator_manager: true
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
     access_control:
-<<<<<<< ours
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/Roby, roles: ROLE_ROBY }
@@ -57,39 +45,20 @@ security:
         - { path: ^/compta, roles: ROLE_COMPTA }
         - { path: ^/rs, roles: ROLE_RESPONSABLE_SECTEUR }
 
-    
     role_hierarchy:
-            ROLE_LHERMITTE: ROLE_USER
-            ROLE_ROBY: ROLE_USER
-            ROLE_MONTEUR: ROLE_USER
-            ROLE_COMPTA: ROLE_USER
-            ROLE_LOGISTIQUE: ROLE_USER
-            ROLE_BUREAU_RB: ROLE_USER, ROLE_ROBY
-            ROLE_TESTEUR: ROLE_USER
-            ROLE_INFORMATIQUE: ROLE_USER
-            ROLE_CONGES: ROLE_USER
-            ROLE_RESPONSABLE_SECTEUR: ROLE_USER
-            ROLE_COMMERCIAL: ROLE_USER
-            ROLE_RSE: ROLE_USER
-            ROLE_ADMIN_MONTEUR: ROLE_MONTEUR
-            ROLE_BOSS: ROLE_USER, ROLE_LHERMITTE, ROLE_ROBY, ROLE_EV, ROLE_HP, ROLE_ME, ROLE_INFORMATIQUE, ROLE_RESPONSABLE_SECTEUR, ROLE_COMMERCIAL, ROLE_CONGES
-            ROLE_ADMIN: ROLE_USER, ROLE_LHERMITTE, ROLE_ROBY, ROLE_EV, ROLE_HP, ROLE_MA, ROLE_ME,ROLE_COMPTA, ROLE_TESTEUR, ROLE_INFORMATIQUE, ROLE_BOSS, ROLE_RESPONSABLE_SECTEUR, ROLE_COMMERCIAL, ROLE_MONTEUR, ROLE_LOGISTIQUE, ROLE_ADMIN_MONTEUR, ROLE_RSE
-            ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
-
-=======
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
-
-when@test:
-    security:
-        password_hashers:
-            # By default, password hashers are resource intensive and take time. This is
-            # important to generate secure password hashes. In tests however, secure hashes
-            # are not important, waste resources and increase test times. The following
-            # reduces the work factor to the lowest possible values.
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
->>>>>>> theirs
+        ROLE_LHERMITTE: ROLE_USER
+        ROLE_ROBY: ROLE_USER
+        ROLE_MONTEUR: ROLE_USER
+        ROLE_COMPTA: ROLE_USER
+        ROLE_LOGISTIQUE: ROLE_USER
+        ROLE_BUREAU_RB: ROLE_USER, ROLE_ROBY
+        ROLE_TESTEUR: ROLE_USER
+        ROLE_INFORMATIQUE: ROLE_USER
+        ROLE_CONGES: ROLE_USER
+        ROLE_RESPONSABLE_SECTEUR: ROLE_USER
+        ROLE_COMMERCIAL: ROLE_USER
+        ROLE_RSE: ROLE_USER
+        ROLE_ADMIN_MONTEUR: ROLE_MONTEUR
+        ROLE_BOSS: ROLE_USER, ROLE_LHERMITTE, ROLE_ROBY, ROLE_EV, ROLE_HP, ROLE_ME, ROLE_INFORMATIQUE, ROLE_RESPONSABLE_SECTEUR, ROLE_COMMERCIAL, ROLE_CONGES
+        ROLE_ADMIN: ROLE_USER, ROLE_LHERMITTE, ROLE_ROBY, ROLE_EV, ROLE_HP, ROLE_MA, ROLE_ME,ROLE_COMPTA, ROLE_TESTEUR, ROLE_INFORMATIQUE, ROLE_BOSS, ROLE_RESPONSABLE_SECTEUR, ROLE_COMMERCIAL, ROLE_MONTEUR, ROLE_LOGISTIQUE, ROLE_ADMIN_MONTEUR, ROLE_RSE
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]

@@ -6,6 +6,7 @@ use App\Entity\Main\SectionSearch;
 use App\Form\EditSectionSearchType;
 use App\Repository\Main\SectionSearchRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SectionSearchController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/section_searchs", name="app_admin_section_search")
      */
@@ -56,10 +64,10 @@ class SectionSearchController extends AbstractController
      */
     public function deletesection_search($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(SectionSearch::class);
+        $repository = $this->entityManager->getRepository(SectionSearch::class);
         $section_searchId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($section_searchId);
         $em->flush();
 
@@ -82,7 +90,7 @@ class SectionSearchController extends AbstractController
         //   $this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($section_search);
             $em->flush();
 

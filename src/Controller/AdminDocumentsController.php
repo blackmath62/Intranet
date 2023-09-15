@@ -8,6 +8,7 @@ use App\Form\EditDocumentsType;
 use App\Repository\Main\DocumentsRepository;
 use App\Repository\Main\SocieteRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -20,6 +21,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
  */
 class AdminDocumentsController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/documents", name="app_admin_documents")
      */
@@ -63,7 +71,7 @@ class AdminDocumentsController extends AbstractController
                     ->setUser($user);
             }
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($document);
             $em->flush();
 
@@ -91,10 +99,10 @@ class AdminDocumentsController extends AbstractController
      */
     public function deleteDocuments($id)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(documents::class);
+        $repository = $this->entityManager->getRepository(documents::class);
         $documentsId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($documentsId);
         $em->flush();
 
@@ -109,7 +117,7 @@ class AdminDocumentsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($documents);
             $em->flush();
 

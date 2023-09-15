@@ -14,6 +14,7 @@ use App\Repository\Main\StatusRepository;
 use App\Repository\Main\TicketsRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Knp\Snappy\Pdf;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -32,12 +33,14 @@ class CommentsController extends AbstractController
     private $repoMail;
     private $mailEnvoi;
     private $mailTreatement;
+    private $entityManager;
 
-    public function __construct(MailListRepository $repoMail)
+    public function __construct(ManagerRegistry $registry, MailListRepository $repoMail)
     {
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -66,13 +69,13 @@ class CommentsController extends AbstractController
                 ->setUser($this->getUser())
                 ->setTicket($repoTicket->findOneBy(['id' => $id]));
             // TODO JEROME Modification du statut du ticket il est plus logique que cela se produise dans le commentaire
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($comment);
             $em->flush();
 
             $ticket = $repoTicket->findOneBy(['id' => $id]);
             $ticket->setModifiedAt(new \DateTime());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($ticket);
             $em->flush();
 
@@ -102,7 +105,7 @@ class CommentsController extends AbstractController
                 ->setTicket($repoTicket->findOneBy(['id' => $id]))
                 ->setUser($this->getUser())
                 ->setCreatedAt(new \DateTime());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($comment);
             $em->flush();
 
@@ -137,7 +140,7 @@ class CommentsController extends AbstractController
                 $ticket->setModifiedAt(new \DateTime());
                 $statuEnCours = $repoStatut->findOneBy(['id' => 16]);
                 $ticket->setStatu($statuEnCours);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($ticket);
                 $em->flush();
 
@@ -150,7 +153,7 @@ class CommentsController extends AbstractController
                     ->setTicket($repoTicket->findOneBy(['id' => $id]))
                     ->setUser($this->getUser())
                     ->setCreatedAt(new \DateTime());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($comment);
                 $em->flush();
 
@@ -191,7 +194,7 @@ class CommentsController extends AbstractController
                     ->setTicket($repoTicket->findOneBy(['id' => $id]))
                     ->setUser($this->getUser())
                     ->setCreatedAt(new \DateTime());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($comment);
                 $em->flush();
                 $this->addFlash('warning', 'Message envoyé a ce collégue!');

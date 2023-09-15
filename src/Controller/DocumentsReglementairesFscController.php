@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Form\DocumentsReglementairesFscType;
 use App\Repository\Main\DocumentsReglementairesFscRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -19,6 +20,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class DocumentsReglementairesFscController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/Roby/documents/reglementaires/fsc", name="app_documents_reglementaires_fsc")
      */
@@ -58,7 +66,7 @@ class DocumentsReglementairesFscController extends AbstractController
                 $doc->setCreatedAt(new \DateTime())
                     ->setFiles($newFilename)
                     ->setAddBy($this->getUser());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($doc);
                 $em->flush();
             }
@@ -106,7 +114,7 @@ class DocumentsReglementairesFscController extends AbstractController
         //$tracking = $request->attributes->get('_route');
         //$this->setTracking($tracking);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($doc);
         $em->flush();
 

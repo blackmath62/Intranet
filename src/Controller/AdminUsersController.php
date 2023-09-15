@@ -6,6 +6,7 @@ use App\Entity\Main\Users;
 use App\Form\EditUsersType;
 use App\Repository\Main\UsersRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class AdminUsersController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/users", name="app_admin_users")
      */
@@ -50,7 +58,7 @@ class AdminUsersController extends AbstractController
             $user->setMe($value);
         }
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($user);
         $em->flush();
 
@@ -103,7 +111,7 @@ class AdminUsersController extends AbstractController
             if(!$img){
             $user->setImg('AdminLTELogo.png');
             }*/
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($user);
             $em->flush();
 
@@ -126,7 +134,7 @@ class AdminUsersController extends AbstractController
 
     public function deleteUser(Users $user, Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($user);
         $em->flush();
 
@@ -148,7 +156,7 @@ class AdminUsersController extends AbstractController
     public function closeUser(Users $user, Request $request)
     {
         $user->setClosedAt(new DateTime());
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($user);
         $em->flush();
 
@@ -169,7 +177,7 @@ class AdminUsersController extends AbstractController
     public function openUser(Users $user, Request $request)
     {
         $user->setClosedAt(null);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($user);
         $em->flush();
 

@@ -8,6 +8,7 @@ use App\Form\AddEmailTreatementType;
 use App\Form\AddEmailType;
 use App\Repository\Main\MailListRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,10 +19,12 @@ class AdminEmailController extends AbstractController
 {
 
     private $repoMail;
+    private $entityManager;
 
-    public function __construct(MailListRepository $repoMail)
+    public function __construct(MailListRepository $repoMail, ManagerRegistry $registry)
     {
         $this->repoMail = $repoMail;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -47,7 +50,7 @@ class AdminEmailController extends AbstractController
                         ->setEmail($formSendGeneralWithMails->getData()['email'])
                         ->setPage($tracking)
                         ->setSecondOption('envoi');
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($mail);
                     $em->flush();
                 } else {
@@ -73,7 +76,7 @@ class AdminEmailController extends AbstractController
                         ->setEmail($formSendTreatementWithMails->getData()['email'])
                         ->setPage($tracking)
                         ->setSecondOption('traitement');
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($mail);
                     $em->flush();
                 } else {
@@ -97,7 +100,7 @@ class AdminEmailController extends AbstractController
                     ->setEmail($formFeu->getData()['email'])
                     ->setPage($tracking)
                     ->setSecondOption('feu');
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
             } else {
@@ -126,7 +129,7 @@ class AdminEmailController extends AbstractController
 
         $search = $this->repoMail->findOneBy(['id' => $id]);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($search);
         $em->flush();
 
@@ -142,7 +145,7 @@ class AdminEmailController extends AbstractController
 
         $search = $this->repoMail->findOneBy(['id' => $id]);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($search);
         $em->flush();
 

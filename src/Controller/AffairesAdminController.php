@@ -14,6 +14,7 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use DateTimeInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Knp\Snappy\Pdf;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
@@ -40,8 +41,9 @@ class AffairesAdminController extends AbstractController
     private $repoFiche;
     private $repoIntervention;
     private $emailTreatementService;
+    private $entityManager;
 
-    public function __construct(EmailTreatementService $emailTreatementService, UsersRepository $repoUsers, InterventionMonteursRepository $repoIntervention, InterventionFicheMonteurRepository $repoFiche, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
+    public function __construct(ManagerRegistry $registry, EmailTreatementService $emailTreatementService, UsersRepository $repoUsers, InterventionMonteursRepository $repoIntervention, InterventionFicheMonteurRepository $repoFiche, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
     {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
@@ -52,7 +54,7 @@ class AffairesAdminController extends AbstractController
         $this->repoIntervention = $repoIntervention;
         $this->repoUsers = $repoUsers;
         $this->emailTreatementService = $emailTreatementService;
-
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -74,7 +76,7 @@ class AffairesAdminController extends AbstractController
                 $mail->setCreatedAt(new DateTime())
                     ->setEmail($form->getData()['email'])
                     ->setPage($tracking);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
             } else {
@@ -124,7 +126,7 @@ class AffairesAdminController extends AbstractController
         $fiche->setValidedBy($this->getUser())
             ->setValidedAt(new DateTime);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($fiche);
         $em->flush();
 
@@ -202,7 +204,7 @@ class AffairesAdminController extends AbstractController
             if ($status == true) {
                 $intervention->setLockedAt(new DateTime)
                     ->setLockedBy($this->repoUsers->findOneBy(['id' => 3]));
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($intervention);
                 $em->flush();
             }
@@ -244,7 +246,7 @@ class AffairesAdminController extends AbstractController
             /*
         // Marquer l'intervention comme envoyée
         $intervention->setSendAt(new DateTime());
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($intervention);
         $em->flush();
          */

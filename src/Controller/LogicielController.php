@@ -6,6 +6,7 @@ use App\Entity\Main\Logiciel;
 use App\Form\EditLogicielType;
 use App\Repository\Main\LogicielRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,13 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class LogicielController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/logiciels", name="app_admin_logiciel")
      */
@@ -57,14 +65,14 @@ class LogicielController extends AbstractController
      */
     public function deletelogiciel($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(Logiciel::class);
+        $repository = $this->entityManager->getRepository(Logiciel::class);
         $logicielId = $repository->find($id);
 
         // tracking user page for stats
         // $tracking = $request->attributes->get('_route');
         // $this->setTracking($tracking);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($logicielId);
         $em->flush();
 
@@ -83,7 +91,7 @@ class LogicielController extends AbstractController
         // $this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($logiciel);
             $em->flush();
 

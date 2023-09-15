@@ -7,6 +7,7 @@ use App\Form\StatesDateFilter2Type;
 use App\Form\StatesDateFilterType;
 use App\Repository\Main\HolidayRepository;
 use App\Repository\Main\InterventionFicheMonteurRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -20,6 +21,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ProfileUserController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/profile/user", name="app_profile_user")
      */
@@ -61,7 +69,7 @@ class ProfileUserController extends AbstractController
             } else {
                 $userImg->setImg('AdminLTELogo.png');
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($user);
             $em->flush();
 

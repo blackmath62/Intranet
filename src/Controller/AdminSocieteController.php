@@ -7,6 +7,7 @@ use App\Form\EditSocieteType;
 use App\Repository\Main\SocieteRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AdminSocieteController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/societe", name="app_admin_societe")
      */
@@ -53,10 +61,10 @@ class AdminSocieteController extends AbstractController
      */
     public function deleteSociete($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(Societe::class);
+        $repository = $this->entityManager->getRepository(Societe::class);
         $societeId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($societeId);
         $em->flush();
 
@@ -79,7 +87,7 @@ class AdminSocieteController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($societe);
             $em->flush();
 

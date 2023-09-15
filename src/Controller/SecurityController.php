@@ -8,6 +8,7 @@ use App\Form\UserRegistrationFormType;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,12 +26,14 @@ class SecurityController extends AbstractController
     private $repoMail;
     private $mailEnvoi;
     private $mailTreatement;
+    private $entityManager;
 
-    public function __construct(MailListRepository $repoMail)
+    public function __construct(ManagerRegistry $registry, MailListRepository $repoMail)
     {
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -229,7 +232,7 @@ class SecurityController extends AbstractController
         }
         // on supprime le token
         $user->setToken(null);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($user);
         $em->flush();
 

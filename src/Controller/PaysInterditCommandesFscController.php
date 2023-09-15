@@ -6,6 +6,7 @@ use App\Entity\Main\PaysBanFsc;
 use App\Form\PaysBanType;
 use App\Repository\Main\PaysBanFscRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PaysInterditCommandesFscController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/Roby/pays/interdit/commandes/fsc", name="app_pays_interdit_commandes_fsc")
      */
@@ -35,7 +43,7 @@ class PaysInterditCommandesFscController extends AbstractController
             $pay->setCreatedAt(new DateTime());
             $pay->setCreatedBy($this->getUser())
                 ->setPays(strtoupper($pays));
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($pay);
             $em->flush();
         }
@@ -57,7 +65,7 @@ class PaysInterditCommandesFscController extends AbstractController
         //$this->setTracking($tracking);
 
         $pay = $repo->findOneBy(['id' => $id]);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($pay);
         $em->flush();
 

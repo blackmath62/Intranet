@@ -7,6 +7,7 @@ use App\Form\EditServiceType;
 use App\Repository\Main\ServicesRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AdminServicesController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/services", name="app_admin_services")
      */
@@ -57,10 +65,10 @@ class AdminServicesController extends AbstractController
      */
     public function deleteservice($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(Services::class);
+        $repository = $this->entityManager->getRepository(Services::class);
         $serviceId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($serviceId);
         $em->flush();
 
@@ -83,7 +91,7 @@ class AdminServicesController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($service);
             $em->flush();
 

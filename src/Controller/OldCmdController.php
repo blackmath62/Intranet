@@ -10,6 +10,7 @@ use App\Repository\Divalto\EntRepository;
 use App\Repository\Main\ListCmdTraiteRepository;
 use App\Repository\Main\MailListRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,8 +31,9 @@ class OldCmdController extends AbstractController
     private $mailEnvoi;
     private $mailTreatement;
     private $adminEmailController;
+    private $entityManager;
 
-    public function __construct(AdminEmailController $adminEmailController, MailListRepository $repoMail, ListCmdTraiteRepository $repoNumCmd, MailerInterface $mailer)
+    public function __construct(ManagerRegistry $registry, AdminEmailController $adminEmailController, MailListRepository $repoMail, ListCmdTraiteRepository $repoNumCmd, MailerInterface $mailer)
     {
         $this->repoNumCmd = $repoNumCmd;
         $this->mailer = $mailer;
@@ -39,6 +41,7 @@ class OldCmdController extends AbstractController
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -103,7 +106,7 @@ class OldCmdController extends AbstractController
                     $mail->setCreatedAt(new DateTime())
                         ->setEmail($form->getData()['email'])
                         ->setPage($tracking);
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($mail);
                     $em->flush();
                 } else {
@@ -152,7 +155,7 @@ class OldCmdController extends AbstractController
             ->setCreatedAt(new DateTime())
             ->setTreatedBy($this->getUser())
             ->setDossier($dossier);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($lockCmd);
         $em->flush();
 

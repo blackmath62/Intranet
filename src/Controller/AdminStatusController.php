@@ -7,6 +7,7 @@ use App\Form\EditStatusType;
 use App\Repository\Main\StatusRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AdminStatusController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/status", name="app_admin_status")
      */
@@ -56,10 +64,10 @@ class AdminStatusController extends AbstractController
      */
     public function deleteStatus($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(Status::class);
+        $repository = $this->entityManager->getRepository(Status::class);
         $StatusId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($StatusId);
         $em->flush();
 
@@ -82,7 +90,7 @@ class AdminStatusController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($status);
             $em->flush();
 

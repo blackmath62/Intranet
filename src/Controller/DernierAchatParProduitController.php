@@ -7,6 +7,7 @@ use App\Form\MetierProdType;
 use App\Form\OthersDocumentsType;
 use App\Repository\Divalto\ArtRepository;
 use App\Repository\Main\IcdRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Shuchkin\SimpleXLSX;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -21,10 +22,12 @@ class DernierAchatParProduitController extends AbstractController
 {
 
     private $repoArt;
+    private $entityManager;
 
-    public function __construct(ArtRepository $repoArt)
+    public function __construct(ManagerRegistry $registry, ArtRepository $repoArt)
     {
         $this->repoArt = $repoArt;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -89,7 +92,7 @@ class DernierAchatParProduitController extends AbstractController
             ini_set('memory_limit', '-1');
             ini_set('max_execution_time', 0);
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             // suppression des anciennes données
             $produits = $repoIcd->findAll();
             foreach ($produits as $key => $value) {

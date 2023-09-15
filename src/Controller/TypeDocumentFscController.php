@@ -6,6 +6,7 @@ use App\Entity\Main\TypeDocumentFsc;
 use App\Form\TypeDocumentFscType;
 use App\Repository\Main\TypeDocumentFscRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TypeDocumentFscController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/type/document/fsc", name="app_type_document_fsc")
      */
@@ -29,7 +37,7 @@ class TypeDocumentFscController extends AbstractController
             $typeDoc = new TypeDocumentFsc();
             $typeDoc = $form->getData();
             $typeDoc->setCreatedAt(new DateTime());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($typeDoc);
             $em->flush();
         }
@@ -59,7 +67,7 @@ class TypeDocumentFscController extends AbstractController
         //   $this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($typeDocFsc);
             $em->flush();
 
@@ -79,10 +87,10 @@ class TypeDocumentFscController extends AbstractController
      */
     public function delete($id, Request $request): Response
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(TypeDocumentFsc::class);
+        $repository = $this->entityManager->getRepository(TypeDocumentFsc::class);
         $typeDocFscId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($typeDocFscId);
         $em->flush();
 

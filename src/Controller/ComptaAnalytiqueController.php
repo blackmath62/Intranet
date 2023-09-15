@@ -9,6 +9,7 @@ use App\Form\YearMonthType;
 use App\Repository\Divalto\ComptaAnalytiqueRepository;
 use App\Repository\Main\MailListRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -34,8 +35,9 @@ class ComptaAnalytiqueController extends AbstractController
     private $mailTreatement;
     private $adminEmailController;
     private $repoAnal;
+    private $entityManager;
 
-    public function __construct(ComptaAnalytiqueRepository $repoAnal, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
+    public function __construct(ManagerRegistry $registry, ComptaAnalytiqueRepository $repoAnal, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
     {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
@@ -43,7 +45,7 @@ class ComptaAnalytiqueController extends AbstractController
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
         $this->repoAnal = $repoAnal;
-
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -87,7 +89,7 @@ class ComptaAnalytiqueController extends AbstractController
                     ->setEmail($formMails->getData()['email'])
                     ->setSecondOption($formMails->getData()['SecondOption'])
                     ->setPage($tracking);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
                 $this->addFlash('message', 'le mail a été ajouté avec succés !');

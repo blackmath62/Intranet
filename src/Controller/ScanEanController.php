@@ -13,6 +13,7 @@ use App\Repository\Main\MailListRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
 use Com\Tecnick\Barcode\Barcode;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,12 +32,14 @@ class ScanEanController extends AbstractController
     private $mailer;
     private $repoMail;
     private $mailEnvoi;
+    private $entityManager;
 
-    public function __construct(MailListRepository $repoMail, MailerInterface $mailer)
+    public function __construct(ManagerRegistry $registry, MailListRepository $repoMail, MailerInterface $mailer)
     {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
     // Retrait chantier
@@ -63,7 +66,7 @@ class ScanEanController extends AbstractController
                 $chantier = $form->getData()->getChantier();
                 $retrait->setCreatedAt(new \DateTime())
                     ->setCreatedBy($this->getUser());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($retrait);
                 $em->flush();
                 $this->addFlash('message', 'Produit ajouté avec succés');
@@ -105,7 +108,7 @@ class ScanEanController extends AbstractController
     public function delete($id, $chantier = null, Request $request, RetraitMarchandisesEanRepository $repo)
     {
         $retrait = $repo->findOneBy(['id' => $id]);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($retrait);
         $em->flush();
 
@@ -124,7 +127,7 @@ class ScanEanController extends AbstractController
         //dd($chantier);
         $retrait = $repo->findBy(['chantier' => $chantier, 'sendAt' => null]);
         foreach ($retrait as $value) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->remove($value);
             $em->flush();
         }
@@ -166,7 +169,7 @@ class ScanEanController extends AbstractController
 
                 $basculeSend = $repo->findOneBy(['id' => $histo[$ligHisto]->getId()]);
                 $basculeSend->setSendAt(new DateTime());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($basculeSend);
                 $em->flush();
 
@@ -267,7 +270,7 @@ class ScanEanController extends AbstractController
                 $emplacement = $form->getData()->getEmplacement();
                 $retrait->setCreatedAt(new \DateTime())
                     ->setCreatedBy($this->getUser());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($retrait);
                 $em->flush();
                 $this->addFlash('message', 'Produit ajouté avec succés');
@@ -309,7 +312,7 @@ class ScanEanController extends AbstractController
         //dd($emplacement);
         $empl = $repo->findBy(['emplacement' => $emplacement, 'sendAt' => null]);
         foreach ($empl as $value) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->remove($value);
             $em->flush();
         }
@@ -327,7 +330,7 @@ class ScanEanController extends AbstractController
     public function deleteEmplacement($id, $emplacement = null, Request $request, AlimentationEmplacementRepository $repo)
     {
         $empl = $repo->findOneBy(['id' => $id]);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($empl);
         $em->flush();
 
@@ -366,7 +369,7 @@ class ScanEanController extends AbstractController
             $prod = $repoArt->getEanStock($dos, $histo[$ligHisto]->getEan());
             $basculeSend = $repo->findOneBy(['id' => $histo[$ligHisto]->getId()]);
             $basculeSend->setSendAt(new DateTime());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($basculeSend);
             $em->flush();
             $historique[$ligHisto]['emplacement'] = $histo[$ligHisto]->getEmplacement();

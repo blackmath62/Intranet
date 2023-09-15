@@ -6,6 +6,7 @@ use App\Form\OthersDocumentsType;
 use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\OthersDocumentsRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class AuditAfnorController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/audit/afnor", name="app_audit_afnor")
      */
@@ -55,7 +63,7 @@ class AuditAfnorController extends AbstractController
                     ->setFile($newFilename)
                     ->setIdentifiant(1)
                     ->setUser($this->getUser());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($doc);
                 $em->flush();
             }
@@ -102,7 +110,7 @@ class AuditAfnorController extends AbstractController
     {
         $doc = $repo->findOneBy(['id' => $id]);
         unlink('doc/Lhermitte_freres/Afnor/' . $doc->getFile());
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($doc);
         $em->flush();
 

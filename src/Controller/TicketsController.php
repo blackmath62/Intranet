@@ -11,6 +11,7 @@ use App\Repository\Main\StatusRepository;
 use App\Repository\Main\TicketsRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -40,10 +41,10 @@ class TicketsController extends AbstractController
     private $mailTreatement;
     private $adminEmailController;
 
-    public function __construct(AdminEmailController $adminEmailController, EntityManagerInterface $entityManager, MailerInterface $mailer, MailListRepository $repoMail)
+    public function __construct(AdminEmailController $adminEmailController, ManagerRegistry $registry, MailerInterface $mailer, MailListRepository $repoMail)
     {
 
-        $this->entityManager = $entityManager;
+        $this->entityManager = $registry->getManager();
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
@@ -103,7 +104,7 @@ class TicketsController extends AbstractController
                 $ticket->setFile($newFilename);
             }
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($ticket);
             $em->flush();
 

@@ -8,6 +8,7 @@ use App\Form\AdminAnnuaireType;
 use App\Repository\Main\AnnuaireRepository;
 use App\Repository\Main\SocieteRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,6 +24,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AdminAnnuaireController extends AbstractController
 {
+
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * Création d'une nouvelle entrée dans l'annuaire et affichage de l'annuaire avec option modification et suppression
      *
@@ -83,9 +92,9 @@ class AdminAnnuaireController extends AbstractController
      *
      * @Route("/admin/annuaire/delete/{id}", name="app_delete_annuaire")
      */
-    public function deleteAnnuaire(Annuaire $annuaire, Request $request)
+    public function deleteAnnuaire(Annuaire $annuaire)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($annuaire);
         $em->flush();
 
@@ -113,7 +122,7 @@ class AdminAnnuaireController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($formEditAnnuaire->isSubmitted() && $formEditAnnuaire->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($annuaire);
             $em->flush();
 

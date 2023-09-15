@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Main\FAQ;
 use App\Form\FaqType;
 use App\Repository\Main\FAQRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FaqController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/faq", name="app_faq")
      */
@@ -34,7 +42,7 @@ class FaqController extends AbstractController
             $faq = $form->getData();
             $faq->setCreatedAt(new \DateTime())
                 ->setUser($this->getUser());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($faq);
             $em->flush();
 
@@ -84,7 +92,7 @@ class FaqController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $faq = $form->getData();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($faq);
             $em->flush();
 

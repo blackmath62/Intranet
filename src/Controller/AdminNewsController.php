@@ -6,6 +6,7 @@ use App\Entity\Main\News;
 use App\Form\AdminNewsType;
 use App\Repository\Main\NewsRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AdminNewsController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/news", name="app_admin_news")
      */
@@ -36,7 +44,7 @@ class AdminNewsController extends AbstractController
             $news->setCreatedAt(new DateTime())
                 ->setUser($this->getUser());
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($news);
             $em->flush();
             $this->addFlash('message', 'Actualité ajoutée avec succès');
@@ -63,7 +71,7 @@ class AdminNewsController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($news);
             $em->flush();
 
@@ -81,7 +89,7 @@ class AdminNewsController extends AbstractController
      */
     public function delete(Request $request, News $news)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($news);
         $em->flush();
 

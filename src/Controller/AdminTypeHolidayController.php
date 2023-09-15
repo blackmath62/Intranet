@@ -8,6 +8,7 @@ use App\Form\EditHolidayTypesType;
 use App\Repository\Main\HolidayTypesRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -22,6 +23,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AdminTypeHolidayController extends AbstractController
 {
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * @Route("/admin/type/holiday", name="app_admin_types_holiday")
      */
@@ -74,10 +82,10 @@ class AdminTypeHolidayController extends AbstractController
      */
     public function deleteHolidayType($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(HolidayTypes::class);
+        $repository = $this->entityManager->getRepository(HolidayTypes::class);
         $holidayId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($holidayId);
         $em->flush();
 
@@ -100,7 +108,7 @@ class AdminTypeHolidayController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($holidayTypes);
             $em->flush();
 

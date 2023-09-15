@@ -11,6 +11,7 @@ use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\ProduitsCommissionnairesRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,8 +33,9 @@ class ContratCommissionnaireController extends AbstractController
     private $mailer;
     private $repoMail;
     private $mailEnvoi;
+    private $entityManager;
 
-    public function __construct(ProduitsCommissionnairesRepository $cc, MouvRepository $repoMouv, MailerInterface $mailer, MailListRepository $repoMail)
+    public function __construct(ManagerRegistry $registry, ProduitsCommissionnairesRepository $cc, MouvRepository $repoMouv, MailerInterface $mailer, MailListRepository $repoMail)
     {
         $this->mailer = $mailer;
         $this->cc = $cc;
@@ -41,6 +43,7 @@ class ContratCommissionnaireController extends AbstractController
         $this->repoMouv = $repoMouv;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -66,7 +69,7 @@ class ContratCommissionnaireController extends AbstractController
                 $mail->setCreatedAt(new DateTime())
                     ->setEmail($form->getData()['email'])
                     ->setPage($tracking);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
             } else {
@@ -110,7 +113,7 @@ class ContratCommissionnaireController extends AbstractController
 
         $search = $repo->findOneBy(['id' => $id]);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($search);
         $em->flush();
 
@@ -134,7 +137,7 @@ class ContratCommissionnaireController extends AbstractController
                     ->setContratCommissionaire(false)
                     ->setUpdatedAt(new DateTime())
                     ->setCreatedAt(new DateTime());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($article);
                 $em->flush();
             }
@@ -155,7 +158,7 @@ class ContratCommissionnaireController extends AbstractController
         } elseif ($article->getContratCommissionaire() == true) {
             $article->setContratCommissionaire(false);
         }
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($article);
         $em->flush();
 

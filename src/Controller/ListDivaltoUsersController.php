@@ -2,28 +2,30 @@
 
 namespace App\Controller;
 
-use App\Form\ListDivaltoUsersType;
 use App\Entity\Main\ListDivaltoUsers;
+use App\Form\ListDivaltoUsersType;
 use App\Repository\Divalto\VrpRepository;
+use App\Repository\Main\ListDivaltoUsersRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\Main\ListDivaltoUsersRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ListDivaltoUsersController extends AbstractController
 {
-    
+
     private $vrpRepo;
     private $listDivaltoUsersRepo;
+    private $entityManager;
 
-    public function __construct(VrpRepository $vrpRepo, ListDivaltoUsersRepository $listDivaltoUsersRepo)
+    public function __construct(ManagerRegistry $registry, VrpRepository $vrpRepo, ListDivaltoUsersRepository $listDivaltoUsersRepo)
     {
         $this->vrpRepo = $vrpRepo;
         $this->listDivaltoUsersRepo = $listDivaltoUsersRepo;
-
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
-    } 
+    }
 
     /**
      * @Route("admin/list/divalto/users/test", name="app_list_divalto_users_test")
@@ -33,11 +35,11 @@ class ListDivaltoUsersController extends AbstractController
         $form = $this->createForm(ListDivaltoUsersType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            
-            /*$entityManager = $this->getDoctrine()->getManager();
+
+            /*$entityManager = $this->entityManager;
             $entityManager->persist($add);
             $entityManager->flush();*/
-            
+
             $this->addFlash('message', 'Mise à jour effectuée avec succés');
             return $this->redirectToRoute('app_list_divalto_users_test');
         }
@@ -62,19 +64,19 @@ class ListDivaltoUsersController extends AbstractController
     /**
      * @Route("admin/list/divalto/users/lock/unlock/{id}/{value}", name="app_list_divalto_users_lock_unlock")
      */
-    public function lockUnlock($id,$value): Response
+    public function lockUnlock($id, $value): Response
     {
         if ($value == 'false') {
             $value = false;
-        }else {
+        } else {
             $value = true;
         }
         $user = $this->listDivaltoUsersRepo->findOneBy(['divalto_id' => $id]);
         $user->setValid($value);
-        
-        $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($user);
-            $entityManager->flush();
+
+        $entityManager = $this->entityManager;
+        $entityManager->persist($user);
+        $entityManager->flush();
 
         $this->addFlash('message', 'Mise à jour effectuée avec succés');
         return $this->redirectToRoute('app_list_divalto_users_show');
@@ -85,22 +87,22 @@ class ListDivaltoUsersController extends AbstractController
      */
     public function update(): Response
     {
-        $users =  $this->vrpRepo->UpdateListDivaltoUser();
+        $users = $this->vrpRepo->UpdateListDivaltoUser();
         foreach ($users as $value) {
             $findUser = $this->listDivaltoUsersRepo->findOneBy(['divalto_id' => $value['divalto_id']]);
             if ($findUser == null | $findUser == '') {
                 $user = new ListDivaltoUsers();
                 $user->setValid(true);
-            }else {
+            } else {
                 $user = $findUser;
             }
             $user->setDivaltoId($value['divalto_id'])
-                    ->setUserX($value['userX'])
-                    ->setNom($value['nom'])
-                    ->setDos($value['dos'])
-                    ->setEmail($value['email']);
+                ->setUserX($value['userX'])
+                ->setNom($value['nom'])
+                ->setDos($value['dos'])
+                ->setEmail($value['email']);
 
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($user);
             $entityManager->flush();
         }

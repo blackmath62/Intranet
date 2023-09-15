@@ -17,6 +17,7 @@ use App\Repository\Main\MailListRepository;
 use App\Repository\Main\MovBillFscRepository;
 use App\Repository\Main\UsersRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,8 +46,9 @@ class FscPieceClientController extends AbstractController
     private $adminEmailController;
     private $repoUsers;
     private $repoComments;
+    private $entityManager;
 
-    public function __construct(CommentairesRepository $repoComments, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt, MailerInterface $mailer)
+    public function __construct(ManagerRegistry $registry, CommentairesRepository $repoComments, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt, MailerInterface $mailer)
     {
         $this->repoFact = $repoFact;
         $this->repoEnt = $repoEnt;
@@ -60,6 +62,7 @@ class FscPieceClientController extends AbstractController
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
         $this->repoComments = $repoComments;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -82,7 +85,7 @@ class FscPieceClientController extends AbstractController
                 $mail->setCreatedAt(new DateTime())
                     ->setEmail($form->getData()['email'])
                     ->setPage($tracking);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
             } else {
@@ -116,7 +119,7 @@ class FscPieceClientController extends AbstractController
                 $this->addFlash('danger', 'Cette piece a bien été mise en anomalie');
             }
 
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($piece);
             $entityManager->flush();
 
@@ -127,7 +130,7 @@ class FscPieceClientController extends AbstractController
                 ->setTables('app_fsc_piece_client')
                 ->setIdentifiant($id);
 
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($commentaire);
             $entityManager->flush();
         } else {
@@ -146,7 +149,7 @@ class FscPieceClientController extends AbstractController
         $form = $this->createForm(FactureFournisseursFscType::class, $bill);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($bill);
             $entityManager->flush();
 
@@ -161,7 +164,7 @@ class FscPieceClientController extends AbstractController
                 ->setUser($this->getUser())
                 ->setCreatedAt(new DateTime())
                 ->setTables('app_fsc_piece_client');
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($commentaires);
             $entityManager->flush();
 
@@ -211,7 +214,7 @@ class FscPieceClientController extends AbstractController
                         ->setTypeTiers($value['typeTiers']);
 
                 }
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->persist($bill);
                 $entityManager->flush();
             }

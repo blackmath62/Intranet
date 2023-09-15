@@ -2,24 +2,27 @@
 
 namespace App\Controller;
 
-use DateTime;
 use App\Entity\Main\FournisseursDivalto;
 use App\Repository\Divalto\FouRepository;
+use App\Repository\Main\FournisseursDivaltoRepository;
+use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\Main\FournisseursDivaltoRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class FournisseursDivaltoController extends AbstractController
 {
 
     private $repoFou;
     private $repoFouDivalto;
+    private $entityManager;
 
-    public function __construct(FournisseursDivaltoRepository $repoFouDivalto, FouRepository $repoFou)
+    public function __construct(ManagerRegistry $registry, FournisseursDivaltoRepository $repoFouDivalto, FouRepository $repoFou)
     {
         $this->repoFou = $repoFou;
         $this->repoFouDivalto = $repoFouDivalto;
+        $this->entityManager = $registry->getManager();
     }
 
     /**
@@ -35,14 +38,14 @@ class FournisseursDivaltoController extends AbstractController
             if (!$fournisseur) {
                 $fournisseur = new FournisseursDivalto();
                 $fournisseur->setTiers($value['tiers'])
-                            ->setNom($value['nom'])
-                            ->setCreatedAt(new DateTime);
-            }else {
+                    ->setNom($value['nom'])
+                    ->setCreatedAt(new DateTime);
+            } else {
                 $fournisseur->setNom($value['nom']);
             }
-            $em = $this->getDoctrine()->getManager();
-                    $em->persist($fournisseur);
-                    $em->flush();
+            $em = $this->entityManager;
+            $em->persist($fournisseur);
+            $em->flush();
         }
 
         return $this->render('fournisseurs_divalto/index.html.twig', [
