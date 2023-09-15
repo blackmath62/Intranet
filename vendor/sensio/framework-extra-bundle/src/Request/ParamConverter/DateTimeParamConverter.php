@@ -49,7 +49,9 @@ class DateTimeParamConverter implements ParamConverterInterface
         if (isset($options['format'])) {
             $date = $class::createFromFormat($options['format'], $value);
 
-            if (0 < \DateTime::getLastErrors()['warning_count']) {
+            $errors = \DateTime::getLastErrors() ?: ['warning_count' => 0];
+
+            if (0 < $errors['warning_count']) {
                 $date = false;
             }
 
@@ -57,7 +59,7 @@ class DateTimeParamConverter implements ParamConverterInterface
                 throw new NotFoundHttpException(sprintf('Invalid date given for parameter "%s".', $param));
             }
         } else {
-            $valueIsInt = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+            $valueIsInt = filter_var($value, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
             if (false !== $valueIsInt) {
                 $date = (new $class())->setTimestamp($value);
             } else {

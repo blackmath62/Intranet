@@ -17,6 +17,7 @@ namespace Sensio\Bundle\FrameworkExtraBundle\Configuration;
  * @author Fabien Potencier <fabien@symfony.com>
  * @Annotation
  */
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 class ParamConverter extends ConfigurationAnnotation
 {
     /**
@@ -55,6 +56,29 @@ class ParamConverter extends ConfigurationAnnotation
     private $converter;
 
     /**
+     * @param array|string $data
+     */
+    public function __construct(
+        $data = [],
+        string $class = null,
+        array $options = [],
+        bool $isOptional = false,
+        string $converter = null
+    ) {
+        $values = [];
+        if (\is_string($data)) {
+            $values['value'] = $data;
+        } else {
+            $values = $data;
+        }
+        $values['class'] = $values['class'] ?? $class;
+        $values['options'] = $values['options'] ?? $options;
+        $values['isOptional'] = $values['isOptional'] ?? $isOptional;
+        $values['converter'] = $values['converter'] ?? $converter;
+        parent::__construct($values);
+    }
+
+    /**
      * Returns the parameter name.
      *
      * @return string
@@ -87,7 +111,7 @@ class ParamConverter extends ConfigurationAnnotation
     /**
      * Returns the parameter class name.
      *
-     * @return string $name
+     * @return string
      */
     public function getClass()
     {

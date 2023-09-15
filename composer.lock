@@ -4,37 +4,33 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fb912498714d00028876b2adfa44f615",
+    "content-hash": "86ae114f5109fa256692eb43765332fd",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
-            "version": "v2.4.3",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ColorlibHQ/AdminLTE.git",
-                "reference": "b3acb63ac56b13eb45b36e628b384a9a2507b50e"
+                "reference": "bd4d9c72931f1dd28601b6bfb387554a381ad540"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ColorlibHQ/AdminLTE/zipball/b3acb63ac56b13eb45b36e628b384a9a2507b50e",
-                "reference": "b3acb63ac56b13eb45b36e628b384a9a2507b50e",
+                "url": "https://api.github.com/repos/ColorlibHQ/AdminLTE/zipball/bd4d9c72931f1dd28601b6bfb387554a381ad540",
+                "reference": "bd4d9c72931f1dd28601b6bfb387554a381ad540",
                 "shasum": ""
             },
-            "require": {
-                "composer/installers": "1.*"
-            },
-            "type": "template",
+            "type": "library",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "Abdullah Almsaeed",
-                    "email": "abdullah@almsaeedstudio.com"
+                    "name": "Colorlib"
                 }
             ],
-            "description": "AdminLTE - admin control panel and dashboard that's based on Bootstrap 3",
+            "description": "AdminLTE - admin control panel and dashboard that's based on Bootstrap 4",
             "homepage": "https://adminlte.io/",
             "keywords": [
                 "JS",
@@ -48,10 +44,10 @@
                 "web"
             ],
             "support": {
-                "issues": "https://github.com/almasaeed2010/AdminLTE/issues",
-                "source": "https://github.com/ColorlibHQ/AdminLTE/tree/v2.4.3"
+                "issues": "https://github.com/ColorlibHQ/AdminLTE/issues",
+                "source": "https://github.com/ColorlibHQ/AdminLTE/tree/v3.2.0"
             },
-            "time": "2018-02-04T12:54:57+00:00"
+            "time": "2022-02-07T20:33:09+00:00"
         },
         {
             "name": "beberlei/doctrineextensions",
@@ -5012,28 +5008,28 @@
         },
         {
             "name": "rewieer/taskschedulerbundle",
-            "version": "0.9.0",
+            "version": "0.11.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/rewieer/TaskSchedulerBundle.git",
-                "reference": "6daa8714358a14961dbdde869b1cbf2650d66f8d"
+                "url": "https://github.com/ancyrweb/TaskSchedulerBundle.git",
+                "reference": "d971436120b3dec44272c27620bd0303e7ef3d43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rewieer/TaskSchedulerBundle/zipball/6daa8714358a14961dbdde869b1cbf2650d66f8d",
-                "reference": "6daa8714358a14961dbdde869b1cbf2650d66f8d",
+                "url": "https://api.github.com/repos/ancyrweb/TaskSchedulerBundle/zipball/d971436120b3dec44272c27620bd0303e7ef3d43",
+                "reference": "d971436120b3dec44272c27620bd0303e7ef3d43",
                 "shasum": ""
             },
             "require": {
                 "dragonmantank/cron-expression": "^2.3|^3.0",
                 "php": "^7.2|^8.0",
-                "symfony/console": "^3.4|^4.4|^5.1",
-                "symfony/framework-bundle": "^3.4|^4.4|^5.1"
+                "symfony/console": "^3.4|^4.4|^5.3|^6.0",
+                "symfony/framework-bundle": "^3.4|^4.4|^5.3|^6.0"
             },
             "require-dev": {
-                "monolog/monolog": "^1.25",
+                "monolog/monolog": "^1.25|^2.2",
                 "phpunit/phpunit": "^8.5",
-                "symfony/phpunit-bridge": "^5.1"
+                "symfony/phpunit-bridge": "^5.3"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -5060,10 +5056,10 @@
                 "task"
             ],
             "support": {
-                "issues": "https://github.com/rewieer/TaskSchedulerBundle/issues",
-                "source": "https://github.com/rewieer/TaskSchedulerBundle/tree/0.9.0"
+                "issues": "https://github.com/ancyrweb/TaskSchedulerBundle/issues",
+                "source": "https://github.com/ancyrweb/TaskSchedulerBundle/tree/0.11.0"
             },
-            "time": "2021-08-04T19:21:03+00:00"
+            "time": "2022-08-05T15:11:37+00:00"
         },
         {
             "name": "robloach/component-installer",
@@ -5116,25 +5112,25 @@
         },
         {
             "name": "sensio/framework-extra-bundle",
-            "version": "v5.6.1",
+            "version": "v6.2.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensiolabs/SensioFrameworkExtraBundle.git",
-                "reference": "430d14c01836b77c28092883d195a43ce413ee32"
+                "reference": "2f886f4b31f23c76496901acaedfedb6936ba61f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sensiolabs/SensioFrameworkExtraBundle/zipball/430d14c01836b77c28092883d195a43ce413ee32",
-                "reference": "430d14c01836b77c28092883d195a43ce413ee32",
+                "url": "https://api.github.com/repos/sensiolabs/SensioFrameworkExtraBundle/zipball/2f886f4b31f23c76496901acaedfedb6936ba61f",
+                "reference": "2f886f4b31f23c76496901acaedfedb6936ba61f",
                 "shasum": ""
             },
             "require": {
-                "doctrine/annotations": "^1.0",
+                "doctrine/annotations": "^1.0|^2.0",
                 "php": ">=7.2.5",
-                "symfony/config": "^4.4|^5.0",
-                "symfony/dependency-injection": "^4.4|^5.0",
-                "symfony/framework-bundle": "^4.4|^5.0",
-                "symfony/http-kernel": "^4.4|^5.0"
+                "symfony/config": "^4.4|^5.0|^6.0",
+                "symfony/dependency-injection": "^4.4|^5.0|^6.0",
+                "symfony/framework-bundle": "^4.4|^5.0|^6.0",
+                "symfony/http-kernel": "^4.4|^5.0|^6.0"
             },
             "conflict": {
                 "doctrine/doctrine-cache-bundle": "<1.3.1",
@@ -5144,25 +5140,23 @@
                 "doctrine/dbal": "^2.10|^3.0",
                 "doctrine/doctrine-bundle": "^1.11|^2.0",
                 "doctrine/orm": "^2.5",
-                "nyholm/psr7": "^1.1",
-                "symfony/browser-kit": "^4.4|^5.0",
-                "symfony/doctrine-bridge": "^4.4|^5.0",
-                "symfony/dom-crawler": "^4.4|^5.0",
-                "symfony/expression-language": "^4.4|^5.0",
-                "symfony/finder": "^4.4|^5.0",
-                "symfony/monolog-bridge": "^4.0|^5.0",
+                "symfony/browser-kit": "^4.4|^5.0|^6.0",
+                "symfony/doctrine-bridge": "^4.4|^5.0|^6.0",
+                "symfony/dom-crawler": "^4.4|^5.0|^6.0",
+                "symfony/expression-language": "^4.4|^5.0|^6.0",
+                "symfony/finder": "^4.4|^5.0|^6.0",
+                "symfony/monolog-bridge": "^4.0|^5.0|^6.0",
                 "symfony/monolog-bundle": "^3.2",
-                "symfony/phpunit-bridge": "^4.4.9|^5.0.9",
-                "symfony/psr-http-message-bridge": "^1.1",
-                "symfony/security-bundle": "^4.4|^5.0",
-                "symfony/twig-bundle": "^4.4|^5.0",
-                "symfony/yaml": "^4.4|^5.0",
+                "symfony/phpunit-bridge": "^4.4.9|^5.0.9|^6.0",
+                "symfony/security-bundle": "^4.4|^5.0|^6.0",
+                "symfony/twig-bundle": "^4.4|^5.0|^6.0",
+                "symfony/yaml": "^4.4|^5.0|^6.0",
                 "twig/twig": "^1.34|^2.4|^3.0"
             },
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "5.6.x-dev"
+                    "dev-master": "6.1.x-dev"
                 }
             },
             "autoload": {
@@ -5189,11 +5183,10 @@
                 "controllers"
             ],
             "support": {
-                "issues": "https://github.com/sensiolabs/SensioFrameworkExtraBundle/issues",
-                "source": "https://github.com/sensiolabs/SensioFrameworkExtraBundle/tree/v5.6.1"
+                "source": "https://github.com/sensiolabs/SensioFrameworkExtraBundle/tree/v6.2.10"
             },
             "abandoned": "Symfony",
-            "time": "2020-08-25T19:10:18+00:00"
+            "time": "2023-02-24T14:57:12+00:00"
         },
         {
             "name": "shuchkin/simplexlsx",
