@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class EmplacementDepotController extends AbstractController
 {
     #[Route("/emplacement/depot", name: "app_emplacement_depot")]
+
     public function index(Request $request, MouvRepository $repo): Response
     {
         $produits = '';

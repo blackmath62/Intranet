@@ -55,7 +55,7 @@ class FaqController extends AbstractController
 
     #[Route("/faq/show/{id}", name: "app_faq_show")]
 
-    public function faqShow(int $id, FAQRepository $repo, Request $request)
+    public function faqShow(int $id, FAQRepository $repo)
     {
         $faq = $repo->findOneBy(['id' => $id]);
 

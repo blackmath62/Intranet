@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Repository\Divalto\StocksJardinewRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -15,7 +14,7 @@ class StockJardinewController extends AbstractController
 {
     #[Route("/jardinew/stocks", name: "app_stock_jardinew")]
 
-    public function index(Request $request, StocksJardinewRepository $repo): Response
+    public function index(StocksJardinewRepository $repo): Response
     {
 
         // tracking user page for stats

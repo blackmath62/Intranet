@@ -38,8 +38,14 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
     private $adminEmailController;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, AdminEmailController $adminEmailController, EntRepository $entete, UsersRepository $Users, CmdRobyDelaiAccepteReporteRepository $cmdRoby, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        AdminEmailController $adminEmailController,
+        EntRepository $entete,
+        UsersRepository $Users,
+        CmdRobyDelaiAccepteReporteRepository $cmdRoby,
+        MailerInterface $mailer,
+        MailListRepository $repoMail) {
         $this->mailer = $mailer;
         $this->cmdRoby = $cmdRoby;
         $this->Users = $Users;
@@ -137,7 +143,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
     #[Route("/Roby/cmd/update", name: "app_cmd_roby_update")]
 
     // mettre à jour les commandes du systéme sur l'intranet
-    public function runUpdate(CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, Request $request): Response
+    public function runUpdate(CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -275,8 +281,6 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         } else {
             $this->addFlash('message', 'La liste des commandes a été nettoyée, ' . $texte);
         }
-
-        //return $this->redirectToRoute('app_cmd_roby_delai_accepte_reporte_active');
 
     }
 

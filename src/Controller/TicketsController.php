@@ -39,8 +39,12 @@ class TicketsController extends AbstractController
     private $mailTreatement;
     private $adminEmailController;
 
-    public function __construct(AdminEmailController $adminEmailController, ManagerRegistry $registry, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        AdminEmailController $adminEmailController,
+        ManagerRegistry $registry,
+        MailerInterface $mailer,
+        MailListRepository $repoMail
+    ) {
 
         $this->entityManager = $registry->getManager();
         $this->mailer = $mailer;

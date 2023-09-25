@@ -26,7 +26,7 @@ class AdminServicesController extends AbstractController
 
     #[Route("/admin/services", name: "app_admin_services")]
 
-    public function index(Services $service = null, Request $request, ServicesRepository $repo, EntityManagerInterface $manager)
+    public function index(Request $request, ServicesRepository $repo, EntityManagerInterface $manager, Services $service = null)
     {
         if (!$service) {
             $service = new Services();

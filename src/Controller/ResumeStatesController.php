@@ -15,7 +15,7 @@ class ResumeStatesController extends AbstractController
     #[Route("/resume/states/{dos}", name: "app_resume_states")]
     #[Route("/resume/states/{dos}/{dd}/{df}", name: "app_resume_states_dd_df")]
 
-    public function index($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle): Response
+    public function index(Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle, $dos, $dd = null, $df = null): Response
     {
 
         // tracking user page for stats

@@ -9,7 +9,6 @@ use App\Form\SendTicketAnnuaireType;
 use App\Form\SendTicketType;
 use App\Repository\Main\CommentsRepository;
 use App\Repository\Main\MailListRepository;
-use App\Repository\Main\PrestataireRepository;
 use App\Repository\Main\StatusRepository;
 use App\Repository\Main\TicketsRepository;
 use DateTime;
@@ -45,7 +44,7 @@ class CommentsController extends AbstractController
     #[Route("/ticket/comment/add/{id<\d+>}", name: "app_comment")]
     #[ParamConverter("Comments", options: ["id" => "Ticket_id"])]
 
-    public function addComment(int $id, Pdf $pdf, StatusRepository $repoStatut, MailerInterface $mailer, TicketsRepository $repoTicket, CommentsRepository $repoComments, Request $request, EntityManagerInterface $em, PrestataireRepository $repoPresta)
+    public function addComment(int $id, Pdf $pdf, StatusRepository $repoStatut, MailerInterface $mailer, TicketsRepository $repoTicket, CommentsRepository $repoComments, Request $request, EntityManagerInterface $em)
     {
         // Enregistrement des commentaires
 

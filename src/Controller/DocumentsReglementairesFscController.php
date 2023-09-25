@@ -83,7 +83,7 @@ class DocumentsReglementairesFscController extends AbstractController
 
     #[Route("/Roby/documents/reglementaires/fsc/show/{id}", name: "app_documents_reglementaires_fsc_show")]
 
-    public function DocsRegleFscShow(int $id, DocumentsReglementairesFscRepository $repo, Request $request)
+    public function DocsRegleFscShow(int $id, DocumentsReglementairesFscRepository $repo)
     {
         $doc = $repo->findOneBy(['id' => $id]);
 
@@ -99,7 +99,7 @@ class DocumentsReglementairesFscController extends AbstractController
 
     #[Route("/Roby/documents/reglementaires/fsc/delete/{id}", name: "app_documents_reglementaires_fsc_delete")]
 
-    public function DocsRegleFscDelete(int $id, DocumentsReglementairesFscRepository $repo, Request $request)
+    public function DocsRegleFscDelete(int $id, DocumentsReglementairesFscRepository $repo)
     {
         $doc = $repo->findOneBy(['id' => $id]);
 

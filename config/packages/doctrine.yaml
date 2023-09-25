@@ -7,7 +7,7 @@ doctrine:
                 # configure these for your database server
                 url: '%env(resolve:DATABASE_URL)%'
                 driver: 'pdo_mysql'
-                server_version: '5.7'
+                server_version: '5.7.31'
                 charset: utf8mb4
                 
             divaltoreel:

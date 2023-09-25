@@ -33,8 +33,13 @@ class ContratCommissionnaireController extends AbstractController
     private $mailEnvoi;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, ProduitsCommissionnairesRepository $cc, MouvRepository $repoMouv, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        ProduitsCommissionnairesRepository $cc,
+        MouvRepository $repoMouv,
+        MailerInterface $mailer,
+        MailListRepository $repoMail
+    ) {
         $this->mailer = $mailer;
         $this->cc = $cc;
         $this->repoMail = $repoMail;

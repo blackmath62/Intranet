@@ -21,7 +21,7 @@ class EmailTreatementService
         $this->entityManager = $entityManager;
     }
 
-    public function sendMail(string $subjet, $donnees = null, string $pageUrl = null, $mails, array $urlFiles = null)
+    public function sendMail(string $subjet, $mails, $donnees = null, string $pageUrl = null, array $urlFiles = null)
     {
         $repository = $this->entityManager->getRepository(MailList::class);
         if ($mails) {

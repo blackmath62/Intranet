@@ -45,8 +45,18 @@ class FscAttachedFileController extends AbstractController
     private $mailTreatement;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, MailListRepository $repoMail, UsersRepository $usersRepo, TypeDocumentFscRepository $typeDocFscRepo, CommentairesRepository $commentairesRepo, MouvRepository $mouvRepo, fscListMovementRepository $repoFsc, EntityManagerInterface $manager, documentsFscRepository $repoDocs, MailerInterface $mailer)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        MailListRepository $repoMail,
+        UsersRepository $usersRepo,
+        TypeDocumentFscRepository $typeDocFscRepo,
+        CommentairesRepository $commentairesRepo,
+        MouvRepository $mouvRepo,
+        fscListMovementRepository $repoFsc,
+        EntityManagerInterface $manager,
+        documentsFscRepository $repoDocs,
+        MailerInterface $mailer
+    ) {
         $this->mouvRepo = $mouvRepo;
         $this->repoFsc = $repoFsc;
         $this->manager = $manager;

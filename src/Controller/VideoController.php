@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,7 +13,7 @@ class VideoController extends AbstractController
 {
     #[Route("/video", name: "app_video")]
 
-    public function index(Request $request): Response
+    public function index(): Response
     {
 
         // tracking user page for stats

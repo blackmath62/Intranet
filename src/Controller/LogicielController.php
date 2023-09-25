@@ -25,7 +25,7 @@ class LogicielController extends AbstractController
 
     #[Route("/admin/logiciels", name: "app_admin_logiciel")]
 
-    public function index(Logiciel $logiciel = null, Request $request, LogicielRepository $repo, EntityManagerInterface $manager)
+    public function index(Request $request, LogicielRepository $repo, EntityManagerInterface $manager, Logiciel $logiciel = null)
     {
         if (!$logiciel) {
             $logiciel = new Logiciel();
@@ -59,7 +59,7 @@ class LogicielController extends AbstractController
 
     #[Route("/admin/logiciel/delete/{id}", name: "app_delete_logiciel")]
 
-    public function deletelogiciel($id, Request $request)
+    public function deletelogiciel($id)
     {
         $repository = $this->entityManager->getRepository(Logiciel::class);
         $logicielId = $repository->find($id);

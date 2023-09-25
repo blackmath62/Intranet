@@ -25,7 +25,7 @@ class AdminPrioritiesController extends AbstractController
 
     #[Route("/admin/priorities", name: "app_admin_priorities")]
 
-    public function index(Priorities $priorities = null, Request $request, PrioritiesRepository $repo, EntityManagerInterface $manager)
+    public function index(Request $request, PrioritiesRepository $repo, EntityManagerInterface $manager, Priorities $priorities = null)
     {
         if (!$priorities) {
             $priorities = new Priorities();

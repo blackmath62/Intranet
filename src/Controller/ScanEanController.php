@@ -101,7 +101,7 @@ class ScanEanController extends AbstractController
 
     #[Route("/scan/ean/delete/{id}/{chantier}", name: "app_scan_ean-delete")]
 
-    public function delete(Request $request, RetraitMarchandisesEanRepository $repo, $id, $chantier = null)
+    public function delete(RetraitMarchandisesEanRepository $repo, $id, $chantier = null)
     {
         $retrait = $repo->findOneBy(['id' => $id]);
         $em = $this->entityManager;
@@ -117,7 +117,7 @@ class ScanEanController extends AbstractController
 
     #[Route("/scan/ean/all/delete/{chantier}", name: "app_scan_ean_delete_all")]
 
-    public function deleteAll($chantier, Request $request, RetraitMarchandisesEanRepository $repo)
+    public function deleteAll($chantier, RetraitMarchandisesEanRepository $repo)
     {
         //dd($chantier);
         $retrait = $repo->findBy(['chantier' => $chantier, 'sendAt' => null]);
@@ -136,7 +136,7 @@ class ScanEanController extends AbstractController
 
     #[Route("/scan/ns", name: "app_scan_ean_ns")]
 
-    public function ns(Request $request, RetraitMarchandisesEanRepository $repo)
+    public function ns(RetraitMarchandisesEanRepository $repo)
     {
         $ns = $repo->getRetraiNonSoumis();
 
@@ -201,7 +201,7 @@ class ScanEanController extends AbstractController
 
     #[Route("/scan/ean/ajax/{dos}/{ean}", name: "app_scan_ean_ajax")]
 
-    public function retourProduitAjax(ArtRepository $repo, Request $request, $dos = null, $ean = null): Response
+    public function retourProduitAjax(ArtRepository $repo, $dos = null, $ean = null): Response
     {
         $dos = 1;
         $produit = "";
@@ -224,7 +224,7 @@ class ScanEanController extends AbstractController
 
     #[Route("/emplacement/scan/ajax/{dos}/{emplacement}", name: "app_emplacement_scan_ajax")]
 
-    public function EmplacementAjax(ArtRepository $repo, Request $request, $dos = null, $emplacement = null): Response
+    public function EmplacementAjax(ArtRepository $repo, $dos = null, $emplacement = null): Response
     {
         $dos = 1;
         $empl = "";
@@ -296,7 +296,7 @@ class ScanEanController extends AbstractController
 
     #[Route("/emplacement/scan/ean/all/delete/{emplacement}", name: "app_emplacement_scan_ean_delete_all")]
 
-    public function emplacementDeleteAll($emplacement, Request $request, AlimentationEmplacementRepository $repo)
+    public function emplacementDeleteAll($emplacement, AlimentationEmplacementRepository $repo)
     {
         //dd($emplacement);
         $empl = $repo->findBy(['emplacement' => $emplacement, 'sendAt' => null]);
@@ -315,7 +315,7 @@ class ScanEanController extends AbstractController
 
     #[Route("/emplacement/scan/ean/delete/{id}/{emplacement}", name: "app_emplacement_scan_ean-delete")]
 
-    public function deleteEmplacement(Request $request, AlimentationEmplacementRepository $repo, $id, $emplacement = null)
+    public function deleteEmplacement(AlimentationEmplacementRepository $repo, $id, $emplacement = null)
     {
         $empl = $repo->findOneBy(['id' => $id]);
         $em = $this->entityManager;
@@ -331,7 +331,7 @@ class ScanEanController extends AbstractController
 
     #[Route("/emplacement/scan/ns", name: "app_scan_emplacement_ns")]
 
-    public function emplacementNs(Request $request, AlimentationEmplacementRepository $repo)
+    public function emplacementNs(AlimentationEmplacementRepository $repo)
     {
         $ns = $repo->getEmplacementNonSoumis();
 
@@ -439,7 +439,7 @@ class ScanEanController extends AbstractController
     // Impression étiquette d'emplacement
     #[Route("/impression/emplacement", name: "app_print_empl")]
 
-    public function impressionEmplacement(ArtRepository $repo, Request $request, AlimentationEmplacementRepository $repoRetrait, PdfController $pdfController): Response
+    public function impressionEmplacement(ArtRepository $repo, Request $request): Response
     {
         $dos = 1;
 
@@ -465,7 +465,7 @@ class ScanEanController extends AbstractController
 
     #[Route("/impression/imprimante", name: "app_imprimante_ajax")]
 
-    public function checkPrinter(ArtRepository $repo, Request $request, $dos = null, $ean = null): JsonResponse
+    public function checkPrinter(): JsonResponse
     {
         $result = ['success' => false, 'response' => 'Erreur exécution...'];
 

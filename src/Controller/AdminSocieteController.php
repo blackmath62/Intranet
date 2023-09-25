@@ -26,7 +26,7 @@ class AdminSocieteController extends AbstractController
 
     #[Route("/admin/societe", name: "app_admin_societe")]
 
-    public function index(Societe $societe = null, Request $request, SocieteRepository $repo, EntityManagerInterface $manager)
+    public function index(Request $request, SocieteRepository $repo, EntityManagerInterface $manager, Societe $societe = null)
     {
         if (!$societe) {
             $societe = new Societe();

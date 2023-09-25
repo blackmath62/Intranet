@@ -10,7 +10,6 @@ use App\Controller\ContratCommissionnaireController;
 use App\Controller\FscAttachedFileController;
 use App\Controller\FscPieceClientController;
 use App\Controller\HolidayController;
-use App\Controller\MovementBillFscController;
 use App\Entity\Main\CmdRobyDelaiAccepteReporte;
 use App\Entity\Main\ControlesAnomalies;
 use App\Repository\Divalto\ArtRepository;
@@ -63,8 +62,29 @@ class ControleAnomaliesController extends AbstractController
     private $holidayController;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, HolidayController $holidayController, ClientFeuRougeOrangeController $clientFeuRougeOrangeController, ComptaAnalytiqueController $comptaAnalytiqueController, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, FscPieceClientController $movementBillFscController, MouvRepository $movRepo, ContratCommissionnaireController $contratCommissionnaireController, FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes, MailerInterface $mailer, ControlesAnomaliesRepository $anomalies, ControleComptabiliteRepository $compta)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        HolidayController $holidayController,
+        ClientFeuRougeOrangeController $clientFeuRougeOrangeController,
+        ComptaAnalytiqueController $comptaAnalytiqueController,
+        UsersRepository $repoUsers,
+        AdminEmailController $adminEmailController,
+        MailListRepository $repoMail,
+        FscPieceClientController $movementBillFscController,
+        MouvRepository $movRepo,
+        ContratCommissionnaireController $contratCommissionnaireController,
+        FscAttachedFileController $fscAttachedFileController,
+        CmdRobyDelaiAccepteReporteController $cmdRobyController,
+        CmdRobyDelaiAccepteReporteRepository $cmdRoby,
+        EntRepository $entete,
+        FouRepository $fournisseur,
+        ArtRepository $article,
+        CliRepository $client,
+        ControleArtStockMouvEfRepository $articleSrefFermes,
+        MailerInterface $mailer,
+        ControlesAnomaliesRepository $anomalies,
+        ControleComptabiliteRepository $compta
+    ) {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
         $this->compta = $compta;

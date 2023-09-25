@@ -80,7 +80,7 @@ class TypeDocumentFscController extends AbstractController
 
     #[Route("/type/document/fsc/delete/{id}", name: "app_type_document_fsc_delete")]
 
-    public function delete($id, Request $request): Response
+    public function delete($id): Response
     {
         $repository = $this->entityManager->getRepository(TypeDocumentFsc::class);
         $typeDocFscId = $repository->find($id);

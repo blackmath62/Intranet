@@ -835,7 +835,7 @@ class ComposerStaticInit589a514d215c339e468ba31a21f8a2fe
         'App\\Command\\AbstractCoreCommand' => __DIR__ . '/../..' . '/src/Command/AbstractCoreCommand.php',
         'App\\Command\\EtiquettesPrintCommand' => __DIR__ . '/../..' . '/src/Command/EtiquettesPrintCommand.php',
         'App\\Command\\EtiquettesQueueCommand' => __DIR__ . '/../..' . '/src/Command/EtiquettesQueueCommand.php',
-        'App\\Command\\HelloWorldCommand' => __DIR__ . '/../..' . '/src/Command/HelloWorldCommand.php',
+        'App\\Command\\RunCronCommand' => __DIR__ . '/../..' . '/src/Command/RunCronCommand.php',
         'App\\Controller\\ActiviteMetierController' => __DIR__ . '/../..' . '/src/Controller/ActiviteMetierController.php',
         'App\\Controller\\AdminAnnuaireController' => __DIR__ . '/../..' . '/src/Controller/AdminAnnuaireController.php',
         'App\\Controller\\AdminController' => __DIR__ . '/../..' . '/src/Controller/AdminController.php',

@@ -26,7 +26,7 @@ class AdminStatusController extends AbstractController
 
     #[Route("/admin/status", name: "app_admin_status")]
 
-    public function index(Status $status = null, Request $request, StatusRepository $repo, EntityManagerInterface $manager)
+    public function index(Request $request, StatusRepository $repo, EntityManagerInterface $manager, Status $status = null)
     {
         if (!$status) {
             $status = new Status();

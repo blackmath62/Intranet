@@ -19,8 +19,12 @@ class ClientFeuRougeOrangeController extends AbstractController
     private $mailTreatement;
     private $adminEmailController;
 
-    public function __construct(MouvRepository $repoMouv, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        MouvRepository $repoMouv,
+        AdminEmailController $adminEmailController,
+        MailerInterface $mailer,
+        MailListRepository $repoMail
+    ) {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();

@@ -2,18 +2,18 @@
 
 namespace App\Command;
 
-use Symfony\Component\Console\Command\Command;
 use App\Controller\ControleAnomaliesController;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-class HelloWorldCommand extends Command
+class RunCronCommand extends Command
 {
-    protected static $defaultName = 'HelloWorld';
-    protected static $defaultDescription = 'Je souhaite juste créer une commande pour ensuite faire des tâches CRON';
+    protected static $defaultName = 'RunCron';
+    protected static $defaultDescription = 'Commande de lancement des tâches CRON';
     private $controller;
 
     public function __construct(ControleAnomaliesController $controller)
@@ -35,7 +35,7 @@ class HelloWorldCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $arg1 = $input->getArgument('arg1');
-        
+
         $this->controller->Run_Cron();
 
         if ($arg1) {

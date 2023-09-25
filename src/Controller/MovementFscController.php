@@ -29,8 +29,13 @@ class MovementFscController extends AbstractController
     private $fscAttachedFileRepo;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, fscListMovementRepository $fscAttachedFileRepo, ControleArticlesFscRepository $controleArticleFscRepo, MouvRepository $mouvRepo, CommentairesRepository $commentairesRepo)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        fscListMovementRepository $fscAttachedFileRepo,
+        ControleArticlesFscRepository $controleArticleFscRepo,
+        MouvRepository $mouvRepo,
+        CommentairesRepository $commentairesRepo
+    ) {
         $this->mouvRepo = $mouvRepo;
         $this->commentairesRepo = $commentairesRepo;
         $this->identifiant = '999999999';

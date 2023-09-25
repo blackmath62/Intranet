@@ -25,7 +25,7 @@ class SectionSearchController extends AbstractController
 
     #[Route("/admin/section_searchs", name: "app_admin_section_search")]
 
-    public function index(SectionSearch $section_search = null, Request $request, SectionSearchRepository $repo, EntityManagerInterface $manager)
+    public function index(Request $request, SectionSearchRepository $repo, EntityManagerInterface $manager, SectionSearch $section_search = null)
     {
         if (!$section_search) {
             $section_search = new SectionSearch();
@@ -57,7 +57,7 @@ class SectionSearchController extends AbstractController
 
     #[Route("/admin/section_search/delete/{id}", name: "app_delete_section_search")]
 
-    public function deletesection_search($id, Request $request)
+    public function deletesection_search($id)
     {
         $repository = $this->entityManager->getRepository(SectionSearch::class);
         $section_searchId = $repository->find($id);

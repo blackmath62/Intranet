@@ -46,8 +46,15 @@ class HolidayController extends AbstractController
     private $adminEmailController;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, AdminEmailController $adminEmailController, MailListRepository $repoMail, MailerInterface $mailer, MailerInterface $mailerInterface, HolidayRepository $repoHoliday, statusHolidayRepository $repoStatuts, UsersRepository $repoUser)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        AdminEmailController $adminEmailController,
+        MailListRepository $repoMail,
+        MailerInterface $mailer,
+        MailerInterface $mailerInterface,
+        HolidayRepository $repoHoliday,
+        statusHolidayRepository $repoStatuts,
+        UsersRepository $repoUser) {
         $this->mailerInterface = $mailerInterface;
         $this->repoHoliday = $repoHoliday;
         $this->repoStatuts = $repoStatuts;
@@ -358,7 +365,7 @@ class HolidayController extends AbstractController
     #[Route("/holiday/new", name: "app_holiday_new", methods: ["GET", "POST"])]
     #[Route("/holiday/edit/{id}", name: "app_holiday_edit", methods: ["GET", "POST"])]
 
-    function Holiday(Holiday $holiday = null, Request $request, $id = null)
+    function Holiday(Request $request, Holiday $holiday = null, $id = null)
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
@@ -506,7 +513,7 @@ class HolidayController extends AbstractController
     #[Route("/holiday/show/{id}", name: "app_holiday_show", methods: ["GET"])]
 
     // Voir un congés
-    function showHoliday($id, Request $request)
+    function showHoliday($id)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -623,7 +630,7 @@ class HolidayController extends AbstractController
     #[Route("/holiday/delete/{id}", name: "app_holiday_delete")]
 
     // supprimer un congés
-    function deleteHoliday($id, Holiday $holiday, Request $request)
+    function deleteHoliday($id, Holiday $holiday)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -661,7 +668,7 @@ class HolidayController extends AbstractController
     #[Route("/conges/holiday/accept/{id}", name: "app_holiday_accept", methods: ["GET"])]
 
     // accepter un congés
-    function acceptHoliday($id, Request $request)
+    function acceptHoliday($id)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -696,7 +703,7 @@ class HolidayController extends AbstractController
     #[Route("/conges/holiday/refuse/{id}", name: "app_holiday_refuse", methods: ["GET"])]
 
     // refuser un congés
-    function refuseHoliday($id, Request $request)
+    function refuseHoliday($id)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');

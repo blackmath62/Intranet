@@ -16,7 +16,7 @@ class StatistiquesIntranetController extends AbstractController
     #[Route("/admin/statistiques/intranet", name: "app_admin_statistiques")]
     #[Route("/admin/statistiques/intranet/{id}", name: "app_admin_statistiques_user")]
 
-    public function index($id = null, $usager = null, TrackingsRepository $repo, UsersRepository $repoUsers): Response
+    public function index(TrackingsRepository $repo, UsersRepository $repoUsers, $id = null, $usager = null): Response
     {
         if ($id) {
             $data = $repo->getUserStatesIntranet($id);

@@ -51,13 +51,9 @@ class AffairesController extends AbstractController
 
     private $repoMouv;
     private $repoArt;
-    private $repoCli;
     private $repoAffaires;
     private $repoAffairePiece;
-    private $repoComments;
     private $repoUsers;
-    private $repoDocs;
-    private $mailer;
     private $repoChats;
     private $repoIntervertionsMonteurs;
     private $repoInterventionFicheMonteur;
@@ -65,15 +61,28 @@ class AffairesController extends AbstractController
     private $affaireAdminController;
     private $repoFiche;
     private $repoRetrait;
-    private $adminEmailController;
-    private $repoMail;
-    private $mailEnvoi;
-    private $mailTreatement;
     private $emailTreatementService;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, EmailTreatementService $emailTreatementService, AdminEmailController $adminEmailController, ArtRepository $repoArt, RetraitMarchandisesEanRepository $repoRetrait, InterventionFicheMonteurRepository $repoFiche, AffairesAdminController $affaireAdminController, InterventionFichesMonteursHeuresRepository $repoInterventionFichesMonteursHeures, InterventionFicheMonteurRepository $repoInterventionFicheMonteur, InterventionMonteursRepository $repoIntervertionsMonteurs, CliRepository $repoCli, UsersRepository $repoUsers, ChatsRepository $repoChats, AffairePieceRepository $repoAffairePiece, OthersDocumentsRepository $repoDocs, MailerInterface $mailer, CommentairesRepository $repoComments, AffairesRepository $repoAffaires, MouvRepository $repoMouv)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        EmailTreatementService $emailTreatementService,
+        ArtRepository $repoArt,
+        RetraitMarchandisesEanRepository $repoRetrait,
+        InterventionFicheMonteurRepository $repoFiche,
+        AffairesAdminController $affaireAdminController,
+        InterventionFichesMonteursHeuresRepository $repoInterventionFichesMonteursHeures,
+        InterventionFicheMonteurRepository $repoInterventionFicheMonteur,
+        InterventionMonteursRepository $repoIntervertionsMonteurs,
+        CliRepository $repoCli,
+        UsersRepository $repoUsers,
+        ChatsRepository $repoChats,
+        AffairePieceRepository $repoAffairePiece,
+        OthersDocumentsRepository $repoDocs,
+        MailerInterface $mailer,
+        CommentairesRepository $repoComments,
+        AffairesRepository $repoAffaires,
+        MouvRepository $repoMouv) {
         $this->repoMouv = $repoMouv;
         $this->repoIntervertionsMonteurs = $repoIntervertionsMonteurs;
         $this->repoCli = $repoCli;
@@ -251,7 +260,7 @@ class AffairesController extends AbstractController
             $pageUrl = "affaires/mails/mailChantierUrgence.html.twig";
             $mails = $this->emailTreatementService->treatementMails('app_affaires_admin', null, $emails);
             $urlFiles = [];
-            $this->emailTreatementService->sendMail($subjet, $donnees, $pageUrl, $mails, $urlFiles);
+            $this->emailTreatementService->sendMail($subjet, $mails, $donnees, $pageUrl, $urlFiles);
 
             $this->changeEtat($chantier->getId(), 'Planifiee');
             $this->addFlash('message', 'Votre chantier a été créé avec succés !');
@@ -458,7 +467,7 @@ class AffairesController extends AbstractController
                 $pageUrl = "affaires/mails/mailNewAffaire.html.twig";
                 $mails = $this->emailTreatementService->treatementMails('app_affaires_admin', null, null);
                 $urlFiles = [];
-                $this->emailTreatementService->sendMail($subjet, $donnees, $pageUrl, $mails, $urlFiles);
+                $this->emailTreatementService->sendMail($subjet, $mails, $donnees, $pageUrl, $urlFiles);
             }
         }
 
@@ -678,7 +687,7 @@ class AffairesController extends AbstractController
             $mails = $this->emailTreatementService->treatementMails('app_affaires_admin', null, $emails);
             $urlFiles = [];
             // envoie du mail
-            $this->emailTreatementService->sendMail($subjet, $donnees, $pageUrl, $mails, $urlFiles);
+            $this->emailTreatementService->sendMail($subjet, $mails, $donnees, $pageUrl, $urlFiles);
 
             $this->addFlash('message', 'Commentaire ajouté avec succès');
             return $this->redirectToRoute('app_affaire_show_intervention', ['id' => $id]);

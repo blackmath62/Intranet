@@ -6,7 +6,6 @@ use App\Repository\Divalto\ArtRepository;
 use App\Repository\Main\FAQRepository;
 use App\Repository\Main\MailListRepository;
 use Com\Tecnick\Barcode\Barcode;
-use Knp\Snappy\Image;
 use Knp\Snappy\Pdf;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -102,7 +101,7 @@ class PDFController extends AbstractController
 
     #[Route("/emplacement/pdf/etiquette/{dos}/{empl1}/{empl2}", name: "app_send_pdf_etiquette_emplacement")]
 
-    public function SendEtiquetteEmplPdf($dos, $empl1, $empl2, Pdf $pdf, ArtRepository $repo, Image $img): Response
+    public function SendEtiquetteEmplPdf($dos, $empl1, $empl2, Pdf $pdf, ArtRepository $repo): Response
     {
 
         $emplacements = $repo->gettrancheEmpl($dos, $empl1, $empl2);

@@ -42,7 +42,7 @@ class ControleProduitStockMouvEfController extends AbstractController
 
     #[Route("/controle/anomalies/produits/fermes", name: "app_anomalies_produits_fermes")]
 
-    public function getAnomaliesProduitsFermes(ControleArtStockMouvEfRepository $repo, Request $request, SearchTiersController $dos): Response
+    public function getAnomaliesProduitsFermes(ControleArtStockMouvEfRepository $repo, SearchTiersController $dos): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');

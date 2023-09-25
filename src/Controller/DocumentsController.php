@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Repository\Main\DocumentsRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[IsGranted("ROLE_USER")]
@@ -13,7 +12,7 @@ class DocumentsController extends AbstractController
 {
     #[Route("/Lh/documents", name: "app_lhermitte_documents")]
 
-    public function Lhermitte_Documents(DocumentsRepository $repo, Request $request)
+    public function Lhermitte_Documents(DocumentsRepository $repo)
     {
         // TODO JEROME gérer le numéro de société ci dessous
         $documents = $repo->findBy(['societe' => 1]);
@@ -30,7 +29,7 @@ class DocumentsController extends AbstractController
     }
     #[Route("/Rb/documents", name: "app_Roby_documents")]
 
-    public function Roby_Documents(DocumentsRepository $repo, Request $request)
+    public function Roby_Documents(DocumentsRepository $repo)
     {
         // TODO JEROME gérer le numéro de société ci dessous
         $documents = $repo->findBy(['societe' => 15]);

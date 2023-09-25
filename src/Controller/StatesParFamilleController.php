@@ -21,7 +21,7 @@ class StatesParFamilleController extends AbstractController
     #[Route("/Lhermitte/states/par/famille/clients/{dos}", name: "app_states_par_famille_clientsLh")]
     #[Route("/Lhermitte/states/par/famille/clients/{dos}/{dd}/{df}", name: "app_states_par_famille_clients_dd_dfLh")]
 
-    public function index($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo): Response
+    public function index(Request $request, StatesByTiersRepository $repo, $dos, $dd = null, $df = null): Response
     {
         // tracking user page for stats
         // $tracking = $request->attributes->get('_route');
@@ -109,7 +109,7 @@ class StatesParFamilleController extends AbstractController
     #[Route("/Lhermitte/states/clients/{dos}", name: "app_states_par_clientsLh")]
     #[Route("/Lhermitte/states/clients/{dos}/{dd}/{df}", name: "app_states_par_clients_dd_dfLh")]
 
-    public function getClientArticle($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo): Response
+    public function getClientArticle(Request $request, StatesByTiersRepository $repo, $dos, $dd = null, $df = null): Response
     {
         // tracking user page for stats
         // $tracking = $request->attributes->get('_route');
@@ -175,7 +175,7 @@ class StatesParFamilleController extends AbstractController
     #[Route("/Roby/states/commerciaux/{dos}/{dd}/{df}", name: "app_states_commerciaux_dd_df")]
     #[Route("/Lhermitte/states/commerciaux/{dos}/{dd}/{df}", name: "app_states_commerciaux_dd_dfLh")]
 
-    public function commerciaux($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume): Response
+    public function commerciaux(Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume, $dos, $dd = null, $df = null): Response
     {
         // tracking user page for stats
         // $tracking = $request->attributes->get('_route');
@@ -341,7 +341,7 @@ class StatesParFamilleController extends AbstractController
     #[Route("/Roby/states/commercial/{dos}/{commercial}/{dd}/{df}", name: "app_states_commercial_dd_df")]
     #[Route("/Lhermitte/states/commercial/{dos}/{commercial}/{dd}/{df}", name: "app_states_commercial_dd_dfLh")]
 
-    public function commercial($dos, $commercial = null, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume): Response
+    public function commercial(Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume, $dos, $commercial = null, $dd = null, $df = null): Response
     {
         // tracking user page for stats
         // $tracking = $request->attributes->get('_route');

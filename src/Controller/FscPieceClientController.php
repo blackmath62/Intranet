@@ -46,8 +46,18 @@ class FscPieceClientController extends AbstractController
     private $repoComments;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, CommentairesRepository $repoComments, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt, MailerInterface $mailer)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        CommentairesRepository $repoComments,
+        UsersRepository $repoUsers,
+        AdminEmailController $adminEmailController,
+        MailListRepository $repoMail,
+        MovBillFscRepository $repoBill,
+        documentsFscRepository $repoDocs,
+        MouvRepository $repoMouv,
+        MovBillFscRepository $repoFact,
+        EntRepository $repoEnt,
+        MailerInterface $mailer) {
         $this->repoFact = $repoFact;
         $this->repoEnt = $repoEnt;
         $this->repoUsers = $repoUsers;
@@ -139,7 +149,7 @@ class FscPieceClientController extends AbstractController
 
     #[Route("/Roby/fsc/pieces/clients/show/{id}", name: "app_fsc_piece_client_show")]
 
-    public function show($id = null, Request $request, MovBillFsc $bill): Response
+    public function show(Request $request, MovBillFsc $bill, $id = null): Response
     {
         $form = $this->createForm(FactureFournisseursFscType::class, $bill);
         $form->handleRequest($request);

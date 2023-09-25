@@ -41,8 +41,16 @@ class AffairesAdminController extends AbstractController
     private $emailTreatementService;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, EmailTreatementService $emailTreatementService, UsersRepository $repoUsers, InterventionMonteursRepository $repoIntervention, InterventionFicheMonteurRepository $repoFiche, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        EmailTreatementService $emailTreatementService,
+        UsersRepository $repoUsers,
+        InterventionMonteursRepository $repoIntervention,
+        InterventionFicheMonteurRepository $repoFiche,
+        AdminEmailController $adminEmailController,
+        MailerInterface $mailer,
+        MailListRepository $repoMail
+    ) {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->repoFiche = $repoFiche;

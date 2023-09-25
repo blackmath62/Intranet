@@ -54,7 +54,7 @@ class PaysInterditCommandesFscController extends AbstractController
 
     #[Route("/Roby/pays/interdit/commandes/fsc/delete{id}", name: "app_pays_interdit_commandes_fsc_delete")]
 
-    public function delete($id, PaysBanFscRepository $repo, Request $request): Response
+    public function delete($id, PaysBanFscRepository $repo): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');

@@ -35,8 +35,13 @@ class ComptaAnalytiqueController extends AbstractController
     private $repoAnal;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, ComptaAnalytiqueRepository $repoAnal, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        ComptaAnalytiqueRepository $repoAnal,
+        AdminEmailController $adminEmailController,
+        MailerInterface $mailer,
+        MailListRepository $repoMail
+    ) {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();

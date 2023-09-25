@@ -10,7 +10,7 @@ return array(
     'App\\Command\\AbstractCoreCommand' => $baseDir . '/src/Command/AbstractCoreCommand.php',
     'App\\Command\\EtiquettesPrintCommand' => $baseDir . '/src/Command/EtiquettesPrintCommand.php',
     'App\\Command\\EtiquettesQueueCommand' => $baseDir . '/src/Command/EtiquettesQueueCommand.php',
-    'App\\Command\\HelloWorldCommand' => $baseDir . '/src/Command/HelloWorldCommand.php',
+    'App\\Command\\RunCronCommand' => $baseDir . '/src/Command/RunCronCommand.php',
     'App\\Controller\\ActiviteMetierController' => $baseDir . '/src/Controller/ActiviteMetierController.php',
     'App\\Controller\\AdminAnnuaireController' => $baseDir . '/src/Controller/AdminAnnuaireController.php',
     'App\\Controller\\AdminController' => $baseDir . '/src/Controller/AdminController.php',

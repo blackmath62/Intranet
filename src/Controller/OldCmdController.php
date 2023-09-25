@@ -31,8 +31,13 @@ class OldCmdController extends AbstractController
     private $adminEmailController;
     private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, AdminEmailController $adminEmailController, MailListRepository $repoMail, ListCmdTraiteRepository $repoNumCmd, MailerInterface $mailer)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        AdminEmailController $adminEmailController,
+        MailListRepository $repoMail,
+        ListCmdTraiteRepository $repoNumCmd,
+        MailerInterface $mailer
+    ) {
         $this->repoNumCmd = $repoNumCmd;
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
@@ -45,7 +50,7 @@ class OldCmdController extends AbstractController
 
     #[Route("/old/cmd/deleteBy", name: "app_list_delete_old_cmd")]
 
-    public function listDelete(Request $request): Response
+    public function listDelete(): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -139,7 +144,7 @@ class OldCmdController extends AbstractController
 
     #[Route("/delete/old/cmd/{numero}/{dossier}", name: "app_delete_old_cmd")]
 
-    public function sendDelete(Request $request, $numero = null, $dossier = null): Response
+    public function sendDelete($numero = null, $dossier = null): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
