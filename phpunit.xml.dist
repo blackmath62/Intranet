@@ -34,7 +34,11 @@
 
         <!-- ###+ symfony/framework-bundle ### -->
         <env name="APP_ENV" value="dev"/>
+<<<<<<< ours
         <env name="APP_SECRET" value="4313af889a25b31607b16dfc60bc3879"/>
+=======
+        <env name="APP_SECRET" value="2389641c95781db94a936d06ce2fb634"/>
+>>>>>>> theirs
         <!-- ###- symfony/framework-bundle ### -->
 >>>>>>> theirs
 <<<<<<< ours
