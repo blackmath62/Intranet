@@ -10,15 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_INFORMATIQUE")
- */
+#[IsGranted("ROLE_INFORMATIQUE")]
 
 class DeclarationAgenceEauController extends AbstractController
 {
-    /**
-     * @Route("/declaration/agence/eau", name="app_declaration_agence_eau")
-     */
+    #[Route("/declaration/agence/eau", name: "app_declaration_agence_eau")]
+
     public function index(Request $request, RpdRepository $repo): Response
     {
 

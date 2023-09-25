@@ -13,7 +13,7 @@ use League\Flysystem\Adapter\Ftp;
 use Spatie\FlysystemDropbox\DropboxAdapter;
 use League\Flysystem\Sftp\SftpAdapter;
 use League\Flysystem\AwsS3v2\AwsS3Adapter as AwsS3v2;
-use League\Flysystem\AwsS3v3\AwsS3Adapter as AwsS3v3;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3v3;
 use League\Flysystem\GridFS\GridFSAdapter;
 use OpenCloud\Rackspace;
 use League\Flysystem\Rackspace\RackspaceAdapter;
@@ -78,14 +78,14 @@ class ElFinderConfigurationReader implements ElFinderConfigurationProviderInterf
                     $filesystem  = $this->configureFlysystem($opt, $adapter, $serviceName);
                 }
             }
-            $driver = $this->container->has($parameter['driver']) ? $this->container->get($parameter['driver']) : null;
+            $driver = $this->container->has($parameter['driver']) ? $this->container->get($parameter['driver']) : false;
 
             $driverOptions = [
                 'driver'            => $parameter['driver'],
                 'service'           => $driver,
                 'glideURL'          => $parameter['glide_url'],
                 'glideKey'          => $parameter['glide_key'],
-                'plugin'            => $parameter['plugins'],
+                'plugin'            => $options['plugin'],
                 'path'              => $pathAndHomeFolder,
                 'startPath'         => $parameter['start_path'],
                 'encoding'          => $parameter['encoding'],
@@ -174,6 +174,7 @@ class ElFinderConfigurationReader implements ElFinderConfigurationProviderInterf
      */
     private function configureFlysystem($opt, $adapter, $serviceName)
     {
+        $filesystem = null;
         switch ($adapter) {
             case 'local':
                 $filesystem = new Filesystem(new Local($opt['local']['path']));
@@ -231,17 +232,20 @@ class ElFinderConfigurationReader implements ElFinderConfigurationProviderInterf
 
                 break;
             case 'aws_s3_v3':
-                $client = new S3Client([
-                    'credentials' => [
-                        'key'     => $opt['aws_s3_v3']['key'],
-                        'secret'  => $opt['aws_s3_v3']['secret'],
-                    ],
+                $s3Options = [
                     'region'                  => $opt['aws_s3_v3']['region'],
                     'version'                 => $opt['aws_s3_v3']['version'],
                     'endpoint'                => $opt['aws_s3_v3']['endpoint'],
                     'use_path_style_endpoint' => $opt['aws_s3_v3']['use_path_style_endpoint'],
-                ]);
-                $filesystem = new Filesystem(new AwsS3v3($client, $opt['aws_s3_v3']['bucket_name'], $opt['aws_s3_v3']['optional_prefix'], $opt['aws_s3_v3']['options']));
+                ];
+                if (!empty($opt['aws_s3_v3']['key']) && !empty($opt['aws_s3_v3']['secret'])) {
+                    $s3Options['credentials'] = [
+                        'key'    => $opt['aws_s3_v3']['key'],
+                        'secret' => $opt['aws_s3_v3']['secret'],
+                    ];
+                }
+                $client     = new S3Client($s3Options);
+                $filesystem = new Filesystem(new AwsS3v3($client, $opt['aws_s3_v3']['bucket_name'], $opt['aws_s3_v3']['optional_prefix'], null, null, $opt['aws_s3_v3']['options']));
 
                 break;
             case 'copy_com':
@@ -280,8 +284,10 @@ class ElFinderConfigurationReader implements ElFinderConfigurationProviderInterf
                 break;
             case 'custom':
                 $adapter = $this->container->get($serviceName);
-                if (is_object($adapter) && $adapter instanceof AdapterInterface) {
+                try {
                     $filesystem = new Filesystem($adapter);
+                } catch (\TypeError $error) {
+                    throw new \Exception(sprintf('Service %s is not an instance of %s.', $serviceName, AdapterInterface::class));
                 }
 
                 break;

@@ -19,9 +19,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class OldCmdController extends AbstractController
 {
@@ -45,9 +43,8 @@ class OldCmdController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/old/cmd/deleteBy", name="app_list_delete_old_cmd")
-     */
+    #[Route("/old/cmd/deleteBy", name: "app_list_delete_old_cmd")]
+
     public function listDelete(Request $request): Response
     {
         // tracking user page for stats
@@ -61,9 +58,8 @@ class OldCmdController extends AbstractController
             'commandesTraites' => $commandesTraites,
         ]);
     }
-    /**
-     * @Route("/old/cmd", name="app_old_cmd")
-     */
+    #[Route("/old/cmd", name: "app_old_cmd")]
+
     public function show(EntRepository $repo, Request $request): Response
     {
 
@@ -141,9 +137,8 @@ class OldCmdController extends AbstractController
 
     }
 
-    /**
-     * @Route("/delete/old/cmd/{numero}/{dossier}", name="app_delete_old_cmd")
-     */
+    #[Route("/delete/old/cmd/{numero}/{dossier}", name: "app_delete_old_cmd")]
+
     public function sendDelete(Request $request, $numero = null, $dossier = null): Response
     {
         // tracking user page for stats

@@ -13,9 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
+
 class AdminSocieteController extends AbstractController
 {
     private $entityManager;
@@ -25,9 +24,8 @@ class AdminSocieteController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/admin/societe", name="app_admin_societe")
-     */
+    #[Route("/admin/societe", name: "app_admin_societe")]
+
     public function index(Societe $societe = null, Request $request, SocieteRepository $repo, EntityManagerInterface $manager)
     {
         if (!$societe) {
@@ -56,9 +54,8 @@ class AdminSocieteController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/societe/delete/{id}",name="app_delete_societe")
-     */
+    #[Route("/admin/societe/delete/{id}", name: "app_delete_societe")]
+
     public function deleteSociete($id, Request $request)
     {
         $repository = $this->entityManager->getRepository(Societe::class);
@@ -74,9 +71,9 @@ class AdminSocieteController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_societe'));
     }
-    /**
-     * @Route("/admin/societe/edit/{id}",name="app_edit_societe")
-     */
+
+    #[Route("/admin/societe/edit/{id}", name: "app_edit_societe")]
+
     public function editSociete(Societe $societe, Request $request)
     {
         $form = $this->createForm(EditSocieteType::class, $societe);

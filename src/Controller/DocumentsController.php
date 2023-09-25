@@ -8,14 +8,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 class DocumentsController extends AbstractController
 {
-    /**
-     * @Route("/Lh/documents", name="app_lhermitte_documents")
-     */
+    #[Route("/Lh/documents", name: "app_lhermitte_documents")]
+
     public function Lhermitte_Documents(DocumentsRepository $repo, Request $request)
     {
         // TODO JEROME gérer le numéro de société ci dessous
@@ -31,9 +28,8 @@ class DocumentsController extends AbstractController
             'title' => 'Documents Lhermitte',
         ]);
     }
-    /**
-     * @Route("/Rb/documents", name="app_Roby_documents")
-     */
+    #[Route("/Rb/documents", name: "app_Roby_documents")]
+
     public function Roby_Documents(DocumentsRepository $repo, Request $request)
     {
         // TODO JEROME gérer le numéro de société ci dessous

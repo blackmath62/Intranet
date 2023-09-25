@@ -24,19 +24,18 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 final class Statement extends AbstractStatementMiddleware
 {
-    private $debugDataHolder;
-    private $connectionName;
-    private $query;
-    private $stopwatch;
+    private Query $query;
 
-    public function __construct(StatementInterface $statement, DebugDataHolder $debugDataHolder, string $connectionName, string $sql, Stopwatch $stopwatch = null)
-    {
+    public function __construct(
+        StatementInterface $statement,
+        private DebugDataHolder $debugDataHolder,
+        private string $connectionName,
+        string $sql,
+        private ?Stopwatch $stopwatch = null,
+    ) {
         parent::__construct($statement);
 
-        $this->debugDataHolder = $debugDataHolder;
-        $this->connectionName = $connectionName;
         $this->query = new Query($sql);
-        $this->stopwatch = $stopwatch;
     }
 
     public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null): bool
@@ -62,20 +61,14 @@ final class Statement extends AbstractStatementMiddleware
         // clone to prevent variables by reference to change
         $this->debugDataHolder->addQuery($this->connectionName, $query = clone $this->query);
 
-        if ($this->stopwatch) {
-            $this->stopwatch->start('doctrine', 'doctrine');
-        }
-
+        $this->stopwatch?->start('doctrine', 'doctrine');
         $query->start();
 
         try {
             $result = parent::execute($params);
         } finally {
             $query->stop();
-
-            if ($this->stopwatch) {
-                $this->stopwatch->stop('doctrine');
-            }
+            $this->stopwatch?->stop('doctrine');
         }
 
         return $result;

@@ -18,9 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ROBY")
- */
+#[IsGranted("ROLE_ROBY")]
 
 class MovementFscController extends AbstractController
 {
@@ -42,9 +40,8 @@ class MovementFscController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Roby/movement/fsc/view/general", name="app_movement_fsc_view_list")
-     */
+    #[Route("/Roby/movement/fsc/view/general", name: "app_movement_fsc_view_list")]
+
     public function index(): Response
     {
         //TODO ajouter une validation manuelle du contrôle article Fsc et lancer la majControleArticleFsc
@@ -59,9 +56,9 @@ class MovementFscController extends AbstractController
             'comments' => $this->commentairesRepo->findBy(['identifiant' => $this->identifiant]),
         ]);
     }
-    /**
-     * @Route("/Roby/movement/fsc/view/detail/{concat}", name="app_movement_fsc_detail_art")
-     */
+
+    #[Route("/Roby/movement/fsc/view/detail/{concat}", name: "app_movement_fsc_detail_art")]
+
     public function getDetailMouvArticleFsc($concat, Request $request): Response
     {
         $details = $this->mouvRepo->getDetailArtMovFsc($concat);
@@ -128,9 +125,8 @@ class MovementFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/movement/fsc/maj/controle/article", name="app_maj_controle_article_fsc")
-     */
+    #[Route("/Roby/movement/fsc/maj/controle/article", name: "app_maj_controle_article_fsc")]
+
     public function majControleArticleFsc(UsersRepository $users)
     {
         //mettre à jour la liste des controles articles Fsc en vérifiant si la date
@@ -172,9 +168,8 @@ class MovementFscController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Roby/movement/fsc/maj/lock/unlock/article/{concat}", name="app_lock_unlock_article_fsc")
-     */
+    #[Route("/Roby/movement/fsc/maj/lock/unlock/article/{concat}", name: "app_lock_unlock_article_fsc")]
+
     // Vérrouillage manuel
     public function lockUnlockArticleFsc($concat)
     {

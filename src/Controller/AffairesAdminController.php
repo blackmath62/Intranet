@@ -26,9 +26,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN_MONTEUR")
- */
+#[IsGranted("ROLE_ADMIN_MONTEUR")]
 
 class AffairesAdminController extends AbstractController
 {
@@ -58,9 +56,8 @@ class AffairesAdminController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Lhermitte/affaires/admin", name="app_affaires_admin")
-     */
+    #[Route("/Lhermitte/affaires/admin", name: "app_affaires_admin")]
+
     public function index(Request $request): Response
     {
         $tracking = $request->attributes->get('_route');
@@ -116,9 +113,8 @@ class AffairesAdminController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/affaires/admin/valider/fiche/{id}", name="app_affaire_valider_fiche_intervention")
-     */
+    #[Route("/Lhermitte/affaires/admin/valider/fiche/{id}", name: "app_affaire_valider_fiche_intervention")]
+
     public function validerFiche($id)
     {
 
@@ -212,13 +208,11 @@ class AffairesAdminController extends AbstractController
         return $fichesManquantes;
     }
 
-    /**
-     * @Route("/Lhermitte/affaires/admin/signature", name="app_affaire_signature")
-     */
     // TODO CETTE PARTIE PLUS COMPLEXE EST A FAIRE
     // CREER LE PDF POUR QU'IL PRESENTE BIEN ET METTRE LES CGV EN DERNIERE PAGE
     // CONNECTER CELA AVEC YOUSIGN
     // PEUT ÊTRE CREER UNE PAGE COMPTE RENDU
+    #[Route("/Lhermitte/affaires/admin/signature", name: "app_affaire_signature")]
 
     public function envoyerPourSignature(MailerInterface $mailer, Pdf $pdf)
     {

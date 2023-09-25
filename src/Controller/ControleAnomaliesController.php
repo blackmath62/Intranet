@@ -35,9 +35,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class ControleAnomaliesController extends AbstractController
 {
@@ -99,9 +97,8 @@ class ControleAnomaliesController extends AbstractController
         return $this->render('controle_anomalies/index.html.twig');
     }
 
-    /**
-     * @Route("/controle/anomalies", name="app_controle_anomalies")
-     */
+    #[Route("/controle/anomalies", name: "app_controle_anomalies")]
+
     public function Show_Anomalies()
     {
         $anomaliesCount = $this->anomalies->getCountAnomalies();
@@ -114,9 +111,8 @@ class ControleAnomaliesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/controle/anomalies/run/script", name="app_controle_anomalies_run")
-     */
+    #[Route("/controle/anomalies/run/script", name: "app_controle_anomalies_run")]
+
     public function Run_Cron()
     {
         $dateDuJour = new DateTime();
@@ -326,9 +322,8 @@ class ControleAnomaliesController extends AbstractController
         $this->Execute($donnees, $libelle, $template, $subject);
     }
 
-    /**
-     * @Route("/controle/pieces", name="app_controle_pieces")
-     */
+    #[Route("/controle/pieces", name: "app_controle_pieces")]
+
     public function ControlePieces()
     {
 

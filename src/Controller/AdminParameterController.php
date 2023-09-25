@@ -7,15 +7,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminParameterController extends AbstractController
 {
-    /**
-     * @Route("/admin/parameter", name="app_admin_parameter")
-     */
+
+    #[Route("/admin/parameter", name: "app_admin_parameter")]
+
     public function index(Request $request)
     {
 

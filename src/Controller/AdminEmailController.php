@@ -28,9 +28,8 @@ class AdminEmailController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/admin/email", name="app_admin_email")
-     */
+    #[Route("/admin/email", name: "app_admin_email")]
+
     public function index(Request $request): Response
     {
         // tracking user page for stats
@@ -121,9 +120,8 @@ class AdminEmailController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/email/delete/{id}", name="app_admin_email_delete")
-     */
+    #[Route("/admin/email/delete/{id}", name: "app_admin_email_delete")]
+
     public function deleteMail($id): Response
     {
 
@@ -137,9 +135,8 @@ class AdminEmailController extends AbstractController
         return $this->redirectToRoute('app_admin_email');
     }
 
-    /**
-     * @Route("/email/delete/{id}/{route}", name="app_email_delete_redirect")
-     */
+    #[Route("/email/delete/{id}/{route}", name: "app_email_delete_redirect")]
+
     public function deleteMailAndRedirect($id, $route): Response
     {
 

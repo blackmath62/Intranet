@@ -11,9 +11,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SrefByArtController extends AbstractController
 {
-    /**
-     * @Route("/sref/by/art", name="app_sref_by_art")
-     */
+    #[Route("/sref/by/art", name: "app_sref_by_art")]
+
     public function index(Request $request, ArtRepository $repo): Response
     {
         // tracking user page for stats

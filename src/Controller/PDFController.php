@@ -17,9 +17,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class PDFController extends AbstractController
 {
@@ -33,9 +31,7 @@ class PDFController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/pdf/faq/{id}", name="app_send_pdf_faq")
-     */
+    #[Route("/pdf/faq/{id}", name: "app_send_pdf_faq")]
 
     public function SendFaqPdf($id, MailerInterface $mailer, Pdf $pdf, FAQRepository $repo): Response
     {
@@ -58,9 +54,7 @@ class PDFController extends AbstractController
 
     }
 
-    /**
-     * @Route("/pdf/etiquette/{ean}", name="app_send_pdf_etiquette")
-     */
+    #[Route("/pdf/etiquette/{ean}", name: "app_send_pdf_etiquette")]
 
     public function SendEtiquettePdf($ean, Pdf $pdf, ArtRepository $repo): Response
     {
@@ -106,9 +100,7 @@ class PDFController extends AbstractController
 
     }
 
-    /**
-     * @Route("/emplacement/pdf/etiquette/{dos}/{empl1}/{empl2}", name="app_send_pdf_etiquette_emplacement")
-     */
+    #[Route("/emplacement/pdf/etiquette/{dos}/{empl1}/{empl2}", name: "app_send_pdf_etiquette_emplacement")]
 
     public function SendEtiquetteEmplPdf($dos, $empl1, $empl2, Pdf $pdf, ArtRepository $repo, Image $img): Response
     {
@@ -153,9 +145,8 @@ class PDFController extends AbstractController
 
     }
 
-    /**
-     * @Route("/power/shell", name="app_power_shell")
-     */
+    #[Route("/power/shell", name: "app_power_shell")]
+
     public function runPowerShell(): Response
     {
 

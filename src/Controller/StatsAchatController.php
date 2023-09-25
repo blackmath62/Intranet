@@ -2,20 +2,18 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use App\Form\DateDebutDateFinFournisseursType;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use App\Controller\FournisseursDivaltoController;
 use App\Repository\Divalto\StatesFournisseursRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class StatsAchatController extends AbstractController
 {
-    /**
-     * @Route("/stats/achat/{dos}", name="app_stats_achat")
-     */
-    public function index($dos ,Request $request,StatesFournisseursRepository $repo): Response
+    #[Route("/stats/achat/{dos}", name: "app_stats_achat")]
+
+    public function index($dos, Request $request, StatesFournisseursRepository $repo): Response
     {
         $dd = '';
         $df = '';
@@ -37,18 +35,18 @@ class StatsAchatController extends AbstractController
             $df = $form->getData()['end']->format('Y-m-d');
             $metier = $this->miseEnForme($form->getData()['metier']);
             if ($form->getData()['type'] == 'dateOp') {
-                $states = $repo->getStatesDetaillees($dos, $dd, $df, $fous,$fams, $metier);
+                $states = $repo->getStatesDetaillees($dos, $dd, $df, $fous, $fams, $metier);
                 $template = 'stats_achat/statesDetaillees.html.twig';
             }
             if ($form->getData()['type'] == 'basique') {
-                $states = $repo->getStatesBasiques($dos, $dd, $df, $fous,$fams, $metier);
+                $states = $repo->getStatesBasiques($dos, $dd, $df, $fous, $fams, $metier);
             }
             if ($form->getData()['type'] == 'sansFournisseurs') {
-                $states = $repo->getStatesSansFournisseurs($dos, $dd, $df, $fous,$fams, $metier);
+                $states = $repo->getStatesSansFournisseurs($dos, $dd, $df, $fous, $fams, $metier);
                 $template = 'stats_achat/statesSansFournisseurs.html.twig';
             }
-            $totauxFournisseurs = $repo->getTotauxStatesParFournisseurs($dos, $dd, $df, $fous,$fams, $metier);
-            $totaux = $repo->getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous,$fams, $metier);
+            $totauxFournisseurs = $repo->getTotauxStatesParFournisseurs($dos, $dd, $df, $fous, $fams, $metier);
+            $totaux = $repo->getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous, $fams, $metier);
         }
 
         return $this->render($template, [
@@ -56,18 +54,18 @@ class StatsAchatController extends AbstractController
             'totauxFournisseurs' => $totauxFournisseurs,
             'totaux' => $totaux,
             'title' => 'States Achats',
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
     }
 
     public function miseEnForme($donnees)
     {
-        $Mef = '' ;
+        $Mef = '';
         //dd($donnees);
         foreach ($donnees as $value) {
             if ($Mef == '') {
                 $Mef = "'" . $value . "'";
-            }else {
+            } else {
                 $Mef = $Mef . ",'" . $value . "'";
             }
         }

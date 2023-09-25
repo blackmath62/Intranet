@@ -13,9 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
+
 class AdminStatusController extends AbstractController
 {
     private $entityManager;
@@ -25,9 +24,8 @@ class AdminStatusController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/admin/status", name="app_admin_status")
-     */
+    #[Route("/admin/status", name: "app_admin_status")]
+
     public function index(Status $status = null, Request $request, StatusRepository $repo, EntityManagerInterface $manager)
     {
         if (!$status) {
@@ -59,9 +57,8 @@ class AdminStatusController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/statut/delete/{id}",name="app_delete_status")
-     */
+    #[Route("/admin/statut/delete/{id}", name: "app_delete_status")]
+
     public function deleteStatus($id, Request $request)
     {
         $repository = $this->entityManager->getRepository(Status::class);
@@ -77,9 +74,9 @@ class AdminStatusController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_status'));
     }
-    /**
-     * @Route("/admin/status/edit/{id}",name="app_edit_status")
-     */
+
+    #[Route("/admin/status/edit/{id}", name: "app_edit_status")]
+
     public function editSociete(Status $status, Request $request)
     {
         $form = $this->createForm(EditStatusType::class, $status);

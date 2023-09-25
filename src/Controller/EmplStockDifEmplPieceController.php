@@ -10,9 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class EmplStockDifEmplPieceController extends AbstractController
 {
-    /**
-     * @Route("/empl/stock/dif/empl/piece", name="app_empl_stock_dif_empl_piece")
-     */
+    #[Route("/empl/stock/dif/empl/piece", name: "app_empl_stock_dif_empl_piece")]
+
     public function index(EmplRepository $repo, Request $request): Response
     {
         // tracking user page for stats

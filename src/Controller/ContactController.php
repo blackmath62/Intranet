@@ -11,9 +11,8 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
+
 class ContactController extends AbstractController
 {
 
@@ -29,9 +28,8 @@ class ContactController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/contact", name="app_contact")
-     */
+    #[Route("/contact", name: "app_contact")]
+
     public function index(Request $request, MailerInterface $mailer)
     {
         $form = $this->createForm(ContactType::class);

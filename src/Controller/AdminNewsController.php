@@ -13,9 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminNewsController extends AbstractController
 {
@@ -26,9 +24,8 @@ class AdminNewsController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/admin/news", name="app_admin_news")
-     */
+    #[Route("/admin/news", name: "app_admin_news")]
+
     public function index(Request $request, NewsRepository $repo): Response
     {
         // user tracking
@@ -57,9 +54,9 @@ class AdminNewsController extends AbstractController
             'news' => $repo->findAll(),
         ]);
     }
-    /**
-     * @Route("/admin/news/edit/{id}", name="app_edit_news")
-     */
+
+    #[Route("/admin/news/edit/{id}", name: "app_edit_news")]
+
     public function edit(Request $request, News $news)
     {
 
@@ -84,9 +81,9 @@ class AdminNewsController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-    /**
-     * @Route("/admin/news/delete/{id}", name="app_delete_news")
-     */
+
+    #[Route("/admin/news/delete/{id}", name: "app_delete_news")]
+
     public function delete(Request $request, News $news)
     {
         $em = $this->entityManager;

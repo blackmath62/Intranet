@@ -4,39 +4,21 @@ namespace Vich\UploaderBundle\Naming;
 
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
+use Vich\UploaderBundle\Util\PropertyPathUtils;
 
 /**
  * Directory namer wich can create subfolder depends on current datetime.
  *
  * @author Vyacheslav Startsev <vyacheslav.startsev@gmail.com>
- * @final
  */
-class CurrentDateTimeDirectoryNamer implements DirectoryNamerInterface, ConfigurableInterface
+final class CurrentDateTimeDirectoryNamer implements DirectoryNamerInterface, ConfigurableInterface
 {
-    /**
-     * @var DateTimeHelper
-     */
-    private $dateTimeHelper;
+    private string $dateTimeFormat = 'Y/m/d';
 
-    /**
-     * @var string
-     */
-    private $dateTimeFormat = 'Y/m/d';
+    private ?string $dateTimeProperty = null;
 
-    /**
-     * @var PropertyAccessorInterface|null
-     */
-    private $propertyAccessor;
-
-    /**
-     * @var string|null
-     */
-    private $dateTimeProperty;
-
-    public function __construct(DateTimeHelper $dateTimeHelper, ?PropertyAccessorInterface $propertyAccessor)
+    public function __construct(private readonly ?PropertyAccessorInterface $propertyAccessor)
     {
-        $this->dateTimeHelper = $dateTimeHelper;
-        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -57,18 +39,18 @@ class CurrentDateTimeDirectoryNamer implements DirectoryNamerInterface, Configur
         }
     }
 
-    public function directoryName($object, PropertyMapping $mapping): string
+    public function directoryName(object|array $object, PropertyMapping $mapping): string
     {
         if (empty($this->dateTimeFormat)) {
             throw new \LogicException('Option "date_time_format" is empty.');
         }
         if (null !== $this->dateTimeProperty) {
-            $dateTime = $this->propertyAccessor->getValue($object, $this->dateTimeProperty)->format('U');
+            $dateTime = $this->propertyAccessor->getValue(
+                $object,
+                PropertyPathUtils::fixPropertyPath($object, $this->dateTimeProperty)
+            )->format('U');
         } else {
-            // see https://github.com/dustin10/VichUploaderBundle/issues/992
-            $msg = 'Not passing "date_time_property" option is deprecated and will be removed in version 2.';
-            @\trigger_error($msg, \E_USER_DEPRECATED);
-            $dateTime = $this->dateTimeHelper->getTimestamp();
+            throw new \LogicException('Option "date_time_property" is mandatory.');
         }
 
         return \date($this->dateTimeFormat, $dateTime);

@@ -16,9 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminStatusHolidayController extends AbstractController
 {
@@ -29,9 +27,8 @@ class AdminStatusHolidayController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/admin/status/holiday", name="app_admin_status_holiday")
-     */
+    #[Route("/admin/status/holiday", name: "app_admin_status_holiday")]
+
     public function index(Request $request, statusHolidayRepository $repo, EntityManagerInterface $manager): Response
     {
         $holidayStatus = new statusHoliday();
@@ -65,9 +62,9 @@ class AdminStatusHolidayController extends AbstractController
             'title' => "Administration des Status de Congés",
         ]);
     }
-    /**
-     * @Route("/admin/status/holiday/delete/{id}",name="app_delete_status_holiday")
-     */
+
+    #[Route("/admin/status/holiday/delete/{id}", name: "app_delete_status_holiday")]
+
     public function deleteHolidayStatus($id, Request $request)
     {
         $repository = $this->entityManager->getRepository(statusHoliday::class);
@@ -83,9 +80,9 @@ class AdminStatusHolidayController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_status_holiday'));
     }
-    /**
-     * @Route("/admin/status/holiday/edit/{id}",name="app_edit_status_holiday")
-     */
+
+    #[Route("/admin/status/holiday/edit/{id}", name: "app_edit_status_holiday")]
+
     public function editSociete(statusHoliday $holidayStatus, Request $request)
     {
         $form = $this->createForm(EditHolidayStatusType::class, $holidayStatus);

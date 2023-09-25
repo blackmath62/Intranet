@@ -12,16 +12,15 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class StatesParFamilleController extends AbstractController
 {
-    /**
-     * @Route("/Roby/states/par/famille/produits/{dos}", name="app_states_par_famille")
-     * @Route("/Roby/states/par/famille/produits/{dos}/{dd}/{df}", name="app_states_par_famille_dd_df")
-     *  @Route("/Roby/states/par/famille/clients/{dos}", name="app_states_par_famille_clients")
-     * @Route("/Roby/states/par/famille/clients/{dos}/{dd}/{df}", name="app_states_par_famille_clients_dd_df")
-     * @Route("/Lhermitte/states/par/famille/produits/{dos}", name="app_states_par_familleLh")
-     * @Route("/Lhermitte/states/par/famille/produits/{dos}/{dd}/{df}", name="app_states_par_famille_dd_dfLh")
-     *  @Route("/Lhermitte/states/par/famille/clients/{dos}", name="app_states_par_famille_clientsLh")
-     * @Route("/Lhermitte/states/par/famille/clients/{dos}/{dd}/{df}", name="app_states_par_famille_clients_dd_dfLh")
-     */
+    #[Route("/Roby/states/par/famille/produits/{dos}", name: "app_states_par_famille")]
+    #[Route("/Roby/states/par/famille/produits/{dos}/{dd}/{df}", name: "app_states_par_famille_dd_df")]
+    #[Route("/Roby/states/par/famille/clients/{dos}", name: "app_states_par_famille_clients")]
+    #[Route("/Roby/states/par/famille/clients/{dos}/{dd}/{df}", name: "app_states_par_famille_clients_dd_df")]
+    #[Route("/Lhermitte/states/par/famille/produits/{dos}", name: "app_states_par_familleLh")]
+    #[Route("/Lhermitte/states/par/famille/produits/{dos}/{dd}/{df}", name: "app_states_par_famille_dd_dfLh")]
+    #[Route("/Lhermitte/states/par/famille/clients/{dos}", name: "app_states_par_famille_clientsLh")]
+    #[Route("/Lhermitte/states/par/famille/clients/{dos}/{dd}/{df}", name: "app_states_par_famille_clients_dd_dfLh")]
+
     public function index($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo): Response
     {
         // tracking user page for stats
@@ -101,16 +100,15 @@ class StatesParFamilleController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/states/produits/{dos}", name="app_states_par_produits")
-     * @Route("/Roby/states/produits/{dos}/{dd}/{df}", name="app_states_par_produits_dd_df")
-     *  @Route("/Roby/states/clients/{dos}", name="app_states_par_clients")
-     * @Route("/Roby/states/clients/{dos}/{dd}/{df}", name="app_states_par_clients_dd_df")
-     * @Route("/Lhermitte/states/produits/{dos}", name="app_states_par_produitsLh")
-     * @Route("/Lhermitte/states/produits/{dos}/{dd}/{df}", name="app_states_par_produits_dd_dfLh")
-     *  @Route("/Lhermitte/states/clients/{dos}", name="app_states_par_clientsLh")
-     * @Route("/Lhermitte/states/clients/{dos}/{dd}/{df}", name="app_states_par_clients_dd_dfLh")
-     */
+    #[Route("/Roby/states/produits/{dos}", name: "app_states_par_produits")]
+    #[Route("/Roby/states/produits/{dos}/{dd}/{df}", name: "app_states_par_produits_dd_df")]
+    #[Route("/Roby/states/clients/{dos}", name: "app_states_par_clients")]
+    #[Route("/Roby/states/clients/{dos}/{dd}/{df}", name: "app_states_par_clients_dd_df")]
+    #[Route("/Lhermitte/states/produits/{dos}", name: "app_states_par_produitsLh")]
+    #[Route("/Lhermitte/states/produits/{dos}/{dd}/{df}", name: "app_states_par_produits_dd_dfLh")]
+    #[Route("/Lhermitte/states/clients/{dos}", name: "app_states_par_clientsLh")]
+    #[Route("/Lhermitte/states/clients/{dos}/{dd}/{df}", name: "app_states_par_clients_dd_dfLh")]
+
     public function getClientArticle($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo): Response
     {
         // tracking user page for stats
@@ -174,10 +172,9 @@ class StatesParFamilleController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/states/commerciaux/{dos}/{dd}/{df}", name="app_states_commerciaux_dd_df")
-     * @Route("/Lhermitte/states/commerciaux/{dos}/{dd}/{df}", name="app_states_commerciaux_dd_dfLh")
-     */
+    #[Route("/Roby/states/commerciaux/{dos}/{dd}/{df}", name: "app_states_commerciaux_dd_df")]
+    #[Route("/Lhermitte/states/commerciaux/{dos}/{dd}/{df}", name: "app_states_commerciaux_dd_dfLh")]
+
     public function commerciaux($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume): Response
     {
         // tracking user page for stats
@@ -341,10 +338,9 @@ class StatesParFamilleController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/states/commercial/{dos}/{commercial}/{dd}/{df}", name="app_states_commercial_dd_df")
-     * @Route("/Lhermitte/states/commercial/{dos}/{commercial}/{dd}/{df}", name="app_states_commercial_dd_dfLh")
-     */
+    #[Route("/Roby/states/commercial/{dos}/{commercial}/{dd}/{df}", name: "app_states_commercial_dd_df")]
+    #[Route("/Lhermitte/states/commercial/{dos}/{commercial}/{dd}/{df}", name: "app_states_commercial_dd_dfLh")]
+
     public function commercial($dos, $commercial = null, $dd = null, $df = null, Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume): Response
     {
         // tracking user page for stats

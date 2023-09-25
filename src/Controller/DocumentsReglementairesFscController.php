@@ -14,9 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class DocumentsReglementairesFscController extends AbstractController
 {
@@ -27,9 +25,8 @@ class DocumentsReglementairesFscController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/Roby/documents/reglementaires/fsc", name="app_documents_reglementaires_fsc")
-     */
+    #[Route("/Roby/documents/reglementaires/fsc", name: "app_documents_reglementaires_fsc")]
+
     public function index(Request $request, DocumentsReglementairesFscRepository $repo, SluggerInterface $slugger): Response
     {
 
@@ -84,9 +81,7 @@ class DocumentsReglementairesFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/documents/reglementaires/fsc/show/{id}", name="app_documents_reglementaires_fsc_show")
-     */
+    #[Route("/Roby/documents/reglementaires/fsc/show/{id}", name: "app_documents_reglementaires_fsc_show")]
 
     public function DocsRegleFscShow(int $id, DocumentsReglementairesFscRepository $repo, Request $request)
     {
@@ -102,9 +97,7 @@ class DocumentsReglementairesFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/documents/reglementaires/fsc/delete/{id}", name="app_documents_reglementaires_fsc_delete")
-     */
+    #[Route("/Roby/documents/reglementaires/fsc/delete/{id}", name: "app_documents_reglementaires_fsc_delete")]
 
     public function DocsRegleFscDelete(int $id, DocumentsReglementairesFscRepository $repo, Request $request)
     {

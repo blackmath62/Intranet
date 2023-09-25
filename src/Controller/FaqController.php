@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Main\FAQ;
 use App\Form\FaqType;
 use App\Repository\Main\FAQRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,9 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class FaqController extends AbstractController
 {
@@ -25,9 +22,8 @@ class FaqController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/faq", name="app_faq")
-     */
+    #[Route("/faq", name: "app_faq")]
+
     public function index(Request $request, FAQRepository $repo): Response
     {
         $faqs = $repo->findAll();
@@ -57,9 +53,7 @@ class FaqController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/faq/show/{id}", name="app_faq_show")
-     */
+    #[Route("/faq/show/{id}", name: "app_faq_show")]
 
     public function faqShow(int $id, FAQRepository $repo, Request $request)
     {
@@ -75,9 +69,7 @@ class FaqController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/faq/edit/{id}", name="app_faq_edit")
-     */
+    #[Route("/faq/edit/{id}", name: "app_faq_edit")]
 
     public function faqEdit(int $id, FAQRepository $repo, Request $request)
     {

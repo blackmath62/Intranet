@@ -31,10 +31,9 @@ class DernierAchatParProduitController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/dernier/achat/par/produit/{dos}", name="app_dernier_achat_par_produit")
-     * @Route("/with/dernier/achat/par/produit/{dos}/{produit}/{cmp}", name="app_dernier_achat_par_produit_with")
-     */
+    #[Route("/dernier/achat/par/produit/{dos}", name: "app_dernier_achat_par_produit")]
+    #[Route("/with/dernier/achat/par/produit/{dos}/{produit}/{cmp}", name: "app_dernier_achat_par_produit_with")]
+
     public function index($dos, $produit = null, $cmp = null, ArtRepository $repo, Request $request): Response
     {
         $produits = '';
@@ -60,9 +59,8 @@ class DernierAchatParProduitController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/import/produit", name="app_import_produit")
-     */
+    #[Route("/import/produit", name: "app_import_produit")]
+
     public function import(IcdRepository $repoIcd, Request $request, SluggerInterface $slugger): Response
     {
 
@@ -163,9 +161,8 @@ class DernierAchatParProduitController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/calcul/Cmp/dernier/achat/{dos}/{produit}/{sref1}/{sref2}", name="app_dernier_achat_calcul_cmp")
-     */
+    #[Route("/calcul/Cmp/dernier/achat/{dos}/{produit}/{sref1}/{sref2}", name: "app_dernier_achat_calcul_cmp")]
+
     public function getcalculCmp($dos = null, $produit = null, $sref1 = null, $sref2 = null, $qte = null, ArtRepository $repo, Request $request): Response
     {
         if ($sref1 == 'null') {
@@ -286,9 +283,8 @@ class DernierAchatParProduitController extends AbstractController
         return $cmp;
     }
 
-    /**
-     * @Route("/calcul/cmp/ajax/{dos}/{produit}/{sref1}/{sref2}/{qte}", name="app_calcul_cmp_ajax")
-     */
+    #[Route("/calcul/cmp/ajax/{dos}/{produit}/{sref1}/{sref2}/{qte}", name: "app_calcul_cmp_ajax")]
+
     public function EmplacementAjax($dos = null, $produit = null, $sref1 = null, $sref2 = null, $qte = null, ArtRepository $repo, Request $request): Response
     {
         $dos = 1;

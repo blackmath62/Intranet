@@ -13,9 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class PaysInterditCommandesFscController extends AbstractController
 {
@@ -26,9 +24,8 @@ class PaysInterditCommandesFscController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/Roby/pays/interdit/commandes/fsc", name="app_pays_interdit_commandes_fsc")
-     */
+    #[Route("/Roby/pays/interdit/commandes/fsc", name: "app_pays_interdit_commandes_fsc")]
+
     public function index(PaysBanFscRepository $repo, Request $request): Response
     {
         // tracking user page for stats
@@ -55,9 +52,8 @@ class PaysInterditCommandesFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/pays/interdit/commandes/fsc/delete{id}", name="app_pays_interdit_commandes_fsc_delete")
-     */
+    #[Route("/Roby/pays/interdit/commandes/fsc/delete{id}", name: "app_pays_interdit_commandes_fsc_delete")]
+
     public function delete($id, PaysBanFscRepository $repo, Request $request): Response
     {
         // tracking user page for stats

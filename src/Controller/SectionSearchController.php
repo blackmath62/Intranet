@@ -12,9 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class SectionSearchController extends AbstractController
 {
@@ -25,9 +23,7 @@ class SectionSearchController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/admin/section_searchs", name="app_admin_section_search")
-     */
+    #[Route("/admin/section_searchs", name: "app_admin_section_search")]
 
     public function index(SectionSearch $section_search = null, Request $request, SectionSearchRepository $repo, EntityManagerInterface $manager)
     {
@@ -59,9 +55,8 @@ class SectionSearchController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/section_search/delete/{id}",name="app_delete_section_search")
-     */
+    #[Route("/admin/section_search/delete/{id}", name: "app_delete_section_search")]
+
     public function deletesection_search($id, Request $request)
     {
         $repository = $this->entityManager->getRepository(SectionSearch::class);
@@ -77,9 +72,8 @@ class SectionSearchController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_section_search'));
     }
-    /**
-     * @Route("/admin/section_search/edit/{id}",name="app_edit_section_search")
-     */
+    #[Route("/admin/section_search/edit/{id}", name: "app_edit_section_search")]
+
     public function editsection_search(SectionSearch $section_search, Request $request)
     {
         $form = $this->createForm(EditSectionSearchType::class, $section_search);

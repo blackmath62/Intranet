@@ -14,7 +14,6 @@ namespace Symfony\Bundle\MakerBundle;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
-use Symfony\Component\EventDispatcher\Event as LegacyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -35,7 +34,6 @@ use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @internal
@@ -43,7 +41,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class EventRegistry
 {
     // list of *known* events to always include (if they exist)
-    private static $newEventsMap = [
+    private static array $newEventsMap = [
         'kernel.exception' => ExceptionEvent::class,
         'kernel.request' => RequestEvent::class,
         'kernel.response' => ResponseEvent::class,
@@ -53,7 +51,7 @@ class EventRegistry
         'kernel.terminate' => TerminateEvent::class,
     ];
 
-    private static $eventsMap = [
+    private static array $eventsMap = [
         'console.command' => ConsoleCommandEvent::class,
         'console.terminate' => ConsoleTerminateEvent::class,
         'console.error' => ConsoleErrorEvent::class,
@@ -71,12 +69,9 @@ class EventRegistry
         'security.switch_user' => SwitchUserEvent::class,
     ];
 
-    private $eventDispatcher;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher)
-    {
-        $this->eventDispatcher = $eventDispatcher;
-
+    public function __construct(
+        private EventDispatcherInterface $eventDispatcher,
+    ) {
         // Loop through the new event classes
         foreach (self::$newEventsMap as $eventName => $newEventClass) {
             // Check if the new event classes exist, if so replace the old one with the new.
@@ -151,11 +146,7 @@ class EventRegistry
             }
 
             if (null !== $type = $args[0]->getType()) {
-                $type = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
-
-                if (LegacyEvent::class === $type && class_exists(Event::class)) {
-                    return Event::class;
-                }
+                $type = $type instanceof \ReflectionNamedType ? $type->getName() : null;
 
                 // ignore an "object" type-hint
                 if ('object' === $type) {

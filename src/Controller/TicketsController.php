@@ -24,9 +24,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class TicketsController extends AbstractController
 {
@@ -52,10 +50,9 @@ class TicketsController extends AbstractController
         $this->adminEmailController = $adminEmailController;
     }
 
-    /**
-     * @Route("/tickets", name="app_tickets")
-     * @Route("/tickets/resolus", name="app_tickets_resolus")
-     */
+    #[Route("/tickets", name: "app_tickets")]
+    #[Route("/tickets/resolus", name: "app_tickets_resolus")]
+
     public function getListTickets(TicketsRepository $repo, Request $request, SluggerInterface $slugger, CommentsRepository $repoComment, StatusRepository $repoStatus)
     {
         // tracking user page for stats
@@ -154,9 +151,8 @@ class TicketsController extends AbstractController
         return $list;
     }
 
-    /**
-     * @Route("/export",  name="app_export")
-     */
+    #[Route("/export", name: "app_export")]
+
     public function export()
     {
         $spreadsheet = new Spreadsheet();

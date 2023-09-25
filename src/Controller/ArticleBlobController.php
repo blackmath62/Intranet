@@ -15,9 +15,8 @@ use Throwable;
 
 class ArticleBlobController extends AbstractController
 {
-    /**
-     * @Route("/article/blob", name="app_article_blob")
-     */
+    #[Route("/article/blob", name: "app_article_blob")]
+
     public function index(ArtRepository $repo, Request $request, StatsAchatController $mef): Response
     {
         $arts = [];

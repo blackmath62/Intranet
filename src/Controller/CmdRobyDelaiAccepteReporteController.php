@@ -23,9 +23,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ROBY")
- */
+#[IsGranted("ROLE_ROBY")]
 
 class CmdRobyDelaiAccepteReporteController extends AbstractController
 {
@@ -54,10 +52,9 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Roby/cmd/delai/accepte/reporte/active", name="app_cmd_roby_delai_accepte_reporte_active")
-     * @Route("/Roby/cmd/delai/accepte/reporte/close", name="app_cmd_roby_delai_accepte_reporte_close")
-     */
+    #[Route("/Roby/cmd/delai/accepte/reporte/active", name: "app_cmd_roby_delai_accepte_reporte_active")]
+    #[Route("/Roby/cmd/delai/accepte/reporte/close", name: "app_cmd_roby_delai_accepte_reporte_close")]
+
     // voir les commandes en cours ou celles terminées
     public function show(CmdRobyDelaiAccepteReporteRepository $repo, NoteRepository $repoNotes, Request $request): Response
     {
@@ -107,10 +104,9 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/cmd/status/close/{id}", name="app_cmd_roby_status_close")
-     * @Route("/Roby/cmd/status/active/{id}", name="app_cmd_roby_status_active")
-     */
+    #[Route("/Roby/cmd/status/close/{id}", name: "app_cmd_roby_status_close")]
+    #[Route("/Roby/cmd/status/active/{id}", name: "app_cmd_roby_status_active")]
+
     // modifier le statut des commandes sur l'intranet
     public function setStatus($id, CmdRobyDelaiAccepteReporteRepository $repo, Request $request): Response
     {
@@ -138,9 +134,8 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         return $this->redirectToRoute('app_cmd_roby_delai_accepte_reporte_active');
     }
 
-    /**
-     * @Route("/Roby/cmd/update", name="app_cmd_roby_update")
-     */
+    #[Route("/Roby/cmd/update", name: "app_cmd_roby_update")]
+
     // mettre à jour les commandes du systéme sur l'intranet
     public function runUpdate(CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, Request $request): Response
     {
@@ -220,9 +215,8 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         return $this->redirectToRoute('app_cmd_roby_delai_accepte_reporte_active');
     }
 
-    /**
-     * @Route("/Roby/cmd/status/auto/close", name="app_cmd_roby_auto_close")
-     */
+    #[Route("/Roby/cmd/status/auto/close", name: "app_cmd_roby_auto_close")]
+
     // passer automatiquement les commandes qui ne sont plus en actives dans le systéme en Terminées
     public function setCloseAuto()
     {
@@ -286,9 +280,8 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Roby/cmd/status/view/note/{id}", name="app_cmd_roby_status_view_note")
-     */
+    #[Route("/Roby/cmd/status/view/note/{id}", name: "app_cmd_roby_status_view_note")]
+
     // voir les notes liées a une commande et pouvoir en ajouter
     public function viewNote($id, CmdRobyDelaiAccepteReporteRepository $repo, NoteRepository $repoNotes, Request $request): Response
     {
@@ -325,9 +318,8 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/cmd/mail", name="app_cmd_roby_send_mail")
-     */
+    #[Route("/Roby/cmd/mail", name: "app_cmd_roby_send_mail")]
+
     // envoyer un mail pour avertir sur les commandes qui ont un délai accéptées
     public function sendMail(): Response
     {

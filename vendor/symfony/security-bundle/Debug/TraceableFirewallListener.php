@@ -25,9 +25,12 @@ use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
  */
 final class TraceableFirewallListener extends FirewallListener
 {
-    private $wrappedListeners = [];
-    private $authenticatorsInfo = [];
+    private array $wrappedListeners = [];
+    private array $authenticatorsInfo = [];
 
+    /**
+     * @return array
+     */
     public function getWrappedListeners()
     {
         return $this->wrappedListeners;
@@ -38,7 +41,7 @@ final class TraceableFirewallListener extends FirewallListener
         return $this->authenticatorsInfo;
     }
 
-    protected function callListeners(RequestEvent $event, iterable $listeners)
+    protected function callListeners(RequestEvent $event, iterable $listeners): void
     {
         $wrappedListeners = [];
         $wrappedLazyListeners = [];

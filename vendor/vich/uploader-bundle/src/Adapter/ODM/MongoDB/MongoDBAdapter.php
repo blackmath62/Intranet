@@ -10,11 +10,10 @@ use Vich\UploaderBundle\Adapter\AdapterInterface;
  * MongoDBAdapter.
  *
  * @author Dustin Dobervich <ddobervich@gmail.com>
- * @final
  *
  * @internal
  */
-class MongoDBAdapter implements AdapterInterface
+final class MongoDBAdapter implements AdapterInterface
 {
     /**
      * @param LifecycleEventArgs $event
@@ -25,7 +24,7 @@ class MongoDBAdapter implements AdapterInterface
 
         $dm = $event->getDocumentManager();
         $uow = $dm->getUnitOfWork();
-        $metadata = $dm->getClassMetadata(\get_class($object));
+        $metadata = $dm->getClassMetadata($object::class);
         $uow->recomputeSingleDocumentChangeSet($metadata, $object);
     }
 }

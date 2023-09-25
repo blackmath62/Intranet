@@ -31,9 +31,8 @@ class ClientFeuRougeOrangeController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/client/feu/rouge/orange/send/mail", name="app_client_feu_rouge_orange_send_mail")
-     */
+    #[Route("/client/feu/rouge/orange/send/mail", name: "app_client_feu_rouge_orange_send_mail")]
+
     public function sendMail(): Response
     {
         // envoyer un mail

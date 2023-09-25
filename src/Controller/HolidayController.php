@@ -30,9 +30,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class HolidayController extends AbstractController
 {
@@ -80,9 +78,8 @@ class HolidayController extends AbstractController
 
     }
 
-    /**
-     * @Route("/holiday", name="app_holiday_list")
-     */
+    #[Route("/holiday", name: "app_holiday_list")]
+
     public function index(UrlGeneratorInterface $urlGenerator, Request $request)
     {
         $holidays = $this->repoHoliday->findAll();
@@ -171,9 +168,8 @@ class HolidayController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/conges/holiday/fermeture", name="app_holiday_new_closing", methods={"GET","POST"})
-     */
+    #[Route("/conges/holiday/fermeture", name: "app_holiday_new_closing", methods: ["GET", "POST"])]
+
     public function newClosing(Request $request)
     {
         $i = 0;
@@ -359,12 +355,10 @@ class HolidayController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/holiday/new", name="app_holiday_new", methods={"GET","POST"})
-     * @Route("/holiday/edit/{id}", name="app_holiday_edit", methods={"GET","POST"})
-     */
+    #[Route("/holiday/new", name: "app_holiday_new", methods: ["GET", "POST"])]
+    #[Route("/holiday/edit/{id}", name: "app_holiday_edit", methods: ["GET", "POST"])]
 
-    public function Holiday($id = null, Holiday $holiday = null, Request $request)
+    function Holiday(Holiday $holiday = null, Request $request, $id = null)
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
@@ -509,11 +503,10 @@ class HolidayController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/holiday/show/{id}", name="app_holiday_show", methods={"GET"})
-     */
+    #[Route("/holiday/show/{id}", name: "app_holiday_show", methods: ["GET"])]
+
     // Voir un congés
-    public function showHoliday($id, Request $request)
+    function showHoliday($id, Request $request)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -529,7 +522,7 @@ class HolidayController extends AbstractController
         ]);
     }
     // compter le nombre de jour de congés déposés
-    public function countHolidayDay($holiday)
+    function countHolidayDay($holiday)
     {
 
         // déclaration des variables
@@ -627,11 +620,10 @@ class HolidayController extends AbstractController
         return $return;
     }
 
-    /**
-     * @Route("/holiday/delete/{id}", name="app_holiday_delete")
-     */
+    #[Route("/holiday/delete/{id}", name: "app_holiday_delete")]
+
     // supprimer un congés
-    public function deleteHoliday($id, Holiday $holiday, Request $request)
+    function deleteHoliday($id, Holiday $holiday, Request $request)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -666,11 +658,10 @@ class HolidayController extends AbstractController
         return $this->redirectToRoute('app_holiday_list');
     }
 
-    /**
-     * @Route("/conges/holiday/accept/{id}", name="app_holiday_accept", methods={"GET"})
-     */
+    #[Route("/conges/holiday/accept/{id}", name: "app_holiday_accept", methods: ["GET"])]
+
     // accepter un congés
-    public function acceptHoliday($id, Request $request)
+    function acceptHoliday($id, Request $request)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -702,11 +693,10 @@ class HolidayController extends AbstractController
         return $this->redirectToRoute('app_holiday_list');
     }
 
-    /**
-     * @Route("/conges/holiday/refuse/{id}", name="app_holiday_refuse", methods={"GET"})
-     */
+    #[Route("/conges/holiday/refuse/{id}", name: "app_holiday_refuse", methods: ["GET"])]
+
     // refuser un congés
-    public function refuseHoliday($id, Request $request)
+    function refuseHoliday($id, Request $request)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -737,7 +727,7 @@ class HolidayController extends AbstractController
         return $this->redirectToRoute('app_holiday_list');
     }
 
-    public function countDaysIntoThisPeriod($start, $startCp, $ss, $end, $endCp, $se)
+    function countDaysIntoThisPeriod($start, $startCp, $ss, $end, $endCp, $se)
     {
         $sStart = false;
         $sEnd = false;
@@ -760,12 +750,12 @@ class HolidayController extends AbstractController
         return $vacationDays;
     }
 
-    public function isWeekend($date)
+    function isWeekend($date)
     {
         return (date('N', strtotime($date)) >= 6); // 6 corresponds to Saturday, 7 to Sunday
     }
 
-    public function countVacationDays($start, $startCp, $ss, $end, $endCp, $se, $holidays)
+    function countVacationDays($start, $startCp, $ss, $end, $endCp, $se, $holidays)
     {
         $start = (new DateTime($start))->format('Y-m-d');
         $end = (new DateTime($end))->format('Y-m-d');
@@ -794,7 +784,7 @@ class HolidayController extends AbstractController
     }
 
     // Contrôle d'accés, Si on est pas le dépositaire ou le décideur pas accés
-    public function holiday_access($holidayId)
+    function holiday_access($holidayId)
     {
         $access = true;
         $holiday = $this->repoHoliday->findOneBy(['id' => $holidayId]);
@@ -806,13 +796,13 @@ class HolidayController extends AbstractController
     }
 
     // contrôle et modification des chevauchements
-    public function holiday_overlaps()
+    function holiday_overlaps()
     {
 
     }
 
     // congés vérrouillé, bloquer la modification de date si le congés est déjà traité
-    public function holiday_lock($holidayId)
+    function holiday_lock($holidayId)
     {
         $lock = false;
         $repo = $this->entityManager->getRepository(Holiday::class);
@@ -826,7 +816,7 @@ class HolidayController extends AbstractController
     }
 
     // envoie de mail
-    public function holiday_send_mail($role, $id, $object, $html)
+    function holiday_send_mail($role, $id, $object, $html)
     {
         // initialiser le mail utilisateur
         $userMail = '';
@@ -865,7 +855,7 @@ class HolidayController extends AbstractController
     }
 
     // générer un fichier Excel qui sera envoyé par mail à l'utilisateur
-    public function getDataRecapConges($start, $end): array
+    function getDataRecapConges($start, $end): array
     {
         $list = [];
         $donnees = [];
@@ -897,7 +887,7 @@ class HolidayController extends AbstractController
     }
 
     // Mise en forme des slices
-    public function sliceTraduct($slice)
+    function sliceTraduct($slice)
     {
         if ($slice == 'DAY') {
             return 'Journée';
@@ -909,7 +899,7 @@ class HolidayController extends AbstractController
     }
 
     // générer un fichier Excel qui sera envoyé par mail à l'utilisateur
-    public function getDataListConges($start, $end): array
+    function getDataListConges($start, $end): array
     {
         $list = [];
         $donnees = [];
@@ -951,7 +941,7 @@ class HolidayController extends AbstractController
         return $list;
     }
 
-    public function get_export_excel($start, $end)
+    function get_export_excel($start, $end)
     {
 
         $spreadsheet = new Spreadsheet();
@@ -1191,7 +1181,7 @@ class HolidayController extends AbstractController
         return $fichier;
     }
 
-    public function sendMail($start, $end)
+    function sendMail($start, $end)
     {
         // envoyer un mail
         $excel = $this->get_export_excel($start, $end);

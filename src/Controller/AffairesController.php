@@ -44,9 +44,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * @IsGranted("ROLE_MONTEUR")
- */
+#[IsGranted("ROLE_MONTEUR")]
 
 class AffairesController extends AbstractController
 {
@@ -97,10 +95,9 @@ class AffairesController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/me/ok", name="app_affaire_me_ok")
-     * @Route("/Lhermitte/affaire/me/nok", name="app_affaire_me_nok")
-     */
+    #[Route("/Lhermitte/affaire/me/ok", name: "app_affaire_me_ok")]
+    #[Route("/Lhermitte/affaire/me/nok", name: "app_affaire_me_nok")]
+
     public function affaire(UrlGeneratorInterface $urlGenerator, Request $request): Response
     {
 
@@ -280,10 +277,9 @@ class AffairesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/pieces/affaire/nok/{{affaire}}", name="app_piece_affaire_nok")
-     * @Route("/Lhermitte/pieces/affaire/ok/{{affaire}}", name="app_piece_affaire_ok")
-     */
+    #[Route("/Lhermitte/pieces/affaire/nok/{{affaire}}", name: "app_piece_affaire_nok")]
+    #[Route("/Lhermitte/pieces/affaire/ok/{{affaire}}", name: "app_piece_affaire_ok")]
+
     public function pieceAffaire($affaire, Request $request): Response
     {
         if ($request->attributes->get('_route') == 'app_piece_affaire_ok') {
@@ -438,9 +434,8 @@ class AffairesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/update/affaire", name="app_update_affaires")
-     */
+    #[Route("/Lhermitte/update/affaire", name: "app_update_affaires")]
+
     public function update(): Response
     {
         $affaires = $this->repoMouv->getAffaires();
@@ -471,9 +466,8 @@ class AffairesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Lhermitte/update/pieces/affaire", name="app_update_piece_affaires")
-     */
+    #[Route("/Lhermitte/update/pieces/affaire", name: "app_update_piece_affaires")]
+
     public function updatePieces(): Response
     {
         $affaires = $this->repoAffaires->findAll();
@@ -522,9 +516,7 @@ class AffairesController extends AbstractController
         return $this->redirectToRoute('app_affaire_me_nok');
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/change/etat/{id}/{etat}",name="app_affaire_change_etat")
-     */
+    #[Route("/Lhermitte/affaire/change/etat/{id}/{etat}", name: "app_affaire_change_etat")]
 
     public function changeEtat($id, $etat): Response
     {
@@ -549,9 +541,7 @@ class AffairesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/piece/change/etat/{id}/{etat}",name="app_affaire_piece_change_etat")
-     */
+    #[Route("/Lhermitte/affaire/piece/change/etat/{id}/{etat}", name: "app_affaire_piece_change_etat")]
 
     public function changeEtatPiece($id, $etat): Response
     {
@@ -571,9 +561,7 @@ class AffairesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/remove/intervention/{id}",name="app_affaire_remove_intervention")
-     */
+    #[Route("/Lhermitte/affaire/remove/intervention/{id}", name: "app_affaire_remove_intervention")]
 
     public function removeIntervention($id): Response
     {
@@ -609,9 +597,7 @@ class AffairesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/edit/intervention/{id}/{affaire}",name="app_affaire_edit_intervention")
-     */
+    #[Route("/Lhermitte/affaire/edit/intervention/{id}/{affaire}", name: "app_affaire_edit_intervention")]
 
     public function editIntervention($id, $affaire, Request $request): Response
     {
@@ -656,9 +642,7 @@ class AffairesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/show/intervention/{id}",name="app_affaire_show_intervention")
-     */
+    #[Route("/Lhermitte/affaire/show/intervention/{id}", name: "app_affaire_show_intervention")]
 
     public function showIntervention($id, Request $request): Response
     {
@@ -782,9 +766,8 @@ class AffairesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/creer/fiche/intervention/{id}/{intervenant}/{createdAt}",name="app_affaire_creer_fiche_intervention")
-     */
+    #[Route("/Lhermitte/affaire/creer/fiche/intervention/{id}/{intervenant}/{createdAt}", name: "app_affaire_creer_fiche_intervention")]
+
     public function creerFicheIntervention($id, $intervenant, $createdAt, Request $request)
     {
         $fiche = new InterventionFicheMonteur;
@@ -801,12 +784,10 @@ class AffairesController extends AbstractController
         return $this->redirectToRoute('app_affaire_edit_fiche_intervention', ['id' => $id, 'ficheId' => $fiche->getId()]);
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/saisie/fiche/intervention/{id}",name="app_affaire_saisie_fiche_intervention")
-     * @Route("/Lhermitte/affaire/edit/fiche/intervention/{id}/{ficheId}",name="app_affaire_edit_fiche_intervention")
-     */
+    #[Route("/Lhermitte/affaire/saisie/fiche/intervention/{id}", name: "app_affaire_saisie_fiche_intervention")]
+    #[Route("/Lhermitte/affaire/edit/fiche/intervention/{id}/{ficheId}", name: "app_affaire_edit_fiche_intervention")]
 
-    public function saisieFicheIntervention($id, $ficheId = null, Request $request): Response
+    public function saisieFicheIntervention($id, Request $request, $ficheId = null): Response
     {
 
         // Si la fiche existe déjà, on la modifie et on la charge
@@ -884,9 +865,8 @@ class AffairesController extends AbstractController
             'intervention' => $intervention,
         ]);
     }
-    /**
-     * @Route("/Lhermitte/affaire/remove/fiche/intervention/{id}/{fiche}",name="app_affaire_remove_fiche_intervention")
-     */
+
+    #[Route("/Lhermitte/affaire/remove/fiche/intervention/{id}/{fiche}", name: "app_affaire_remove_fiche_intervention")]
 
     public function removeFicheIntervention($id, $fiche, Request $request): Response
     {
@@ -908,9 +888,7 @@ class AffairesController extends AbstractController
         return $this->redirectToRoute('app_affaire_saisie_fiche_intervention', ['id' => $id]);
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/remove/heure/intervention/{id}/{ficheId}/{heureId}",name="app_affaire_remove_heure_intervention")
-     */
+    #[Route("/Lhermitte/affaire/remove/heure/intervention/{id}/{ficheId}/{heureId}", name: "app_affaire_remove_heure_intervention")]
 
     public function removeHeureIntervention($id, $ficheId, $heureId, Request $request): Response
     {
@@ -923,9 +901,7 @@ class AffairesController extends AbstractController
         return $this->redirectToRoute('app_affaire_edit_fiche_intervention', ['id' => $id, 'ficheId' => $ficheId]);
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/verrouiller/fiche/intervention/{id}/{ficheId}",name="app_affaire_verrouiller_fiche_intervention")
-     */
+    #[Route("/Lhermitte/affaire/verrouiller/fiche/intervention/{id}/{ficheId}", name: "app_affaire_verrouiller_fiche_intervention")]
 
     public function verrouillerFicheIntervention($id, $ficheId): Response
     {

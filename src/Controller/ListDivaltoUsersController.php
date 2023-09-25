@@ -27,9 +27,8 @@ class ListDivaltoUsersController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("admin/list/divalto/users/test", name="app_list_divalto_users_test")
-     */
+    #[Route("admin/list/divalto/users/test", name: "app_list_divalto_users_test")]
+
     public function test(Request $request): Response
     {
         $form = $this->createForm(ListDivaltoUsersType::class);
@@ -49,9 +48,8 @@ class ListDivaltoUsersController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("admin/list/divalto/users/show", name="app_list_divalto_users_show")
-     */
+    #[Route("admin/list/divalto/users/show", name: "app_list_divalto_users_show")]
+
     public function show(): Response
     {
         //dd($this->listDivaltoUsersRepo->findAll());
@@ -61,9 +59,8 @@ class ListDivaltoUsersController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("admin/list/divalto/users/lock/unlock/{id}/{value}", name="app_list_divalto_users_lock_unlock")
-     */
+    #[Route("admin/list/divalto/users/lock/unlock/{id}/{value}", name: "app_list_divalto_users_lock_unlock")]
+
     public function lockUnlock($id, $value): Response
     {
         if ($value == 'false') {
@@ -82,9 +79,8 @@ class ListDivaltoUsersController extends AbstractController
         return $this->redirectToRoute('app_list_divalto_users_show');
     }
 
-    /**
-     * @Route("admin/list/divalto/users/update", name="app_list_divalto_users_update")
-     */
+    #[Route("admin/list/divalto/users/update", name: "app_list_divalto_users_update")]
+
     public function update(): Response
     {
         $users = $this->vrpRepo->UpdateListDivaltoUser();

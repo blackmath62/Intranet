@@ -26,9 +26,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ROBY")
- */
+#[IsGranted("ROLE_ROBY")]
 
 class FscPieceClientController extends AbstractController
 //class MovementBillFscController extends AbstractController
@@ -66,9 +64,8 @@ class FscPieceClientController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Roby/fsc/pieces/clients/index", name="app_fsc_piece_client")
-     */
+    #[Route("/Roby/fsc/pieces/clients/index", name: "app_fsc_piece_client")]
+
     public function index(Request $request): Response
     {
         // tracking user page for stats
@@ -102,9 +99,8 @@ class FscPieceClientController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/fsc/pieces/clients/verrou/{id}", name="app_fsc_piece_client_verrou")
-     */
+    #[Route("/Roby/fsc/pieces/clients/verrou/{id}", name: "app_fsc_piece_client_verrou")]
+
     public function verrou($id, Request $request): Response
     {
 
@@ -141,9 +137,8 @@ class FscPieceClientController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Roby/fsc/pieces/clients/show/{id}", name="app_fsc_piece_client_show")
-     */
+    #[Route("/Roby/fsc/pieces/clients/show/{id}", name: "app_fsc_piece_client_show")]
+
     public function show($id = null, Request $request, MovBillFsc $bill): Response
     {
         $form = $this->createForm(FactureFournisseursFscType::class, $bill);
@@ -190,9 +185,8 @@ class FscPieceClientController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/fsc/pieces/clients/update", name="app_fsc_piece_client_update")
-     */
+    #[Route("/Roby/fsc/pieces/clients/update", name: "app_fsc_piece_client_update")]
+
     // on ajoute les factures clients qui n'y sont pas déjà
     public function update(): Response
     {

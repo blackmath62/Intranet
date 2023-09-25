@@ -7,7 +7,6 @@ use App\Repository\Main\UsersRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -23,20 +22,16 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 
 class LoginFormAuthenticator extends AbstractAuthenticator
 {
-    /**
-     * @var FlashBagInterface
-     */
-
-    private $flashBag;
 
     private $usersRepository;
     private $urlGenerator;
-
-    public function __construct(UsersRepository $usersRepository, UrlGeneratorInterface $urlGenerator, FlashBagInterface $flashBag)
+    /**
+     * @required
+     */
+    public function __construct(UsersRepository $usersRepository, UrlGeneratorInterface $urlGenerator)
     {
         $this->usersRepository = $usersRepository;
         $this->urlGenerator = $urlGenerator;
-        $this->flashBag = $flashBag;
     }
 
     /**
@@ -125,7 +120,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         // todo mise en place du message flash
-        $this->flashBag->add('error', 'Identifiant ou mot de passe invalide !');
+        $request->attributes->set('error', 'Identifiant ou mot de passe invalide !');
         return new RedirectResponse($this->urlGenerator->generate('app_login'));
     }
 }

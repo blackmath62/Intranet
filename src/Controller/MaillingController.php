@@ -15,9 +15,8 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class MaillingController extends AbstractController
 {
-    /**
-     * @Route("/admin/mailing", name="app_mailing")
-     */
+    #[Route("/admin/mailing", name: "app_mailing")]
+
     public function index(MailerInterface $mailer, FouRepository $repo, Request $request, SluggerInterface $slugger): Response
     {
 

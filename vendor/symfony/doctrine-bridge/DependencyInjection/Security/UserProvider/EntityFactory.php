@@ -24,8 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class EntityFactory implements UserProviderFactoryInterface
 {
-    private $key;
-    private $providerId;
+    private string $key;
+    private string $providerId;
 
     public function __construct(string $key, string $providerId)
     {
@@ -33,6 +33,9 @@ class EntityFactory implements UserProviderFactoryInterface
         $this->providerId = $providerId;
     }
 
+    /**
+     * @return void
+     */
     public function create(ContainerBuilder $container, string $id, array $config)
     {
         $container
@@ -43,11 +46,17 @@ class EntityFactory implements UserProviderFactoryInterface
         ;
     }
 
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return $this->key;
     }
 
+    /**
+     * @return void
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $node

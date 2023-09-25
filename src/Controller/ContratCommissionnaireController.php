@@ -21,9 +21,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class ContratCommissionnaireController extends AbstractController
 {
@@ -47,9 +45,8 @@ class ContratCommissionnaireController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("Lhermitte/contrat/commissionnaire", name="app_contrat_commissionnaire")
-     */
+    #[Route("Lhermitte/contrat/commissionnaire", name: "app_contrat_commissionnaire")]
+
     public function index(ProduitsCommissionnairesRepository $repo, Request $request, MailListRepository $repoMails): Response
     {
 
@@ -105,9 +102,8 @@ class ContratCommissionnaireController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("Lhermitte/contrat/commissionnaire/delete/mail{id}", name="app_contrat_commissionnaire_delete_mail")
-     */
+    #[Route("Lhermitte/contrat/commissionnaire/delete/mail{id}", name: "app_contrat_commissionnaire_delete_mail")]
+
     public function deleteMail($id, MailListRepository $repo): Response
     {
 
@@ -121,9 +117,8 @@ class ContratCommissionnaireController extends AbstractController
         return $this->redirectToRoute('app_contrat_commissionnaire');
     }
 
-    /**
-     * @Route("Lhermitte/contrat/commissionnaire/update/list", name="app_contrat_commissionnaire_update_list")
-     */
+    #[Route("Lhermitte/contrat/commissionnaire/update/list", name: "app_contrat_commissionnaire_update_list")]
+
     public function updateList(ArtRepository $repo, ProduitsCommissionnairesRepository $cc): Response
     {
         $listeArticlesDivalto = $repo->getPhyto();
@@ -147,9 +142,8 @@ class ContratCommissionnaireController extends AbstractController
         return $this->redirectToRoute('app_contrat_commissionnaire');
     }
 
-    /**
-     * @Route("Lhermitte/contrat/commissionnaire/change/cc/{id}", name="app_contrat_commissionnaire_update_article")
-     */
+    #[Route("Lhermitte/contrat/commissionnaire/change/cc/{id}", name: "app_contrat_commissionnaire_update_article")]
+
     public function updateArticle($id, ProduitsCommissionnairesRepository $cc): Response
     {
         $article = $cc->findOneBy(['id' => $id]);
@@ -166,9 +160,8 @@ class ContratCommissionnaireController extends AbstractController
         return $this->redirectToRoute('app_contrat_commissionnaire');
     }
 
-    /**
-     * @Route("Lhermitte/contrat/commissionnaire/send/mail", name="app_contrat_commissionnaire_send_mail")
-     */
+    #[Route("Lhermitte/contrat/commissionnaire/send/mail", name: "app_contrat_commissionnaire_send_mail")]
+
     public function sendMail(): Response
     {
 

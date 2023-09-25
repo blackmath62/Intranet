@@ -10,15 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class ControleProduitStockMouvEfController extends AbstractController
 {
-    /**
-     * @Route("/controle/produit/stock/mouv/ef", name="app_controle_produit_stock_mouv_ef")
-     */
+    #[Route("/controle/produit/stock/mouv/ef", name: "app_controle_produit_stock_mouv_ef")]
+
     public function index(ControleArtStockMouvEfRepository $repo, Request $request): Response
     {
         // tracking user page for stats
@@ -43,9 +40,8 @@ class ControleProduitStockMouvEfController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/controle/anomalies/produits/fermes", name="app_anomalies_produits_fermes")
-     */
+    #[Route("/controle/anomalies/produits/fermes", name: "app_anomalies_produits_fermes")]
+
     public function getAnomaliesProduitsFermes(ControleArtStockMouvEfRepository $repo, Request $request, SearchTiersController $dos): Response
     {
         // tracking user page for stats

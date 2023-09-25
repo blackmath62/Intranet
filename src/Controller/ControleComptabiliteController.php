@@ -12,15 +12,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_COMPTA")
- */
+#[IsGranted("ROLE_COMPTA")]
 
 class ControleComptabiliteController extends AbstractController
 {
-    /**
-     * @Route("/compta/controle/comptabilite/{slug}", name="app_controle_comptabilite")
-     */
+    #[Route("/compta/controle/comptabilite/{slug}", name: "app_controle_comptabilite")]
+
     public function controleComptabilite($slug, Request $request, ControleComptabiliteRepository $repo, ControleComptabiliteAchatRepository $repoAchat, ControleComptabiliteVenteRepository $repoVente): Response
     {
 

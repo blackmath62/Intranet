@@ -12,9 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminPrestataireController extends AbstractController
 {
@@ -25,9 +23,8 @@ class AdminPrestataireController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/admin/prestataire", name="app_admin_prestataire")
-     */
+    #[Route("/admin/prestataire", name: "app_admin_prestataire")]
+
     public function index(PrestataireRepository $repo, Request $request): Response
     {
 
@@ -55,9 +52,8 @@ class AdminPrestataireController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/prestataire/delete/{id}",name="app_delete_prestataire")
-     */
+    #[Route("/admin/prestataire/delete/{id}", name: "app_delete_prestataire")]
+
     public function deletePrestataire($id, Request $request)
     {
         $repository = $this->entityManager->getRepository(Prestataire::class);
@@ -73,9 +69,9 @@ class AdminPrestataireController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_prestataire'));
     }
-    /**
-     * @Route("/admin/prestataire/edit/{id}",name="app_edit_prestataire")
-     */
+
+    #[Route("/admin/prestataire/edit/{id}", name: "app_edit_prestataire")]
+
     public function editprestataire(Prestataire $prestataire, Request $request)
     {
         $form = $this->createForm(PrestataireType::class, $prestataire);

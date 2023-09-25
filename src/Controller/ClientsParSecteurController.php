@@ -12,9 +12,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_RESPONSABLE_SECTEUR")
- */
+#[IsGranted("ROLE_RESPONSABLE_SECTEUR")]
 
 class ClientsParSecteurController extends AbstractController
 {
@@ -31,9 +29,8 @@ class ClientsParSecteurController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Lhermitte/clients", name="app_lhermitte_clients_secteur")
-     */
+    #[Route("/Lhermitte/clients", name: "app_lhermitte_clients_secteur")]
+
     public function index(Request $request, ClientLhermitteByCommercialRepository $clients): Response
     {
 
@@ -49,9 +46,8 @@ class ClientsParSecteurController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/contacts/client/{tiers}", name="app_lhermitte_contact_client")
-     */
+    #[Route("/Lhermitte/contacts/client/{tiers}", name: "app_lhermitte_contact_client")]
+
     public function getContactsClient($tiers, Request $request, ClientLhermitteByCommercialRepository $client): Response
     {
 
@@ -66,11 +62,9 @@ class ClientsParSecteurController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/clients/need/{tiers}", name="app_lhermitte_need_clients")
-     *
-     */
-    public function need($tiers = null, Request $request, MailerInterface $mailer, ClientLhermitteByCommercialRepository $clients): Response
+    #[Route("/Lhermitte/clients/need/{tiers}", name: "app_lhermitte_need_clients")]
+
+    public function need(Request $request, MailerInterface $mailer, ClientLhermitteByCommercialRepository $clients, $tiers = null): Response
     {
 
         if ($tiers) {
@@ -101,11 +95,9 @@ class ClientsParSecteurController extends AbstractController
         }
     }
 
-    /**
-     * @Route("/Lhermitte/clients/close/{tiers}", name="app_lhermitte_close_clients")
-     *
-     */
-    public function close($tiers = null, Request $request, MailerInterface $mailer): Response
+    #[Route("/Lhermitte/clients/close/{tiers}", name: "app_lhermitte_close_clients")]
+
+    public function close(Request $request, MailerInterface $mailer, $tiers = null): Response
     {
 
         if ($tiers) {

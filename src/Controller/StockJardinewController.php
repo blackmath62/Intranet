@@ -9,15 +9,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class StockJardinewController extends AbstractController
 {
-    /**
-     * @Route("/jardinew/stocks", name="app_stock_jardinew")
-     */
+    #[Route("/jardinew/stocks", name: "app_stock_jardinew")]
+
     public function index(Request $request, StocksJardinewRepository $repo): Response
     {
 

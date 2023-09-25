@@ -14,21 +14,7 @@ use Doctrine\Persistence\Proxy;
  */
 class RemoveListener extends BaseListener
 {
-    /** @var array */
-    private $entities = [];
-
-    /**
-     * The events the listener is subscribed to.
-     *
-     * @return array The array of events
-     */
-    public function getSubscribedEvents(): array
-    {
-        return [
-            'preRemove',
-            'postFlush',
-        ];
-    }
+    private array $entities = [];
 
     /**
      * Ensures a proxy will be usable in the postFlush (when transaction has ended).

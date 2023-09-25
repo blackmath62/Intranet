@@ -15,9 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class ProfileUserController extends AbstractController
 {
@@ -28,9 +26,8 @@ class ProfileUserController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/profile/user", name="app_profile_user")
-     */
+    #[Route("/profile/user", name: "app_profile_user")]
+
     public function index(Request $request, SluggerInterface $slugger, HolidayRepository $repoHoliday, InterventionFicheMonteurRepository $repoInterventions)
     {
         // tracking user page for stats

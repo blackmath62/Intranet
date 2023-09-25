@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Vich\UploaderBundle\Exception\MissingPackageException;
 use Vich\UploaderBundle\Metadata\CacheWarmer;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
@@ -21,13 +22,10 @@ use Vich\UploaderBundle\Storage\StorageInterface;
  */
 final class VichUploaderExtension extends Extension
 {
-    /**
-     * @var array
-     */
-    protected $tagMap = [
-        'orm' => 'doctrine.event_subscriber',
-        'mongodb' => 'doctrine_mongodb.odm.event_subscriber',
-        'phpcr' => 'doctrine_phpcr.event_subscriber',
+    protected array $tagMap = [
+        'orm' => 'doctrine.event_listener',
+        'mongodb' => 'doctrine_mongodb.odm.event_listener',
+        'phpcr' => 'doctrine_phpcr.event_listener',
     ];
 
     public function load(array $configs, ContainerBuilder $container): void
@@ -42,8 +40,8 @@ final class VichUploaderExtension extends Extension
         $container->setParameter('vich_uploader.default_filename_attribute_suffix', $config['default_filename_attribute_suffix']);
         $container->setParameter('vich_uploader.mappings', $config['mappings']);
 
-        if (0 === \strpos($config['storage'], '@')) {
-            $container->setAlias('vich_uploader.storage', \substr($config['storage'], 1));
+        if (\str_starts_with((string) $config['storage'], '@')) {
+            $container->setAlias('vich_uploader.storage', \substr((string) $config['storage'], 1));
         } else {
             $container->setAlias('vich_uploader.storage', 'vich_uploader.storage.'.$config['storage']);
         }
@@ -104,13 +102,6 @@ final class VichUploaderExtension extends Extension
                 $directory = \dirname($ref->getFileName()).'/../config/vich_uploader';
 
                 if (!\is_dir($directory)) {
-                    $directory = \dirname($ref->getFileName()).'/Resources/config/vich_uploader';
-                    if (\is_dir($directory)) {
-                        @\trigger_error('Using Resources/config/vich_uploader for auto config discovery is deprecated use ../config/vich_uploader, relative to the Bundle class, instead', \E_USER_DEPRECATED);
-                    }
-                }
-
-                if (!\is_dir($directory)) {
                     continue;
                 }
 
@@ -119,7 +110,7 @@ final class VichUploaderExtension extends Extension
         }
 
         foreach ($config['metadata']['directories'] as $directory) {
-            $directory['path'] = \rtrim(\str_replace('\\', '/', $directory['path']), '/');
+            $directory['path'] = \rtrim(\str_replace('\\', '/', (string) $directory['path']), '/');
 
             if ('@' === $directory['path'][0]) {
                 $bundleName = \substr($directory['path'], 1, \strpos($directory['path'], '/') - 1);
@@ -132,7 +123,7 @@ final class VichUploaderExtension extends Extension
                 $directory['path'] = \dirname($ref->getFileName()).\substr($directory['path'], \strlen('@'.$bundleName));
             }
 
-            $directories[\rtrim($directory['namespace_prefix'], '\\')] = \rtrim($directory['path'], '\\/');
+            $directories[\rtrim((string) $directory['namespace_prefix'], '\\')] = \rtrim($directory['path'], '\\/');
         }
 
         $container
@@ -148,16 +139,22 @@ final class VichUploaderExtension extends Extension
         }
 
         switch ($config['metadata']['type']) {
-            case 'attribute':
-                $container->setDefinition(
-                    'vich_uploader.metadata.reader',
-                    $container->getDefinition('vich_uploader.metadata.attribute_reader')
-                );
-                break;
-            default:
+            case 'annotation':
+                if (!class_exists(AnnotationReader::class) || !$container::willBeAvailable('doctrine/annotations', AnnotationReader::class, [])) {
+                    $msg = 'Annotations support missing. Try running "composer require doctrine/annotations".';
+                    throw new MissingPackageException($msg);
+                }
+
                 $container->setDefinition(
                     'vich_uploader.metadata.reader',
                     new Definition(AnnotationReader::class)
+                );
+                break;
+
+            default:
+                $container->setDefinition(
+                    'vich_uploader.metadata.reader',
+                    $container->getDefinition('vich_uploader.metadata.attribute_reader')
                 );
         }
     }
@@ -177,7 +174,7 @@ final class VichUploaderExtension extends Extension
             ;
 
             $dir = $container->getParameterBag()->resolveValue($config['metadata']['file_cache']['dir']);
-            if (!\file_exists($dir) && !@\mkdir($dir, 0777, true)) {
+            if (!\file_exists($dir) && !@\mkdir($dir, 0o777, true)) {
                 throw new \RuntimeException(\sprintf('Could not create cache directory "%s".', $dir));
             }
         } else {
@@ -198,9 +195,9 @@ final class VichUploaderExtension extends Extension
     protected function registerListeners(ContainerBuilder $container, array $config): void
     {
         $servicesMap = [
-            'inject_on_load' => ['name' => 'inject', 'priority' => 0],
-            'delete_on_update' => ['name' => 'clean', 'priority' => 50],
-            'delete_on_remove' => ['name' => 'remove', 'priority' => 0],
+            'inject_on_load' => ['name' => 'inject', 'priority' => 0, 'events' => ['postLoad']],
+            'delete_on_update' => ['name' => 'clean', 'priority' => 50, 'events' => ['preUpdate']],
+            'delete_on_remove' => ['name' => 'remove', 'priority' => 0, 'events' => ['preRemove', 'postFlush']],
         ];
 
         foreach ($config['mappings'] as $name => $mapping) {
@@ -212,11 +209,11 @@ final class VichUploaderExtension extends Extension
                     continue;
                 }
 
-                $this->createListener($container, $name, $service['name'], $driver, $service['priority']);
+                $this->createListener($container, $name, $service['name'], $driver, $service['events'], $service['priority']);
             }
 
             // the upload listener is mandatory
-            $this->createListener($container, $name, 'upload', $driver);
+            $this->createListener($container, $name, 'upload', $driver, ['prePersist', 'preUpdate']);
         }
     }
 
@@ -246,6 +243,7 @@ final class VichUploaderExtension extends Extension
         string $name,
         string $type,
         string $driver,
+        array $events,
         int $priority = 0
     ): void {
         $definition = $container
@@ -254,7 +252,9 @@ final class VichUploaderExtension extends Extension
             ->replaceArgument(1, new Reference('vich_uploader.adapter.'.$driver));
 
         if (isset($this->tagMap[$driver])) {
-            $definition->addTag($this->tagMap[$driver], ['priority' => $priority]);
+            foreach ($events as $event) {
+                $definition->addTag($this->tagMap[$driver], ['event' => $event, 'priority' => $priority]);
+            }
         }
     }
 

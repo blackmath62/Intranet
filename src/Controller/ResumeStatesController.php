@@ -12,10 +12,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ResumeStatesController extends AbstractController
 {
-    /**
-     * @Route("/resume/states/{dos}", name="app_resume_states")
-     * @Route("/resume/states/{dos}/{dd}/{df}", name="app_resume_states_dd_df")
-     */
+    #[Route("/resume/states/{dos}", name: "app_resume_states")]
+    #[Route("/resume/states/{dos}/{dd}/{df}", name: "app_resume_states_dd_df")]
+
     public function index($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle): Response
     {
 

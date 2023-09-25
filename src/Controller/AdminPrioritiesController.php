@@ -12,9 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminPrioritiesController extends AbstractController
 {
@@ -25,9 +23,8 @@ class AdminPrioritiesController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/admin/priorities", name="app_admin_priorities")
-     */
+    #[Route("/admin/priorities", name: "app_admin_priorities")]
+
     public function index(Priorities $priorities = null, Request $request, PrioritiesRepository $repo, EntityManagerInterface $manager)
     {
         if (!$priorities) {
@@ -59,9 +56,8 @@ class AdminPrioritiesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/priorities/delete/{id}",name="app_delete_priorities")
-     */
+    #[Route("/admin/priorities/delete/{id}", name: "app_delete_priorities")]
+
     public function deletepriorities($id, Request $request)
     {
         $repository = $this->entityManager->getRepository(priorities::class);
@@ -77,9 +73,9 @@ class AdminPrioritiesController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_priorities'));
     }
-    /**
-     * @Route("/admin/priorities/edit/{id}",name="app_edit_priorities")
-     */
+
+    #[Route("/admin/priorities/edit/{id}", name: "app_edit_priorities")]
+
     public function editSociete(priorities $priorities, Request $request)
     {
         $form = $this->createForm(EditPrioritiesType::class, $priorities);

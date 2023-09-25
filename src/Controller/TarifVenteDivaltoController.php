@@ -10,15 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class TarifVenteDivaltoController extends AbstractController
 {
-    /**
-     * @Route("/Lhermitte/tarif/vente/divalto", name="app_tarif_vente_divalto")
-     */
+    #[Route("/Lhermitte/tarif/vente/divalto", name: "app_tarif_vente_divalto")]
+
     public function index(MouvRepository $repo, Request $request, StatsAchatController $mef): Response
     {
 

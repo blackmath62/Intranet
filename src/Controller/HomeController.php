@@ -16,23 +16,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class HomeController extends AbstractController
 {
-    /**
-     * @Route("/php_info", name="app_php_info")
-     */
+    #[Route("/php_info", name: "app_php_info")]
+
     public function getPhpInfo()
     {
         return new Response('<html><body>' . phpinfo() . '</body></html>');
     }
 
-    /**
-     * @Route("/", name="app_home")
-     */
+    #[Route("/", name: "app_home")]
+
     public function index(Request $request, UrlGeneratorInterface $urlGenerator, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews)
     {
 

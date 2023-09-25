@@ -8,15 +8,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class ThemeController extends AbstractController
 {
-    /**
-     * @Route("/theme", name="theme")
-     */
+    #[Route("/theme", name: "theme")]
+
     public function index(Request $request): Response
     {
         // tracking user page for stats

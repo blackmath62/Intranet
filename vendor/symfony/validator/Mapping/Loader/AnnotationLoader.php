@@ -34,10 +34,7 @@ class AnnotationLoader implements LoaderInterface
         $this->reader = $reader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $reflClass = $metadata->getReflectionClass();
         $className = $reflClass->name;
@@ -97,19 +94,17 @@ class AnnotationLoader implements LoaderInterface
     {
         $dedup = [];
 
-        if (\PHP_VERSION_ID >= 80000) {
-            foreach ($reflection->getAttributes(GroupSequence::class) as $attribute) {
-                $dedup[] = $attribute->newInstance();
-                yield $attribute->newInstance();
-            }
-            foreach ($reflection->getAttributes(GroupSequenceProvider::class) as $attribute) {
-                $dedup[] = $attribute->newInstance();
-                yield $attribute->newInstance();
-            }
-            foreach ($reflection->getAttributes(Constraint::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-                $dedup[] = $attribute->newInstance();
-                yield $attribute->newInstance();
-            }
+        foreach ($reflection->getAttributes(GroupSequence::class) as $attribute) {
+            $dedup[] = $attribute->newInstance();
+            yield $attribute->newInstance();
+        }
+        foreach ($reflection->getAttributes(GroupSequenceProvider::class) as $attribute) {
+            $dedup[] = $attribute->newInstance();
+            yield $attribute->newInstance();
+        }
+        foreach ($reflection->getAttributes(Constraint::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            $dedup[] = $attribute->newInstance();
+            yield $attribute->newInstance();
         }
         if (!$this->reader) {
             return;

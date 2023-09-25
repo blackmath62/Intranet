@@ -13,9 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class TypeDocumentFscController extends AbstractController
 {
@@ -26,9 +24,8 @@ class TypeDocumentFscController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/type/document/fsc", name="app_type_document_fsc")
-     */
+    #[Route("/type/document/fsc", name: "app_type_document_fsc")]
+
     public function index(TypeDocumentFscRepository $repo, Request $request): Response
     {
         $form = $this->createForm(TypeDocumentFscType::class);
@@ -54,9 +51,8 @@ class TypeDocumentFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/type/document/fsc/edit/{id}", name="app_type_document_fsc_edit")
-     */
+    #[Route("/type/document/fsc/edit/{id}", name: "app_type_document_fsc_edit")]
+
     public function edit($id, TypeDocumentFsc $typeDocFsc, Request $request): Response
     {
         $form = $this->createForm(TypeDocumentFscType::class, $typeDocFsc);
@@ -82,9 +78,8 @@ class TypeDocumentFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/type/document/fsc/delete/{id}", name="app_type_document_fsc_delete")
-     */
+    #[Route("/type/document/fsc/delete/{id}", name: "app_type_document_fsc_delete")]
+
     public function delete($id, Request $request): Response
     {
         $repository = $this->entityManager->getRepository(TypeDocumentFsc::class);

@@ -25,9 +25,7 @@ class FournisseursDivaltoController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/fournisseurs/divalto", name="app_fournisseurs_divalto")
-     */
+    #[Route("/fournisseurs/divalto", name: "app_fournisseurs_divalto")]
     // Mise à jour de la liste des fournisseurs Divalto dans la base SQL du Main
     public function maj(): Response
     {

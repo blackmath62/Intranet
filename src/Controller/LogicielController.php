@@ -12,9 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
+
 class LogicielController extends AbstractController
 {
     private $entityManager;
@@ -24,9 +23,7 @@ class LogicielController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/admin/logiciels", name="app_admin_logiciel")
-     */
+    #[Route("/admin/logiciels", name: "app_admin_logiciel")]
 
     public function index(Logiciel $logiciel = null, Request $request, LogicielRepository $repo, EntityManagerInterface $manager)
     {
@@ -60,9 +57,8 @@ class LogicielController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/logiciel/delete/{id}",name="app_delete_logiciel")
-     */
+    #[Route("/admin/logiciel/delete/{id}", name: "app_delete_logiciel")]
+
     public function deletelogiciel($id, Request $request)
     {
         $repository = $this->entityManager->getRepository(Logiciel::class);
@@ -78,9 +74,8 @@ class LogicielController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_logiciel'));
     }
-    /**
-     * @Route("/admin/logiciel/edit/{id}",name="app_edit_logiciel")
-     */
+    #[Route("/admin/logiciel/edit/{id}", name: "app_edit_logiciel")]
+
     public function editlogiciel(Logiciel $logiciel, Request $request)
     {
         $form = $this->createForm(EditLogicielType::class, $logiciel);

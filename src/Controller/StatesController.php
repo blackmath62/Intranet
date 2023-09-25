@@ -10,9 +10,6 @@ use App\Repository\Divalto\MouvRepository;
 use App\Repository\Divalto\StatesByTiersRepository;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,10 +20,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class StatesController extends AbstractController
 {
-    /**
-     * @Route("/Lhermitte/states", name="app_states_lhermitte")
-     * @Route("/Roby/states", name="app_states_roby")
-     */
+    #[Route("/Lhermitte/states", name: "app_states_lhermitte")]
+    #[Route("/Roby/states", name: "app_states_roby")]
 
     public function states(StatesByTiersRepository $repo, Request $request): Response
     {
@@ -422,10 +417,8 @@ class StatesController extends AbstractController
         return $list;
     }
 
-    /**
-     * @Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name="app_states_excel_metier_Lh")
-     * @Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name="app_states_excel_metier_Rb")
-     */
+    #[Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name: "app_states_excel_metier_Lh")]
+    #[Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name: "app_states_excel_metier_Rb")]
 
     public function get_states_excel_metier($metier, $dateDebutN, $dateFinN, $dossier, StatesByTiersRepository $repo, Request $request)
     {
@@ -686,10 +679,8 @@ class StatesController extends AbstractController
         return $list;
     }
 
-    /**
-     * @Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name="app_states_excel_commercial_Lh")
-     * @Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name="app_states_excel_commercial_Rb")
-     */
+    #[Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name: "app_states_excel_commercial_Lh")]
+    #[Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name: "app_states_excel_commercial_Rb")]
 
     public function get_states_excel_commercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, StatesByTiersRepository $repo, Request $request)
     {
@@ -925,9 +916,8 @@ class StatesController extends AbstractController
         return $dateParam;
     }
 
-    /**
-     * @Route("/Lhermitte/states/archive/inutiliser", name="app_states_lhermitte_archive")
-     */
+    #[Route("/Lhermitte/states/archive/inutiliser", name: "app_states_lhermitte_archive")]
+
     public function statesInutiliser(string $secteur, StatesByTiersRepository $repo, Request $request): Response
     {
 
@@ -1460,9 +1450,8 @@ class StatesController extends AbstractController
         return $list;
     }
 
-    /**
-     * @Route("/export/statesGlobales",  name="app_export_states_globales")
-     */
+    #[Route("/export/statesGlobales", name: "app_export_states_globales")]
+
     public function export()
     {
         $spreadsheet = new Spreadsheet();
@@ -1507,10 +1496,9 @@ class StatesController extends AbstractController
         return $this->redirectToRoute('app_tickets');
     }
 
-    /**
-     * @Route("/Lhermitte/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}/{commercialId}/{dossier}", name="app_states_par_article_Lh")
-     * @Route("/Roby/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}/{commercialId}/{dossier}", name="app_states_par_article_Rb")
-     */
+    #[Route("/Lhermitte/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}/{commercialId}/{dossier}", name: "app_states_par_article_Lh")]
+    #[Route("/Roby/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}/{commercialId}/{dossier}", name: "app_states_par_article_Rb")]
+
     public function statesByArticle(string $tiers, string $metier, $commercialId, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier, StatesByTiersRepository $repo, Request $request, UserInterface $user): Response
     {
         // tracking user page for stats
@@ -1583,9 +1571,8 @@ class StatesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/states/clients/3/ans/lhermitte", name="app_states_par_client_Lh")
-     */
+    #[Route("/Lhermitte/states/clients/3/ans/lhermitte", name: "app_states_par_client_Lh")]
+
     public function statesParClientTroisAns(MouvRepository $repo, Request $request): Response
     {
         $clients = '';

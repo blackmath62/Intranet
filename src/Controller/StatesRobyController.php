@@ -9,15 +9,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ROBY")
- */
+#[IsGranted("ROLE_ROBY")]
 
 class StatesRobyController extends AbstractController
 {
-    /**
-     * @Route("/Roby/states/inutile", name="app_states_roby_inutile")
-     */
+    #[Route("/Roby/states/inutile", name: "app_states_roby_inutile")]
+
     public function index(StatesRobyByTiersRepository $repo, Request $request)
     {
 

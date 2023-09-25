@@ -10,24 +10,22 @@ class <?= $class_name; ?> extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    private <?= $use_typed_properties ? 'UrlGeneratorInterface ' : null ?>$urlGenerator;
-
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    public function __construct(private UrlGeneratorInterface $urlGenerator)
     {
-        $this->urlGenerator = $urlGenerator;
     }
 
     public function authenticate(Request $request): Passport
     {
         $<?= $username_field_var ?> = $request->request->get('<?= $username_field ?>', '');
 
-        $request->getSession()->set(Security::LAST_USERNAME, $<?= $username_field_var ?>);
+        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $<?= $username_field_var ?>);
 
         return new Passport(
             new UserBadge($<?= $username_field_var ?>),
             new PasswordCredentials($request->request->get('password', '')),
             [
-                new CsrfTokenBadge('authenticate', $request->request->get('_csrf_token')),
+                new CsrfTokenBadge('authenticate', $request->request->get('_csrf_token')),<?= $remember_me_badge ? "
+                new RememberMeBadge(),\n" : "" ?>
             ]
         );
     }

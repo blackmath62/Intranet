@@ -10,15 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class SearchTiersController extends AbstractController
 {
-    /**
-     * @Route("/search/tiers", name="app_search_tiers")
-     */
+    #[Route("/search/tiers", name: "app_search_tiers")]
+
     public function index(Request $request, ClientLhermitteByCommercialRepository $repo): Response
     {
         // tracking user page for stats

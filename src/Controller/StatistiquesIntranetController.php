@@ -9,16 +9,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class StatistiquesIntranetController extends AbstractController
 {
-    /**
-     * @Route("/admin/statistiques/intranet", name="app_admin_statistiques")
-     * @Route("/admin/statistiques/intranet/{id}", name="app_admin_statistiques_user")
-     */
+    #[Route("/admin/statistiques/intranet", name: "app_admin_statistiques")]
+    #[Route("/admin/statistiques/intranet/{id}", name: "app_admin_statistiques_user")]
+
     public function index($id = null, $usager = null, TrackingsRepository $repo, UsersRepository $repoUsers): Response
     {
         if ($id) {

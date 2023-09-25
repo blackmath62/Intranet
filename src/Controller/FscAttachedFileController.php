@@ -28,9 +28,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class FscAttachedFileController extends AbstractController
 {
@@ -64,10 +62,9 @@ class FscAttachedFileController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Roby/fsc/liste/nok", name="app_fsc_attached_file")
-     * @Route("/Roby/fsc/liste/ok", name="app_fsc_attached_file_ok")
-     */
+    #[Route("/Roby/fsc/liste/nok", name: "app_fsc_attached_file")]
+    #[Route("/Roby/fsc/liste/ok", name: "app_fsc_attached_file_ok")]
+
     public function index(Request $request): Response
     {
         // vérifier si le statut des piéces a changé
@@ -96,9 +93,8 @@ class FscAttachedFileController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/fsc/show/{num}/{type}/{tiers}", name="app_fsc_show")
-     */
+    #[Route("/Roby/fsc/show/{num}/{type}/{tiers}", name: "app_fsc_show")]
+
     // Voir les détails d'une piéce
     public function fscShow($num, $type, $tiers, fscListMovementRepository $repo, Request $request): Response
     {
@@ -244,9 +240,8 @@ class FscAttachedFileController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/change/type/doc/fsc/{id}", name="app_change_type_doc_fsc")
-     */
+    #[Route("/Roby/change/type/doc/fsc/{id}", name: "app_change_type_doc_fsc")]
+
     // Modifier le type de document Fsc
     public function changeTypeDocFsc($id, Request $request)
     {
@@ -286,9 +281,8 @@ class FscAttachedFileController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/supprime/doc/{id}", name="app_document_fsc_delete")
-     */
+    #[Route("/Roby/supprime/doc/{id}", name: "app_document_fsc_delete")]
+
     // supprimer un document
     public function deleteImage($id, documentsFsc $doc)
     {
@@ -361,9 +355,8 @@ class FscAttachedFileController extends AbstractController
         $entityManager->flush();
     }
 
-    /**
-     * @Route("/Roby/fsc/order/list/maj", name="app_fsc_order_list_maj")
-     */
+    #[Route("/Roby/fsc/order/list/maj", name: "app_fsc_order_list_maj")]
+
     // Mettre à jour la liste en comparant Divalto à la liste
     public function majFscOrderListFromDivalto(): Response
     {
@@ -442,9 +435,8 @@ class FscAttachedFileController extends AbstractController
         return $this->redirectToRoute('app_fsc_attached_file');
     }
 
-    /**
-     * @Route("/Roby/fsc/order/list/maj/from/list", name="app_fsc_order_list_maj_from_list")
-     */
+    #[Route("/Roby/fsc/order/list/maj/from/list", name: "app_fsc_order_list_maj_from_list")]
+
     // Mettre à jour la liste en comparant la liste et Divalto
     public function majFscOrderListFromList()
     {

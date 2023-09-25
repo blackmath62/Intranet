@@ -10,14 +10,8 @@ use Vich\UploaderBundle\Templating\Helper\UploaderHelperInterface;
  */
 final class UploaderExtensionRuntime implements RuntimeExtensionInterface
 {
-    /**
-     * @var UploaderHelperInterface
-     */
-    private $helper;
-
-    public function __construct(UploaderHelperInterface $helper)
+    public function __construct(private readonly UploaderHelperInterface $helper)
     {
-        $this->helper = $helper;
     }
 
     /**
@@ -29,13 +23,8 @@ final class UploaderExtensionRuntime implements RuntimeExtensionInterface
      *
      * @return string|null The public path or null if file not stored
      */
-    public function asset($object, ?string $fieldName = null, ?string $className = null): ?string
+    public function asset(object|array $object, ?string $fieldName = null, ?string $className = null): ?string
     {
-        if (null === $className) {
-            return $this->helper->asset($object, $fieldName);
-        }
-
-        // @phpstan-ignore-next-line
         return $this->helper->asset($object, $fieldName, $className);
     }
 }

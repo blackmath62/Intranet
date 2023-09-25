@@ -13,9 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FscExtractPeriodeController extends AbstractController
 {
-    /**
-     * @Route("/fsc/extract/periode", name="app_fsc_extract_periode")
-     */
+    #[Route("/fsc/extract/periode", name: "app_fsc_extract_periode")]
+
     public function index(Request $request, fscListMovementRepository $repoAchat, MovBillFscRepository $repoVente, MouvRepository $repoMouv): Response
     {
         $achats = '';

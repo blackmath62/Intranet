@@ -12,9 +12,8 @@ use Throwable;
 
 class CoupeStationChargeurMajController extends AbstractController
 {
-    /**
-     * @Route("/Lhermitte/coupe/station/chargeur/maj", name="app_coupe_station_chargeur_maj")
-     */
+    #[Route("/Lhermitte/coupe/station/chargeur/maj", name: "app_coupe_station_chargeur_maj")]
+
     public function index(CliRepository $repo): Response
     {
         $clients = $repo->getClientsForCoupe();

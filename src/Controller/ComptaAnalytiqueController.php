@@ -22,9 +22,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_COMPTA")
- */
+#[IsGranted("ROLE_COMPTA")]
 
 class ComptaAnalytiqueController extends AbstractController
 {
@@ -49,9 +47,8 @@ class ComptaAnalytiqueController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("compta/compta_analytique", name="app_compta_analytique")
-     */
+    #[Route("compta/compta_analytique", name: "app_compta_analytique")]
+
     public function index(Request $request): Response
     {
         ini_set('memory_limit', '1024M');
@@ -220,9 +217,8 @@ class ComptaAnalytiqueController extends AbstractController
         return $ventes;
     }
 
-    /**
-     * @Route("compta/compta_analytique/send/mail", name="app_compta_analytique_send_mail")
-     */
+    #[Route("compta/compta_analytique/send/mail", name: "app_compta_analytique_send_mail")]
+
     public function sendMail(): Response
     {
         // jour actuel, n'envoyer que si le jour est bien celui choisi par les utilisateurs
@@ -251,9 +247,7 @@ class ComptaAnalytiqueController extends AbstractController
         return $this->redirectToRoute('app_compta_analytique');
     }
 
-    /**
-     * @Route("compta/compta_analytique/export/excel/{annee}/{mois}/{type}", name="app_compta_analytique_export_excel")
-     */
+    #[Route("compta/compta_analytique/export/excel/{annee}/{mois}/{type}", name: "app_compta_analytique_export_excel")]
 
     public function get_compta_analytique_excel($annee, $mois, $type)
     {

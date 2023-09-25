@@ -2,18 +2,16 @@
 
 namespace App\Controller;
 
-use App\Repository\Divalto\MouvRepository;
 use App\Form\DateDebutFinFamilleDossierType;
+use App\Repository\Divalto\MouvRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class EmplacementDepotController extends AbstractController
 {
-    /**
-     * @Route("/emplacement/depot", name="app_emplacement_depot")
-     */
+    #[Route("/emplacement/depot", name: "app_emplacement_depot")]
     public function index(Request $request, MouvRepository $repo): Response
     {
         $produits = '';
@@ -29,33 +27,32 @@ class EmplacementDepotController extends AbstractController
             $fermeOuvert = $form->getData()['fermeOuvert'];
             $familles = $form->getData()['famille'];
             $stockOuBl = $form->getData()['stockOuBl'];
-            $i = 0 ;
+            $i = 0;
             $famille = '';
             foreach ($familles as $value) {
                 if ($i == 0) {
                     $famille = "'" . $value . "'";
-                }else {
-                    $famille = $famille . ',' . "'" . $value . "'" ;
+                } else {
+                    $famille = $famille . ',' . "'" . $value . "'";
                 }
-            $i++;    
+                $i++;
             }
-            $produits = $repo->getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert,$famille,$stockOuBl);
+            $produits = $repo->getNbeBlEtStockParProduit($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl);
 
-        $data = $repo->getNbeBlEtStockParFamille($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl);
-        /*for ($ligFamille=0; $ligFamille <count($data) ; $ligFamille++) { 
-            if (!empty($data[$ligFamille]['famille'])) { 
-                //dd($data[$ligFamille]['famille']);   
-                $famille[] = $data[$ligFamille]['famille'];
-                $count[] = $data[$ligFamille]['nbeBl'];
-                $color[] = 'rgba(' . rand(0, 255) . ',' . rand(0, 255) . ', ' . rand(0, 255) . ', 1)';
+            $data = $repo->getNbeBlEtStockParFamille($dos, $dd, $df, $fermeOuvert, $famille, $stockOuBl);
+            /*for ($ligFamille=0; $ligFamille <count($data) ; $ligFamille++) {
+            if (!empty($data[$ligFamille]['famille'])) {
+            //dd($data[$ligFamille]['famille']);
+            $famille[] = $data[$ligFamille]['famille'];
+            $count[] = $data[$ligFamille]['nbeBl'];
+            $color[] = 'rgba(' . rand(0, 255) . ',' . rand(0, 255) . ', ' . rand(0, 255) . ', 1)';
             }
-        }*/
-        foreach ($data as $value) {
+            }*/
+            foreach ($data as $value) {
                 $fam[] = $value['famille'];
                 $count[] = $value['nbeBl'];
                 $color[] = 'rgba(' . rand(0, 255) . ',' . rand(0, 255) . ', ' . rand(0, 255) . ', 1)';
-        }
-        
+            }
 
         }
 

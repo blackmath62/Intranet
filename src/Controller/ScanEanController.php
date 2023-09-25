@@ -23,9 +23,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class ScanEanController extends AbstractController
 {
@@ -43,10 +41,9 @@ class ScanEanController extends AbstractController
         //parent::__construct();
     }
     // Retrait chantier
-    /**
-     * @Route("/scan/ean/{chantier}", name="app_scan_ean")
-     */
-    public function index($chantier = null, ArtRepository $repo, Request $request, RetraitMarchandisesEanRepository $repoRetrait): Response
+    #[Route("/scan/ean/{chantier}", name: "app_scan_ean")]
+
+    public function index(ArtRepository $repo, Request $request, RetraitMarchandisesEanRepository $repoRetrait, $chantier = null): Response
     {
         $dos = 1;
         $produit = "";
@@ -102,10 +99,9 @@ class ScanEanController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/scan/ean/delete/{id}/{chantier}", name="app_scan_ean-delete")
-     */
-    public function delete($id, $chantier = null, Request $request, RetraitMarchandisesEanRepository $repo)
+    #[Route("/scan/ean/delete/{id}/{chantier}", name: "app_scan_ean-delete")]
+
+    public function delete(Request $request, RetraitMarchandisesEanRepository $repo, $id, $chantier = null)
     {
         $retrait = $repo->findOneBy(['id' => $id]);
         $em = $this->entityManager;
@@ -119,9 +115,8 @@ class ScanEanController extends AbstractController
         return $this->redirectToRoute('app_scan_ean', ['chantier' => $chantier]);
     }
 
-    /**
-     * @Route("/scan/ean/all/delete/{chantier}", name="app_scan_ean_delete_all")
-     */
+    #[Route("/scan/ean/all/delete/{chantier}", name: "app_scan_ean_delete_all")]
+
     public function deleteAll($chantier, Request $request, RetraitMarchandisesEanRepository $repo)
     {
         //dd($chantier);
@@ -139,9 +134,8 @@ class ScanEanController extends AbstractController
         return $this->redirectToRoute('app_scan_ean');
     }
 
-    /**
-     * @Route("/scan/ns", name="app_scan_ean_ns")
-     */
+    #[Route("/scan/ns", name: "app_scan_ean_ns")]
+
     public function ns(Request $request, RetraitMarchandisesEanRepository $repo)
     {
         $ns = $repo->getRetraiNonSoumis();
@@ -155,10 +149,9 @@ class ScanEanController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/scan/send/ean/{chantier}", name="app_scan_ean-send")
-     */
-    public function send($chantier = null, Request $request, RetraitMarchandisesEanRepository $repo, ArtRepository $repoArt)
+    #[Route("/scan/send/ean/{chantier}", name: "app_scan_ean-send")]
+
+    public function send(Request $request, RetraitMarchandisesEanRepository $repo, ArtRepository $repoArt, $chantier = null)
     {
         $dos = 1;
         if ($chantier) {
@@ -206,10 +199,9 @@ class ScanEanController extends AbstractController
         return $this->redirectToRoute('app_scan_ean');
     }
 
-    /**
-     * @Route("/scan/ean/ajax/{dos}/{ean}", name="app_scan_ean_ajax")
-     */
-    public function retourProduitAjax($dos = null, $ean = null, ArtRepository $repo, Request $request): Response
+    #[Route("/scan/ean/ajax/{dos}/{ean}", name: "app_scan_ean_ajax")]
+
+    public function retourProduitAjax(ArtRepository $repo, Request $request, $dos = null, $ean = null): Response
     {
         $dos = 1;
         $produit = "";
@@ -230,10 +222,9 @@ class ScanEanController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/emplacement/scan/ajax/{dos}/{emplacement}", name="app_emplacement_scan_ajax")
-     */
-    public function EmplacementAjax($dos = null, $emplacement = null, ArtRepository $repo, Request $request): Response
+    #[Route("/emplacement/scan/ajax/{dos}/{emplacement}", name: "app_emplacement_scan_ajax")]
+
+    public function EmplacementAjax(ArtRepository $repo, Request $request, $dos = null, $emplacement = null): Response
     {
         $dos = 1;
         $empl = "";
@@ -244,10 +235,9 @@ class ScanEanController extends AbstractController
     }
 
     // Alimentation d'emplacement
-    /**
-     * @Route("/emplacement/scan/ean/{emplacement}", name="app_scan_ean_alim_empl")
-     */
-    public function alimentationEmplacement($emplacement = null, ArtRepository $repo, Request $request, AlimentationEmplacementRepository $repoRetrait): Response
+    #[Route("/emplacement/scan/ean/{emplacement}", name: "app_scan_ean_alim_empl")]
+
+    public function alimentationEmplacement(ArtRepository $repo, Request $request, AlimentationEmplacementRepository $repoRetrait, $emplacement = null): Response
     {
         $dos = 1;
         $produit = "";
@@ -304,9 +294,8 @@ class ScanEanController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/emplacement/scan/ean/all/delete/{emplacement}", name="app_emplacement_scan_ean_delete_all")
-     */
+    #[Route("/emplacement/scan/ean/all/delete/{emplacement}", name: "app_emplacement_scan_ean_delete_all")]
+
     public function emplacementDeleteAll($emplacement, Request $request, AlimentationEmplacementRepository $repo)
     {
         //dd($emplacement);
@@ -324,10 +313,9 @@ class ScanEanController extends AbstractController
         return $this->redirectToRoute('app_scan_ean_alim_empl');
     }
 
-    /**
-     * @Route("/emplacement/scan/ean/delete/{id}/{emplacement}", name="app_emplacement_scan_ean-delete")
-     */
-    public function deleteEmplacement($id, $emplacement = null, Request $request, AlimentationEmplacementRepository $repo)
+    #[Route("/emplacement/scan/ean/delete/{id}/{emplacement}", name: "app_emplacement_scan_ean-delete")]
+
+    public function deleteEmplacement(Request $request, AlimentationEmplacementRepository $repo, $id, $emplacement = null)
     {
         $empl = $repo->findOneBy(['id' => $id]);
         $em = $this->entityManager;
@@ -341,9 +329,8 @@ class ScanEanController extends AbstractController
         return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
     }
 
-    /**
-     * @Route("/emplacement/scan/ns", name="app_scan_emplacement_ns")
-     */
+    #[Route("/emplacement/scan/ns", name: "app_scan_emplacement_ns")]
+
     public function emplacementNs(Request $request, AlimentationEmplacementRepository $repo)
     {
         $ns = $repo->getEmplacementNonSoumis();
@@ -357,9 +344,8 @@ class ScanEanController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/emplacement/scan/send/ean", name="app_emplacement_scan_ean-send")
-     */
+    #[Route("/emplacement/scan/send/ean", name: "app_emplacement_scan_ean-send")]
+
     public function EmplacementsSend(Request $request, AlimentationEmplacementRepository $repo, ArtRepository $repoArt)
     {
         $dos = 1;
@@ -403,10 +389,9 @@ class ScanEanController extends AbstractController
         return $this->redirectToRoute('app_scan_ean_alim_empl');
     }
 
-    /**
-     * @Route("/emplacement/produit/print/{emplacement}", name="app_scan_emplacement_print")
-     */
-    public function print($emplacement = null, Request $request, ArtRepository $repo)
+    #[Route("/emplacement/produit/print/{emplacement}", name: "app_scan_emplacement_print")]
+
+    public function print(Request $request, ArtRepository $repo, $emplacement = null)
     {
 
         $dos = 1;
@@ -452,9 +437,8 @@ class ScanEanController extends AbstractController
     }
 
     // Impression étiquette d'emplacement
-    /**
-     * @Route("/impression/emplacement", name="app_print_empl")
-     */
+    #[Route("/impression/emplacement", name: "app_print_empl")]
+
     public function impressionEmplacement(ArtRepository $repo, Request $request, AlimentationEmplacementRepository $repoRetrait, PdfController $pdfController): Response
     {
         $dos = 1;
@@ -479,10 +463,9 @@ class ScanEanController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/impression/imprimante", name="app_imprimante_ajax")
-     */
-    public function checkPrinter($dos = null, $ean = null, ArtRepository $repo, Request $request): JsonResponse
+    #[Route("/impression/imprimante", name: "app_imprimante_ajax")]
+
+    public function checkPrinter(ArtRepository $repo, Request $request, $dos = null, $ean = null): JsonResponse
     {
         $result = ['success' => false, 'response' => 'Erreur exécution...'];
 

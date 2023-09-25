@@ -16,9 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
+
 class AdminDocumentsController extends AbstractController
 {
     private $entityManager;
@@ -28,9 +27,8 @@ class AdminDocumentsController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/admin/documents", name="app_admin_documents")
-     */
+    #[Route("/admin/documents", name: "app_admin_documents")]
+
     public function index(Request $request, DocumentsRepository $repo, SocieteRepository $repoSociete, SluggerInterface $slugger)
     {
         $document = new Documents();
@@ -94,9 +92,8 @@ class AdminDocumentsController extends AbstractController
 
     }
 
-    /**
-     * @Route("/admin/documents/delete/{id}",name="app_delete_document")
-     */
+    #[Route("/admin/documents/delete/{id}", name: "app_delete_document")]
+
     public function deleteDocuments($id)
     {
         $repository = $this->entityManager->getRepository(documents::class);
@@ -108,9 +105,9 @@ class AdminDocumentsController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_documents'));
     }
-    /**
-     * @Route("/admin/documents/edit/{id}",name="app_edit_document")
-     */
+
+    #[Route("/admin/documents/edit/{id}", name: "app_edit_document")]
+
     public function editSociete(documents $documents, Request $request)
     {
         $form = $this->createForm(EditDocumentsType::class, $documents);

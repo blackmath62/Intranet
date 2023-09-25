@@ -23,9 +23,8 @@ class AuditAfnorController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/audit/afnor", name="app_audit_afnor")
-     */
+    #[Route("/audit/afnor", name: "app_audit_afnor")]
+
     public function index(Request $request, OthersDocumentsRepository $repo, SluggerInterface $slugger, MouvRepository $repoMouv): Response
     {
         // tracking user page for stats
@@ -84,9 +83,7 @@ class AuditAfnorController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/audit/afnor/view/{id}", name="app_audit_afnor_show")
-     */
+    #[Route("/audit/afnor/view/{id}", name: "app_audit_afnor_show")]
 
     public function DocsReferentielAfnorShow(int $id, OthersDocumentsRepository $repo, Request $request)
     {
@@ -102,9 +99,7 @@ class AuditAfnorController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/audit/afnor/delete/{id}", name="app_audit_afnor_delete")
-     */
+    #[Route("/audit/afnor/delete/{id}", name: "app_audit_afnor_delete")]
 
     public function DocsReferentielAfnorDelete(int $id, OthersDocumentsRepository $repo, Request $request)
     {

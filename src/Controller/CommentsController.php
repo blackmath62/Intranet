@@ -24,9 +24,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class CommentsController extends AbstractController
 {
@@ -44,10 +42,9 @@ class CommentsController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/ticket/comment/add/{id<\d+>}", name="app_comment")
-     * @ParamConverter("Comments", options={"id" = "Ticket_id"})
-     */
+    #[Route("/ticket/comment/add/{id<\d+>}", name: "app_comment")]
+    #[ParamConverter("Comments", options: ["id" => "Ticket_id"])]
+
     public function addComment(int $id, Pdf $pdf, StatusRepository $repoStatut, MailerInterface $mailer, TicketsRepository $repoTicket, CommentsRepository $repoComments, Request $request, EntityManagerInterface $em, PrestataireRepository $repoPresta)
     {
         // Enregistrement des commentaires

@@ -53,9 +53,9 @@ class TypeValidator extends ConstraintValidator
     ];
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof Type) {
             throw new UnexpectedTypeException($constraint, Type::class);

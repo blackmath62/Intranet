@@ -19,8 +19,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * @IsGranted("ROLE_ADMIN")
  */
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminAnnuaireController extends AbstractController
 {
@@ -34,9 +34,10 @@ class AdminAnnuaireController extends AbstractController
 
     /**
      * Création d'une nouvelle entrée dans l'annuaire et affichage de l'annuaire avec option modification et suppression
-     *
-     * @Route("/admin/annuaire", name="app_admin_annuaire")
      */
+
+    #[Route("/admin/annuaire", name: "app_admin_annuaire")]
+
     public function index(Request $request, AnnuaireRepository $repo, SocieteRepository $repoSociete, EntityManagerInterface $manager)
     {
 
@@ -87,11 +88,11 @@ class AdminAnnuaireController extends AbstractController
     }
 
     /**
-     *
      * Suppresion d'une ligne de l'annuaire
-     *
-     * @Route("/admin/annuaire/delete/{id}", name="app_delete_annuaire")
      */
+
+    #[Route("/admin/annuaire/delete/{id}", name: "app_delete_annuaire")]
+
     public function deleteAnnuaire(Annuaire $annuaire)
     {
         $em = $this->entityManager;
@@ -106,11 +107,11 @@ class AdminAnnuaireController extends AbstractController
     }
 
     /**
-     *
      * Modification d'une ligne de l'annuaire
-     *
-     * @Route("/admin/annuaire/edit/{id}", name="app_edit_annuaire")
      */
+
+    #[Route("/admin/annuaire/edit/{id}", name: "app_edit_annuaire")]
+
     public function editAnnuaire(Request $request, Annuaire $annuaire)
     {
 

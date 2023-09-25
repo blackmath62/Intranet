@@ -10,16 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_LHERMITTE")
- */
+#[IsGranted("ROLE_LHERMITTE")]
 
 class RossignolController extends AbstractController
 {
-    /**
-     * @Route("/Lhermitte/rossignol/{annee}", name="app_lhermitte_rossignols")
-     */
-    public function index($annee = null, Request $request, RossignolRepository $repo): Response
+    #[Route("/Lhermitte/rossignol/{annee}", name: "app_lhermitte_rossignols")]
+
+    public function index(Request $request, RossignolRepository $repo, $annee = null): Response
     {
 
         // tracking user page for stats

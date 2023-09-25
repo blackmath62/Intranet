@@ -9,16 +9,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ROBY")
- */
+#[IsGranted("ROLE_ROBY")]
 
 class DebRobyController extends AbstractController
 {
 
-    /**
-     * @Route("/Roby/deb", name="app_deb_roby")
-     */
+    #[Route("/Roby/deb", name: "app_deb_roby")]
+
     public function getDebRobyByMonth(DebRobyRepository $repo, Request $request)
     {
 

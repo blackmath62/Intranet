@@ -308,7 +308,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         $this->cmdRobyDelaiAccepteReportesModifiedBy = new ArrayCollection();
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         return $this->email; // Ou toute autre propriété unique de l'utilisateur
     }

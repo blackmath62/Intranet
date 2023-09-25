@@ -13,9 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
+
 class AdminServicesController extends AbstractController
 {
     private $entityManager;
@@ -25,9 +24,7 @@ class AdminServicesController extends AbstractController
         $this->entityManager = $registry->getManager();
     }
 
-    /**
-     * @Route("/admin/services", name="app_admin_services")
-     */
+    #[Route("/admin/services", name: "app_admin_services")]
 
     public function index(Services $service = null, Request $request, ServicesRepository $repo, EntityManagerInterface $manager)
     {
@@ -60,9 +57,8 @@ class AdminServicesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/service/delete/{id}",name="app_delete_service")
-     */
+    #[Route("/admin/service/delete/{id}", name: "app_delete_service")]
+
     public function deleteservice($id, Request $request)
     {
         $repository = $this->entityManager->getRepository(Services::class);
@@ -78,9 +74,9 @@ class AdminServicesController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_services'));
     }
-    /**
-     * @Route("/admin/service/edit/{id}",name="app_edit_service")
-     */
+
+    #[Route("/admin/service/edit/{id}", name: "app_edit_service")]
+
     public function editservice(Services $service, Request $request)
     {
         $form = $this->createForm(EditServiceType::class, $service);

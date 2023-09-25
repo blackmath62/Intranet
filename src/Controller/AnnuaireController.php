@@ -10,9 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class AnnuaireController extends AbstractController
 {
@@ -21,9 +19,8 @@ class AnnuaireController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/annuaire", name="annuaire")
-     */
+    #[Route("/annuaire", name: "annuaire")]
+
     public function index(AnnuaireRepository $repo, Request $request)
     {
 

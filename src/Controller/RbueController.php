@@ -11,9 +11,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RbueController extends AbstractController
 {
-    /**
-     * @Route("/rbue", name="app_rbue")
-     */
+    #[Route("/rbue", name: "app_rbue")]
+
     public function index(MouvRepository $repo, Request $request): Response
     {
 

@@ -9,14 +9,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MesClientsController extends AbstractController
 {
-    /**
-     * @Route("/mes/clients/{commercial}", name="app_mes_clients")
-     */
+    #[Route("/mes/clients/{commercial}", name: "app_mes_clients")]
+
     public function index($commercial, CliRepository $repo): Response
     {
         return $this->render('mes_clients/index.html.twig', [
             'clients' => $repo->MesClients($commercial),
-            'title' => "Mes Clients"
+            'title' => "Mes Clients",
         ]);
     }
 }
