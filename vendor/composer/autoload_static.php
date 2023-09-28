@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit589a514d215c339e468ba31a21f8a2fe
+class ComposerStaticInit4542bad5bf0841ffcdf37e36dc77029a
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -921,6 +921,7 @@ class ComposerStaticInit589a514d215c339e468ba31a21f8a2fe
         'App\\Controller\\TestController' => __DIR__ . '/../..' . '/src/Controller/TestController.php',
         'App\\Controller\\ThemeController' => __DIR__ . '/../..' . '/src/Controller/ThemeController.php',
         'App\\Controller\\TicketsController' => __DIR__ . '/../..' . '/src/Controller/TicketsController.php',
+        'App\\Controller\\TrackingController' => __DIR__ . '/../..' . '/src/Controller/TrackingController.php',
         'App\\Controller\\TypeDocumentFscController' => __DIR__ . '/../..' . '/src/Controller/TypeDocumentFscController.php',
         'App\\Controller\\VideoController' => __DIR__ . '/../..' . '/src/Controller/VideoController.php',
         'App\\Entity\\Divalto\\Art' => __DIR__ . '/../..' . '/src/Entity/Divalto/Art.php',
@@ -1133,6 +1134,8 @@ class ComposerStaticInit589a514d215c339e468ba31a21f8a2fe
         'App\\Service\\EmailTreatementService' => __DIR__ . '/../..' . '/src/Service/EmailTreatementService.php',
         'App\\Service\\PdfGeneratorService' => __DIR__ . '/../..' . '/src/Service/PdfGeneratorService.php',
         'App\\Service\\Twig' => __DIR__ . '/../..' . '/src/Service/Twig.php',
+        'App\\Service\\YousignService' => __DIR__ . '/../..' . '/src/Service/YousignService.php',
+        'App\\Twig\\TimeDifferenceExtension' => __DIR__ . '/../..' . '/src/Twig/TimeDifferenceExtension.php',
         'Assetic\\AssetManager' => __DIR__ . '/..' . '/kriswallsmith/assetic/src/Assetic/AssetManager.php',
         'Assetic\\AssetWriter' => __DIR__ . '/..' . '/kriswallsmith/assetic/src/Assetic/AssetWriter.php',
         'Assetic\\Asset\\AssetCache' => __DIR__ . '/..' . '/kriswallsmith/assetic/src/Assetic/Asset/AssetCache.php',
@@ -2056,6 +2059,7 @@ class ComposerStaticInit589a514d215c339e468ba31a21f8a2fe
         'Doctrine\\DBAL\\ParameterType' => __DIR__ . '/..' . '/doctrine/dbal/src/ParameterType.php',
         'Doctrine\\DBAL\\Platforms\\AbstractMySQLPlatform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/AbstractMySQLPlatform.php',
         'Doctrine\\DBAL\\Platforms\\AbstractPlatform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/AbstractPlatform.php',
+        'Doctrine\\DBAL\\Platforms\\DB2111Platform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/DB2111Platform.php',
         'Doctrine\\DBAL\\Platforms\\DB2Platform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/DB2Platform.php',
         'Doctrine\\DBAL\\Platforms\\DateIntervalUnit' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/DateIntervalUnit.php',
         'Doctrine\\DBAL\\Platforms\\Keywords\\DB2Keywords' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/Keywords/DB2Keywords.php',
@@ -2075,6 +2079,8 @@ class ComposerStaticInit589a514d215c339e468ba31a21f8a2fe
         'Doctrine\\DBAL\\Platforms\\Keywords\\SQLiteKeywords' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/Keywords/SQLiteKeywords.php',
         'Doctrine\\DBAL\\Platforms\\MariaDBPlatform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/MariaDBPlatform.php',
         'Doctrine\\DBAL\\Platforms\\MariaDb1027Platform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/MariaDb1027Platform.php',
+        'Doctrine\\DBAL\\Platforms\\MariaDb1043Platform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/MariaDb1043Platform.php',
+        'Doctrine\\DBAL\\Platforms\\MariaDb1052Platform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/MariaDb1052Platform.php',
         'Doctrine\\DBAL\\Platforms\\MySQL57Platform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/MySQL57Platform.php',
         'Doctrine\\DBAL\\Platforms\\MySQL80Platform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/MySQL80Platform.php',
         'Doctrine\\DBAL\\Platforms\\MySQLPlatform' => __DIR__ . '/..' . '/doctrine/dbal/src/Platforms/MySQLPlatform.php',
@@ -2161,6 +2167,7 @@ class ComposerStaticInit589a514d215c339e468ba31a21f8a2fe
         'Doctrine\\DBAL\\Schema\\Visitor\\RemoveNamespacedAssets' => __DIR__ . '/..' . '/doctrine/dbal/src/Schema/Visitor/RemoveNamespacedAssets.php',
         'Doctrine\\DBAL\\Schema\\Visitor\\Visitor' => __DIR__ . '/..' . '/doctrine/dbal/src/Schema/Visitor/Visitor.php',
         'Doctrine\\DBAL\\Statement' => __DIR__ . '/..' . '/doctrine/dbal/src/Statement.php',
+        'Doctrine\\DBAL\\Tools\\Console\\Command\\CommandCompatibility' => __DIR__ . '/..' . '/doctrine/dbal/src/Tools/Console/Command/CommandCompatibility.php',
         'Doctrine\\DBAL\\Tools\\Console\\Command\\ReservedWordsCommand' => __DIR__ . '/..' . '/doctrine/dbal/src/Tools/Console/Command/ReservedWordsCommand.php',
         'Doctrine\\DBAL\\Tools\\Console\\Command\\RunSqlCommand' => __DIR__ . '/..' . '/doctrine/dbal/src/Tools/Console/Command/RunSqlCommand.php',
         'Doctrine\\DBAL\\Tools\\Console\\ConnectionNotFound' => __DIR__ . '/..' . '/doctrine/dbal/src/Tools/Console/ConnectionNotFound.php',
@@ -8251,10 +8258,10 @@ class ComposerStaticInit589a514d215c339e468ba31a21f8a2fe
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit589a514d215c339e468ba31a21f8a2fe::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit589a514d215c339e468ba31a21f8a2fe::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit589a514d215c339e468ba31a21f8a2fe::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit589a514d215c339e468ba31a21f8a2fe::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit4542bad5bf0841ffcdf37e36dc77029a::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit4542bad5bf0841ffcdf37e36dc77029a::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit4542bad5bf0841ffcdf37e36dc77029a::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit4542bad5bf0841ffcdf37e36dc77029a::$classMap;
 
         }, null, ClassLoader::class);
     }
