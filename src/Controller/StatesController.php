@@ -2,31 +2,28 @@
 
 namespace App\Controller;
 
-use App\Form\ActivitesMetierType;
+use DateTime;
 use App\Form\DateDebutFinType;
+use App\Form\ActivitesMetierType;
 use App\Form\DateSecteurLhDebutFinType;
 use App\Form\DateSecteurRbDebutFinType;
-use App\Repository\Divalto\MouvRepository;
-use App\Repository\Divalto\StatesByTiersRepository;
-use DateTime;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\Divalto\MouvRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
+use App\Repository\Divalto\StatesByTiersRepository;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+#[IsGranted("ROLE_USER")]
 
 class StatesController extends AbstractController
 {
-    /**
-     * @Route("/Lhermitte/states", name="app_states_lhermitte")
-     * @Route("/Roby/states", name="app_states_roby")
-     */
+    #[Route("/Lhermitte/states", name: "app_states_lhermitte")]
+    #[Route("/Roby/states", name: "app_states_roby")]
 
     public function states(StatesByTiersRepository $repo, Request $request): Response
     {
@@ -422,12 +419,10 @@ class StatesController extends AbstractController
         return $list;
     }
 
-    /**
-     * @Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name="app_states_excel_metier_Lh")
-     * @Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name="app_states_excel_metier_Rb")
-     */
+    #[Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name: "app_states_excel_metier_Lh")]
+    #[Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name: "app_states_excel_metier_Rb")]
 
-    public function get_states_excel_metier($metier, $dateDebutN, $dateFinN, $dossier, StatesByTiersRepository $repo, Request $request)
+    public function get_states_excel_metier($metier, $dateDebutN, $dateFinN, $dossier, StatesByTiersRepository $repo)
     {
 
         // tracking user page for stats
@@ -587,15 +582,15 @@ class StatesController extends AbstractController
         // Format nombre € colonne PU et montant N
         $sheet->getStyle("N1:O{$dernLign}")
             ->getNumberFormat()
-            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_INTEGER);
         // Format nombre € colonne PU et montant N-1
         $sheet->getStyle("R1:S{$dernLign}")
             ->getNumberFormat()
-            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_INTEGER);
         // Format nombre € colonne PU et montant N-2
         $sheet->getStyle("V1:W{$dernLign}")
             ->getNumberFormat()
-            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_INTEGER);
         // Format Pourcentage CELLULE montant N-1/ montant N
         $sheet->getStyle('P4')
             ->getNumberFormat()
@@ -686,12 +681,10 @@ class StatesController extends AbstractController
         return $list;
     }
 
-    /**
-     * @Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name="app_states_excel_commercial_Lh")
-     * @Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name="app_states_excel_commercial_Rb")
-     */
+    #[Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name: "app_states_excel_commercial_Lh")]
+    #[Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name: "app_states_excel_commercial_Rb")]
 
-    public function get_states_excel_commercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, StatesByTiersRepository $repo, Request $request)
+    public function get_states_excel_commercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, StatesByTiersRepository $repo)
     {
 
         // tracking user page for stats
@@ -852,15 +845,15 @@ class StatesController extends AbstractController
         file_put_contents($fileText, 'Mise en place des formats de données de pourcentages et monétaires');
         $sheet->getStyle("N1:O{$dernLign}")
             ->getNumberFormat()
-            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_INTEGER);
         // Format nombre € colonne PU et montant N-1
         $sheet->getStyle("R1:S{$dernLign}")
             ->getNumberFormat()
-            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_INTEGER);
         // Format nombre € colonne PU et montant N-2
         $sheet->getStyle("V1:W{$dernLign}")
             ->getNumberFormat()
-            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_SIMPLE);
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_INTEGER);
         // Format Pourcentage CELLULE montant N-1/ montant N
         $sheet->getStyle('P4')
             ->getNumberFormat()
@@ -925,9 +918,8 @@ class StatesController extends AbstractController
         return $dateParam;
     }
 
-    /**
-     * @Route("/Lhermitte/states/archive/inutiliser", name="app_states_lhermitte_archive")
-     */
+    #[Route("/Lhermitte/states/archive/inutiliser", name: "app_states_lhermitte_archive")]
+
     public function statesInutiliser(string $secteur, StatesByTiersRepository $repo, Request $request): Response
     {
 
@@ -1460,9 +1452,8 @@ class StatesController extends AbstractController
         return $list;
     }
 
-    /**
-     * @Route("/export/statesGlobales",  name="app_export_states_globales")
-     */
+    #[Route("/export/statesGlobales", name: "app_export_states_globales")]
+
     public function export()
     {
         $spreadsheet = new Spreadsheet();
@@ -1507,11 +1498,10 @@ class StatesController extends AbstractController
         return $this->redirectToRoute('app_tickets');
     }
 
-    /**
-     * @Route("/Lhermitte/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}/{commercialId}/{dossier}", name="app_states_par_article_Lh")
-     * @Route("/Roby/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}/{commercialId}/{dossier}", name="app_states_par_article_Rb")
-     */
-    public function statesByArticle(string $tiers, string $metier, $commercialId, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier, StatesByTiersRepository $repo, Request $request, UserInterface $user): Response
+    #[Route("/Lhermitte/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}/{commercialId}/{dossier}", name: "app_states_par_article_Lh")]
+    #[Route("/Roby/DetailArticle/{tiers}/{metier}/{dateDebutN}/{dateFinN}/{dateDebutN1}/{dateFinN1}/{commercialId}/{dossier}", name: "app_states_par_article_Rb")]
+
+    public function statesByArticle(string $tiers, string $metier, $commercialId, $dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier, StatesByTiersRepository $repo): Response
     {
         // tracking user page for stats
         // $tracking = $request->attributes->get('_route');
@@ -1583,9 +1573,8 @@ class StatesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/states/clients/3/ans/lhermitte", name="app_states_par_client_Lh")
-     */
+    #[Route("/Lhermitte/states/clients/3/ans/lhermitte", name: "app_states_par_client_Lh")]
+
     public function statesParClientTroisAns(MouvRepository $repo, Request $request): Response
     {
         $clients = '';

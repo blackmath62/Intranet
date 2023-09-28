@@ -3,20 +3,17 @@
 namespace App\Controller;
 
 use App\Repository\Divalto\MouvRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class DernierePieceClientController extends AbstractController
 {
-    /**
-     * @Route("/dernieres/pieces/client", name="app_dernieres_pieces_ par_client")
-     */
+    #[Route("/dernieres/pieces/client", name: "app_dernieres_pieces_ par_client")]
+
     public function index(MouvRepository $repo): Response
     {
         $roby = false;

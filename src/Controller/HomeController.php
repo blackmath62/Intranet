@@ -9,30 +9,26 @@ use App\Repository\Main\UsersRepository;
 use DateTime;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class HomeController extends AbstractController
 {
-    /**
-     * @Route("/php_info", name="app_php_info")
-     */
+    #[Route("/php_info", name: "app_php_info")]
+
     public function getPhpInfo()
     {
         return new Response('<html><body>' . phpinfo() . '</body></html>');
     }
 
-    /**
-     * @Route("/", name="app_home")
-     */
-    public function index(Request $request, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews)
+    #[Route("/", name: "app_home")]
+
+    public function index(UrlGeneratorInterface $urlGenerator, UsersRepository $repoUser, TrackingsRepository $repoTracking, HolidayRepository $holidayRepo, UsersRepository $userRepo, NewsRepository $repoNews)
     {
 
         // tracking user page for stats
@@ -70,12 +66,11 @@ class HomeController extends AbstractController
                 $start = $event->getStart()->format('Y-m-d');
                 $end = $event->getEnd()->format('Y-m-d');
             }
-
             $rdvs[] = [
                 'id' => $event->getId(),
                 'start' => $start,
                 'end' => $end,
-                'url' => 'http://192.168.50.244/holiday/show/' . $id,
+                'url' => $urlGenerator->generate('app_holiday_show', ['id' => $id]),
                 'title' => 'Congés ' . $pseudo . ' du ' . $event->getStart()->format('d-m-Y') . ' au ' . $event->getEnd()->format('d-m-Y'),
                 'backgroundColor' => $color,
                 'borderColor' => '#FFFFFF',

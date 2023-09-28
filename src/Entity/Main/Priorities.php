@@ -2,51 +2,35 @@
 
 namespace App\Entity\Main;
 
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 use App\Repository\Main\PrioritiesRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=PrioritiesRepository::class)
- */
+#[ORM\Entity(repositoryClass: PrioritiesRepository::class)]
 class Priorities
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id()]
+    #[ORM\GeneratedValue()]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $title;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $color;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Tickets::class, mappedBy="priority")
-     */
+    #[ORM\OneToMany(targetEntity: Tickets::class, mappedBy: "priority")]
     private $tickets;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $textColor;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $closedAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $fa;
 
     public function __construct()
@@ -131,7 +115,7 @@ class Priorities
         return $this->closedAt;
     }
 
-    public function setClosedAt(?\DateTimeInterface $closedAt): self
+    public function setClosedAt(?\DateTimeInterface $closedAt) : self
     {
         $this->closedAt = $closedAt;
 

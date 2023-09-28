@@ -7,52 +7,34 @@ use App\Repository\Main\RetraitMarchandisesEanRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity(repositoryClass=RetraitMarchandisesEanRepository::class)
- */
+#[ORM\Entity(repositoryClass: RetraitMarchandisesEanRepository::class)]
 class RetraitMarchandisesEan
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $chantier;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=users::class, inversedBy="retraitMarchandisesEans")
-     */
+    #[ORM\ManyToOne(targetEntity: users::class, inversedBy: "retraitMarchandisesEans")]
     private $createdBy;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $sendAt;
 
-    /**
-     * @ORM\Column(type="string", length=13)
-     * @Assert\Length(min=13,max=13, minMessage="Le code EAN doit faire 13 caractéres numériques de long",maxMessage="Le code EAN doit faire 13 caractéres numériques de long")
-     */
+    #[ORM\Column(type: "string", length: 13)]
+    #[Assert\Length(min: 13, max: 13, minMessage: "Le code EAN doit faire 13 caractéres numériques de long", maxMessage: "Le code EAN doit faire 13 caractéres numériques de long")]
     private $ean;
 
-    /**
-     * @ORM\Column(type="float")
-     */
+    #[ORM\Column(type: "float")]
     private $qte;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: "boolean", nullable: true)]
     private $stockFaux;
 
     public function getId(): ?int
@@ -65,7 +47,7 @@ class RetraitMarchandisesEan
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -113,7 +95,7 @@ class RetraitMarchandisesEan
         return $this->sendAt;
     }
 
-    public function setSendAt(?\DateTimeInterface $sendAt): self
+    public function setSendAt(?\DateTimeInterface $sendAt) : self
     {
         $this->sendAt = $sendAt;
 

@@ -4,16 +4,15 @@ namespace App\Controller;
 
 use App\Form\ContactType;
 use App\Repository\Main\MailListRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
+
 class ContactController extends AbstractController
 {
 
@@ -29,9 +28,8 @@ class ContactController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/contact", name="app_contact")
-     */
+    #[Route("/contact", name: "app_contact")]
+
     public function index(Request $request, MailerInterface $mailer)
     {
         $form = $this->createForm(ContactType::class);

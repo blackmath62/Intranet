@@ -6,21 +6,26 @@ use App\Entity\Main\Priorities;
 use App\Form\EditPrioritiesType;
 use App\Repository\Main\PrioritiesRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminPrioritiesController extends AbstractController
 {
-    /**
-     * @Route("/admin/priorities", name="app_admin_priorities")
-     */
-    public function index(Priorities $priorities = null, Request $request, PrioritiesRepository $repo, EntityManagerInterface $manager)
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/admin/priorities", name: "app_admin_priorities")]
+
+    public function index(Request $request, PrioritiesRepository $repo, EntityManagerInterface $manager, Priorities $priorities = null)
     {
         if (!$priorities) {
             $priorities = new Priorities();
@@ -51,15 +56,14 @@ class AdminPrioritiesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/priorities/delete/{id}",name="app_delete_priorities")
-     */
+    #[Route("/admin/priorities/delete/{id}", name: "app_delete_priorities")]
+
     public function deletepriorities($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(priorities::class);
+        $repository = $this->entityManager->getRepository(priorities::class);
         $prioritiesId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($prioritiesId);
         $em->flush();
 
@@ -69,9 +73,9 @@ class AdminPrioritiesController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_priorities'));
     }
-    /**
-     * @Route("/admin/priorities/edit/{id}",name="app_edit_priorities")
-     */
+
+    #[Route("/admin/priorities/edit/{id}", name: "app_edit_priorities")]
+
     public function editSociete(priorities $priorities, Request $request)
     {
         $form = $this->createForm(EditPrioritiesType::class, $priorities);
@@ -82,7 +86,7 @@ class AdminPrioritiesController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($priorities);
             $em->flush();
 

@@ -4,17 +4,14 @@ namespace App\Controller;
 
 use App\Repository\Divalto\ClientLhermitteByCommercialRepository;
 use App\Repository\Main\MailListRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_RESPONSABLE_SECTEUR")
- */
+#[IsGranted("ROLE_RESPONSABLE_SECTEUR")]
 
 class ClientsParSecteurController extends AbstractController
 {
@@ -31,10 +28,9 @@ class ClientsParSecteurController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Lhermitte/clients", name="app_lhermitte_clients_secteur")
-     */
-    public function index(Request $request, ClientLhermitteByCommercialRepository $clients): Response
+    #[Route("/Lhermitte/clients", name: "app_lhermitte_clients_secteur")]
+
+    public function index(ClientLhermitteByCommercialRepository $clients): Response
     {
 
         // tracking user page for stats
@@ -49,10 +45,9 @@ class ClientsParSecteurController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/contacts/client/{tiers}", name="app_lhermitte_contact_client")
-     */
-    public function getContactsClient($tiers, Request $request, ClientLhermitteByCommercialRepository $client): Response
+    #[Route("/Lhermitte/contacts/client/{tiers}", name: "app_lhermitte_contact_client")]
+
+    public function getContactsClient($tiers, ClientLhermitteByCommercialRepository $client): Response
     {
 
         // tracking user page for stats
@@ -66,11 +61,9 @@ class ClientsParSecteurController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/clients/need/{tiers}", name="app_lhermitte_need_clients")
-     *
-     */
-    public function need($tiers = null, Request $request, MailerInterface $mailer, ClientLhermitteByCommercialRepository $clients): Response
+    #[Route("/Lhermitte/clients/need/{tiers}", name: "app_lhermitte_need_clients")]
+
+    public function need(MailerInterface $mailer, ClientLhermitteByCommercialRepository $clients, $tiers = null): Response
     {
 
         if ($tiers) {
@@ -101,11 +94,9 @@ class ClientsParSecteurController extends AbstractController
         }
     }
 
-    /**
-     * @Route("/Lhermitte/clients/close/{tiers}", name="app_lhermitte_close_clients")
-     *
-     */
-    public function close($tiers = null, Request $request, MailerInterface $mailer): Response
+    #[Route("/Lhermitte/clients/close/{tiers}", name: "app_lhermitte_close_clients")]
+
+    public function close(MailerInterface $mailer, $tiers = null): Response
     {
 
         if ($tiers) {

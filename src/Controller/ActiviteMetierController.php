@@ -9,13 +9,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted("ROLE_USER")]
 
 class ActiviteMetierController extends AbstractController
 {
-    /**
-     * @Route("/Lhermitte/activite/metier", name="app_activite_metier_Lhermitte")
-     * @Route("/Roby/activite/metier", name="app_activite_metier_Roby")
-     */
+    #[Route("/Lhermitte/activite/metier", name: "app_activite_metier_Lhermitte")]
+    #[Route("/Roby/activite/metier", name: "app_activite_metier_Roby")]
+
     public function index(MouvRepository $repo, Request $request): Response
     {
         // tracking user page for stats

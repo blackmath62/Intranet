@@ -6,21 +6,26 @@ use App\Entity\Main\Users;
 use App\Form\EditUsersType;
 use App\Repository\Main\UsersRepository;
 use DateTime;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminUsersController extends AbstractController
 {
-    /**
-     * @Route("/admin/users", name="app_admin_users")
-     */
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/admin/users", name: "app_admin_users")]
+
     public function index(UsersRepository $repo, Request $request)
     {
 
@@ -37,9 +42,8 @@ class AdminUsersController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/users/change/metier/{id}/{metier}/{value}", name="app_admin_users_change_metier")
-     */
+    #[Route("/admin/users/change/metier/{id}/{metier}/{value}", name: "app_admin_users_change_metier")]
+
     public function getChangeMetier($metier, $value, Request $request, Users $user)
     {
         if ($metier == 'ev') {
@@ -50,7 +54,7 @@ class AdminUsersController extends AbstractController
             $user->setMe($value);
         }
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($user);
         $em->flush();
 
@@ -63,9 +67,9 @@ class AdminUsersController extends AbstractController
     }
     /**
      * Modifier un Utilisateur
-     *
-     * @Route("/admin/users/edit/{id}", name="app_edit_user")
      */
+    #[Route("/admin/users/edit/{id}", name: "app_edit_user")]
+
     public function editUser(Users $user, Request $request, SluggerInterface $slugger)
     {
 
@@ -103,7 +107,7 @@ class AdminUsersController extends AbstractController
             if(!$img){
             $user->setImg('AdminLTELogo.png');
             }*/
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($user);
             $em->flush();
 
@@ -120,13 +124,12 @@ class AdminUsersController extends AbstractController
 
     /**
      * Supprimer l'utilisateur, ne sert pas, nous fermons ou ouvrons les utilisateurs
-     *
-     * @Route("/admin/users/delete/{id}", name="app_delete_user")
      */
+    #[Route("/admin/users/delete/{id}", name: "app_delete_user")]
 
     public function deleteUser(Users $user, Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($user);
         $em->flush();
 
@@ -141,14 +144,13 @@ class AdminUsersController extends AbstractController
 
     /**
      * Fermer l'utilisateur
-     *
-     * @Route("/admin/users/close/{id}", name="app_close_user")
      */
+    #[Route("/admin/users/close/{id}", name: "app_close_user")]
 
     public function closeUser(Users $user, Request $request)
     {
         $user->setClosedAt(new DateTime());
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($user);
         $em->flush();
 
@@ -158,18 +160,17 @@ class AdminUsersController extends AbstractController
 
         $this->addFlash('message', 'L\'utilisateur a été fermé avec succès');
         return $this->redirectToRoute('app_admin_users');
-
     }
+
     /**
      * Ouvrir l'utilisateur
-     *
-     * @Route("/admin/users/open/{id}", name="app_open_user")
      */
+    #[Route("/admin/users/open/{id}", name: "app_open_user")]
 
     public function openUser(Users $user, Request $request)
     {
         $user->setClosedAt(null);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($user);
         $em->flush();
 

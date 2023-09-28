@@ -15,22 +15,22 @@ use App\Repository\Main\UsersRepository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class HolidayController extends AbstractController
 {
@@ -44,9 +44,17 @@ class HolidayController extends AbstractController
     private $mailTreatement;
     private $mailer;
     private $adminEmailController;
+    private $entityManager;
 
-    public function __construct(AdminEmailController $adminEmailController, MailListRepository $repoMail, MailerInterface $mailer, MailerInterface $mailerInterface, HolidayRepository $repoHoliday, statusHolidayRepository $repoStatuts, UsersRepository $repoUser)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        AdminEmailController $adminEmailController,
+        MailListRepository $repoMail,
+        MailerInterface $mailer,
+        MailerInterface $mailerInterface,
+        HolidayRepository $repoHoliday,
+        statusHolidayRepository $repoStatuts,
+        UsersRepository $repoUser) {
         $this->mailerInterface = $mailerInterface;
         $this->repoHoliday = $repoHoliday;
         $this->repoStatuts = $repoStatuts;
@@ -56,6 +64,7 @@ class HolidayController extends AbstractController
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->mailer = $mailer;
         $this->adminEmailController = $adminEmailController;
+        $this->entityManager = $registry->getManager();
     }
 
     public function sendMailSummerForAllUsers()
@@ -76,10 +85,9 @@ class HolidayController extends AbstractController
 
     }
 
-    /**
-     * @Route("/holiday", name="app_holiday_list")
-     */
-    public function index(Request $request)
+    #[Route("/holiday", name: "app_holiday_list")]
+
+    public function index(UrlGeneratorInterface $urlGenerator, Request $request)
     {
         $holidays = $this->repoHoliday->findAll();
 
@@ -111,7 +119,7 @@ class HolidayController extends AbstractController
                 'id' => $event->getId(),
                 'start' => $start,
                 'end' => $end,
-                'url' => 'http://192.168.50.244/holiday/show/' . $id,
+                'url' => $urlGenerator->generate('app_holiday_show', ['id' => $id]),
                 'title' => 'Congés ' . $pseudo . ' du ' . $event->getStart()->format('d-m-Y') . ' au ' . $event->getEnd()->format('d-m-Y'),
                 'backgroundColor' => $color,
                 'borderColor' => '#FFFFFF',
@@ -167,9 +175,8 @@ class HolidayController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/conges/holiday/fermeture", name="app_holiday_new_closing", methods={"GET","POST"})
-     */
+    #[Route("/conges/holiday/fermeture", name: "app_holiday_new_closing", methods: ["GET", "POST"])]
+
     public function newClosing(Request $request)
     {
         $i = 0;
@@ -247,7 +254,7 @@ class HolidayController extends AbstractController
                     ->setTreatmentedBy($this->getUser())
                     ->setTreatmentedAt(new DateTime())
                     ->setUser($value);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($holiday);
                 $em->flush();
                 $majHoliday = $this->repoHoliday->findOneBy(['id' => $this->repoHoliday->getLastHoliday()]);
@@ -258,7 +265,7 @@ class HolidayController extends AbstractController
                 }
                 $nbJ = $nbJours['nbjours'];
                 $majHoliday->setNbJours($nbJ);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($majHoliday);
                 $em->flush();
                 $i++;
@@ -355,12 +362,10 @@ class HolidayController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/holiday/new", name="app_holiday_new", methods={"GET","POST"})
-     * @Route("/holiday/edit/{id}", name="app_holiday_edit", methods={"GET","POST"})
-     */
+    #[Route("/holiday/new", name: "app_holiday_new", methods: ["GET", "POST"])]
+    #[Route("/holiday/edit/{id}", name: "app_holiday_edit", methods: ["GET", "POST"])]
 
-    public function Holiday($id = null, Holiday $holiday = null, Request $request)
+    function Holiday(Request $request, Holiday $holiday = null, $id = null)
     {
         // tracking user page for stats
         $tracking = $request->attributes->get('_route');
@@ -411,7 +416,7 @@ class HolidayController extends AbstractController
                 if ($overlaps[$ligOverlaps]['statutId'] == 2) {
                     $statut = $this->repoStatuts->findOneBy(['id' => 1]);
                     $holiday->setHolidayStatus($statut);
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($holiday);
                     $em->flush();
                 }
@@ -465,7 +470,7 @@ class HolidayController extends AbstractController
                 ->setNbJours($nbJ)
                 ->setHolidayStatus($statut)
                 ->setUser($utilisateur);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($holiday);
             $em->flush();
 
@@ -505,11 +510,10 @@ class HolidayController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/holiday/show/{id}", name="app_holiday_show", methods={"GET"})
-     */
+    #[Route("/holiday/show/{id}", name: "app_holiday_show", methods: ["GET"])]
+
     // Voir un congés
-    public function showHoliday($id, Request $request)
+    function showHoliday($id)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -525,7 +529,7 @@ class HolidayController extends AbstractController
         ]);
     }
     // compter le nombre de jour de congés déposés
-    public function countHolidayDay($holiday)
+    function countHolidayDay($holiday)
     {
 
         // déclaration des variables
@@ -623,11 +627,10 @@ class HolidayController extends AbstractController
         return $return;
     }
 
-    /**
-     * @Route("/holiday/delete/{id}", name="app_holiday_delete")
-     */
+    #[Route("/holiday/delete/{id}", name: "app_holiday_delete")]
+
     // supprimer un congés
-    public function deleteHoliday($id, Holiday $holiday, Request $request)
+    function deleteHoliday($id, Holiday $holiday)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -654,7 +657,7 @@ class HolidayController extends AbstractController
         $mail = $this->holiday_send_mail($role, $id, $object, $html);
 
         // Supprimer le congés
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->remove($holiday);
         $entityManager->flush();
 
@@ -662,11 +665,10 @@ class HolidayController extends AbstractController
         return $this->redirectToRoute('app_holiday_list');
     }
 
-    /**
-     * @Route("/conges/holiday/accept/{id}", name="app_holiday_accept", methods={"GET"})
-     */
+    #[Route("/conges/holiday/accept/{id}", name: "app_holiday_accept", methods: ["GET"])]
+
     // accepter un congés
-    public function acceptHoliday($id, Request $request)
+    function acceptHoliday($id)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -678,7 +680,7 @@ class HolidayController extends AbstractController
         $holiday->setTreatmentedAt(new DateTime())
             ->setTreatmentedBy($this->getUser())
             ->setHolidayStatus($statut);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($holiday);
         $em->flush();
 
@@ -698,11 +700,10 @@ class HolidayController extends AbstractController
         return $this->redirectToRoute('app_holiday_list');
     }
 
-    /**
-     * @Route("/conges/holiday/refuse/{id}", name="app_holiday_refuse", methods={"GET"})
-     */
+    #[Route("/conges/holiday/refuse/{id}", name: "app_holiday_refuse", methods: ["GET"])]
+
     // refuser un congés
-    public function refuseHoliday($id, Request $request)
+    function refuseHoliday($id)
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -713,7 +714,7 @@ class HolidayController extends AbstractController
         $holiday->setTreatmentedAt(new DateTime())
             ->setTreatmentedBy($this->getUser())
             ->setHolidayStatus($this->repoStatuts->findOneBy(['id' => 4]));
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($holiday);
         $em->flush();
 
@@ -733,7 +734,7 @@ class HolidayController extends AbstractController
         return $this->redirectToRoute('app_holiday_list');
     }
 
-    public function countDaysIntoThisPeriod($start, $startCp, $ss, $end, $endCp, $se)
+    function countDaysIntoThisPeriod($start, $startCp, $ss, $end, $endCp, $se)
     {
         $sStart = false;
         $sEnd = false;
@@ -756,12 +757,12 @@ class HolidayController extends AbstractController
         return $vacationDays;
     }
 
-    public function isWeekend($date)
+    function isWeekend($date)
     {
         return (date('N', strtotime($date)) >= 6); // 6 corresponds to Saturday, 7 to Sunday
     }
 
-    public function countVacationDays($start, $startCp, $ss, $end, $endCp, $se, $holidays)
+    function countVacationDays($start, $startCp, $ss, $end, $endCp, $se, $holidays)
     {
         $start = (new DateTime($start))->format('Y-m-d');
         $end = (new DateTime($end))->format('Y-m-d');
@@ -790,7 +791,7 @@ class HolidayController extends AbstractController
     }
 
     // Contrôle d'accés, Si on est pas le dépositaire ou le décideur pas accés
-    public function holiday_access($holidayId)
+    function holiday_access($holidayId)
     {
         $access = true;
         $holiday = $this->repoHoliday->findOneBy(['id' => $holidayId]);
@@ -802,16 +803,16 @@ class HolidayController extends AbstractController
     }
 
     // contrôle et modification des chevauchements
-    public function holiday_overlaps()
+    function holiday_overlaps()
     {
 
     }
 
     // congés vérrouillé, bloquer la modification de date si le congés est déjà traité
-    public function holiday_lock($holidayId)
+    function holiday_lock($holidayId)
     {
         $lock = false;
-        $repo = $this->getDoctrine()->getRepository(Holiday::class);
+        $repo = $this->entityManager->getRepository(Holiday::class);
         $holiday = $repo->find($holidayId);
 
         if ($holiday->getTreatmentedBy() != null) {
@@ -822,7 +823,7 @@ class HolidayController extends AbstractController
     }
 
     // envoie de mail
-    public function holiday_send_mail($role, $id, $object, $html)
+    function holiday_send_mail($role, $id, $object, $html)
     {
         // initialiser le mail utilisateur
         $userMail = '';
@@ -861,7 +862,7 @@ class HolidayController extends AbstractController
     }
 
     // générer un fichier Excel qui sera envoyé par mail à l'utilisateur
-    public function getDataRecapConges($start, $end): array
+    function getDataRecapConges($start, $end): array
     {
         $list = [];
         $donnees = [];
@@ -893,7 +894,7 @@ class HolidayController extends AbstractController
     }
 
     // Mise en forme des slices
-    public function sliceTraduct($slice)
+    function sliceTraduct($slice)
     {
         if ($slice == 'DAY') {
             return 'Journée';
@@ -905,7 +906,7 @@ class HolidayController extends AbstractController
     }
 
     // générer un fichier Excel qui sera envoyé par mail à l'utilisateur
-    public function getDataListConges($start, $end): array
+    function getDataListConges($start, $end): array
     {
         $list = [];
         $donnees = [];
@@ -947,7 +948,7 @@ class HolidayController extends AbstractController
         return $list;
     }
 
-    public function get_export_excel($start, $end)
+    function get_export_excel($start, $end)
     {
 
         $spreadsheet = new Spreadsheet();
@@ -1187,7 +1188,7 @@ class HolidayController extends AbstractController
         return $fichier;
     }
 
-    public function sendMail($start, $end)
+    function sendMail($start, $end)
     {
         // envoyer un mail
         $excel = $this->get_export_excel($start, $end);

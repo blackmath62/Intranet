@@ -26,12 +26,13 @@ class BlockNode extends Node
         parent::__construct(['body' => $body], ['name' => $name], $lineno, $tag);
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler
             ->addDebugInfo($this)
             ->write(sprintf("public function block_%s(\$context, array \$blocks = [])\n", $this->getAttribute('name')), "{\n")
             ->indent()
+            ->write("\$macros = \$this->macros;\n")
         ;
 
         $compiler
@@ -41,5 +42,3 @@ class BlockNode extends Node
         ;
     }
 }
-
-class_alias('Twig\Node\BlockNode', 'Twig_Node_Block');

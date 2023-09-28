@@ -6,18 +6,28 @@ use App\Form\OthersDocumentsType;
 use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\OthersDocumentsRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
+
+#[IsGranted("ROLE_ADMIN")]
 
 class AuditAfnorController extends AbstractController
 {
-    /**
-     * @Route("/audit/afnor", name="app_audit_afnor")
-     */
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/audit/afnor", name: "app_audit_afnor")]
+
     public function index(Request $request, OthersDocumentsRepository $repo, SluggerInterface $slugger, MouvRepository $repoMouv): Response
     {
         // tracking user page for stats
@@ -55,7 +65,7 @@ class AuditAfnorController extends AbstractController
                     ->setFile($newFilename)
                     ->setIdentifiant(1)
                     ->setUser($this->getUser());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($doc);
                 $em->flush();
             }
@@ -76,9 +86,7 @@ class AuditAfnorController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/audit/afnor/view/{id}", name="app_audit_afnor_show")
-     */
+    #[Route("/audit/afnor/view/{id}", name: "app_audit_afnor_show")]
 
     public function DocsReferentielAfnorShow(int $id, OthersDocumentsRepository $repo, Request $request)
     {
@@ -94,15 +102,13 @@ class AuditAfnorController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/audit/afnor/delete/{id}", name="app_audit_afnor_delete")
-     */
+    #[Route("/audit/afnor/delete/{id}", name: "app_audit_afnor_delete")]
 
     public function DocsReferentielAfnorDelete(int $id, OthersDocumentsRepository $repo, Request $request)
     {
         $doc = $repo->findOneBy(['id' => $id]);
         unlink('doc/Lhermitte_freres/Afnor/' . $doc->getFile());
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($doc);
         $em->flush();
 

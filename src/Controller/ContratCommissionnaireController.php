@@ -11,7 +11,7 @@ use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\ProduitsCommissionnairesRepository;
 use DateTime;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,10 +19,9 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class ContratCommissionnaireController extends AbstractController
 {
@@ -32,21 +31,27 @@ class ContratCommissionnaireController extends AbstractController
     private $mailer;
     private $repoMail;
     private $mailEnvoi;
+    private $entityManager;
 
-    public function __construct(ProduitsCommissionnairesRepository $cc, MouvRepository $repoMouv, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        ProduitsCommissionnairesRepository $cc,
+        MouvRepository $repoMouv,
+        MailerInterface $mailer,
+        MailListRepository $repoMail
+    ) {
         $this->mailer = $mailer;
         $this->cc = $cc;
         $this->repoMail = $repoMail;
         $this->repoMouv = $repoMouv;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("Lhermitte/contrat/commissionnaire", name="app_contrat_commissionnaire")
-     */
+    #[Route("Lhermitte/contrat/commissionnaire", name: "app_contrat_commissionnaire")]
+
     public function index(ProduitsCommissionnairesRepository $repo, Request $request, MailListRepository $repoMails): Response
     {
 
@@ -66,7 +71,7 @@ class ContratCommissionnaireController extends AbstractController
                 $mail->setCreatedAt(new DateTime())
                     ->setEmail($form->getData()['email'])
                     ->setPage($tracking);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
             } else {
@@ -102,15 +107,14 @@ class ContratCommissionnaireController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("Lhermitte/contrat/commissionnaire/delete/mail{id}", name="app_contrat_commissionnaire_delete_mail")
-     */
+    #[Route("Lhermitte/contrat/commissionnaire/delete/mail{id}", name: "app_contrat_commissionnaire_delete_mail")]
+
     public function deleteMail($id, MailListRepository $repo): Response
     {
 
         $search = $repo->findOneBy(['id' => $id]);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($search);
         $em->flush();
 
@@ -118,9 +122,8 @@ class ContratCommissionnaireController extends AbstractController
         return $this->redirectToRoute('app_contrat_commissionnaire');
     }
 
-    /**
-     * @Route("Lhermitte/contrat/commissionnaire/update/list", name="app_contrat_commissionnaire_update_list")
-     */
+    #[Route("Lhermitte/contrat/commissionnaire/update/list", name: "app_contrat_commissionnaire_update_list")]
+
     public function updateList(ArtRepository $repo, ProduitsCommissionnairesRepository $cc): Response
     {
         $listeArticlesDivalto = $repo->getPhyto();
@@ -134,7 +137,7 @@ class ContratCommissionnaireController extends AbstractController
                     ->setContratCommissionaire(false)
                     ->setUpdatedAt(new DateTime())
                     ->setCreatedAt(new DateTime());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($article);
                 $em->flush();
             }
@@ -144,9 +147,8 @@ class ContratCommissionnaireController extends AbstractController
         return $this->redirectToRoute('app_contrat_commissionnaire');
     }
 
-    /**
-     * @Route("Lhermitte/contrat/commissionnaire/change/cc/{id}", name="app_contrat_commissionnaire_update_article")
-     */
+    #[Route("Lhermitte/contrat/commissionnaire/change/cc/{id}", name: "app_contrat_commissionnaire_update_article")]
+
     public function updateArticle($id, ProduitsCommissionnairesRepository $cc): Response
     {
         $article = $cc->findOneBy(['id' => $id]);
@@ -155,7 +157,7 @@ class ContratCommissionnaireController extends AbstractController
         } elseif ($article->getContratCommissionaire() == true) {
             $article->setContratCommissionaire(false);
         }
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($article);
         $em->flush();
 
@@ -163,9 +165,8 @@ class ContratCommissionnaireController extends AbstractController
         return $this->redirectToRoute('app_contrat_commissionnaire');
     }
 
-    /**
-     * @Route("Lhermitte/contrat/commissionnaire/send/mail", name="app_contrat_commissionnaire_send_mail")
-     */
+    #[Route("Lhermitte/contrat/commissionnaire/send/mail", name: "app_contrat_commissionnaire_send_mail")]
+
     public function sendMail(): Response
     {
 

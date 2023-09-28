@@ -11,9 +11,9 @@ use App\Repository\Main\StatusRepository;
 use App\Repository\Main\TicketsRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +21,10 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class TicketsController extends AbstractController
 {
@@ -40,10 +39,14 @@ class TicketsController extends AbstractController
     private $mailTreatement;
     private $adminEmailController;
 
-    public function __construct(AdminEmailController $adminEmailController, EntityManagerInterface $entityManager, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        AdminEmailController $adminEmailController,
+        ManagerRegistry $registry,
+        MailerInterface $mailer,
+        MailListRepository $repoMail
+    ) {
 
-        $this->entityManager = $entityManager;
+        $this->entityManager = $registry->getManager();
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
@@ -51,10 +54,9 @@ class TicketsController extends AbstractController
         $this->adminEmailController = $adminEmailController;
     }
 
-    /**
-     * @Route("/tickets", name="app_tickets")
-     * @Route("/tickets/resolus", name="app_tickets_resolus")
-     */
+    #[Route("/tickets", name: "app_tickets")]
+    #[Route("/tickets/resolus", name: "app_tickets_resolus")]
+
     public function getListTickets(TicketsRepository $repo, Request $request, SluggerInterface $slugger, CommentsRepository $repoComment, StatusRepository $repoStatus)
     {
         // tracking user page for stats
@@ -103,7 +105,7 @@ class TicketsController extends AbstractController
                 $ticket->setFile($newFilename);
             }
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($ticket);
             $em->flush();
 
@@ -153,9 +155,8 @@ class TicketsController extends AbstractController
         return $list;
     }
 
-    /**
-     * @Route("/export",  name="app_export")
-     */
+    #[Route("/export", name: "app_export")]
+
     public function export()
     {
         $spreadsheet = new Spreadsheet();

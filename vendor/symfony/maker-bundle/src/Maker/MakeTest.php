@@ -11,9 +11,7 @@
 
 namespace Symfony\Bundle\MakerBundle\Maker;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase as LegacyApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -70,7 +68,7 @@ final class MakeTest extends AbstractMaker implements InputAwareMakerInterface
         return 'Creates a new test class';
     }
 
-    public function configureCommand(Command $command, InputConfiguration $inputConf)
+    public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $typesDesc = [];
         $typesHelp = [];
@@ -84,11 +82,11 @@ final class MakeTest extends AbstractMaker implements InputAwareMakerInterface
             ->addArgument('name', InputArgument::OPTIONAL, 'The name of the test class (e.g. <fg=yellow>BlogPostTest</>)')
             ->setHelp(file_get_contents(__DIR__.'/../Resources/help/MakeTest.txt').implode("\n", $typesHelp));
 
-        $inputConf->setArgumentAsNonInteractive('name');
-        $inputConf->setArgumentAsNonInteractive('type');
+        $inputConfig->setArgumentAsNonInteractive('name');
+        $inputConfig->setArgumentAsNonInteractive('type');
     }
 
-    public function interact(InputInterface $input, ConsoleStyle $io, Command $command)
+    public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
         /* @deprecated remove the following block when removing make:unit-test and make:functional-test */
         $this->handleDeprecatedMakerCommands($input, $io);
@@ -104,7 +102,7 @@ final class MakeTest extends AbstractMaker implements InputAwareMakerInterface
             );
         }
 
-        if ('ApiTestCase' === $input->getArgument('type') && !class_exists(ApiTestCase::class) && !class_exists(LegacyApiTestCase::class)) {
+        if ('ApiTestCase' === $input->getArgument('type') && !class_exists(ApiTestCase::class)) {
             $io->warning([
                 'API Platform is required for this test type. Install it with',
                 'composer require api',
@@ -133,7 +131,7 @@ final class MakeTest extends AbstractMaker implements InputAwareMakerInterface
         }
     }
 
-    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
+    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $testClassNameDetails = $generator->createClassNameDetails(
             $input->getArgument('name'),
@@ -148,8 +146,7 @@ final class MakeTest extends AbstractMaker implements InputAwareMakerInterface
             "test/$type.tpl.php",
             [
                 'web_assertions_are_available' => trait_exists(WebTestAssertionsTrait::class),
-                'use_legacy_container_property' => $this->useLegacyContainerProperty(),
-                'api_test_case_fqcn' => \PHP_VERSION_ID < 80100 && !class_exists(ApiTestCase::class) ? LegacyApiTestCase::class : ApiTestCase::class,
+                'api_test_case_fqcn' => !class_exists(ApiTestCase::class) ? LegacyApiTestCase::class : ApiTestCase::class,
             ]
         );
 
@@ -188,7 +185,7 @@ final class MakeTest extends AbstractMaker implements InputAwareMakerInterface
 
             case 'ApiTestCase':
                 $dependencies->addClassDependency(
-                    \PHP_VERSION_ID < 80100 && !class_exists(ApiTestCase::class) ? LegacyApiTestCase::class : ApiTestCase::class,
+                    !class_exists(ApiTestCase::class) ? LegacyApiTestCase::class : ApiTestCase::class,
                     'api',
                     true,
                     false
@@ -225,11 +222,5 @@ final class MakeTest extends AbstractMaker implements InputAwareMakerInterface
                 $io->warning('The "make:functional-test" command is deprecated, use "make:test" instead.');
                 break;
         }
-    }
-
-    private function useLegacyContainerProperty(): bool
-    {
-        // for 5.2 and lower
-        return !method_exists(KernelTestCase::class, 'getContainer');
     }
 }

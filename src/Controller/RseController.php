@@ -4,22 +4,19 @@ namespace App\Controller;
 
 use App\Form\StatesDateFilterType;
 use App\Repository\Divalto\MouvRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class RseController extends AbstractController
 {
-    /**
-     * @Route("/Lhermitte/rse/{dos}", name="app_rse")
-     * * @Route("/Roby/rse/{dos}", name="app_rse")
-     */
+    #[Route("/Lhermitte/rse/{dos}", name: "app_rse")]
+    #[Route("/Roby/rse/{dos}", name: "app_rse")]
+
     public function index($dos, MouvRepository $repoMouv, Request $request): Response
     {
         $depClis = '';

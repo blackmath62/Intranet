@@ -23,6 +23,8 @@ use Twig\Node\Expression\Binary\EqualBinary;
 use Twig\Node\Expression\Binary\FloorDivBinary;
 use Twig\Node\Expression\Binary\GreaterBinary;
 use Twig\Node\Expression\Binary\GreaterEqualBinary;
+use Twig\Node\Expression\Binary\HasEveryBinary;
+use Twig\Node\Expression\Binary\HasSomeBinary;
 use Twig\Node\Expression\Binary\InBinary;
 use Twig\Node\Expression\Binary\LessBinary;
 use Twig\Node\Expression\Binary\LessEqualBinary;
@@ -34,6 +36,7 @@ use Twig\Node\Expression\Binary\NotInBinary;
 use Twig\Node\Expression\Binary\OrBinary;
 use Twig\Node\Expression\Binary\PowerBinary;
 use Twig\Node\Expression\Binary\RangeBinary;
+use Twig\Node\Expression\Binary\SpaceshipBinary;
 use Twig\Node\Expression\Binary\StartsWithBinary;
 use Twig\Node\Expression\Binary\SubBinary;
 use Twig\Node\Expression\Filter\DefaultFilter;
@@ -48,13 +51,13 @@ use Twig\Node\Expression\Test\SameasTest;
 use Twig\Node\Expression\Unary\NegUnary;
 use Twig\Node\Expression\Unary\NotUnary;
 use Twig\Node\Expression\Unary\PosUnary;
+use Twig\NodeVisitor\MacroAutoImportNodeVisitor;
 use Twig\TokenParser\ApplyTokenParser;
 use Twig\TokenParser\BlockTokenParser;
 use Twig\TokenParser\DeprecatedTokenParser;
 use Twig\TokenParser\DoTokenParser;
 use Twig\TokenParser\EmbedTokenParser;
 use Twig\TokenParser\ExtendsTokenParser;
-use Twig\TokenParser\FilterTokenParser;
 use Twig\TokenParser\FlushTokenParser;
 use Twig\TokenParser\ForTokenParser;
 use Twig\TokenParser\FromTokenParser;
@@ -63,7 +66,6 @@ use Twig\TokenParser\ImportTokenParser;
 use Twig\TokenParser\IncludeTokenParser;
 use Twig\TokenParser\MacroTokenParser;
 use Twig\TokenParser\SetTokenParser;
-use Twig\TokenParser\SpacelessTokenParser;
 use Twig\TokenParser\UseTokenParser;
 use Twig\TokenParser\WithTokenParser;
 use Twig\TwigFilter;
@@ -75,28 +77,6 @@ final class CoreExtension extends AbstractExtension
     private $dateFormats = ['F j, Y H:i', '%d days'];
     private $numberFormat = [0, '.', ','];
     private $timezone = null;
-    private $escapers = [];
-
-    /**
-     * Defines a new escaper to be used via the escape filter.
-     *
-     * @param string   $strategy The strategy name that should be used as a strategy in the escape call
-     * @param callable $callable A valid PHP callable
-     */
-    public function setEscaper($strategy, callable $callable)
-    {
-        $this->escapers[$strategy] = $callable;
-    }
-
-    /**
-     * Gets all defined escapers.
-     *
-     * @return callable[] An array of escapers
-     */
-    public function getEscapers()
-    {
-        return $this->escapers;
-    }
 
     /**
      * Sets the default format to be used by the date filter.
@@ -171,7 +151,7 @@ final class CoreExtension extends AbstractExtension
         return $this->numberFormat;
     }
 
-    public function getTokenParsers()
+    public function getTokenParsers(): array
     {
         return [
             new ApplyTokenParser(),
@@ -181,12 +161,10 @@ final class CoreExtension extends AbstractExtension
             new IncludeTokenParser(),
             new BlockTokenParser(),
             new UseTokenParser(),
-            new FilterTokenParser(),
             new MacroTokenParser(),
             new ImportTokenParser(),
             new FromTokenParser(),
             new SetTokenParser(),
-            new SpacelessTokenParser(),
             new FlushTokenParser(),
             new DoTokenParser(),
             new EmbedTokenParser(),
@@ -195,13 +173,13 @@ final class CoreExtension extends AbstractExtension
         ];
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             // formatting filters
             new TwigFilter('date', 'twig_date_format_filter', ['needs_environment' => true]),
             new TwigFilter('date_modify', 'twig_date_modify_filter', ['needs_environment' => true]),
-            new TwigFilter('format', 'sprintf'),
+            new TwigFilter('format', 'twig_sprintf'),
             new TwigFilter('replace', 'twig_replace_filter'),
             new TwigFilter('number_format', 'twig_number_format_filter', ['needs_environment' => true]),
             new TwigFilter('abs', 'abs'),
@@ -217,21 +195,21 @@ final class CoreExtension extends AbstractExtension
             new TwigFilter('capitalize', 'twig_capitalize_string_filter', ['needs_environment' => true]),
             new TwigFilter('upper', 'twig_upper_filter', ['needs_environment' => true]),
             new TwigFilter('lower', 'twig_lower_filter', ['needs_environment' => true]),
-            new TwigFilter('striptags', 'strip_tags'),
+            new TwigFilter('striptags', 'twig_striptags'),
             new TwigFilter('trim', 'twig_trim_filter'),
-            new TwigFilter('nl2br', 'nl2br', ['pre_escape' => 'html', 'is_safe' => ['html']]),
+            new TwigFilter('nl2br', 'twig_nl2br', ['pre_escape' => 'html', 'is_safe' => ['html']]),
             new TwigFilter('spaceless', 'twig_spaceless', ['is_safe' => ['html']]),
 
             // array helpers
             new TwigFilter('join', 'twig_join_filter'),
             new TwigFilter('split', 'twig_split_filter', ['needs_environment' => true]),
-            new TwigFilter('sort', 'twig_sort_filter'),
+            new TwigFilter('sort', 'twig_sort_filter', ['needs_environment' => true]),
             new TwigFilter('merge', 'twig_array_merge'),
             new TwigFilter('batch', 'twig_array_batch'),
             new TwigFilter('column', 'twig_array_column'),
-            new TwigFilter('filter', 'twig_array_filter'),
-            new TwigFilter('map', 'twig_array_map'),
-            new TwigFilter('reduce', 'twig_array_reduce'),
+            new TwigFilter('filter', 'twig_array_filter', ['needs_environment' => true]),
+            new TwigFilter('map', 'twig_array_map', ['needs_environment' => true]),
+            new TwigFilter('reduce', 'twig_array_reduce', ['needs_environment' => true]),
 
             // string/array filters
             new TwigFilter('reverse', 'twig_reverse_filter', ['needs_environment' => true]),
@@ -243,14 +221,10 @@ final class CoreExtension extends AbstractExtension
             // iteration and runtime
             new TwigFilter('default', '_twig_default_filter', ['node_class' => DefaultFilter::class]),
             new TwigFilter('keys', 'twig_get_array_keys_filter'),
-
-            // escaping
-            new TwigFilter('escape', 'twig_escape_filter', ['needs_environment' => true, 'is_safe_callback' => 'twig_escape_filter_is_safe']),
-            new TwigFilter('e', 'twig_escape_filter', ['needs_environment' => true, 'is_safe_callback' => 'twig_escape_filter_is_safe']),
         ];
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('max', 'max'),
@@ -265,23 +239,28 @@ final class CoreExtension extends AbstractExtension
         ];
     }
 
-    public function getTests()
+    public function getTests(): array
     {
         return [
             new TwigTest('even', null, ['node_class' => EvenTest::class]),
             new TwigTest('odd', null, ['node_class' => OddTest::class]),
             new TwigTest('defined', null, ['node_class' => DefinedTest::class]),
-            new TwigTest('same as', null, ['node_class' => SameasTest::class]),
+            new TwigTest('same as', null, ['node_class' => SameasTest::class, 'one_mandatory_argument' => true]),
             new TwigTest('none', null, ['node_class' => NullTest::class]),
             new TwigTest('null', null, ['node_class' => NullTest::class]),
-            new TwigTest('divisible by', null, ['node_class' => DivisiblebyTest::class]),
+            new TwigTest('divisible by', null, ['node_class' => DivisiblebyTest::class, 'one_mandatory_argument' => true]),
             new TwigTest('constant', null, ['node_class' => ConstantTest::class]),
             new TwigTest('empty', 'twig_test_empty'),
             new TwigTest('iterable', 'twig_test_iterable'),
         ];
     }
 
-    public function getOperators()
+    public function getNodeVisitors(): array
+    {
+        return [new MacroAutoImportNodeVisitor()];
+    }
+
+    public function getOperators(): array
     {
         return [
             [
@@ -297,6 +276,7 @@ final class CoreExtension extends AbstractExtension
                 'b-and' => ['precedence' => 18, 'class' => BitwiseAndBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
                 '==' => ['precedence' => 20, 'class' => EqualBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
                 '!=' => ['precedence' => 20, 'class' => NotEqualBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
+                '<=>' => ['precedence' => 20, 'class' => SpaceshipBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
                 '<' => ['precedence' => 20, 'class' => LessBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
                 '>' => ['precedence' => 20, 'class' => GreaterBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
                 '>=' => ['precedence' => 20, 'class' => GreaterEqualBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
@@ -306,6 +286,8 @@ final class CoreExtension extends AbstractExtension
                 'matches' => ['precedence' => 20, 'class' => MatchesBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
                 'starts with' => ['precedence' => 20, 'class' => StartsWithBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
                 'ends with' => ['precedence' => 20, 'class' => EndsWithBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
+                'has some' => ['precedence' => 20, 'class' => HasSomeBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
+                'has every' => ['precedence' => 20, 'class' => HasEveryBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
                 '..' => ['precedence' => 25, 'class' => RangeBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
                 '+' => ['precedence' => 30, 'class' => AddBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
                 '-' => ['precedence' => 30, 'class' => SubBinary::class, 'associativity' => ExpressionParser::OPERATOR_LEFT],
@@ -322,8 +304,6 @@ final class CoreExtension extends AbstractExtension
         ];
     }
 }
-
-class_alias('Twig\Extension\CoreExtension', 'Twig_Extension_Core');
 }
 
 namespace {
@@ -333,12 +313,11 @@ namespace {
     use Twig\Extension\CoreExtension;
     use Twig\Extension\SandboxExtension;
     use Twig\Markup;
-    use Twig\Node\Expression\ConstantExpression;
-    use Twig\Node\Node;
     use Twig\Source;
     use Twig\Template;
+    use Twig\TemplateWrapper;
 
-    /**
+/**
  * Cycles over a value.
  *
  * @param \ArrayAccess|array $values
@@ -371,7 +350,7 @@ function twig_cycle($values, $position)
 function twig_random(Environment $env, $values = null, $max = null)
 {
     if (null === $values) {
-        return null === $max ? mt_rand() : mt_rand(0, $max);
+        return null === $max ? mt_rand() : mt_rand(0, (int) $max);
     }
 
     if (\is_int($values) || \is_float($values)) {
@@ -388,7 +367,7 @@ function twig_random(Environment $env, $values = null, $max = null)
             $max = $max;
         }
 
-        return mt_rand($min, $max);
+        return mt_rand((int) $min, (int) $max);
     }
 
     if (\is_string($values)) {
@@ -399,7 +378,7 @@ function twig_random(Environment $env, $values = null, $max = null)
         $charset = $env->getCharset();
 
         if ('UTF-8' !== $charset) {
-            $values = iconv($charset, 'UTF-8', $values);
+            $values = twig_convert_encoding($values, 'UTF-8', $charset);
         }
 
         // unicode version of str_split()
@@ -408,7 +387,7 @@ function twig_random(Environment $env, $values = null, $max = null)
 
         if ('UTF-8' !== $charset) {
             foreach ($values as $i => $value) {
-                $values[$i] = iconv('UTF-8', $charset, $value);
+                $values[$i] = twig_convert_encoding($value, $charset, 'UTF-8');
             }
         }
     }
@@ -469,6 +448,19 @@ function twig_date_modify_filter(Environment $env, $date, $modifier)
 }
 
 /**
+ * Returns a formatted string.
+ *
+ * @param string|null $format
+ * @param ...$values
+ *
+ * @return string
+ */
+function twig_sprintf($format, ...$values)
+{
+    return sprintf($format ?? '', ...$values);
+}
+
+/**
  * Converts an input to a \DateTime instance.
  *
  *    {% if date(user.created_at) < date('+2days') %}
@@ -478,7 +470,7 @@ function twig_date_modify_filter(Environment $env, $date, $modifier)
  * @param \DateTimeInterface|string|null  $date     A date or null to use the current time
  * @param \DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
  *
- * @return \DateTime
+ * @return \DateTimeInterface
  */
 function twig_date_converter(Environment $env, $date = null, $timezone = null)
 {
@@ -506,6 +498,10 @@ function twig_date_converter(Environment $env, $date = null, $timezone = null)
     }
 
     if (null === $date || 'now' === $date) {
+        if (null === $date) {
+            $date = 'now';
+        }
+
         return new \DateTime($date, false !== $timezone ? $timezone : $env->getExtension(CoreExtension::class)->getTimezone());
     }
 
@@ -526,7 +522,7 @@ function twig_date_converter(Environment $env, $date = null, $timezone = null)
 /**
  * Replaces strings within a string.
  *
- * @param string             $str  String to replace in
+ * @param string|null        $str  String to replace in
  * @param array|\Traversable $from Replace values
  *
  * @return string
@@ -537,36 +533,38 @@ function twig_replace_filter($str, $from)
         throw new RuntimeError(sprintf('The "replace" filter expects an array or "Traversable" as replace values, got "%s".', \is_object($from) ? \get_class($from) : \gettype($from)));
     }
 
-    return strtr($str, twig_to_array($from));
+    return strtr($str ?? '', twig_to_array($from));
 }
 
 /**
  * Rounds a number.
  *
- * @param int|float $value     The value to round
- * @param int|float $precision The rounding precision
- * @param string    $method    The method to use for rounding
+ * @param int|float|string|null $value     The value to round
+ * @param int|float             $precision The rounding precision
+ * @param string                $method    The method to use for rounding
  *
  * @return int|float The rounded number
  */
 function twig_round($value, $precision = 0, $method = 'common')
 {
-    if ('common' == $method) {
+    $value = (float) $value;
+
+    if ('common' === $method) {
         return round($value, $precision);
     }
 
-    if ('ceil' != $method && 'floor' != $method) {
+    if ('ceil' !== $method && 'floor' !== $method) {
         throw new RuntimeError('The round filter only supports the "common", "ceil", and "floor" methods.');
     }
 
-    return $method($value * pow(10, $precision)) / pow(10, $precision);
+    return $method($value * 10 ** $precision) / 10 ** $precision;
 }
 
 /**
  * Number format filter.
  *
  * All of the formatting options can be left null, in that case the defaults will
- * be used.  Supplying any of the parameters will override the defaults set in the
+ * be used. Supplying any of the parameters will override the defaults set in the
  * environment object.
  *
  * @param mixed  $number       A float/int/string of the number to format
@@ -597,45 +595,47 @@ function twig_number_format_filter(Environment $env, $number, $decimal = null, $
 /**
  * URL encodes (RFC 3986) a string as a path segment or an array as a query string.
  *
- * @param string|array $url A URL or an array of query parameters
+ * @param string|array|null $url A URL or an array of query parameters
  *
  * @return string The URL encoded value
  */
 function twig_urlencode_filter($url)
 {
     if (\is_array($url)) {
-        return http_build_query($url, '', '&', PHP_QUERY_RFC3986);
+        return http_build_query($url, '', '&', \PHP_QUERY_RFC3986);
     }
 
-    return rawurlencode($url);
+    return rawurlencode($url ?? '');
 }
 
 /**
- * Merges an array with another one.
+ * Merges any number of arrays or Traversable objects.
  *
  *  {% set items = { 'apple': 'fruit', 'orange': 'fruit' } %}
  *
- *  {% set items = items|merge({ 'peugeot': 'car' }) %}
+ *  {% set items = items|merge({ 'peugeot': 'car' }, { 'banana': 'fruit' }) %}
  *
- *  {# items now contains { 'apple': 'fruit', 'orange': 'fruit', 'peugeot': 'car' } #}
+ *  {# items now contains { 'apple': 'fruit', 'orange': 'fruit', 'peugeot': 'car', 'banana': 'fruit' } #}
  *
- * @param array|\Traversable $arr1 An array
- * @param array|\Traversable $arr2 An array
+ * @param array|\Traversable ...$arrays Any number of arrays or Traversable objects to merge
  *
  * @return array The merged array
  */
-function twig_array_merge($arr1, $arr2)
+function twig_array_merge(...$arrays)
 {
-    if (!twig_test_iterable($arr1)) {
-        throw new RuntimeError(sprintf('The merge filter only works with arrays or "Traversable", got "%s" as first argument.', \gettype($arr1)));
+    $result = [];
+
+    foreach ($arrays as $argNumber => $array) {
+        if (!twig_test_iterable($array)) {
+            throw new RuntimeError(sprintf('The merge filter only works with arrays or "Traversable", got "%s" for argument %d.', \gettype($array), $argNumber + 1));
+        }
+
+        $result = array_merge($result, twig_to_array($array));
     }
 
-    if (!twig_test_iterable($arr2)) {
-        throw new RuntimeError(sprintf('The merge filter only works with arrays or "Traversable", got "%s" as second argument.', \gettype($arr2)));
-    }
-
-    return array_merge(twig_to_array($arr1), twig_to_array($arr2));
+    return $result;
 }
+
 
 /**
  * Slices a variable.
@@ -669,9 +669,7 @@ function twig_slice(Environment $env, $item, $start, $length = null, $preserveKe
         return \array_slice($item, $start, $length, $preserveKeys);
     }
 
-    $item = (string) $item;
-
-    return (string) mb_substr($item, $start, $length, $env->getCharset());
+    return (string) mb_substr((string) $item, $start, $length, $env->getCharset());
 }
 
 /**
@@ -760,15 +758,17 @@ function twig_join_filter($value, $glue = '', $and = null)
  *  {{ "aabbcc"|split('', 2) }}
  *  {# returns [aa, bb, cc] #}
  *
- * @param string $value     A string
- * @param string $delimiter The delimiter
- * @param int    $limit     The limit
+ * @param string|null $value     A string
+ * @param string      $delimiter The delimiter
+ * @param int         $limit     The limit
  *
  * @return array The split string as an array
  */
 function twig_split_filter(Environment $env, $value, $delimiter, $limit = null)
 {
-    if (!empty($delimiter)) {
+    $value = $value ?? '';
+
+    if (\strlen($delimiter) > 0) {
         return null === $limit ? explode($delimiter, $value) : explode($delimiter, $value, $limit);
     }
 
@@ -824,8 +824,8 @@ function twig_get_array_keys_filter($array)
             $array = $array->getIterator();
         }
 
+        $keys = [];
         if ($array instanceof \Iterator) {
-            $keys = [];
             $array->rewind();
             while ($array->valid()) {
                 $keys[] = $array->key();
@@ -835,7 +835,6 @@ function twig_get_array_keys_filter($array)
             return $keys;
         }
 
-        $keys = [];
         foreach ($array as $key => $item) {
             $keys[] = $key;
         }
@@ -853,8 +852,8 @@ function twig_get_array_keys_filter($array)
 /**
  * Reverses a variable.
  *
- * @param array|\Traversable|string $item         An array, a \Traversable instance, or a string
- * @param bool                      $preserveKeys Whether to preserve key or not
+ * @param array|\Traversable|string|null $item         An array, a \Traversable instance, or a string
+ * @param bool                           $preserveKeys Whether to preserve key or not
  *
  * @return mixed The reversed input
  */
@@ -873,15 +872,15 @@ function twig_reverse_filter(Environment $env, $item, $preserveKeys = false)
     $charset = $env->getCharset();
 
     if ('UTF-8' !== $charset) {
-        $item = iconv($charset, 'UTF-8', $string);
+        $string = twig_convert_encoding($string, 'UTF-8', $charset);
     }
 
-    preg_match_all('/./us', $item, $matches);
+    preg_match_all('/./us', $string, $matches);
 
     $string = implode('', array_reverse($matches[0]));
 
     if ('UTF-8' !== $charset) {
-        $string = iconv('UTF-8', $charset, $string);
+        $string = twig_convert_encoding($string, $charset, 'UTF-8');
     }
 
     return $string;
@@ -894,7 +893,7 @@ function twig_reverse_filter(Environment $env, $item, $preserveKeys = false)
  *
  * @return array
  */
-function twig_sort_filter($array)
+function twig_sort_filter(Environment $env, $array, $arrow = null)
 {
     if ($array instanceof \Traversable) {
         $array = iterator_to_array($array);
@@ -902,7 +901,13 @@ function twig_sort_filter($array)
         throw new RuntimeError(sprintf('The sort filter only works with arrays or "Traversable", got "%s".', \gettype($array)));
     }
 
-    asort($array);
+    if (null !== $arrow) {
+        twig_check_arrow_in_sandbox($env, $arrow, 'sort', 'filter');
+
+        uasort($array, $arrow);
+    } else {
+        asort($array);
+    }
 
     return $array;
 }
@@ -915,34 +920,133 @@ function twig_in_filter($value, $compare)
     if ($value instanceof Markup) {
         $value = (string) $value;
     }
+    if ($compare instanceof Markup) {
+        $compare = (string) $compare;
+    }
 
-    if (\is_array($compare)) {
-        return \in_array($value, $compare, \is_object($value) || \is_resource($value));
-    } elseif (\is_string($compare) && (\is_string($value) || \is_int($value) || \is_float($value))) {
-        return '' === $value || false !== strpos($compare, (string) $value);
-    } elseif ($compare instanceof \Traversable) {
-        if (\is_object($value) || \is_resource($value)) {
+    if (\is_string($compare)) {
+        if (\is_string($value) || \is_int($value) || \is_float($value)) {
+            return '' === $value || false !== strpos($compare, (string) $value);
+        }
+
+        return false;
+    }
+
+    if (!is_iterable($compare)) {
+        return false;
+    }
+
+    if (\is_object($value) || \is_resource($value)) {
+        if (!\is_array($compare)) {
             foreach ($compare as $item) {
                 if ($item === $value) {
                     return true;
                 }
             }
-        } else {
-            foreach ($compare as $item) {
-                if ($item == $value) {
-                    return true;
-                }
-            }
+
+            return false;
         }
 
-        return false;
+        return \in_array($value, $compare, true);
+    }
+
+    foreach ($compare as $item) {
+        if (0 === twig_compare($value, $item)) {
+            return true;
+        }
     }
 
     return false;
 }
 
 /**
+ * Compares two values using a more strict version of the PHP non-strict comparison operator.
+ *
+ * @see https://wiki.php.net/rfc/string_to_number_comparison
+ * @see https://wiki.php.net/rfc/trailing_whitespace_numerics
+ *
+ * @internal
+ */
+function twig_compare($a, $b)
+{
+    // int <=> string
+    if (\is_int($a) && \is_string($b)) {
+        $bTrim = trim($b, " \t\n\r\v\f");
+        if (!is_numeric($bTrim)) {
+            return (string) $a <=> $b;
+        }
+        if ((int) $bTrim == $bTrim) {
+            return $a <=> (int) $bTrim;
+        } else {
+            return (float) $a <=> (float) $bTrim;
+        }
+    }
+    if (\is_string($a) && \is_int($b)) {
+        $aTrim = trim($a, " \t\n\r\v\f");
+        if (!is_numeric($aTrim)) {
+            return $a <=> (string) $b;
+        }
+        if ((int) $aTrim == $aTrim) {
+            return (int) $aTrim <=> $b;
+        } else {
+            return (float) $aTrim <=> (float) $b;
+        }
+    }
+
+    // float <=> string
+    if (\is_float($a) && \is_string($b)) {
+        if (is_nan($a)) {
+            return 1;
+        }
+        $bTrim = trim($b, " \t\n\r\v\f");
+        if (!is_numeric($bTrim)) {
+            return (string) $a <=> $b;
+        }
+
+        return $a <=> (float) $bTrim;
+    }
+    if (\is_string($a) && \is_float($b)) {
+        if (is_nan($b)) {
+            return 1;
+        }
+        $aTrim = trim($a, " \t\n\r\v\f");
+        if (!is_numeric($aTrim)) {
+            return $a <=> (string) $b;
+        }
+
+        return (float) $aTrim <=> $b;
+    }
+
+    // fallback to <=>
+    return $a <=> $b;
+}
+
+/**
+ * @param string $pattern
+ * @param string|null $subject
+ *
+ * @return int
+ *
+ * @throws RuntimeError When an invalid pattern is used
+ */
+function twig_matches(string $regexp, ?string $str)
+{
+    set_error_handler(function ($t, $m) use ($regexp) {
+        throw new RuntimeError(sprintf('Regexp "%s" passed to "matches" is not valid', $regexp).substr($m, 12));
+    });
+    try {
+        return preg_match($regexp, $str ?? '');
+    } finally {
+        restore_error_handler();
+    }
+}
+
+/**
  * Returns a trimmed string.
+ *
+ * @param string|null $string
+ * @param string|null $characterMask
+ * @param string      $side
  *
  * @return string
  *
@@ -956,273 +1060,54 @@ function twig_trim_filter($string, $characterMask = null, $side = 'both')
 
     switch ($side) {
         case 'both':
-            return trim($string, $characterMask);
+            return trim($string ?? '', $characterMask);
         case 'left':
-            return ltrim($string, $characterMask);
+            return ltrim($string ?? '', $characterMask);
         case 'right':
-            return rtrim($string, $characterMask);
+            return rtrim($string ?? '', $characterMask);
         default:
             throw new RuntimeError('Trimming side must be "left", "right" or "both".');
     }
 }
 
 /**
+ * Inserts HTML line breaks before all newlines in a string.
+ *
+ * @param string|null $string
+ *
+ * @return string
+ */
+function twig_nl2br($string)
+{
+    return nl2br($string ?? '');
+}
+
+/**
  * Removes whitespaces between HTML tags.
+ *
+ * @param string|null $string
  *
  * @return string
  */
 function twig_spaceless($content)
 {
-    return trim(preg_replace('/>\s+</', '><', $content));
+    return trim(preg_replace('/>\s+</', '><', $content ?? ''));
 }
 
 /**
- * Escapes a string.
- *
- * @param mixed  $string     The value to be escaped
- * @param string $strategy   The escaping strategy
- * @param string $charset    The charset
- * @param bool   $autoescape Whether the function is called by the auto-escaping feature (true) or by the developer (false)
+ * @param string|null $string
+ * @param string      $to
+ * @param string      $from
  *
  * @return string
  */
-function twig_escape_filter(Environment $env, $string, $strategy = 'html', $charset = null, $autoescape = false)
-{
-    if ($autoescape && $string instanceof Markup) {
-        return $string;
-    }
-
-    if (!\is_string($string)) {
-        if (\is_object($string) && method_exists($string, '__toString')) {
-            $string = (string) $string;
-        } elseif (\in_array($strategy, ['html', 'js', 'css', 'html_attr', 'url'])) {
-            return $string;
-        }
-    }
-
-    if ('' === $string) {
-        return '';
-    }
-
-    if (null === $charset) {
-        $charset = $env->getCharset();
-    }
-
-    switch ($strategy) {
-        case 'html':
-            // see https://secure.php.net/htmlspecialchars
-
-            // Using a static variable to avoid initializing the array
-            // each time the function is called. Moving the declaration on the
-            // top of the function slow downs other escaping strategies.
-            static $htmlspecialcharsCharsets = [
-                'ISO-8859-1' => true, 'ISO8859-1' => true,
-                'ISO-8859-15' => true, 'ISO8859-15' => true,
-                'utf-8' => true, 'UTF-8' => true,
-                'CP866' => true, 'IBM866' => true, '866' => true,
-                'CP1251' => true, 'WINDOWS-1251' => true, 'WIN-1251' => true,
-                '1251' => true,
-                'CP1252' => true, 'WINDOWS-1252' => true, '1252' => true,
-                'KOI8-R' => true, 'KOI8-RU' => true, 'KOI8R' => true,
-                'BIG5' => true, '950' => true,
-                'GB2312' => true, '936' => true,
-                'BIG5-HKSCS' => true,
-                'SHIFT_JIS' => true, 'SJIS' => true, '932' => true,
-                'EUC-JP' => true, 'EUCJP' => true,
-                'ISO8859-5' => true, 'ISO-8859-5' => true, 'MACROMAN' => true,
-            ];
-
-            if (isset($htmlspecialcharsCharsets[$charset])) {
-                return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, $charset);
-            }
-
-            if (isset($htmlspecialcharsCharsets[strtoupper($charset)])) {
-                // cache the lowercase variant for future iterations
-                $htmlspecialcharsCharsets[$charset] = true;
-
-                return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, $charset);
-            }
-
-            $string = iconv($charset, 'UTF-8', $string);
-            $string = htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-
-            return iconv('UTF-8', $charset, $string);
-
-        case 'js':
-            // escape all non-alphanumeric characters
-            // into their \x or \uHHHH representations
-            if ('UTF-8' !== $charset) {
-                $string = iconv($charset, 'UTF-8', $string);
-            }
-
-            if (!preg_match('//u', $string)) {
-                throw new RuntimeError('The string to escape is not a valid UTF-8 string.');
-            }
-
-            $string = preg_replace_callback('#[^a-zA-Z0-9,\._]#Su', function ($matches) {
-                $char = $matches[0];
-
-                /*
-                 * A few characters have short escape sequences in JSON and JavaScript.
-                 * Escape sequences supported only by JavaScript, not JSON, are ommitted.
-                 * \" is also supported but omitted, because the resulting string is not HTML safe.
-                 */
-                static $shortMap = [
-                    '\\' => '\\\\',
-                    '/' => '\\/',
-                    "\x08" => '\b',
-                    "\x0C" => '\f',
-                    "\x0A" => '\n',
-                    "\x0D" => '\r',
-                    "\x09" => '\t',
-                ];
-
-                if (isset($shortMap[$char])) {
-                    return $shortMap[$char];
-                }
-
-                // \uHHHH
-                $char = twig_convert_encoding($char, 'UTF-16BE', 'UTF-8');
-                $char = strtoupper(bin2hex($char));
-
-                if (4 >= \strlen($char)) {
-                    return sprintf('\u%04s', $char);
-                }
-
-                return sprintf('\u%04s\u%04s', substr($char, 0, -4), substr($char, -4));
-            }, $string);
-
-            if ('UTF-8' !== $charset) {
-                $string = iconv('UTF-8', $charset, $string);
-            }
-
-            return $string;
-
-        case 'css':
-            if ('UTF-8' !== $charset) {
-                $string = iconv($charset, 'UTF-8', $string);
-            }
-
-            if (!preg_match('//u', $string)) {
-                throw new RuntimeError('The string to escape is not a valid UTF-8 string.');
-            }
-
-            $string = preg_replace_callback('#[^a-zA-Z0-9]#Su', function ($matches) {
-                $char = $matches[0];
-
-                return sprintf('\\%X ', 1 === \strlen($char) ? \ord($char) : mb_ord($char, 'UTF-8'));
-            }, $string);
-
-            if ('UTF-8' !== $charset) {
-                $string = iconv('UTF-8', $charset, $string);
-            }
-
-            return $string;
-
-        case 'html_attr':
-            if ('UTF-8' !== $charset) {
-                $string = iconv($charset, 'UTF-8', $string);
-            }
-
-            if (!preg_match('//u', $string)) {
-                throw new RuntimeError('The string to escape is not a valid UTF-8 string.');
-            }
-
-            $string = preg_replace_callback('#[^a-zA-Z0-9,\.\-_]#Su', function ($matches) {
-                /**
-                 * This function is adapted from code coming from Zend Framework.
-                 *
-                 * @copyright Copyright (c) 2005-2012 Zend Technologies USA Inc. (https://www.zend.com)
-                 * @license   https://framework.zend.com/license/new-bsd New BSD License
-                 */
-                $chr = $matches[0];
-                $ord = \ord($chr);
-
-                /*
-                 * The following replaces characters undefined in HTML with the
-                 * hex entity for the Unicode replacement character.
-                 */
-                if (($ord <= 0x1f && "\t" != $chr && "\n" != $chr && "\r" != $chr) || ($ord >= 0x7f && $ord <= 0x9f)) {
-                    return '&#xFFFD;';
-                }
-
-                /*
-                 * Check if the current character to escape has a name entity we should
-                 * replace it with while grabbing the hex value of the character.
-                 */
-                if (1 === \strlen($chr)) {
-                    /*
-                     * While HTML supports far more named entities, the lowest common denominator
-                     * has become HTML5's XML Serialisation which is restricted to the those named
-                     * entities that XML supports. Using HTML entities would result in this error:
-                     *     XML Parsing Error: undefined entity
-                     */
-                    static $entityMap = [
-                        34 => '&quot;', /* quotation mark */
-                        38 => '&amp;',  /* ampersand */
-                        60 => '&lt;',   /* less-than sign */
-                        62 => '&gt;',   /* greater-than sign */
-                    ];
-
-                    if (isset($entityMap[$ord])) {
-                        return $entityMap[$ord];
-                    }
-
-                    return sprintf('&#x%02X;', $ord);
-                }
-
-                /*
-                 * Per OWASP recommendations, we'll use hex entities for any other
-                 * characters where a named entity does not exist.
-                 */
-                return sprintf('&#x%04X;', mb_ord($chr, 'UTF-8'));
-            }, $string);
-
-            if ('UTF-8' !== $charset) {
-                $string = iconv('UTF-8', $charset, $string);
-            }
-
-            return $string;
-
-        case 'url':
-            return rawurlencode($string);
-
-        default:
-            static $escapers;
-
-            if (null === $escapers) {
-                $escapers = $env->getExtension(CoreExtension::class)->getEscapers();
-            }
-
-            if (isset($escapers[$strategy])) {
-                return $escapers[$strategy]($env, $string, $charset);
-            }
-
-            $validStrategies = implode(', ', array_merge(['html', 'js', 'url', 'css', 'html_attr'], array_keys($escapers)));
-
-            throw new RuntimeError(sprintf('Invalid escaping strategy "%s" (valid ones: %s).', $strategy, $validStrategies));
-    }
-}
-
-/**
- * @internal
- */
-function twig_escape_filter_is_safe(Node $filterArgs)
-{
-    foreach ($filterArgs as $arg) {
-        if ($arg instanceof ConstantExpression) {
-            return [$arg->getAttribute('value')];
-        }
-
-        return [];
-    }
-
-    return ['html'];
-}
-
 function twig_convert_encoding($string, $to, $from)
 {
-    return iconv($from, $to, $string);
+    if (!\function_exists('iconv')) {
+        throw new RuntimeError('Unable to convert encoding: required function iconv() does not exist. You should install ext-iconv or symfony/polyfill-iconv.');
+    }
+
+    return iconv($from, $to, $string ?? '');
 }
 
 /**
@@ -1260,47 +1145,60 @@ function twig_length_filter(Environment $env, $thing)
 /**
  * Converts a string to uppercase.
  *
- * @param string $string A string
+ * @param string|null $string A string
  *
  * @return string The uppercased string
  */
 function twig_upper_filter(Environment $env, $string)
 {
-    return mb_strtoupper($string, $env->getCharset());
+    return mb_strtoupper($string ?? '', $env->getCharset());
 }
 
 /**
  * Converts a string to lowercase.
  *
- * @param string $string A string
+ * @param string|null $string A string
  *
  * @return string The lowercased string
  */
 function twig_lower_filter(Environment $env, $string)
 {
-    return mb_strtolower($string, $env->getCharset());
+    return mb_strtolower($string ?? '', $env->getCharset());
+}
+
+/**
+ * Strips HTML and PHP tags from a string.
+ *
+ * @param string|null $string
+ * @param string[]|string|null $string
+ *
+ * @return string
+ */
+function twig_striptags($string, $allowable_tags = null)
+{
+    return strip_tags($string ?? '', $allowable_tags);
 }
 
 /**
  * Returns a titlecased string.
  *
- * @param string $string A string
+ * @param string|null $string A string
  *
  * @return string The titlecased string
  */
 function twig_title_string_filter(Environment $env, $string)
 {
     if (null !== $charset = $env->getCharset()) {
-        return mb_convert_case($string, MB_CASE_TITLE, $charset);
+        return mb_convert_case($string ?? '', \MB_CASE_TITLE, $charset);
     }
 
-    return ucwords(strtolower($string));
+    return ucwords(strtolower($string ?? ''));
 }
 
 /**
  * Returns a capitalized string.
  *
- * @param string $string A string
+ * @param string|null $string A string
  *
  * @return string The capitalized string
  */
@@ -1308,7 +1206,26 @@ function twig_capitalize_string_filter(Environment $env, $string)
 {
     $charset = $env->getCharset();
 
-    return mb_strtoupper(mb_substr($string, 0, 1, $charset), $charset).mb_strtolower(mb_substr($string, 1, null, $charset), $charset);
+    return mb_strtoupper(mb_substr($string ?? '', 0, 1, $charset), $charset).mb_strtolower(mb_substr($string ?? '', 1, null, $charset), $charset);
+}
+
+/**
+ * @internal
+ */
+function twig_call_macro(Template $template, string $method, array $args, int $lineno, array $context, Source $source)
+{
+    if (!method_exists($template, $method)) {
+        $parent = $template;
+        while ($parent = $parent->getParent($context)) {
+            if (method_exists($parent, $method)) {
+                return $parent->$method(...$args);
+            }
+        }
+
+        throw new RuntimeError(sprintf('Macro "%s" is not defined in template "%s".', substr($method, \strlen('macro_')), $template->getTemplateName()), $lineno, $source);
+    }
+
+    return $template->$method(...$args);
 }
 
 /**
@@ -1354,7 +1271,11 @@ function twig_to_array($seq, $preserveKeys = true)
 function twig_test_empty($value)
 {
     if ($value instanceof \Countable) {
-        return 0 == \count($value);
+        return 0 === \count($value);
+    }
+
+    if ($value instanceof \Traversable) {
+        return !iterator_count($value);
     }
 
     if (\is_object($value) && method_exists($value, '__toString')) {
@@ -1405,6 +1326,13 @@ function twig_include(Environment $env, $context, $template, $variables = [], $w
         $sandbox = $env->getExtension(SandboxExtension::class);
         if (!$alreadySandboxed = $sandbox->isSandboxed()) {
             $sandbox->enableSandbox();
+        }
+
+        foreach ((\is_array($template) ? $template : [$template]) as $name) {
+            // if a Template instance is passed, it might have been instantiated outside of a sandbox, check security
+            if ($name instanceof TemplateWrapper || $name instanceof Template) {
+                $name->unwrap()->checkSecurity();
+            }
         }
     }
 
@@ -1457,7 +1385,15 @@ function twig_source(Environment $env, $name, $ignoreMissing = false)
 function twig_constant($constant, $object = null)
 {
     if (null !== $object) {
+        if ('class' === $constant) {
+            return \get_class($object);
+        }
+
         $constant = \get_class($object).'::'.$constant;
+    }
+
+    if (!\defined($constant)) {
+        throw new RuntimeError(sprintf('Constant "%s" is undefined.', $constant));
     }
 
     return \constant($constant);
@@ -1474,6 +1410,10 @@ function twig_constant($constant, $object = null)
 function twig_constant_is_defined($constant, $object = null)
 {
     if (null !== $object) {
+        if ('class' === $constant) {
+            return true;
+        }
+
         $constant = \get_class($object).'::'.$constant;
     }
 
@@ -1534,7 +1474,7 @@ function twig_get_attribute(Environment $env, Source $source, $object, $item, ar
     if (/* Template::METHOD_CALL */ 'method' !== $type) {
         $arrayItem = \is_bool($item) || \is_float($item) ? (int) $item : $item;
 
-        if (((\is_array($object) || $object instanceof \ArrayObject) && (isset($object[$arrayItem]) || \array_key_exists($arrayItem, $object)))
+        if (((\is_array($object) || $object instanceof \ArrayObject) && (isset($object[$arrayItem]) || \array_key_exists($arrayItem, (array) $object)))
             || ($object instanceof ArrayAccess && isset($object[$arrayItem]))
         ) {
             if ($isDefinedTest) {
@@ -1605,7 +1545,7 @@ function twig_get_attribute(Environment $env, Source $source, $object, $item, ar
 
     // object property
     if (/* Template::METHOD_CALL */ 'method' !== $type) {
-        if (isset($object->$item) || \array_key_exists((string) $item, $object)) {
+        if (isset($object->$item) || \array_key_exists((string) $item, (array) $object)) {
             if ($isDefinedTest) {
                 return true;
             }
@@ -1627,7 +1567,7 @@ function twig_get_attribute(Environment $env, Source $source, $object, $item, ar
     if (!isset($cache[$class])) {
         $methods = get_class_methods($object);
         sort($methods);
-        $lcMethods = array_map('strtolower', $methods);
+        $lcMethods = array_map(function ($value) { return strtr($value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'); }, $methods);
         $classCache = [];
         foreach ($methods as $i => $method) {
             $classCache[$method] = $method;
@@ -1666,7 +1606,7 @@ function twig_get_attribute(Environment $env, Source $source, $object, $item, ar
     $call = false;
     if (isset($cache[$class][$item])) {
         $method = $cache[$class][$item];
-    } elseif (isset($cache[$class][$lcItem = strtolower($item)])) {
+    } elseif (isset($cache[$class][$lcItem = strtr($item, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')])) {
         $method = $cache[$class][$lcItem];
     } elseif (isset($cache[$class]['__call'])) {
         $method = $item;
@@ -1718,10 +1658,11 @@ function twig_get_attribute(Environment $env, Source $source, $object, $item, ar
  *
  * @param array|Traversable $array An array
  * @param mixed             $name  The column name
+ * @param mixed             $index The column to use as the index/keys for the returned array
  *
  * @return array The array of values
  */
-function twig_array_column($array, $name): array
+function twig_array_column($array, $name, $index = null): array
 {
     if ($array instanceof Traversable) {
         $array = iterator_to_array($array);
@@ -1729,28 +1670,29 @@ function twig_array_column($array, $name): array
         throw new RuntimeError(sprintf('The column filter only works with arrays or "Traversable", got "%s" as first argument.', \gettype($array)));
     }
 
-    return array_column($array, $name);
+    return array_column($array, $name, $index);
 }
 
-function twig_array_filter($array, $arrow)
+function twig_array_filter(Environment $env, $array, $arrow)
 {
+    if (!twig_test_iterable($array)) {
+        throw new RuntimeError(sprintf('The "filter" filter expects an array or "Traversable", got "%s".', \is_object($array) ? \get_class($array) : \gettype($array)));
+    }
+
+    twig_check_arrow_in_sandbox($env, $arrow, 'filter', 'filter');
+
     if (\is_array($array)) {
-        if (\PHP_VERSION_ID >= 50600) {
-            return array_filter($array, $arrow, \ARRAY_FILTER_USE_BOTH);
-        }
-
-        return array_filter($array, $arrow);
+        return array_filter($array, $arrow, \ARRAY_FILTER_USE_BOTH);
     }
 
-    while ($array instanceof \IteratorAggregate) {
-        $array = $array->getIterator();
-    }
-
-    return new \CallbackFilterIterator($array, $arrow);
+    // the IteratorIterator wrapping is needed as some internal PHP classes are \Traversable but do not implement \Iterator
+    return new \CallbackFilterIterator(new \IteratorIterator($array), $arrow);
 }
 
-function twig_array_map($array, $arrow)
+function twig_array_map(Environment $env, $array, $arrow)
 {
+    twig_check_arrow_in_sandbox($env, $arrow, 'map', 'filter');
+
     $r = [];
     foreach ($array as $k => $v) {
         $r[$k] = $arrow($v, $k);
@@ -1759,12 +1701,52 @@ function twig_array_map($array, $arrow)
     return $r;
 }
 
-function twig_array_reduce($array, $arrow, $initial = null)
+function twig_array_reduce(Environment $env, $array, $arrow, $initial = null)
 {
-    if (!\is_array($array)) {
-        $array = iterator_to_array($array);
+    twig_check_arrow_in_sandbox($env, $arrow, 'reduce', 'filter');
+
+    if (!\is_array($array) && !$array instanceof \Traversable) {
+        throw new RuntimeError(sprintf('The "reduce" filter only works with arrays or "Traversable", got "%s" as first argument.', \gettype($array)));
     }
 
-    return array_reduce($array, $arrow, $initial);
+    $accumulator = $initial;
+    foreach ($array as $key => $value) {
+        $accumulator = $arrow($accumulator, $value, $key);
+    }
+
+    return $accumulator;
+}
+
+function twig_array_some(Environment $env, $array, $arrow)
+{
+    twig_check_arrow_in_sandbox($env, $arrow, 'has some', 'operator');
+
+    foreach ($array as $k => $v) {
+        if ($arrow($v, $k)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function twig_array_every(Environment $env, $array, $arrow)
+{
+    twig_check_arrow_in_sandbox($env, $arrow, 'has every', 'operator');
+
+    foreach ($array as $k => $v) {
+        if (!$arrow($v, $k)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function twig_check_arrow_in_sandbox(Environment $env, $arrow, $thing, $type)
+{
+    if (!$arrow instanceof Closure && $env->hasExtension('\Twig\Extension\SandboxExtension') && $env->getExtension('\Twig\Extension\SandboxExtension')->isSandboxed()) {
+        throw new RuntimeError(sprintf('The callable passed to the "%s" %s must be a Closure in sandbox mode.', $thing, $type));
+    }
 }
 }

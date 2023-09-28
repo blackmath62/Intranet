@@ -1,4 +1,5 @@
 @ECHO OFF
 setlocal DISABLEDELAYEDEXPANSION
-SET BIN_TARGET=%~dp0/../h4cc/wkhtmltopdf-amd64/bin/wkhtmltopdf-amd64
+SET BIN_TARGET=%~dp0/wkhtmltopdf-amd64
+SET COMPOSER_RUNTIME_BIN_DIR=%~dp0
 php "%BIN_TARGET%" %*

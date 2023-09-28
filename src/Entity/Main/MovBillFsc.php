@@ -7,76 +7,48 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=MovBillFscRepository::class)
- */
+#[ORM\Entity(repositoryClass: MovBillFscRepository::class)]
 class MovBillFsc
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="integer", unique=true)
-     */
+    #[ORM\Column(type: "integer", unique: true)]
     private $facture;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $dateFact;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $tiers;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $nom;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $notreRef;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $TypeTiers;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="movBillFscs")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "movBillFscs")]
     private $createdBy;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=fscListMovement::class, inversedBy="movBillFscs")
-     */
+    #[ORM\ManyToMany(targetEntity: fscListMovement::class, inversedBy: "movBillFscs")]
     private $ventilations;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $dateBl;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: "integer", nullable: true)]
     private $bl;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: "boolean", nullable: true)]
     private $anomalie;
 
     public function __construct()
@@ -94,7 +66,7 @@ class MovBillFsc
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -118,7 +90,7 @@ class MovBillFsc
         return $this->dateFact;
     }
 
-    public function setDateFact(\DateTimeInterface $dateFact): self
+    public function setDateFact(\DateTimeInterface $dateFact) : self
     {
         $this->dateFact = $dateFact;
 
@@ -214,7 +186,7 @@ class MovBillFsc
         return $this->dateBl;
     }
 
-    public function setDateBl(?\DateTimeInterface $dateBl): self
+    public function setDateBl(?\DateTimeInterface $dateBl) : self
     {
         $this->dateBl = $dateBl;
 

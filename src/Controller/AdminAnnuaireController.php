@@ -8,26 +8,34 @@ use App\Form\AdminAnnuaireType;
 use App\Repository\Main\AnnuaireRepository;
 use App\Repository\Main\SocieteRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminAnnuaireController extends AbstractController
 {
+
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
     /**
      * Création d'une nouvelle entrée dans l'annuaire et affichage de l'annuaire avec option modification et suppression
-     *
-     * @Route("/admin/annuaire", name="app_admin_annuaire")
      */
+
+    #[Route("/admin/annuaire", name: "app_admin_annuaire")]
+
     public function index(Request $request, AnnuaireRepository $repo, SocieteRepository $repoSociete, EntityManagerInterface $manager)
     {
 
@@ -78,14 +86,14 @@ class AdminAnnuaireController extends AbstractController
     }
 
     /**
-     *
      * Suppresion d'une ligne de l'annuaire
-     *
-     * @Route("/admin/annuaire/delete/{id}", name="app_delete_annuaire")
      */
-    public function deleteAnnuaire(Annuaire $annuaire, Request $request)
+
+    #[Route("/admin/annuaire/delete/{id}", name: "app_delete_annuaire")]
+
+    public function deleteAnnuaire(Annuaire $annuaire)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($annuaire);
         $em->flush();
 
@@ -97,11 +105,11 @@ class AdminAnnuaireController extends AbstractController
     }
 
     /**
-     *
      * Modification d'une ligne de l'annuaire
-     *
-     * @Route("/admin/annuaire/edit/{id}", name="app_edit_annuaire")
      */
+
+    #[Route("/admin/annuaire/edit/{id}", name: "app_edit_annuaire")]
+
     public function editAnnuaire(Request $request, Annuaire $annuaire)
     {
 
@@ -113,7 +121,7 @@ class AdminAnnuaireController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($formEditAnnuaire->isSubmitted() && $formEditAnnuaire->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($annuaire);
             $em->flush();
 

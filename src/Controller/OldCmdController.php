@@ -10,17 +10,16 @@ use App\Repository\Divalto\EntRepository;
 use App\Repository\Main\ListCmdTraiteRepository;
 use App\Repository\Main\MailListRepository;
 use DateTime;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class OldCmdController extends AbstractController
 {
@@ -30,22 +29,28 @@ class OldCmdController extends AbstractController
     private $mailEnvoi;
     private $mailTreatement;
     private $adminEmailController;
+    private $entityManager;
 
-    public function __construct(AdminEmailController $adminEmailController, MailListRepository $repoMail, ListCmdTraiteRepository $repoNumCmd, MailerInterface $mailer)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        AdminEmailController $adminEmailController,
+        MailListRepository $repoMail,
+        ListCmdTraiteRepository $repoNumCmd,
+        MailerInterface $mailer
+    ) {
         $this->repoNumCmd = $repoNumCmd;
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("/old/cmd/deleteBy", name="app_list_delete_old_cmd")
-     */
-    public function listDelete(Request $request): Response
+    #[Route("/old/cmd/deleteBy", name: "app_list_delete_old_cmd")]
+
+    public function listDelete(): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -58,9 +63,8 @@ class OldCmdController extends AbstractController
             'commandesTraites' => $commandesTraites,
         ]);
     }
-    /**
-     * @Route("/old/cmd", name="app_old_cmd")
-     */
+    #[Route("/old/cmd", name: "app_old_cmd")]
+
     public function show(EntRepository $repo, Request $request): Response
     {
 
@@ -103,7 +107,7 @@ class OldCmdController extends AbstractController
                     $mail->setCreatedAt(new DateTime())
                         ->setEmail($form->getData()['email'])
                         ->setPage($tracking);
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($mail);
                     $em->flush();
                 } else {
@@ -138,10 +142,9 @@ class OldCmdController extends AbstractController
 
     }
 
-    /**
-     * @Route("/delete/old/cmd/{numero}/{dossier}", name="app_delete_old_cmd")
-     */
-    public function sendDelete(Request $request, $numero = null, $dossier = null): Response
+    #[Route("/delete/old/cmd/{numero}/{dossier}", name: "app_delete_old_cmd")]
+
+    public function sendDelete($numero = null, $dossier = null): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -152,7 +155,7 @@ class OldCmdController extends AbstractController
             ->setCreatedAt(new DateTime())
             ->setTreatedBy($this->getUser())
             ->setDossier($dossier);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($lockCmd);
         $em->flush();
 

@@ -8,14 +8,15 @@ use App\Form\UserRegistrationFormType;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class SecurityController extends AbstractController
@@ -25,18 +26,19 @@ class SecurityController extends AbstractController
     private $repoMail;
     private $mailEnvoi;
     private $mailTreatement;
+    private $entityManager;
 
-    public function __construct(MailListRepository $repoMail)
+    public function __construct(ManagerRegistry $registry, MailListRepository $repoMail)
     {
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("/login", name="app_login" , methods={"GET", "POST"})
-     */
+    #[Route("/login", name: "app_login", methods: ["GET", "POST"])]
+
     public function login(): Response
     {
         return $this->render('security/login.html.twig', [
@@ -44,10 +46,9 @@ class SecurityController extends AbstractController
             'title' => "connexion",
         ]);
     }
-    /**
-     * @Route("/register", name="app_register", methods={"GET","POST"})
-     */
-    public function register(Request $request, EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder, MailerInterface $mailerInterface, SluggerInterface $slugger): Response
+    #[Route("/register", name: "app_register", methods: ["GET", "POST"])]
+
+    function register(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder, MailerInterface $mailerInterface, SluggerInterface $slugger): Response
     {
         $form = $this->createForm(UserRegistrationFormType::class);
         $form->handleRequest($request);
@@ -56,7 +57,7 @@ class SecurityController extends AbstractController
             $plainPassword = $form['plainPassword']->getData();
             $user->setCreatedAt(new \DateTime())
                 ->setRoles(["ROLE_USER"])
-                ->setPassword($passwordEncoder->encodePassword($user, $plainPassword))
+                ->setPassword($passwordEncoder->hashPassword($user, $plainPassword))
                 ->setToken(md5(uniqid()));
 
             $file = $form->get('img')->getData();
@@ -122,11 +123,10 @@ class SecurityController extends AbstractController
             'registrationForm' => $form->createView(),
         ]);
     }
-    /**
-     * @Route("/passwordForgot", name="app_password_forgot")
-     */
+    #[Route("/passwordForgot", name: "app_password_forgot")]
+
     // envoyer un mail pour réinitialiser le mot de passe
-    public function passwordforgot(Request $request, MailerInterface $mailerInterface, UsersRepository $usersRepo, EntityManagerInterface $em)
+    function passwordforgot(Request $request, MailerInterface $mailerInterface, UsersRepository $usersRepo, EntityManagerInterface $em)
     {
         $form = $this->createForm(PasswordForgotType::class);
         // lecture des données
@@ -167,10 +167,9 @@ class SecurityController extends AbstractController
             'passwordForgotForm' => $form->createView(),
         ]);
     }
-    /**
-     * @Route("/changePassword/{token}", name="app_change_password")
-     */
-    public function changePassword($token, Request $request, EntityManagerInterface $em, UserPasswordEncoderInterface $passwordEncoder, UsersRepository $usersRepo)
+    #[Route("/changePassword/{token}", name: "app_change_password")]
+
+    function changePassword($token, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder, UsersRepository $usersRepo)
     {
         $form = $this->createForm(ModifiedPasswordType::class);
         $form->handleRequest($request);
@@ -188,7 +187,7 @@ class SecurityController extends AbstractController
             //dd($user);
             // Modification du mot de passe de l'utilisateur
             $plainPassword = $form['plainPassword']->getData();
-            $user->setPassword($passwordEncoder->encodePassword($user, $plainPassword))
+            $user->setPassword($passwordEncoder->hashPassword($user, $plainPassword))
             // on supprime le token
                 ->setToken(null);
             $em->persist($user);
@@ -206,18 +205,16 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/logout", name="app_logout", methods={"GET"})
-     */
-    public function logout()
+    #[Route("/logout", name: "app_logout", methods: ["GET"])]
+
+    function logout()
     {
         $this->addFlash('warning', 'Vous avez bien été déconnecté !');
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
-    /**
-     * @Route("/activation/{token}", name="app_activation", methods={"GET"})
-     */
-    public function activation($token, UsersRepository $usersRepo)
+    #[Route("/activation/{token}", name: "app_activation", methods: ["GET"])]
+
+    function activation($token, UsersRepository $usersRepo)
     {
         // On verifie si un utilisateur a ce token
         $user = $usersRepo->findOneBy(['token' => $token]);
@@ -229,7 +226,7 @@ class SecurityController extends AbstractController
         }
         // on supprime le token
         $user->setToken(null);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($user);
         $em->flush();
 

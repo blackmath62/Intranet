@@ -1,4 +1,5 @@
 @ECHO OFF
 setlocal DISABLEDELAYEDEXPANSION
-SET BIN_TARGET=%~dp0/../h4cc/wkhtmltoimage-amd64/bin/wkhtmltoimage-amd64
+SET BIN_TARGET=%~dp0/wkhtmltoimage-amd64
+SET COMPOSER_RUNTIME_BIN_DIR=%~dp0
 php "%BIN_TARGET%" %*

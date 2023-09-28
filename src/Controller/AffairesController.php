@@ -33,31 +33,27 @@ use App\Repository\Main\RetraitMarchandisesEanRepository;
 use App\Repository\Main\UsersRepository;
 use App\Service\EmailTreatementService;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_MONTEUR")
- */
+#[IsGranted("ROLE_MONTEUR")]
 
 class AffairesController extends AbstractController
 {
 
     private $repoMouv;
     private $repoArt;
-    private $repoCli;
     private $repoAffaires;
     private $repoAffairePiece;
-    private $repoComments;
     private $repoUsers;
-    private $repoDocs;
-    private $mailer;
     private $repoChats;
     private $repoIntervertionsMonteurs;
     private $repoInterventionFicheMonteur;
@@ -65,14 +61,28 @@ class AffairesController extends AbstractController
     private $affaireAdminController;
     private $repoFiche;
     private $repoRetrait;
-    private $adminEmailController;
-    private $repoMail;
-    private $mailEnvoi;
-    private $mailTreatement;
     private $emailTreatementService;
+    private $entityManager;
 
-    public function __construct(EmailTreatementService $emailTreatementService, AdminEmailController $adminEmailController, ArtRepository $repoArt, RetraitMarchandisesEanRepository $repoRetrait, InterventionFicheMonteurRepository $repoFiche, AffairesAdminController $affaireAdminController, InterventionFichesMonteursHeuresRepository $repoInterventionFichesMonteursHeures, InterventionFicheMonteurRepository $repoInterventionFicheMonteur, InterventionMonteursRepository $repoIntervertionsMonteurs, CliRepository $repoCli, UsersRepository $repoUsers, ChatsRepository $repoChats, AffairePieceRepository $repoAffairePiece, OthersDocumentsRepository $repoDocs, MailerInterface $mailer, CommentairesRepository $repoComments, AffairesRepository $repoAffaires, MouvRepository $repoMouv)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        EmailTreatementService $emailTreatementService,
+        ArtRepository $repoArt,
+        RetraitMarchandisesEanRepository $repoRetrait,
+        InterventionFicheMonteurRepository $repoFiche,
+        AffairesAdminController $affaireAdminController,
+        InterventionFichesMonteursHeuresRepository $repoInterventionFichesMonteursHeures,
+        InterventionFicheMonteurRepository $repoInterventionFicheMonteur,
+        InterventionMonteursRepository $repoIntervertionsMonteurs,
+        CliRepository $repoCli,
+        UsersRepository $repoUsers,
+        ChatsRepository $repoChats,
+        AffairePieceRepository $repoAffairePiece,
+        OthersDocumentsRepository $repoDocs,
+        MailerInterface $mailer,
+        CommentairesRepository $repoComments,
+        AffairesRepository $repoAffaires,
+        MouvRepository $repoMouv) {
         $this->repoMouv = $repoMouv;
         $this->repoIntervertionsMonteurs = $repoIntervertionsMonteurs;
         $this->repoCli = $repoCli;
@@ -90,14 +100,14 @@ class AffairesController extends AbstractController
         $this->repoRetrait = $repoRetrait;
         $this->repoArt = $repoArt;
         $this->emailTreatementService = $emailTreatementService;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/me/ok", name="app_affaire_me_ok")
-     * @Route("/Lhermitte/affaire/me/nok", name="app_affaire_me_nok")
-     */
-    public function affaire(Request $request): Response
+    #[Route("/Lhermitte/affaire/me/ok", name: "app_affaire_me_ok")]
+    #[Route("/Lhermitte/affaire/me/nok", name: "app_affaire_me_nok")]
+
+    public function affaire(UrlGeneratorInterface $urlGenerator, Request $request): Response
     {
 
         $tracking = $request->attributes->get('_route');
@@ -131,7 +141,7 @@ class AffairesController extends AbstractController
                     'id' => $event->getId(),
                     'start' => $start,
                     'end' => $end,
-                    'url' => 'http://192.168.50.244/Lhermitte/affaire/show/intervention/' . $id,
+                    'url' => $urlGenerator->generate('app_affaire_show_intervention', ['id' => $id]),
                     'title' => 'Affaire : ' . $libelle . ' du ' . $event->getStart()->format('d-m-Y H:i') . ' au ' . $event->getEnd()->format('d-m-Y H:i'),
                     'backgroundColor' => $color,
                     'borderColor' => '#FFFFFF',
@@ -177,7 +187,7 @@ class AffairesController extends AbstractController
                     ->setNom($data['tiers']);
                 $chantier->setStart(new DateTime())
                     ->setEtat('Nouvelle');
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($chantier);
                 $em->flush();
                 // Création de la piéce de ce chantier
@@ -193,7 +203,7 @@ class AffairesController extends AbstractController
                 } else {
                     $pieceChantier->setAdresse($data['tiers']);
                 }
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($pieceChantier);
                 $em->flush();
 
@@ -216,7 +226,7 @@ class AffairesController extends AbstractController
                     $intervention->setAdresse($data['tiers']);
                 }
             }
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($intervention);
             $entityManager->flush();
             // on ajoute le commentaire s'il y en a un
@@ -228,7 +238,7 @@ class AffairesController extends AbstractController
                     ->setFonction('chatAffaire')
                     ->setIdentifiant($intervention->getCode()->getId())
                     ->setTables($intervention->getId());
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->persist($chat);
                 $entityManager->flush();
 
@@ -250,7 +260,7 @@ class AffairesController extends AbstractController
             $pageUrl = "affaires/mails/mailChantierUrgence.html.twig";
             $mails = $this->emailTreatementService->treatementMails('app_affaires_admin', null, $emails);
             $urlFiles = [];
-            $this->emailTreatementService->sendMail($subjet, $donnees, $pageUrl, $mails, $urlFiles);
+            $this->emailTreatementService->sendMail($subjet, $mails, $donnees, $pageUrl, $urlFiles);
 
             $this->changeEtat($chantier->getId(), 'Planifiee');
             $this->addFlash('message', 'Votre chantier a été créé avec succés !');
@@ -276,10 +286,9 @@ class AffairesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/pieces/affaire/nok/{{affaire}}", name="app_piece_affaire_nok")
-     * @Route("/Lhermitte/pieces/affaire/ok/{{affaire}}", name="app_piece_affaire_ok")
-     */
+    #[Route("/Lhermitte/pieces/affaire/nok/{{affaire}}", name: "app_piece_affaire_nok")]
+    #[Route("/Lhermitte/pieces/affaire/ok/{{affaire}}", name: "app_piece_affaire_ok")]
+
     public function pieceAffaire($affaire, Request $request): Response
     {
         if ($request->attributes->get('_route') == 'app_piece_affaire_ok') {
@@ -312,7 +321,7 @@ class AffairesController extends AbstractController
             if ($data->getTextColor()) {
                 $affaire->setTextColor($data->getTextColor());
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($affaire);
             $em->flush();
             $this->addFlash('message', 'Mise à jour effectuée avec succés');
@@ -351,7 +360,7 @@ class AffairesController extends AbstractController
                 }
                 $intervention->setAdresse($adresse);
             }
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($intervention);
             $entityManager->flush();
 
@@ -380,7 +389,7 @@ class AffairesController extends AbstractController
                     $doc->setUser($this->getUser());
                     $doc->setIdentifiant($intervention->getCode()->getId());
                     $this->addFlash('message', 'Fichier ' . $filename . ' ajouté avec succés');
-                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager = $this->entityManager;
                     $entityManager->persist($doc);
                     $entityManager->flush();
                 }
@@ -394,7 +403,7 @@ class AffairesController extends AbstractController
                     ->setFonction('chatAffaire')
                     ->setIdentifiant($intervention->getCode()->getId())
                     ->setTables($intervention->getId());
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->persist($chat);
                 $entityManager->flush();
 
@@ -434,9 +443,8 @@ class AffairesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/update/affaire", name="app_update_affaires")
-     */
+    #[Route("/Lhermitte/update/affaire", name: "app_update_affaires")]
+
     public function update(): Response
     {
         $affaires = $this->repoMouv->getAffaires();
@@ -450,7 +458,7 @@ class AffairesController extends AbstractController
                     ->setNom($value['nom'])
                     ->setStart(new Datetime($value['dateCreation']))
                     ->setEtat('Nouvelle');
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->persist($affaire);
                 $entityManager->flush();
 
@@ -459,7 +467,7 @@ class AffairesController extends AbstractController
                 $pageUrl = "affaires/mails/mailNewAffaire.html.twig";
                 $mails = $this->emailTreatementService->treatementMails('app_affaires_admin', null, null);
                 $urlFiles = [];
-                $this->emailTreatementService->sendMail($subjet, $donnees, $pageUrl, $mails, $urlFiles);
+                $this->emailTreatementService->sendMail($subjet, $mails, $donnees, $pageUrl, $urlFiles);
             }
         }
 
@@ -467,9 +475,8 @@ class AffairesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Lhermitte/update/pieces/affaire", name="app_update_piece_affaires")
-     */
+    #[Route("/Lhermitte/update/pieces/affaire", name: "app_update_piece_affaires")]
+
     public function updatePieces(): Response
     {
         $affaires = $this->repoAffaires->findAll();
@@ -488,14 +495,14 @@ class AffairesController extends AbstractController
                         ->setOp($p['op'])
                         ->setTransport($p['transport'])
                         ->setEtat('Nouvelle');
-                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager = $this->entityManager;
                     $entityManager->persist($piece);
                     $entityManager->flush();
 
                     if ($affaire->getEnd()) {
                         $affaire->setEnd(null)
                             ->setEtat('A finir');
-                        $entityManager = $this->getDoctrine()->getManager();
+                        $entityManager = $this->entityManager;
                         $entityManager->persist($affaire);
                         $entityManager->flush();
                     }
@@ -508,7 +515,7 @@ class AffairesController extends AbstractController
                         ->setPiece($p['piece'])
                         ->setOp($p['op'])
                         ->setTransport($p['transport']);
-                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager = $this->entityManager;
                     $entityManager->persist($piece);
                     $entityManager->flush();
                 }
@@ -518,9 +525,7 @@ class AffairesController extends AbstractController
         return $this->redirectToRoute('app_affaire_me_nok');
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/change/etat/{id}/{etat}",name="app_affaire_change_etat")
-     */
+    #[Route("/Lhermitte/affaire/change/etat/{id}/{etat}", name: "app_affaire_change_etat")]
 
     public function changeEtat($id, $etat): Response
     {
@@ -536,7 +541,7 @@ class AffairesController extends AbstractController
         } else {
             $affaire->setEnd(null);
         }
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->persist($affaire);
         $entityManager->flush();
 
@@ -545,9 +550,7 @@ class AffairesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/piece/change/etat/{id}/{etat}",name="app_affaire_piece_change_etat")
-     */
+    #[Route("/Lhermitte/affaire/piece/change/etat/{id}/{etat}", name: "app_affaire_piece_change_etat")]
 
     public function changeEtatPiece($id, $etat): Response
     {
@@ -558,7 +561,7 @@ class AffairesController extends AbstractController
         } else {
             $piece->setClosedAt(null);
         }
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->persist($piece);
         $entityManager->flush();
 
@@ -567,9 +570,7 @@ class AffairesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/remove/intervention/{id}",name="app_affaire_remove_intervention")
-     */
+    #[Route("/Lhermitte/affaire/remove/intervention/{id}", name: "app_affaire_remove_intervention")]
 
     public function removeIntervention($id): Response
     {
@@ -579,7 +580,7 @@ class AffairesController extends AbstractController
         if ($fichiers) {
             foreach ($fichiers as $fichier) {
                 $chemin = $this->getParameter('doc_lhermitte_affaires') . '/' . $fichier->getFile();
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->remove($fichier);
                 $entityManager->flush();
                 unset($chemin);
@@ -590,13 +591,13 @@ class AffairesController extends AbstractController
         $commentaires = $this->repoChats->findBy(['fonction' => 'chatAffaire', 'identifiant' => $intervention->getCode()->getId(), 'tables' => $id]);
         if ($commentaires) {
             foreach ($commentaires as $commentaire) {
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->remove($commentaire);
                 $entityManager->flush();
             }
         }
         $affaire = $intervention->getCode()->getCode();
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->remove($intervention);
         $entityManager->flush();
 
@@ -605,9 +606,7 @@ class AffairesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/edit/intervention/{id}/{affaire}",name="app_affaire_edit_intervention")
-     */
+    #[Route("/Lhermitte/affaire/edit/intervention/{id}/{affaire}", name: "app_affaire_edit_intervention")]
 
     public function editIntervention($id, $affaire, Request $request): Response
     {
@@ -638,7 +637,7 @@ class AffairesController extends AbstractController
                 }
                 $intervention->setAdresse($adresse);
             }
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($intervention);
             $entityManager->flush();
             $this->addFlash('message', 'Intervention modifiée avec succés');
@@ -652,9 +651,7 @@ class AffairesController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/show/intervention/{id}",name="app_affaire_show_intervention")
-     */
+    #[Route("/Lhermitte/affaire/show/intervention/{id}", name: "app_affaire_show_intervention")]
 
     public function showIntervention($id, Request $request): Response
     {
@@ -672,7 +669,7 @@ class AffairesController extends AbstractController
                 ->setFonction('chatAffaire')
                 ->setIdentifiant($intervention->getCode()->getId())
                 ->setTables($intervention->getId());
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($chat);
             $entityManager->flush();
 
@@ -690,7 +687,7 @@ class AffairesController extends AbstractController
             $mails = $this->emailTreatementService->treatementMails('app_affaires_admin', null, $emails);
             $urlFiles = [];
             // envoie du mail
-            $this->emailTreatementService->sendMail($subjet, $donnees, $pageUrl, $mails, $urlFiles);
+            $this->emailTreatementService->sendMail($subjet, $mails, $donnees, $pageUrl, $urlFiles);
 
             $this->addFlash('message', 'Commentaire ajouté avec succès');
             return $this->redirectToRoute('app_affaire_show_intervention', ['id' => $id]);
@@ -723,7 +720,7 @@ class AffairesController extends AbstractController
                     $doc->setUser($this->getUser());
                     $doc->setIdentifiant($intervention->getCode()->getId());
                     $this->addFlash('message', 'Fichier ' . $filename . ' ajouté avec succés');
-                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager = $this->entityManager;
                     $entityManager->persist($doc);
                     $entityManager->flush();
                 } else {
@@ -778,9 +775,8 @@ class AffairesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/creer/fiche/intervention/{id}/{intervenant}/{createdAt}",name="app_affaire_creer_fiche_intervention")
-     */
+    #[Route("/Lhermitte/affaire/creer/fiche/intervention/{id}/{intervenant}/{createdAt}", name: "app_affaire_creer_fiche_intervention")]
+
     public function creerFicheIntervention($id, $intervenant, $createdAt, Request $request)
     {
         $fiche = new InterventionFicheMonteur;
@@ -789,7 +785,7 @@ class AffairesController extends AbstractController
             ->setHere(true)
             ->setIntervenant($this->repoUsers->findOneBy(['id' => $intervenant]))
             ->setIntervention($this->repoIntervertionsMonteurs->findOneBy(['id' => $id]));
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->persist($fiche);
         $entityManager->flush();
 
@@ -797,12 +793,10 @@ class AffairesController extends AbstractController
         return $this->redirectToRoute('app_affaire_edit_fiche_intervention', ['id' => $id, 'ficheId' => $fiche->getId()]);
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/saisie/fiche/intervention/{id}",name="app_affaire_saisie_fiche_intervention")
-     * @Route("/Lhermitte/affaire/edit/fiche/intervention/{id}/{ficheId}",name="app_affaire_edit_fiche_intervention")
-     */
+    #[Route("/Lhermitte/affaire/saisie/fiche/intervention/{id}", name: "app_affaire_saisie_fiche_intervention")]
+    #[Route("/Lhermitte/affaire/edit/fiche/intervention/{id}/{ficheId}", name: "app_affaire_edit_fiche_intervention")]
 
-    public function saisieFicheIntervention($id, $ficheId = null, Request $request): Response
+    public function saisieFicheIntervention($id, Request $request, $ficheId = null): Response
     {
 
         // Si la fiche existe déjà, on la modifie et on la charge
@@ -831,7 +825,7 @@ class AffairesController extends AbstractController
                 //$fiche->setCreatedAt(new DateTime($fiche['createdAt']));
                 $fiche->setCreatedBy($this->getUser());
             }
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($fiche);
             $entityManager->flush();
             if ($request->attributes->get('_route') == 'app_affaire_saisie_fiche_intervention') {
@@ -848,7 +842,7 @@ class AffairesController extends AbstractController
             $heure->setCreatedAt(new DateTime())
                 ->setCreatedBy($this->getUser())
                 ->setInterventionFicheMonteur($fiche);
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($heure);
             $entityManager->flush();
             $this->addFlash('message', 'Heures déposée avec succès');
@@ -858,7 +852,7 @@ class AffairesController extends AbstractController
         $formCommentaire = $this->createForm(InterventionFicheCommentType::class, $fiche);
         $formCommentaire->handleRequest($request);
         if ($formCommentaire->isSubmitted() && $formCommentaire->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($fiche);
             $entityManager->flush();
 
@@ -880,22 +874,21 @@ class AffairesController extends AbstractController
             'intervention' => $intervention,
         ]);
     }
-    /**
-     * @Route("/Lhermitte/affaire/remove/fiche/intervention/{id}/{fiche}",name="app_affaire_remove_fiche_intervention")
-     */
+
+    #[Route("/Lhermitte/affaire/remove/fiche/intervention/{id}/{fiche}", name: "app_affaire_remove_fiche_intervention")]
 
     public function removeFicheIntervention($id, $fiche, Request $request): Response
     {
         // suppression des heures en rapport avec la fiche monteur
         $heures = $this->repoInterventionFichesMonteursHeures->findBy(['interventionFicheMonteur' => $fiche]);
         foreach ($heures as $heure) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->remove($heure);
             $entityManager->flush();
         }
         // suppression de la fiche monteur
         $fiche = $this->repoInterventionFicheMonteur->findOneBy(['id' => $fiche]);
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->remove($fiche);
         $entityManager->flush();
 
@@ -904,14 +897,12 @@ class AffairesController extends AbstractController
         return $this->redirectToRoute('app_affaire_saisie_fiche_intervention', ['id' => $id]);
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/remove/heure/intervention/{id}/{ficheId}/{heureId}",name="app_affaire_remove_heure_intervention")
-     */
+    #[Route("/Lhermitte/affaire/remove/heure/intervention/{id}/{ficheId}/{heureId}", name: "app_affaire_remove_heure_intervention")]
 
     public function removeHeureIntervention($id, $ficheId, $heureId, Request $request): Response
     {
         $heure = $this->repoInterventionFichesMonteursHeures->findOneBy(['id' => $heureId]);
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->remove($heure);
         $entityManager->flush();
 
@@ -919,9 +910,7 @@ class AffairesController extends AbstractController
         return $this->redirectToRoute('app_affaire_edit_fiche_intervention', ['id' => $id, 'ficheId' => $ficheId]);
     }
 
-    /**
-     * @Route("/Lhermitte/affaire/verrouiller/fiche/intervention/{id}/{ficheId}",name="app_affaire_verrouiller_fiche_intervention")
-     */
+    #[Route("/Lhermitte/affaire/verrouiller/fiche/intervention/{id}/{ficheId}", name: "app_affaire_verrouiller_fiche_intervention")]
 
     public function verrouillerFicheIntervention($id, $ficheId): Response
     {
@@ -930,7 +919,7 @@ class AffairesController extends AbstractController
         if ($heures || $fiche->getHere() == false) {
             $fiche->setLockedAt(new DateTime())
                 ->setLockedBy($this->getUser());
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($fiche);
             $entityManager->flush();
 

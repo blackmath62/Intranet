@@ -10,7 +10,6 @@ use App\Controller\ContratCommissionnaireController;
 use App\Controller\FscAttachedFileController;
 use App\Controller\FscPieceClientController;
 use App\Controller\HolidayController;
-use App\Controller\MovementBillFscController;
 use App\Entity\Main\CmdRobyDelaiAccepteReporte;
 use App\Entity\Main\ControlesAnomalies;
 use App\Repository\Divalto\ArtRepository;
@@ -25,18 +24,17 @@ use App\Repository\Main\ControlesAnomaliesRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\UsersRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class ControleAnomaliesController extends AbstractController
 {
@@ -62,9 +60,31 @@ class ControleAnomaliesController extends AbstractController
     private $comptaAnalytiqueController;
     private $clientFeuRougeOrangeController;
     private $holidayController;
+    private $entityManager;
 
-    public function __construct(HolidayController $holidayController, ClientFeuRougeOrangeController $clientFeuRougeOrangeController, ComptaAnalytiqueController $comptaAnalytiqueController, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, FscPieceClientController $movementBillFscController, MouvRepository $movRepo, ContratCommissionnaireController $contratCommissionnaireController, FscAttachedFileController $fscAttachedFileController, CmdRobyDelaiAccepteReporteController $cmdRobyController, CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, FouRepository $fournisseur, ArtRepository $article, CliRepository $client, ControleArtStockMouvEfRepository $articleSrefFermes, MailerInterface $mailer, ControlesAnomaliesRepository $anomalies, ControleComptabiliteRepository $compta)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        HolidayController $holidayController,
+        ClientFeuRougeOrangeController $clientFeuRougeOrangeController,
+        ComptaAnalytiqueController $comptaAnalytiqueController,
+        UsersRepository $repoUsers,
+        AdminEmailController $adminEmailController,
+        MailListRepository $repoMail,
+        FscPieceClientController $movementBillFscController,
+        MouvRepository $movRepo,
+        ContratCommissionnaireController $contratCommissionnaireController,
+        FscAttachedFileController $fscAttachedFileController,
+        CmdRobyDelaiAccepteReporteController $cmdRobyController,
+        CmdRobyDelaiAccepteReporteRepository $cmdRoby,
+        EntRepository $entete,
+        FouRepository $fournisseur,
+        ArtRepository $article,
+        CliRepository $client,
+        ControleArtStockMouvEfRepository $articleSrefFermes,
+        MailerInterface $mailer,
+        ControlesAnomaliesRepository $anomalies,
+        ControleComptabiliteRepository $compta
+    ) {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
         $this->compta = $compta;
@@ -87,6 +107,7 @@ class ControleAnomaliesController extends AbstractController
         $this->comptaAnalytiqueController = $comptaAnalytiqueController;
         $this->clientFeuRougeOrangeController = $clientFeuRougeOrangeController;
         $this->holidayController = $holidayController;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
@@ -96,9 +117,8 @@ class ControleAnomaliesController extends AbstractController
         return $this->render('controle_anomalies/index.html.twig');
     }
 
-    /**
-     * @Route("/controle/anomalies", name="app_controle_anomalies")
-     */
+    #[Route("/controle/anomalies", name: "app_controle_anomalies")]
+
     public function Show_Anomalies()
     {
         $anomaliesCount = $this->anomalies->getCountAnomalies();
@@ -111,9 +131,8 @@ class ControleAnomaliesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/controle/anomalies/run/script", name="app_controle_anomalies_run")
-     */
+    #[Route("/controle/anomalies/run/script", name: "app_controle_anomalies_run")]
+
     public function Run_Cron()
     {
         $dateDuJour = new DateTime();
@@ -212,7 +231,7 @@ class ControleAnomaliesController extends AbstractController
                     $listCmd->setDelaiReporte(null);
                 }
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($listCmd);
             $em->flush();
         }
@@ -323,9 +342,8 @@ class ControleAnomaliesController extends AbstractController
         $this->Execute($donnees, $libelle, $template, $subject);
     }
 
-    /**
-     * @Route("/controle/pieces", name="app_controle_pieces")
-     */
+    #[Route("/controle/pieces", name: "app_controle_pieces")]
+
     public function ControlePieces()
     {
 
@@ -385,7 +403,7 @@ class ControleAnomaliesController extends AbstractController
                     ->setCreatedAt($dateDuJour)
                     ->setModifiedAt($dateDuJour)
                     ->setType($libelle);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($createAnomalie);
                 $em->flush();
 
@@ -416,13 +434,13 @@ class ControleAnomaliesController extends AbstractController
                     $ano->setUser($donnees[$lig]['Utilisateur']);
                     $ano->setUpdatedAt($dateDuJour);
                     $ano->setModifiedAt($dateDuJour);
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($ano);
                     $em->flush();
                 } else {
                     $ano->setUser($donnees[$lig]['Utilisateur']);
                     $ano->setUpdatedAt($dateDuJour);
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($ano);
                     $em->flush();
                 }
@@ -446,7 +464,7 @@ class ControleAnomaliesController extends AbstractController
                 && $key->getType() != 'StockDirect'
                 && $key->getType() != 'SrefArticleAFermer'
                 && $key->getType() != 'ArticleAFermer') {
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->remove($key);
                 $em->flush();
             }
@@ -471,13 +489,13 @@ class ControleAnomaliesController extends AbstractController
             $ano->setUpdatedAt($dateDuJour)
                 ->setUser('JEROME')
                 ->setModifiedAt($dateDuJour);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($ano);
             $em->flush();
         } else {
             $ano->setUpdatedAt($dateDuJour)
                 ->setUser('JEROME');
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($ano);
             $em->flush();
         }
@@ -683,13 +701,13 @@ class ControleAnomaliesController extends AbstractController
             $ano->setUpdatedAt($dateDuJour)
                 ->setUser('JEROME')
                 ->setModifiedAt($dateDuJour);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($ano);
             $em->flush();
         } else {
             $ano->setUpdatedAt($dateDuJour);
             $ano->setUser('JEROME');
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($ano);
             $em->flush();
         }
@@ -845,12 +863,12 @@ class ControleAnomaliesController extends AbstractController
             $this->exportStockDirect();
             $ano->setUpdatedAt($dateDuJour);
             $ano->setModifiedAt($dateDuJour);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($ano);
             $em->flush();
         } else {
             $ano->setUpdatedAt($dateDuJour);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($ano);
             $em->flush();
         }

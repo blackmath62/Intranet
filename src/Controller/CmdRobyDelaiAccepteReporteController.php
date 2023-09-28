@@ -14,17 +14,16 @@ use App\Repository\Main\MailListRepository;
 use App\Repository\Main\NoteRepository;
 use App\Repository\Main\UsersRepository;
 use DateTime;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ROBY")
- */
+#[IsGranted("ROLE_ROBY")]
 
 class CmdRobyDelaiAccepteReporteController extends AbstractController
 {
@@ -37,9 +36,16 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
     private $mailEnvoi;
     private $mailTreatement;
     private $adminEmailController;
+    private $entityManager;
 
-    public function __construct(AdminEmailController $adminEmailController, EntRepository $entete, UsersRepository $Users, CmdRobyDelaiAccepteReporteRepository $cmdRoby, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        AdminEmailController $adminEmailController,
+        EntRepository $entete,
+        UsersRepository $Users,
+        CmdRobyDelaiAccepteReporteRepository $cmdRoby,
+        MailerInterface $mailer,
+        MailListRepository $repoMail) {
         $this->mailer = $mailer;
         $this->cmdRoby = $cmdRoby;
         $this->Users = $Users;
@@ -48,14 +54,13 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
-
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Roby/cmd/delai/accepte/reporte/active", name="app_cmd_roby_delai_accepte_reporte_active")
-     * @Route("/Roby/cmd/delai/accepte/reporte/close", name="app_cmd_roby_delai_accepte_reporte_close")
-     */
+    #[Route("/Roby/cmd/delai/accepte/reporte/active", name: "app_cmd_roby_delai_accepte_reporte_active")]
+    #[Route("/Roby/cmd/delai/accepte/reporte/close", name: "app_cmd_roby_delai_accepte_reporte_close")]
+
     // voir les commandes en cours ou celles terminées
     public function show(CmdRobyDelaiAccepteReporteRepository $repo, NoteRepository $repoNotes, Request $request): Response
     {
@@ -82,7 +87,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                 $mail->setCreatedAt(new DateTime())
                     ->setEmail($form->getData()['email'])
                     ->setPage($tracking);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
             } else {
@@ -105,10 +110,9 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/cmd/status/close/{id}", name="app_cmd_roby_status_close")
-     * @Route("/Roby/cmd/status/active/{id}", name="app_cmd_roby_status_active")
-     */
+    #[Route("/Roby/cmd/status/close/{id}", name: "app_cmd_roby_status_close")]
+    #[Route("/Roby/cmd/status/active/{id}", name: "app_cmd_roby_status_active")]
+
     // modifier le statut des commandes sur l'intranet
     public function setStatus($id, CmdRobyDelaiAccepteReporteRepository $repo, Request $request): Response
     {
@@ -128,7 +132,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                 ->setStatut('en cours ...');
         }
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($commande);
         $em->flush();
 
@@ -136,11 +140,10 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         return $this->redirectToRoute('app_cmd_roby_delai_accepte_reporte_active');
     }
 
-    /**
-     * @Route("/Roby/cmd/update", name="app_cmd_roby_update")
-     */
+    #[Route("/Roby/cmd/update", name: "app_cmd_roby_update")]
+
     // mettre à jour les commandes du systéme sur l'intranet
-    public function runUpdate(CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete, Request $request): Response
+    public function runUpdate(CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -192,7 +195,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                     $listCmd->setDelaiReporte(null);
                 }
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($listCmd);
             $em->flush();
         }
@@ -218,9 +221,8 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         return $this->redirectToRoute('app_cmd_roby_delai_accepte_reporte_active');
     }
 
-    /**
-     * @Route("/Roby/cmd/status/auto/close", name="app_cmd_roby_auto_close")
-     */
+    #[Route("/Roby/cmd/status/auto/close", name: "app_cmd_roby_auto_close")]
+
     // passer automatiquement les commandes qui ne sont plus en actives dans le systéme en Terminées
     public function setCloseAuto()
     {
@@ -236,7 +238,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                 $cmd->setModifiedBy($this->Users->findOneBy(['id' => 3]))
                     ->setStatut('Terminé')
                     ->setModifiedAt(new DateTime);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($cmd);
                 $em->flush();
                 if ($donnee == false) {
@@ -246,7 +248,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                         ->setCreatedAt(new DateTime)
                         ->setModifiedAt(new DateTime)
                         ->setCmdRobyDelaiAccepteReporte($value);
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($note);
                     $em->flush();
                 }
@@ -257,7 +259,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                         ->setCreatedAt(new DateTime)
                         ->setModifiedAt(new DateTime)
                         ->setCmdRobyDelaiAccepteReporte($value);
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($note);
                     $em->flush();
                 }
@@ -280,13 +282,10 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
             $this->addFlash('message', 'La liste des commandes a été nettoyée, ' . $texte);
         }
 
-        //return $this->redirectToRoute('app_cmd_roby_delai_accepte_reporte_active');
-
     }
 
-    /**
-     * @Route("/Roby/cmd/status/view/note/{id}", name="app_cmd_roby_status_view_note")
-     */
+    #[Route("/Roby/cmd/status/view/note/{id}", name: "app_cmd_roby_status_view_note")]
+
     // voir les notes liées a une commande et pouvoir en ajouter
     public function viewNote($id, CmdRobyDelaiAccepteReporteRepository $repo, NoteRepository $repoNotes, Request $request): Response
     {
@@ -308,7 +307,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                 ->setCmdRobyDelaiAccepteReporte($commande)
                 ->setCreatedAt(new DateTime)
                 ->setContent($form->getData()->getContent());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($note);
             $em->flush();
             $this->addFlash('message', 'Vous avez bien ajouté une note !');
@@ -323,9 +322,8 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/cmd/mail", name="app_cmd_roby_send_mail")
-     */
+    #[Route("/Roby/cmd/mail", name: "app_cmd_roby_send_mail")]
+
     // envoyer un mail pour avertir sur les commandes qui ont un délai accéptées
     public function sendMail(): Response
     {

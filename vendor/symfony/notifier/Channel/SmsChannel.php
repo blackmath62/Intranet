@@ -14,26 +14,22 @@ namespace Symfony\Component\Notifier\Channel;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\Notification\SmsNotificationInterface;
-use Symfony\Component\Notifier\Recipient\Recipient;
+use Symfony\Component\Notifier\Recipient\RecipientInterface;
 use Symfony\Component\Notifier\Recipient\SmsRecipientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 class SmsChannel extends AbstractChannel
 {
-    public function notify(Notification $notification, Recipient $recipient, string $transportName = null): void
+    public function notify(Notification $notification, RecipientInterface $recipient, string $transportName = null): void
     {
         $message = null;
         if ($notification instanceof SmsNotificationInterface) {
             $message = $notification->asSmsMessage($recipient, $transportName);
         }
 
-        if (null === $message) {
-            $message = SmsMessage::fromNotification($notification, $recipient);
-        }
+        $message ??= SmsMessage::fromNotification($notification, $recipient);
 
         if (null !== $transportName) {
             $message->transport($transportName);
@@ -46,8 +42,8 @@ class SmsChannel extends AbstractChannel
         }
     }
 
-    public function supports(Notification $notification, Recipient $recipient): bool
+    public function supports(Notification $notification, RecipientInterface $recipient): bool
     {
-        return $recipient instanceof SmsRecipientInterface && '' !== $recipient->getPhone();
+        return $recipient instanceof SmsRecipientInterface;
     }
 }

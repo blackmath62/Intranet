@@ -2,7 +2,7 @@
 
 namespace Vich\UploaderBundle\EventListener\Doctrine;
 
-use Doctrine\Common\EventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 /**
  * CleanListener.
@@ -13,24 +13,9 @@ use Doctrine\Common\EventArgs;
  */
 class CleanListener extends BaseListener
 {
-    /**
-     * The events the listener is subscribed to.
-     *
-     * @return array<int, string> The array of events
-     */
-    public function getSubscribedEvents(): array
+    public function preUpdate(LifecycleEventArgs $event): void
     {
-        return [
-            'preUpdate',
-        ];
-    }
-
-    /**
-     * @param EventArgs|\Doctrine\ORM\Event\PreUpdateEventArgs $event
-     */
-    public function preUpdate(EventArgs $event): void
-    {
-        $object = $this->adapter->getObjectFromArgs($event);
+        $object = $event->getObject();
 
         if (!$this->isUploadable($object)) {
             return;

@@ -2,15 +2,12 @@
 
 namespace App\Entity\Divalto;
 
-use App\Entity\Main\Decisionnel;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Divalto\ArtRepository;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Art
- * 
+ *
  * @ORM\Entity(repositoryClass=ArtRepository::class)
  * @ORM\Table(name="ART", indexes={@ORM\Index(name="INDEX_A", columns={"DOS", "REF", "ART_ID"}), @ORM\Index(name="INDEX_A_MINI", columns={"CE9", "DOS", "REF", "ART_ID"}), @ORM\Index(name="INDEX_B", columns={"DOS", "DESABR", "ART_ID"}), @ORM\Index(name="INDEX_I", columns={"DOS", "EAN", "ART_ID"}), @ORM\Index(name="INDEX_J", columns={"DOS", "FAM_0001", "REF", "ART_ID"}), @ORM\Index(name="INDEX_K", columns={"DOS", "FAM_0002", "REF", "ART_ID"}), @ORM\Index(name="INDEX_L", columns={"DOS", "FAM_0003", "REF", "ART_ID"}), @ORM\Index(name="INDEX_M", columns={"DOS", "TIERS", "REF", "ART_ID"}), @ORM\Index(name="INDEX_Z", columns={"DOS", "PRODNAT", "REF", "ART_ID"})})
  */
@@ -104,7 +101,7 @@ class Art
 
     /**
      * @var string
-     * 
+     *
      * @ORM\Column(name="USERCR", type="string", length=20, nullable=false, options={"fixed"=true,"comment"="Auteur de la création"})
      */
     private $usercr;

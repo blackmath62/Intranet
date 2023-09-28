@@ -3,44 +3,32 @@
 namespace App\Entity\Main;
 
 use App\Entity\Main\Users;
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Main\DocumentsReglementairesFscRepository;
+use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=DocumentsReglementairesFscRepository::class)
- */
+#[ORM\Entity(repositoryClass: DocumentsReglementairesFscRepository::class)]
+
 class DocumentsReglementairesFsc
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+
     private $id;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $files;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $years;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="documentsReglementairesFsc")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "addBys")]
     private $addBy;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $type;
 
     public function getId(): ?int
@@ -53,7 +41,7 @@ class DocumentsReglementairesFsc
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -110,12 +98,12 @@ class DocumentsReglementairesFsc
 
     public function getUser(): ?Users
     {
-        return $this->user;
+        return $this->addBy;
     }
 
     public function setUser(?Users $user): self
     {
-        $this->user = $user;
+        $this->addBy = $user;
 
         return $this;
     }

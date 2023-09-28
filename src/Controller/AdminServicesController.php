@@ -7,21 +7,26 @@ use App\Form\EditServiceType;
 use App\Repository\Main\ServicesRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
+
 class AdminServicesController extends AbstractController
 {
-    /**
-     * @Route("/admin/services", name="app_admin_services")
-     */
+    private $entityManager;
 
-    public function index(Services $service = null, Request $request, ServicesRepository $repo, EntityManagerInterface $manager)
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/admin/services", name: "app_admin_services")]
+
+    public function index(Request $request, ServicesRepository $repo, EntityManagerInterface $manager, Services $service = null)
     {
         if (!$service) {
             $service = new Services();
@@ -52,15 +57,14 @@ class AdminServicesController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/service/delete/{id}",name="app_delete_service")
-     */
+    #[Route("/admin/service/delete/{id}", name: "app_delete_service")]
+
     public function deleteservice($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(Services::class);
+        $repository = $this->entityManager->getRepository(Services::class);
         $serviceId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($serviceId);
         $em->flush();
 
@@ -70,9 +74,9 @@ class AdminServicesController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_services'));
     }
-    /**
-     * @Route("/admin/service/edit/{id}",name="app_edit_service")
-     */
+
+    #[Route("/admin/service/edit/{id}", name: "app_edit_service")]
+
     public function editservice(Services $service, Request $request)
     {
         $form = $this->createForm(EditServiceType::class, $service);
@@ -83,7 +87,7 @@ class AdminServicesController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($service);
             $em->flush();
 

@@ -2,22 +2,18 @@
 
 namespace App\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class ThemeController extends AbstractController
 {
-    /**
-     * @Route("/theme", name="theme")
-     */
-    public function index(Request $request): Response
+    #[Route("/theme", name: "theme")]
+
+    public function index(): Response
     {
         // tracking user page for stats
         //  $tracking = $request->attributes->get('_route');

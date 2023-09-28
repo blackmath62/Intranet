@@ -3,36 +3,25 @@
 namespace App\Entity\Main;
 
 use App\Entity\Main\Users;
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Main\TrackingsRepository;
-use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=TrackingsRepository::class)
- */
+#[ORM\Entity(repositoryClass: TrackingsRepository::class)]
 class Trackings
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-     /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="trackings")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "trackings")]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $page;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
     public function getId(): ?int
@@ -69,7 +58,7 @@ class Trackings
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 

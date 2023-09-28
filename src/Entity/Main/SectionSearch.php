@@ -3,59 +3,40 @@
 namespace App\Entity\Main;
 
 use App\Entity\Main\FAQ;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 use App\Repository\Main\SectionSearchRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-/**
- * @ORM\Entity(repositoryClass=SectionSearchRepository::class)
- * @UniqueEntity("nom")
- */
+#[ORM\Entity(repositoryClass: SectionSearchRepository::class)]
+#[UniqueEntity("nom")]
 class SectionSearch
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $nom;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $closedAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $textColor;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $backgroundColor;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $fa;
 
-
-     /**
-     * @ORM\OneToMany(targetEntity=FAQ::class, mappedBy="search")
-     */
+    #[ORM\OneToMany(targetEntity: FAQ::class, mappedBy: "search")]
     private $faqs;
 
     public function __construct()
@@ -116,7 +97,7 @@ class SectionSearch
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -128,7 +109,7 @@ class SectionSearch
         return $this->closedAt;
     }
 
-    public function setClosedAt(?\DateTimeInterface $closedAt): self
+    public function setClosedAt(?\DateTimeInterface $closedAt) : self
     {
         $this->closedAt = $closedAt;
 

@@ -5,9 +5,11 @@ FMElfinderBundle
 
 ### Code Quality Assurance ###
 
-| SL Insight | TravisCI | Coverage| License | Version |
-| ------------------------|-------------|-----------------|-----------------|----------------|
-|[![SensioLabsInsight](https://insight.sensiolabs.com/projects/604032ab-06ef-4ee2-b0cf-bb5240b9cd17/mini.png)](https://insight.sensiolabs.com/projects/604032ab-06ef-4ee2-b0cf-bb5240b9cd17)|[![Build Status](https://secure.travis-ci.org/helios-ag/FMElfinderBundle.png)](http://travis-ci.org/helios-ag/FMElfinderBundle)|[![Coverage Status](https://coveralls.io/repos/helios-ag/FMElfinderBundle/badge.svg?branch=master&service=github)](https://coveralls.io/github/helios-ag/FMElfinderBundle?branch=master)|[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)|[![Latest Stable Version](https://poser.pugx.org/helios-ag/fm-elfinder-bundle/v/stable.svg)](https://packagist.org/packages/helios-ag/fm-elfinder-bundle)|
+Proudly developed with [![PhpStorm](https://img.shields.io/badge/phpstorm-143?style=for-the-badge&logo=phpstorm&logoColor=black&color=black&labelColor=darkorchid)](https://www.jetbrains.com/phpstorm/)
+
+| Tests | Coverage| License | Version |
+|-------------|-----------------|-----------------|----------------|
+|[![Tests - Linux](https://github.com/helios-ag/FMElfinderBundle/actions/workflows/test.yaml/badge.svg)](https://github.com/helios-ag/FMElfinderBundle/actions/workflows/test.yaml)|[![Coverage Status](https://coveralls.io/repos/helios-ag/FMElfinderBundle/badge.svg?branch=master&service=github)](https://coveralls.io/github/helios-ag/FMElfinderBundle?branch=master)|[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)|[![Latest Stable Version](https://poser.pugx.org/helios-ag/fm-elfinder-bundle/v/stable.svg)](https://packagist.org/packages/helios-ag/fm-elfinder-bundle)|
 
 
 | Downloads |
@@ -43,6 +45,7 @@ Recommended bundles to use with:
 - [Elfinder Form Type](/docs/elfinder-form-type.md)
     - [Configuration](/docs/elfinder-form-type.md#configuration)
     - [EasyAdmin 2.x](/docs/elfinder-form-type.md#easyadmin-2x-integration)
+    - [EasyAdmin 3.x/4.x](/docs/elfinder-form-type.md#easyadmin-3x/4x-integration)
 - [CKEditor integration](/docs/ckeditor-integration.md)
     - [Installation](/docs/ckeditor-integration.md#step-1-installation)
     - [Configuration](/docs/ckeditor-integration.md#step-2-configure-ckeditor-setting-via-settingsyml-or-through-form-builder)
@@ -200,11 +203,12 @@ and of course be sure to set proper write/read permissions on home folders.
 
 Yes you can with this configuration in your fm_elfinder.yaml
 
-
-where_is_multi: 
+```yaml
+where_is_multi:
     {connector}: {index of the connector}
 multi_home_folder: true
 folder_separator: {one char other of /}
+```
 
 ### Example
 ```
@@ -216,7 +220,7 @@ fm_elfinder:
             #editor_template: custom template for your editor # default null
             #path_prefix: http://localhost/ # for setting custom assets path prefix, useful for non vhost configurations, i.e. http://127.0.0.1/mysite/
             fullscreen: false # default is true, applies to simple and ckeditor editors
-            where_is_multi: 
+            where_is_multi:
                 roots: 0
             multi_home_folder: true
             folder_separator: "|"

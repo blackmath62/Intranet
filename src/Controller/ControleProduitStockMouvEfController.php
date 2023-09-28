@@ -4,21 +4,18 @@ namespace App\Controller;
 
 use App\Form\SearchType;
 use App\Repository\Divalto\ControleArtStockMouvEfRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class ControleProduitStockMouvEfController extends AbstractController
 {
-    /**
-     * @Route("/controle/produit/stock/mouv/ef", name="app_controle_produit_stock_mouv_ef")
-     */
+    #[Route("/controle/produit/stock/mouv/ef", name: "app_controle_produit_stock_mouv_ef")]
+
     public function index(ControleArtStockMouvEfRepository $repo, Request $request): Response
     {
         // tracking user page for stats
@@ -43,10 +40,9 @@ class ControleProduitStockMouvEfController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/controle/anomalies/produits/fermes", name="app_anomalies_produits_fermes")
-     */
-    public function getAnomaliesProduitsFermes(ControleArtStockMouvEfRepository $repo, Request $request, SearchTiersController $dos): Response
+    #[Route("/controle/anomalies/produits/fermes", name: "app_anomalies_produits_fermes")]
+
+    public function getAnomaliesProduitsFermes(ControleArtStockMouvEfRepository $repo, SearchTiersController $dos): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');

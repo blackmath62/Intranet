@@ -4,22 +4,19 @@ namespace App\Controller;
 
 use App\Repository\Main\TrackingsRepository;
 use App\Repository\Main\UsersRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class StatistiquesIntranetController extends AbstractController
 {
-    /**
-     * @Route("/admin/statistiques/intranet", name="app_admin_statistiques")
-     * @Route("/admin/statistiques/intranet/{id}", name="app_admin_statistiques_user")
-     */
-    public function index($id = null, $usager = null, TrackingsRepository $repo, UsersRepository $repoUsers): Response
+    #[Route("/admin/statistiques/intranet", name: "app_admin_statistiques")]
+    #[Route("/admin/statistiques/intranet/{id}", name: "app_admin_statistiques_user")]
+
+    public function index(TrackingsRepository $repo, UsersRepository $repoUsers, $id = null, $usager = null): Response
     {
         if ($id) {
             $data = $repo->getUserStatesIntranet($id);

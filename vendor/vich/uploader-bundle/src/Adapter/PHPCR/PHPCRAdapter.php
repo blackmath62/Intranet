@@ -2,27 +2,22 @@
 
 namespace Vich\UploaderBundle\Adapter\PHPCR;
 
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Vich\UploaderBundle\Adapter\AdapterInterface;
 
 /**
  * @author Ben Glassman <bglassman@gmail.com>
- * @final
  *
  * @internal
  */
-class PHPCRAdapter implements AdapterInterface
+final class PHPCRAdapter implements AdapterInterface
 {
-    public function getObjectFromArgs($event)
+    public function recomputeChangeSet(LifecycleEventArgs $event): void
     {
-        return $event->getObject();
-    }
+        $object = $event->getObject();
 
-    public function recomputeChangeSet($event): void
-    {
-        $object = $this->getObjectFromArgs($event);
-
-        $dm = $event->getObjectManager();
-        $uow = $dm->getUnitOfWork();
+        $objectManager = $event->getObjectManager();
+        $uow = $objectManager->getUnitOfWork();
         $uow->computeSingleDocumentChangeSet($object);
     }
 }

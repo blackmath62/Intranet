@@ -11,13 +11,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Throwable;
+
+#[IsGranted("ROLE_USER")]
 
 class ArticleBlobController extends AbstractController
 {
-    /**
-     * @Route("/article/blob", name="app_article_blob")
-     */
+    #[Route("/article/blob", name: "app_article_blob")]
+
     public function index(ArtRepository $repo, Request $request, StatsAchatController $mef): Response
     {
         $arts = [];

@@ -22,9 +22,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 class DateTimeValidator extends DateValidator
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint)
     {
         if (!$constraint instanceof DateTime) {
             throw new UnexpectedTypeException($constraint, DateTime::class);
@@ -34,7 +34,7 @@ class DateTimeValidator extends DateValidator
             return;
         }
 
-        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!\is_scalar($value) && !$value instanceof \Stringable) {
             throw new UnexpectedValueException($value, 'string');
         }
 
@@ -42,7 +42,7 @@ class DateTimeValidator extends DateValidator
 
         \DateTime::createFromFormat($constraint->format, $value);
 
-        $errors = \DateTime::getLastErrors();
+        $errors = \DateTime::getLastErrors() ?: ['error_count' => 0, 'warnings' => []];
 
         if (0 < $errors['error_count']) {
             $this->context->buildViolation($constraint->message)
@@ -53,10 +53,8 @@ class DateTimeValidator extends DateValidator
             return;
         }
 
-        if ('+' === substr($constraint->format, -1)) {
-            $errors['warnings'] = array_filter($errors['warnings'], function ($warning) {
-                return 'Trailing data' !== $warning;
-            });
+        if (str_ends_with($constraint->format, '+')) {
+            $errors['warnings'] = array_filter($errors['warnings'], fn ($warning) => 'Trailing data' !== $warning);
         }
 
         foreach ($errors['warnings'] as $warning) {

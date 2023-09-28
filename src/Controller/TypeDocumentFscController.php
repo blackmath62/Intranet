@@ -6,21 +6,26 @@ use App\Entity\Main\TypeDocumentFsc;
 use App\Form\TypeDocumentFscType;
 use App\Repository\Main\TypeDocumentFscRepository;
 use DateTime;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class TypeDocumentFscController extends AbstractController
 {
-    /**
-     * @Route("/type/document/fsc", name="app_type_document_fsc")
-     */
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/type/document/fsc", name: "app_type_document_fsc")]
+
     public function index(TypeDocumentFscRepository $repo, Request $request): Response
     {
         $form = $this->createForm(TypeDocumentFscType::class);
@@ -29,7 +34,7 @@ class TypeDocumentFscController extends AbstractController
             $typeDoc = new TypeDocumentFsc();
             $typeDoc = $form->getData();
             $typeDoc->setCreatedAt(new DateTime());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($typeDoc);
             $em->flush();
         }
@@ -46,9 +51,8 @@ class TypeDocumentFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/type/document/fsc/edit/{id}", name="app_type_document_fsc_edit")
-     */
+    #[Route("/type/document/fsc/edit/{id}", name: "app_type_document_fsc_edit")]
+
     public function edit($id, TypeDocumentFsc $typeDocFsc, Request $request): Response
     {
         $form = $this->createForm(TypeDocumentFscType::class, $typeDocFsc);
@@ -59,7 +63,7 @@ class TypeDocumentFscController extends AbstractController
         //   $this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($typeDocFsc);
             $em->flush();
 
@@ -74,15 +78,14 @@ class TypeDocumentFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/type/document/fsc/delete/{id}", name="app_type_document_fsc_delete")
-     */
-    public function delete($id, Request $request): Response
+    #[Route("/type/document/fsc/delete/{id}", name: "app_type_document_fsc_delete")]
+
+    public function delete($id): Response
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(TypeDocumentFsc::class);
+        $repository = $this->entityManager->getRepository(TypeDocumentFsc::class);
         $typeDocFscId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($typeDocFscId);
         $em->flush();
 

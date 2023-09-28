@@ -7,20 +7,26 @@ use App\Form\EditStatusType;
 use App\Repository\Main\StatusRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
+
 class AdminStatusController extends AbstractController
 {
-    /**
-     * @Route("/admin/status", name="app_admin_status")
-     */
-    public function index(Status $status = null, Request $request, StatusRepository $repo, EntityManagerInterface $manager)
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/admin/status", name: "app_admin_status")]
+
+    public function index(Request $request, StatusRepository $repo, EntityManagerInterface $manager, Status $status = null)
     {
         if (!$status) {
             $status = new Status();
@@ -51,15 +57,14 @@ class AdminStatusController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/statut/delete/{id}",name="app_delete_status")
-     */
+    #[Route("/admin/statut/delete/{id}", name: "app_delete_status")]
+
     public function deleteStatus($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(Status::class);
+        $repository = $this->entityManager->getRepository(Status::class);
         $StatusId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($StatusId);
         $em->flush();
 
@@ -69,9 +74,9 @@ class AdminStatusController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_status'));
     }
-    /**
-     * @Route("/admin/status/edit/{id}",name="app_edit_status")
-     */
+
+    #[Route("/admin/status/edit/{id}", name: "app_edit_status")]
+
     public function editSociete(Status $status, Request $request)
     {
         $form = $this->createForm(EditStatusType::class, $status);
@@ -82,7 +87,7 @@ class AdminStatusController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($status);
             $em->flush();
 

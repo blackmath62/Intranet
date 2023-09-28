@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted("ROLE_USER")]
 
 class ClientFeuRougeOrangeController extends AbstractController
 {
@@ -19,8 +22,12 @@ class ClientFeuRougeOrangeController extends AbstractController
     private $mailTreatement;
     private $adminEmailController;
 
-    public function __construct(MouvRepository $repoMouv, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        MouvRepository $repoMouv,
+        AdminEmailController $adminEmailController,
+        MailerInterface $mailer,
+        MailListRepository $repoMail
+    ) {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
@@ -31,9 +38,8 @@ class ClientFeuRougeOrangeController extends AbstractController
         //parent::__construct();
     }
 
-    /**
-     * @Route("/client/feu/rouge/orange/send/mail", name="app_client_feu_rouge_orange_send_mail")
-     */
+    #[Route("/client/feu/rouge/orange/send/mail", name: "app_client_feu_rouge_orange_send_mail")]
+
     public function sendMail(): Response
     {
         // envoyer un mail

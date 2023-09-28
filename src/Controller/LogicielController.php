@@ -6,21 +6,26 @@ use App\Entity\Main\Logiciel;
 use App\Form\EditLogicielType;
 use App\Repository\Main\LogicielRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
+
 class LogicielController extends AbstractController
 {
-    /**
-     * @Route("/admin/logiciels", name="app_admin_logiciel")
-     */
+    private $entityManager;
 
-    public function index(Logiciel $logiciel = null, Request $request, LogicielRepository $repo, EntityManagerInterface $manager)
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/admin/logiciels", name: "app_admin_logiciel")]
+
+    public function index(Request $request, LogicielRepository $repo, EntityManagerInterface $manager, Logiciel $logiciel = null)
     {
         if (!$logiciel) {
             $logiciel = new Logiciel();
@@ -52,27 +57,25 @@ class LogicielController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/logiciel/delete/{id}",name="app_delete_logiciel")
-     */
-    public function deletelogiciel($id, Request $request)
+    #[Route("/admin/logiciel/delete/{id}", name: "app_delete_logiciel")]
+
+    public function deletelogiciel($id)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(Logiciel::class);
+        $repository = $this->entityManager->getRepository(Logiciel::class);
         $logicielId = $repository->find($id);
 
         // tracking user page for stats
         // $tracking = $request->attributes->get('_route');
         // $this->setTracking($tracking);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($logicielId);
         $em->flush();
 
         return $this->redirect($this->generateUrl('app_admin_logiciel'));
     }
-    /**
-     * @Route("/admin/logiciel/edit/{id}",name="app_edit_logiciel")
-     */
+    #[Route("/admin/logiciel/edit/{id}", name: "app_edit_logiciel")]
+
     public function editlogiciel(Logiciel $logiciel, Request $request)
     {
         $form = $this->createForm(EditLogicielType::class, $logiciel);
@@ -83,7 +86,7 @@ class LogicielController extends AbstractController
         // $this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($logiciel);
             $em->flush();
 

@@ -2,27 +2,21 @@
 
 namespace App\Form;
 
-use DateTime;
-use App\Entity\Main\ConduiteDeTravauxMe;
-use App\Entity\Main\FournisseursDivalto;
 use App\Repository\Divalto\ArtRepository;
-use Symfony\Component\Form\AbstractType;
 use App\Repository\Divalto\FouRepository;
-use phpDocumentor\Reflection\PseudoTypes\False_;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class DateDebutDateFinFournisseursType extends AbstractType
 {
     private $repoFou;
     protected $requestStack;
-    private$repoArt;
+    private $repoArt;
     public function __construct(FouRepository $repoFou, ArtRepository $repoArt, RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
@@ -30,12 +24,12 @@ class DateDebutDateFinFournisseursType extends AbstractType
         $this->repoArt = $repoArt;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $dos = $this->requestStack->getCurrentRequest()->get('dos');
         $familles = $this->repoArt->getFamilleProduitOuvertParDossier($dos);
         $fous = $this->repoFou->getListFou($dos);
-        
+
         $arrayFous = [];
         foreach ($fous as $fou) {
             if (!empty($fou['tiers'])) {
@@ -50,39 +44,39 @@ class DateDebutDateFinFournisseursType extends AbstractType
         }
 
         $builder
-            ->add('start', DateType::class,[
+            ->add('start', DateType::class, [
                 'widget' => 'single_text',
                 'required' => true,
                 'label' => "Date Début : ",
                 'attr' => ['class' => 'form-control col-12 text-center'],
-                'label_attr' => ['class' => 'col-12 text-center']
+                'label_attr' => ['class' => 'col-12 text-center'],
             ])
-            ->add('end', DateType::class,[
+            ->add('end', DateType::class, [
                 'widget' => 'single_text',
                 'required' => true,
                 'label' => "Date fin : ",
                 'attr' => ['class' => 'form-control col-12 text-center'],
-                'label_attr' => ['class' => 'col-12 text-center']
+                'label_attr' => ['class' => 'col-12 text-center'],
             ])
-            ->add('fournisseurs', ChoiceType::class,[
+            ->add('fournisseurs', ChoiceType::class, [
                 'choices' => $arrayFous,
                 'expanded' => false,
                 'required' => false,
                 'multiple' => true,
                 'label' => 'Fournisseurs',
                 'attr' => ['class' => 'select2 form-control'],
-               
+
             ])
-            ->add('familles', ChoiceType::class,[
+            ->add('familles', ChoiceType::class, [
                 'choices' => $arrayFamilles,
                 'expanded' => false,
                 'required' => false,
                 'multiple' => true,
                 'label' => 'Familles produits',
                 'attr' => ['class' => 'select2 form-control'],
-               
+
             ])
-            ->add('type', ChoiceType::class,[
+            ->add('type', ChoiceType::class, [
                 'choices' => [
                     'Tiers | Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => "basique",
                     'Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => "sansFournisseurs",
@@ -98,9 +92,9 @@ class DateDebutDateFinFournisseursType extends AbstractType
                 'multiple' => false,
                 'label' => 'Selectionnez le type d\'export',
                 'attr' => ['class' => 'form-control'],
-               
+
             ])
-            ->add('metier', ChoiceType::class,[
+            ->add('metier', ChoiceType::class, [
                 'choices' => [
                     'EV' => "EV",
                     'HP' => "HP",
@@ -116,18 +110,18 @@ class DateDebutDateFinFournisseursType extends AbstractType
                 'multiple' => true,
                 'label' => 'Choisissez un ou plusieurs métiers (optionnel)',
                 'attr' => ['class' => ''],
-               
+
             ])
-            ->add('filtrer', SubmitType::class,[
-                'attr' => ['class' => 'btn btn-secondary mt-3 float-right']
+            ->add('filtrer', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-secondary mt-3 float-right'],
             ])
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            
+
         ]);
     }
 }

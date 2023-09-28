@@ -9,14 +9,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted("ROLE_USER")]
 
 class ResumeStatesController extends AbstractController
 {
-    /**
-     * @Route("/resume/states/{dos}", name="app_resume_states")
-     * @Route("/resume/states/{dos}/{dd}/{df}", name="app_resume_states_dd_df")
-     */
-    public function index($dos, $dd = null, $df = null, Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle): Response
+    #[Route("/resume/states/{dos}", name: "app_resume_states")]
+    #[Route("/resume/states/{dos}/{dd}/{df}", name: "app_resume_states_dd_df")]
+
+    public function index(Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle, $dos, $dd = null, $df = null): Response
     {
 
         // tracking user page for stats

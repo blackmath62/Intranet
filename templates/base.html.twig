@@ -3,7 +3,7 @@
 	<head>
 
 		{% block stylesheets %}
-
+			{{ encore_entry_link_tags('app') }}
 
 			<meta charset="utf-8">
 			<meta
@@ -325,7 +325,7 @@
 								<ul class="nav nav-treeview">
 									<li class="nav-item">
 										<a href="{{ path('app_scan_ean')}}" class="nav-link">
-											<i class="nav-icon fas fa-barcode text-warning"></i>
+											<i class="nav-icon fas fa-barcode text-info"></i>
 											<p>
 												Retrait marchandise
 											</p>
@@ -334,9 +334,9 @@
 									</li>
 									<li class="nav-item">
 										<a href="{{ path('app_affaire_me_nok')}}" class="nav-link">
-											<i class="nav-icon fas fa-barcode text-dark"></i>
+											<i class="nav-icon fas fa-barcode text-warning"></i>
 											<p>
-												Interventions
+												Interventions ME
 											</p>
 											<!-- <span class="badge badge-info right">1</span> -->
 										</a>
@@ -843,8 +843,7 @@
 						</div>
 						<strong>Contacter l'administrateur<a href="mailto:jpochet@groupe-axis.fr">Jpochet</a>.</strong>
 						<div class="float-right d-none d-sm-inline-block">
-							<b>Version</b>
-							1.1.1 du 16/09/2021
+							<p>Version de PHP : 8.2.10 - Version de Symfony : 6.3.4</p>
 						</div>
 					</footer>
 
@@ -918,6 +917,7 @@
 					<!-- Select2 -->
 					<script src="{{ asset("plugins/select2/js/select2.full.min.js")}}"></script>
 					{% block javascripts %}
+						{{ encore_entry_script_tags('app') }}
 						<script>
 							$(function () {
 $("#example1").DataTable({

@@ -12,24 +12,23 @@
 namespace Symfony\Component\Notifier\Messenger;
 
 use Symfony\Component\Notifier\Message\MessageInterface;
+use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 5.1
  */
 final class MessageHandler
 {
-    private $transport;
+    private TransportInterface $transport;
 
     public function __construct(TransportInterface $transport)
     {
         $this->transport = $transport;
     }
 
-    public function __invoke(MessageInterface $message)
+    public function __invoke(MessageInterface $message): ?SentMessage
     {
-        $this->transport->send($message);
+        return $this->transport->send($message);
     }
 }

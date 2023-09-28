@@ -21,7 +21,7 @@ class SearchAndFouType extends AbstractType
         $this->repoFou = $repoFou;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $fous = $this->repoFou->getListFou(1);
 
@@ -56,7 +56,7 @@ class SearchAndFouType extends AbstractType
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             // Configure your form options here

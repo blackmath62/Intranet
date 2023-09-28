@@ -37,9 +37,7 @@ use function strtolower;
  */
 class ConvertMappingCommand extends AbstractEntityManagerCommand
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @return void */
     protected function configure()
     {
         $this->setName('orm:convert-mapping')
@@ -75,13 +73,19 @@ in Doctrine 2 and can be used as runtime mapping for the ORM.
 by the ORM, you can use a DBAL functionality to filter the tables and sequences down
 on a global level:
 
-    $config->setFilterSchemaAssetsExpression($regexp);
+    $config->setSchemaAssetsFilter(function (string|AbstractAsset $assetName): bool {
+        if ($assetName instanceof AbstractAsset) {
+            $assetName = $assetName->getName();
+        }
+
+        return !str_starts_with($assetName, 'audit_');
+    });
 EOT
              );
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return int
      */

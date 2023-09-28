@@ -3,16 +3,12 @@
 namespace App\Controller;
 
 use App\Repository\Main\AnnuaireRepository;
-use App\Repository\Main\HolidayRepository;
 use App\Repository\Main\UsersRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class AnnuaireController extends AbstractController
 {
@@ -21,18 +17,12 @@ class AnnuaireController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/annuaire", name="annuaire")
-     */
-    public function index(AnnuaireRepository $repo, Request $request)
+    #[Route("/annuaire", name: "annuaire")]
+
+    public function index(AnnuaireRepository $repo)
     {
 
         $annuaires = $repo->getAnnuaire();
-        /*
-        SELECT u.societe_id AS societe, u.interne AS interne, u.pseudo AS nom, u.exterieur AS exterieur, u.email AS email, u.fonction AS fonction, u.portable AS portable
-        FROM users u
-        WHERE u.closedAt IS NULL
-         */
 
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
@@ -45,7 +35,7 @@ class AnnuaireController extends AbstractController
         ]);
     }
 
-    public function home(UsersRepository $repo, Request $request, HolidayRepository $holidayRepo)
+    public function home(UsersRepository $repo)
     {
 
         $users = $repo->findAll();

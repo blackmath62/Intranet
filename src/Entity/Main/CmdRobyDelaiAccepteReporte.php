@@ -7,91 +7,59 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CmdRobyDelaiAccepteReporteRepository::class)
- */
+#[ORM\Entity(repositoryClass: CmdRobyDelaiAccepteReporteRepository::class)]
+
 class CmdRobyDelaiAccepteReporte
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $identification;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $statut;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $modifiedAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="cmdRobyDelaiAccepteReportes")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "cmdRobyDelaiAccepteReportesModifiedBy")]
     private $modifiedBy;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $tiers;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $Nom;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $dateCmd;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $notreRef;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $delaiAccepte;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $delaiReporte;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $cmd;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Note::class, mappedBy="cmdRobyDelaiAccepteReporte")
-     */
+    #[ORM\OneToMany(targetEntity: Note::class, mappedBy: "cmdRobyDelaiAccepteReporte")]
     private $note;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $tel;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $ht;
 
     public function __construct()
@@ -133,7 +101,7 @@ class CmdRobyDelaiAccepteReporte
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -145,7 +113,7 @@ class CmdRobyDelaiAccepteReporte
         return $this->modifiedAt;
     }
 
-    public function setModifiedAt(?\DateTimeInterface $modifiedAt): self
+    public function setModifiedAt(?\DateTimeInterface $modifiedAt) : self
     {
         $this->modifiedAt = $modifiedAt;
 
@@ -193,7 +161,7 @@ class CmdRobyDelaiAccepteReporte
         return $this->dateCmd;
     }
 
-    public function setDateCmd(\DateTimeInterface $dateCmd): self
+    public function setDateCmd(\DateTimeInterface $dateCmd) : self
     {
         $this->dateCmd = $dateCmd;
 
@@ -217,7 +185,7 @@ class CmdRobyDelaiAccepteReporte
         return $this->delaiAccepte;
     }
 
-    public function setDelaiAccepte(?\DateTimeInterface $delaiAccepte): self
+    public function setDelaiAccepte(?\DateTimeInterface $delaiAccepte) : self
     {
         $this->delaiAccepte = $delaiAccepte;
 
@@ -229,7 +197,7 @@ class CmdRobyDelaiAccepteReporte
         return $this->delaiReporte;
     }
 
-    public function setDelaiReporte(?\DateTimeInterface $delaiReporte): self
+    public function setDelaiReporte(?\DateTimeInterface $delaiReporte) : self
     {
         $this->delaiReporte = $delaiReporte;
 

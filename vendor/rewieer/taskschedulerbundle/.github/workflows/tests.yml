@@ -19,11 +19,28 @@ jobs:
                     - "7.3"
                     - "7.4"
                     - "8.0"
+                    - "8.1"
                 symfony-version:
                     - "3.4.x"
                     - "4.4.x"
-                    - "5.1.x"
-                    - "5.2.x"
+                    - "5.3.x"
+                    - "5.4.x"
+                monolog-version:
+                    - "^1.25"
+                    - "^2.2"
+                include:
+                    - php-version: "8.0"
+                      symfony-version: "6.0.x"
+                      monolog-version: "^1.25"
+                    - php-version: "8.1"
+                      symfony-version: "6.0.x"
+                      monolog-version: "^1.25"
+                    - php-version: "8.0"
+                      symfony-version: "6.0.x"
+                      monolog-version: "^2.2"
+                    - php-version: "8.1"
+                      symfony-version: "6.0.x"
+                      monolog-version: "^2.2"
 
         steps:
             - name: "Checkout"
@@ -51,7 +68,8 @@ jobs:
 
             - name: Install Composer dependencies
               run: |
-                  composer require --dev --no-update symfony/framework-bundle:${{ matrix.symfony-version }}
+                  composer config minimum-stability dev
+                  composer require --dev --no-update symfony/framework-bundle:${{ matrix.symfony-version }} monolog/monolog:${{ matrix.monolog-version }}
                   composer install --no-progress --prefer-dist --optimize-autoloader
 
             - name: Run Tests

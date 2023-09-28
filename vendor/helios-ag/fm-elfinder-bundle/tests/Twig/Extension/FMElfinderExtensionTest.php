@@ -150,31 +150,22 @@ EOF;
         $this->assertTrue($rc->isSubclassOf('Twig\Extension\AbstractExtension'));
     }
 
-    /**
-     * @expectedException \Twig\Error\RuntimeError
-     * @expectedExceptionMessage The function can be applied to strings only.
-     */
     public function testSummernoteInstanceNotString()
     {
-        $this->extension->summernote([]);
+        $this->expectException(\Twig\Error\LoaderError::class);
+        $this->extension->summernote(1);
     }
 
-    /**
-     * @expectedException \Twig\Error\RuntimeError
-     * @expectedExceptionMessage The function can be applied to strings only.
-     */
     public function testTinyMCEInstanceNotString()
     {
-        $this->extension->tinymce([]);
+        $this->expectException(\Twig\Error\LoaderError::class);
+        $this->extension->tinymce(1);
     }
 
-    /**
-     * @expectedException \Twig\Error\RuntimeError
-     * @expectedExceptionMessage The function can be applied to strings only.
-     */
     public function testTinyMCE4InstanceNotString()
     {
-        $this->extension->tinymce4([]);
+        $this->expectException(\Twig\Error\LoaderError::class);
+        $this->extension->tinymce4(1);
     }
 
     public function testGetFunctions()

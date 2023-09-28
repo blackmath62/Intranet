@@ -3,96 +3,61 @@
 namespace App\Entity\Main;
 
 use App\Repository\Main\InterventionMonteursRepository;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=InterventionMonteursRepository::class)
- */
+#[ORM\Entity(repositoryClass: InterventionMonteursRepository::class)]
 class InterventionMonteurs
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="interventionMonteurs")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "interventionMonteursUserCr")]
     private $UserCr;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Users::class, inversedBy="interventionMonteurs")
-     */
+    #[ORM\ManyToMany(targetEntity: Users::class, inversedBy: "interventionMonteursEquipes")]
     private $Equipes;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $start;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $end;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $adresse;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $backgroundColor;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $textColor;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $createdAt;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=AffairePiece::class, inversedBy="interventionMonteurs")
-     */
+    #[ORM\ManyToMany(targetEntity: AffairePiece::class, inversedBy: "interventionMonteurs")]
     private $pieces;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Affaires::class, inversedBy="interventionMonteurs")
-     */
+    #[ORM\ManyToOne(targetEntity: Affaires::class, inversedBy: "interventionMonteurs")]
     private $code;
 
-    /**
-     * @ORM\OneToMany(targetEntity=SignatureElectronique::class, mappedBy="intervention")
-     */
+    #[ORM\OneToMany(targetEntity: SignatureElectronique::class, mappedBy: "intervention")]
     private $signatureElectroniques;
 
-    /**
-     * @ORM\OneToMany(targetEntity=InterventionFicheMonteur::class, mappedBy="intervention")
-     */
+    #[ORM\OneToMany(targetEntity: InterventionFicheMonteur::class, mappedBy: "intervention")]
     private $interventionFicheMonteurs;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="interventionMonteursLockedBy")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "interventionMonteursLockedBy")]
     private $lockedBy;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $lockedAt;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $sendAt;
 
     private $champTemporaire;

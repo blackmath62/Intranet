@@ -8,26 +8,31 @@ use App\Form\AddEmailTreatementType;
 use App\Form\AddEmailType;
 use App\Repository\Main\MailListRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminEmailController extends AbstractController
 {
 
     private $repoMail;
+    private $entityManager;
 
-    public function __construct(MailListRepository $repoMail)
+    public function __construct(MailListRepository $repoMail, ManagerRegistry $registry)
     {
         $this->repoMail = $repoMail;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("/admin/email", name="app_admin_email")
-     */
+    #[Route("/admin/email", name: "app_admin_email")]
+
     public function index(Request $request): Response
     {
         // tracking user page for stats
@@ -47,7 +52,7 @@ class AdminEmailController extends AbstractController
                         ->setEmail($formSendGeneralWithMails->getData()['email'])
                         ->setPage($tracking)
                         ->setSecondOption('envoi');
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($mail);
                     $em->flush();
                 } else {
@@ -73,7 +78,7 @@ class AdminEmailController extends AbstractController
                         ->setEmail($formSendTreatementWithMails->getData()['email'])
                         ->setPage($tracking)
                         ->setSecondOption('traitement');
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->entityManager;
                     $em->persist($mail);
                     $em->flush();
                 } else {
@@ -97,7 +102,7 @@ class AdminEmailController extends AbstractController
                     ->setEmail($formFeu->getData()['email'])
                     ->setPage($tracking)
                     ->setSecondOption('feu');
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
             } else {
@@ -118,15 +123,14 @@ class AdminEmailController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/email/delete/{id}", name="app_admin_email_delete")
-     */
+    #[Route("/admin/email/delete/{id}", name: "app_admin_email_delete")]
+
     public function deleteMail($id): Response
     {
 
         $search = $this->repoMail->findOneBy(['id' => $id]);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($search);
         $em->flush();
 
@@ -134,15 +138,14 @@ class AdminEmailController extends AbstractController
         return $this->redirectToRoute('app_admin_email');
     }
 
-    /**
-     * @Route("/email/delete/{id}/{route}", name="app_email_delete_redirect")
-     */
+    #[Route("/email/delete/{id}/{route}", name: "app_email_delete_redirect")]
+
     public function deleteMailAndRedirect($id, $route): Response
     {
 
         $search = $this->repoMail->findOneBy(['id' => $id]);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($search);
         $em->flush();
 

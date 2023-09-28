@@ -31,9 +31,9 @@ class WebProcessor extends BaseWebProcessor implements EventSubscriberInterface
         parent::__construct([], $extraFields);
     }
 
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             $this->serverData = $event->getRequest()->server->all();
             $this->serverData['REMOTE_ADDR'] = $event->getRequest()->getClientIp();
         }

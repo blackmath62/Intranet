@@ -4,19 +4,19 @@ namespace App\Controller;
 
 use App\Form\StatesDateFilterType;
 use App\Repository\Divalto\MouvRepository;
-use App\Repository\Main\fscListMovementRepository;
-use App\Repository\Main\MovBillFscRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted("ROLE_USER")]
 
 class FscExtractPeriodeController extends AbstractController
 {
-    /**
-     * @Route("/fsc/extract/periode", name="app_fsc_extract_periode")
-     */
-    public function index(Request $request, fscListMovementRepository $repoAchat, MovBillFscRepository $repoVente, MouvRepository $repoMouv): Response
+    #[Route("/fsc/extract/periode", name: "app_fsc_extract_periode")]
+
+    public function index(Request $request, MouvRepository $repoMouv): Response
     {
         $achats = '';
         $ventes = '';

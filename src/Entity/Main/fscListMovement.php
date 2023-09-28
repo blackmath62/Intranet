@@ -7,250 +7,208 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=fscListMovementRepository::class)
- */
+#[ORM\Entity(repositoryClass: fscListMovementRepository::class)]
 class fscListMovement
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
-    
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $updatedAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $utilisateur;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: "integer", nullable: true)]
     private $numCmd;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $dateCmd;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: "integer", nullable: true)]
     private $numBl;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $dateBl;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: "integer", nullable: true)]
     private $numFact;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $dateFact;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $tiers;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: "integer")]
     private $codePiece;
 
-    /**
-     * @ORM\OneToMany(targetEntity=documentsFsc::class, mappedBy="fscListMovement",cascade={"persist"})
-     */
+    #[ORM\OneToMany(targetEntity: documentsFsc::class, mappedBy: "fscListMovement", cascade: ["persist"])]
     private $file;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $notreRef;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: "boolean")]
     private $status;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: "boolean")]
     private $Probleme;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=MovBillFsc::class, mappedBy="ventilations")
-     */
+    #[ORM\ManyToMany(targetEntity: MovBillFsc::class, mappedBy: "ventilations")]
     private $movBillFscs;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $perimetreBois;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="updatePerimetreBoisFsc")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "updatePerimetreBoisFsc")]
     private $userChangePerimetreBoisFsc;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $updatePerimetreBoisFsc;
 
-    public function __construct()
+    function __construct()
     {
         $this->file = new ArrayCollection();
         $this->movBillFscs = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUtilisateur(): ?string
+    function getUtilisateur(): ?string
     {
         return $this->utilisateur;
     }
 
-    public function setUtilisateur(?string $utilisateur): self
+    function setUtilisateur(?string $utilisateur): self
     {
         $this->utilisateur = $utilisateur;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    function setUpdatedAt(?\DateTimeInterface $updatedAt) : self
     {
         $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
-    public function getNumCmd(): ?int
+    function getNumCmd(): ?int
     {
         return $this->numCmd;
     }
 
-    public function setNumCmd(?int $numCmd): self
+    function setNumCmd(?int $numCmd): self
     {
         $this->numCmd = $numCmd;
 
         return $this;
     }
 
-    public function getDateCmd(): ?\DateTimeInterface
+    function getDateCmd(): ?\DateTimeInterface
     {
         return $this->dateCmd;
     }
 
-    public function setDateCmd(?\DateTimeInterface $dateCmd): self
+    function setDateCmd(?\DateTimeInterface $dateCmd) : self
     {
         $this->dateCmd = $dateCmd;
 
         return $this;
     }
 
-    public function getNumBl(): ?int
+    function getNumBl(): ?int
     {
         return $this->numBl;
     }
 
-    public function setNumBl(?int $numBl): self
+    function setNumBl(?int $numBl): self
     {
         $this->numBl = $numBl;
 
         return $this;
     }
 
-    public function getDateBl(): ?\DateTimeInterface
+    function getDateBl(): ?\DateTimeInterface
     {
         return $this->dateBl;
     }
 
-    public function setDateBl(?\DateTimeInterface $dateBl): self
+    function setDateBl(?\DateTimeInterface $dateBl) : self
     {
         $this->dateBl = $dateBl;
 
         return $this;
     }
 
-    public function getNumFact(): ?int
+    function getNumFact(): ?int
     {
         return $this->numFact;
     }
 
-    public function setNumFact(?int $numFact): self
+    function setNumFact(?int $numFact): self
     {
         $this->numFact = $numFact;
 
         return $this;
     }
 
-    public function getDateFact(): ?\DateTimeInterface
+    function getDateFact(): ?\DateTimeInterface
     {
         return $this->dateFact;
     }
 
-    public function setDateFact(?\DateTimeInterface $dateFact): self
+    function setDateFact(?\DateTimeInterface $dateFact) : self
     {
         $this->dateFact = $dateFact;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getTiers(): ?string
+    function getTiers(): ?string
     {
         return $this->tiers;
     }
 
-    public function setTiers(string $tiers): self
+    function setTiers(string $tiers): self
     {
         $this->tiers = $tiers;
 
         return $this;
     }
 
-    public function getCodePiece(): ?int
+    function getCodePiece(): ?int
     {
         return $this->codePiece;
     }
 
-    public function setCodePiece(int $codePiece): self
+    function setCodePiece(int $codePiece): self
     {
         $this->codePiece = $codePiece;
 
@@ -260,12 +218,12 @@ class fscListMovement
     /**
      * @return Collection|documentsFsc[]
      */
-    public function getFile(): Collection
+    function getFile(): Collection
     {
         return $this->file;
     }
 
-    public function addFile(documentsFsc $file): self
+    function addFile(documentsFsc $file): self
     {
         if (!$this->file->contains($file)) {
             $this->file[] = $file;
@@ -275,7 +233,7 @@ class fscListMovement
         return $this;
     }
 
-    public function removeFile(documentsFsc $file): self
+    function removeFile(documentsFsc $file): self
     {
         if ($this->file->removeElement($file)) {
             // set the owning side to null (unless already changed)
@@ -287,36 +245,36 @@ class fscListMovement
         return $this;
     }
 
-    public function getNotreRef(): ?string
+    function getNotreRef(): ?string
     {
         return $this->notreRef;
     }
 
-    public function setNotreRef(?string $notreRef): self
+    function setNotreRef(?string $notreRef): self
     {
         $this->notreRef = $notreRef;
 
         return $this;
     }
 
-    public function getStatus(): ?bool
+    function getStatus(): ?bool
     {
         return $this->status;
     }
 
-    public function setStatus(bool $status): self
+    function setStatus(bool $status): self
     {
         $this->status = $status;
 
         return $this;
     }
 
-    public function getProbleme(): ?bool
+    function getProbleme(): ?bool
     {
         return $this->Probleme;
     }
 
-    public function setProbleme(bool $Probleme): self
+    function setProbleme(bool $Probleme): self
     {
         $this->Probleme = $Probleme;
 
@@ -326,12 +284,12 @@ class fscListMovement
     /**
      * @return Collection|MovBillFsc[]
      */
-    public function getMovBillFscs(): Collection
+    function getMovBillFscs(): Collection
     {
         return $this->movBillFscs;
     }
 
-    public function addMovBillFsc(MovBillFsc $movBillFsc): self
+    function addMovBillFsc(MovBillFsc $movBillFsc): self
     {
         if (!$this->movBillFscs->contains($movBillFsc)) {
             $this->movBillFscs[] = $movBillFsc;
@@ -341,7 +299,7 @@ class fscListMovement
         return $this;
     }
 
-    public function removeMovBillFsc(MovBillFsc $movBillFsc): self
+    function removeMovBillFsc(MovBillFsc $movBillFsc): self
     {
         if ($this->movBillFscs->removeElement($movBillFsc)) {
             $movBillFsc->removeVentilation($this);
@@ -350,36 +308,36 @@ class fscListMovement
         return $this;
     }
 
-    public function getPerimetreBois(): ?string
+    function getPerimetreBois(): ?string
     {
         return $this->perimetreBois;
     }
 
-    public function setPerimetreBois(string $perimetreBois): self
+    function setPerimetreBois(string $perimetreBois): self
     {
         $this->perimetreBois = $perimetreBois;
 
         return $this;
     }
 
-    public function getUserChangePerimetreBoisFsc(): ?Users
+    function getUserChangePerimetreBoisFsc(): ?Users
     {
         return $this->userChangePerimetreBoisFsc;
     }
 
-    public function setUserChangePerimetreBoisFsc(?Users $userChangePerimetreBoisFsc): self
+    function setUserChangePerimetreBoisFsc(?Users $userChangePerimetreBoisFsc): self
     {
         $this->userChangePerimetreBoisFsc = $userChangePerimetreBoisFsc;
 
         return $this;
     }
 
-    public function getUpdatePerimetreBoisFsc(): ?\DateTimeInterface
+    function getUpdatePerimetreBoisFsc(): ?\DateTimeInterface
     {
         return $this->updatePerimetreBoisFsc;
     }
 
-    public function setUpdatePerimetreBoisFsc(?\DateTimeInterface $updatePerimetreBoisFsc): self
+    function setUpdatePerimetreBoisFsc(?\DateTimeInterface $updatePerimetreBoisFsc) : self
     {
         $this->updatePerimetreBoisFsc = $updatePerimetreBoisFsc;
 

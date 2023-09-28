@@ -6,22 +6,26 @@ use App\Entity\Main\SectionSearch;
 use App\Form\EditSectionSearchType;
 use App\Repository\Main\SectionSearchRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class SectionSearchController extends AbstractController
 {
-    /**
-     * @Route("/admin/section_searchs", name="app_admin_section_search")
-     */
+    private $entityManager;
 
-    public function index(SectionSearch $section_search = null, Request $request, SectionSearchRepository $repo, EntityManagerInterface $manager)
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/admin/section_searchs", name: "app_admin_section_search")]
+
+    public function index(Request $request, SectionSearchRepository $repo, EntityManagerInterface $manager, SectionSearch $section_search = null)
     {
         if (!$section_search) {
             $section_search = new SectionSearch();
@@ -51,15 +55,14 @@ class SectionSearchController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/section_search/delete/{id}",name="app_delete_section_search")
-     */
-    public function deletesection_search($id, Request $request)
+    #[Route("/admin/section_search/delete/{id}", name: "app_delete_section_search")]
+
+    public function deletesection_search($id)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(SectionSearch::class);
+        $repository = $this->entityManager->getRepository(SectionSearch::class);
         $section_searchId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($section_searchId);
         $em->flush();
 
@@ -69,9 +72,8 @@ class SectionSearchController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_section_search'));
     }
-    /**
-     * @Route("/admin/section_search/edit/{id}",name="app_edit_section_search")
-     */
+    #[Route("/admin/section_search/edit/{id}", name: "app_edit_section_search")]
+
     public function editsection_search(SectionSearch $section_search, Request $request)
     {
         $form = $this->createForm(EditSectionSearchType::class, $section_search);
@@ -82,7 +84,7 @@ class SectionSearchController extends AbstractController
         //   $this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($section_search);
             $em->flush();
 

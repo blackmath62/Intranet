@@ -5,51 +5,33 @@ namespace App\Entity\Main;
 use App\Repository\Main\ControleArticlesFscRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=ControleArticlesFscRepository::class)
- */
+#[ORM\Entity(repositoryClass: ControleArticlesFscRepository::class)]
 class ControleArticlesFsc
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $UpdatedAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $products;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="controleArticlesFscs")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "controleArticlesFscs")]
     private $controledBy;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: "boolean")]
     private $status;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $LastOrder;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $LastOrderAt;
 
     public function getId(): ?int
@@ -62,7 +44,7 @@ class ControleArticlesFsc
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -74,7 +56,7 @@ class ControleArticlesFsc
         return $this->UpdatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $UpdatedAt): self
+    public function setUpdatedAt(\DateTimeInterface $UpdatedAt) : self
     {
         $this->UpdatedAt = $UpdatedAt;
 
@@ -134,7 +116,7 @@ class ControleArticlesFsc
         return $this->LastOrderAt;
     }
 
-    public function setLastOrderAt(\DateTimeInterface $LastOrderAt): self
+    public function setLastOrderAt(\DateTimeInterface $LastOrderAt) : self
     {
         $this->LastOrderAt = $LastOrderAt;
 

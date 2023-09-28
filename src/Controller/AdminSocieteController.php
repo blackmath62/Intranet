@@ -7,20 +7,26 @@ use App\Form\EditSocieteType;
 use App\Repository\Main\SocieteRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
+
 class AdminSocieteController extends AbstractController
 {
-    /**
-     * @Route("/admin/societe", name="app_admin_societe")
-     */
-    public function index(Societe $societe = null, Request $request, SocieteRepository $repo, EntityManagerInterface $manager)
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/admin/societe", name: "app_admin_societe")]
+
+    public function index(Request $request, SocieteRepository $repo, EntityManagerInterface $manager, Societe $societe = null)
     {
         if (!$societe) {
             $societe = new Societe();
@@ -48,15 +54,14 @@ class AdminSocieteController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/admin/societe/delete/{id}",name="app_delete_societe")
-     */
+    #[Route("/admin/societe/delete/{id}", name: "app_delete_societe")]
+
     public function deleteSociete($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(Societe::class);
+        $repository = $this->entityManager->getRepository(Societe::class);
         $societeId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($societeId);
         $em->flush();
 
@@ -66,9 +71,9 @@ class AdminSocieteController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_societe'));
     }
-    /**
-     * @Route("/admin/societe/edit/{id}",name="app_edit_societe")
-     */
+
+    #[Route("/admin/societe/edit/{id}", name: "app_edit_societe")]
+
     public function editSociete(Societe $societe, Request $request)
     {
         $form = $this->createForm(EditSocieteType::class, $societe);
@@ -79,7 +84,7 @@ class AdminSocieteController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($societe);
             $em->flush();
 

@@ -8,12 +8,14 @@ use RtfHtmlPhp\Html\HtmlFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted("ROLE_USER")]
 
 class MatiereDangeureuseController extends AbstractController
 {
-    /**
-     * @Route("/matiere/dangeureuse", name="app_matiere_dangeureuse")
-     */
+    #[Route("/matiere/dangeureuse", name: "app_matiere_dangeureuse")]
+
     public function index(ArtRepository $repo): Response
     {
         $articles = $repo->StockBlobMatiereDangeureuse();

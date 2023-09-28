@@ -2,22 +2,18 @@
 
 namespace App\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class VideoController extends AbstractController
 {
-    /**
-     * @Route("/video", name="app_video")
-     */
-    public function index(Request $request): Response
+    #[Route("/video", name: "app_video")]
+
+    public function index(): Response
     {
 
         // tracking user page for stats

@@ -14,9 +14,10 @@ namespace Symfony\Bundle\DebugBundle\DependencyInjection;
 use Symfony\Bridge\Monolog\Command\ServerLogCommand;
 use Symfony\Bundle\DebugBundle\Command\ServerDumpPlaceholderCommand;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
@@ -30,15 +31,15 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 class DebugExtension extends Extension
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.php');
 
         $container->getDefinition('var_dumper.cloner')
             ->addMethodCall('setMaxItems', [$config['max_items']])
@@ -59,7 +60,7 @@ class DebugExtension extends Extension
             $container->getDefinition('var_dumper.command.server_dump')
                 ->setClass(ServerDumpPlaceholderCommand::class)
             ;
-        } elseif (0 === strpos($config['dump_destination'], 'tcp://')) {
+        } elseif (str_starts_with($config['dump_destination'], 'tcp://')) {
             $container->getDefinition('debug.dump_listener')
                 ->replaceArgument(2, new Reference('var_dumper.server_connection'))
             ;
@@ -92,23 +93,17 @@ class DebugExtension extends Extension
             ;
         }
 
-        if (!class_exists(ServerLogCommand::class)) {
+        if (!class_exists(Command::class) || !class_exists(ServerLogCommand::class)) {
             $container->removeDefinition('monolog.command.server_log');
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string|false
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return 'http://symfony.com/schema/dic/debug';
     }

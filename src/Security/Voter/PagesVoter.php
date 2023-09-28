@@ -2,21 +2,22 @@
 
 namespace App\Security\Voter;
 
+use App\Entity\Main\Users;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class PagesVoter extends Voter
 {
-    protected function supports($attribute, $subject)
+    protected function supports(string $attribute, mixed $subject): bool
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
         return in_array($attribute, ['EDIT', 'VIEW'])
-            && $subject instanceof \App\Entity\Main\Annuaire;
+        && $subject instanceof Users;
     }
 
-    protected function voteOnAttribute($attribute, $annuaire, TokenInterface $token)
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
         // if the user is anonymous, do not grant access

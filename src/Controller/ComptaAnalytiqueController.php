@@ -9,10 +9,10 @@ use App\Form\YearMonthType;
 use App\Repository\Divalto\ComptaAnalytiqueRepository;
 use App\Repository\Main\MailListRepository;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,10 +20,9 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_COMPTA")
- */
+#[IsGranted("ROLE_COMPTA")]
 
 class ComptaAnalytiqueController extends AbstractController
 {
@@ -34,22 +33,27 @@ class ComptaAnalytiqueController extends AbstractController
     private $mailTreatement;
     private $adminEmailController;
     private $repoAnal;
+    private $entityManager;
 
-    public function __construct(ComptaAnalytiqueRepository $repoAnal, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        ComptaAnalytiqueRepository $repoAnal,
+        AdminEmailController $adminEmailController,
+        MailerInterface $mailer,
+        MailListRepository $repoMail
+    ) {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
         $this->repoAnal = $repoAnal;
-
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("compta/compta_analytique", name="app_compta_analytique")
-     */
+    #[Route("compta/compta_analytique", name: "app_compta_analytique")]
+
     public function index(Request $request): Response
     {
         ini_set('memory_limit', '1024M');
@@ -87,7 +91,7 @@ class ComptaAnalytiqueController extends AbstractController
                     ->setEmail($formMails->getData()['email'])
                     ->setSecondOption($formMails->getData()['SecondOption'])
                     ->setPage($tracking);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
                 $this->addFlash('message', 'le mail a été ajouté avec succés !');
@@ -161,7 +165,7 @@ class ComptaAnalytiqueController extends AbstractController
             $ventes[$lig]['TotalCoutMoyenPondere'] = $cmpt;
             if ($pa != 0 && $exportVentes[$lig]['qteVtl'] != 0) {$cmat = abs($exportVentes[$lig]['qteVtl']) * $pa;}
             $ventes[$lig]['TotalCoutCma'] = $cmat;
-            if ($achat['regimePiece']) {
+            if (is_array($achat) && $achat['regimePiece']) {
                 $regime = $achat['regimePiece'];
             } else {
                 $regime = $exportVentes[$lig]['regimeFou'];
@@ -174,10 +178,11 @@ class ComptaAnalytiqueController extends AbstractController
                 $compteAchat = $exportVentes[$lig]['CompteAchat'] + 20000;
             }
             $ventes[$lig]['CompteAchat'] = $compteAchat;
-            if ($achat['pinoFou']) {
+            if (is_array($achat) && $achat['pinoFou']) {
                 // ramener la somme des montants du transport sur cette piéce
                 $port = $this->repoAnal->getTransportFournisseur($achat['pinoFou'], $exportVentes[$lig]['Article']);
-                if ($port['montant'] > 0 && $port['montant'] != 'null' && $cmat > 0) {
+
+                if (is_array($port) && $port['montant'] > 0 && $port['montant'] != 'null' && $cmat > 0) {
                     // ramener le détail de la piéce fournisseur
                     $ventes[$lig]['type'] = 'truck';
                     $ventes[$lig]['color'] = 'secondary';
@@ -194,7 +199,7 @@ class ComptaAnalytiqueController extends AbstractController
                             $ventes[$lig]['estimationTotal'] = $exportVentes[$lig]['qteVtl'] * ($port['montant'] / $estim['qte']);
                         }
                     }
-                } elseif (($port['montant'] == 0 | $port['montant'] == 'null') && $cmat > 0) {
+                } elseif (is_array($port) && ($port['montant'] == 0 | $port['montant'] == 'null') && $cmat > 0) {
                     // ramener le détail de la piéce fournisseur
                     $ventes[$lig]['type'] = 'dollar-sign';
                     $ventes[$lig]['color'] = 'warning';
@@ -218,9 +223,8 @@ class ComptaAnalytiqueController extends AbstractController
         return $ventes;
     }
 
-    /**
-     * @Route("compta/compta_analytique/send/mail", name="app_compta_analytique_send_mail")
-     */
+    #[Route("compta/compta_analytique/send/mail", name: "app_compta_analytique_send_mail")]
+
     public function sendMail(): Response
     {
         // jour actuel, n'envoyer que si le jour est bien celui choisi par les utilisateurs
@@ -249,9 +253,7 @@ class ComptaAnalytiqueController extends AbstractController
         return $this->redirectToRoute('app_compta_analytique');
     }
 
-    /**
-     * @Route("compta/compta_analytique/export/excel/{annee}/{mois}/{type}", name="app_compta_analytique_export_excel")
-     */
+    #[Route("compta/compta_analytique/export/excel/{annee}/{mois}/{type}", name: "app_compta_analytique_export_excel")]
 
     public function get_compta_analytique_excel($annee, $mois, $type)
     {

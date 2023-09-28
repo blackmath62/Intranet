@@ -14,20 +14,19 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use DateTimeInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Knp\Snappy\Pdf;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ADMIN_MONTEUR")
- */
+#[IsGranted("ROLE_ADMIN_MONTEUR")]
 
 class AffairesAdminController extends AbstractController
 {
@@ -40,9 +39,18 @@ class AffairesAdminController extends AbstractController
     private $repoFiche;
     private $repoIntervention;
     private $emailTreatementService;
+    private $entityManager;
 
-    public function __construct(EmailTreatementService $emailTreatementService, UsersRepository $repoUsers, InterventionMonteursRepository $repoIntervention, InterventionFicheMonteurRepository $repoFiche, AdminEmailController $adminEmailController, MailerInterface $mailer, MailListRepository $repoMail)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        EmailTreatementService $emailTreatementService,
+        UsersRepository $repoUsers,
+        InterventionMonteursRepository $repoIntervention,
+        InterventionFicheMonteurRepository $repoFiche,
+        AdminEmailController $adminEmailController,
+        MailerInterface $mailer,
+        MailListRepository $repoMail
+    ) {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->repoFiche = $repoFiche;
@@ -52,13 +60,12 @@ class AffairesAdminController extends AbstractController
         $this->repoIntervention = $repoIntervention;
         $this->repoUsers = $repoUsers;
         $this->emailTreatementService = $emailTreatementService;
-
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Lhermitte/affaires/admin", name="app_affaires_admin")
-     */
+    #[Route("/Lhermitte/affaires/admin", name: "app_affaires_admin")]
+
     public function index(Request $request): Response
     {
         $tracking = $request->attributes->get('_route');
@@ -74,7 +81,7 @@ class AffairesAdminController extends AbstractController
                 $mail->setCreatedAt(new DateTime())
                     ->setEmail($form->getData()['email'])
                     ->setPage($tracking);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
             } else {
@@ -114,9 +121,8 @@ class AffairesAdminController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Lhermitte/affaires/admin/valider/fiche/{id}", name="app_affaire_valider_fiche_intervention")
-     */
+    #[Route("/Lhermitte/affaires/admin/valider/fiche/{id}", name: "app_affaire_valider_fiche_intervention")]
+
     public function validerFiche($id)
     {
 
@@ -124,7 +130,7 @@ class AffairesAdminController extends AbstractController
         $fiche->setValidedBy($this->getUser())
             ->setValidedAt(new DateTime);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($fiche);
         $em->flush();
 
@@ -202,7 +208,7 @@ class AffairesAdminController extends AbstractController
             if ($status == true) {
                 $intervention->setLockedAt(new DateTime)
                     ->setLockedBy($this->repoUsers->findOneBy(['id' => 3]));
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($intervention);
                 $em->flush();
             }
@@ -210,13 +216,11 @@ class AffairesAdminController extends AbstractController
         return $fichesManquantes;
     }
 
-    /**
-     * @Route("/Lhermitte/affaires/admin/signature", name="app_affaire_signature")
-     */
     // TODO CETTE PARTIE PLUS COMPLEXE EST A FAIRE
     // CREER LE PDF POUR QU'IL PRESENTE BIEN ET METTRE LES CGV EN DERNIERE PAGE
     // CONNECTER CELA AVEC YOUSIGN
     // PEUT ÊTRE CREER UNE PAGE COMPTE RENDU
+    #[Route("/Lhermitte/affaires/admin/signature", name: "app_affaire_signature")]
 
     public function envoyerPourSignature(MailerInterface $mailer, Pdf $pdf)
     {
@@ -244,7 +248,7 @@ class AffairesAdminController extends AbstractController
             /*
         // Marquer l'intervention comme envoyée
         $intervention->setSendAt(new DateTime());
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->persist($intervention);
         $em->flush();
          */

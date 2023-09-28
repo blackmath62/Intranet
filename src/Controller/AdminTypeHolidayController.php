@@ -2,29 +2,33 @@
 
 namespace App\Controller;
 
-use App\Entity\Main\Holiday;
 use App\Entity\Main\HolidayTypes;
 use App\Form\EditHolidayTypesType;
 use App\Repository\Main\HolidayTypesRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
 
 class AdminTypeHolidayController extends AbstractController
 {
-    /**
-     * @Route("/admin/type/holiday", name="app_admin_types_holiday")
-     */
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/admin/type/holiday", name: "app_admin_types_holiday")]
+
     public function index(Request $request, HolidayTypesRepository $repo, EntityManagerInterface $manager): Response
     {
         $holidayType = new HolidayTypes();
@@ -69,15 +73,15 @@ class AdminTypeHolidayController extends AbstractController
             'title' => "Administration des Types de Congés",
         ]);
     }
-    /**
-     * @Route("/admin/type/holiday/delete/{id}",name="app_delete_types_holiday")
-     */
+
+    #[Route("/admin/type/holiday/delete/{id}", name: "app_delete_types_holiday")]
+
     public function deleteHolidayType($id, Request $request)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(HolidayTypes::class);
+        $repository = $this->entityManager->getRepository(HolidayTypes::class);
         $holidayId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($holidayId);
         $em->flush();
 
@@ -87,9 +91,9 @@ class AdminTypeHolidayController extends AbstractController
 
         return $this->redirect($this->generateUrl('app_admin_types_holiday'));
     }
-    /**
-     * @Route("/admin/type/holiday/edit/{id}",name="app_edit_types_holiday")
-     */
+
+    #[Route("/admin/type/holiday/edit/{id}", name: "app_edit_types_holiday")]
+
     public function editSociete(HolidayTypes $holidayTypes, Request $request)
     {
         $form = $this->createForm(EditHolidayTypesType::class, $holidayTypes);
@@ -100,7 +104,7 @@ class AdminTypeHolidayController extends AbstractController
         //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($holidayTypes);
             $em->flush();
 

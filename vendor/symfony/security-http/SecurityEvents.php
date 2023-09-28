@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Security\Http;
 
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\SwitchUserEvent;
+
 final class SecurityEvents
 {
     /**
@@ -18,7 +21,7 @@ final class SecurityEvents
      * into your website. It is important to distinguish this action from
      * non-interactive authentication methods, such as:
      *   - authentication based on your session.
-     *   - authentication using a HTTP basic or HTTP digest header.
+     *   - authentication using an HTTP basic or HTTP digest header.
      *
      * @Event("Symfony\Component\Security\Http\Event\InteractiveLoginEvent")
      */
@@ -31,4 +34,14 @@ final class SecurityEvents
      * @Event("Symfony\Component\Security\Http\Event\SwitchUserEvent")
      */
     public const SWITCH_USER = 'security.switch_user';
+
+    /**
+     * Event aliases.
+     *
+     * These aliases can be consumed by RegisterListenersPass.
+     */
+    public const ALIASES = [
+        InteractiveLoginEvent::class => self::INTERACTIVE_LOGIN,
+        SwitchUserEvent::class => self::SWITCH_USER,
+    ];
 }

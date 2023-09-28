@@ -4,21 +4,18 @@ namespace App\Controller;
 
 use App\Form\SearchAndFouCodeTarifType;
 use App\Repository\Divalto\MouvRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class TarifVenteDivaltoController extends AbstractController
 {
-    /**
-     * @Route("/Lhermitte/tarif/vente/divalto", name="app_tarif_vente_divalto")
-     */
+    #[Route("/Lhermitte/tarif/vente/divalto", name: "app_tarif_vente_divalto")]
+
     public function index(MouvRepository $repo, Request $request, StatsAchatController $mef): Response
     {
 

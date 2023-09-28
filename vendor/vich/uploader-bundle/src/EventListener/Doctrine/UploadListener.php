@@ -2,7 +2,7 @@
 
 namespace Vich\UploaderBundle\EventListener\Doctrine;
 
-use Doctrine\Common\EventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 /**
  * UploadListener.
@@ -14,26 +14,13 @@ use Doctrine\Common\EventArgs;
 class UploadListener extends BaseListener
 {
     /**
-     * The events the listener is subscribed to.
-     *
-     * @return array The array of events
-     */
-    public function getSubscribedEvents(): array
-    {
-        return [
-            'prePersist',
-            'preUpdate',
-        ];
-    }
-
-    /**
-     * @param EventArgs $event The event
+     * @param LifecycleEventArgs $event The event
      *
      * @throws \Vich\UploaderBundle\Exception\MappingNotFoundException
      */
-    public function prePersist(EventArgs $event): void
+    public function prePersist(LifecycleEventArgs $event): void
     {
-        $object = $this->adapter->getObjectFromArgs($event);
+        $object = $event->getObject();
 
         if (!$this->isUploadable($object)) {
             return;
@@ -45,13 +32,13 @@ class UploadListener extends BaseListener
     }
 
     /**
-     * @param EventArgs|\Doctrine\ORM\Event\PreUpdateEventArgs $event The event
+     * @param LifecycleEventArgs $event The event
      *
      * @throws \Vich\UploaderBundle\Exception\MappingNotFoundException
      */
-    public function preUpdate(EventArgs $event): void
+    public function preUpdate(LifecycleEventArgs $event): void
     {
-        $object = $this->adapter->getObjectFromArgs($event);
+        $object = $event->getObject();
 
         if (!$this->isUploadable($object)) {
             return;

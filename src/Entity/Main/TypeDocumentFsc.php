@@ -2,49 +2,34 @@
 
 namespace App\Entity\Main;
 
+use App\Repository\Main\TypeDocumentFscRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\Main\TypeDocumentFscRepository;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-/**
- * @ORM\Entity(repositoryClass=TypeDocumentFscRepository::class)
-  * @UniqueEntity("title",
- *     message="Ce nom est déjà utilisé.")
- */
+#[ORM\Entity(repositoryClass: TypeDocumentFscRepository::class)]
+#[UniqueEntity("title", message: "Ce nom est déjà utilisé.")]
 class TypeDocumentFsc
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=255, unique=true)
-     */
+    #[ORM\Column(type: "string", length: 255, unique: true)]
     private $title;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $color;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $icone;
 
-    /**
-     * @ORM\OneToMany(targetEntity=documentsFsc::class, mappedBy="TypeDoc")
-     */
+    #[ORM\OneToMany(targetEntity: documentsFsc::class, mappedBy: "TypeDoc")]
     private $documentsFscs;
 
     public function __construct()
@@ -62,7 +47,7 @@ class TypeDocumentFsc
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 

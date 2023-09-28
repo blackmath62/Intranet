@@ -1,15 +1,20 @@
 KnpSnappyBundle
 ===============
 
-[![Build Status](https://travis-ci.org/KnpLabs/KnpSnappyBundle.svg?branch=master)](https://travis-ci.org/KnpLabs/KnpSnappyBundle)
+![Build Status](https://github.com/KnpLabs/KnpSnappyBundle/actions/workflows/build.yaml/badge.svg)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/KnpLabs/KnpSnappyBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/KnpLabs/KnpSnappyBundle/?branch=master)
 [![StyleCI](https://styleci.io/repos/743218/shield?branch=master)](https://styleci.io/repos/743218)
-[![knpbundles.com](http://knpbundles.com/KnpLabs/KnpSnappyBundle/badge-short)](http://knpbundles.com/KnpLabs/KnpSnappyBundle)
 
-[Snappy][snappy] is a PHP (5.6+) wrapper for the [wkhtmltopdf][wkhtmltopdf] conversion utility.
+[Snappy][snappy] is a PHP wrapper for the [wkhtmltopdf][wkhtmltopdf] conversion utility.
 It allows you to generate either pdf or image files from your html documents, using the webkit engine.
 
 The KnpSnappyBundle provides a simple integration for your Symfony project.
+
+Limitations
+----------
+
+If you use JavaScript to render your pages, you may encounter some issues because of [wkhtmltopdf][wkhtmltopdf] not being fully compatible with ES6 apis.
+The only way to solve this issue is to provide polyfills that fix the gaps between modern ES6 apis and the [wkhtmltopdf][wkhtmltopdf] rendering engine.
 
 Installation
 ------------

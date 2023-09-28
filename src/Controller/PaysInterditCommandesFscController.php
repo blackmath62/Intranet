@@ -6,21 +6,26 @@ use App\Entity\Main\PaysBanFsc;
 use App\Form\PaysBanType;
 use App\Repository\Main\PaysBanFscRepository;
 use DateTime;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class PaysInterditCommandesFscController extends AbstractController
 {
-    /**
-     * @Route("/Roby/pays/interdit/commandes/fsc", name="app_pays_interdit_commandes_fsc")
-     */
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/Roby/pays/interdit/commandes/fsc", name: "app_pays_interdit_commandes_fsc")]
+
     public function index(PaysBanFscRepository $repo, Request $request): Response
     {
         // tracking user page for stats
@@ -35,7 +40,7 @@ class PaysInterditCommandesFscController extends AbstractController
             $pay->setCreatedAt(new DateTime());
             $pay->setCreatedBy($this->getUser())
                 ->setPays(strtoupper($pays));
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($pay);
             $em->flush();
         }
@@ -47,17 +52,16 @@ class PaysInterditCommandesFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/pays/interdit/commandes/fsc/delete{id}", name="app_pays_interdit_commandes_fsc_delete")
-     */
-    public function delete($id, PaysBanFscRepository $repo, Request $request): Response
+    #[Route("/Roby/pays/interdit/commandes/fsc/delete{id}", name: "app_pays_interdit_commandes_fsc_delete")]
+
+    public function delete($id, PaysBanFscRepository $repo): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
         //$this->setTracking($tracking);
 
         $pay = $repo->findOneBy(['id' => $id]);
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($pay);
         $em->flush();
 

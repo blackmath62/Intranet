@@ -17,17 +17,16 @@ use App\Repository\Main\MailListRepository;
 use App\Repository\Main\MovBillFscRepository;
 use App\Repository\Main\UsersRepository;
 use DateTime;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_ROBY")
- */
+#[IsGranted("ROLE_ROBY")]
 
 class FscPieceClientController extends AbstractController
 //class MovementBillFscController extends AbstractController
@@ -45,9 +44,20 @@ class FscPieceClientController extends AbstractController
     private $adminEmailController;
     private $repoUsers;
     private $repoComments;
+    private $entityManager;
 
-    public function __construct(CommentairesRepository $repoComments, UsersRepository $repoUsers, AdminEmailController $adminEmailController, MailListRepository $repoMail, MovBillFscRepository $repoBill, documentsFscRepository $repoDocs, MouvRepository $repoMouv, MovBillFscRepository $repoFact, EntRepository $repoEnt, MailerInterface $mailer)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        CommentairesRepository $repoComments,
+        UsersRepository $repoUsers,
+        AdminEmailController $adminEmailController,
+        MailListRepository $repoMail,
+        MovBillFscRepository $repoBill,
+        documentsFscRepository $repoDocs,
+        MouvRepository $repoMouv,
+        MovBillFscRepository $repoFact,
+        EntRepository $repoEnt,
+        MailerInterface $mailer) {
         $this->repoFact = $repoFact;
         $this->repoEnt = $repoEnt;
         $this->repoUsers = $repoUsers;
@@ -60,12 +70,12 @@ class FscPieceClientController extends AbstractController
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
         $this->repoComments = $repoComments;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Roby/fsc/pieces/clients/index", name="app_fsc_piece_client")
-     */
+    #[Route("/Roby/fsc/pieces/clients/index", name: "app_fsc_piece_client")]
+
     public function index(Request $request): Response
     {
         // tracking user page for stats
@@ -82,7 +92,7 @@ class FscPieceClientController extends AbstractController
                 $mail->setCreatedAt(new DateTime())
                     ->setEmail($form->getData()['email'])
                     ->setPage($tracking);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($mail);
                 $em->flush();
             } else {
@@ -99,9 +109,8 @@ class FscPieceClientController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/fsc/pieces/clients/verrou/{id}", name="app_fsc_piece_client_verrou")
-     */
+    #[Route("/Roby/fsc/pieces/clients/verrou/{id}", name: "app_fsc_piece_client_verrou")]
+
     public function verrou($id, Request $request): Response
     {
 
@@ -116,7 +125,7 @@ class FscPieceClientController extends AbstractController
                 $this->addFlash('danger', 'Cette piece a bien été mise en anomalie');
             }
 
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($piece);
             $entityManager->flush();
 
@@ -127,7 +136,7 @@ class FscPieceClientController extends AbstractController
                 ->setTables('app_fsc_piece_client')
                 ->setIdentifiant($id);
 
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($commentaire);
             $entityManager->flush();
         } else {
@@ -138,15 +147,14 @@ class FscPieceClientController extends AbstractController
 
     }
 
-    /**
-     * @Route("/Roby/fsc/pieces/clients/show/{id}", name="app_fsc_piece_client_show")
-     */
-    public function show($id = null, Request $request, MovBillFsc $bill): Response
+    #[Route("/Roby/fsc/pieces/clients/show/{id}", name: "app_fsc_piece_client_show")]
+
+    public function show(Request $request, MovBillFsc $bill, $id = null): Response
     {
         $form = $this->createForm(FactureFournisseursFscType::class, $bill);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($bill);
             $entityManager->flush();
 
@@ -161,7 +169,7 @@ class FscPieceClientController extends AbstractController
                 ->setUser($this->getUser())
                 ->setCreatedAt(new DateTime())
                 ->setTables('app_fsc_piece_client');
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($commentaires);
             $entityManager->flush();
 
@@ -187,9 +195,8 @@ class FscPieceClientController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/fsc/pieces/clients/update", name="app_fsc_piece_client_update")
-     */
+    #[Route("/Roby/fsc/pieces/clients/update", name: "app_fsc_piece_client_update")]
+
     // on ajoute les factures clients qui n'y sont pas déjà
     public function update(): Response
     {
@@ -211,7 +218,7 @@ class FscPieceClientController extends AbstractController
                         ->setTypeTiers($value['typeTiers']);
 
                 }
-                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager = $this->entityManager;
                 $entityManager->persist($bill);
                 $entityManager->flush();
             }

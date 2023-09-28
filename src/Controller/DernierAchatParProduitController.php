@@ -7,6 +7,7 @@ use App\Form\MetierProdType;
 use App\Form\OthersDocumentsType;
 use App\Repository\Divalto\ArtRepository;
 use App\Repository\Main\IcdRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Shuchkin\SimpleXLSX;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -14,25 +15,29 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Throwable;
+
+#[IsGranted("ROLE_ADMIN")]
 
 class DernierAchatParProduitController extends AbstractController
 {
 
     private $repoArt;
+    private $entityManager;
 
-    public function __construct(ArtRepository $repoArt)
+    public function __construct(ManagerRegistry $registry, ArtRepository $repoArt)
     {
         $this->repoArt = $repoArt;
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("/dernier/achat/par/produit/{dos}", name="app_dernier_achat_par_produit")
-     * @Route("/with/dernier/achat/par/produit/{dos}/{produit}/{cmp}", name="app_dernier_achat_par_produit_with")
-     */
-    public function index($dos, $produit = null, $cmp = null, ArtRepository $repo, Request $request): Response
+    #[Route("/dernier/achat/par/produit/{dos}", name: "app_dernier_achat_par_produit")]
+    #[Route("/with/dernier/achat/par/produit/{dos}/{produit}/{cmp}", name: "app_dernier_achat_par_produit_with")]
+
+    public function index(ArtRepository $repo, Request $request, $dos, $produit = null, $cmp = null): Response
     {
         $produits = '';
 
@@ -57,9 +62,8 @@ class DernierAchatParProduitController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/import/produit", name="app_import_produit")
-     */
+    #[Route("/import/produit", name: "app_import_produit")]
+
     public function import(IcdRepository $repoIcd, Request $request, SluggerInterface $slugger): Response
     {
 
@@ -89,7 +93,7 @@ class DernierAchatParProduitController extends AbstractController
             ini_set('memory_limit', '-1');
             ini_set('max_execution_time', 0);
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             // suppression des anciennes données
             $produits = $repoIcd->findAll();
             foreach ($produits as $key => $value) {
@@ -160,10 +164,9 @@ class DernierAchatParProduitController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/calcul/Cmp/dernier/achat/{dos}/{produit}/{sref1}/{sref2}", name="app_dernier_achat_calcul_cmp")
-     */
-    public function getcalculCmp($dos = null, $produit = null, $sref1 = null, $sref2 = null, $qte = null, ArtRepository $repo, Request $request): Response
+    #[Route("/calcul/Cmp/dernier/achat/{dos}/{produit}/{sref1}/{sref2}", name: "app_dernier_achat_calcul_cmp")]
+
+    public function getcalculCmp(ArtRepository $repo, Request $request, $dos = null, $produit = null, $sref1 = null, $sref2 = null, $qte = null): Response
     {
         if ($sref1 == 'null') {
             $sref1 = null;
@@ -283,10 +286,9 @@ class DernierAchatParProduitController extends AbstractController
         return $cmp;
     }
 
-    /**
-     * @Route("/calcul/cmp/ajax/{dos}/{produit}/{sref1}/{sref2}/{qte}", name="app_calcul_cmp_ajax")
-     */
-    public function EmplacementAjax($dos = null, $produit = null, $sref1 = null, $sref2 = null, $qte = null, ArtRepository $repo, Request $request): Response
+    #[Route("/calcul/cmp/ajax/{dos}/{produit}/{sref1}/{sref2}/{qte}", name: "app_calcul_cmp_ajax")]
+
+    public function EmplacementAjax(ArtRepository $repo, Request $request, $dos = null, $produit = null, $sref1 = null, $sref2 = null, $qte = null): Response
     {
         $dos = 1;
         $qte = 171;

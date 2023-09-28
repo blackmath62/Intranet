@@ -1,17 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}
+	{{ title }}
+{% endblock %}
 
 {% block body %}
-	<section class="content-header">
+	<section
+		class="content-header">
 		<!-- Création de Ticket -->
 		<div class="card collapsed-card card-dark">
 			<div class="card-header d-flex">
 				<h3 class="card-title">Créer un nouveau ticket .....</h3>
 				{% if app.request.attributes.get('_route')  == 'app_tickets_resolus' %}
-				<a href="{{ path('app_tickets') }}" class="badge badge-danger ml-auto">Afficher les tickets non résolus</a>
+					<a href="{{ path('app_tickets') }}" class="badge badge-danger ml-auto">Afficher les tickets non résolus</a>
 				{% else %}
-				<a href="{{ path('app_tickets_resolus') }}" class="badge badge-success ml-auto">Afficher les tickets résolus</a>
+					<a href="{{ path('app_tickets_resolus') }}" class="badge badge-success ml-auto">Afficher les tickets résolus</a>
 				{% endif %}
 
 				<div class="card-tools">
@@ -33,190 +36,205 @@
 						{{ form_widget(formTickets.content)}}
 					</div>
 					<div class="d-flex flex-wrap col-12">
-					<div class="form-group col-12 col-sm-12 col-md-3">
-						<label>{{ form_label(formTickets.service) }}:</label>
-						{{ form_widget(formTickets.service) }}
-					</div>
-					<div class="form-group col-12 col-sm-12 col-md-3">
-						<label>{{ form_label(formTickets.societe) }}:</label>
-						{{ form_widget(formTickets.societe) }}
-					</div>
-					<div class="form-group col-12 col-sm-12 col-md-3">
-						<label>{{ form_label(formTickets.priority) }}:</label>
-						{{ form_widget(formTickets.priority) }}
-					</div>
-					<div class="form-group col-12 col-sm-12 col-md-3">
-						<label>{{ form_label(formTickets.file) }}:</label>
-						{{ form_widget(formTickets.file) }}
-					</div>
-					<div class="d-none">
-						<label>{{ form_label(formTickets.statu) }}:</label>
-						{{ form_widget(formTickets.statu) }}
-					</div>
+						<div class="form-group col-12 col-sm-12 col-md-3">
+							<label>{{ form_label(formTickets.service) }}:</label>
+							{{ form_widget(formTickets.service) }}
+						</div>
+						<div class="form-group col-12 col-sm-12 col-md-3">
+							<label>{{ form_label(formTickets.societe) }}:</label>
+							{{ form_widget(formTickets.societe) }}
+						</div>
+						<div class="form-group col-12 col-sm-12 col-md-3">
+							<label>{{ form_label(formTickets.priority) }}:</label>
+							{{ form_widget(formTickets.priority) }}
+						</div>
+						<div class="form-group col-12 col-sm-12 col-md-3">
+							<label>{{ form_label(formTickets.file) }}:</label>
+							{{ form_widget(formTickets.file) }}
+						</div>
+						<div class="d-none">
+							<label>{{ form_label(formTickets.statu) }}:</label>
+							{{ form_widget(formTickets.statu) }}
+						</div>
 
-					<div class="form-group col-12 col-sm-12 col-md-12 text-right">
-						{{ form_row(formTickets.poster) }}
-					</div>
+						<div class="form-group col-12 col-sm-12 col-md-12 text-right">
+							{{ form_row(formTickets.poster) }}
+						</div>
 					</div>
 				</div>
 				{{ form_end(formTickets) }}
 			</div>
 			<!-- /.card-footer-->
 		</div>
-		
+
 		<!-- Control Sidebar -->
 		<aside class="control-sidebar control-sidebar-dark"></aside>
 		<!-- /.control-sidebar -->
 		<!-- ./wrapper -->
 		{% for statu in status %}
-		{% if statu.id %}		
+			{% if statu.id %}
 				{% set countTicketsByStatus = 0 %}
-				{% for ticket in tickets if ticket.statu == statu %}
-					{% set countTicketsByStatus = countTicketsByStatus + 1 %}
+				{% for ticket in tickets %}
+					{% if ticket.statu == statu %}
+						{% set countTicketsByStatus = countTicketsByStatus + 1 %}
+					{% endif %}
 				{% endfor %}
-			{% if countTicketsByStatus > 0 %}
+				{% if countTicketsByStatus > 0 %}
 
-				<!-- /.Création -->
-				<div class="card">
-					<div class="card-header" style="background-color: {{ statu.backgroundColor }}; color: {{ statu.textColor }}" ;>
-						<div class="d-flex">
-							<div class="p-2">
-								<h3 class="card-title"><i class="pr-1 fas {{ statu.fa}}"></i>{{ statu.title }}</h3>
+					<!-- /.Création -->
+					<div class="card">
+						<div class="card-header" style="background-color: {{ statu.backgroundColor }}; color: {{ statu.textColor }}" ;>
+							<div class="d-flex">
+								<div class="p-2">
+									<h3 class="card-title">
+										<i class="pr-1 fas {{ statu.fa}}"></i>
+										{{ statu.title }}</h3>
+								</div>
+								<div class="p-2">
+									<span class="badge badge-secondary right">{{ countTicketsByStatus }}</span>
+								</div>
+								<div
+									class="ml-auto p-2">
+									<!--	 TODO JEROME Voir pour extraire uniquement les tickets avec le statut correspondant -->
+									<a href="{{ path('app_export') }}" class='btn btn-sm btn-dark'>Export Excel</a>
+								</div>
 							</div>
-							<div class="p-2">
-								<span class="badge badge-secondary right">{{ countTicketsByStatus }}</span>
-							</div>
-							<div class="ml-auto p-2">
-							<!--	 TODO JEROME Voir pour extraire uniquement les tickets avec le statut correspondant -->
-								<a href="{{ path('app_export') }}" class='btn btn-sm btn-dark'>Export Excel</a>
-							</div>
+							<div></div>
 						</div>
-						<div></div>
-					</div>
 
 
-					{% for ticket in tickets %}
-						{% if ticket.statu == statu %}
-							<div class="card collapsed-card card-light border m-2">
-								<div class="card-header">
+						{% for ticket in tickets %}
+							{% if ticket.statu == statu %}
+								<div class="card collapsed-card card-light border m-2">
+									<div class="card-header">
 
-									<div class="d-flex ">
-										<h2 class="card-title mr-auto p-2">
-											<a href=" {{path('app_comment', {'id' : ticket.id} ) }}">Ticket
-												{{ ticket.id }}
-												:
-												{{ ticket.title}}
-											</a>
-											{% set countNotEmpty = 0 %}
-											{% for comment in comments if comment.ticket_id == ticket.id %}
-												{% set countNotEmpty = comment.nbComments %}
-											{% endfor %}
-
-											{% if countNotEmpty > 0 %}
-												<a class="btn btn-sm" href=" {{path('app_comment', {'id' : ticket.id} ) }}">
-													<i class="fas fa-comments"></i>
-													<span class="badge bg-warning">{{ countNotEmpty }}</span>
+										<div class="d-flex ">
+											<h2 class="card-title mr-auto p-2">
+												<a href=" {{path('app_comment', {'id' : ticket.id} ) }}">Ticket
+													{{ ticket.id }}
+													:
+													{{ ticket.title}}
 												</a>
-											{% endif %}
+												{% set countNotEmpty = 0 %}
+												{% for comment in comments %}
+													{% if comment.ticket_id == ticket.id %}
+														{% set countNotEmpty = comment.nbComments %}
+													{% endif %}
+												{% endfor %}
+
+												{% if countNotEmpty > 0 %}
+													<a class="btn btn-sm" href=" {{path('app_comment', {'id' : ticket.id} ) }}">
+														<i class="fas fa-comments"></i>
+														<span class="badge bg-warning">{{ countNotEmpty }}</span>
+													</a>
+												{% endif %}
 												{% if ticket.prestataire %}
-													<a href="mailto:{{ ticket.prestataire.email }}" class="btn btn-xl text-white text-center" style= "background-color: {{ ticket.prestataire.color }};">
+													<a href="mailto:{{ ticket.prestataire.email }}" class="btn btn-xl text-white text-center" style="background-color: {{ ticket.prestataire.color }};">
 														{{ticket.prestataire.nom}}</a>
 												{% else %}
 													<a class="btn btn-xl btn-danger text-white text-center">non assigné</a>
 												{% endif %}
 												{% if ticket.modifiedAt %}
-												Derniere action	le
-												{{ ticket.modifiedAt|date("d/m/Y")}}
-												à
-												{{ ticket.modifiedAt|date("H:i")}}
+													Derniere action	le
+													{{ ticket.modifiedAt|date("d/m/Y")}}
+													à
+													{{ ticket.modifiedAt|date("H:i")}}
 												{% endif %}
-										</h2>
-										<div>
-											<a class="btn btn-sm" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;><i class="fas {{ ticket.service.fa}}"></i></a>
-											<a class="btn btn-sm" style="background-color: {{ ticket.priority.color }}; color: {{ ticket.priority.textColor }}" ;><i class="fas {{ticket.priority.fa}}"></i></a>
-											<h2 class="card-title p-2">
-												
-												Déposé par 
-												{{ ticket.user.pseudo}}
-												le
-												{{ ticket.createdAt|date("d/m/Y")}}
-												à
-												{{ ticket.createdAt|date("H:i")}}
-												
 											</h2>
-										</div>
+											<div>
+												<a class="btn btn-sm" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;>
+													<i class="fas {{ ticket.service.fa}}"></i>
+												</a>
+												<a class="btn btn-sm" style="background-color: {{ ticket.priority.color }}; color: {{ ticket.priority.textColor }}" ;>
+													<i class="fas {{ticket.priority.fa}}"></i>
+												</a>
+												<h2 class="card-title p-2">
 
-										<div class="card-tools">
-											<button type="button" class="btn btn-tool p-2" data-card-widget="collapse">
-												<i class="fas fa-plus"></i>
-											</button>
+													Déposé par
+													{{ ticket.user.pseudo}}
+													le
+													{{ ticket.createdAt|date("d/m/Y")}}
+													à
+													{{ ticket.createdAt|date("H:i")}}
+
+												</h2>
+											</div>
+
+											<div class="card-tools">
+												<button type="button" class="btn btn-tool p-2" data-card-widget="collapse">
+													<i class="fas fa-plus"></i>
+												</button>
+											</div>
 										</div>
 									</div>
-								</div>
 
-								<div class="card-body">
-									<div class="form-group col-12 col-sm-12 col-md-3">
-										<label for="exampleInputEmail1">Objet</label>
-										<h3 type="text" name="objet" id="objet">{{ ticket.title}}</h3>
-									</div>
-									<div class='d-flex flex-wrap'>
-										<div class="form-group col-12 col-sm-12 col-md-3 text-center">
-											<label for="exampleInputPassword1">Date ouverture</label>
-											<div>{{ ticket.createdAt|date("d/m/Y")}}</div>
+									<div class="card-body">
+										<div class="form-group col-12 col-sm-12 col-md-3">
+											<label for="exampleInputEmail1">Objet</label>
+											<h3 type="text" name="objet" id="objet">{{ ticket.title}}</h3>
 										</div>
-										<div class="form-group col-12 col-sm-12 col-md-3 text-center">
-											<label for="exampleInputPassword1">Prestataire</label>
+										<div class='d-flex flex-wrap'>
+											<div class="form-group col-12 col-sm-12 col-md-3 text-center">
+												<label for="exampleInputPassword1">Date ouverture</label>
+												<div>{{ ticket.createdAt|date("d/m/Y")}}</div>
+											</div>
+											<div class="form-group col-12 col-sm-12 col-md-3 text-center">
+												<label for="exampleInputPassword1">Prestataire</label>
 												<div class="text-center">
-												{% if ticket.prestataire %}
-													<a href="mailto:{{ ticket.prestataire.email }}" class="btn btn-xl btn-dark text-white text-center">
-														{{ticket.prestataire.nom}}</a>
-												{% else %}
-													<a class="btn btn-xl btn-danger text-white text-center">non assigné</a>
-												{% endif %}
+													{% if ticket.prestataire %}
+														<a href="mailto:{{ ticket.prestataire.email }}" class="btn btn-xl btn-dark text-white text-center">
+															{{ticket.prestataire.nom}}</a>
+													{% else %}
+														<a class="btn btn-xl btn-danger text-white text-center">non assigné</a>
+													{% endif %}
 												</div>
-										</div>
-										<div class="form-group col-12 col-sm-12 col-md-3 text-center">
-											<label for="exampleInputPassword1">Service</label>
-											<div>
-												<a class="btn btn-xl" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;><i class="pr-1 fas {{ ticket.service.fa}}"></i>{{ ticket.service.title }}</a>
+											</div>
+											<div class="form-group col-12 col-sm-12 col-md-3 text-center">
+												<label for="exampleInputPassword1">Service</label>
+												<div>
+													<a class="btn btn-xl" style="background-color: {{ ticket.service.color }}; color: {{ ticket.service.textColor }}" ;>
+														<i class="pr-1 fas {{ ticket.service.fa}}"></i>
+														{{ ticket.service.title }}</a>
+												</div>
+											</div>
+											<div class="form-group col-12 col-sm-12 col-md-3 text-center">
+												<label for="exampleInputPassword1">Statut</label>
+												<div>
+													<a class="btn btn-xl" style="background-color: {{ ticket.statu.backgroundColor }}; color: {{ ticket.statu.textColor }}" ;>
+														<i class="pr-1 fas {{ ticket.statu.fa}}"></i>
+														{{ ticket.statu.title }}</a>
+												</div>
 											</div>
 										</div>
-										<div class="form-group col-12 col-sm-12 col-md-3 text-center">
-											<label for="exampleInputPassword1">Statut</label>
-											<div>
-												<a class="btn btn-xl" style="background-color: {{ ticket.statu.backgroundColor }}; color: {{ ticket.statu.textColor }}" ;><i class="pr-1 fas {{ ticket.statu.fa}}"></i>{{ ticket.statu.title }}</a>
-											</div>
-										</div>
-									</div>
-									<div class="form-group col-12 col-sm-12 col-md-3">
-										<label for="exampleInputPassword1">Détail :
-										</label>
-										<article>{{ ticket.content|raw}}</article>
-									</div>
-									{% if ticket.file %}
-										<div class="form-group col-12 col-sm-12 col-md-3 text-center">
-											<label>Fichiers joints :
+										<div class="form-group col-12 col-sm-12 col-md-3">
+											<label for="exampleInputPassword1">Détail :
 											</label>
-											<a href="{{ asset(asset('doc/tickets/' ~ ticket.file))}}" id="lien" name="lien" class="text-center btn btn-outline-info btn-xs">{{ ticket.file}}</a>
+											<article>{{ ticket.content|raw}}</article>
 										</div>
-									{% endif %}
+										{% if ticket.file %}
+											<div class="form-group col-12 col-sm-12 col-md-3 text-center">
+												<label>Fichiers joints :
+												</label>
+												<a href="{{ asset(asset('doc/tickets/' ~ ticket.file))}}" id="lien" name="lien" class="text-center btn btn-outline-info btn-xs">{{ ticket.file}}</a>
+											</div>
+										{% endif %}
 
-									<div class='row'>
-										<div class="form-group mx-auto align-center">
-											<a href=" {{path('app_comment', {'id' : ticket.id} ) }}" class="btn btn-dark">
-												<i class="fas fa-comments mr-2"></i>
-												Aller aux commentaires
-											</a>
+										<div class='row'>
+											<div class="form-group mx-auto align-center">
+												<a href=" {{path('app_comment', {'id' : ticket.id} ) }}" class="btn btn-dark">
+													<i class="fas fa-comments mr-2"></i>
+													Aller aux commentaires
+												</a>
+											</div>
 										</div>
+
 									</div>
-
 								</div>
-							</div>
-						{% endif %}
-					{% endfor %}
-				</div>
+							{% endif %}
+						{% endfor %}
+					</div>
+				{% endif %}
 			{% endif %}
-		{% endif %}
 		{% endfor %}
 	</section>
 {% endblock %}

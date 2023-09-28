@@ -43,12 +43,12 @@ class MovBillFscRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM(
             SELECT movbillfsc.id AS id, movbillfsc.facture AS facture, movbillfsc.dateFact AS dateFact,
-            movbillfsc.tiers AS tiers, movbillfsc.nom AS nom, movbillfsc.notreRef AS notreRef,
+            movbillfsc.tiers AS tiers, movbillfsc.nom AS nom, movbillfsc.notreRef AS notreRef, movbillfsc.anomalie AS anomalie,
             COUNT(movbillfsc_fsclistmovement.fsclistmovement_id) AS liaison
             FROM movbillfsc
             LEFT JOIN movbillfsc_fsclistmovement ON movbillfsc.id = movbillfsc_fsclistmovement.movbillfsc_id
             GROUP BY movbillfsc.id)reponse
-            WHERE liaison = 0 AND DATE_FORMAT(dateFact, '%Y' '-' '%m' '-' '%d') > DATE_FORMAT(DATE_ADD(now(), INTERVAL - 5 YEAR), '%Y' '-' '%m' '-' '%d') AND movbillfsc.anomalie = false
+            WHERE liaison = 0 AND DATE_FORMAT(dateFact, '%Y' '-' '%m' '-' '%d') > DATE_FORMAT(DATE_ADD(now(), INTERVAL - 5 YEAR), '%Y' '-' '%m' '-' '%d') AND anomalie = false
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

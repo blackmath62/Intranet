@@ -24,9 +24,22 @@
         <!-- IMPORTANT: You MUST configure your server version, either here or in config/packages/doctrine.yaml -->
         <!--  -->
         <!-- DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db" -->
-        <!-- DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=8&charset=utf8mb4" -->
+        <!-- DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=8.0.32&charset=utf8mb4" -->
+        <!-- DATABASE_URL="mysql://app:!ChangeMe!@127.0.0.1:3306/app?serverVersion=10.11.2-MariaDB&charset=utf8mb4" -->
         <env name="DATABASE_URL" value="postgresql://app:!ChangeMe!@127.0.0.1:5432/app?serverVersion=15&amp;charset=utf8"/>
         <!-- ###- doctrine/doctrine-bundle ### -->
+>>>>>>> theirs
+<<<<<<< ours
+=======
+
+        <!-- ###+ symfony/framework-bundle ### -->
+        <env name="APP_ENV" value="dev"/>
+<<<<<<< ours
+        <env name="APP_SECRET" value="4313af889a25b31607b16dfc60bc3879"/>
+=======
+        <env name="APP_SECRET" value="2389641c95781db94a936d06ce2fb634"/>
+>>>>>>> theirs
+        <!-- ###- symfony/framework-bundle ### -->
 >>>>>>> theirs
 <<<<<<< ours
 =======
@@ -37,16 +50,6 @@
 >>>>>>> theirs
 =======
         <server name="SYMFONY_PHPUNIT_VERSION" value="9.5" />
->>>>>>> theirs
-<<<<<<< ours
-=======
-
-        <!-- ###+ symfony/framework-bundle ### -->
-        <env name="APP_ENV" value="dev"/>
-        <env name="APP_SECRET" value="32ead4a7d920b774ea42e5bc6853ae31"/>
-        <!-- env name="TRUSTED_PROXIES" value="127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" -->
-        <!-- env name="TRUSTED_HOSTS" value="'^(localhost|example\.com)$'" -->
-        <!-- ###- symfony/framework-bundle ### -->
 >>>>>>> theirs
     </php>
 

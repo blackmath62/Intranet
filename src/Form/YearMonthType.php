@@ -3,22 +3,22 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class YearMonthType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $anneeActuelle = date("Y");
-        $N1 = date("Y")-1;
-        $N2 = date("Y")-2;
-        $N3 = date("Y")-3;
-        $N4 = date("Y")-4;
+        $N1 = date("Y") - 1;
+        $N2 = date("Y") - 2;
+        $N3 = date("Y") - 3;
+        $N4 = date("Y") - 4;
         $builder
-            ->add('month', ChoiceType::class,[
+            ->add('month', ChoiceType::class, [
                 'choices' => [
                     'Janvier' => "01",
                     'Février' => "02",
@@ -31,15 +31,15 @@ class YearMonthType extends AbstractType
                     'Septembre' => "09",
                     'Octobre' => "10",
                     'Novembre' => "11",
-                    'Décembre' => "12"
+                    'Décembre' => "12",
                 ],
                 'label' => 'Mois',
                 'label_attr' => ['class' => 'd-none'],
                 'attr' => [
-                    'class' => 'form-control'
-                ]
+                    'class' => 'form-control',
+                ],
             ])
-            ->add('year', ChoiceType::class,[
+            ->add('year', ChoiceType::class, [
                 'choices' => [
                     $anneeActuelle => $anneeActuelle,
                     $N1 => $N1,
@@ -49,20 +49,20 @@ class YearMonthType extends AbstractType
 
                 ],
                 'attr' => [
-                    'class' => 'form-control'
+                    'class' => 'form-control',
                 ],
                 'expanded' => false,
                 'multiple' => false,
                 'label' => 'Année',
-                'label_attr' => ['class' => 'd-none']
+                'label_attr' => ['class' => 'd-none'],
             ])
-            ->add('filtrer', SubmitType::class,[
-                'attr' => ['class' => 'btn btn-secondary']
+            ->add('filtrer', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-secondary'],
             ])
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             // Configure your form options here

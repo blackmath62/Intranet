@@ -19,7 +19,7 @@ class Task implements TaskInterface
         return [];
     }
 
-    public function run()
+    public function run(): void
     {
         static::$runCount++;
     }

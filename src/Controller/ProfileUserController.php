@@ -7,22 +7,27 @@ use App\Form\StatesDateFilter2Type;
 use App\Form\StatesDateFilterType;
 use App\Repository\Main\HolidayRepository;
 use App\Repository\Main\InterventionFicheMonteurRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class ProfileUserController extends AbstractController
 {
-    /**
-     * @Route("/profile/user", name="app_profile_user")
-     */
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/profile/user", name: "app_profile_user")]
+
     public function index(Request $request, SluggerInterface $slugger, HolidayRepository $repoHoliday, InterventionFicheMonteurRepository $repoInterventions)
     {
         // tracking user page for stats
@@ -61,7 +66,7 @@ class ProfileUserController extends AbstractController
             } else {
                 $userImg->setImg('AdminLTELogo.png');
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($user);
             $em->flush();
 

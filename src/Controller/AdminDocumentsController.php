@@ -8,21 +8,27 @@ use App\Form\EditDocumentsType;
 use App\Repository\Main\DocumentsRepository;
 use App\Repository\Main\SocieteRepository;
 use DateTime;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-/**
- * @IsGranted("ROLE_ADMIN")
- */
+#[IsGranted("ROLE_ADMIN")]
+
 class AdminDocumentsController extends AbstractController
 {
-    /**
-     * @Route("/admin/documents", name="app_admin_documents")
-     */
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/admin/documents", name: "app_admin_documents")]
+
     public function index(Request $request, DocumentsRepository $repo, SocieteRepository $repoSociete, SluggerInterface $slugger)
     {
         $document = new Documents();
@@ -63,7 +69,7 @@ class AdminDocumentsController extends AbstractController
                     ->setUser($user);
             }
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($document);
             $em->flush();
 
@@ -86,30 +92,29 @@ class AdminDocumentsController extends AbstractController
 
     }
 
-    /**
-     * @Route("/admin/documents/delete/{id}",name="app_delete_document")
-     */
+    #[Route("/admin/documents/delete/{id}", name: "app_delete_document")]
+
     public function deleteDocuments($id)
     {
-        $repository = $this->getDoctrine()->getManager()->getRepository(documents::class);
+        $repository = $this->entityManager->getRepository(documents::class);
         $documentsId = $repository->find($id);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($documentsId);
         $em->flush();
 
         return $this->redirect($this->generateUrl('app_admin_documents'));
     }
-    /**
-     * @Route("/admin/documents/edit/{id}",name="app_edit_document")
-     */
+
+    #[Route("/admin/documents/edit/{id}", name: "app_edit_document")]
+
     public function editSociete(documents $documents, Request $request)
     {
         $form = $this->createForm(EditDocumentsType::class, $documents);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($documents);
             $em->flush();
 

@@ -24,9 +24,29 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Google\Transport\GmailTransportFactory::class,
             'package' => 'symfony/google-mailer',
         ],
+        'infobip' => [
+            'class' => Bridge\Infobip\Transport\InfobipTransportFactory::class,
+            'package' => 'symfony/infobip-mailer',
+        ],
+        'mailersend' => [
+            'class' => Bridge\MailerSend\Transport\MailerSendTransportFactory::class,
+            'package' => 'symfony/mailersend-mailer',
+        ],
         'mailgun' => [
             'class' => Bridge\Mailgun\Transport\MailgunTransportFactory::class,
             'package' => 'symfony/mailgun-mailer',
+        ],
+        'mailjet' => [
+            'class' => Bridge\Mailjet\Transport\MailjetTransportFactory::class,
+            'package' => 'symfony/mailjet-mailer',
+        ],
+        'mandrill' => [
+            'class' => Bridge\Mailchimp\Transport\MandrillTransportFactory::class,
+            'package' => 'symfony/mailchimp-mailer',
+        ],
+        'ohmysmtp' => [
+            'class' => Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory::class,
+            'package' => 'symfony/oh-my-smtp-mailer',
         ],
         'postmark' => [
             'class' => Bridge\Postmark\Transport\PostmarkTransportFactory::class,
@@ -36,13 +56,13 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Sendgrid\Transport\SendgridTransportFactory::class,
             'package' => 'symfony/sendgrid-mailer',
         ],
+        'sendinblue' => [
+            'class' => Bridge\Sendinblue\Transport\SendinblueTransportFactory::class,
+            'package' => 'symfony/sendinblue-mailer',
+        ],
         'ses' => [
             'class' => Bridge\Amazon\Transport\SesTransportFactory::class,
             'package' => 'symfony/amazon-mailer',
-        ],
-        'mandrill' => [
-            'class' => Bridge\Mailchimp\Transport\MandrillTransportFactory::class,
-            'package' => 'symfony/mailchimp-mailer',
         ],
     ];
 
@@ -54,7 +74,7 @@ class UnsupportedSchemeException extends LogicException
         }
         $package = self::SCHEME_TO_PACKAGE_MAP[$provider] ?? null;
         if ($package && !class_exists($package['class'])) {
-            parent::__construct(sprintf('Unable to send emails via "%s" as the bridge is not installed; try running "composer require %s".', $provider, $package['package']));
+            parent::__construct(sprintf('Unable to send emails via "%s" as the bridge is not installed. Try running "composer require %s".', $provider, $package['package']));
 
             return;
         }

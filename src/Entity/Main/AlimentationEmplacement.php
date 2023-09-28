@@ -5,41 +5,29 @@ namespace App\Entity\Main;
 use App\Repository\Main\AlimentationEmplacementRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=AlimentationEmplacementRepository::class)
- */
+#[ORM\Entity(repositoryClass: AlimentationEmplacementRepository::class)]
+
 class AlimentationEmplacement
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+
     private $id;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=8)
-     */
+    #[ORM\Column(type: "string", length: 8)]
     private $emplacement;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $sendAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="alimentationEmplacements")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "alimentationEmplacements")]
     private $createdBy;
 
-    /**
-     * @ORM\Column(type="string", length=13)
-     */
+    #[ORM\Column(type: "string", length: 13)]
     private $ean;
 
     public function getId(): ?int
@@ -52,7 +40,7 @@ class AlimentationEmplacement
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -76,7 +64,7 @@ class AlimentationEmplacement
         return $this->sendAt;
     }
 
-    public function setSendAt(?\DateTimeInterface $sendAt): self
+    public function setSendAt(?\DateTimeInterface $sendAt) : self
     {
         $this->sendAt = $sendAt;
 

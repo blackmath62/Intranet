@@ -2,24 +2,28 @@
 
 namespace App\Controller;
 
-use App\Entity\Main\FAQ;
 use App\Form\FaqType;
 use App\Repository\Main\FAQRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class FaqController extends AbstractController
 {
-    /**
-     * @Route("/faq", name="app_faq")
-     */
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/faq", name: "app_faq")]
+
     public function index(Request $request, FAQRepository $repo): Response
     {
         $faqs = $repo->findAll();
@@ -34,7 +38,7 @@ class FaqController extends AbstractController
             $faq = $form->getData();
             $faq->setCreatedAt(new \DateTime())
                 ->setUser($this->getUser());
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($faq);
             $em->flush();
 
@@ -49,11 +53,9 @@ class FaqController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/faq/show/{id}", name="app_faq_show")
-     */
+    #[Route("/faq/show/{id}", name: "app_faq_show")]
 
-    public function faqShow(int $id, FAQRepository $repo, Request $request)
+    public function faqShow(int $id, FAQRepository $repo)
     {
         $faq = $repo->findOneBy(['id' => $id]);
 
@@ -67,9 +69,7 @@ class FaqController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/faq/edit/{id}", name="app_faq_edit")
-     */
+    #[Route("/faq/edit/{id}", name: "app_faq_edit")]
 
     public function faqEdit(int $id, FAQRepository $repo, Request $request)
     {
@@ -84,7 +84,7 @@ class FaqController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $faq = $form->getData();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($faq);
             $em->flush();
 

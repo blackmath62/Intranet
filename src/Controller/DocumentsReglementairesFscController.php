@@ -5,23 +5,28 @@ namespace App\Controller;
 use App\Form\DocumentsReglementairesFscType;
 use App\Repository\Main\DocumentsReglementairesFscRepository;
 use DateTime;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class DocumentsReglementairesFscController extends AbstractController
 {
-    /**
-     * @Route("/Roby/documents/reglementaires/fsc", name="app_documents_reglementaires_fsc")
-     */
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->entityManager = $registry->getManager();
+    }
+
+    #[Route("/Roby/documents/reglementaires/fsc", name: "app_documents_reglementaires_fsc")]
+
     public function index(Request $request, DocumentsReglementairesFscRepository $repo, SluggerInterface $slugger): Response
     {
 
@@ -58,7 +63,7 @@ class DocumentsReglementairesFscController extends AbstractController
                 $doc->setCreatedAt(new \DateTime())
                     ->setFiles($newFilename)
                     ->setAddBy($this->getUser());
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->entityManager;
                 $em->persist($doc);
                 $em->flush();
             }
@@ -76,11 +81,9 @@ class DocumentsReglementairesFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/documents/reglementaires/fsc/show/{id}", name="app_documents_reglementaires_fsc_show")
-     */
+    #[Route("/Roby/documents/reglementaires/fsc/show/{id}", name: "app_documents_reglementaires_fsc_show")]
 
-    public function DocsRegleFscShow(int $id, DocumentsReglementairesFscRepository $repo, Request $request)
+    public function DocsRegleFscShow(int $id, DocumentsReglementairesFscRepository $repo)
     {
         $doc = $repo->findOneBy(['id' => $id]);
 
@@ -94,11 +97,9 @@ class DocumentsReglementairesFscController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/documents/reglementaires/fsc/delete/{id}", name="app_documents_reglementaires_fsc_delete")
-     */
+    #[Route("/Roby/documents/reglementaires/fsc/delete/{id}", name: "app_documents_reglementaires_fsc_delete")]
 
-    public function DocsRegleFscDelete(int $id, DocumentsReglementairesFscRepository $repo, Request $request)
+    public function DocsRegleFscDelete(int $id, DocumentsReglementairesFscRepository $repo)
     {
         $doc = $repo->findOneBy(['id' => $id]);
 
@@ -106,7 +107,7 @@ class DocumentsReglementairesFscController extends AbstractController
         //$tracking = $request->attributes->get('_route');
         //$this->setTracking($tracking);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($doc);
         $em->flush();
 

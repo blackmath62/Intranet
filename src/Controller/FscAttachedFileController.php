@@ -19,17 +19,16 @@ use App\Repository\Main\TypeDocumentFscRepository;
 use App\Repository\Main\UsersRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted("ROLE_USER")]
 
 class FscAttachedFileController extends AbstractController
 {
@@ -44,9 +43,20 @@ class FscAttachedFileController extends AbstractController
     private $repoMail;
     private $mailEnvoi;
     private $mailTreatement;
+    private $entityManager;
 
-    public function __construct(MailListRepository $repoMail, UsersRepository $usersRepo, TypeDocumentFscRepository $typeDocFscRepo, CommentairesRepository $commentairesRepo, MouvRepository $mouvRepo, fscListMovementRepository $repoFsc, EntityManagerInterface $manager, documentsFscRepository $repoDocs, MailerInterface $mailer)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        MailListRepository $repoMail,
+        UsersRepository $usersRepo,
+        TypeDocumentFscRepository $typeDocFscRepo,
+        CommentairesRepository $commentairesRepo,
+        MouvRepository $mouvRepo,
+        fscListMovementRepository $repoFsc,
+        EntityManagerInterface $manager,
+        documentsFscRepository $repoDocs,
+        MailerInterface $mailer
+    ) {
         $this->mouvRepo = $mouvRepo;
         $this->repoFsc = $repoFsc;
         $this->manager = $manager;
@@ -58,13 +68,13 @@ class FscAttachedFileController extends AbstractController
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
+        $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
 
-    /**
-     * @Route("/Roby/fsc/liste/nok", name="app_fsc_attached_file")
-     * @Route("/Roby/fsc/liste/ok", name="app_fsc_attached_file_ok")
-     */
+    #[Route("/Roby/fsc/liste/nok", name: "app_fsc_attached_file")]
+    #[Route("/Roby/fsc/liste/ok", name: "app_fsc_attached_file_ok")]
+
     public function index(Request $request): Response
     {
         // vérifier si le statut des piéces a changé
@@ -93,9 +103,8 @@ class FscAttachedFileController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/fsc/show/{num}/{type}/{tiers}", name="app_fsc_show")
-     */
+    #[Route("/Roby/fsc/show/{num}/{type}/{tiers}", name: "app_fsc_show")]
+
     // Voir les détails d'une piéce
     public function fscShow($num, $type, $tiers, fscListMovementRepository $repo, Request $request): Response
     {
@@ -139,7 +148,7 @@ class FscAttachedFileController extends AbstractController
             $per->setUserChangePerimetreBoisFsc($this->getUser())
                 ->setUpdatePerimetreBoisFsc(new DateTime())
                 ->setPerimetreBois($formPerimetre->get('perimetreBois')->getData());
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($per);
             $entityManager->flush();
         }
@@ -164,7 +173,7 @@ class FscAttachedFileController extends AbstractController
                 ->setTables($table)
                 ->setContent($dd)
                 ->setIdentifiant($piece->getId());
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($commentaire);
             $entityManager->flush();
 
@@ -195,7 +204,7 @@ class FscAttachedFileController extends AbstractController
                 $piece->addFile($doc);
             }
 
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($piece);
             $entityManager->flush();
 
@@ -215,7 +224,7 @@ class FscAttachedFileController extends AbstractController
                 ->setTables($table)
                 ->setContent($dd)
                 ->setIdentifiant($piece->getId());
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->entityManager;
             $entityManager->persist($comment);
             $entityManager->flush();
 
@@ -241,9 +250,8 @@ class FscAttachedFileController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/change/type/doc/fsc/{id}", name="app_change_type_doc_fsc")
-     */
+    #[Route("/Roby/change/type/doc/fsc/{id}", name: "app_change_type_doc_fsc")]
+
     // Modifier le type de document Fsc
     public function changeTypeDocFsc($id, Request $request)
     {
@@ -257,7 +265,7 @@ class FscAttachedFileController extends AbstractController
             $doc = $this->repoDocs->findOneBy(['id' => $id]);
             $d = $form->get('title')->getData();
             $doc->setTypeDoc($d);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->persist($doc);
             $em->flush();
 
@@ -283,9 +291,8 @@ class FscAttachedFileController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/Roby/supprime/doc/{id}", name="app_document_fsc_delete")
-     */
+    #[Route("/Roby/supprime/doc/{id}", name: "app_document_fsc_delete")]
+
     // supprimer un document
     public function deleteImage($id, documentsFsc $doc)
     {
@@ -304,7 +311,7 @@ class FscAttachedFileController extends AbstractController
         // On supprime le fichier
         unlink($this->getParameter('images_directory') . '/' . $nom);
         // On supprime l'entrée de la base
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($doc);
         $em->flush();
 
@@ -353,14 +360,13 @@ class FscAttachedFileController extends AbstractController
                 }
             }
         }
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->entityManager;
         $entityManager->persist($piece);
         $entityManager->flush();
     }
 
-    /**
-     * @Route("/Roby/fsc/order/list/maj", name="app_fsc_order_list_maj")
-     */
+    #[Route("/Roby/fsc/order/list/maj", name: "app_fsc_order_list_maj")]
+
     // Mettre à jour la liste en comparant Divalto à la liste
     public function majFscOrderListFromDivalto(): Response
     {
@@ -439,9 +445,8 @@ class FscAttachedFileController extends AbstractController
         return $this->redirectToRoute('app_fsc_attached_file');
     }
 
-    /**
-     * @Route("/Roby/fsc/order/list/maj/from/list", name="app_fsc_order_list_maj_from_list")
-     */
+    #[Route("/Roby/fsc/order/list/maj/from/list", name: "app_fsc_order_list_maj_from_list")]
+
     // Mettre à jour la liste en comparant la liste et Divalto
     public function majFscOrderListFromList()
     {
@@ -479,14 +484,14 @@ class FscAttachedFileController extends AbstractController
             // supprimer les fichiers dans le dossier
             unlink($this->getParameter('images_directory') . '/' . $value->getFile());
             // supprimer la ligne dans la BDD document
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->entityManager;
             $em->remove($value);
             $em->flush();
         }
         $search = $this->repoFsc->findOneBy(['id' => $id]);
 
         // On supprime la piéce de la base
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->entityManager;
         $em->remove($search);
         $em->flush();
 

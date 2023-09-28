@@ -11,14 +11,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted("ROLE_ADMIN")]
 
 class MaillingController extends AbstractController
 {
-    /**
-     * @Route("/admin/mailing", name="app_mailing")
-     */
-    public function index(MailerInterface $mailer, FouRepository $repo, Request $request, SluggerInterface $slugger): Response
+    #[Route("/admin/mailing", name: "app_mailing")]
+
+    public function index(MailerInterface $mailer, FouRepository $repo, Request $request): Response
     {
 
         $erreur = [];

@@ -2,90 +2,60 @@
 
 namespace App\Entity\Main;
 
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Main\TicketsRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=TicketsRepository::class)
- */
+#[ORM\Entity(repositoryClass: TicketsRepository::class)]
 class Tickets
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id()]
+    #[ORM\GeneratedValue()]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $title;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: "text")]
     private $content;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Services::class, inversedBy="tickets")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Services::class, inversedBy: "tickets")]
+    #[ORM\JoinColumn(nullable: false)]
     private $service;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Status::class, inversedBy="tickets")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: "tickets")]
+    #[ORM\JoinColumn(nullable: false)]
     private $statu;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Societe::class, inversedBy="tickets")
-     */
+    #[ORM\ManyToOne(targetEntity: Societe::class, inversedBy: "tickets")]
     private $societe;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="tickets")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "tickets")]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Priorities::class, inversedBy="tickets")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Priorities::class, inversedBy: "tickets")]
+    #[ORM\JoinColumn(nullable: false)]
     private $priority;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Comments::class, mappedBy="ticket")
-     */
+    #[ORM\OneToMany(targetEntity: Comments::class, mappedBy: "ticket")]
     private $comments;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $closedAt;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $file;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Prestataire::class, inversedBy="tickets")
-     */
+    #[ORM\ManyToOne(targetEntity: Prestataire::class, inversedBy: "tickets")]
     private $prestataire;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $modifiedAt;
 
     public function __construct()
@@ -127,7 +97,7 @@ class Tickets
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -230,7 +200,7 @@ class Tickets
         return $this->closedAt;
     }
 
-    public function setClosedAt(?\DateTimeInterface $closedAt): self
+    public function setClosedAt(?\DateTimeInterface $closedAt) : self
     {
         $this->closedAt = $closedAt;
 
@@ -266,7 +236,7 @@ class Tickets
         return $this->modifiedAt;
     }
 
-    public function setModifiedAt(?\DateTimeInterface $modifiedAt): self
+    public function setModifiedAt(?\DateTimeInterface $modifiedAt) : self
     {
         $this->modifiedAt = $modifiedAt;
 

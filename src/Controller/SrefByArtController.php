@@ -8,12 +8,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted("ROLE_USER")]
 
 class SrefByArtController extends AbstractController
 {
-    /**
-     * @Route("/sref/by/art", name="app_sref_by_art")
-     */
+    #[Route("/sref/by/art", name: "app_sref_by_art")]
+
     public function index(Request $request, ArtRepository $repo): Response
     {
         // tracking user page for stats
