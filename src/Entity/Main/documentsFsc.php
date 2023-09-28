@@ -5,31 +5,22 @@ namespace App\Entity\Main;
 use App\Repository\Main\documentsFscRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=documentsFscRepository::class)
- */
+#[ORM\Entity(repositoryClass: documentsFscRepository::class)]
+
 class documentsFsc
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $file;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=fscListMovement::class, inversedBy="file")
-     */
+    #[ORM\ManyToOne(targetEntity: fscListMovement::class, inversedBy: "file")]
     private $fscListMovement;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=TypeDocumentFsc::class, inversedBy="documentsFscs")
-     */
+    #[ORM\ManyToOne(targetEntity: TypeDocumentFsc::class, inversedBy: "documentsFscs")]
     private $TypeDoc;
 
     public function getId(): ?int

@@ -7,7 +7,6 @@ use App\Repository\Main\FAQRepository;
 use App\Repository\Main\MailListRepository;
 use Com\Tecnick\Barcode\Barcode;
 use Knp\Snappy\Pdf;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -15,6 +14,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted("ROLE_USER")]
 

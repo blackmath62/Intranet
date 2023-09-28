@@ -6,11 +6,11 @@ use App\Form\YearMonthType;
 use App\Repository\Divalto\ControleComptabiliteAchatRepository;
 use App\Repository\Divalto\ControleComptabiliteRepository;
 use App\Repository\Divalto\ControleComptabiliteVenteRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted("ROLE_COMPTA")]
 

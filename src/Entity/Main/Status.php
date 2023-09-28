@@ -2,56 +2,38 @@
 
 namespace App\Entity\Main;
 
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Main\StatusRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=StatusRepository::class)
- */
+#[ORM\Entity(repositoryClass: StatusRepository::class)]
 class Status
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id()]
+    #[ORM\GeneratedValue()]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $title;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Tickets::class, mappedBy="statu")
-     */
+    #[ORM\OneToMany(targetEntity: Tickets::class, mappedBy: "statu")]
     private $tickets;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $ClosedAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $backgroundColor;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $textColor;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $fa;
 
     public function __construct()
@@ -112,7 +94,7 @@ class Status
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -124,7 +106,7 @@ class Status
         return $this->ClosedAt;
     }
 
-    public function setClosedAt(?\DateTimeInterface $ClosedAt): self
+    public function setClosedAt(?\DateTimeInterface $ClosedAt) : self
     {
         $this->ClosedAt = $ClosedAt;
 

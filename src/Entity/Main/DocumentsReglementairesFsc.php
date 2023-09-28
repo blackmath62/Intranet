@@ -6,41 +6,29 @@ use App\Entity\Main\Users;
 use App\Repository\Main\DocumentsReglementairesFscRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=DocumentsReglementairesFscRepository::class)
- */
+#[ORM\Entity(repositoryClass: DocumentsReglementairesFscRepository::class)]
+
 class DocumentsReglementairesFsc
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+
     private $id;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $files;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $years;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="addBys")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "addBys")]
     private $addBy;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $type;
 
     public function getId(): ?int

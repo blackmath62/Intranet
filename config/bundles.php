@@ -18,4 +18,5 @@ return [
     Cron\CronBundle\CronCronBundle::class => ['all' => true],
     Rewieer\TaskSchedulerBundle\RewieerTaskSchedulerBundle::class => ['all' => true],
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
+    Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
 ];

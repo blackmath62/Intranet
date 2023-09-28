@@ -13,265 +13,164 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity(repositoryClass=UsersRepository::class)
- *
- */
+#[ORM\Entity(repositoryClass: UsersRepository::class)]
 class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id()]
+    #[ORM\GeneratedValue()]
+    #[ORM\Column(type: "integer")]
+
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255, unique=true)
-     * @Assert\NotBlank(message="Veuillez remplir ce champs")
-     * @Assert\Email
-     */
+    #[ORM\Column(type: "string", length: 255, unique: true)]
+    #[Assert\NotBlank(message: "Veuillez remplir ce champs")]
+    #[Assert\Email]
+
     private $email;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $password;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $token;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true, unique=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true, unique: true)]
     private $pseudo;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true, unique=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true, unique: true)]
     private $commercial;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $img;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Societe::class, inversedBy="users")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Societe::class, inversedBy: "users")]
+    #[ORM\JoinColumn(nullable: false)]
     private $societe;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Documents::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: Documents::class, mappedBy: "user")]
     private $documents;
 
-    /**
-     * @ORM\OneToMany(targetEntity=CmdRobyDelaiAccepteReporte::class, mappedBy="modifiedBy")
-     */
+    #[ORM\OneToMany(targetEntity: CmdRobyDelaiAccepteReporte::class, mappedBy: "modifiedBy")]
     private $cmdRobyDelaiAccepteReportesModifiedBy;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Chats::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: Chats::class, mappedBy: "user")]
     private $chats;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Comments::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: Comments::class, mappedBy: "user")]
     private $comments;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Tickets::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: Tickets::class, mappedBy: "user")]
     private $tickets;
 
-    /**
-     * @ORM\OneToMany(targetEntity=FAQ::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: FAQ::class, mappedBy: "user")]
     private $faqs;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: "json")]
     private $roles = [];
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $bornAt;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Trackings::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: Trackings::class, mappedBy: "user")]
     private $trackings;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Holiday::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: Holiday::class, mappedBy: "user")]
     private $holidays;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Holiday::class, mappedBy="treatmentedBy")
-     */
+    #[ORM\OneToMany(targetEntity: Holiday::class, mappedBy: "treatmentedBy")]
     private $UserTreatmentholidays;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Services::class, inversedBy="users")
-     */
+    #[ORM\ManyToOne(targetEntity: Services::class, inversedBy: "users")]
     private $service;
 
-    /**
-     * @ORM\OneToMany(targetEntity=News::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: News::class, mappedBy: "user")]
     private $news;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $closedAt;
 
-    /**
-     * @ORM\OneToMany(targetEntity=ListCmdTraite::class, mappedBy="treatedBy")
-     */
+    #[ORM\OneToMany(targetEntity: ListCmdTraite::class, mappedBy: "treatedBy")]
     private $listCmdTraites;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Note::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: Note::class, mappedBy: "user")]
     private $notes;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Commentaires::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: Commentaires::class, mappedBy: "user")]
     private $commentaires;
 
-    /**
-     * @ORM\OneToMany(targetEntity=DocumentsReglementairesFsc::class, mappedBy="addBy")
-     */
+    #[ORM\OneToMany(targetEntity: DocumentsReglementairesFsc::class, mappedBy: "addBy")]
     private $addBys;
 
-    /**
-     * @ORM\OneToMany(targetEntity=ControleArticlesFsc::class, mappedBy="controledBy")
-     */
+    #[ORM\OneToMany(targetEntity: ControleArticlesFsc::class, mappedBy: "controledBy")]
     private $controleArticlesFscs;
 
-    /**
-     * @ORM\OneToMany(targetEntity=PaysBanFsc::class, mappedBy="CreatedBy")
-     */
+    #[ORM\OneToMany(targetEntity: PaysBanFsc::class, mappedBy: "CreatedBy")]
     private $paysBanFscs;
 
-    /**
-     * @ORM\OneToMany(targetEntity=MovBillFsc::class, mappedBy="createdBy")
-     */
+    #[ORM\OneToMany(targetEntity: MovBillFsc::class, mappedBy: "createdBy")]
     private $movBillFscs;
 
-    /**
-     * @ORM\OneToMany(targetEntity=fscListMovement::class, mappedBy="userChangePerimetreBoisFsc")
-     */
+    #[ORM\OneToMany(targetEntity: fscListMovement::class, mappedBy: "userChangePerimetreBoisFsc")]
     private $updatePerimetreBoisFsc;
 
-    /**
-     * @ORM\OneToMany(targetEntity=OthersDocuments::class, mappedBy="user")
-     */
+    #[ORM\OneToMany(targetEntity: OthersDocuments::class, mappedBy: "user")]
     private $othersDocuments;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: "boolean", nullable: true)]
     private $ev;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: "boolean", nullable: true)]
     private $hp;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: "boolean", nullable: true)]
     private $me;
 
-    /**
-     * @ORM\OneToMany(targetEntity=RetraitMarchandisesEan::class, mappedBy="createdBy")
-     */
+    #[ORM\OneToMany(targetEntity: RetraitMarchandisesEan::class, mappedBy: "createdBy")]
     private $retraitMarchandisesEans;
 
-    /**
-     * @ORM\OneToMany(targetEntity=AlimentationEmplacement::class, mappedBy="createdBy")
-     */
+    #[ORM\OneToMany(targetEntity: AlimentationEmplacement::class, mappedBy: "createdBy")]
     private $alimentationEmplacements;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=InterventionMonteurs::class, mappedBy="Equipes")
-     */
+    #[ORM\ManyToMany(targetEntity: InterventionMonteurs::class, mappedBy: "Equipes")]
     private $interventionMonteursEquipes;
 
-    /**
-     * @ORM\OneToMany(targetEntity=InterventionMonteurs::class, mappedBy="UserCr")
-     */
+    #[ORM\OneToMany(targetEntity: InterventionMonteurs::class, mappedBy: "UserCr")]
     private $interventionMonteursUserCr;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $interne;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $exterieur;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $fonction;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $portable;
 
-    /**
-     * @ORM\OneToMany(targetEntity=SignatureElectronique::class, mappedBy="createdBy")
-     */
+    #[ORM\OneToMany(targetEntity: SignatureElectronique::class, mappedBy: "createdBy")]
     private $signatureElectroniques;
 
-    /**
-     * @ORM\OneToMany(targetEntity=InterventionFicheMonteur::class, mappedBy="createdBy")
-     */
+    #[ORM\OneToMany(targetEntity: InterventionFicheMonteur::class, mappedBy: "createdBy")]
     private $interventionFicheMonteursCreatedBy;
 
-    /**
-     * @ORM\OneToMany(targetEntity=InterventionFicheMonteur::class, mappedBy="intervenant")
-     */
+    #[ORM\OneToMany(targetEntity: InterventionFicheMonteur::class, mappedBy: "intervenant")]
     private $interventionFicheMonteursIntervenant;
 
-    /**
-     * @ORM\OneToMany(targetEntity=InterventionFichesMonteursHeures::class, mappedBy="createdBy")
-     */
+    #[ORM\OneToMany(targetEntity: InterventionFichesMonteursHeures::class, mappedBy: "createdBy")]
     private $interventionFichesMonteursHeures;
 
-    /**
-     * @ORM\OneToMany(targetEntity=InterventionFicheMonteur::class, mappedBy="validedBy")
-     */
+    #[ORM\OneToMany(targetEntity: InterventionFicheMonteur::class, mappedBy: "validedBy")]
     private $InterventionFicheMonteursValidedBy;
 
-    /**
-     * @ORM\OneToMany(targetEntity=InterventionFicheMonteur::class, mappedBy="lockedBy")
-     */
+    #[ORM\OneToMany(targetEntity: InterventionFicheMonteur::class, mappedBy: "lockedBy")]
     private $interventionFicheMonteursLockedBy;
 
-    /**
-     * @ORM\OneToMany(targetEntity=InterventionMonteurs::class, mappedBy="lockedBy")
-     */
+    #[ORM\OneToMany(targetEntity: InterventionMonteurs::class, mappedBy: "lockedBy")]
     private $interventionMonteursLockedBy;
 
     public function __construct()

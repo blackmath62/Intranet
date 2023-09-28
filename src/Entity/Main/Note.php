@@ -5,42 +5,28 @@ namespace App\Entity\Main;
 use App\Repository\Main\NoteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=NoteRepository::class)
- */
+#[ORM\Entity(repositoryClass: NoteRepository::class)]
 class Note
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: "text")]
     private $content;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="notes")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "notes")]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $modifiedAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=CmdRobyDelaiAccepteReporte::class, inversedBy="note")
-     */
+    #[ORM\ManyToOne(targetEntity: CmdRobyDelaiAccepteReporte::class, inversedBy: "note")]
     private $cmdRobyDelaiAccepteReporte;
 
     public function getId(): ?int
@@ -65,7 +51,7 @@ class Note
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -89,7 +75,7 @@ class Note
         return $this->modifiedAt;
     }
 
-    public function setModifiedAt(?\DateTimeInterface $modifiedAt): self
+    public function setModifiedAt(?\DateTimeInterface $modifiedAt) : self
     {
         $this->modifiedAt = $modifiedAt;
 

@@ -2,44 +2,31 @@
 
 namespace App\Entity\Main;
 
+use App\Repository\Main\HolidayTypesRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\Main\HolidayTypesRepository;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-/**
- * @ORM\Entity(repositoryClass=HolidayTypesRepository::class)
- * @UniqueEntity("name",
- *     message="Ce nom est déjà utilisé.")
- */
+#[ORM\Entity(repositoryClass: HolidayTypesRepository::class)]
+#[UniqueEntity("name", message: "Ce nom est déjà utilisé.")]
 class HolidayTypes
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $name;
 
-    /**
-     * @ORM\Column(type="datetime", unique=true)
-     */
+    #[ORM\Column(type: "datetime", unique: true)]
     private $createdAt;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Holiday::class, mappedBy="holidayType")
-     */
+    #[ORM\OneToMany(targetEntity: Holiday::class, mappedBy: "holidayType")]
     private $holidays;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $color;
 
     public function __construct()
@@ -69,7 +56,7 @@ class HolidayTypes
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 

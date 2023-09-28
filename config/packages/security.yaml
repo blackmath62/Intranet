@@ -1,21 +1,13 @@
 security:
-<<<<<<< ours
-=======
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
->>>>>>> theirs
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-
-
-    # enable_authenticator_manager: true
-    # password_hashers:
-    #     Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
     providers:
         app_user_provider:
             entity:
                 class: 'App\Entity\Main\Users'
                 property: 'email'
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -32,7 +24,7 @@ security:
 
             remember_me:
                 secret: '%kernel.secret%'
-                lifetime: 3600 #604800 # 1 week in seconds
+                lifetime: 3600 # 1 hour in seconds
                 path: /
 
             custom_authenticators:

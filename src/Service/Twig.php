@@ -4,6 +4,7 @@ namespace App\Service;
 use DateTime;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 class Twig extends AbstractExtension
 {
@@ -12,6 +13,13 @@ class Twig extends AbstractExtension
         return [
             new TwigFilter('calculateTimeDifference', [$this, 'calculateTimeDifference']),
             new TwigFilter('time_diff', [$this, 'calcTimeDiff']),
+        ];
+    }
+
+    public function getFunctions() // Ajoutez cette fonction
+    {
+        return [
+            new TwigFunction('now', [$this, 'getCurrentDateTime']),
         ];
     }
 

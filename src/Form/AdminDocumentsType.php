@@ -2,39 +2,37 @@
 
 namespace App\Form;
 
-use App\Entity\Main\Societe;
 use App\Entity\Main\Documents;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
+use App\Entity\Main\Societe;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AdminDocumentsType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title', TextType::class,[
+            ->add('title', TextType::class, [
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Merci de saisir un Titre'
-                    ])
-                    ],
-                    'required' => true,
-                    'attr' => [
-                        'class' => 'col-12 form-control'
-                    ]
+                        'message' => 'Merci de saisir un Titre',
+                    ]),
+                ],
+                'required' => true,
+                'attr' => [
+                    'class' => 'col-12 form-control',
+                ],
             ])
-            ->add('url', FileType::class,[
+            ->add('url', FileType::class, [
                 'label' => "Le Fichier",
-                'required'  => true,
+                'required' => true,
                 'constraints' => [
                     new File([
                         'maxSize' => '6M',
@@ -46,13 +44,13 @@ class AdminDocumentsType extends AbstractType
                             "application/x-pdf",
                         ],
                         'mimeTypesMessage' => 'Les formats autorisés sont PDF, JPG, PNG',
-                    ])
-                    ],
+                    ]),
+                ],
                 'attr' => [
-                    'class' => 'col-12 form-control btn btn-primary'
-                ]
-        ])
-            ->add('beginningDate', DateType::class,[
+                    'class' => 'col-12 form-control btn btn-primary',
+                ],
+            ])
+            ->add('beginningDate', DateType::class, [
                 'placeholder' => [
                     'year' => 'Année', 'month' => 'Mois', 'day' => 'Jour',
                 ],
@@ -60,10 +58,10 @@ class AdminDocumentsType extends AbstractType
                 'widget' => 'single_text',
                 'required' => false,
                 'attr' => [
-                    'class' => 'col-12 form-control js-datepicker'
-                ]
-        ])
-            ->add('endDate', DateType::class,[
+                    'class' => 'col-12 form-control js-datepicker',
+                ],
+            ])
+            ->add('endDate', DateType::class, [
                 'placeholder' => [
                     'year' => 'Année', 'month' => 'Mois', 'day' => 'Jour',
                 ],
@@ -71,9 +69,9 @@ class AdminDocumentsType extends AbstractType
                 'widget' => 'single_text',
                 'required' => false,
                 'attr' => [
-                    'class' => 'col-12 form-control js-datepicker'
-                ]
-        ])
+                    'class' => 'col-12 form-control js-datepicker',
+                ],
+            ])
             ->add('societe', EntityType::class, [
                 // looks for choices from this entity
                 'class' => Societe::class,
@@ -81,13 +79,13 @@ class AdminDocumentsType extends AbstractType
                 'expanded' => false,
                 'multiple' => false,
                 'attr' => [
-                    'class' => 'col-12 form-control'
-                ]
+                    'class' => 'col-12 form-control',
+                ],
             ])
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Documents::class,

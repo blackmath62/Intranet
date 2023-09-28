@@ -14,7 +14,6 @@ use App\Repository\Main\RetraitMarchandisesEanRepository;
 use Com\Tecnick\Barcode\Barcode;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted("ROLE_USER")]
 
@@ -180,9 +180,10 @@ class ScanEanController extends AbstractController
                 // envoyer un mail
                 $html = $this->renderView('mails/listeRetraitProduits.html.twig', ['historiques' => $historique, 'commentaire' => $request->request->get('ta'), 'chantier' => $chantier]);
                 $d = new DateTime();
+                $destinataires = ['adeschodt@lhermitte.fr', 'adefaria@lhermitte.fr'];
                 $email = (new Email())
                     ->from($this->mailEnvoi)
-                    ->to('adeschodt@lhermitte.fr')
+                    ->to(...$destinataires)
                     ->subject('Liste des produits retiré pour ' . $chantier . " par " . $this->getUser()->getPseudo() . " le " . $d->format('d-m-Y H:i:s'))
                     ->html($html);
                 $this->mailer->send($email);

@@ -3,90 +3,59 @@
 namespace App\Entity\Main;
 
 use App\Entity\Main\Users;
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Main\HolidayRepository;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=HolidayRepository::class)
- */
+#[ORM\Entity(repositoryClass: HolidayRepository::class)]
 class Holiday
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
-    
-    /**
-     * @ORM\Column(type="datetime")
-     */
+
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: "text", nullable: true)]
     private $details;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $treatmentedAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="UserTreatmentholidays")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "UserTreatmentholidays")]
     private $treatmentedBy;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=HolidayTypes::class, inversedBy="holidays")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: HolidayTypes::class, inversedBy: "holidays")]
+    #[ORM\JoinColumn(nullable: false)]
     private $holidayType;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=statusHoliday::class, inversedBy="holidays")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: statusHoliday::class, inversedBy: "holidays")]
+    #[ORM\JoinColumn(nullable: false)]
     private $holidayStatus;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $sliceStart;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $sliceEnd;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $start;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $end;
 
-    /**
-     * @ORM\Column(type="decimal", precision=10, scale=1)
-     */
+    #[ORM\Column(type: "decimal", precision: 10, scale: 1)]
     private $nbJours;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="holidays")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "holidays")]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    
     /*public function __construct()
     {
-        $this->user = new ArrayCollection();
+    $this->user = new ArrayCollection();
     }*/
 
     public function getId(): ?int
@@ -99,7 +68,7 @@ class Holiday
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -123,7 +92,7 @@ class Holiday
         return $this->treatmentedAt;
     }
 
-    public function setTreatmentedAt(?\DateTimeInterface $treatmentedAt): self
+    public function setTreatmentedAt(?\DateTimeInterface $treatmentedAt) : self
     {
         $this->treatmentedAt = $treatmentedAt;
 
@@ -207,7 +176,7 @@ class Holiday
         return $this->start;
     }
 
-    public function setStart(\DateTimeInterface $start): self
+    public function setStart(\DateTimeInterface $start) : self
     {
         $this->start = $start;
 
@@ -219,7 +188,7 @@ class Holiday
         return $this->end;
     }
 
-    public function setEnd(\DateTimeInterface $end): self
+    public function setEnd(\DateTimeInterface $end) : self
     {
         $this->end = $end;
 

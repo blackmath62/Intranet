@@ -2,76 +2,51 @@
 
 namespace App\Entity\Main;
 
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Main\SocieteRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity(repositoryClass=SocieteRepository::class)
- * @ORM\Entity
- * @UniqueEntity("nom")
- */
+#[ORM\Entity(repositoryClass: SocieteRepository::class)]
+#[UniqueEntity("nom")]
 class Societe
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id()]
+    #[ORM\GeneratedValue()]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", unique=true)
-     * @Assert\Length(min=3,max=255, minMessage="Le nom de la société doit être au minimum de 3 caractéres",maxMessage="Le nom de la société dépasse 255 caractéres")
-     */
+    #[ORM\Column(type: "string", unique: true)]
+    #[Assert\Length(min: 3, max: 255, minMessage: "Le nom de la société doit être au minimum de 3 caractéres", maxMessage: "Le nom de la société dépasse 255 caractéres")]
     private $nom;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: "datetime", nullable: true)]
     private $closedAt;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Annuaire::class, mappedBy="societe", orphanRemoval=true)
-     */
+    #[ORM\OneToMany(targetEntity: Annuaire::class, mappedBy: "societe", orphanRemoval: true)]
     private $annuaires;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Users::class, mappedBy="societe")
-     */
+    #[ORM\OneToMany(targetEntity: Users::class, mappedBy: "societe")]
     private $users;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Documents::class, mappedBy="societe")
-     */
+    #[ORM\OneToMany(targetEntity: Documents::class, mappedBy: "societe")]
     private $documents;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Tickets::class, mappedBy="societe")
-     */
+    #[ORM\OneToMany(targetEntity: Tickets::class, mappedBy: "societe")]
     private $tickets;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $dossier;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $img;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $parameter;
 
     public function __construct()
@@ -104,7 +79,7 @@ class Societe
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -116,7 +91,7 @@ class Societe
         return $this->closedAt;
     }
 
-    public function setClosedAt(?\DateTimeInterface $closedAt): self
+    public function setClosedAt(?\DateTimeInterface $closedAt) : self
     {
         $this->closedAt = $closedAt;
 
@@ -126,7 +101,7 @@ class Societe
     /**
      * @return Collection|Annuaire[]
      */
-    public function getAnnuaires(): Collection
+    public function getAnnuaires() : Collection
     {
         return $this->annuaires;
     }

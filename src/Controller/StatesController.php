@@ -2,20 +2,23 @@
 
 namespace App\Controller;
 
-use App\Form\ActivitesMetierType;
+use DateTime;
 use App\Form\DateDebutFinType;
+use App\Form\ActivitesMetierType;
 use App\Form\DateSecteurLhDebutFinType;
 use App\Form\DateSecteurRbDebutFinType;
-use App\Repository\Divalto\MouvRepository;
-use App\Repository\Divalto\StatesByTiersRepository;
-use DateTime;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\Divalto\MouvRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\Divalto\StatesByTiersRepository;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+#[IsGranted("ROLE_USER")]
 
 class StatesController extends AbstractController
 {

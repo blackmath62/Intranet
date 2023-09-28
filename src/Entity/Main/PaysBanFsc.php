@@ -3,35 +3,25 @@
 namespace App\Entity\Main;
 
 use App\Repository\Main\PaysBanFscRepository;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity(repositoryClass=PaysBanFscRepository::class)
- */
+#[ORM\Entity(repositoryClass: PaysBanFscRepository::class)]
 class PaysBanFsc
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", unique=true)
-     * @Assert\Length(min=2,max=2, minMessage="Le Pays doit être composé de 2 caractéres comme dans Divalto",maxMessage="Le Pays doit être composé de 2 caractéres comme dans Divalto")
-     */
+    #[ORM\Column(type: "string", unique: true)]
+    #[Assert\Length(min: 2, max: 2, minMessage: "Le Pays doit être composé de 2 caractéres comme dans Divalto", maxMessage: "Le Pays doit être composé de 2 caractéres comme dans Divalto")]
     private $pays;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="paysBanFscs")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "paysBanFscs")]
     private $CreatedBy;
 
     public function getId(): ?int
@@ -56,7 +46,7 @@ class PaysBanFsc
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 

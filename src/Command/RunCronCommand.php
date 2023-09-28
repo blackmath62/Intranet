@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Controller\ControleAnomaliesController;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,10 +11,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+// Import de l'attribut
+
+#[AsCommand(
+    name: 'RunCron', // Nom de la commande
+    description: 'Commande de lancement des tâches CRON'
+)]
 class RunCronCommand extends Command
 {
-    protected static $defaultName = 'RunCron';
-    protected static $defaultDescription = 'Commande de lancement des tâches CRON';
     private $controller;
 
     public function __construct(ControleAnomaliesController $controller)
@@ -22,13 +27,11 @@ class RunCronCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
+            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -46,7 +49,7 @@ class RunCronCommand extends Command
             // ...
         }
 
-        $io->success('La requête a été effectué avec succés ! Pass --help to see your options.');
+        $io->success('La requête a été effectuée avec succès ! Utilisez --help pour voir vos options.');
 
         return Command::SUCCESS;
     }

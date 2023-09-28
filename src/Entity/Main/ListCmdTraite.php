@@ -5,36 +5,24 @@ namespace App\Entity\Main;
 use App\Repository\Main\ListCmdTraiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=ListCmdTraiteRepository::class)
- */
+#[ORM\Entity(repositoryClass: ListCmdTraiteRepository::class)]
 class ListCmdTraite
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $numero;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $dossier;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="listCmdTraites")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "listCmdTraites")]
     private $treatedBy;
 
     public function getId(): ?int
@@ -59,7 +47,7 @@ class ListCmdTraite
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 

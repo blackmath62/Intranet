@@ -2,55 +2,38 @@
 
 namespace App\Entity\Main;
 
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Main\DocumentsRepository;
+use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=DocumentsRepository::class)
- */
+#[ORM\Entity(repositoryClass: DocumentsRepository::class)]
 class Documents
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id()]
+    #[ORM\GeneratedValue()]
+    #[ORM\Column(type: "integer")]
+
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Societe::class, inversedBy="documents")
-     */
+    #[ORM\ManyToOne(targetEntity: Societe::class, inversedBy: "documents")]
     private $societe;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="documents")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "documents")]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $title;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $url;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $beginningDate;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $endDate;
 
     public function getId(): ?int
@@ -87,7 +70,7 @@ class Documents
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 
@@ -123,7 +106,7 @@ class Documents
         return $this->beginningDate;
     }
 
-    public function setBeginningDate(\DateTimeInterface $beginningDate): self
+    public function setBeginningDate(\DateTimeInterface $beginningDate) : self
     {
         $this->beginningDate = $beginningDate;
 
@@ -135,7 +118,7 @@ class Documents
         return $this->endDate;
     }
 
-    public function setEndDate(\DateTimeInterface $endDate): self
+    public function setEndDate(\DateTimeInterface $endDate) : self
     {
         $this->endDate = $endDate;
 

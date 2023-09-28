@@ -5,51 +5,33 @@ namespace App\Entity\Main;
 use App\Repository\Main\SignatureElectroniqueRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=SignatureElectroniqueRepository::class)
- */
+#[ORM\Entity(repositoryClass: SignatureElectroniqueRepository::class)]
 class SignatureElectronique
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $signatureId;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $documentId;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $signerId;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $pdfSansSignature;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=InterventionMonteurs::class, inversedBy="signatureElectroniques")
-     */
+    #[ORM\ManyToOne(targetEntity: InterventionMonteurs::class, inversedBy: "signatureElectroniques")]
     private $intervention;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="signatureElectroniques")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "signatureElectroniques")]
     private $createdBy;
 
     public function getId(): ?int
@@ -110,7 +92,7 @@ class SignatureElectronique
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 

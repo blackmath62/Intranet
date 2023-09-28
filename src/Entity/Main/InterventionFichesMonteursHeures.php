@@ -5,46 +5,30 @@ namespace App\Entity\Main;
 use App\Repository\Main\InterventionFichesMonteursHeuresRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=InterventionFichesMonteursHeuresRepository::class)
- */
+#[ORM\Entity(repositoryClass: InterventionFichesMonteursHeuresRepository::class)]
 class InterventionFichesMonteursHeures
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $type;
 
-    /**
-     * @ORM\Column(type="time")
-     */
+    #[ORM\Column(type: "time")]
     private $start;
 
-    /**
-     * @ORM\Column(type="time")
-     */
+    #[ORM\Column(type: "time")]
     private $end;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="interventionFichesMonteursHeures")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "interventionFichesMonteursHeures")]
     private $createdBy;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=InterventionFicheMonteur::class, inversedBy="heures")
-     */
+    #[ORM\ManyToOne(targetEntity: InterventionFicheMonteur::class, inversedBy: "heures")]
     private $interventionFicheMonteur;
 
     public function getId(): ?int
@@ -64,7 +48,7 @@ class InterventionFichesMonteursHeures
         return $this;
     }
 
-    public function getStart():  ? \DateTimeInterface
+    public function getStart(): ?\DateTimeInterface
     {
         return $this->start;
     }
@@ -76,7 +60,7 @@ class InterventionFichesMonteursHeures
         return $this;
     }
 
-    public function getEnd():  ? \DateTimeInterface
+    public function getEnd(): ?\DateTimeInterface
     {
         return $this->end;
     }
@@ -88,7 +72,7 @@ class InterventionFichesMonteursHeures
         return $this;
     }
 
-    public function getCreatedAt():  ? \DateTimeInterface
+    public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
     }

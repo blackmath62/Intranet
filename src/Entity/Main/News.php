@@ -4,39 +4,26 @@ namespace App\Entity\Main;
 
 use App\Repository\Main\NewsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=NewsRepository::class)
- */
+#[ORM\Entity(repositoryClass: NewsRepository::class)]
 class News
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $title;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: "text")]
     private $content;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="news")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "news")]
     private $user;
 
     public function __construct()
@@ -54,7 +41,7 @@ class News
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 

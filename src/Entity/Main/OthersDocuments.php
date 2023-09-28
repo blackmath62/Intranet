@@ -2,54 +2,35 @@
 
 namespace App\Entity\Main;
 
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Main\OthersDocumentsRepository;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-/**
- * @ORM\Entity(repositoryClass=OthersDocumentsRepository::class)
- * @UniqueEntity("file",
- *     message="Ce nom est déjà utilisé.")
- */
+#[ORM\Entity(repositoryClass: OthersDocumentsRepository::class)]
+#[UniqueEntity("file", message: "Ce nom est déjà utilisé.")]
 class OthersDocuments
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="othersDocuments")
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "othersDocuments")]
     private $user;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="string", length=255, unique=true)
-     */
+    #[ORM\Column(type: "string", length: 255, unique: true)]
     private $file;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $tables;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: "integer")]
     private $identifiant;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $Parametre;
 
     public function getId(): ?int
@@ -74,7 +55,7 @@ class OthersDocuments
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 

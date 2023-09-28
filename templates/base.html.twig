@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
-<<<<<<< ours
 	<head>
 
 		{% block stylesheets %}
-
+			{{ encore_entry_link_tags('app') }}
 
 			<meta charset="utf-8">
 			<meta
@@ -326,7 +325,7 @@
 								<ul class="nav nav-treeview">
 									<li class="nav-item">
 										<a href="{{ path('app_scan_ean')}}" class="nav-link">
-											<i class="nav-icon fas fa-barcode text-warning"></i>
+											<i class="nav-icon fas fa-barcode text-info"></i>
 											<p>
 												Retrait marchandise
 											</p>
@@ -335,9 +334,9 @@
 									</li>
 									<li class="nav-item">
 										<a href="{{ path('app_affaire_me_nok')}}" class="nav-link">
-											<i class="nav-icon fas fa-barcode text-dark"></i>
+											<i class="nav-icon fas fa-barcode text-warning"></i>
 											<p>
-												Interventions
+												Interventions ME
 											</p>
 											<!-- <span class="badge badge-info right">1</span> -->
 										</a>
@@ -919,6 +918,7 @@
 					<!-- Select2 -->
 					<script src="{{ asset("plugins/select2/js/select2.full.min.js")}}"></script>
 					{% block javascripts %}
+						{{ encore_entry_script_tags('app') }}
 						<script>
 							$(function () {
 $("#example1").DataTable({
@@ -1093,19 +1093,3 @@ $('[data-toggle="tooltip"]').tooltip()
 		</body>
 	</html>
 </body></html>
-=======
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
-
-        {% block javascripts %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
-</html>
->>>>>>> theirs

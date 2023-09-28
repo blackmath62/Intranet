@@ -5,49 +5,37 @@ namespace App\Entity\Main;
 use App\Entity\Main\Logiciel;
 use App\Entity\Main\SectionSearch;
 use App\Entity\Main\Users;
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Main\FAQRepository;
-use Proxies\__CG__\App\Entity\Main\Logiciel as MainLogiciel;
-use Proxies\__CG__\App\Entity\Main\SectionSearch as MainSectionSearch;
+use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=FAQRepository::class)
- */
+#[ORM\Entity(repositoryClass: FAQRepository::class)]
 class FAQ
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private $title;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: "text")]
     private $content;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="faqs")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "faqs")]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Logiciel::class, inversedBy="faqs")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Logiciel::class, inversedBy: "faqs")]
+    #[ORM\JoinColumn(nullable: false)]
     private $logiciel;
+
+    #[ORM\ManyToOne(targetEntity: SectionSearch::class, inversedBy: "faqs")]
+    #[ORM\JoinColumn(nullable: false)]
+    private $search;
 
     public function getLogiciel(): ?Logiciel
     {
@@ -61,12 +49,6 @@ class FAQ
         return $this;
     }
 
-    /**
-     * @ORM\ManyToOne(targetEntity=SectionSearch::class, inversedBy="faqs")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $search;
-
     public function getSearch(): ?SectionSearch
     {
         return $this->search;
@@ -78,7 +60,6 @@ class FAQ
 
         return $this;
     }
-
 
     public function getUser(): ?Users
     {
@@ -126,7 +107,7 @@ class FAQ
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
 

@@ -13,7 +13,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +20,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted("ROLE_COMPTA")]
 
@@ -165,7 +165,7 @@ class ComptaAnalytiqueController extends AbstractController
             $ventes[$lig]['TotalCoutMoyenPondere'] = $cmpt;
             if ($pa != 0 && $exportVentes[$lig]['qteVtl'] != 0) {$cmat = abs($exportVentes[$lig]['qteVtl']) * $pa;}
             $ventes[$lig]['TotalCoutCma'] = $cmat;
-            if ($achat['regimePiece']) {
+            if (is_array($achat) && $achat['regimePiece']) {
                 $regime = $achat['regimePiece'];
             } else {
                 $regime = $exportVentes[$lig]['regimeFou'];
@@ -178,10 +178,11 @@ class ComptaAnalytiqueController extends AbstractController
                 $compteAchat = $exportVentes[$lig]['CompteAchat'] + 20000;
             }
             $ventes[$lig]['CompteAchat'] = $compteAchat;
-            if ($achat['pinoFou']) {
+            if (is_array($achat) && $achat['pinoFou']) {
                 // ramener la somme des montants du transport sur cette piéce
                 $port = $this->repoAnal->getTransportFournisseur($achat['pinoFou'], $exportVentes[$lig]['Article']);
-                if ($port['montant'] > 0 && $port['montant'] != 'null' && $cmat > 0) {
+
+                if (is_array($port) && $port['montant'] > 0 && $port['montant'] != 'null' && $cmat > 0) {
                     // ramener le détail de la piéce fournisseur
                     $ventes[$lig]['type'] = 'truck';
                     $ventes[$lig]['color'] = 'secondary';
@@ -198,7 +199,7 @@ class ComptaAnalytiqueController extends AbstractController
                             $ventes[$lig]['estimationTotal'] = $exportVentes[$lig]['qteVtl'] * ($port['montant'] / $estim['qte']);
                         }
                     }
-                } elseif (($port['montant'] == 0 | $port['montant'] == 'null') && $cmat > 0) {
+                } elseif (is_array($port) && ($port['montant'] == 0 | $port['montant'] == 'null') && $cmat > 0) {
                     // ramener le détail de la piéce fournisseur
                     $ventes[$lig]['type'] = 'dollar-sign';
                     $ventes[$lig]['color'] = 'warning';

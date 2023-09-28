@@ -2,18 +2,18 @@
 
 namespace App\Form;
 
-use Doctrine\ORM\EntityRepository;
 use App\Entity\Main\ListDivaltoUsers;
-use Symfony\Component\Form\AbstractType;
 use App\Entity\Main\UsersDivaltoByFunction;
-use Symfony\Component\Form\FormBuilderInterface;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ListDivaltoUsersType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('users', EntityType::class, [
@@ -22,29 +22,27 @@ class ListDivaltoUsersType extends AbstractType
                 'required' => true,
                 'choice_label' => 'nom',
                 'multiple' => true,
-                'expanded'=>true,
+                'expanded' => true,
                 'by_reference' => false,
                 'attr' => [
                     'class' => 'form-control col-12 m-2',
-                    'data-placeholder' => 'Selectionnez les fournisseurs'
+                    'data-placeholder' => 'Selectionnez les fournisseurs',
                 ],
-                'query_builder' => function(EntityRepository $er){
+                'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('f')
-                            ->where('f.valid = true');
+                        ->where('f.valid = true');
                 },
 
-                
             ])
 
-            
-            ->add('Creer', SubmitType::class,[
+            ->add('Creer', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-success m-2 col-3 float-right'],
-                'label' => 'Créer un nouveau décisionnel'
+                'label' => 'Créer un nouveau décisionnel',
             ])
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => UsersDivaltoByFunction::class,

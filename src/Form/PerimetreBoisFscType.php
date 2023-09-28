@@ -4,17 +4,17 @@ namespace App\Form;
 
 use App\Entity\Main\fscListMovement;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PerimetreBoisFscType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('perimetreBois', ChoiceType::class,[
+            ->add('perimetreBois', ChoiceType::class, [
                 'choices' => [
                     'Non Renseigné' => "Non Renseigné",
                     'Fsc Mix Crédit' => "Fsc Mix Crédit",
@@ -29,16 +29,16 @@ class PerimetreBoisFscType extends AbstractType
                 ],
                 'expanded' => true,
                 'multiple' => false,
-                'label' => 'Périmétre Bois'
+                'label' => 'Périmétre Bois',
             ])
-        
-        ->add('ModifierPerimetre', SubmitType::class,[
-            'attr' => ['class' => 'btn btn-dark float-right']
-        ])
+
+            ->add('ModifierPerimetre', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-dark float-right'],
+            ])
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => fscListMovement::class,
