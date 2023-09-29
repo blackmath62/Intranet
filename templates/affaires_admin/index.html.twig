@@ -5,8 +5,12 @@
 {% endblock %}
 
 {% block body %}
-	<div class="row mb-2">
+	<div class="row mb-2 d-flex justify-content-between">
 		<h1>{{ title}}</h1>
+		<a class="btn btn-xl btn-default col-sm-2 col-12 m-1 float-right" href='{{path('app_affaire_change_code_affaire_search') }}'>
+			<i class="fa-solid fa-code-pull-request pr-3"></i>
+			<strong>Assigner code affaire sur piéce</strong>
+		</a>
 	</div>
 	<div class="row">
 		<div class="col-md-12">
@@ -91,7 +95,6 @@
 					<div class="small-box bg-info">
 						<div class="inner">
 							<h3>{{ fichesNonVerrouillees|length }}</h3>
-
 							<p>Non Verrouillée(s)</p>
 						</div>
 						<div class="icon">
@@ -103,9 +106,9 @@
 				<div class="col-lg-2 col-6">
 					<div class="small-box bg-success">
 						<div class="inner">
-							<h3>{{ fichesAttenteValidations|length }}<sup style="font-size: 20px"></sup>
+							<h3>
+								{{ fichesAttenteValidations|length }}<sup style="font-size: 20px"></sup>
 							</h3>
-
 							<p>En attente de validation</p>
 						</div>
 						<div class="icon">

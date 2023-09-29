@@ -95,6 +95,39 @@ class MouvRepository extends ServiceEntityRepository
         return $resultSet->fetchOne();
     }
 
+    public function searchCodeAffairePiece($tiers, $piece)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT m.PROJET AS affaire, m.TIERS AS tiers, c.NOM AS nom, m.FADT AS dateFact,  m.REF AS ref, m.DES AS designation, m.SREF1 AS sref1, m.SREF2 AS sref2, m.VENUN AS uv,m.OP AS op, m.FAQTE AS qte
+        FROM MOUV m
+        LEFT JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = 1 AND m.PICOD = 4 AND m.TICOD = '$tiers' AND m.FANO = '$piece'
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function changeCodeAffairePiece($tiers, $piece, $affaire)
+    {
+        if ($affaire) {
+            $ce3 = "m.CE3 = 1";
+        } else {
+            $ce3 = "m.CE3 = ''";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "UPDATE m
+        SET m.PROJET = '$affaire', $ce3
+        FROM MOUV m
+        LEFT JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = 1 AND m.PICOD = 4 AND m.TICOD = '$tiers' AND m.FANO = '$piece'
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     // Mouvements sur la piéce
     public function getMouvOnOrder($num, $typePiece, $tiers): array
     {

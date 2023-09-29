@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Main\MailList;
 use App\Form\AddEmailType;
 use App\Form\StatesDateFilterType;
+use App\Form\TiersPieceAffaireFormType;
+use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\InterventionFicheMonteurRepository;
 use App\Repository\Main\InterventionMonteursRepository;
 use App\Repository\Main\MailListRepository;
@@ -19,6 +21,7 @@ use Knp\Snappy\Pdf;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -40,6 +43,7 @@ class AffairesAdminController extends AbstractController
     private $repoIntervention;
     private $emailTreatementService;
     private $entityManager;
+    private $repoMouv;
 
     public function __construct(
         ManagerRegistry $registry,
@@ -49,9 +53,11 @@ class AffairesAdminController extends AbstractController
         InterventionFicheMonteurRepository $repoFiche,
         AdminEmailController $adminEmailController,
         MailerInterface $mailer,
-        MailListRepository $repoMail
+        MailListRepository $repoMail,
+        MouvRepository $repoMouv,
     ) {
         $this->mailer = $mailer;
+        $this->repoMouv = $repoMouv;
         $this->repoMail = $repoMail;
         $this->repoFiche = $repoFiche;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
@@ -62,6 +68,40 @@ class AffairesAdminController extends AbstractController
         $this->emailTreatementService = $emailTreatementService;
         $this->entityManager = $registry->getManager();
         //parent::__construct();
+    }
+
+    #[Route("/Lhermitte/affaires/change/code/affaire", name: "app_affaire_change_code_affaire_search")]
+
+    public function changeCodeAffairePiece(Request $request)
+    {
+
+        $form = $this->createForm(TiersPieceAffaireFormType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Modification des données dans Divalto
+            $this->repoMouv->changeCodeAffairePiece($form->getData()['tiers'], $form->getData()['piece'], $form->getData()['affaire']);
+        }
+
+        return $this->render('affaires_admin/setCodeAffairePiece.html.twig', [
+            'title' => 'Change Affaire',
+            'form' => $form->createView(),
+        ]);
+
+    }
+
+    #[Route("/Lhermitte/affaires/search/piece/code/affaire", name: "app_affaire_search_piece_code_affaire")]
+
+    public function searchPiece(Request $request)
+    {
+        // Récupérez les données du formulaire via la requête
+        $tiers = $request->request->get('tiers');
+        $piece = $request->request->get('piece');
+
+        // Effectuez la recherche dans la base de données en utilisant $champ1 et $champ2
+        $donnees = $this->repoMouv->searchCodeAffairePiece($tiers, $piece);
+
+        // Convertissez les données en format JSON et renvoyez-les
+        return new JsonResponse($donnees);
     }
 
     #[Route("/Lhermitte/affaires/admin", name: "app_affaires_admin")]
