@@ -101,6 +101,19 @@ class CliRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // Récupérer les codes affaires
+    public function getCodeAffaire(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT a.AFFAIRE AS affaire, a.LIB80 AS lib
+        FROM PRJAP a
+        ORDER BY a.AFFAIRE ASC
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     public function getThisCodeClient($code): array
     {
         $conn = $this->getEntityManager()->getConnection();

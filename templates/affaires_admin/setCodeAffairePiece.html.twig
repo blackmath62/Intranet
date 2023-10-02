@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block body %}
+<div class="row">
+	<div class="col-md-12">
+		<div class="card card-dark">
+			<div class="card-header">
+				<h3 class="card-title text-center">Mettre un code affaire sur une facture</h3>
+				<div class="card-tools">
+					<a class="btn btn-xs btn-success col-sm-12 col-12 m-1 float-right" href='{{path('app_affaires_admin') }}'>
+						<i class="fa-solid fa-share-from-square pr-3"></i>
+						<strong>Retourner à l'Admin Affaire</strong>
+					</a>
+				</div>
+			</div>
+			<!-- /.card-header -->
+			<div class="card-body">
+				{{ form_start(form, {'id': 'mon-formulaire'}) }}
+				{# Ajout de l'ID du formulaire #}
+				<div class="form-group d-flex flex-wrap col-12">
+					<div class="col-3">
+						{{ form_label(form.tiers) }}
+						{{ form_widget(form.tiers, {'id': 'tiers'}) }}
+						{# Ajout de l'ID du champ Tiers #}
+					</div>
+					<div class="col-3">
+						{{ form_label(form.piece) }}
+						{{ form_widget(form.piece, {'id': 'piece'}) }}
+						{# Ajout de l'ID du champ Numéro facture #}
+					</div>
+					<div class="col-3">
+						{{ form_label(form.affaire) }}
+						{{ form_widget(form.affaire, {'id': 'affaire'}) }}
+					</div>
+					<div class="col-3 d-flex flex-column">
+						<small>* sur toutes les lignes de la piéce</small>
+						<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-default">
+							Mettre le code Affaire sur cette piéce
+						</button>
+					</div>
+					<div class="modal fade" id="modal-default">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title">Est ce que vous êtes sûr de vouloir mettre ce code affaire sur la piéce ?</h4>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body"></div>
+								<div class="modal-footer justify-content-between">
+									<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+									{{ form_widget(form.modifier, {'id': 'modifier', 'label': 'Modifier l\'affaire sur la piéce'}) }}
+									</div>
+								</div>
+								<!-- /.modal-content -->
+							</div>
+							<!-- /.modal-dialog -->
+						</div>
+						<!-- /.modal -->
+
+						{{ form_end(form) }}
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card card-light" id="table-card">
+								<div class="card-header">
+									<h3 class="card-title">Informations Tiers</h3>
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-md-4">
+											<p>Tiers:
+												<span id="tiers-nom"></span>
+											</p>
+										</div>
+										<div class="col-md-4">
+											<p>Nom:
+												<span id="nom-tiers"></span>
+											</p>
+										</div>
+										<div class="col-md-4">
+											<p>Date Facture:
+												<span id="date-fact"></span>
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<table id="example11" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="text-center">Affaire</th>
+								<th class="text-center">Référence</th>
+								<th class="text-center">Désignation</th>
+								<th class="text-center">Sref 1</th>
+								<th class="text-center">Sref 2</th>
+								<th class="text-center">U.V</th>
+								<th class="text-center">Quantité</th>
+								<th class="text-center">OP</th>
+							</tr>
+						</thead>
+						<tbody
+							id="table-body"><!-- Cette balise tbody sera remplie avec les données -->
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		$(document).ready(function () {
+var tableBody = $('#table-body');
+var tableCard = $('#table-card');
+var tiersNom = $('#tiers-nom');
+var nomTiers = $('#nom-tiers');
+var dateFact = $('#date-fact');
+
+function activerDesactiverChamps() {
+var tiers = $('#tiers').val();
+var piece = $('#piece').val();
+
+$.ajax({
+url: '/Lhermitte/affaires/search/piece/code/affaire',
+type: 'POST',
+data: {
+tiers: tiers,
+piece: piece
+},
+success: function (donnees) {
+tableBody.empty();
+
+if (donnees.length > 0) {
+$('#affaire').prop('disabled', false);
+$('#modifier').prop('disabled', false);
+
+var premiereEntree = donnees[0];
+tiersNom.text(premiereEntree.tiers);
+nomTiers.text(premiereEntree.nom);
+dateFact.text(premiereEntree.dateFact);
+
+for (var i = 0; i < donnees.length; i++) {
+var row = '<tr>' + '<td class="text-center"><a class="text-center text-dark">' + donnees[i].affaire + '</a></td>' + '<td class="text-center"><a class="text-center text-dark">' + donnees[i].ref + '</a></td>' + '<td class="text-center"><a class="text-center text-dark">' + donnees[i].designation + '</a></td>' + '<td class="text-center"><a class="text-center text-dark">' + donnees[i].sref1 + '</a></td>' + '<td class="text-center"><a class="text-center text-dark">' + donnees[i].sref2 + '</a></td>' + '<td class="text-center"><a class="text-center text-dark">' + donnees[i].uv + '</a></td>' + '<td class="text-center"><a class="text-center text-dark">' + donnees[i].qte + '</a></td>' + '<td class="text-center"><a class="text-center text-dark">' + donnees[i].op + '</a></td>' + '</tr>';
+tableBody.append(row);
+}
+} else {
+$('#affaire').prop('disabled', true);
+$('#modifier').prop('disabled', true);
+tiersNom.text('');
+nomTiers.text('');
+dateFact.text('');
+}
+},
+error: function () {
+tiersNom.text('');
+nomTiers.text('');
+dateFact.text('');
+}
+});
+}
+
+$('#tiers, #piece').change(function () {
+activerDesactiverChamps();
+});
+
+activerDesactiverChamps();
+});
+	</script>
+{% endblock %}
