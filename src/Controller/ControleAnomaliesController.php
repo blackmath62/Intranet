@@ -61,6 +61,7 @@ class ControleAnomaliesController extends AbstractController
     private $clientFeuRougeOrangeController;
     private $holidayController;
     private $entityManager;
+    private $affairesController;
 
     public function __construct(
         ManagerRegistry $registry,
@@ -83,7 +84,8 @@ class ControleAnomaliesController extends AbstractController
         ControleArtStockMouvEfRepository $articleSrefFermes,
         MailerInterface $mailer,
         ControlesAnomaliesRepository $anomalies,
-        ControleComptabiliteRepository $compta
+        ControleComptabiliteRepository $compta,
+        AffairesController $affairesController
     ) {
         $this->mailer = $mailer;
         $this->anomalies = $anomalies;
@@ -108,6 +110,7 @@ class ControleAnomaliesController extends AbstractController
         $this->clientFeuRougeOrangeController = $clientFeuRougeOrangeController;
         $this->holidayController = $holidayController;
         $this->entityManager = $registry->getManager();
+        $this->affairesController = $affairesController;
         //parent::__construct();
     }
 
@@ -155,7 +158,7 @@ class ControleAnomaliesController extends AbstractController
             $this->clientFeuRougeOrangeController->sendMail();
         }
 
-        // envoie d'un mail le 5 de chaque mois
+        // envoie d'un mail le 20 de chaque mois
         if ($d == 20) {
             if ($heure >= 8 && $heure < 20) {
                 $this->contratCommissionnaireController->sendMail();
@@ -166,7 +169,8 @@ class ControleAnomaliesController extends AbstractController
             $this->ControleClient();
             $this->ControleFournisseur();
             $this->ControleArticle();
-            $this->ControlStockDirect(); // j'ai mis Utilisateur
+            $this->ControlStockDirect();
+            $this->affairesController->update();
             $this->movementBillFscController->update(); // Envoyer les mails à la référente sur les ventes FSC.
             if ($heure >= 8 && $heure < 20) {
                 $this->fscAttachedFileController->majFscOrderListFromDivalto();
