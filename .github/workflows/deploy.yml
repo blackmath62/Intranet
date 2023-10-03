@@ -1,0 +1,37 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main  # Change this to your main branch name
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Copy Preproduction Files
+        run: |
+          cp -r ../preprod_intranet/* ./
+        working-directory: ./  # Change this to the appropriate directory
+
+      - name: Install Composer Dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Clear Composer Cache
+        run: composer clear-cache
+
+      - name: Commit and Push Changes
+        run: |
+          git add .
+          git commit -m "Update for production"
+          git push origin main  # Change this to your main branch name
+        env:
+          GIT_USER: ${{ secrets.GIT_USER }}
+          GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}  # Store your credentials securely as GitHub secrets
+
+      - name: Deploy Complete
+        run: echo "Deployment to production complete!"
