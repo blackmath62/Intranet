@@ -120,33 +120,33 @@ class StatesByTiersRepository extends ServiceEntityRepository
                         WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 2
                         END AS CommercialId,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN' AND '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT BETWEEN '$dateDebutN' AND '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN' AND '$dateFinN' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT BETWEEN '$dateDebutN' AND '$dateFinN' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN1' AND '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT BETWEEN '$dateDebutN1' AND '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN1,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN1' AND '$dateFinN1' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT BETWEEN '$dateDebutN1' AND '$dateFinN1' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN1,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN2' AND '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT BETWEEN '$dateDebutN2' AND '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN2,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN2' AND '$dateFinN2' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT BETWEEN '$dateDebutN2' AND '$dateFinN2' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN2
         FROM MOUV
@@ -154,9 +154,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND CLI.DOS = MOUV.DOS
         LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
         WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
-        AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ))
+        AND MOUV.FADT BETWEEN '$dateDebutN2' AND '$dateFinN'
         AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
-
         AND MOUV.OP IN('C','CD','DD','D')) Reponse
         WHERE SecteurMouvement IN( $metiers ) AND CommercialId IN ($commercial)
         GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
