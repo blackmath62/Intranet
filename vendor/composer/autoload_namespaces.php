@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'MercurySeries\\Flashy' => array($vendorDir . '/mercuryseries/flashy/src'),
     'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
+    'Geocoder' => array($vendorDir . '/geocoder-php/geocoder-service-provider/src'),
     'ComponentInstaller' => array($vendorDir . '/robloach/component-installer/src'),
     'Assetic' => array($vendorDir . '/kriswallsmith/assetic/src'),
 );

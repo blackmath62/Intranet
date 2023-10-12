@@ -856,6 +856,13 @@ class ComposerStaticInit4542bad5bf0841ffcdf37e36dc77029a
                 0 => __DIR__ . '/..' . '/ezyang/htmlpurifier/library',
             ),
         ),
+        'G' => 
+        array (
+            'Geocoder' => 
+            array (
+                0 => __DIR__ . '/..' . '/geocoder-php/geocoder-service-provider/src',
+            ),
+        ),
         'C' => 
         array (
             'ComponentInstaller' => 
@@ -3154,6 +3161,7 @@ class ComposerStaticInit4542bad5bf0841ffcdf37e36dc77029a
         'Geocoder\\Provider\\AbstractProvider' => __DIR__ . '/..' . '/willdurand/geocoder/Provider/AbstractProvider.php',
         'Geocoder\\Provider\\GeoIP2\\GeoIP2' => __DIR__ . '/..' . '/geocoder-php/geoip2-provider/GeoIP2.php',
         'Geocoder\\Provider\\GeoIP2\\GeoIP2Adapter' => __DIR__ . '/..' . '/geocoder-php/geoip2-provider/GeoIP2Adapter.php',
+        'Geocoder\\Provider\\GeocoderServiceProvider' => __DIR__ . '/..' . '/geocoder-php/geocoder-service-provider/src/Geocoder/Provider/GeocoderServiceProvider.php',
         'Geocoder\\Provider\\Provider' => __DIR__ . '/..' . '/willdurand/geocoder/Provider/Provider.php',
         'Geocoder\\Query\\GeocodeQuery' => __DIR__ . '/..' . '/willdurand/geocoder/Query/GeocodeQuery.php',
         'Geocoder\\Query\\Query' => __DIR__ . '/..' . '/willdurand/geocoder/Query/Query.php',

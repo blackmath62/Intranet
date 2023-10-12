@@ -40,3 +40,4 @@ services:
             $entityManager: '@doctrine.orm.entity_manager'
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.request' }
+    

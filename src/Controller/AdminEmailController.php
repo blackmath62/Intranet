@@ -12,7 +12,9 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -23,10 +25,16 @@ class AdminEmailController extends AbstractController
 
     private $repoMail;
     private $entityManager;
+    private $mailTreatement;
+    private $mailer;
+    private $mailEnvoi;
 
-    public function __construct(MailListRepository $repoMail, ManagerRegistry $registry)
+    public function __construct(MailListRepository $repoMail, ManagerRegistry $registry, MailerInterface $mailer, )
     {
         $this->repoMail = $repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
+        $this->mailTreatement = $this->repoMail->getEmailTreatement();
+        $this->mailer = $mailer;
         $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
@@ -157,7 +165,16 @@ class AdminEmailController extends AbstractController
     {
         $MailsList = [];
         foreach ($listMails as $value) {
-            array_push($MailsList, new Address($value->getEmail()));
+            try {
+                array_push($MailsList, new Address($value->getEmail()));
+            } catch (\Throwable $th) {
+                $email = (new Email())
+                    ->from($this->mailEnvoi)
+                    ->to($this->mailTreatement)
+                    ->subject('Probléme formatage de mail automatique')
+                    ->html("Voici le probléme => " . $value->getEmail());
+                $this->mailer->send($email);
+            }
         }
         return $MailsList;
     }

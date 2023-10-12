@@ -8,13 +8,33 @@ use Twig\TwigFunction;
 
 class Twig extends AbstractExtension
 {
+    /*private $geocoder;
+
+    public function __construct(StatefulGeocoder $geocoder)
+    {
+    $this->geocoder = $geocoder;
+    }*/
+
     public function getFilters()
     {
         return [
             new TwigFilter('calculateTimeDifference', [$this, 'calculateTimeDifference']),
             new TwigFilter('time_diff', [$this, 'calcTimeDiff']),
+            /*new TwigFilter('calculate_distance', [$this, 'calculateDistance']),*/
         ];
     }
+
+    /*public function calculateDistance($address1, $address2)
+    {
+    try {
+    $location1 = $this->geocoder->geocode($address1)->first();
+    $location2 = $this->geocoder->geocode($address2)->first();
+
+    return $location1->getCoordinates()->distanceTo($location2->getCoordinates());
+    } catch (\Exception $e) {
+    return null; // Vous pouvez personnaliser le comportement en cas d'erreur
+    }
+    }*/
 
     public function getFunctions() // Ajoutez cette fonction
     {

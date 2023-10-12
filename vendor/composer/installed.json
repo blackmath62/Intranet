@@ -1059,17 +1059,17 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "3.7.0",
-            "version_normalized": "3.7.0.0",
+            "version": "3.7.1",
+            "version_normalized": "3.7.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "00d03067f07482f025d41ab55e4ba0db5eca2cdf"
+                "reference": "5b7bd66c9ff58c04c5474ab85edce442f8081cb2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/00d03067f07482f025d41ab55e4ba0db5eca2cdf",
-                "reference": "00d03067f07482f025d41ab55e4ba0db5eca2cdf",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/5b7bd66c9ff58c04c5474ab85edce442f8081cb2",
+                "reference": "5b7bd66c9ff58c04c5474ab85edce442f8081cb2",
                 "shasum": ""
             },
             "require": {
@@ -1098,7 +1098,7 @@
             "suggest": {
                 "symfony/console": "For helpful console commands such as SQL execution and import of files."
             },
-            "time": "2023-09-26T20:56:55+00:00",
+            "time": "2023-10-06T05:06:20+00:00",
             "bin": [
                 "bin/doctrine-dbal"
             ],
@@ -1155,7 +1155,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/dbal/issues",
-                "source": "https://github.com/doctrine/dbal/tree/3.7.0"
+                "source": "https://github.com/doctrine/dbal/tree/3.7.1"
             },
             "funding": [
                 {
@@ -2289,17 +2289,17 @@
         },
         {
             "name": "egulias/email-validator",
-            "version": "4.0.1",
-            "version_normalized": "4.0.1.0",
+            "version": "4.0.2",
+            "version_normalized": "4.0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/egulias/EmailValidator.git",
-                "reference": "3a85486b709bc384dae8eb78fb2eec649bdb64ff"
+                "reference": "ebaaf5be6c0286928352e054f2d5125608e5405e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/3a85486b709bc384dae8eb78fb2eec649bdb64ff",
-                "reference": "3a85486b709bc384dae8eb78fb2eec649bdb64ff",
+                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/ebaaf5be6c0286928352e054f2d5125608e5405e",
+                "reference": "ebaaf5be6c0286928352e054f2d5125608e5405e",
                 "shasum": ""
             },
             "require": {
@@ -2308,13 +2308,13 @@
                 "symfony/polyfill-intl-idn": "^1.26"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.5.27",
-                "vimeo/psalm": "^4.30"
+                "phpunit/phpunit": "^10.2",
+                "vimeo/psalm": "^5.12"
             },
             "suggest": {
                 "ext-intl": "PHP Internationalization Libraries are required to use the SpoofChecking validation"
             },
-            "time": "2023-01-14T14:17:03+00:00",
+            "time": "2023-10-06T06:47:41+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -2347,7 +2347,7 @@
             ],
             "support": {
                 "issues": "https://github.com/egulias/EmailValidator/issues",
-                "source": "https://github.com/egulias/EmailValidator/tree/4.0.1"
+                "source": "https://github.com/egulias/EmailValidator/tree/4.0.2"
             },
             "funding": [
                 {
@@ -2572,6 +2572,60 @@
                 "source": "https://github.com/fullcalendar/fullcalendar/tree/v3.10.5"
             },
             "install-path": "../fullcalendar/fullcalendar"
+        },
+        {
+            "name": "geocoder-php/geocoder-service-provider",
+            "version": "0.0.1",
+            "version_normalized": "0.0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/geocoder-php/GeocoderServiceProvider.git",
+                "reference": "37f49c6460ae9816fa76ee448c61557c5beedc92"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/geocoder-php/GeocoderServiceProvider/zipball/37f49c6460ae9816fa76ee448c61557c5beedc92",
+                "reference": "37f49c6460ae9816fa76ee448c61557c5beedc92",
+                "shasum": ""
+            },
+            "require": {
+                "willdurand/geocoder": ">=1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=3.7.0",
+                "silex/silex": "~1.0@dev"
+            },
+            "time": "2013-09-12T12:54:05+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Geocoder": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kévin Gomez",
+                    "email": "contact@kevingomez.fr",
+                    "homepage": "http://www.kevingomez.fr/"
+                }
+            ],
+            "description": "Geocoder service provider for Silex",
+            "keywords": [
+                "geocoder",
+                "provider",
+                "service",
+                "silex"
+            ],
+            "support": {
+                "issues": "https://github.com/geocoder-php/GeocoderServiceProvider/issues",
+                "source": "https://github.com/geocoder-php/GeocoderServiceProvider/tree/master"
+            },
+            "install-path": "../geocoder-php/geocoder-service-provider"
         },
         {
             "name": "geocoder-php/geoip2-provider",
@@ -3259,8 +3313,8 @@
         },
         {
             "name": "illuminate/collections",
-            "version": "v10.26.2",
-            "version_normalized": "10.26.2.0",
+            "version": "v10.27.0",
+            "version_normalized": "10.27.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/collections.git",
@@ -3317,8 +3371,8 @@
         },
         {
             "name": "illuminate/conditionable",
-            "version": "v10.26.2",
-            "version_normalized": "10.26.2.0",
+            "version": "v10.27.0",
+            "version_normalized": "10.27.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/conditionable.git",
@@ -3366,8 +3420,8 @@
         },
         {
             "name": "illuminate/contracts",
-            "version": "v10.26.2",
-            "version_normalized": "10.26.2.0",
+            "version": "v10.27.0",
+            "version_normalized": "10.27.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
@@ -3417,8 +3471,8 @@
         },
         {
             "name": "illuminate/macroable",
-            "version": "v10.26.2",
-            "version_normalized": "10.26.2.0",
+            "version": "v10.27.0",
+            "version_normalized": "10.27.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/macroable.git",
@@ -3466,17 +3520,17 @@
         },
         {
             "name": "illuminate/support",
-            "version": "v10.26.2",
-            "version_normalized": "10.26.2.0",
+            "version": "v10.27.0",
+            "version_normalized": "10.27.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/support.git",
-                "reference": "c7cf96f64ae6766a85fcd17f46afcae5a6a88744"
+                "reference": "dd3b3275a9dbd30736363f232e6bc2970d7681e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/support/zipball/c7cf96f64ae6766a85fcd17f46afcae5a6a88744",
-                "reference": "c7cf96f64ae6766a85fcd17f46afcae5a6a88744",
+                "url": "https://api.github.com/repos/illuminate/support/zipball/dd3b3275a9dbd30736363f232e6bc2970d7681e9",
+                "reference": "dd3b3275a9dbd30736363f232e6bc2970d7681e9",
                 "shasum": ""
             },
             "require": {
@@ -3504,7 +3558,7 @@
                 "symfony/var-dumper": "Required to use the dd function (^6.2).",
                 "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.4.1)."
             },
-            "time": "2023-09-21T20:37:39+00:00",
+            "time": "2023-10-06T13:41:04+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -5091,17 +5145,17 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.37",
-            "version_normalized": "1.10.37.0",
+            "version": "1.10.38",
+            "version_normalized": "1.10.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "058ba07e92f744d4dcf6061ae75283d0c6456f2e"
+                "reference": "5302bb402c57f00fb3c2c015bac86e0827e4b691"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/058ba07e92f744d4dcf6061ae75283d0c6456f2e",
-                "reference": "058ba07e92f744d4dcf6061ae75283d0c6456f2e",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/5302bb402c57f00fb3c2c015bac86e0827e4b691",
+                "reference": "5302bb402c57f00fb3c2c015bac86e0827e4b691",
                 "shasum": ""
             },
             "require": {
@@ -5110,7 +5164,7 @@
             "conflict": {
                 "phpstan/phpstan-shim": "*"
             },
-            "time": "2023-10-02T16:18:37+00:00",
+            "time": "2023-10-06T14:19:14+00:00",
             "bin": [
                 "phpstan",
                 "phpstan.phar"
@@ -5750,22 +5804,22 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.18.4",
-            "version_normalized": "0.18.4.0",
+            "version": "0.18.5",
+            "version_normalized": "0.18.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "d99a91176b7eb7f2b6d509a6486b3661c6dfd370"
+                "reference": "2a3b82f317e431fc142d21f3303891a4e64c96eb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/d99a91176b7eb7f2b6d509a6486b3661c6dfd370",
-                "reference": "d99a91176b7eb7f2b6d509a6486b3661c6dfd370",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/2a3b82f317e431fc142d21f3303891a4e64c96eb",
+                "reference": "2a3b82f317e431fc142d21f3303891a4e64c96eb",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2|^8.0",
-                "phpstan/phpstan": "^1.10.31"
+                "phpstan/phpstan": "^1.10.35"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -5773,7 +5827,7 @@
                 "rector/rector-phpunit": "*",
                 "rector/rector-symfony": "*"
             },
-            "time": "2023-09-25T17:07:54+00:00",
+            "time": "2023-10-05T11:25:40+00:00",
             "bin": [
                 "bin/rector"
             ],
@@ -5797,7 +5851,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.18.4"
+                "source": "https://github.com/rectorphp/rector/tree/0.18.5"
             },
             "funding": [
                 {
@@ -12747,6 +12801,7 @@
     "dev-package-names": [
         "doctrine/data-fixtures",
         "doctrine/doctrine-fixtures-bundle",
+        "geocoder-php/geocoder-service-provider",
         "masterminds/html5",
         "nikic/php-parser",
         "phpstan/phpstan",

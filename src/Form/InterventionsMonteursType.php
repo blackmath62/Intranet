@@ -74,7 +74,7 @@ class InterventionsMonteursType extends AbstractType
                 'multiple' => true,
                 'expanded' => false,
                 'by_reference' => false,
-                'required' => true,
+                'required' => false,
                 'attr' => [
                     'class' => 'form-control select2',
                 ],

@@ -2287,6 +2287,7 @@ return array(
     'Geocoder\\Provider\\AbstractProvider' => $vendorDir . '/willdurand/geocoder/Provider/AbstractProvider.php',
     'Geocoder\\Provider\\GeoIP2\\GeoIP2' => $vendorDir . '/geocoder-php/geoip2-provider/GeoIP2.php',
     'Geocoder\\Provider\\GeoIP2\\GeoIP2Adapter' => $vendorDir . '/geocoder-php/geoip2-provider/GeoIP2Adapter.php',
+    'Geocoder\\Provider\\GeocoderServiceProvider' => $vendorDir . '/geocoder-php/geocoder-service-provider/src/Geocoder/Provider/GeocoderServiceProvider.php',
     'Geocoder\\Provider\\Provider' => $vendorDir . '/willdurand/geocoder/Provider/Provider.php',
     'Geocoder\\Query\\GeocodeQuery' => $vendorDir . '/willdurand/geocoder/Query/GeocodeQuery.php',
     'Geocoder\\Query\\Query' => $vendorDir . '/willdurand/geocoder/Query/Query.php',
