@@ -25,18 +25,18 @@ class RetraitMarchandiseEanType extends AbstractType
                     ]),
                 ],
                 'required' => true,
-                'label' => 'Nom du Chantier',
-                'attr' => ['class' => 'form-control col-12'],
+                'attr' => ['class' => 'form-control col-12',
+                    'placeholder' => 'Nom du Chantier'],
             ])
             ->add('ean', IntegerType::class, [
                 'required' => true,
-                'label' => 'Code EAN',
-                'attr' => ['class' => 'form-control col-12'],
+                'attr' => ['class' => 'form-control col-12',
+                    'placeholder' => 'Scannez le code EAN'],
             ])
             ->add('qte', NumberType::class, array(
-                'label' => 'Quantité',
                 'required' => true,
-                'attr' => ['class' => 'form-control col-12'],
+                'attr' => ['class' => 'form-control col-12',
+                    'placeholder' => 'Quantité par unité de vente'],
             ))
             ->add('stockFaux', CheckboxType::class, array(
                 'label' => 'Stock Faux ?',
@@ -45,7 +45,7 @@ class RetraitMarchandiseEanType extends AbstractType
                 'label_attr' => ['class' => 'form-check-label'],
             ))
             ->add('save', SubmitType::class, [
-                'label' => "Ajouter ce produit",
+                'label' => "Je prends ce produit",
                 'attr' => ['class' => 'form-control btn btn-warning mt-3 col-12'],
             ])
         ;

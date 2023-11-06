@@ -18,21 +18,38 @@
 		<div class="card-body">
 			<p>Cette liste permet de contrôler le stock présent dans Divalto, il est possible entre autre de la croiser avec la table achat Jardinew pour mettre à jour Wordpress</p>
 			<p>L'idée est d'avoir une liste facilement accessible et exploitable sous excel pour ne pas avoir à contrôle chaque article manuellement !</p>
+			<p>Vous ne pouvez choisir que de n'extraire que des codes articles qui commencent par, ou avec des designation qui contiennent, la case à cocher ne sort par défaut que les produits qui ont du stock, si vous la décochez, vous aurez les articles avec les commandes qui n'ont pas de stock</p>
+			<p>le stock Direct est</p>
 		</div>
 		<!-- /.card-footer-->
 	</div>
 
-
+	{{ form_start(form) }}
+	<div class="d-flex flex-wrap justify-content-between p-2">
+		<div class="ml-4">
+			<b>Paramétres de filtrage :</b>
+		</div>
+		<div class="ml-1 col-2">{{ form_widget(form.ref) }}</div>
+		<div class="ml-1 col-3">{{ form_widget(form.des) }}</div>
+		<div class='d-flex'>
+			<div class="ml-1">{{ form_widget(form.cmd) }}</div>
+			<div class="ml-1 mt-2">{{ form_label(form.cmd) }}</div>
+		</div>
+		<div class='d-flex'>
+			<div class="ml-1">{{ form_widget(form.direct) }}</div>
+			<div class="ml-1 mt-2">{{ form_label(form.direct) }}</div>
+		</div>
+		<div class="ml-1">{{ form_widget(form.filtrer) }}</div>
+	</div>
+	{{ form_end(form) }}
 	<div class="row">
 		<div class="col-md-12">
 			<div
 				class="card card-dark">
 				<!-- /.card-header -->
+
 				<div class="card-header d-flex justify-content-between ">
-					<h3 class="card-title text-center">Stocks</h3>
-					<a href="" class="ml-auto btn btn-secondary">
-						<i class="fas fa-sync-alt fa-spin"></i>
-						Rafraichir la Page</a>
+					<h3 class="card-title text-center">Stock et commandes clients/fournisseurs</h3>
 				</div>
 				<div class="card-body">
 					{% if stockProduits %}
@@ -87,34 +104,58 @@
 											</a>
 										</td>
 										<td class="text-center">
-											<a class="text-center text-dark">{{ stockProduit.Fournisseur }}</a>
+											<a class="text-dark">{{ stockProduit.Fournisseur }}</a>
 										</td>
 										<td class="text-center">
-											<a class="text-center text-dark">{{ stockProduit.Ref }}</a>
+											<a class="text-dark">{{ stockProduit.Ref }}</a>
+										</td>
+										<td class="text-left">
+											<a class="text-dark">{{ stockProduit.Designation }}</a>
 										</td>
 										<td class="text-center">
-											<a class="text-center text-dark">{{ stockProduit.Designation }}</a>
+											<a class="text-dark">
+												{% if stockProduit.Sref1 %}
+													{{ stockProduit.Sref1 }}
+												{% endif %}
+											</a>
 										</td>
 										<td class="text-center">
-											<a class="text-center text-dark">{{ stockProduit.Sref1 }}</a>
+											<a class="text-dark">
+												{% if stockProduit.Sref2 %}
+													{{ stockProduit.Sref2 }}
+												{% endif %}
+											</a>
 										</td>
 										<td class="text-center">
-											<a class="text-center text-dark">{{ stockProduit.Sref2 }}</a>
+											<a class="text-dark">{{ stockProduit.Uv }}</a>
 										</td>
 										<td class="text-center">
-											<a class="text-center text-dark">{{ stockProduit.Uv }}</a>
+											<a class="text-dark">
+												{% if stockProduit.Stock != 0 %}
+													{{ stockProduit.Stock }}
+												{% endif %}
+											</a>
 										</td>
 										<td class="text-center">
-											<a class="text-center text-dark">{{ stockProduit.Stock }}</a>
+											<a class="text-dark">
+												{% if stockProduit.cmdCli != 0 %}
+													{{ stockProduit.cmdCli }}
+												{% endif %}
+											</a>
 										</td>
 										<td class="text-center">
-											<a class="text-center text-dark">{{ stockProduit.cmdCli }}</a>
+											<a class="text-dark">
+												{% if stockProduit.cmdFou != 0 %}
+													{{ stockProduit.cmdFou }}
+												{% endif %}
+											</a>
 										</td>
 										<td class="text-center">
-											<a class="text-center text-dark">{{ stockProduit.cmdFou }}</a>
-										</td>
-										<td class="text-center">
-											<a class="text-center text-dark">{{ stockProduit.total }}</a>
+											<a class="text-dark">
+												{% if stockProduit.total != 0 %}
+													{{ stockProduit.total }}
+												{% endif %}
+											</a>
 										</td>
 									</tr>
 								{% endfor %}

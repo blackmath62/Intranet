@@ -53,9 +53,9 @@ class PDFController extends AbstractController
 
     }
 
-    #[Route("/pdf/etiquette/{ean}", name: "app_send_pdf_etiquette")]
+    #[Route("/pdf/etiquette/{ean}/{qte}", name: "app_send_pdf_etiquette")]
 
-    public function SendEtiquettePdf($ean, Pdf $pdf, ArtRepository $repo): Response
+    public function SendEtiquettePdf($ean, $qte, Pdf $pdf, ArtRepository $repo): Response
     {
 
         $produit = '';
@@ -89,9 +89,11 @@ class PDFController extends AbstractController
         $pdf->setOption('print-media-type', true);
         //$pdf->setOption('header-font-size', 10);
         $pdf->setOption('zoom', false);
-        $file = 'C:/wamp64/www/Intranet/bin/' . $ean . '.pdf';
-        @unlink($file);
-        $pdf->generateFromHtml($htmlPdf, $file);
+        for ($i = 1; $i <= $qte; $i++) {
+            $file = 'C:/wamp64/www/Intranet/bin/' . $ean . '-' . $i . '.pdf';
+            @unlink($file);
+            $pdf->generateFromHtml($htmlPdf, $file);
+        }
         //$this->runPowerShell();
 
         $this->addFlash('message', 'Ajouté à la file d\'attente d\'impression !');

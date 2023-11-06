@@ -45,7 +45,7 @@ class ClientFeuRougeOrangeController extends AbstractController
         // envoyer un mail
         $treatementMails = $this->repoMail->findBy(['page' => 'app_admin_email', 'SecondOption' => 'feu']);
         $mails = $this->adminEmailController->formateEmailList($treatementMails);
-        $pieces = $this->repoMouv->getCmdBlClientFeuRougeOrange();
+        $pieces = $this->repoMouv->getCmdBlClientFeuRouge();
         if ($pieces) {
             $html = $this->renderView('mails/piecesClientFeuRougeOrange.html.twig', ['pieces' => $pieces]);
             $email = (new Email())

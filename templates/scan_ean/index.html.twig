@@ -22,38 +22,79 @@
 			{{ form_start(form, { 'attr' : { 'class' : 'ml-auto' }}
 			) }}
 			<div class="form-group">
-				<label class="col-form-label">
-					<i class="fas fa-map-marker-alt"></i>
-					Chantier
-				</label>
 				{{ form_widget(form.chantier, {'id': 'chantier' ,'attr' : { 'value' : chantier} }) }}
 				{{ form_errors(form.chantier) }}
 			</div>
 			<div class="form-group">
-				<label class="col-form-label col-12" for="ean">
-					<div class='d-flex justify-content-between'>
-						<div>
-							<i class="fas fa-barcode"></i>
-							{{ form_label(form.ean) }}
-						</div>
-						<div class="resultStockR"></div>
-						<div class="d-flex">
-							<div id="stockFaux" class="form-check">
-								{{ form_widget(form.stockFaux, {'attr' : { 'class' : 'form-check-input' } }) }}
-								{{ form_label(form.stockFaux) }}
-							</div>
-						</div>
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<button id="clear-ean-button" class="btn btn-dark" type="button">
+							<i class="fa-solid fa-trash-can"></i>
+						</button>
 					</div>
-				</label>
-				{{ form_widget(form.ean, { 'id': 'ean' , 'attr' : { 'class' : 'form-control col-12 is-warning' } }) }}
-				<small class="resultDesR"></small>
+					{{ form_widget(form.ean, { 'id': 'ean' , 'attr' : { 'class' : 'form-control col-12 is-warning' } }) }}
+					<div class="input-group-append">
+						<button id="open-camera-modal" class="btn btn-warning" type="button">
+							<i class="fa-solid fa-camera"></i>
+						</button>
+					</div>
+				</div>
 				{{ form_errors(form.ean) }}
 			</div>
+
+			<div id="produit" class="card d-none">
+				<div class="card-body p-0">
+					<ul class="nav flex-column">
+						<li class="nav-item">
+							<small class="nav-link">
+								<b>
+									<span class="resultDes"></span>
+								</b>
+							</small>
+						</li>
+						<li class="nav-item">
+							<small class="nav-link">
+								<b>Référence :</b>
+								<span class="float-right resultRef"></span>
+							</small>
+						</li>
+						<li class="nav-item d-flex justify-content-between">
+							<small id="sref1" class="nav-link">
+								<b class="mr-3">Sref1 :</b>
+								<span class="float-right resultSref1"></span>
+							</small>
+							<small id="sref2" class="nav-link">
+								<b class="mr-3">Sref2 :</b>
+								<span class="float-right resultSref2"></span>
+							</small>
+						</li>
+						<li class="nav-item d-flex justify-content-between">
+							<small class="nav-link">
+								<b class="mr-1">Stock :</b>
+								<span class="float-right resultStock"></span>
+							</small>
+							<small class="nav-link">
+								<b class="mr-3">U.v :</b>
+								<span class="float-right resultUv"></span>
+							</small>
+							<div id="stockFaux" class="custom-control custom-checkbox">
+								{{ form_widget(form.stockFaux, {'id' : "customCheckbox", 'attr' : { 'class' : 'custom-control-input custom-control-input-warning custom-control-input-outline' } }) }}
+								<small>
+									<label for="customCheckbox" class="custom-control-label">Erreur stock ?</label>
+								</small>
+							</div>
+						</li>
+						<li class="nav-item d-flex justify-content-between">
+							<small id="ferme" class="nav-link">
+								<b class="mr-1">Date Fermeture :</b>
+								<span class="float-right resultFerme"></span>
+							</small>
+						</li>
+					</ul>
+				</div>
+			</div>
+
 			<div class="form-group">
-				<label class="col-form-label">
-					<i class="fas fa-shopping-basket"></i>
-					{{ form_label(form.qte) }}
-				</label>
 				{{ form_widget(form.qte, { 'id': 'qte' ,'type' : "number", 'attr' : { 'class' : 'form-control col-12' ,'step' : "0.001", 'min' : "0" } }) }}
 				{{ form_errors(form.qte) }}
 			</div>
@@ -81,7 +122,6 @@
 								</div>
 								<div class="modal-footer justify-content-between">
 									<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-
 									<button class="btn btn-success" type="submit">Soumettre ce retrait de marchandise</button>
 								</div>
 							</form>
@@ -98,53 +138,6 @@
 		<!-- /.card -->
 	</div>
 	<!-- /.card-body -->
-
-	<div id="produit" class="d-none">
-		<div class="card">
-			<div class="card-content card-orange">
-				<div class="card-header">
-					<h4 class="card-title text-white resultDes"></h4>
-				</div>
-				<div class="card-footer p-0">
-					<ul class="nav flex-column">
-						<li class="nav-item">
-							<small class="nav-link">
-								<b>Référence :</b>
-								<span class="float-right resultRef"></span>
-							</small>
-						</li>
-						<li class="nav-item d-flex justify-content-between">
-							<small id="sref1" class="nav-link">
-								<b class="mr-3">Sref1 :</b>
-								<span class="float-right resultSref1"></span>
-							</small>
-							<small id="sref2" class="nav-link">
-								<b class="mr-3">Sref2 :</b>
-								<span class="float-right resultSref2"></span>
-							</small>
-							<small class="nav-link">
-								<b class="mr-3">Unité de vente :</b>
-								<span class="float-right resultUv"></span>
-							</small>
-						</li>
-						<li class="nav-item d-flex justify-content-between">
-							<small id="stock" class="nav-link">
-								<b class="mr-1">Stock :</b>
-								<span class="float-right resultStock"></span>
-							</small>
-							<small id="ferme" class="nav-link">
-								<b class="mr-1">Date Fermeture :</b>
-								<span class="float-right resultFerme"></span>
-							</small>
-						</li>
-					</ul>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal-dialog -->
-	</div>
-
 
 	{% if historiques %}
 		<div class="card card-dark mt-4">
@@ -290,8 +283,105 @@
 		</div>
 		<!-- /.modal -->
 	{% endif %}
+
+	<div class="modal fade" id="cameraModal">
+		<div class="modal-dialog">
+			<div class="modal-content bg-warning">
+				<div class="modal-header">
+					<h4 class="modal-title">Caméra en direct</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div id="camera-preview" style="width: 100%; position: relative;"></div>
+				</div>
+				<div class="modal-footer justify-content-between">
+					<div>
+						<input type="checkbox" id="flashlight-toggle">
+						<label for="flashlight-toggle">Activer la lumière</label>
+					</div>
+					<button type="button" class="btn btn-outline-dark">Save changes</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+
 {% endblock %}
 {% block javascripts %}
+	{{ parent() }}
+	<script src="https://cdn.jsdelivr.net/npm/quagga"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+const openCameraButton = document.getElementById("open-camera-modal");
+const cameraPreview = document.getElementById("camera-preview");
+
+
+openCameraButton.addEventListener("click", () => { // Activer la caméra avec deux lecteurs
+Quagga.init({
+inputStream: {
+name: "Live",
+type: "LiveStream",
+target: cameraPreview,
+constraints: {
+width: 460,
+height: 345,
+facingMode: "environment"
+},
+area: { // Zone de recherche des codes-barres (en pourcentage de la vidéo)
+top: "0%",
+right: "0%",
+left: "0%",
+bottom: "0%"
+}
+},
+decoder: {
+readers: ["ean_reader", "code_128_reader"]
+},
+numOfWorkers: 2, // Nombre de travailleurs (workers) pour le traitement
+locate: false,
+frequency: 50, // Fréquence de vérification des codes-barres
+});
+
+Quagga.onDetected((result) => {
+const scannedCode = result.codeResult.code;
+// Alimenter le champ avec l'ID 'ean'
+document.getElementById('ean').value = scannedCode;
+
+// Arrêter Quagga pour éviter de continuer à scanner
+Quagga.stop();
+
+// Déclencher manuellement l'événement 'change' sur le champ 'ean'
+processEAN();
+
+// Fermer la modal
+$('#cameraModal').modal('hide');
+});
+
+Quagga.start();
+
+// Ouvrir la modal
+$('#cameraModal').modal('show');
+});
+});
+	</script>
+	<script>
+		// Sélectionnez le bouton par son ID ou sa classe CSS
+const clearButton = document.querySelector('#clear-ean-button');
+// Remplacez '#clear-ean-button' par votre sélecteur approprié
+
+// Sélectionnez le champ EAN par son ID
+const eanInput = document.querySelector('#ean');
+
+// Ajoutez un écouteur d'événements sur le bouton pour détecter les clics
+clearButton.addEventListener('click', function () { // Effacez la valeur du champ EAN
+eanInput.value = '';
+$("#produit").attr('class', 'd-none');
+$("#ean").attr('class', 'form-control col-12 is-invalid');
+});
+	</script>
 
 	<script>
 
@@ -301,7 +391,6 @@ document.getElementById("qte").value = "";
 document.getElementById("ean").focus();
 }
 
-
 var monAlert = $('#alert');
 console.log(monAlert);
 if (monAlert.length > 0) {
@@ -310,21 +399,18 @@ monAlert.delay(3000).slideUp();
 	</script>
 
 	<script>
-		$(function () { // Initialize
-$('#ean').on('change', function () {
+		function processEAN() {
 let ean = $('#ean');
-if (ean.length = 13) { // alert(ean.val()); créer une alerte
+if (ean.val().length === 13) {
 $.ajax({
 url: "/scan/ean/ajax/1/" + ean.val(),
 type: "GET"
 }).done(function (data) {
-console.log(data);
+console.log(data.error);
 const resultRef = document.querySelector('.resultRef');
 const resultDes = document.querySelector('.resultDes');
-const resultDesR = document.querySelector('.resultDesR');
 // const resultEan = document.querySelector('.resultEan');
 const resultStock = document.querySelector('.resultStock');
-const resultStockR = document.querySelector('.resultStockR');
 const resultUv = document.querySelector('.resultUv');
 const resultFerme = document.querySelector('.resultFerme');
 const resultSref1 = document.querySelector('.resultSref1');
@@ -332,50 +418,52 @@ const resultSref2 = document.querySelector('.resultSref2');
 
 resultRef.textContent = data.ref;
 resultDes.textContent = data.designation;
-resultDesR.textContent = data.designation;
 // resultEan.textContent = data.ean;
-resultStock.textContent = data.stock;
-resultStockR.textContent = data.stock;
+resultStock.textContent = data.stock !== null ? data.stock : 0;
 resultUv.textContent = data.uv;
 resultFerme.textContent = data.ferme;
 resultSref1.textContent = data.sref1;
 resultSref2.textContent = data.sref2;
-if (data.ean) {
-$("#ean").attr('class', 'form-control col-12 is-valid');
-$("#produit").attr('class', 'card mt-3');
-$("#stockFaux").attr('class', 'd-flex');
-} else {
+
+if (data.ean == null) { // Le produit n'a pas été trouvé, donc marquez le champ EAN comme invalide
 $("#ean").attr('class', 'form-control col-12 is-invalid');
 $("#produit").attr('class', 'd-none');
 $("#stockFaux").attr('class', 'd-none');
+} else { // Le produit a été trouvé, marquez le champ EAN comme valide
+$("#ean").attr('class', 'form-control col-12 is-valid');
+$("#produit").attr('class', 'card mt-3');
+$("#stockFaux").attr('class', 'd-flex');
 }
+
 if (data.sref1) {
 $("#sref1").attr('class', 'nav-link');
 } else {
 $("#sref1").attr('class', 'd-none');
 }
+
 if (data.sref2) {
 $("#sref2").attr('class', 'nav-link');
 } else {
 $("#sref2").attr('class', 'd-none');
 }
-if (data.stock) {
-$("#stock").attr('class', 'nav-link');
-} else {
-$("#stock").attr('class', 'd-none');
-}
-console.log(data.stock);
+
 if (data.ferme) {
 $("#ferme").attr('class', 'nav-link');
 } else {
 $("#ferme").attr('class', 'd-none');
 }
-
 });
+} else {
+$("#ean").attr('class', 'form-control col-12 is-invalid');
+$("#produit").attr('class', 'd-none');
+$("#stockFaux").attr('class', 'd-none');
+}
 }
 
+$(function () { // Initialize
+$('#ean').on('change', function () {
+processEAN();
 });
-
-})
+});
 	</script>
 {% endblock %}

@@ -11,7 +11,6 @@ use App\Repository\Divalto\ArtRepository;
 use App\Repository\Main\AlimentationEmplacementRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
-use Com\Tecnick\Barcode\Barcode;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -204,23 +203,29 @@ class ScanEanController extends AbstractController
 
     public function retourProduitAjax(ArtRepository $repo, $dos = null, $ean = null): Response
     {
-        $dos = 1;
-        $produit = "";
-        // tracking user page for stats
-        /*$tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);*/
-        if ($ean) {
-            $produit = $repo->getEanStock($dos, $ean);
+        // Si $dos n'est pas fourni dans la requête AJAX, il reste null.
+        // Vous pouvez utiliser la valeur $dos par défaut de la manière suivante :
+        if ($dos === null) {
+            $dos = 1; // Valeur par défaut
         }
-        return new JsonResponse(['ref' => $produit['ref'],
-            'sref1' => $produit['sref1'],
-            'sref2' => $produit['sref2'],
-            'designation' => $produit['designation'],
-            'ean' => $produit['ean'],
-            'uv' => $produit['uv'],
-            'stock' => $produit['stock'],
-            'ferme' => $produit['ferme'],
-        ]);
+
+        $produit = $repo->getEanStock($dos, $ean);
+
+        if ($produit) {
+            return new JsonResponse([
+                'ref' => $produit['ref'],
+                'sref1' => $produit['sref1'],
+                'sref2' => $produit['sref2'],
+                'designation' => $produit['designation'],
+                'ean' => $produit['ean'],
+                'uv' => $produit['uv'],
+                'stock' => $produit['stock'],
+                'ferme' => $produit['ferme'],
+            ]);
+        } else {
+            // Aucun produit trouvé, retournez une réponse avec une indication d'échec.
+            return new JsonResponse(['ean' => null]);
+        }
     }
 
     #[Route("/emplacement/scan/ajax/{dos}/{emplacement}", name: "app_emplacement_scan_ajax")]
@@ -409,31 +414,10 @@ class ScanEanController extends AbstractController
             }
         }
 
-        // instantiate the barcode class
-        $barcode = new Barcode();
-
-        // generate a barcode
-        $bobj = $barcode->getBarcodeObj(
-            'C128A', // barcode type and additional comma-separated parameters
-            '1000000440324', // data string to encode
-            150, // bar width (use absolute or negative value as multiplication factor)
-            30, // bar height (use absolute or negative value as multiplication factor)
-            'black', // foreground color
-            array(0, 0, 0, 0) // padding (use absolute or negative values as multiplication factors)
-        )->setBackgroundColor('white'); // background color
-
-        // output the barcode as HTML div (see other output formats in the documentation and examples)
-        //echo $bobj->getHtmlDiv();
-
-        //  $route = $request->attributes->get('_route');
-        // $this->setTracking($route);
-
         return $this->render('scan_ean/print.html.twig', [
             'title' => 'Imprimer',
             'form' => $form->createView(),
             'produits' => $produits,
-            'ean' => $bobj->getHtmlDiv(),
-
         ]);
     }
 

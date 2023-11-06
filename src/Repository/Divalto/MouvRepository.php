@@ -742,8 +742,8 @@ class MouvRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
-// Commande et BL de la veille pour les clients feu rouge et orange
-    public function getCmdBlClientFeuRougeOrange(): array
+// Commande et BL de la veille pour les clients feu rouge
+    public function getCmdBlClientFeuRouge(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT *
@@ -773,7 +773,7 @@ class MouvRepository extends ServiceEntityRepository
         INNER JOIN CLI ON CLI.DOS = ENT.DOS AND CLI.TIERS = ENT.TIERS
         INNER JOIN VRP ON VRP.TIERS = CLI.REPR_0001 AND VRP.DOS = ENT.DOS
         WHERE ENT.PIDT = DATEADD(day,-1,CAST(GETDATE() as date)) AND ENT.CE4 = 1 )reponse
-        WHERE feu <> 'vert' AND ENT.DOS = 1
+        WHERE feu = 'rouge' AND ENT.DOS = 1
     ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

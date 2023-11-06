@@ -52,7 +52,8 @@
 				<div class="callout callout-{{ produit.color }}">
 					{% if produit.ean %}
 						<div class="d-flex justify-content-between">
-							<a href="{{ path('app_send_pdf_etiquette', {'ean' : produit.ean })}}" class="text-white btn btn-dark col-12">
+							<input type="number" id="champ_nombre_{{ produit.ean }}" name="champ_nombre" value="1" class="form-control col-3 col-sm-1" min="1" max="99" oninput="if(value < 1) value = 1; if(value > 99) value = 99;">
+							<a href="{{ path('app_send_pdf_etiquette', {'ean' : produit.ean, 'qte' : 1 })}}" class="text-white btn btn-dark col-9 col-sm-11 imprimer-etiquette-button" data-ean="{{ produit.ean }}">
 								<i class="nav-icon pr-3 fas fa-barcode text-white"></i>
 								Imprimer l'étiquette
 							</a>
@@ -111,18 +112,6 @@
 							{% endif %}
 							<li class="nav-item">
 								<small class="nav-link">
-									Gencod :
-									<span class="float-right barcode">
-										{% if produit.ean %}
-											{{ ean|raw }}
-										{% else %}
-											Pas de code EAN
-										{% endif %}
-									</span>
-								</small>
-							</li>
-							<li class="nav-item">
-								<small class="nav-link">
 									EAN :
 									<span class="float-right">
 										{% if produit.ean %}
@@ -161,6 +150,37 @@
 	{% endif %}
 {% endblock %}
 {% block javascripts %}
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+var inputs = document.querySelectorAll('[id^="champ_nombre_"]');
+
+inputs.forEach(function (input) {
+input.addEventListener('input', function () {
+var quantite = input.value;
+var ean = input.getAttribute('id').replace('champ_nombre_', ''); // Extrait l'EAN du champ d'entrée
+var button = document.querySelector('.imprimer-etiquette-button[data-ean="' + ean + '"]');
+
+if (button) {
+var lien = 'http://192.168.50.244/pdf/etiquette/' + ean + '/' + quantite;
+button.setAttribute('href', lien);
+}
+});
+
+// Initialisation du lien avec la quantité de l'input
+var quantite = input.value;
+var ean = input.getAttribute('id').replace('champ_nombre_', ''); // Extrait l'EAN du champ d'entrée
+var button = document.querySelector('.imprimer-etiquette-button[data-ean="' + ean + '"]');
+
+if (button) {
+var lien = 'http://192.168.50.244/pdf/etiquette/' + ean + '/' + quantite;
+button.setAttribute('href', lien);
+}
+});
+});
+	</script>
+
+
 	<script>
 		var monAlert = $('#alert');
 console.log(monAlert);
