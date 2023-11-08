@@ -40,8 +40,8 @@
 	</div>
 	<div class="text-dark">
 		<div class="info-box">
-			<span class=" info-box-icon" style=" background-color: {{ intervention.backgroundColor }} ; color: {{ intervention.textColor }} " ;>
-				<i class=" fas fa-binoculars"></i>
+			<span class=" info-box-icon" style=" background-color: {{ intervention.typeIntervention.backgroundColor }} ; color: {{ intervention.typeIntervention.textColor }} " ;>
+				<i class="{{ intervention.typeIntervention.faIconsClass }}"></i>
 			</span>
 			<div class="info-box-content">
 				<h5 class="">{{ intervention.code.Libelle}}</h5>

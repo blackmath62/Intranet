@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Main\AffairePiece;
 use App\Entity\Main\InterventionMonteurs;
+use App\Entity\Main\StatutsGeneraux;
 use App\Entity\Main\Users;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -51,17 +52,31 @@ class InterventionsMonteursType extends AbstractType
                 'attr' => ['class' => 'form-control form-control',
                     'placeholder' => "Adresse si différente ? "],
             ])
-            ->add('backgroundColor', TextType::class, [
+            ->add('typeIntervention', EntityType::class, [
+                'class' => StatutsGeneraux::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('s')
+                        ->where('s.entity = :entityName')
+                        ->setParameter('entityName', 'InterventionMonteurs');
+                },
+                'choice_label' => 'libelle',
+                'choice_value' => 'id',
+                'multiple' => false,
+                'expanded' => false,
+                'by_reference' => false,
                 'required' => false,
-                'label' => "Fond : ",
-                'attr' => ['class' => 'form-control form-control-color m-2',
-                    'placeholder' => "Couleur du fond"],
-            ])
-            ->add('textColor', TextType::class, [
-                'required' => false,
-                'label' => "Texte : ",
-                'attr' => ['class' => 'form-control form-control-color m-2',
-                    'placeholder' => "Couleur du fond"],
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+                'choice_attr' => function ($choice) {
+                    $backgroundColor = $choice->getBackgroundColor();
+                    $textColor = $choice->getTextColor();
+
+                    return [
+                        'style' => "color: $textColor; background-color: $backgroundColor;",
+                    ];
+                },
+                'label' => "Type",
             ])
             ->add('Equipes', EntityType::class, [
                 'class' => Users::class,

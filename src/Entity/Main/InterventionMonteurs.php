@@ -62,6 +62,9 @@ class InterventionMonteurs
 
     private $champTemporaire;
 
+    #[ORM\ManyToOne(inversedBy: 'statutInverventionMonteurs')]
+    private ?StatutsGeneraux $typeIntervention = null;
+
     public function __construct()
     {
         $this->Equipes = new ArrayCollection();
@@ -323,5 +326,17 @@ class InterventionMonteurs
     public function setChampTemporaire($champTemporaire)
     {
         $this->champTemporaire = $champTemporaire;
+    }
+
+    public function getTypeIntervention(): ?StatutsGeneraux
+    {
+        return $this->typeIntervention;
+    }
+
+    public function setTypeIntervention(?StatutsGeneraux $typeIntervention): static
+    {
+        $this->typeIntervention = $typeIntervention;
+
+        return $this;
     }
 }

@@ -21,16 +21,8 @@
 				{{ form_start(InterventionsMonteursForm)}}
 				<div class="row">
 					<div class="col-12 col-sm-6">
-						<div class="col-12 col-sm-6 d-flex">
-							<div class="m-2">
-								<p>Couleur fond</p>
-								{{ form_widget(InterventionsMonteursForm.backgroundColor, {'type' : 'color' } ) }}
-							</div>
-							<div class="m-2">
-								<p>Couleur texte</p>
-								{{ form_widget(InterventionsMonteursForm.textColor, {'type' : 'color' } ) }}
-							</div>
-						</div>
+						{{ form_label(InterventionsMonteursForm.typeIntervention) }}
+						{{ form_widget(InterventionsMonteursForm.typeIntervention|raw) }}
 						{{ form_label(InterventionsMonteursForm.adresse) }}
 						{{ form_widget(InterventionsMonteursForm.adresse) }}
 						{{ form_errors(InterventionsMonteursForm.adresse) }}

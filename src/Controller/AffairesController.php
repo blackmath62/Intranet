@@ -30,6 +30,7 @@ use App\Repository\Main\InterventionFichesMonteursHeuresRepository;
 use App\Repository\Main\InterventionMonteursRepository;
 use App\Repository\Main\OthersDocumentsRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
+use App\Repository\Main\StatutsGenerauxRepository;
 use App\Repository\Main\UsersRepository;
 use App\Service\EmailTreatementService;
 use DateTime;
@@ -54,15 +55,20 @@ class AffairesController extends AbstractController
     private $repoAffaires;
     private $repoAffairePiece;
     private $repoUsers;
+    private $repoCli;
+    private $repoDocs;
+    private $repoComments;
     private $repoChats;
     private $repoIntervertionsMonteurs;
     private $repoInterventionFicheMonteur;
     private $repoInterventionFichesMonteursHeures;
     private $affaireAdminController;
     private $repoFiche;
+    private $mailer;
     private $repoRetrait;
     private $emailTreatementService;
     private $entityManager;
+    private $repoStatusGeneraux;
 
     public function __construct(
         ManagerRegistry $registry,
@@ -82,7 +88,8 @@ class AffairesController extends AbstractController
         MailerInterface $mailer,
         CommentairesRepository $repoComments,
         AffairesRepository $repoAffaires,
-        MouvRepository $repoMouv) {
+        MouvRepository $repoMouv,
+        StatutsGenerauxRepository $repoStatusGeneraux) {
         $this->repoMouv = $repoMouv;
         $this->repoIntervertionsMonteurs = $repoIntervertionsMonteurs;
         $this->repoCli = $repoCli;
@@ -91,6 +98,7 @@ class AffairesController extends AbstractController
         $this->repoDocs = $repoDocs;
         $this->mailer = $mailer;
         $this->repoAffairePiece = $repoAffairePiece;
+        $this->repoStatusGeneraux = $repoStatusGeneraux;
         $this->repoChats = $repoChats;
         $this->repoUsers = $repoUsers;
         $this->repoInterventionFichesMonteursHeures = $repoInterventionFichesMonteursHeures;
@@ -109,10 +117,6 @@ class AffairesController extends AbstractController
 
     public function affaire(UrlGeneratorInterface $urlGenerator, Request $request): Response
     {
-
-        $tracking = $request->attributes->get('_route');
-        //$this->setTracking($tracking);
-
         // Calendrier des congés
         $events = $this->repoIntervertionsMonteurs->findAll();
         $interventionsActuels = $this->repoIntervertionsMonteurs->findInterventionDuMoment();
@@ -120,17 +124,12 @@ class AffairesController extends AbstractController
 
         foreach ($events as $event) {
             $id = $event->getId();
-            $code = $event->getCode()->getCode();
             $libelle = $event->getCode()->getLibelle();
-            if ($event->getBackgroundColor()) {
-                $color = $event->getBackgroundColor();
-            }
-            if ($event->getTextColor()) {
-                $textColor = $event->getTextColor();
-            }
+            $color = $event->getTypeIntervention()->getBackgroundColor();
+            $textColor = $event->getTypeIntervention()->getTextColor();
             if ($event->getStart() && $event->getEnd()) {
-                $start = $event->getStart()->format('Y-m-d H:i:s');
-                $end = $event->getEnd()->format('Y-m-d H:i:s');
+                $start = $event->getStart()->format('Y-m-d');
+                $end = $event->getEnd()->format('Y-m-d');
                 if ($event->getStart()->format('Y-m-d') == $event->getEnd()->format('Y-m-d') && $event->getStart()->format('H:i') == '00:00' && $event->getEnd()->format('H:i') == '23:00') {
                     $start = $event->getStart()->format('Y-m-d');
                     $end = $event->getEnd()->format('Y-m-d');
@@ -142,7 +141,8 @@ class AffairesController extends AbstractController
                     'start' => $start,
                     'end' => $end,
                     'url' => $urlGenerator->generate('app_affaire_show_intervention', ['id' => $id]),
-                    'title' => 'Affaire : ' . $libelle . ' du ' . $event->getStart()->format('d-m-Y H:i') . ' au ' . $event->getEnd()->format('d-m-Y H:i'),
+                    'title' => $libelle . ' du ' . $event->getStart()->format('d-m-y H:i') . ' au ' . $event->getEnd()->format('d-m-y H:i'),
+                    'icon' => $event->getTypeIntervention()->getFaIconsClass(),
                     'backgroundColor' => $color,
                     'borderColor' => '#FFFFFF',
                     'textColor' => $textColor,
@@ -162,7 +162,7 @@ class AffairesController extends AbstractController
                 'start' => $key,
                 'end' => $key,
                 'title' => $val,
-                'backgroundColor' => '#404040',
+                'backgroundColor' => '#6c757d',
                 'borderColor' => '#FFFFFF',
                 'textColor' => '#FFFFFF',
             ];
@@ -214,8 +214,7 @@ class AffairesController extends AbstractController
                     ->setStart($data['start'])
                     ->setEnd($data['end'])
                     ->addPiece($pieceChantier)
-                    ->setBackgroundColor('#c40000')
-                    ->setTextColor('#ffffff')
+                    ->setTypeIntervention($this->repoStatusGeneraux->findOneBy(['id' => 2]))
                     ->setCode($chantier);
                 foreach ($data['Equipes'] as $monteur) {
                     $intervention->addEquipe($monteur);
@@ -315,12 +314,6 @@ class AffairesController extends AbstractController
             if ($data->getDuration()) {
                 $affaire->setDuration($data->getDuration());
             }
-            if ($data->getbackgroundColor()) {
-                $affaire->setbackgroundColor($data->getBackgroundColor());
-            }
-            if ($data->getTextColor()) {
-                $affaire->setTextColor($data->getTextColor());
-            }
             $em = $this->entityManager;
             $em->persist($affaire);
             $em->flush();
@@ -337,10 +330,12 @@ class AffairesController extends AbstractController
         $InterventionsMonteursForm->handleRequest($request);
 
         if ($InterventionsMonteursForm->isSubmitted() && $InterventionsMonteursForm->isValid()) {
-            //dd($InterventionsMonteursForm->getData());
             $intervention->setCreatedAt(new DateTime())
                 ->setUserCr($this->getUser())
                 ->setCode($affaire);
+            if (!$InterventionsMonteursForm->getData()->getTypeIntervention()) {
+                $intervention->setTypeIntervention($this->repoStatusGeneraux->findOneBy(['id' => 7]));
+            }
             if ($InterventionsMonteursForm->getData()->getAdresse()) {
                 $intervention->setAdresse($InterventionsMonteursForm->getData()->getAdresse());
             } else {

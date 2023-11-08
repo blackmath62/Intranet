@@ -115,6 +115,7 @@
 											<th>date</th>
 											<th>Adresse</th>
 											<th>Créateur</th>
+											<th>Type</th>
 											<th>Composition</th>
 											<th>Piéces</th>
 											<th>Actions</th>
@@ -137,6 +138,9 @@
 														le
 														{{ Intervention.createdAt|date("d-m-Y") }}
 													</small>
+												</td>
+												<td>
+													<i class="text-center fa-2x {{ Intervention.typeIntervention.faIconsClass }}" style="color: {{ Intervention.typeIntervention.backgroundColor }}"></i>
 												</td>
 												<td>
 													<ul>
@@ -214,12 +218,8 @@
 									{{ form_start(InterventionsMonteursForm)}}
 									<div class="row">
 										<div class="col-12 col-sm-6">
-											<div class="col-12 col-sm-12 d-flex flex-colum justify-content-around">
-												{{ form_label(InterventionsMonteursForm.backgroundColor ) }}
-												{{ form_widget(InterventionsMonteursForm.backgroundColor, {'attr': {'value': '#5D5B5B', 'class': 'col-4 form-control' },'type' : 'color' } ) }}
-												{{ form_label(InterventionsMonteursForm.textColor ) }}
-												{{ form_widget(InterventionsMonteursForm.textColor, {'attr': {'value': '#FFFFFF', 'class': 'col-4 form-control' },'type' : 'color' } ) }}
-											</div>
+											{{ form_label(InterventionsMonteursForm.typeIntervention) }}
+											{{ form_widget(InterventionsMonteursForm.typeIntervention|raw) }}
 											{{ form_label(InterventionsMonteursForm.adresse) }}
 											{{ form_widget(InterventionsMonteursForm.adresse,{ 'attr': {'rows': '2'}}) }}
 											{{ form_errors(InterventionsMonteursForm.adresse) }}

@@ -22,42 +22,56 @@
 	</div>
 	{% if interventionsActuels %}
 		<div class="row">
-			<div class="col-md-12">
-				<div class="card card-default">
-					<div class="card-header">
-						<h3 class="card-title">
-							<i class="fas fa-exclamation-triangle"></i>
-							Interventions du moment
-						</h3>
-					</div>
-					<!-- /.card-header -->
-					<div class="card-body d-flex flex-wrap justify-content-start col-12 text-center">
+			<h3 class="pl-3" style="font-size: 1.5em;">
+				<i class="fas fa-exclamation-triangle"></i>
+				Interventions du moment
+			</h3>
+			<div class="d-flex flex-wrap justify-content-start col-12 text-right">
 
-						{% for interventionsActuel in interventionsActuels %}
-							<a class="col-12 col-sm-4" href='{{path('app_affaire_show_intervention', {'id' : interventionsActuel.id } ) }}'>
-								<div class="callout text-dark p-2" style=" border-color: {{ interventionsActuel.backgroundColor }}">
-									<h5>{{ interventionsActuel.code.Libelle}}</h5>
+				{% for interventionsActuel in interventionsActuels %}
+					<a class="col-12 col-sm-4 text-dark" href='{{path('app_affaire_show_intervention', {'id' : interventionsActuel.id } ) }}'>
+						<div class="card elevation-5 p-0">
+							<div class="card-header p-0" style="font-size: 70%; background-color: {{ interventionsActuel.typeIntervention.backgroundColor }}; color: {{ interventionsActuel.typeIntervention.textColor }};">
+								<b class="p-1">{{ interventionsActuel.typeIntervention.libelle }}</b>
+							</div>
+							<div class="card-body p-0">
+								<div class="info-box p-0 m-0">
+									<span class="info-box-icon">
+										<i class="fa-2x {{ interventionsActuel.typeIntervention.faIconsClass }}" style="color: {{ interventionsActuel.typeIntervention.backgroundColor }};"></i>
+									</span>
 
-									<p>Du
-										{{interventionsActuel.start|date("d/m/Y H:i", "Europe/Paris") }}
-										au
-										{{interventionsActuel.end|date("d/m/Y H:i", "Europe/Paris") }}</p>
-									<p>
-										<u>Equipe :</u>
-										{% for monteur in interventionsActuel.Equipes %}
-											{{ monteur.Pseudo }}
-											|
-										{% endfor %}
-									</p>
-									<p>
-										<u>Adresse :</u>
-										{{ interventionsActuel.adresse }}
-									</p>
+									<div class="info-box-content" style="font-size: 70%;">
+										<span class="info-box-text">
+											<b>{{ interventionsActuel.code.Libelle}}</b>
+										</span>
+										<span class="info-box-text d-flex flex-wrap justify-content-end">
+											<b>Equipe :
+												{% set ce = 1 %}
+												{% for monteur in interventionsActuel.Equipes %}
+													{{ monteur.Pseudo }}
+													{% if ce != interventionsActuel.Equipes|length %}
+														,
+													{% endif %}
+													{% set ce = ce + 1 %}
+												{% endfor %}
+											</b>
+										</span>
+										<span class="info-box-text">
+											{{interventionsActuel.start|date("d/m/Y H:i", "Europe/Paris") }}
+											au
+											{{interventionsActuel.end|date("d/m/Y H:i", "Europe/Paris") }}
+										</span>
+									</div>
 								</div>
-							</a>
-						{% endfor %}
-					</div>
-				</div>
+							</div>
+							<div class="card-footer p-0" style="font-size: 80%;">
+								<b class="p-1">
+									{{ interventionsActuel.adresse}}
+								</b>
+							</div>
+						</div>
+					</a>
+				{% endfor %}
 			</div>
 		</div>
 	{% endif %}
