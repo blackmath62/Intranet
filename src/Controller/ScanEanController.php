@@ -47,16 +47,10 @@ class ScanEanController extends AbstractController
         $dos = 1;
         $produit = "";
         $historique = [];
-        // tracking user page for stats
-        /*$tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);*/
-
         $form = $this->createForm(RetraitMarchandiseEanType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            //dd($form->getData());
             $produit = $repo->getEanStock($dos, $form->getData()->getEan());
-            //dd($produit);
             if ($produit) {
                 $retrait = $form->getData();
                 $chantier = $form->getData()->getChantier();
@@ -77,7 +71,6 @@ class ScanEanController extends AbstractController
             $histo = $repoRetrait->findBy(['chantier' => $chantier, 'sendAt' => null]);
             for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
                 $prod = $repo->getEanStock($dos, $histo[$ligHisto]->getEan());
-                //dd($prod);
                 $historique[$ligHisto]['id'] = $histo[$ligHisto]->getId();
                 $historique[$ligHisto]['ref'] = $prod['ref'];
                 $historique[$ligHisto]['sref1'] = $prod['sref1'];
@@ -89,9 +82,11 @@ class ScanEanController extends AbstractController
                 $historique[$ligHisto]['stockFaux'] = $histo[$ligHisto]->getStockFaux();
             }
         }
+        $productData = "";
         return $this->render('scan_ean/index.html.twig', [
             'title' => 'Retrait produits',
             'form' => $form->createView(),
+            'productData' => $productData,
             'produit' => $produit,
             'chantier' => $chantier,
             "historiques" => $historique,

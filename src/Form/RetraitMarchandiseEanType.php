@@ -36,18 +36,21 @@ class RetraitMarchandiseEanType extends AbstractType
             ->add('qte', NumberType::class, array(
                 'required' => true,
                 'attr' => ['class' => 'form-control col-12',
-                    'placeholder' => 'Quantité par unité de vente'],
+                    'placeholder' => 'Qte/Uv',
+                ],
             ))
             ->add('stockFaux', CheckboxType::class, array(
                 'label' => 'Stock Faux ?',
                 'required' => false,
-                'attr' => ['class' => ''],
-                'label_attr' => ['class' => 'form-check-label'],
+                'attr' => ['class' => 'custom-control-input custom-control-input-warning'],
+                'label_attr' => ['class' => 'custom-control-label'],
             ))
             ->add('save', SubmitType::class, [
-                'label' => "Je prends ce produit",
+                'label' => '<i class="fas fa-cart-plus fa-lg"></i> Ajouter au panier',
+                'label_html' => true,
                 'attr' => ['class' => 'form-control btn btn-warning mt-3 col-12'],
             ])
+
         ;
     }
 

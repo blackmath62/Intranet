@@ -31,13 +31,13 @@
 				{% for interventionsActuel in interventionsActuels %}
 					<a class="col-12 col-sm-4 text-dark" href='{{path('app_affaire_show_intervention', {'id' : interventionsActuel.id } ) }}'>
 						<div class="card elevation-5 p-0">
-							<div class="card-header p-0" style="font-size: 70%; background-color: {{ interventionsActuel.typeIntervention.backgroundColor }}; color: {{ interventionsActuel.typeIntervention.textColor }};">
+							<div class="card-header p-0" style="font-size: 70%; border-bottom: 0px none {{ interventionsActuel.typeIntervention.backgroundColor }}; background-color: {{ interventionsActuel.typeIntervention.backgroundColor }}; color: {{ interventionsActuel.typeIntervention.textColor }};">
 								<b class="p-1">{{ interventionsActuel.typeIntervention.libelle }}</b>
 							</div>
 							<div class="card-body p-0">
 								<div class="info-box p-0 m-0">
-									<span class="info-box-icon">
-										<i class="fa-2x {{ interventionsActuel.typeIntervention.faIconsClass }}" style="color: {{ interventionsActuel.typeIntervention.backgroundColor }};"></i>
+									<span class="info-box-icon" style="border-radius: 0rem ; border-bottom-right-radius: 1em; background-color: {{ interventionsActuel.typeIntervention.backgroundColor }};">
+										<i class="fa-2x {{ interventionsActuel.typeIntervention.faIconsClass }}" style="background-color: {{ interventionsActuel.typeIntervention.backgroundColor }}; color: {{ interventionsActuel.typeIntervention.textColor }};"></i>
 									</span>
 
 									<div class="info-box-content" style="font-size: 70%;">

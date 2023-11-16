@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		#reader {
+			width: 100%;
+			height: calc(100% - 40px);
+		}
+		#read-video,
+		#read-canvas {
+			display: none;
+		}
+		#text {
+			width: 100%;
+			height: 40px;
+			text-align: center;
+			font-size: 24px;
+			color: #FFF;
+			background-color: #333;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<button type="button" id="btn-ean" class="btn btn-default col-12" data-toggle="modal" data-target="#scannerModal">
+		Scanner un code barre
+	</button>
+	<div class="modal fade" id="scannerModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Scannez le code</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div id="text">Scannez le code</div>
+					<div id="reader"></div>
+				</div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default close" data-dismiss="modal">fermer</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<input type="text" id="ean" name="ean" class='col-12 my-2'>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="https://unpkg.com/html5-qrcode"></script>
+	<script src="{{ asset("js/html5-qrcode.min.js")}}"></script>
+	<script>
+		// Vérifie si le protocole est HTTP, puis redirige vers HTTPS
+if (window.location.protocol !== "https:") { // Affiche une boîte de dialogue pour avertir l'utilisateur
+var confirmation = confirm("Vous allez être redirigé sur l'adresse HTTPS de cette même page de l'intranet afin de pouvoir scanner des codes barres. Appuyez sur OK quand vous aurez lu ce message.");
+// Si l'utilisateur appuie sur OK, redirige vers HTTPS
+if (confirmation) {
+window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+}
+}
+const txt = document.getElementById('text');
+const eanInput = document.getElementById('ean'); // Assurez-vous que votre champ de saisie a l'ID 'ean'
+var lastResult;
+
+function onScanSuccess(decodedText, decodedResult) {
+if (decodedText !== lastResult) {
+lastResult = decodedText;
+console.log (`Scan result ${decodedText}`, decodedResult);
+txt.textContent = decodedText;
+// Mettre à jour la valeur de l'input avec le résultat du scan
+eanInput.value = decodedText;
+closeScannerModal()
+}
+}
+
+var html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+fps: 10,
+qrbox: 250
+});
+
+html5QrcodeScanner.render(onScanSuccess);
+
+function closeScannerModal() { // Fermer la modal et arrêter la caméra
+$('#scannerModal').modal('hide');
+// Déclencher le clic sur le bouton pour arrêter la caméra
+$('#html5-qrcode-button-camera-stop').click();
+}
+
+// Ajouter un gestionnaire d'événements pour le bouton avec la classe "close"
+$('.close').on('click', function () {
+closeScannerModal();
+});
+	</script>
+{% endblock %}

@@ -3,6 +3,13 @@
 {% block title %}
 	{{ title }}
 {% endblock %}
+{% block stylesheets %}
+	{{ parent() }}
+	<!-- Ajoutez votre lien vers le fichier CSS -->
+	<link rel="stylesheet" href="{{ asset("css/quagga_colors.css") }}">
+	<link rel="stylesheet" href="{{ asset("css/quagga_fonts.css") }}">
+	<link rel="stylesheet" href="{{ asset("css/quagga_styles.css") }}">
+{% endblock %}
 
 {% block body %}
 
@@ -19,7 +26,12 @@
 					{{ form_start(form, { 'attr' : { 'class' : 'ml-auto' }}) }}
 					<small>Vous pouvez taper une partie de la référence ou un EAN à 13 chiffres</small>
 					<div class="input-group">
-						{{ form_widget(form.search, { 'placeholder' : "Référence article",'attr' : { 'class' : 'form-control form-control-lg' }}) }}
+						<div class="input-group-prepend">
+							<button id="openScannerModalBtn" class="btn btn-warning" type="button">
+								<i class="fa-solid fa-camera"></i>
+							</button>
+						</div>
+						{{ form_widget(form.search, { 'id': 'ean' ,'placeholder' : "Référence article",'attr' : { 'class' : 'form-control form-control-lg' }}) }}
 						<div class="input-group-append">
 							{{ form_widget(form.rechercher) }}
 						</div>
@@ -30,6 +42,120 @@
 		</div>
 		<!-- /.card -->
 	</div>
+
+	<div class="modal fade" id="scannerModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Scanner un produit</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<section id="container" class="container">
+						<div id="accordion" style="display: none">
+							<div class="card card-primary">
+								<div class="card-header">
+									<h4 class="card-title w-100">
+										<a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
+											<i class="fa-solid fa-sliders"></i>
+										</a>
+									</h4>
+								</div>
+								<div id="collapseOne" class="collapse" data-parent="#accordion">
+									<div class="card-body">
+										<div class="controls">
+											<fieldset class="input-group">
+												<button class="stop btn btn-primary col-12">Stop Caméra</button>
+											</fieldset>
+											<fieldset class="reader-config-group p-2 col-12">
+												<label class='d-flex flex-wrap justify-content-between'>
+													<div>Barcode-Type</div>
+													<select name="decoder_readers" class="form-control">
+														<option value="code_128" selected="selected">Code 128</option>
+														<option value="code_39">Code 39</option>
+														<option value="code_39_vin">Code 39 VIN</option>
+														<option value="ean">EAN</option>
+														<option value="ean_extended">EAN-extended</option>
+														<option value="ean_8">EAN-8</option>
+														<option value="upc">UPC</option>
+														<option value="upc_e">UPC-E</option>
+														<option value="codabar">Codabar</option>
+														<option value="i2of5">Interleaved 2 of 5</option>
+														<option value="2of5">Standard 2 of 5</option>
+														<option value="code_93">Code 93</option>
+													</select>
+												</label>
+												<label class='d-flex flex-wrap justify-content-between'>
+													<div>Résolution</div>
+													<select name="input-stream_constraints" class="form-control">
+														<option value="320x240">320px</option>
+														<option selected="selected" value="640x480">640px</option>
+														<option value="800x600">800px</option>
+														<option value="1280x720">1280px</option>
+														<option value="1600x960">1600px</option>
+														<option value="1920x1080">1920px</option>
+													</select>
+												</label>
+												<label class='d-flex flex-wrap justify-content-between'>
+													<div>Patch-Size</div>
+													<select name="locator_patch-size" class="form-control">
+														<option value="x-small">x-small</option>
+														<option value="small">small</option>
+														<option selected="selected" value="medium">medium</option>
+														<option value="large">large</option>
+														<option value="x-large">x-large</option>
+													</select>
+												</label>
+												<label class='d-flex flex-wrap justify-content-between'>
+													<div>Half-Sample</div>
+													<input type="checkbox" checked="checked" name="locator_half-sample"/>
+												</label>
+												<label class='d-flex flex-wrap justify-content-between'>
+													<div>Workers</div>
+													<select name="numOfWorkers" class="form-control">
+														<option value="0">0</option>
+														<option value="1">1</option>
+														<option value="2">2</option>
+														<option selected="selected" value="4">4</option>
+														<option value="8">8</option>
+													</select>
+												</label>
+												<label class='d-flex flex-wrap justify-content-between'>
+													<div>Camera</div>
+													<select name="input-stream_constraints" id="deviceSelection" class="form-control"></select>
+												</label>
+												<label style="display: none">
+													<span>Zoom</span>
+													<select name="settings_zoom"></select>
+												</label>
+												<label style="display: none">
+													<span>Torch</span>
+													<input type="checkbox" name="settings_torch"/>
+												</label>
+											</fieldset>
+										</div>
+										<div id="result_strip" style="display: none">
+											<ul class="thumbnails"></ul>
+											<ul class="collector"></ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="interactive" class="viewport"></div>
+					</section>
+				</div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default close" data-dismiss="modal">Fermer</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+
 
 	{% if produits %}
 		<div class="content-header">
@@ -55,7 +181,7 @@
 							<input type="number" id="champ_nombre_{{ produit.ean }}" name="champ_nombre" value="1" class="form-control col-3 col-sm-1" min="1" max="99" oninput="if(value < 1) value = 1; if(value > 99) value = 99;">
 							<a href="{{ path('app_send_pdf_etiquette', {'ean' : produit.ean, 'qte' : 1 })}}" class="text-white btn btn-dark col-9 col-sm-11 imprimer-etiquette-button" data-ean="{{ produit.ean }}">
 								<i class="nav-icon pr-3 fas fa-barcode text-white"></i>
-								Imprimer l'étiquette
+								Imprimer
 							</a>
 						</div>
 					{% else %}
@@ -151,6 +277,12 @@
 {% endblock %}
 {% block javascripts %}
 
+	{{ parent() }}
+	<!-- Quagga -->
+	<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.js"></script>
+	<!-- Adapter WebRTC -->
+	<script src="https://webrtc.github.io/adapter/adapter-latest.js" type="text/javascript"></script>
+	<script src="{{ asset("js/live_w_locator_perso.js")}}"></script>
 	<script>
 		document.addEventListener('DOMContentLoaded', function () {
 var inputs = document.querySelectorAll('[id^="champ_nombre_"]');

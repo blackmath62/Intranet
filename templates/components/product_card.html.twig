@@ -1,0 +1,68 @@
+<div id="produit" class="d-none">
+	<div class="col-12 col-sm-6">
+		<h5 class="d-inline-block resultDes"></h5>
+		<div class="row mt-4">
+			<nav class="w-100">
+				<div class="nav nav-tabs" id="product-tab" role="tablist">
+					<a class="nav-item nav-link active" id="product-pictures-tab" data-toggle="tab" href="#product-pictures" role="tab" aria-controls="product-pictures" aria-selected="true">Images</a>
+					<a class="nav-item nav-link" id="product-documents-tab" data-toggle="tab" href="#product-documents" role="tab" aria-controls="product-documents" aria-selected="false">Documents</a>
+				</div>
+			</nav>
+			<div class="tab-content p-3" id="nav-tabContent">
+				<div class="tab-pane fade show active" id="product-pictures" role="tabpanel" aria-labelledby="product-pictures-tab">
+					<div class="col-12">
+						<img src="../../dist/img/prod-1.jpg" class="product-image" alt="Product Image">
+					</div>
+					<div class="col-12 product-image-thumbs">
+						<div class="product-image-thumb active"><img src="../../dist/img/prod-1.jpg" alt="Product Image"></div>
+						<div class="product-image-thumb"><img src="../../dist/img/prod-2.jpg" alt="Product Image"></div>
+						<div class="product-image-thumb"><img src="../../dist/img/prod-3.jpg" alt="Product Image"></div>
+						<div class="product-image-thumb"><img src="../../dist/img/prod-4.jpg" alt="Product Image"></div>
+						<div class="product-image-thumb"><img src="../../dist/img/prod-5.jpg" alt="Product Image"></div>
+					</div>
+				</div>
+				<div class="tab-pane fade" id="product-documents" role="tabpanel" aria-labelledby="product-documents-tab">
+					Ici sera affiché la liste des documents en rapport avec ce produit
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+	<div class="col-12 col-sm-6">
+		<ul class="nav flex-column">
+			<li class="nav-item">
+				<small class="nav-link">
+					<b>Référence :</b>
+					<span class="float-right resultRef"></span>
+				</small>
+			</li>
+			<li class="nav-item d-flex justify-content-between">
+				<small id="sref1" class="nav-link">
+					<b class="mr-3">Sref1 :</b>
+					<span class="float-right resultSref1"></span>
+				</small>
+				<small id="sref2" class="nav-link">
+					<b class="mr-3">Sref2 :</b>
+					<span class="float-right resultSref2"></span>
+				</small>
+			</li>
+			<li class="nav-item d-flex justify-content-between">
+				<small class="nav-link">
+					<b class="mr-1">Stock :</b>
+					<span class="float-right resultStock"></span>
+				</small>
+				<small class="nav-link">
+					<b class="mr-3">U.v :</b>
+					<span class="float-right resultUv"></span>
+				</small>
+			</li>
+			<li class="nav-item d-flex justify-content-between">
+				<small id="ferme" class="nav-link">
+					<b class="mr-1">Date Fermeture :</b>
+					<span class="float-right resultFerme"></span>
+				</small>
+			</li>
+		</ul>
+	</div>
+</div>
