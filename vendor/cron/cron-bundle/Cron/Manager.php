@@ -13,6 +13,7 @@ use Cron\CronBundle\Entity\CronJob;
 use Cron\CronBundle\Entity\CronJobRepository;
 use Cron\CronBundle\Entity\CronReport;
 use Cron\CronBundle\Entity\CronReportRepository;
+use Cron\CronBundle\Job\ShellJobWrapper;
 use Doctrine\Persistence\ManagerRegistry;
 use Cron\Report\JobReport;
 use Doctrine\DBAL\Connection;
@@ -62,12 +63,17 @@ class Manager
             $connection->connect();
         }
         foreach ($reports as $report) {
+            $job = $report->getJob();
+            if (! $job instanceof ShellJobWrapper) {
+                continue;
+            }
             $dbReport = new CronReport();
-            $dbReport->setJob($report->getJob()->raw);
+            $dbReport->setJob($job->raw);
             $dbReport->setOutput(implode("\n", (array) $report->getOutput()));
             $dbReport->setError(implode("\n", (array) $report->getError()));
             $dbReport->setExitCode($report->getJob()->getProcess()->getExitCode());
             $dbReport->setRunAt(\DateTime::createFromFormat('U.u', number_format($report->getStartTime(), 6, '.', '')));
+            $dbReport->getRunAt()->setTimezone(new \DateTimeZone(getenv('TZ') ?: date_default_timezone_get()));
             $dbReport->setRunTime($report->getEndTime() - $report->getStartTime());
             $this->manager->persist($dbReport);
         }

@@ -1173,8 +1173,8 @@ class MouvRepository extends ServiceEntityRepository
         $dfN2 = $dfN2->format('Y-m-d');
 
         if ($type == 'CLIENT') {
-            $select = 'tiers as tiers, nom AS nom, cp AS cp, famille AS famille, siret AS siret, intra AS intra';
-            $group = 'tiers, nom,cp, famille, siret, intra';
+            $select = 'tiers as tiers, nom AS nom, cp AS cp, tel AS tel, famille AS famille, siret AS siret, intra AS intra, blob AS blob';
+            $group = 'tiers, nom,cp,tel, famille, siret, intra, blob';
         } elseif ($type == 'FAMILLE') {
             $select = 'famille AS famille';
             $group = 'famille';
@@ -1193,7 +1193,7 @@ class MouvRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT $select ,SUM(montantN) AS montantN, SUM(montantN1) AS montantN1, SUM(montantN2) AS montantN2
         FROM(
-            SELECT m.TIERS AS tiers, c.NOM AS nom, c.CPOSTAL AS cp, c.STAT_0001 AS famille ,c.SIRET AS siret, c.TVANO AS intra,
+            SELECT m.TIERS AS tiers, c.NOM AS nom, c.CPOSTAL AS cp, c.TEL AS tel, c.STAT_0001 AS famille ,c.SIRET AS siret, c.TVANO AS intra, n.NOTEBLOB AS blob,
             CASE
                 WHEN m.OP IN ('C', 'CD') AND m.FADT BETWEEN '$dd' AND '$df' THEN m.MONT - m.REMPIEMT_0004
                 WHEN m.OP IN ('D', 'DD') AND m.FADT BETWEEN '$dd' AND '$df' THEN (-1 * m.MONT) + m.REMPIEMT_0004
@@ -1209,6 +1209,8 @@ class MouvRepository extends ServiceEntityRepository
             FROM MOUV m
             LEFT JOIN CLI c ON m.DOS = c.DOS AND m.TIERS = c.TIERS
             INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+            LEFT JOIN T041 t ON c.TEXCOD_0004 = t.TEXCOD AND m.DOS = t.DOS
+			LEFT JOIN MNOTE n ON t.NOTE = n.NOTE
             WHERE m.DOS = 1 AND m.PICOD = 4 AND m.TICOD = 'C' AND m.OP IN ('C', 'D', 'CD','DD') AND m.MONT > 0
             AND m.FADT BETWEEN '$ddN2' AND '$df'
             $secteur

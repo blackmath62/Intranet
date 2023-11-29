@@ -15,6 +15,7 @@ use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\BinaryOp\BooleanAnd;
+use PhpParser\Node\Expr\BinaryOp\BooleanOr;
 use PhpParser\Node\Expr\BinaryOp\Concat;
 use PhpParser\Node\Expr\BinaryOp\Identical;
 use PhpParser\Node\Expr\BinaryOp\NotIdentical;
@@ -305,7 +306,7 @@ final class NodeFactory
         return $this->builderFactory->classConstFetch($className, $constantName);
     }
     /**
-     * @param array<NotIdentical|BooleanAnd|Identical> $newNodes
+     * @param array<NotIdentical|BooleanAnd|BooleanOr|Identical> $newNodes
      */
     public function createReturnBooleanAnd(array $newNodes) : ?Expr
     {
@@ -316,6 +317,16 @@ final class NodeFactory
             return $newNodes[0];
         }
         return $this->createBooleanAndFromNodes($newNodes);
+    }
+    public function createReprintedExpr(Expr $expr) : Expr
+    {
+        // reset original node, to allow the printer to re-use the expr
+        $expr->setAttribute(AttributeKey::ORIGINAL_NODE, null);
+        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($expr, static function (Node $node) : Node {
+            $node->setAttribute(AttributeKey::ORIGINAL_NODE, null);
+            return $node;
+        });
+        return $expr;
     }
     /**
      * @param string|int|null $key
@@ -400,15 +411,5 @@ final class NodeFactory
             return new MethodCall($exprOrVariableName->var, $exprOrVariableName->name, $exprOrVariableName->args);
         }
         return $exprOrVariableName;
-    }
-    public function createReprintedExpr(Expr $expr) : Expr
-    {
-        // reset original node, to allow the printer to re-use the expr
-        $expr->setAttribute(AttributeKey::ORIGINAL_NODE, null);
-        $this->simpleCallableNodeTraverser->traverseNodesWithCallable($expr, static function (Node $node) : Node {
-            $node->setAttribute(AttributeKey::ORIGINAL_NODE, null);
-            return $node;
-        });
-        return $expr;
     }
 }

@@ -11,20 +11,19 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use LogicException;
 use ReflectionClass;
 use RuntimeException;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 
 use function array_key_exists;
 use function array_values;
 use function get_class;
 use function sprintf;
 
-final class SymfonyFixturesLoader extends ContainerAwareLoader
+final class SymfonyFixturesLoader extends SymfonyBridgeLoader
 {
     /** @var FixtureInterface[] */
-    private $loadedFixtures = [];
+    private array $loadedFixtures = [];
 
     /** @var array<string, array<string, bool>> */
-    private $groupsFixtureMapping = [];
+    private array $groupsFixtureMapping = [];
 
     /**
      * @internal
@@ -78,7 +77,7 @@ final class SymfonyFixturesLoader extends ContainerAwareLoader
             throw new LogicException(sprintf(
                 'The "%s" fixture class is trying to be loaded, but is not available. Make sure this class is defined as a service and tagged with "%s".',
                 $class,
-                FixturesCompilerPass::FIXTURE_TAG
+                FixturesCompilerPass::FIXTURE_TAG,
             ));
         }
 

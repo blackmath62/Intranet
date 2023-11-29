@@ -245,7 +245,7 @@ final class NodeTypeResolver
     }
     public function isNumberType(Expr $expr) : bool
     {
-        $nodeType = $this->getType($expr);
+        $nodeType = $this->getNativeType($expr);
         if ($nodeType->isInteger()->yes()) {
             return \true;
         }
@@ -383,7 +383,10 @@ final class NodeTypeResolver
         $type = TypeCombinator::removeNull($resolvedType);
         // for falsy nullables
         $type = TypeCombinator::remove($type, new ConstantBooleanType(\false));
-        return $type->isSuperTypeOf($requiredObjectType)->yes();
+        if ($type instanceof ObjectWithoutClassType) {
+            return $this->isMatchObjectWithoutClassType($type, $requiredObjectType);
+        }
+        return $requiredObjectType->isSuperTypeOf($type)->yes();
     }
     private function resolveByNodeTypeResolvers(Node $node) : ?Type
     {

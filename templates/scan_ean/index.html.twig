@@ -4,27 +4,6 @@
 	{{ title }}
 {% endblock %}
 
-{% block stylesheets %}
-	{{ parent() }}
-	<style>
-		#reader {
-			width: 100%;
-			height: calc(100% - 40px);
-		}
-		#read-video,
-		#read-canvas {
-			display: none;
-		}
-		#text {
-			width: 100%;
-			height: 40px;
-			text-align: center;
-			font-size: 24px;
-			color: #FFF;
-			background-color: #333;
-		}
-	</style>
-{% endblock %}
 {% block body %}
 	<!-- general form elements disabled -->
 	<div class="card card-navy">
@@ -63,6 +42,7 @@
 				{{ form_errors(form.ean) }}
 			</div>
 			{% include 'components/product_card.html.twig' %}
+			{% include 'components/modal_scanner.html.twig' %}
 			<div id="panier" class="d-none">
 				<div id="stockFaux" class="custom-control custom-switch">
 					{{ form_widget(form.stockFaux) }}
@@ -115,29 +95,6 @@
 		</div>
 		<!-- /.card -->
 	</div>
-
-	<div class="modal fade" id="scannerModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h4 class="modal-title">Scannez le code</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div id="text">Scannez le code</div>
-					<div id="reader"></div>
-				</div>
-				<div class="modal-footer justify-content-between">
-					<button type="button" class="btn btn-default close" data-dismiss="modal">fermer</button>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal-dialog -->
-	</div>
-
 
 	{% if historiques %}
 		<div class="card card-dark mt-4">
@@ -288,61 +245,10 @@
 {% endblock %}
 {% block javascripts %}
 	{{ parent() }}
+
 	<script src="https://unpkg.com/html5-qrcode"></script>
 	<script src="{{ asset("js/html5-qrcode.min.js")}}"></script>
-	<script>
-		// Vérifie si le protocole est HTTP, puis redirige vers HTTPS
-if (window.location.protocol !== "https:") { // Affiche une boîte de dialogue pour avertir l'utilisateur
-var confirmation = confirm("Vous allez être redirigé sur l'adresse HTTPS de cette même page de l'intranet afin de pouvoir scanner des codes barres. Appuyez sur OK quand vous aurez lu ce message.");
-// Si l'utilisateur appuie sur OK, redirige vers HTTPS
-if (confirmation) {
-window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
-}
-}
-const txt = document.getElementById('text');
-const eanInput = document.getElementById('ean'); // Assurez-vous que votre champ de saisie a l'ID 'ean'
-var lastResult;
-
-function onScanSuccess(decodedText, decodedResult) {
-if (decodedText !== lastResult) {
-lastResult = decodedText;
-console.log (`Scan result ${decodedText}`, decodedResult);
-txt.textContent = decodedText;
-// Mettre à jour la valeur de l'input avec le résultat du scan
-eanInput.value = decodedText;
-processEAN();
-
-closeScannerModal()
-}
-}
-
-// Fonction pour démarrer la caméra
-function startScanner() {
-var html5QrcodeScanner = new Html5QrcodeScanner("reader", {
-fps: 10,
-qrbox: 250
-});
-
-html5QrcodeScanner.render(onScanSuccess);
-}
-
-// Gestionnaire d'événements pour détecter l'ouverture de la modal
-$('#scannerModal').on('shown.bs.modal', function () { // Démarrer la caméra lorsque la modal est ouverte
-startScanner();
-});
-
-
-function closeScannerModal() { // Fermer la modal et arrêter la caméra
-$('#scannerModal').modal('hide');
-// Déclencher le clic sur le bouton pour arrêter la caméra
-$('#html5-qrcode-button-camera-stop').click();
-}
-
-// Ajouter un gestionnaire d'événements pour le bouton avec la classe "close"
-$('.close').on('click', function () {
-closeScannerModal();
-});
-	</script>
+	<script>{{ eanScannerScript | raw }}</script>
 	<script>
 		$(document).ready(function () {
 $('.product-image-thumb').on('click', function () {
@@ -370,14 +276,12 @@ $("#ean").attr('class', 'form-control col-12 is-invalid');
 	</script>
 
 	<script>
-
 		window.onload = (event) => {
 eanInput.value = "";
 document.getElementById("qte").value = "";
 eanInput.focus();
 }
 	</script>
-
 	<script>
 		function processEAN() {
 const ean = $('#ean');
@@ -395,6 +299,8 @@ const resultUv = document.querySelector('.resultUv');
 const resultFerme = document.querySelector('.resultFerme');
 const resultSref1 = document.querySelector('.resultSref1');
 const resultSref2 = document.querySelector('.resultSref2');
+const resultFiles = document.querySelector('.resultFiles');
+const resultPictures = document.querySelector('.resultPictures'); // Ajout pour les images
 
 resultRef.textContent = data.ref;
 resultDes.textContent = data.designation;
@@ -404,6 +310,43 @@ resultUv.textContent = data.uv;
 resultFerme.textContent = data.ferme;
 resultSref1.textContent = data.sref1;
 resultSref2.textContent = data.sref2;
+resultFiles.textContent = data.files;
+
+
+// Traiter la liste de fichiers
+if (data.files && data.files.length > 0) {
+resultFiles.innerHTML = '<ul>';
+data.files.forEach(function (file) {
+resultFiles.innerHTML += '<li>' + file + '</li>';
+});
+resultFiles.innerHTML += '</ul>';
+} else {
+resultFiles.innerHTML = 'Aucun fichier trouvé.';
+}
+
+console.log(data.files);
+// Traiter la liste d'images
+var mainImage = document.getElementById('product-image');
+var thumbsContainer = document.getElementById('product-image-thumbs');
+// Utilisez un chemin relatif vers le contrôleur Symfony
+
+if (data.pictures && data.pictures.length > 0) { // Mettre à jour les miniatures
+thumbsContainer.innerHTML = '';
+for (var i = 0; i < data.pictures.length; i++) {
+if (i == 0) { // Mettre à jour l'image principale
+var productsFilePath = encodeURIComponent(data.pictures[i].replace(/^\//, ''));
+// Mettre à jour l'image principale
+mainImage.src = productsFilePath;
+// Mettre à jour les miniatures ici
+thumbsContainer.innerHTML += '<div class="product-image-thumb"><img src="' + data.pictures[i] + '" alt="Product Image"></div>';
+}
+}
+} else { // Afficher l'image par défaut si aucune image n'est trouvée
+mainImage.src = '/img/autre/noPicture.jpg';
+// Afficher un message si aucune image n'est trouvée
+thumbsContainer.innerHTML = 'Aucune image trouvée.';
+}
+
 
 if (data.ean == null) { // Le produit n'a pas été trouvé, donc marquez le champ EAN comme invalide
 $("#ean").attr('class', 'form-control col-12 is-invalid');
@@ -447,6 +390,9 @@ $(document).ready(function () { // Utilisez 'input' au lieu de 'change' pour dé
 $('#ean').on('input', function () {
 processEAN();
 });
+});
+$('#ean').on('input change', function () {
+processEAN();
 });
 	</script>
 {% endblock %}

@@ -27,17 +27,14 @@ class ResetAssetsEventListener implements EventSubscriberInterface
         $this->buildNames = $buildNames;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::FINISH_REQUEST => 'resetAssets',
         ];
     }
 
-    /**
-     * @return void
-     */
-    public function resetAssets(FinishRequestEvent $event)
+    public function resetAssets(FinishRequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;

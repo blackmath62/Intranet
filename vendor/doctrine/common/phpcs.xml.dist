@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<ruleset>
+    <arg name="basepath" value="."/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="80"/>
+    <arg name="cache" value=".phpcs-cache"/>
+    <arg name="colors" />
+
+    <config name="php_version" value="70100"/>
+
+    <!-- Ignore warnings and show progress of the run -->
+    <arg value="np"/>
+
+    <file>src</file>
+    <file>tests</file>
+
+    <exclude-pattern>tests/Common/Proxy/*</exclude-pattern>
+    <exclude-pattern>tests/Common/ClassLoaderTest/*</exclude-pattern>
+    <exclude-pattern>tests/Common/Util/TestAsset/*</exclude-pattern>
+
+    <rule ref="Doctrine">
+        <exclude name="SlevomatCodingStandard.TypeHints.DeclareStrictTypes"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint"/>
+        <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint"/>
+        <exclude name="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly.ReferencedGeneralException"/>
+        <exclude name="SlevomatCodingStandard.ControlStructures.EarlyExit"/>
+        <exclude name="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming"/>
+        <exclude name="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming"/>
+        <exclude name="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps"/>
+    </rule>
+
+    <rule ref="Squiz.Classes.ClassFileName.NoMatch">
+        <exclude-pattern>tests/Common/Util/ClassUtilsTest.php</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Commenting.RequireOneLineDocComment.MultiLineDocComment">
+        <!-- This sniff produces annotations that PHPUnit 7 does not understand. -->
+        <exclude-pattern>tests</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.Classes.ClassFileName.NoMatch">
+        <exclude-pattern>tests/Common/Util/ClassUtilsTest.php</exclude-pattern>
+    </rule>
+
+    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>tests/Common/ClassLoaderTest/*.class.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Classes.ValidClassName.NotCamelCaps">
+        <exclude-pattern>tests/Common/Util/ClassUtilsTest.php</exclude-pattern>
+        <exclude-pattern>tests/Common/ClassLoaderTest/*.class.php</exclude-pattern>
+    </rule>
+    <rule ref="PEAR.Functions.ValidDefaultValue.NotAtEnd">
+        <exclude-pattern>tests/Common/Proxy/*HintClass.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.Classes.ClassFileName.NoMatch">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.InvalidNoReturn">
+        <exclude-pattern>tests/Common/Proxy/InvalidReturnTypeClass.php</exclude-pattern>
+    </rule>
+</ruleset>

@@ -1,0 +1,101 @@
+name: "Continuous Integration"
+
+on:
+  pull_request:
+    branches:
+      - "*.x"
+    paths:
+      - .github/workflows/continuous-integration.yml
+      - composer.*
+      - download-box.sh
+      - lib/**
+      - phpunit.xml.dist
+      - tests/**
+  push:
+    branches:
+      - "*.x"
+    paths:
+      - .github/workflows/continuous-integration.yml
+      - composer.*
+      - download-box.sh
+      - lib/**
+      - phpunit.xml.dist
+      - tests/**
+
+jobs:
+  phpunit:
+    name: "PHPUnit"
+    runs-on: "ubuntu-22.04"
+
+    strategy:
+      matrix:
+        php-version:
+          - "8.1"
+          - "8.2"
+        dependencies:
+          - "highest"
+        stability:
+          - "default"
+        include:
+          - dependencies: "lowest"
+            stability: "default"
+            php-version: "8.1"
+          - dependencies: "highest"
+            stability: "dev"
+            php-version: "8.2"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "${{ matrix.php-version }}"
+          coverage: "pcov"
+          extensions: "pdo_sqlite"
+          ini-values: "zend.assertions=1"
+
+      - name: "Download box"
+        run: "./download-box.sh"
+
+      - name: "Allow dev dependencies"
+        if: "matrix.stability == 'dev'"
+        run: "composer config minimum-stability dev"
+
+      - name: "Install dependencies with Composer"
+        uses: "ramsey/composer-install@v2"
+        with:
+          dependency-versions: "${{ matrix.dependencies }}"
+          composer-options: "--ignore-platform-req=php+"
+
+      - name: "Run PHPUnit"
+        run: "vendor/bin/phpunit --coverage-clover=coverage.xml"
+
+      - name: "Upload coverage file"
+        uses: "actions/upload-artifact@v3"
+        with:
+          name: "phpunit-${{ matrix.deps }}-${{ matrix.php-version }}.coverage"
+          path: "coverage.xml"
+
+  upload_coverage:
+    name: "Upload coverage to Codecov"
+    runs-on: "ubuntu-22.04"
+    needs:
+      - "phpunit"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v3"
+        with:
+          fetch-depth: 2
+
+      - name: "Download coverage files"
+        uses: "actions/download-artifact@v3"
+        with:
+          path: "reports"
+
+      - name: "Upload to Codecov"
+        uses: "codecov/codecov-action@v3"
+        with:
+          directory: reports

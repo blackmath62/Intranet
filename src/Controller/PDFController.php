@@ -77,7 +77,6 @@ class PDFController extends AbstractController
         //echo $bobj->getHtmlDiv();
 
         $produit = $repo->getEanStock($dos, $ean);
-        //dd($produit);
         $htmlPdf = $this->renderView('pdf/pdfEtiquette.html.twig', ['produit' => $produit, 'ean' => $bobj->getHtmlDiv()]);
         $pdf->setOption('page-height', '40mm');
         $pdf->setOption('page-width', '90mm');
@@ -89,6 +88,7 @@ class PDFController extends AbstractController
         $pdf->setOption('print-media-type', true);
         //$pdf->setOption('header-font-size', 10);
         $pdf->setOption('zoom', false);
+        //dd($qte);
         for ($i = 1; $i <= $qte; $i++) {
             $file = 'C:/wamp64/www/Intranet/bin/' . $ean . '-' . $i . '.pdf';
             @unlink($file);

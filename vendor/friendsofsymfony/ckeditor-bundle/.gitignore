@@ -1,0 +1,17 @@
+# Composer
+/composer.lock
+/vendor
+
+# Docker
+/.env
+
+# PHP CS Fixer
+/.php_cs.cache
+
+# PHPUnit
+/build
+/phpunit.xml
+.phpunit.result.cache
+
+# Documentation
+/docs/_build/*

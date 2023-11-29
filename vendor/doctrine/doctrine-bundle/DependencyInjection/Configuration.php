@@ -2,11 +2,12 @@
 
 namespace Doctrine\Bundle\DoctrineBundle\DependencyInjection;
 
-use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Proxy\ProxyFactory;
 use InvalidArgumentException;
 use ReflectionClass;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -32,6 +33,7 @@ use function is_bool;
 use function is_int;
 use function is_string;
 use function key;
+use function method_exists;
 use function reset;
 use function sprintf;
 use function strlen;
@@ -202,7 +204,7 @@ class Configuration implements ConfigurationInterface
                     ->setDeprecated(
                         'doctrine/doctrine-bundle',
                         '2.9',
-                        'The "platform_service" configuration key is deprecated since doctrine-bundle 2.9. DBAL 4 will not support setting a custom platform via connection params anymore.'
+                        'The "platform_service" configuration key is deprecated since doctrine-bundle 2.9. DBAL 4 will not support setting a custom platform via connection params anymore.',
                     )
                 ->end()
                 ->booleanNode('auto_commit')->end()
@@ -217,6 +219,7 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(true)
                     ->info('Enables collecting schema errors when profiling is enabled')
                 ->end()
+                ->booleanNode('disable_type_comments')->end()
                 ->scalarNode('server_version')->end()
                 ->scalarNode('driver_class')->end()
                 ->scalarNode('wrapper_class')->end()
@@ -239,7 +242,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('default_table_options')
                 ->info(sprintf(
                     "This option is used by the schema-tool and affects generated SQL. Possible keys include 'charset','%s', and 'engine'.",
-                    $collationKey
+                    $collationKey,
                 ))
                     ->useAttributeAsKey('name')
                     ->prototype('scalar')->end()
@@ -248,6 +251,7 @@ class Configuration implements ConfigurationInterface
                     ->cannotBeEmpty()
                     ->defaultValue($this->getDefaultSchemaManagerFactory())
                 ->end()
+                ->scalarNode('result_cache')->end()
             ->end();
 
         // dbal < 2.11
@@ -298,7 +302,7 @@ class Configuration implements ConfigurationInterface
                         '2.4',
                         'Setting the "doctrine.dbal.%s" %s while the "url" one is defined is deprecated',
                         implode('", "', $urlConflictingValues),
-                        $tail
+                        $tail,
                     );
                 }
 
@@ -331,7 +335,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('servicename')
                     ->info(
                         'Overrules dbname parameter if given and used as SERVICE_NAME or SID connection parameter ' .
-                        'for Oracle depending on the service parameter.'
+                        'for Oracle depending on the service parameter.',
                     )
                 ->end()
                 ->scalarNode('sessionMode')
@@ -342,34 +346,34 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('default_dbname')
                     ->info(
-                        'Override the default database (postgres) to connect to for PostgreSQL connexion.'
+                        'Override the default database (postgres) to connect to for PostgreSQL connexion.',
                     )
                 ->end()
                 ->scalarNode('sslmode')
                     ->info(
                         'Determines whether or with what priority a SSL TCP/IP connection will be negotiated with ' .
-                        'the server for PostgreSQL.'
+                        'the server for PostgreSQL.',
                     )
                 ->end()
                 ->scalarNode('sslrootcert')
                     ->info(
                         'The name of a file containing SSL certificate authority (CA) certificate(s). ' .
-                        'If the file exists, the server\'s certificate will be verified to be signed by one of these authorities.'
+                        'If the file exists, the server\'s certificate will be verified to be signed by one of these authorities.',
                     )
                 ->end()
                 ->scalarNode('sslcert')
                     ->info(
-                        'The path to the SSL client certificate file for PostgreSQL.'
+                        'The path to the SSL client certificate file for PostgreSQL.',
                     )
                 ->end()
                 ->scalarNode('sslkey')
                     ->info(
-                        'The path to the SSL client key file for PostgreSQL.'
+                        'The path to the SSL client key file for PostgreSQL.',
                     )
                 ->end()
                 ->scalarNode('sslcrl')
                     ->info(
-                        'The file name of the SSL certificate revocation list for PostgreSQL.'
+                        'The file name of the SSL certificate revocation list for PostgreSQL.',
                     )
                 ->end()
                 ->booleanNode('pooled')->info('True to use a pooled server with the oci8/pdo_oracle driver')->end()
@@ -379,7 +383,7 @@ class Configuration implements ConfigurationInterface
                 ->info(
                     'Optional parameter, complete whether to add the INSTANCE_NAME parameter in the connection.' .
                     ' It is generally used to connect to an Oracle RAC server to select the name' .
-                    ' of a particular instance.'
+                    ' of a particular instance.',
                 )
                 ->end()
                 ->scalarNode('connectstring')
@@ -387,7 +391,7 @@ class Configuration implements ConfigurationInterface
                     'Complete Easy Connect connection descriptor, see https://docs.oracle.com/database/121/NETAG/naming.htm.' .
                     'When using this option, you will still need to provide the user and password parameters, but the other ' .
                     'parameters will no longer be used. Note that when using this parameter, the getHost and getPort methods' .
-                    ' from Doctrine\DBAL\Connection will no longer function as expected.'
+                    ' from Doctrine\DBAL\Connection will no longer function as expected.',
                 )
                 ->end()
             ->end()
@@ -497,11 +501,11 @@ class Configuration implements ConfigurationInterface
                             ->validate()
                                 ->ifString()
                                 ->then(static function ($v) {
-                                    return constant('Doctrine\Common\Proxy\AbstractProxyFactory::AUTOGENERATE_' . strtoupper($v));
+                                    return constant('Doctrine\ORM\Proxy\ProxyFactory::AUTOGENERATE_' . strtoupper($v));
                                 })
                             ->end()
                         ->end()
-                        ->booleanNode('enable_lazy_ghost_objects')->defaultFalse()
+                        ->booleanNode('enable_lazy_ghost_objects')->defaultValue(! method_exists(ProxyFactory::class, 'resetUninitializedProxy'))
                         ->end()
                         ->scalarNode('proxy_dir')->defaultValue('%kernel.cache_dir%/doctrine/orm/Proxies')->end()
                         ->scalarNode('proxy_namespace')->defaultValue('Proxies')->end()
@@ -658,7 +662,14 @@ class Configuration implements ConfigurationInterface
                     ->arrayNode('schema_ignore_classes')
                         ->prototype('scalar')->end()
                     ->end()
-                    ->scalarNode('report_fields_where_declared')->defaultFalse()->info('Set to "true" to opt-in to the new mapping driver mode that was added in Doctrine ORM 2.16 and will be mandatory in ORM 3.0. See https://github.com/doctrine/orm/pull/10455.')->end()
+                    ->booleanNode('report_fields_where_declared')
+                        ->defaultValue(! class_exists(AnnotationDriver::class))
+                        ->info('Set to "true" to opt-in to the new mapping driver mode that was added in Doctrine ORM 2.16 and will be mandatory in ORM 3.0. See https://github.com/doctrine/orm/pull/10455.')
+                        ->validate()
+                            ->ifTrue(static fn (bool $v): bool => ! class_exists(AnnotationDriver::class) && ! $v)
+                            ->thenInvalid('The setting "report_fields_where_declared" cannot be disabled for ORM 3.')
+                        ->end()
+                    ->end()
                     ->booleanNode('validate_xml_mapping')->defaultFalse()->info('Set to "true" to opt-in to the new mapping driver mode that was added in Doctrine ORM 2.14 and will be mandatory in ORM 3.0. See https://github.com/doctrine/orm/pull/6728.')->end()
                 ->end()
                 ->children()
@@ -831,7 +842,7 @@ class Configuration implements ConfigurationInterface
     {
         $constPrefix = 'AUTOGENERATE_';
         $prefixLen   = strlen($constPrefix);
-        $refClass    = new ReflectionClass(AbstractProxyFactory::class);
+        $refClass    = new ReflectionClass(ProxyFactory::class);
         $constsArray = $refClass->getConstants();
         $namesArray  = [];
         $valuesArray = [];

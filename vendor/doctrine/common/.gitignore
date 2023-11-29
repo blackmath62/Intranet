@@ -1,0 +1,12 @@
+logs/
+reports/
+dist/
+tests/Common/Proxy/generated/
+composer.lock
+vendor/
+doctrine-common-*.tar
+doctrine-common-*.tar.gz
+/phpcs.xml
+/.phpcs-cache
+/phpstan.neon
+/.phpunit.result.cache

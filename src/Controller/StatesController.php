@@ -11,6 +11,8 @@ use App\Service\ProgressManager;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use RtfHtmlPhp\Document;
+use RtfHtmlPhp\Html\HtmlFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -1076,13 +1078,41 @@ class StatesController extends AbstractController
             $metier = $form->getData()['Metiers'];
 
             $clients = $repo->getVenteClientSur3Ans($dd, $df, 'CLIENT', $metier);
+
+            foreach ($clients as $value) {
+                $document = '';
+                $formatter = new HtmlFormatter();
+                try {
+                    $document = new Document($value['blob']);
+                } catch (\Throwable $th) {
+                }
+                if (!$document) {
+                    $blob = "";
+                } else {
+                    $blob = $formatter->Format($document);
+                }
+                $clis[] = [
+                    'tiers' => $value['tiers'],
+                    'nom' => $value['nom'],
+                    'cp' => $value['cp'],
+                    'tel' => $value['tel'],
+                    'famille' => $value['famille'],
+                    'siret' => $value['siret'],
+                    'intra' => $value['intra'],
+                    'blob' => $blob,
+                    'montantN' => $value['montantN'],
+                    'montantN1' => $value['montantN1'],
+                    'montantN2' => $value['montantN2'],
+                ];
+            }
+
             $familles = $repo->getVenteClientSur3Ans($dd, $df, 'FAMILLE', $metier);
         }
 
         return $this->render('states_lhermitte/client3Ans.html.twig', [
             'form' => $form->createView(),
             'title' => 'States client 3 ans tous métiers',
-            'clients' => $clients,
+            'clients' => $clis,
             'familles' => $familles,
         ]);
     }

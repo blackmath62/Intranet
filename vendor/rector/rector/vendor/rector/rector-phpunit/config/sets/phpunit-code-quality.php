@@ -1,18 +1,22 @@
 <?php
 
 declare (strict_types=1);
-namespace RectorPrefix202310;
+namespace RectorPrefix202311;
 
 use Rector\Config\RectorConfig;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\AddSeeTestAnnotationRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\ConstructClassMethodToSetUpTestCaseRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector;
+use Rector\PHPUnit\CodeQuality\Rector\Class_\TestWithToDataProviderRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector;
+use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\DataProviderArrayItemsNewLinedRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\RemoveEmptyTestMethodRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\ReplaceTestAnnotationWithPrefixedFunctionRector;
 use Rector\PHPUnit\CodeQuality\Rector\Foreach_\SimplifyForeachInstanceOfRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertCompareToSpecificMethodRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertComparisonToSpecificMethodRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEmptyNullableObjectToAssertInstanceofRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertFalseStrposToContainsRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertInstanceOfComparisonRector;
@@ -24,7 +28,6 @@ use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertSameBoolNullToSpecificMet
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertSameTrueFalseToAssertTrueFalseRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertTrueFalseToSpecificMethodRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\RemoveExpectAnyFromMockRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\RemoveSetMethodsMethodCallRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWillMethodRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWithMethodRector;
 return static function (RectorConfig $rectorConfig) : void {
@@ -37,7 +40,10 @@ return static function (RectorConfig $rectorConfig) : void {
         YieldDataProviderRector::class,
         RemoveEmptyTestMethodRector::class,
         ReplaceTestAnnotationWithPrefixedFunctionRector::class,
-        // sepcific asserts
+        TestWithToDataProviderRector::class,
+        AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector::class,
+        DataProviderArrayItemsNewlinedRector::class,
+        // specific asserts
         AssertCompareToSpecificMethodRector::class,
         AssertComparisonToSpecificMethodRector::class,
         AssertNotOperatorRector::class,
@@ -51,6 +57,7 @@ return static function (RectorConfig $rectorConfig) : void {
         SimplifyForeachInstanceOfRector::class,
         UseSpecificWillMethodRector::class,
         UseSpecificWithMethodRector::class,
+        AssertEmptyNullableObjectToAssertInstanceofRector::class,
         /**
          * Improve direct testing of your code, without mock creep. Make it simple, clear and easy to maintain:
          *
@@ -61,7 +68,6 @@ return static function (RectorConfig $rectorConfig) : void {
          * @see https://steemit.com/php/@crell/don-t-use-mocking-libraries
          * @see https://davegebler.com/post/php/better-php-unit-testing-avoiding-mocks
          */
-        RemoveSetMethodsMethodCallRector::class,
         RemoveExpectAnyFromMockRector::class,
     ]);
 };

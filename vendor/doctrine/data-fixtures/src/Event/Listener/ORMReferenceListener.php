@@ -6,7 +6,7 @@ namespace Doctrine\Common\DataFixtures\Event\Listener;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PostPersistEventArgs;
 
 use function get_class;
 
@@ -16,8 +16,7 @@ use function get_class;
  */
 final class ORMReferenceListener implements EventSubscriber
 {
-    /** @var ReferenceRepository */
-    private $referenceRepository;
+    private ReferenceRepository $referenceRepository;
 
     public function __construct(ReferenceRepository $referenceRepository)
     {
@@ -25,9 +24,9 @@ final class ORMReferenceListener implements EventSubscriber
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         // would be better to use onClear, but it is supported only in 2.1
         return ['postPersist'];
@@ -35,10 +34,8 @@ final class ORMReferenceListener implements EventSubscriber
 
     /**
      * Populates identities for stored references
-     *
-     * @return void
      */
-    public function postPersist(LifecycleEventArgs $args)
+    public function postPersist(PostPersistEventArgs $args): void
     {
         $object = $args->getObject();
 

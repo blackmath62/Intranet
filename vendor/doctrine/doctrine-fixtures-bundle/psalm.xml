@@ -5,8 +5,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
-    errorBaseline="psalm-baseline.xml"
-    phpVersion="8.1"
+    phpVersion="8.2"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="false"
 >
     <projectFiles>
         <directory name="Command" />
@@ -22,4 +23,13 @@
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <DuplicateClass>
+            <errorLevel type="suppress">
+                <file name="Command/CommandCompatibility.php"/>
+                <file name="Tests/IntegrationTest.php"/>
+            </errorLevel>
+        </DuplicateClass>
+    </issueHandlers>
 </psalm>

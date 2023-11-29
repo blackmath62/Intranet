@@ -115,6 +115,9 @@
 											<span>Cp</span>
 										</th>
 										<th class="text-center">
+											<span>Tel</span>
+										</th>
+										<th class="text-center">
 											<span>Famille</span>
 										</th>
 										<th class="text-center">
@@ -122,6 +125,9 @@
 										</th>
 										<th class="text-center">
 											<span>Intra</span>
+										</th>
+										<th class="text-center">
+											<span>Dématérialisation</span>
 										</th>
 										<th class="text-center">
 											<span>Montant N - 2</span>
@@ -147,6 +153,9 @@
 												<a class="text-dark">{{ client.cp}}</a>
 											</td>
 											<td class="text-center">
+												<a class="text-dark">{{ client.tel}}</a>
+											</td>
+											<td class="text-center">
 												<a class="text-dark">{{ client.famille}}</a>
 											</td>
 											<td class="text-center">
@@ -154,6 +163,9 @@
 											</td>
 											<td class="text-center">
 												<a class="text-dark">{{ client.intra}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ client.blob|raw}}</a>
 											</td>
 											<td class="text-center">
 												<a class="text-dark">{{ client.montantN2 }}</a>

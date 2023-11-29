@@ -1,0 +1,39 @@
+
+name: "Static Analysis"
+
+on:
+  pull_request:
+    branches:
+      - "*.x"
+  push:
+    branches:
+      - "*.x"
+
+jobs:
+  static-analysis-psalm:
+    name: "Static Analysis with Psalm"
+    runs-on: "ubuntu-22.04"
+
+    strategy:
+      matrix:
+        php-version:
+          - "7.4"
+
+    steps:
+      - name: "Checkout code"
+        uses: "actions/checkout@v4"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "${{ matrix.php-version }}"
+
+      - name: "Enforce using stable dependencies"
+        run: "composer config minimum-stability stable"
+
+      - name: "Install dependencies with Composer"
+        uses: "ramsey/composer-install@v2"
+
+      - name: "Run a static analysis with vimeo/psalm"
+        run: "vendor/bin/psalm --show-info=false --stats --output-format=github --threads=$(nproc) --find-unused-psalm-suppress"

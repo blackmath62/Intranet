@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Main\AlimentationEmplacement;
+use App\Form\AddPicturesOrDocsType;
 use App\Form\AlimentationEmplacementEanType;
 use App\Form\GeneralSearchType;
 use App\Form\PrintEmplType;
@@ -11,9 +12,12 @@ use App\Repository\Divalto\ArtRepository;
 use App\Repository\Main\AlimentationEmplacementRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
+use App\Service\EanScannerService;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Asset\Package;
+use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,16 +34,18 @@ class ScanEanController extends AbstractController
     private $repoMail;
     private $mailEnvoi;
     private $entityManager;
+    private $eanScannerService;
 
-    public function __construct(ManagerRegistry $registry, MailListRepository $repoMail, MailerInterface $mailer)
+    public function __construct(EanScannerService $eanScannerService, ManagerRegistry $registry, MailListRepository $repoMail, MailerInterface $mailer)
     {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
+        $this->eanScannerService = $eanScannerService;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->entityManager = $registry->getManager();
         //parent::__construct();
     }
-    // Retrait chantier
+
     #[Route("/scan/ean/{chantier}", name: "app_scan_ean")]
 
     public function index(ArtRepository $repo, Request $request, RetraitMarchandisesEanRepository $repoRetrait, $chantier = null): Response
@@ -47,6 +53,13 @@ class ScanEanController extends AbstractController
         $dos = 1;
         $produit = "";
         $historique = [];
+
+        $formAddPicturesOrDocs = $this->createForm(AddPicturesOrDocsType::class);
+        $formAddPicturesOrDocs->handleRequest($request);
+        if ($formAddPicturesOrDocs->isSubmitted() && $formAddPicturesOrDocs->isValid()) {
+            $this->addFlash('danger', 'Cette fonctionnalité n\'est pas encore opérationnelle');
+        }
+
         $form = $this->createForm(RetraitMarchandiseEanType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -86,10 +99,12 @@ class ScanEanController extends AbstractController
         return $this->render('scan_ean/index.html.twig', [
             'title' => 'Retrait produits',
             'form' => $form->createView(),
+            'formAddPicturesOrDocs' => $formAddPicturesOrDocs->createView(),
             'productData' => $productData,
             'produit' => $produit,
             'chantier' => $chantier,
             "historiques" => $historique,
+            'eanScannerScript' => $this->eanScannerService->getScannerScript(),
         ]);
     }
 
@@ -195,18 +210,46 @@ class ScanEanController extends AbstractController
     }
 
     #[Route("/scan/ean/ajax/{dos}/{ean}", name: "app_scan_ean_ajax")]
-
-    public function retourProduitAjax(ArtRepository $repo, $dos = null, $ean = null): Response
+    public function retourProduitAjax(ArtRepository $repo, $dos = null, $ean = null): JsonResponse
     {
-        // Si $dos n'est pas fourni dans la requête AJAX, il reste null.
-        // Vous pouvez utiliser la valeur $dos par défaut de la manière suivante :
         if ($dos === null) {
             $dos = 1; // Valeur par défaut
         }
 
         $produit = $repo->getEanStock($dos, $ean);
+        $imageExtensions = ['jpg', 'jpeg', 'png'];
+        $pictures = [];
+        $files = [];
 
         if ($produit) {
+            $directory = "//SRVSOFT/FicJoints_R/achat_vente/articles/" . $dos . "/" . strtolower($produit['ref']);
+
+            // Vérifier si le dossier existe
+            if (is_dir($directory)) {
+                $allFiles = scandir($directory);
+
+                // Filtrer les fichiers et dossiers spéciaux (.) et (..)
+                $allFiles = array_filter($allFiles, function ($file) {
+                    return $file !== "." && $file !== "..";
+                });
+
+                // Créer un package Asset
+                $assetPackage = new Package(new EmptyVersionStrategy());
+
+                foreach ($allFiles as $file) {
+                    $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+                    // Utiliser Asset pour générer l'URL de l'image
+                    $cheminRelatif = "fichiers/" . $dos . "/" . strtolower($produit['ref']) . '/' . $file;
+
+                    if (in_array($extension, $imageExtensions)) {
+                        $pictures[] = $assetPackage->getUrl($cheminRelatif);
+                    } else {
+                        $files[] = $assetPackage->getUrl($cheminRelatif);
+                    }
+                }
+            }
+
             return new JsonResponse([
                 'ref' => $produit['ref'],
                 'sref1' => $produit['sref1'],
@@ -216,6 +259,8 @@ class ScanEanController extends AbstractController
                 'uv' => $produit['uv'],
                 'stock' => $produit['stock'],
                 'ferme' => $produit['ferme'],
+                'pictures' => $pictures,
+                'files' => $files,
             ]);
         } else {
             // Aucun produit trouvé, retournez une réponse avec une indication d'échec.
@@ -243,9 +288,6 @@ class ScanEanController extends AbstractController
         $dos = 1;
         $produit = "";
         $historique = [];
-        // tracking user page for stats
-        /*$tracking = $request->attributes->get('_route');
-        $this->setTracking($tracking);*/
 
         $form = $this->createForm(AlimentationEmplacementEanType::class);
         $form->handleRequest($request);
@@ -403,7 +445,6 @@ class ScanEanController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             if (is_numeric($form->getData()['search']) && strlen($form->getData()['search']) == 13) {
                 $produits = $repo->getSearchArt($dos, $form->getData()['search'], 'EAN');
-                //dd($produits);
             } else {
                 $produits = $repo->getSearchArt($dos, $form->getData()['search'], 'REF');
             }
@@ -413,6 +454,7 @@ class ScanEanController extends AbstractController
             'title' => 'Imprimer',
             'form' => $form->createView(),
             'produits' => $produits,
+            'eanScannerScript' => $this->eanScannerService->getScannerScript(),
         ]);
     }
 

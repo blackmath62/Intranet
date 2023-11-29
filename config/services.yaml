@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     images_directory: '%kernel.project_dir%/public/doc/Roby/Fsc'
+    images_autres_directory: '%kernel.project_dir%/public/img/autre'
     doc_lhermitte: '%kernel.project_dir%/public/doc/Lhermitte_freres'
     doc_lhermitte_affaires: '%kernel.project_dir%/public/doc/Lhermitte_freres/Affaires'
     doc_roby: '%kernel.project_dir%/public/doc/Roby'

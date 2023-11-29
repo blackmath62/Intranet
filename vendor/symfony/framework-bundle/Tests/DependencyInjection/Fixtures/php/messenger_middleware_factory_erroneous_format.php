@@ -1,0 +1,17 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'http_method_override' => false,
+    'messenger' => [
+        'buses' => [
+            'command_bus' => [
+                'middleware' => [
+                    [
+                        'foo' => ['qux'],
+                        'bar' => ['baz'],
+                    ],
+                ],
+            ],
+        ],
+    ],
+]);

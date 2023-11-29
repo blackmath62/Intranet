@@ -28,6 +28,7 @@ use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\NodeTypeResolver\PhpDoc\NodeAnalyzer\DocBlockClassRenamer;
 use Rector\NodeTypeResolver\ValueObject\OldToNewType;
 use Rector\PhpDocParser\NodeTraverser\SimpleCallableNodeTraverser;
+use Rector\Renaming\Collector\RenamedNameCollector;
 use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
 final class ClassRenamer
 {
@@ -82,6 +83,11 @@ final class ClassRenamer
      */
     private $docBlockUpdater;
     /**
+     * @readonly
+     * @var \Rector\Renaming\Collector\RenamedNameCollector
+     */
+    private $renamedNameCollector;
+    /**
      * @var string[]
      */
     private $alreadyProcessedClasses = [];
@@ -89,7 +95,7 @@ final class ClassRenamer
      * @var array<string, OldToNewType[]>
      */
     private $oldToNewTypesByCacheKey = [];
-    public function __construct(BetterNodeFinder $betterNodeFinder, SimpleCallableNodeTraverser $simpleCallableNodeTraverser, ClassNaming $classNaming, NodeNameResolver $nodeNameResolver, PhpDocClassRenamer $phpDocClassRenamer, PhpDocInfoFactory $phpDocInfoFactory, DocBlockClassRenamer $docBlockClassRenamer, ReflectionProvider $reflectionProvider, FileHasher $fileHasher, DocBlockUpdater $docBlockUpdater)
+    public function __construct(BetterNodeFinder $betterNodeFinder, SimpleCallableNodeTraverser $simpleCallableNodeTraverser, ClassNaming $classNaming, NodeNameResolver $nodeNameResolver, PhpDocClassRenamer $phpDocClassRenamer, PhpDocInfoFactory $phpDocInfoFactory, DocBlockClassRenamer $docBlockClassRenamer, ReflectionProvider $reflectionProvider, FileHasher $fileHasher, DocBlockUpdater $docBlockUpdater, RenamedNameCollector $renamedNameCollector)
     {
         $this->betterNodeFinder = $betterNodeFinder;
         $this->simpleCallableNodeTraverser = $simpleCallableNodeTraverser;
@@ -101,6 +107,7 @@ final class ClassRenamer
         $this->reflectionProvider = $reflectionProvider;
         $this->fileHasher = $fileHasher;
         $this->docBlockUpdater = $docBlockUpdater;
+        $this->renamedNameCollector = $renamedNameCollector;
     }
     /**
      * @param array<string, string> $oldToNewClasses
@@ -108,7 +115,7 @@ final class ClassRenamer
     public function renameNode(Node $node, array $oldToNewClasses, ?Scope $scope) : ?Node
     {
         $oldToNewTypes = $this->createOldToNewTypes($oldToNewClasses);
-        if ($node instanceof Name) {
+        if ($node instanceof FullyQualified) {
             return $this->refactorName($node, $oldToNewClasses);
         }
         $phpDocInfo = $this->phpDocInfoFactory->createFromNode($node);
@@ -146,9 +153,9 @@ final class ClassRenamer
         }
         return \false;
     }
-    private function shouldSkip(string $newName, Name $name) : bool
+    private function shouldSkip(string $newName, FullyQualified $fullyQualified) : bool
     {
-        if ($name->getAttribute(AttributeKey::IS_STATICCALL_CLASS_NAME) === \true && $this->reflectionProvider->hasClass($newName)) {
+        if ($fullyQualified->getAttribute(AttributeKey::IS_STATICCALL_CLASS_NAME) === \true && $this->reflectionProvider->hasClass($newName)) {
             $classReflection = $this->reflectionProvider->getClass($newName);
             return $classReflection->isInterface();
         }
@@ -157,28 +164,26 @@ final class ClassRenamer
     /**
      * @param array<string, string> $oldToNewClasses
      */
-    private function refactorName(Name $name, array $oldToNewClasses) : ?Name
+    private function refactorName(FullyQualified $fullyQualified, array $oldToNewClasses) : ?FullyQualified
     {
-        if ($name->getAttribute(AttributeKey::IS_NAMESPACE_NAME) === \true) {
-            return null;
-        }
-        $stringName = $this->nodeNameResolver->getName($name);
+        $stringName = $fullyQualified->toString();
         $newName = $oldToNewClasses[$stringName] ?? null;
         if ($newName === null) {
             return null;
         }
-        if (!$this->isClassToInterfaceValidChange($name, $newName)) {
+        if (!$this->isClassToInterfaceValidChange($fullyQualified, $newName)) {
             return null;
         }
         // no need to preslash "use \SomeNamespace" of imported namespace
-        if ($name->getAttribute(AttributeKey::IS_USEUSE_NAME) === \true) {
+        if ($fullyQualified->getAttribute(AttributeKey::IS_USEUSE_NAME) === \true) {
             // no need to rename imports, they will be handled by autoimport and coding standard
             // also they might cause some rename
             return null;
         }
-        if ($this->shouldSkip($newName, $name)) {
+        if ($this->shouldSkip($newName, $fullyQualified)) {
             return null;
         }
+        $this->renamedNameCollector->add($stringName);
         return new FullyQualified($newName);
     }
     /**
@@ -253,18 +258,18 @@ final class ClassRenamer
      * - implements SomeInterface
      * - implements SomeClass
      */
-    private function isClassToInterfaceValidChange(Name $name, string $newClassName) : bool
+    private function isClassToInterfaceValidChange(FullyQualified $fullyQualified, string $newClassName) : bool
     {
         if (!$this->reflectionProvider->hasClass($newClassName)) {
             return \true;
         }
         $classReflection = $this->reflectionProvider->getClass($newClassName);
         // ensure new is not with interface
-        if ($name->getAttribute(AttributeKey::IS_NEW_INSTANCE_NAME) !== \true) {
-            return $this->isValidClassNameChange($name, $classReflection);
+        if ($fullyQualified->getAttribute(AttributeKey::IS_NEW_INSTANCE_NAME) !== \true) {
+            return $this->isValidClassNameChange($fullyQualified, $classReflection);
         }
         if (!$classReflection->isInterface()) {
-            return $this->isValidClassNameChange($name, $classReflection);
+            return $this->isValidClassNameChange($fullyQualified, $classReflection);
         }
         return \false;
     }
@@ -319,9 +324,9 @@ final class ClassRenamer
             $node->setAttribute(AttributeKey::ORIGINAL_NODE, null);
         });
     }
-    private function isValidClassNameChange(Name $name, ClassReflection $classReflection) : bool
+    private function isValidClassNameChange(FullyQualified $fullyQualified, ClassReflection $classReflection) : bool
     {
-        if ($name->getAttribute(AttributeKey::IS_CLASS_EXTENDS) === \true) {
+        if ($fullyQualified->getAttribute(AttributeKey::IS_CLASS_EXTENDS) === \true) {
             // is class to interface?
             if ($classReflection->isInterface()) {
                 return \false;
@@ -330,7 +335,7 @@ final class ClassRenamer
                 return \false;
             }
         }
-        if ($name->getAttribute(AttributeKey::IS_CLASS_IMPLEMENT) === \true) {
+        if ($fullyQualified->getAttribute(AttributeKey::IS_CLASS_IMPLEMENT) === \true) {
             // is interface to class?
             return !$classReflection->isClass();
         }

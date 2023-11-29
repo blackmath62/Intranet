@@ -1,0 +1,18 @@
+build.properties
+build/
+logs/
+reports/
+dist/
+tests/phpunit.xml
+vendor/
+/composer.lock
+/composer.lock.back
+phpunit.xml
+/.phpunit.result.cache
+/phpcs.xml
+/phpstan.neon
+/.phpcs-cache
+/box.phar
+/box.json
+
+# Please don't add your IDE's files here, use global gitignore instead.

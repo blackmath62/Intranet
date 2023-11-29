@@ -1010,9 +1010,9 @@ class SqlWalker implements TreeWalker
     /**
      * Walks down a JoinAssociationDeclaration AST node, thereby generating the appropriate SQL.
      *
-     * @param AST\JoinAssociationDeclaration $joinAssociationDeclaration
-     * @param int                            $joinType
-     * @param AST\ConditionalExpression      $condExpr
+     * @param AST\JoinAssociationDeclaration                             $joinAssociationDeclaration
+     * @param int                                                        $joinType
+     * @param AST\ConditionalExpression|AST\Phase2OptimizableConditional $condExpr
      * @psalm-param AST\Join::JOIN_TYPE_* $joinType
      *
      * @return string
@@ -1047,7 +1047,9 @@ class SqlWalker implements TreeWalker
             }
         }
 
-        $targetTableJoin = null;
+        if ($relation['fetch'] === ClassMetadata::FETCH_EAGER && $condExpr !== null) {
+            throw QueryException::eagerFetchJoinWithNotAllowed($assoc['sourceEntity'], $assoc['fieldName']);
+        }
 
         // This condition is not checking ClassMetadata::MANY_TO_ONE, because by definition it cannot
         // be the owning side and previously we ensured that $assoc is always the owning side of the associations.
@@ -2048,7 +2050,7 @@ class SqlWalker implements TreeWalker
     /**
      * Walk down a ConditionalExpression AST node, thereby generating the appropriate SQL.
      *
-     * @param AST\ConditionalExpression $condExpr
+     * @param AST\ConditionalExpression|AST\Phase2OptimizableConditional $condExpr
      *
      * @return string
      *
@@ -2068,7 +2070,7 @@ class SqlWalker implements TreeWalker
     /**
      * Walks down a ConditionalTerm AST node, thereby generating the appropriate SQL.
      *
-     * @param AST\ConditionalTerm $condTerm
+     * @param AST\ConditionalTerm|AST\ConditionalFactor|AST\ConditionalPrimary $condTerm
      *
      * @return string
      *
@@ -2088,7 +2090,7 @@ class SqlWalker implements TreeWalker
     /**
      * Walks down a ConditionalFactor AST node, thereby generating the appropriate SQL.
      *
-     * @param AST\ConditionalFactor $factor
+     * @param AST\ConditionalFactor|AST\ConditionalPrimary $factor
      *
      * @return string The SQL.
      *

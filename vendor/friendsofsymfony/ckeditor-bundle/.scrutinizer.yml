@@ -1,0 +1,10 @@
+filter:
+    excluded_paths:
+        - vendor/*
+        - tests/*
+        - docs/*
+
+checks:
+    php:
+        code_rating: true
+        duplication: true

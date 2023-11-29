@@ -1,0 +1,11 @@
+vendor
+composer.phar
+phpunit.xml
+composer.lock
+.DS_Store
+.php-cs-fixer.cache
+.hg
+.phpunit.result.cache
+.phpunit.cache
+favicon.ico
+logo.jpg

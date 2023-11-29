@@ -13,7 +13,6 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\UnionType;
 use PHPStan\Type\ArrayType;
-use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use Rector\Naming\ExpectedNameResolver\MatchParamTypeExpectedNameResolver;
@@ -113,14 +112,10 @@ final class ExpectedNameResolver
             return null;
         }
         $returnedType = $this->nodeTypeResolver->getType($expr);
-        if ($returnedType instanceof ArrayType) {
+        if (!$returnedType->isObject()->yes()) {
             return null;
         }
-        if ($returnedType instanceof MixedType) {
-            return null;
-        }
-        if ($returnedType instanceof ObjectType && $returnedType->isInstanceOf('DateTimeInterface')->yes()) {
-            // skip date time, as custom naming
+        if ($this->isDateTimeType($returnedType)) {
             return null;
         }
         $expectedName = $this->propertyNaming->getExpectedNameFromType($returnedType);
@@ -194,5 +189,18 @@ final class ExpectedNameResolver
             return null;
         }
         return $arrayType->getItemType();
+    }
+    /**
+     * Skip date time, as custom naming
+     */
+    private function isDateTimeType(Type $type) : bool
+    {
+        if (!$type instanceof ObjectType) {
+            return \false;
+        }
+        if ($type->isInstanceOf('DateTimeInterface')->yes()) {
+            return \true;
+        }
+        return $type->isInstanceOf('DateTime')->yes();
     }
 }

@@ -1,0 +1,10 @@
+parameters:
+    env(REDIS_DSN): redis://paas.com
+
+framework:
+    http_method_override: false
+    lock:
+        foo: semaphore
+        bar: flock
+        baz: [semaphore, flock]
+        qux: "%env(REDIS_DSN)%"

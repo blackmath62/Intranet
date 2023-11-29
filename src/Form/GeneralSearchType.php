@@ -21,6 +21,8 @@ class GeneralSearchType extends AbstractType
                 ],
             ])
             ->add('rechercher', SubmitType::class, [
+                'label' => '<i class="fa-solid fa-magnifying-glass"></i>',
+                'label_html' => true,
                 'attr' => ['class' => 'btn btn-secondary'],
             ])
         ;

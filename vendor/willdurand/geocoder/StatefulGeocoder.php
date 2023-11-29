@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the Geocoder package.
@@ -12,11 +12,10 @@ declare (strict_types = 1);
 
 namespace Geocoder;
 
-use Geocoder\Geocoder;
 use Geocoder\Model\Bounds;
-use Geocoder\Provider\Provider;
 use Geocoder\Query\GeocodeQuery;
 use Geocoder\Query\ReverseQuery;
+use Geocoder\Provider\Provider;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>

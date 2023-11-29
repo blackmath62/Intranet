@@ -1,0 +1,5 @@
+fos_ck_editor:
+    plugins:
+        plugin-name:
+            path:     "/my/path"
+            filename: "plugin.js"
