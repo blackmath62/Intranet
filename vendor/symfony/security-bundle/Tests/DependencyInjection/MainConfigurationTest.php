@@ -23,7 +23,7 @@ class MainConfigurationTest extends TestCase
      * The minimal, required config needed to not have any required validation
      * issues.
      */
-    protected static $minimalConfig = [
+    protected static array $minimalConfig = [
         'providers' => [
             'stub' => [
                 'id' => 'foo',
@@ -36,7 +36,6 @@ class MainConfigurationTest extends TestCase
 
     public function testNoConfigForProvider()
     {
-        $this->expectException(InvalidConfigurationException::class);
         $config = [
             'providers' => [
                 'stub' => [],
@@ -45,12 +44,14 @@ class MainConfigurationTest extends TestCase
 
         $processor = new Processor();
         $configuration = new MainConfiguration([], []);
+
+        $this->expectException(InvalidConfigurationException::class);
+
         $processor->processConfiguration($configuration, [$config]);
     }
 
     public function testManyConfigForProvider()
     {
-        $this->expectException(InvalidConfigurationException::class);
         $config = [
             'providers' => [
                 'stub' => [
@@ -62,6 +63,9 @@ class MainConfigurationTest extends TestCase
 
         $processor = new Processor();
         $configuration = new MainConfiguration([], []);
+
+        $this->expectException(InvalidConfigurationException::class);
+
         $processor->processConfiguration($configuration, [$config]);
     }
 

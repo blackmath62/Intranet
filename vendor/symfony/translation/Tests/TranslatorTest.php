@@ -24,7 +24,7 @@ use Symfony\Component\Translation\Translator;
 
 class TranslatorTest extends TestCase
 {
-    private $defaultLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -225,8 +225,8 @@ class TranslatorTest extends TestCase
         $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
         $translator = new Translator('en');
         $translator->addLoader($format, new $loaderClass());
-        $translator->addResource($format, __DIR__.'/fixtures/non-existing', 'en');
-        $translator->addResource($format, __DIR__.'/fixtures/resources.'.$format, 'en');
+        $translator->addResource($format, __DIR__.'/Fixtures/non-existing', 'en');
+        $translator->addResource($format, __DIR__.'/Fixtures/resources.'.$format, 'en');
 
         // force catalogue loading
         $translator->trans('foo');
@@ -240,8 +240,8 @@ class TranslatorTest extends TestCase
         $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
         $translator = new Translator('en_GB');
         $translator->addLoader($format, new $loaderClass());
-        $translator->addResource($format, __DIR__.'/fixtures/non-existing', 'en_GB');
-        $translator->addResource($format, __DIR__.'/fixtures/resources.'.$format, 'en', 'resources');
+        $translator->addResource($format, __DIR__.'/Fixtures/non-existing', 'en_GB');
+        $translator->addResource($format, __DIR__.'/Fixtures/resources.'.$format, 'en', 'resources');
 
         $this->assertEquals('bar', $translator->trans('foo', [], 'resources'));
     }
@@ -364,20 +364,20 @@ class TranslatorTest extends TestCase
     {
         $translator = new Translator('en_GB');
         $translator->addLoader('yml', new \Symfony\Component\Translation\Loader\YamlFileLoader());
-        $translator->addResource('yml', __DIR__.'/fixtures/empty.yml', 'en_GB');
-        $translator->addResource('yml', __DIR__.'/fixtures/resources.yml', 'en');
+        $translator->addResource('yml', __DIR__.'/Fixtures/empty.yml', 'en_GB');
+        $translator->addResource('yml', __DIR__.'/Fixtures/resources.yml', 'en');
 
         // force catalogue loading
         $this->assertEquals('bar', $translator->trans('foo', []));
 
         $resources = $translator->getCatalogue('en')->getResources();
         $this->assertCount(1, $resources);
-        $this->assertContainsEquals(__DIR__.\DIRECTORY_SEPARATOR.'fixtures'.\DIRECTORY_SEPARATOR.'resources.yml', $resources);
+        $this->assertContainsEquals(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'resources.yml', $resources);
 
         $resources = $translator->getCatalogue('en_GB')->getResources();
         $this->assertCount(2, $resources);
-        $this->assertContainsEquals(__DIR__.\DIRECTORY_SEPARATOR.'fixtures'.\DIRECTORY_SEPARATOR.'empty.yml', $resources);
-        $this->assertContainsEquals(__DIR__.\DIRECTORY_SEPARATOR.'fixtures'.\DIRECTORY_SEPARATOR.'resources.yml', $resources);
+        $this->assertContainsEquals(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'empty.yml', $resources);
+        $this->assertContainsEquals(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'resources.yml', $resources);
     }
 
     /**
@@ -598,11 +598,9 @@ class TranslatorTest extends TestCase
 
 class StringClass
 {
-    protected $str;
-
-    public function __construct($str)
-    {
-        $this->str = $str;
+    public function __construct(
+        protected string $str,
+    ) {
     }
 
     public function __toString(): string

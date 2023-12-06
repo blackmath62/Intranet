@@ -23,19 +23,26 @@
 				<div class="tab-pane fade show active" id="product-pictures" role="tabpanel" aria-labelledby="product-pictures-tab">
 					<h4>Photos</h4>
 					<div class="col-12">
+						<a type="button" data-target-id="product-image" class="float-right updateButton">
+							<i class="fas fa-trash-alt fa-3x text-secondary" style="cursor: pointer;"></i>
+						</a>
 						<img id="product-image" class="product-image" alt="Product Image">
 					</div>
-					<div class="col-12 product-image-thumbs" id="product-image-thumbs"></div>
+					<div class="col-12 product-image-thumbs overflow-auto d-flex" id="product-image-thumbs"></div>
 					<!-- La liste d'images sera ajoutée ici dynamiquement -->
 				</div>
 				<div class="tab-pane fade" id="product-documents" role="tabpanel" aria-labelledby="product-documents-tab">
 					<h4>Fichiers</h4>
-					<p>Aucun fichier pour ce produit .....</p>
 					<div class="resultFiles"></div>
 				</div>
 				<div class="tab-pane fade" id="product-add-pictures" role="tabpanel" aria-labelledby="product-add-pictures-tab">
-					<h4>Ajouter Photos/Fichiers</h4>
-					<p>fonctionnalité à venir</p>
+					<h4>Ajouter plusieurs Photos/Fichiers</h4>
+					{{ form_start(formAddPicturesOrDocs, {'attr': {'enctype': 'multipart/form-data'}}) }}
+					{{ form_widget(formAddPicturesOrDocs.files) }}
+					{{ form_widget(formAddPicturesOrDocs.type) }}
+					{{ form_widget(formAddPicturesOrDocs.reference, {'id': 'add_pictures_or_docs_reference' }) }}
+					{{ form_widget(formAddPicturesOrDocs.importer) }}
+					{{ form_end(formAddPicturesOrDocs) }}
 				</div>
 				<div class="tab-pane fade" id="product-tools" role="tabpanel" aria-labelledby="product-tools-tab">
 					<h4>Utilitaires</h4>

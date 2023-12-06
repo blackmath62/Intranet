@@ -29,7 +29,7 @@ class InlineTest extends TestCase
     /**
      * @dataProvider getTestsForParse
      */
-    public function testParse($yaml, $value, $flags = 0)
+    public function testParse(string $yaml, $value, $flags = 0)
     {
         $this->assertSame($value, Inline::parse($yaml, $flags), sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
     }
@@ -318,7 +318,6 @@ class InlineTest extends TestCase
     {
         return [
             ['', ''],
-            [null, ''],
             ['null', null],
             ['false', false],
             ['true', true],
@@ -578,7 +577,7 @@ class InlineTest extends TestCase
      */
     public function testParseTimestampAsDateTimeObject(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond, string $timezone)
     {
-        $expected = (new \DateTime($yaml))
+        $expected = (new \DateTimeImmutable($yaml))
             ->setTimeZone(new \DateTimeZone('UTC'))
             ->setDate($year, $month, $day)
             ->setTime($hour, $minute, $second, $microsecond);
@@ -603,7 +602,7 @@ class InlineTest extends TestCase
      */
     public function testParseNestedTimestampListAsDateTimeObject(string $yaml, int $year, int $month, int $day, int $hour, int $minute, int $second, int $microsecond)
     {
-        $expected = (new \DateTime($yaml))
+        $expected = (new \DateTimeImmutable($yaml))
             ->setTimeZone(new \DateTimeZone('UTC'))
             ->setDate($year, $month, $day)
             ->setTime($hour, $minute, $second, $microsecond);

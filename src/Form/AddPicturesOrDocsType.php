@@ -5,6 +5,7 @@ namespace App\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,7 +15,7 @@ class AddPicturesOrDocsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('file', FileType::class, [
+            ->add('files', FileType::class, [
                 'label' => false,
                 'multiple' => true,
                 'mapped' => false,
@@ -32,6 +33,12 @@ class AddPicturesOrDocsType extends AbstractType
                 'label' => 'Type de Documents',
                 'attr' => ['class' => 'form-control m-2 p-2'],
 
+            ])
+            ->add('reference', HiddenType::class, [
+                'mapped' => false,
+                'attr' => [
+                    'id' => 'add_pictures_or_docs_reference',
+                ],
             ])
             ->add('importer', SubmitType::class, [
                 'attr' => ['class' => 'form-control m-2 p-2 col-12 text-center btn btn-primary'],

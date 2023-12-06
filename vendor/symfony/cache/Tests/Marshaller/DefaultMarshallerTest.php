@@ -58,8 +58,7 @@ class DefaultMarshallerTest extends TestCase
     {
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('Class not found: NotExistingClass');
-        $marshaller = new DefaultMarshaller();
-        $marshaller->unmarshall('O:16:"NotExistingClass":0:{}');
+        (new DefaultMarshaller())->unmarshall('O:16:"NotExistingClass":0:{}');
     }
 
     /**
@@ -82,7 +81,7 @@ class DefaultMarshallerTest extends TestCase
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('unserialize(): Error at offset 0 of 3 bytes');
         $marshaller = new DefaultMarshaller();
-        set_error_handler(fn () => false);
+        set_error_handler(static fn () => false);
         try {
             @$marshaller->unmarshall(':::');
         } finally {
@@ -102,7 +101,7 @@ class DefaultMarshallerTest extends TestCase
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('igbinary_unserialize_zval: unknown type \'61\', position 5');
         $marshaller = new DefaultMarshaller();
-        set_error_handler(fn () => false);
+        set_error_handler(static fn () => false);
         try {
             @$marshaller->unmarshall(rawurldecode('%00%00%00%02abc'));
         } finally {

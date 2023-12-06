@@ -4,8 +4,5 @@ controllers:
         namespace: App\Controller
     type: attribute
 
-afficher_fichier:
-    path: /fichiers/{chemin}
-    controller: App\Controller\FichierController::afficherFichier
 
 

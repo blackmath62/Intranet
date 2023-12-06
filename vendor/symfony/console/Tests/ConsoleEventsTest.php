@@ -39,7 +39,7 @@ class ConsoleEventsTest extends TestCase
                 if (9 === $i) {
                     continue;
                 }
-                pcntl_signal($i, SIG_DFL);
+                pcntl_signal($i, \SIG_DFL);
             }
         }
     }
@@ -73,7 +73,7 @@ class ConsoleEventsTest extends TestCase
 
 class EventTraceSubscriber implements EventSubscriberInterface
 {
-    public $observedEvents = [];
+    public array $observedEvents = [];
 
     public static function getSubscribedEvents(): array
     {

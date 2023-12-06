@@ -25,6 +25,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class TableTest extends TestCase
 {
+    /** @var resource */
     protected $stream;
 
     protected function setUp(): void
@@ -34,8 +35,7 @@ class TableTest extends TestCase
 
     protected function tearDown(): void
     {
-        fclose($this->stream);
-        $this->stream = null;
+        unset($this->stream);
     }
 
     /**
@@ -1017,15 +1017,14 @@ TABLE;
 
     public function testThrowsWhenTheCellInAnArray()
     {
-        $table = new Table($this->getOutputStream());
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
+        $table = new Table($output = $this->getOutputStream());
         $table
             ->setHeaders(['ISBN', 'Title', 'Author', 'Price'])
             ->setRows([
                 ['99921-58-10-7', [], 'Dante Alighieri', '9.95'],
             ]);
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
 
         $table->render();
     }
@@ -1723,7 +1722,7 @@ EOTXT
 |-------------------------|
 |   ISBN: 9971-5-0210-0   |
 |  Title: A Tale          |
-| of Two Cities           |
+|         of Two Cities   |
 | Author: Charles Dickens |
 |  Price: 139.25          |
 +-------------------------+

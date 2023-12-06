@@ -18,9 +18,6 @@ class SrefByArtController extends AbstractController
 
     public function index(Request $request, ArtRepository $repo): Response
     {
-        // tracking user page for stats
-        //  $tracking = $request->attributes->get('_route');
-        //  $this->setTracking($tracking);
         $dos = 1;
         $articles = "";
 

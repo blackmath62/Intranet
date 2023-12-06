@@ -53,15 +53,8 @@ class EntityTypeTest extends BaseTypeTestCase
     private const COMPOSITE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity';
     private const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity';
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var MockObject&ManagerRegistry
-     */
-    private $emRegistry;
+    private EntityManager $em;
+    private MockObject&ManagerRegistry $emRegistry;
 
     protected function setUp(): void
     {
@@ -91,14 +84,6 @@ class EntityTypeTest extends BaseTypeTestCase
             $schemaTool->createSchema($classes);
         } catch (\Exception $e) {
         }
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->em = null;
-        $this->emRegistry = null;
     }
 
     protected function getExtensions()
@@ -233,7 +218,7 @@ class EntityTypeTest extends BaseTypeTestCase
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => fn () => new \stdClass(),

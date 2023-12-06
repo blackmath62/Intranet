@@ -36,7 +36,7 @@ class AbstractRecursivePassTest extends TestCase
             ->setFactory([new Reference('child'), 'createFactory']);
 
         $pass = new class() extends AbstractRecursivePass {
-            public $actual;
+            public \ReflectionMethod $actual;
 
             protected function processValue($value, $isRoot = false): mixed
             {
@@ -62,7 +62,7 @@ class AbstractRecursivePassTest extends TestCase
         $container->setDefinition('foo', new ChildDefinition('parent'));
 
         $pass = new class() extends AbstractRecursivePass {
-            public $actual;
+            public \ReflectionMethod $actual;
 
             protected function processValue($value, $isRoot = false): mixed
             {
@@ -88,7 +88,7 @@ class AbstractRecursivePassTest extends TestCase
         $container->setDefinition('foo', new ChildDefinition('parent'));
 
         $pass = new class() extends AbstractRecursivePass {
-            public $actual;
+            public \ReflectionMethod $actual;
 
             protected function processValue($value, $isRoot = false): mixed
             {
@@ -107,11 +107,11 @@ class AbstractRecursivePassTest extends TestCase
 
     public function testGetConstructorDefinitionNoClass()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid service "foo": the class is not set.');
-
         $container = new ContainerBuilder();
         $container->register('foo');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid service "foo": the class is not set.');
 
         (new class() extends AbstractRecursivePass {
             protected function processValue($value, $isRoot = false): mixed

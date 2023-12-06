@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Tests\Fixtures\ChildOfGroupsAnnotationDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\GroupDummyInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

@@ -20,10 +20,13 @@ use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @group legacy
+ */
 class DataCollectorTranslatorPassTest extends TestCase
 {
-    private $container;
-    private $dataCollectorTranslatorPass;
+    private ContainerBuilder $container;
+    private DataCollectorTranslatorPass $dataCollectorTranslatorPass;
 
     protected function setUp(): void
     {
@@ -34,7 +37,6 @@ class DataCollectorTranslatorPassTest extends TestCase
         $this->container->setParameter('translator_not_implementing_bag', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag');
 
         $this->container->register('translator.data_collector', DataCollectorTranslator::class)
-            ->setPublic(false)
             ->setDecoratedService('translator')
             ->setArguments([new Reference('translator.data_collector.inner')])
         ;

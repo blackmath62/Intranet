@@ -1,123 +1,159 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}
+	{{ title }}
+{% endblock %}
 {% block body %}
 
-<div class="card collapsed-card card-info">
-    <div class="card-header">
-    <h3 class="card-title"><i class="icon fas fa-info-circle pr-2"></i>Informations utiles</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-        </div>
-    </div>
-<!-- /.card-header -->
-    <div class="card-body">
-        <p>Cette liste permet de contrôler les sous références articles présentent sur les articles qui commencent par un prefixe donnée</p>
-        <p>L'intérêt est un contrôle plus rapide pour mise à jour de Divalto et d'éviter de passer dans Sous référence de chaque article pour regarder.</p>
-        <p>Par exemple lors de mise à jour des couleurs ouvertes de CHAPELU chaque année le gain de temps est considérable.</p>
-    </div>
-<!-- /.card-footer-->
-</div>
+	<div class="card collapsed-card card-info">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-info-circle pr-2"></i>Informations utiles</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<p>Cette liste permet de contrôler les sous références articles présentent sur les articles qui commencent par un prefixe donnée</p>
+			<p>L'intérêt est un contrôle plus rapide pour mise à jour de Divalto et d'éviter de passer dans Sous référence de chaque article pour regarder.</p>
+			<p>Par exemple lors de mise à jour des couleurs ouvertes de CHAPELU chaque année le gain de temps est considérable.</p>
+		</div>
+		<!-- /.card-footer-->
+	</div>
 
 
-<div class="row">
-            <div class="col-md-12">
-                <div class="card card-dark">
-                    <!-- /.card-header -->
-                    <div class="card-header d-flex justify-content-between ">
-                        <h3 class="card-title text-center">Liste des Srefs ouvertes sur les articles avec le préfixe ...</h3>
-                        {{ form_start(search, { 'attr' : { 'class' : 'ml-auto' }} ) }}
-                        <div class='d-flex'>
-                            <div class="p-1 mt-2">
-                            Recherche des références produits qui commencent par : 
-                            </div>
-                            <div class="p-1">
-                            {{ form_row(search.search) }}
-                            </div>
-                            <div class="p-1">
-                            {{ form_row(search.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }} ) }}
-                            </div>
-                        </div>
-                        {{ form_end(search)}}
-                    </div>
-                    <div class="card-body">
-                        {% if articles %}    
-                        <table id="example1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"><span>Ref</span></th>
-                                    <th class="text-center"><span>Désignation</span></th>
-                                    <th class="text-center"><span>Sref1</span></th>
-                                    <th class="text-center"><span>Sref2</span></th>
-                                    <th class="text-center"><span>Confidentialité</span></th>
-                                    <th class="text-center"><span>Stock</span></th>
-                                    <th class="text-center"><span>Mouv Cmd Cli</span></th>
-                                    <th class="text-center"><span>Mouv Bl Cli</span></th>
-                                    <th class="text-center"><span>Mouv Cmd Fou</span></th>
-                                    <th class="text-center"><span>Mouv Bl Fou</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-							 
-                                                        
-                              <!-- >boucle -->
-                              {% for article in articles %}
-                                    <tr>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ article.ref }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ article.designation }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ article.sref1 }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ article.sref2 }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ article.conf }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ article.stock }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ article.qteCmdCli }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ article.qteCmdFou }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ article.qteBlCli }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-center text-dark">{{ article.qteBlFou }}</a>
-                                        </td>
-                                    </tr>
-                              {% endfor %}
-                             <!-- >boucle -->
+	<div class="row">
+		<div class="col-md-12">
+			<div
+				class="card card-dark">
+				<!-- /.card-header -->
+				<div class="card-header d-flex justify-content-between ">
+					<h3 class="card-title text-center">Liste des Srefs ouvertes sur les articles avec le préfixe ...</h3>
+					{{ form_start(search, { 'attr' : { 'class' : 'ml-auto' }}
+					) }}
+					<div class='d-flex'>
+						<div class="p-1 mt-2">
+							Recherche des références produits qui commencent par :
+						</div>
+						<div class="p-1">
+							{{ form_row(search.search) }}
+						</div>
+						<div class="p-1">
+							{{ form_row(search.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }}
+							) }}
+						</div>
+					</div>
+					{{ form_end(search)}}
+				</div>
+				<div class="card-body">
+					{% if articles %}
+						<table id="example1" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th class="text-center">
+										<span>REFERENCE</span>
+									</th>
+									<th class="text-center">
+										<span>DESIGNATION</span>
+									</th>
+									<th class="text-center">
+										<span>SREF1</span>
+									</th>
+									<th class="text-center">
+										<span>SREF2</span>
+									</th>
+									<th class="text-center">
+										<span>U.V</span>
+									</th>
+									<th class="text-center">
+										<span>FAMILLE</span>
+									</th>
+									<th class="text-center">
+										<span>SECTEUR</span>
+									</th>
+									<th class="text-center">
+										<span>TVA</span>
+									</th>
+									<th class="text-center">
+										<span>Confidentialité</span>
+									</th>
+									<th class="text-center">
+										<span>Stock</span>
+									</th>
+									<th class="text-center">
+										<span>Mouv Cmd Cli</span>
+									</th>
+									<th class="text-center">
+										<span>Mouv Bl Cli</span>
+									</th>
+									<th class="text-center">
+										<span>Mouv Cmd Fou</span>
+									</th>
+									<th class="text-center">
+										<span>Mouv Bl Fou</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- >boucle -->
+								{% for article in articles %}
+									<tr>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.ref }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.designation }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.sref1 }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.sref2 }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.uv }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.famille }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.metier }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.tva }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.conf }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.stock }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.qteCmdCli }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.qteCmdFou }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.qteBlCli }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ article.qteBlFou }}</a>
+										</td>
+									</tr>
+								{% endfor %}
+								<!-- >boucle -->
 
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th class="text-center"><span>Ref</span></th>
-                                    <th class="text-center"><span>Désignation</span></th>
-                                    <th class="text-center"><span>Sref1</span></th>
-                                    <th class="text-center"><span>Sref2</span></th>
-                                    <th class="text-center"><span>Confidentialité</span></th>
-                                    <th class="text-center"><span>Stock</span></th>
-                                    <th class="text-center"><span>Mouv Cmd Cli</span></th>
-                                    <th class="text-center"><span>Mouv Bl Cli</span></th>
-                                    <th class="text-center"><span>Mouv Cmd Fou</span></th>
-                                    <th class="text-center"><span>Mouv Bl Fou</span></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                        {% else %}
-                            <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter le champs de recherche</h4>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
+							</tbody>
+						</table>
+					{% else %}
+						<h4 class="text-left text-dark">
+							<i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter le champs de recherche</h4>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
-

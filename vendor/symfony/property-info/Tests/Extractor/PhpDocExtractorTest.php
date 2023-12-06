@@ -26,10 +26,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class PhpDocExtractorTest extends TestCase
 {
-    /**
-     * @var PhpDocExtractor
-     */
-    private $extractor;
+    private PhpDocExtractor $extractor;
 
     protected function setUp(): void
     {
@@ -39,7 +36,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract($property, array $type = null, $shortDescription, $longDescription)
+    public function testExtract($property, ?array $type, $shortDescription, $longDescription)
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
         $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
@@ -134,7 +131,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider provideCollectionTypes
      */
-    public function testExtractCollection($property, array $type = null, $shortDescription, $longDescription)
+    public function testExtractCollection($property, ?array $type, $shortDescription, $longDescription)
     {
         $this->testExtract($property, $type, $shortDescription, $longDescription);
     }

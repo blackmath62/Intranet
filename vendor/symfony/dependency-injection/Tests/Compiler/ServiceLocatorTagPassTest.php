@@ -232,10 +232,7 @@ class ServiceLocatorTagPassTest extends TestCase
 
 class Locator
 {
-    /**
-     * @var ServiceLocator
-     */
-    public $locator;
+    public ServiceLocator $locator;
 
     public function __construct(ServiceLocator $locator)
     {

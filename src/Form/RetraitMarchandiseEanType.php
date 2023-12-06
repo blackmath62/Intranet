@@ -5,8 +5,8 @@ namespace App\Form;
 use App\Entity\Main\RetraitMarchandisesEan;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,10 +28,10 @@ class RetraitMarchandiseEanType extends AbstractType
                 'attr' => ['class' => 'form-control col-12',
                     'placeholder' => 'Nom du Chantier'],
             ])
-            ->add('ean', IntegerType::class, [
+            ->add('ean', SearchType::class, [
                 'required' => true,
                 'attr' => ['class' => 'form-control col-12',
-                    'placeholder' => 'Scannez le code EAN'],
+                    'placeholder' => 'Je cherche ....'],
             ])
             ->add('qte', NumberType::class, array(
                 'required' => true,

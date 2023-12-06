@@ -19,9 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
-use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\Exception\LogicException;
 
 /**
@@ -29,56 +27,17 @@ use Symfony\Component\Form\Exception\LogicException;
  */
 class DoctrineChoiceLoaderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
-    /**
-     * @var MockObject&ChoiceListFactoryInterface
-     */
-    private $factory;
-
-    /**
-     * @var MockObject&ObjectManager
-     */
-    private $om;
-
-    /**
-     * @var MockObject&ObjectRepository
-     */
-    private $repository;
-
-    /**
-     * @var string
-     */
-    private $class;
-
-    /**
-     * @var MockObject&IdReader
-     */
-    private $idReader;
-
-    /**
-     * @var MockObject&EntityLoaderInterface
-     */
-    private $objectLoader;
-
-    /**
-     * @var \stdClass
-     */
-    private $obj1;
-
-    /**
-     * @var \stdClass
-     */
-    private $obj2;
-
-    /**
-     * @var \stdClass
-     */
-    private $obj3;
+    private MockObject&ObjectManager $om;
+    private MockObject&ObjectRepository $repository;
+    private string $class;
+    private MockObject&IdReader $idReader;
+    private MockObject&EntityLoaderInterface $objectLoader;
+    private \stdClass $obj1;
+    private \stdClass $obj2;
+    private \stdClass $obj3;
 
     protected function setUp(): void
     {
-        $this->factory = $this->createMock(ChoiceListFactoryInterface::class);
         $this->om = $this->createMock(ObjectManager::class);
         $this->repository = $this->createMock(ObjectRepository::class);
         $this->class = 'stdClass';
@@ -193,9 +152,6 @@ class DoctrineChoiceLoaderTest extends TestCase
 
     public function testLoadValuesForChoicesDoesNotLoadIfSingleIntId()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
-
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
@@ -210,7 +166,10 @@ class DoctrineChoiceLoaderTest extends TestCase
             ->with($this->obj2)
             ->willReturn('2');
 
-        $this->assertSame(['2'], $loader->loadValuesForChoices([$this->obj2]));
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
+
+        $loader->loadValuesForChoices([$this->obj2]);
     }
 
     public function testLoadValuesForChoicesDoesNotLoadIfSingleIntIdAndValueGiven()
@@ -294,17 +253,12 @@ class DoctrineChoiceLoaderTest extends TestCase
 
     public function testLegacyLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
-
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
             $this->idReader,
             $this->objectLoader
         );
-
-        $choices = [$this->obj2, $this->obj3];
 
         $this->idReader->expects($this->any())
             ->method('getIdField')
@@ -316,10 +270,10 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->objectLoader->expects($this->never())
             ->method('getEntitiesByIds');
 
-        $this->assertSame(
-            [4 => $this->obj3, 7 => $this->obj2],
-            $loader->loadChoicesForValues([4 => '3', 7 => '2'])
-        );
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
+
+        $loader->loadChoicesForValues([4 => '3', 7 => '2']);
     }
 
     public function testLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
@@ -415,14 +369,14 @@ class DoctrineChoiceLoaderTest extends TestCase
 
     public function testPassingIdReaderWithoutSingleIdEntity()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "$idReader" argument of "Symfony\\Bridge\\Doctrine\\Form\\ChoiceList\\DoctrineChoiceLoader::__construct" must be null when the query cannot be optimized because of composite id fields.');
-
         $idReader = $this->createMock(IdReader::class);
         $idReader->expects($this->once())
             ->method('isSingleId')
             ->willReturn(false)
         ;
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$idReader" argument of "Symfony\\Bridge\\Doctrine\\Form\\ChoiceList\\DoctrineChoiceLoader::__construct" must be null when the query cannot be optimized because of composite id fields.');
 
         new DoctrineChoiceLoader($this->om, $this->class, $idReader, $this->objectLoader);
     }

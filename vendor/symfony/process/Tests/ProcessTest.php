@@ -28,9 +28,9 @@ use Symfony\Component\Process\Process;
  */
 class ProcessTest extends TestCase
 {
-    private static $phpBin;
-    private static $process;
-    private static $sigchild;
+    private static string $phpBin;
+    private static ?Process $process = null;
+    private static bool $sigchild;
 
     public static function setUpBeforeClass(): void
     {
@@ -198,6 +198,20 @@ class ProcessTest extends TestCase
         $process->wait();
 
         $this->assertSame('foo'.\PHP_EOL, $data);
+    }
+
+    public function testReadSupportIsDisabledWithoutCallback()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Pass the callback to the "Process::start" method or call enableOutput to use a callback with "Process::wait".');
+
+        $process = $this->getProcess('echo foo');
+        // disabling output + not passing a callback to start() => read support disabled
+        $process->disableOutput();
+        $process->start();
+        $process->wait(function ($type, $buffer) use (&$data) {
+            $data .= $buffer;
+        });
     }
 
     /**

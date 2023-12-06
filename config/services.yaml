@@ -10,6 +10,7 @@ parameters:
     doc_lhermitte_affaires: '%kernel.project_dir%/public/doc/Lhermitte_freres/Affaires'
     doc_roby: '%kernel.project_dir%/public/doc/Roby'
     doc: '%kernel.project_dir%/public/doc'
+    fic_joints_Divalto: '//SRVSOFT/FicJoints_R/achat_vente/articles'
     doc_axis: '%kernel.project_dir%/public/doc/Axis'
     doc_francial: '%kernel.project_dir%/public/doc/Francial'
     doc_tickets: '%kernel.project_dir%/public/doc/tickets'

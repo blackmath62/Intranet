@@ -55,9 +55,7 @@ class MiddlewareTest extends TestCase
         if (class_exists(DefaultSchemaManagerFactory::class)) {
             $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
         }
-        if (method_exists($config, 'setLazyGhostObjectEnabled')) {
-            $config->setLazyGhostObjectEnabled(true);
-        }
+        $config->setLazyGhostObjectEnabled(true);
         $this->debugDataHolder = new DebugDataHolder();
         $config->setMiddlewares([new Middleware($this->debugDataHolder, $this->stopwatch)]);
 
@@ -134,7 +132,7 @@ EOT;
         $stmt->bindValue(3, 5, ParameterType::INTEGER);
         $stmt->bindValue(4, $res = $this->getResourceFromString('mydata'), ParameterType::BINARY);
         $stmt->bindValue(5, ['foo', 'bar'], Types::SIMPLE_ARRAY);
-        $stmt->bindValue(6, new \DateTime('2022-06-12 11:00:00'), Types::DATETIME_MUTABLE);
+        $stmt->bindValue(6, new \DateTimeImmutable('2022-06-12 11:00:00'), Types::DATETIME_IMMUTABLE);
 
         $executeMethod($stmt);
 
@@ -279,5 +277,7 @@ EOT;
         $this->conn->beginTransaction();
         $sqlMethod($this->conn, 'SELECT * FROM products');
         $endTransactionMethod($this->conn);
+
+        $this->addToAssertionCount(1);
     }
 }

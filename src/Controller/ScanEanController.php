@@ -13,17 +13,19 @@ use App\Repository\Main\AlimentationEmplacementRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
 use App\Service\EanScannerService;
+use App\Service\ImageService;
+use App\Service\ProductFormService;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Asset\Package;
-use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted("ROLE_USER")]
@@ -35,20 +37,33 @@ class ScanEanController extends AbstractController
     private $mailEnvoi;
     private $entityManager;
     private $eanScannerService;
+    private $productFormService;
+    private $parameterBag;
+    private $imageService;
 
-    public function __construct(EanScannerService $eanScannerService, ManagerRegistry $registry, MailListRepository $repoMail, MailerInterface $mailer)
-    {
+    public function __construct(
+        EanScannerService $eanScannerService,
+        ManagerRegistry $registry,
+        MailListRepository $repoMail,
+        MailerInterface $mailer,
+        ParameterBagInterface $parameterBag,
+        ProductFormService $productFormService,
+        ImageService $imageService
+    ) {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
         $this->eanScannerService = $eanScannerService;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->entityManager = $registry->getManager();
+        $this->parameterBag = $parameterBag;
+        $this->productFormService = $productFormService;
+        $this->imageService = $imageService;
         //parent::__construct();
     }
 
     #[Route("/scan/ean/{chantier}", name: "app_scan_ean")]
 
-    public function index(ArtRepository $repo, Request $request, RetraitMarchandisesEanRepository $repoRetrait, $chantier = null): Response
+    public function index(ImageService $imageService, ArtRepository $repo, Request $request, RetraitMarchandisesEanRepository $repoRetrait, $chantier = null): Response
     {
         $dos = 1;
         $produit = "";
@@ -56,8 +71,46 @@ class ScanEanController extends AbstractController
 
         $formAddPicturesOrDocs = $this->createForm(AddPicturesOrDocsType::class);
         $formAddPicturesOrDocs->handleRequest($request);
+        //dd($request);
+        /*if ($formAddPicturesOrDocs->isSubmitted() && !$formAddPicturesOrDocs->isValid()) {
+        if ($formAddPicturesOrDocs->get('files')->getErrors(true)->count() > 0) {
+        // Il y a des erreurs dans le champ 'files'
+        dd($formAddPicturesOrDocs->get('files')->getErrors(true));
+        }
+        }*/
+
         if ($formAddPicturesOrDocs->isSubmitted() && $formAddPicturesOrDocs->isValid()) {
-            $this->addFlash('danger', 'Cette fonctionnalité n\'est pas encore opérationnelle');
+            //dd($formAddPicturesOrDocs->getData());
+            $files = $formAddPicturesOrDocs->get('files')->getData();
+            $type = $formAddPicturesOrDocs->get('type')->getData();
+            $ref = $formAddPicturesOrDocs->get('reference')->getData();
+            foreach ($files as $file) {
+                // Logique pour traiter chaque fichier
+                $filename = $type . $ref . '_' . $this->getUser()->getPseudo() . '_' . $file->getClientOriginalName();
+                $cheminRelatif = '//SRVSOFT/FicJoints_R/achat_vente/articles/' . $dos . '/' . strtolower($ref);
+                // Vérifier si le répertoire existe
+                if (!file_exists($cheminRelatif)) {
+                    // Créer le répertoire avec les permissions 0777 (modifiable selon vos besoins)
+                    mkdir($cheminRelatif, 0777, true);
+                }
+                $filepath = $cheminRelatif . '/' . $filename;
+
+                // Vérifier si le fichier existe déjà
+                if (!file_exists($filepath)) {
+                    if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+                        // Appeler la méthode du service pour compresser et redimensionner l'image
+                        $processedImage = $imageService->compressAndResize($file, 1000000);
+                        // Enregistrer l'image dans le répertoire souhaité
+                        $processedImage->save($cheminRelatif . '/' . $filename); // Ajustez le chemin selon vos besoins
+                    } else {
+                        $file->move($cheminRelatif, $filename);
+                    }
+                    $this->addFlash('success', 'Le fichier ' . $file->getClientOriginalName() . ' a été ajouté avec succés.');
+                } else {
+                    // Ajouter ici la logique en cas de fichier existant
+                    $this->addFlash('danger', 'Le fichier ' . $file->getClientOriginalName() . ' existe déjà.');
+                }
+            }
         }
 
         $form = $this->createForm(RetraitMarchandiseEanType::class);
@@ -105,7 +158,59 @@ class ScanEanController extends AbstractController
             'chantier' => $chantier,
             "historiques" => $historique,
             'eanScannerScript' => $this->eanScannerService->getScannerScript(),
+            'productFormScript' => $this->productFormService->getProductFormScript(),
         ]);
+    }
+
+    #[Route("/ajax/product/delete/file/{dos}/{ref}/{file}", name: "app_product_delete_file")]
+    public function productDeleteFile($dos, $ref, $file)
+    {
+
+        $filePath = '//SRVSOFT/FicJoints_R/achat_vente/articles/' . $dos . '/' . strtolower($ref) . '/' . $file;
+
+        // Vérifiez si le fichier existe avant de le supprimer
+        if (file_exists($filePath)) {
+            unlink($filePath);
+            $response = new Response("Fichier supprimé avec succès", Response::HTTP_OK);
+        } else {
+            $response = new Response("Le fichier n'existe pas", Response::HTTP_NOT_FOUND);
+        }
+
+        return $response;
+    }
+
+    #[Route("/ajax/product/add/file/{dos}/{type}/{ref}/{file}", name: "app_product_add_file")]
+    public function productAddFile(ImageService $imageService, $dos, $type, $ref, $file)
+    {
+        // Logique pour traiter chaque fichier
+        $filename = $type . $ref . '_' . $this->getUser()->getPseudo() . '_' . $file->getClientOriginalName();
+        $cheminRelatif = '//SRVSOFT/FicJoints_R/achat_vente/articles/' . $dos . '/' . strtolower($ref);
+        // Vérifier si le répertoire existe
+        if (!file_exists($cheminRelatif)) {
+            // Créer le répertoire avec les permissions 0777 (modifiable selon vos besoins)
+            mkdir($cheminRelatif, 0777, true);
+        }
+        $filepath = $cheminRelatif . '/' . $filename;
+
+        // Vérifier si le fichier existe déjà
+        if (!file_exists($filepath)) {
+            if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+                // Appeler la méthode du service pour compresser et redimensionner l'image
+                $processedImage = $imageService->compressAndResize($file, 1000000);
+                // Enregistrer l'image dans le répertoire souhaité
+                $processedImage->save($cheminRelatif . '/' . $filename); // Ajustez le chemin selon vos besoins
+            } else {
+                $file->move($cheminRelatif, $filename);
+            }
+            $this->addFlash('success', 'Le fichier ' . $file->getClientOriginalName() . ' a été ajouté avec succés.');
+            $response = new Response("Fichier ajouté avec succès", Response::HTTP_OK);
+        } else {
+            // Ajouter ici la logique en cas de fichier existant
+            $this->addFlash('danger', 'Le fichier ' . $file->getClientOriginalName() . ' existe déjà.');
+            $response = new Response("Le fichier existe déjà", Response::HTTP_NOT_FOUND);
+        }
+
+        return $response;
     }
 
     #[Route("/scan/ean/delete/{id}/{chantier}", name: "app_scan_ean-delete")]
@@ -116,9 +221,6 @@ class ScanEanController extends AbstractController
         $em = $this->entityManager;
         $em->remove($retrait);
         $em->flush();
-
-        // $route = $request->attributes->get('_route');
-        // $this->setTracking($route);
 
         $this->addFlash('message', 'Article supprimée avec succès');
         return $this->redirectToRoute('app_scan_ean', ['chantier' => $chantier]);
@@ -210,7 +312,7 @@ class ScanEanController extends AbstractController
     }
 
     #[Route("/scan/ean/ajax/{dos}/{ean}", name: "app_scan_ean_ajax")]
-    public function retourProduitAjax(ArtRepository $repo, $dos = null, $ean = null): JsonResponse
+    public function retourProduitAjax(ArtRepository $repo, UrlGeneratorInterface $urlGenerator, $dos = null, $ean = null): JsonResponse
     {
         if ($dos === null) {
             $dos = 1; // Valeur par défaut
@@ -218,11 +320,13 @@ class ScanEanController extends AbstractController
 
         $produit = $repo->getEanStock($dos, $ean);
         $imageExtensions = ['jpg', 'jpeg', 'png'];
+        $fileExtensions = ['pdf', 'docx'];
         $pictures = [];
         $files = [];
 
         if ($produit) {
-            $directory = "//SRVSOFT/FicJoints_R/achat_vente/articles/" . $dos . "/" . strtolower($produit['ref']);
+            //$directory = "//SRVSOFT/FicJoints_R/achat_vente/articles/" . $dos . "/" . strtolower($produit['ref']);
+            $directory = $this->parameterBag->get('fic_joints_Divalto') . '/' . $dos . '/' . strtolower($produit['ref']);
 
             // Vérifier si le dossier existe
             if (is_dir($directory)) {
@@ -233,19 +337,22 @@ class ScanEanController extends AbstractController
                     return $file !== "." && $file !== "..";
                 });
 
-                // Créer un package Asset
-                $assetPackage = new Package(new EmptyVersionStrategy());
-
                 foreach ($allFiles as $file) {
                     $extension = pathinfo($file, PATHINFO_EXTENSION);
 
-                    // Utiliser Asset pour générer l'URL de l'image
-                    $cheminRelatif = "fichiers/" . $dos . "/" . strtolower($produit['ref']) . '/' . $file;
+                    $cheminRelatif = 'https://192.168.50.244/fichiers/' . $dos . '/' . strtolower($produit['ref']) . '/' . $file;
 
-                    if (in_array($extension, $imageExtensions)) {
-                        $pictures[] = $assetPackage->getUrl($cheminRelatif);
-                    } else {
-                        $files[] = $assetPackage->getUrl($cheminRelatif);
+                    if (strpos($file, 'photo_') === 0) {
+                        $pictures[] = $cheminRelatif;
+                    }
+                    if (strpos($file, 'ft_') === 0) {
+                        $files[] = $cheminRelatif;
+                    }
+                    if (strpos($file, 'photo_') !== 0 && strpos($file, 'ft_') !== 0 && in_array($extension, $fileExtensions)) {
+                        $files[] = $cheminRelatif;
+                    }
+                    if (strpos($file, 'photo_') !== 0 && strpos($file, 'ft_') !== 0 && in_array($extension, $imageExtensions)) {
+                        $pictures[] = $cheminRelatif;
                     }
                 }
             }
@@ -432,7 +539,7 @@ class ScanEanController extends AbstractController
         return $this->redirectToRoute('app_scan_ean_alim_empl');
     }
 
-    #[Route("/emplacement/produit/print/{emplacement}", name: "app_scan_emplacement_print")]
+    #[Route("/produit/print/{emplacement}", name: "app_scan_emplacement_print")]
 
     public function print(Request $request, ArtRepository $repo, $emplacement = null)
     {
@@ -456,6 +563,63 @@ class ScanEanController extends AbstractController
             'produits' => $produits,
             'eanScannerScript' => $this->eanScannerService->getScannerScript(),
         ]);
+    }
+
+    #[Route("/products/search/ajax/{dos}/{search}", name: "app_products_search")]
+    public function productsSearch(Request $request, ArtRepository $repo, $dos, $search)
+    {
+        if ($dos === null) {
+            $dos = 1; // Valeur par défaut
+        }
+
+        $produits = "";
+        if (is_numeric($search) && strlen($search) == 13) {
+            $produits = $repo->getSearchArt($dos, $search, 'EAN');
+        } else {
+            $produits = $repo->getSearchArt($dos, $search, 'REF');
+        }
+
+        $imageExtensions = ['jpg', 'jpeg', 'png'];
+        $result = [];
+
+        foreach ($produits as $produit) {
+            $pictures = [];
+            $directory = $this->parameterBag->get('fic_joints_Divalto') . '/' . $dos . '/' . strtolower($produit['ref']);
+
+            // Vérifier si le dossier existe
+            if (is_dir($directory)) {
+                $allFiles = scandir($directory);
+
+                // Filtrer les fichiers et dossiers spéciaux (.) et (..)
+                $allFiles = array_filter($allFiles, function ($file) {
+                    return $file !== "." && $file !== "..";
+                });
+
+                foreach ($allFiles as $file) {
+                    $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+                    $cheminRelatif = 'https://192.168.50.244/fichiers/' . $dos . '/' . strtolower($produit['ref']) . '/' . $file;
+
+                    if (strpos($file, 'photo_') === 0 || (strpos($file, 'photo_') !== 0 && strpos($file, 'ft_') !== 0 && in_array($extension, $imageExtensions))) {
+                        $pictures[] = $cheminRelatif;
+                    }
+                }
+            }
+
+            $result[] = [
+                'ref' => $produit['ref'],
+                'sref1' => $produit['sref1'],
+                'sref2' => $produit['sref2'],
+                'designation' => $produit['designation'],
+                'ean' => $produit['ean'],
+                'uv' => $produit['uv'],
+                'stock' => $produit['stock'],
+                'ferme' => $produit['ferme'],
+                'pictures' => $pictures,
+            ];
+        }
+
+        return new JsonResponse($result);
     }
 
     // Impression étiquette d'emplacement

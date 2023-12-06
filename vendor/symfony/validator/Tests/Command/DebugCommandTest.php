@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Validator\Tests\Command;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Validator\Command\DebugCommand;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
-use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Tests\Dummy\DummyClassOne;
 
 /**
@@ -27,7 +26,7 @@ class DebugCommandTest extends TestCase
 {
     public function testOutputWithClassArgument()
     {
-        $command = new DebugCommand(new LazyLoadingMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        $command = new DebugCommand(new LazyLoadingMetadataFactory(new AttributeLoader()));
 
         $tester = new CommandTester($command);
         $tester->execute(['class' => DummyClassOne::class], ['decorated' => false]);
@@ -83,7 +82,7 @@ TXT
 
     public function testOutputWithPathArgument()
     {
-        $command = new DebugCommand(new LazyLoadingMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        $command = new DebugCommand(new LazyLoadingMetadataFactory(new AttributeLoader()));
 
         $tester = new CommandTester($command);
         $tester->execute(['class' => __DIR__.'/../Dummy'], ['decorated' => false]);

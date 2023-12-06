@@ -249,9 +249,13 @@ class KernelTest extends TestCase
 
     /**
      * @dataProvider getStripCommentsCodes
+     *
+     * @group legacy
      */
     public function testStripComments(string $source, string $expected)
     {
+        $this->expectDeprecation('Since symfony/http-kernel 6.4: Method "Symfony\Component\HttpKernel\Kernel::stripComments()" is deprecated without replacement.');
+
         $output = Kernel::stripComments($source);
 
         // Heredocs are preserved, making the output mixing Unix and Windows line
@@ -558,6 +562,7 @@ EOF
         $kernel->boot();
 
         $this->assertTrue($kernel->warmedUp);
+        $this->assertSame($kernel->getBuildDir(), $kernel->warmedUpBuildDir);
     }
 
     public function testServicesResetter()
@@ -731,7 +736,7 @@ EOF
 
 class TestKernel implements HttpKernelInterface
 {
-    public $terminateCalled = false;
+    public bool $terminateCalled = false;
 
     public function terminate(): void
     {
@@ -750,8 +755,9 @@ class TestKernel implements HttpKernelInterface
 
 class CustomProjectDirKernel extends Kernel implements WarmableInterface
 {
-    public $warmedUp = false;
-    private $baseDir;
+    public bool $warmedUp = false;
+
+    public ?string $warmedUpBuildDir = null;
 
     public function __construct(
         private readonly ?\Closure $buildContainer = null,
@@ -775,9 +781,10 @@ class CustomProjectDirKernel extends Kernel implements WarmableInterface
         return __DIR__.'/Fixtures';
     }
 
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, string $buildDir = null): array
     {
         $this->warmedUp = true;
+        $this->warmedUpBuildDir = $buildDir;
 
         return [];
     }

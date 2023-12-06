@@ -21,10 +21,7 @@ use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
  */
 class DateIntervalNormalizerTest extends TestCase
 {
-    /**
-     * @var DateIntervalNormalizer
-     */
-    private $normalizer;
+    private DateIntervalNormalizer $normalizer;
 
     protected function setUp(): void
     {
@@ -117,6 +114,16 @@ class DateIntervalNormalizerTest extends TestCase
 
         $this->assertDateIntervalEquals($this->getInterval('P3Y2M4DT0H0M0S'), $normalizer->denormalize('P3Y2M4D', \DateInterval::class));
         $this->assertDateIntervalEquals($this->getInterval('P0Y0M0DT12H34M0S'), $normalizer->denormalize('PT12H34M', \DateInterval::class));
+    }
+
+    public function testDenormalizeIntervalWithBothWeeksAndDays()
+    {
+        $input = 'P1W1D';
+        $interval = $this->normalizer->denormalize($input, \DateInterval::class, null, [
+            DateIntervalNormalizer::FORMAT_KEY => '%rP%yY%mM%wW%dDT%hH%iM%sS',
+        ]);
+        $this->assertDateIntervalEquals($this->getInterval($input), $interval);
+        $this->assertSame(8, $interval->d);
     }
 
     public function testDenormalizeExpectsString()

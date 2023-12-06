@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 class ProgressBarTest extends TestCase
 {
-    private $colSize;
+    private string|false $colSize;
 
     protected function setUp(): void
     {
@@ -1001,6 +1001,18 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         rewind($output->getStream());
         $this->assertEquals(
             '  0/10 [>---------------------------]   0%',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testSetFormatWithTimes()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 15, 0);
+        $bar->setFormat('%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%/%remaining:-6s%');
+        $bar->start();
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 0/15 [>---------------------------]   0% < 1 sec/< 1 sec/< 1 sec',
             stream_get_contents($output->getStream())
         );
     }

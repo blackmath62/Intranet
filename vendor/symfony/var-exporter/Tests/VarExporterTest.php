@@ -127,7 +127,7 @@ class VarExporterTest extends TestCase
             \DateTime::createFromFormat('U', 0),
             \DateTimeImmutable::createFromFormat('U', 0),
             $tz = new \DateTimeZone('Europe/Paris'),
-            $interval = ($start = new \DateTime('2009-10-11', $tz))->diff(new \DateTime('2009-10-18', $tz)),
+            $interval = ($start = new \DateTimeImmutable('2009-10-11', $tz))->diff(new \DateTimeImmutable('2009-10-18', $tz)),
             new \DatePeriod($start, $interval, 4),
         ]];
 
@@ -333,17 +333,21 @@ class MyArrayObject extends \ArrayObject
 class GoodNight
 {
     public $good;
+    protected $foo;
+    private $bar;
 
     public function __construct()
     {
         unset($this->good);
+        $this->foo = 'afternoon';
+        $this->bar = 'morning';
     }
 
     public function __sleep(): array
     {
         $this->good = 'night';
 
-        return ['good'];
+        return ['good', 'foo', "\0*\0foo", "\0".__CLASS__."\0bar"];
     }
 }
 

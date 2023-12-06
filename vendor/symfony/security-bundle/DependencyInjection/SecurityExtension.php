@@ -49,6 +49,7 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+use Symfony\Component\Routing\Loader\ContainerLoader;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\PriorityStrategy;
@@ -98,7 +99,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         if (!array_filter($configs)) {
             trigger_deprecation('symfony/security-bundle', '6.3', 'Enabling bundle "%s" and not configuring it is deprecated.', SecurityBundle::class);
             // uncomment the following line in 7.0
-            // throw new InvalidArgumentException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
+            // throw new InvalidConfigurationException(sprintf('Enabling bundle "%s" and not configuring it is not allowed.', SecurityBundle::class));
             return;
         }
 
@@ -170,6 +171,13 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         $this->createFirewalls($config, $container);
+
+        if ($container::willBeAvailable('symfony/routing', ContainerLoader::class, ['symfony/security-bundle'])) {
+            $this->createLogoutUrisParameter($config['firewalls'] ?? [], $container);
+        } else {
+            $container->removeDefinition('security.route_loader.logout');
+        }
+
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
 
@@ -192,9 +200,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $container->getDefinition('security.authorization_checker')->setArgument(3, false);
     }
 
-    /**
-     * @throws \InvalidArgumentException if the $strategy is invalid
-     */
     private function createStrategyDefinition(string $strategy, bool $allowIfAllAbstainDecisions, bool $allowIfEqualGrantedDeniedDecisions): Definition
     {
         return match ($strategy) {
@@ -202,7 +207,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             MainConfiguration::STRATEGY_CONSENSUS => new Definition(ConsensusStrategy::class, [$allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions]),
             MainConfiguration::STRATEGY_UNANIMOUS => new Definition(UnanimousStrategy::class, [$allowIfAllAbstainDecisions]),
             MainConfiguration::STRATEGY_PRIORITY => new Definition(PriorityStrategy::class, [$allowIfAllAbstainDecisions]),
-            default => throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy)),
+            default => throw new InvalidConfigurationException(sprintf('The strategy "%s" is not supported.', $strategy)),
         };
     }
 
@@ -294,12 +299,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $nbUserProviders = \count($userProviders);
 
         if ($nbUserProviders > 1) {
-            $container->setDefinition('security.user_providers', new Definition(ChainUserProvider::class, [$userProviderIteratorsArgument]))
-                ->setPublic(false);
+            $container->setDefinition('security.user_providers', new Definition(ChainUserProvider::class, [$userProviderIteratorsArgument]));
         } elseif (0 === $nbUserProviders) {
             $container->removeDefinition('security.listener.user_provider');
         } else {
-            $container->setAlias('security.user_providers', new Alias(current($providerIds)))->setPublic(false);
+            $container->setAlias('security.user_providers', new Alias(current($providerIds)));
         }
 
         if (1 === \count($providerIds)) {
@@ -594,7 +598,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null, $firewallAuthenticationProviders];
     }
 
-    private function createContextListener(ContainerBuilder $container, string $contextKey, ?string $firewallEventDispatcherId)
+    private function createContextListener(ContainerBuilder $container, string $contextKey, ?string $firewallEventDispatcherId): string
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];
@@ -930,7 +934,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $container
             ->register($id, Expression::class)
-            ->setPublic(false)
             ->addArgument($expression)
         ;
 
@@ -1041,7 +1044,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
     private function isValidIps(string|array $ips): bool
     {
-        $ipsList = array_reduce((array) $ips, static fn (array $ips, string $ip) => array_merge($ips, preg_split('/\s*,\s*/', $ip)), []);
+        $ipsList = array_reduce((array) $ips, fn ($ips, $ip) => array_merge($ips, preg_split('/\s*,\s*/', $ip)), []);
 
         if (!$ipsList) {
             return false;
@@ -1099,5 +1102,21 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         return $this->sortedFactories;
+    }
+
+    private function createLogoutUrisParameter(array $firewallsConfig, ContainerBuilder $container): void
+    {
+        $logoutUris = [];
+        foreach ($firewallsConfig as $name => $config) {
+            if (!$logoutPath = $config['logout']['path'] ?? null) {
+                continue;
+            }
+
+            if ('/' === $logoutPath[0]) {
+                $logoutUris[$name] = $logoutPath;
+            }
+        }
+
+        $container->setParameter('security.logout_uris', $logoutUris);
     }
 }
