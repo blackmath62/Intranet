@@ -179,11 +179,14 @@ class ScanEanController extends AbstractController
         return $response;
     }
 
-    #[Route("/ajax/product/add/file/{dos}/{type}/{ref}/{file}", name: "app_product_add_file")]
-    public function productAddFile(ImageService $imageService, $dos, $type, $ref, $file)
+    #[Route("/ajax/product/add/file/{dos}/{type}/{ref}", name: "app_product_add_file")]
+    public function productAddFile(Request $request, ImageService $imageService, $dos, $type, $ref)
     {
+        // Récupérer le fichier depuis la requête
+        $file = $request->files->get('addFile');
+
         // Logique pour traiter chaque fichier
-        $filename = $type . $ref . '_' . $this->getUser()->getPseudo() . '_' . $file->getClientOriginalName();
+        $filename = $type . $ref . '_' . $this->getUser()->getPseudo() . ' ' . $file->getClientOriginalName();
         $cheminRelatif = '//SRVSOFT/FicJoints_R/achat_vente/articles/' . $dos . '/' . strtolower($ref);
         // Vérifier si le répertoire existe
         if (!file_exists($cheminRelatif)) {

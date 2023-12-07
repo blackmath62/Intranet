@@ -62,7 +62,7 @@ class ProductFormService
                 data.files.forEach(function (file) {
                 fileId++;
                 var fileName = file.split("/").pop();
-                resultFiles.innerHTML += \'<div class="btn-group m-2"><a id="\' + fileId + \'" href="\' + file + \'"target="_blank" class="btn btn-outline-info">\' + fileName + \'</a><a type="button" data-target-id="\' + fileId + \'" class="btn btn-outline-secondary updateButton"><i class="fas fa-xmark"></i></a></div>\';
+                resultFiles.innerHTML += \'<div class="btn-group m-2"><a id="\' + fileId + \'" href="\' + file +  \'" target="_blank" class="btn btn-outline-info">\' + fileName + \'</a><a type="button" data-target-id="\' + fileId + \'" class="btn btn-outline-secondary deleteButton"><i class="fas fa-xmark"></i></a></div>\';
                 });
                 resultFiles.innerHTML += \'</div>\';
                 } else {
@@ -137,6 +137,47 @@ class ProductFormService
                 $("#ean").on("input change", function () {
                 processEAN();
                 });
+
+                function handleFileDeletion(targetId) { // Vérifier le type d\'élément (image ou fichier)
+                    var element = document.getElementById(targetId);
+                    var filePath,
+                    fileName;
+
+                    if (element.tagName.toLowerCase() === "img") { // Pour les images, utilisez l\'attribut src
+                    filePath = element.src;
+                    } else if (element.tagName.toLowerCase() === "a") { // Pour les fichiers, utilisez l\'attribut href
+                    filePath = element.href;
+                    }
+
+                    if (! filePath) {
+                    console.error("Impossible de déterminer le chemin du fichier.");
+                    return;
+                    }
+
+                    fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
+
+                    var isConfirmed = confirm("Êtes-vous sûr de vouloir supprimer le fichier " + fileName + " ?");
+
+                    if (isConfirmed) {
+                    $.ajax({
+                    url: "/ajax/product/delete/file/1/" + document.getElementById("add_pictures_or_docs_reference").value + "/" + fileName,
+                    type: "POST",
+                    success: function (response) {
+                    processEAN();
+                    },
+                    error: function (error) {
+                    console.error("Erreur lors de la suppression du fichier :", error);
+                    }
+                    });
+                    }
+                    }
+
+                    document.addEventListener("DOMContentLoaded", function () {
+                        $(document).on("click", ".deleteButton", function () {
+                            var targetId = $(this).attr("data-target-id");
+                            handleFileDeletion(targetId);
+                        });
+                    });
 
         ';
         return $javascriptCode;

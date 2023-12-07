@@ -241,6 +241,7 @@
 
 	{% endif %}
 
+
 {% endblock %}
 {% block javascripts %}
 	{{ parent() }}
@@ -250,32 +251,35 @@
 	<script>{{ eanScannerScript | raw }}</script>
 	<script>{{ productFormScript | raw }}</script>
 	<script>
-		document.querySelectorAll(".updateButton").forEach(function (button) {
-button.addEventListener("click", function () {
-var target = this.getAttribute("data-target-id");
-console.log(target);
-// Vérifier le type d'élément (image ou fichier)
-if (document.getElementById(target).tagName.toLowerCase() === "img") { // Pour les images, utilisez l'attribut src
-filePath = document.getElementById(target).src;
-} else if (document.getElementById(target).tagName.toLowerCase() === "a") { // Pour les fichiers, utilisez l'attribut href
-filePath = document.getElementById(target).href;
-}
-var fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
+		document.addEventListener("DOMContentLoaded", function () { // Sélectionnez tous les éléments avec la classe addFile
+const fileInputs = document.querySelectorAll('.addFile');
 
-var isConfirmed = confirm("Êtes-vous sûr de vouloir supprimer le fichier " + fileName + " ?");
+// Ajoutez un gestionnaire d'événements pour chaque champ de fichier
+fileInputs.forEach(function (fileInput) {
+fileInput.addEventListener("change", function () { // Vérifiez si un fichier est sélectionné
+if (fileInput.files.length > 0) { // Récupérez l'ID du <i>
+const iconId = fileInput.id;
 
-if (isConfirmed) {
+// Créez un objet FormData pour envoyer le fichier
+const formData = new FormData();
+formData.append("addFile", fileInput.files[0]);
+
+// Effectuez l'envoi AJAX
 $.ajax({
-url: "/ajax/product/delete/file/1/" + document.getElementById("add_pictures_or_docs_reference").value + "/" + fileName,
-type: 'POST',
-success: function (response) {
+url: "/ajax/product/add/file/1/" + iconId + "/" + document.getElementById("add_pictures_or_docs_reference").value,
+type: "POST",
+data: formData,
+contentType: false,
+processData: false,
+success: function (response) { // Traitez la réponse si nécessaire
 processEAN();
 },
-error: function (error) {
-console.error("Erreur lors de la suppression de l\'image :", error);
+error: function (error) { // Traitez les erreurs si nécessaire
+alert('Le nom de fichier existe déjà..., veuillez renommer le fichier ou mettre un autre fichier');
 }
 });
 }
+});
 });
 });
 	</script>
