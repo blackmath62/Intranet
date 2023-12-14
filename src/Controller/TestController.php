@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\Main\HolidayRepository;
+use App\Repository\Main\UsersRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Mailer\MailerInterface;
@@ -21,8 +23,13 @@ class TestController extends AbstractController
 
     #[Route("/test", name: "app_test")]
 
-    public function test_tiers_mal_renseigne()
+    public function test(HolidayRepository $repo, UsersRepository $repoUsers)
     {
+
+        $thisRoleUser = $repo->findHolidayWithUserRole(735, 'ROLE_MONTEUR');
+        if ($thisRoleUser) {
+            dd($repoUsers->findUsersByRole('ROLE_ADMIN_MONTEUR'));
+        }
 
         return $this->render('test/index.html.twig', [
             'title' => 'page de test',

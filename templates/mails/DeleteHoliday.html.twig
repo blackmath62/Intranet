@@ -1,4 +1,4 @@
 <p>Bonjour</p></br>
-<p>Le congés de {% for user in holiday.user %}{{ user.pseudo }}{% endfor %} pour la période du  {{ holiday.start|date('d-m-Y H:i:s') }} au {{ holiday.end|date('d-m-Y H:i:s') }} a été supprimé !</p></br>
+<p>Le congés de {{ holiday.user.pseudo }} pour la période du  {{ holiday.start|date('d-m-Y H:i:s') }} au {{ holiday.end|date('d-m-Y H:i:s') }} a été supprimé !</p></br>
 <p>Intranet Axis</p>
 <p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

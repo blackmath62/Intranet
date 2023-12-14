@@ -141,6 +141,21 @@ class HolidayRepository extends ServiceEntityRepository
         return $resultSet->fetchOne();
     }
 
+    public function findHolidayWithUserRole($holidayId, $role)
+    {
+        $qb = $this->createQueryBuilder('h');
+
+        $qb
+            ->select('h', 'u')
+            ->innerJoin('h.user', 'u')
+            ->where($qb->expr()->eq('h.id', ':holidayId'))
+            ->andWhere($qb->expr()->like('u.roles', ':role'))
+            ->setParameter('holidayId', $holidayId)
+            ->setParameter('role', '%' . $role . '%');
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
     public function getMailDecideurConges()
     {
 
