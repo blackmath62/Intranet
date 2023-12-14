@@ -22,7 +22,6 @@ class ProductFormService
             const eanInput = document.querySelector("#ean");
             window.onload = (event) => {
             eanInput.value = "";
-            document.getElementById("qte").value = "";
             eanInput.focus();
             }
 
@@ -33,7 +32,7 @@ class ProductFormService
                 url: "/scan/ean/ajax/1/" + ean.val(),
                 type: "GET"
                 }).done(function (data) {
-                console.log(data.error);
+                update_imprimer_etiquette_button();
                 const resultRef = document.querySelector(".resultRef");
                 const resultDes = document.querySelector(".resultDes");
                 // const resultEan = document.querySelector(".resultEan");
@@ -48,7 +47,52 @@ class ProductFormService
                 resultRef.textContent = data.ref;
                 resultDes.textContent = data.designation;
                 // resultEan.textContent = data.ean;
-                resultStock.textContent = data.stock !== null ? data.stock : 0;
+
+                // Supposons que data.stock soit un tableau avec les trois colonnes empl, natureStock et qteStock
+if (data.stock && Array.isArray(data.stock)) {
+    const resultStock = document.querySelector(".resultStock");
+
+    // Créez une table pour afficher les informations détaillées du stock
+    const table = document.createElement("table");
+    table.classList.add("table"); // Ajoutez des classes Bootstrap si nécessaire
+
+    // Créez l\'en-tête de la table
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    const headers = ["Emplacement", "Nature du stock", "Quantité"];
+
+    headers.forEach(headerText => {
+        const th = document.createElement("th");
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Créez le corps de la table
+    const tbody = document.createElement("tbody");
+
+    data.stock.forEach(stockRow => {
+        const tr = document.createElement("tr");
+
+        // Ajoutez chaque cellule de la ligne
+        ["empl", "natureStock", "qteStock"].forEach(column => {
+            const td = document.createElement("td");
+            td.textContent = stockRow[column];
+            tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+
+    // Ajoutez la table à votre élément HTML
+    resultStock.appendChild(table);
+}
+
+
                 resultUv.textContent = data.uv;
                 resultFerme.textContent = data.ferme;
                 resultSref1.textContent = data.sref1;
@@ -171,14 +215,180 @@ class ProductFormService
                     });
                     }
                     }
-
                     document.addEventListener("DOMContentLoaded", function () {
                         $(document).on("click", ".deleteButton", function () {
                             var targetId = $(this).attr("data-target-id");
                             handleFileDeletion(targetId);
                         });
                     });
+                    // pour ajouter un fichier par un pour la photo ou fichier selon la page utilisée pour déposer le fichier
+                    document.addEventListener("DOMContentLoaded", function () { // Sélectionnez tous les éléments avec la classe addFile
+                        const fileInputs = document.querySelectorAll(".addFile");
+                        // Supprimez tous les gestionnaires d\'événements change précédemment attachés
+                        //fileInputs.off("change");
+                        // Ajoutez un gestionnaire d\'événements pour chaque champ de fichier
+                        fileInputs.forEach(function (fileInput) {
+                        fileInput.addEventListener("change", function () { // Vérifiez si un fichier est sélectionné
+                        if (fileInput.files.length > 0) { // Récupérez l\'ID du <i>
+                        const iconId = fileInput.id;
 
+                        // Créez un objet FormData pour envoyer le fichier
+                        const formData = new FormData();
+                        formData.append("addFile", fileInput.files[0]);
+                        console.log(iconId);
+
+                        // Effectuez l\'envoi AJAX
+                        $.ajax({
+                        url: "/ajax/product/add/file/1/" + iconId + "/" + document.getElementById("add_pictures_or_docs_reference").value,
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) { // Traitez la réponse si nécessaire
+                            processEAN();
+                        },
+                        error: function (error) { // Traitez les erreurs si nécessaire
+                        alert("Le nom de fichier existe déjà..., veuillez renommer le fichier ou mettre un autre fichier");
+                        }
+                        });
+                        }
+                        });
+                        });
+                        });
+
+                        const imprimerEtiquetteLink = document.getElementById("imprimer-etiquette-button");
+                        const champNombreInput = document.getElementById("champ_nombre");
+                        let linkPath = "";  // Déclarer linkPath en dehors de la fonction
+
+                        function update_imprimer_etiquette_button() {
+                            // Récupérez les valeurs des champs ean et champ_nombre
+                            const eanValue = eanInput.value;
+                            const champNombreValue = champNombreInput.value;
+                            // Construisez le chemin du lien avec les valeurs d\'ean et champ_nombre
+                            linkPath = "/pdf/etiquette/" + eanValue + "/" + champNombreValue;
+                        }
+
+                        champNombreInput.addEventListener("input", function () {
+                            update_imprimer_etiquette_button();
+                        });
+
+                        imprimerEtiquetteLink.addEventListener("click", function (e) {
+                            e.preventDefault();  // Empêche la navigation par défaut du lien
+                            // Effectuez l\'envoi AJAX ici
+                            $.ajax({
+                                url: linkPath,
+                                type: "GET",
+                                success: function (response) {
+                                    // Traitez la réponse si nécessaire
+                                    alert(response);
+                                },
+                                error: function (error) {
+                                    // Traitez les erreurs si nécessaire
+                                    alert(error);
+                                }
+                            });
+                        });
+
+                        // SYSTEME DE RECHERCHE DE PRODUIT PAR DESIGNATION OU CODE PRODUIT
+		document.addEventListener(\'DOMContentLoaded\', function () {
+var openButton = document.getElementById(\'openProductsModal\');
+var modal;
+
+openButton.addEventListener(\'click\', function () {
+var eanInput = document.getElementById(\'ean\');
+var modalTemplate = document.getElementById(\'productsModal\');
+var eanValue = eanInput.value.trim();
+
+if (eanValue.length >= 5) {
+var dosValue = 1;
+var searchValue = encodeURIComponent(eanValue.toUpperCase());
+var openProductCheck = document.getElementById(\'openProductsCheckbox\');
+var checkProd = 0;
+// Tester si la case à cocher est cochée
+if (openProductCheck.checked) {
+checkProd = 1; // Si cochée, assigner la valeur correspondante
+}
+var searchProducts = \'/products/search/ajax/\' + dosValue + \'/\' + searchValue + \'/\' + checkProd;
+
+// Effectuer une requête AJAX
+axios.get(searchProducts).then(function (response) { // Traitez la réponse de la requête AJAX ici
+var numberOfResults = response.data.length;
+// Clonez le modèle à chaque ouverture pour éviter les problèmes après la fermeture
+modal = new bootstrap.Modal(modalTemplate.cloneNode(true));
+if (numberOfResults > 0) {
+modal._element.querySelector(\'.resultQte\').textContent = numberOfResults + " produit(s) trouvé(s)";
+updateProductCards(response.data);
+} else {
+modal._element.querySelector(\'.modal-body\').innerHTML = "<div class=\'info-box mb-3 bg-light\'><span class=\'info-box-icon\'><i class=\'fa-solid text-info fa-face-dizzy fa-2x\'></i></span><div class=\'info-box-content\'><span class=\'info-box-number\'>Veuillez être plus précis dans votre demande</span><span class=\'info-box-text\'>Aucun produit trouvé .....</span ></div></div>";
+}
+
+// Ouvrir la modal
+modal.show();
+}).catch(function (error) { // Gérez les erreurs de la requête AJAX ici
+alert("Erreur lors de la requête AJAX.");
+console.error("Erreur lors de la requête AJAX :", error);
+});
+} else { // Si la condition n\'est pas remplie, affichez une alerte
+alert("Le champ EAN doit contenir au moins 5 caractères.");
+}
+});
+
+function updateProductCards(products) { // Supprimer le contenu existant dans la modal
+var modalContent = modal._element.querySelector(\'.modal-body\');
+modalContent.innerHTML = "";
+
+// Itérer sur chaque produit et créer une carte pour chacun
+products.forEach(function (product) {
+var productCard = createProductCard(product);
+modalContent.appendChild(productCard);
+});
+}
+
+function createProductCard(product) { // Créer une nouvelle carte de produit en utilisant le modèle HTML que vous avez fourni
+var productCardTemplate = document.getElementById(\'produit_light\');
+var productCard = productCardTemplate.cloneNode(true);
+productCard.classList.remove(\'d-none\');
+// Afficher la carte
+
+// Mettre à jour le contenu de la carte avec les données du produit
+productCard.querySelector(\'.resultDes\').textContent = product.designation;
+productCard.querySelector(\'.resultRef\').textContent = product.ref;
+productCard.querySelector(\'.resultSref1\').textContent = product.sref1;
+productCard.querySelector(\'.resultSref2\').textContent = product.sref2;
+productCard.querySelector(\'.resultStock\').textContent = product.stock
+productCard.querySelector(\'.resultFerme\').textContent = product.ferme;
+
+// Mettre à jour l\'URL de l\'image
+var productImage = productCard.querySelector(\'.product-image\');
+if (product.pictures[0]) {
+productImage.src = product.pictures[0];
+} else {
+productImage.src = "/img/autre/noPicture.jpg";
+}
+
+// Ajoutez un gestionnaire d\'événements au bouton "C\'est ce que je cherche !"
+var addToCartButton = productCard.querySelector(\'.trouve\');
+var cardFooter = productCard.querySelector(\'.card-footer\');
+
+if (product.ean) { // Afficher le bouton seulement s\'il y a un EAN
+cardFooter.classList.remove(\'d-none\');
+addToCartButton.innerHTML = "C\'est ce que je cherche ! <i class=\'fa-solid fa-face-laugh-beam\'></i>";
+addToCartButton.addEventListener(\'click\', function () { // Mettez à jour le champ EAN avec le code EAN du produit
+eanInput.value = product.ean;
+// Fermer la modal après avoir mis à jour le champ EAN
+processEAN();
+modal.hide();
+});
+} else { // Afficher un texte différent si pas d\'EAN
+addToCartButton.innerHTML = "Pas de code EAN sur ce produit <i class=\'fa-solid fa-face-frown-open\'></i>";
+// Désactiver le bouton ou masquer, selon votre choix
+addToCartButton.classList.add(\'disabled\', \'btn-danger\');
+// Vous pouvez également masquer la div cardFooter si vous ne voulez pas afficher le bouton du tout
+}
+
+return productCard;
+}
+});
         ';
         return $javascriptCode;
     }

@@ -20,6 +20,7 @@
 		<!-- /.card-header -->
 		<div class="card-body">
 			{% include 'components/product_card.html.twig' %}
+			{% include 'components/product_card_light.html.twig' %}
 			{% include 'components/modal_scanner.html.twig' %}
 			{% include 'components/modal_products.html.twig' %}
 			{{ form_start(form, { 'attr' : { 'class' : 'ml-auto' }}
@@ -37,13 +38,19 @@
 					</div>
 					{{ form_widget(form.ean, { 'id': 'ean', 'name':"ean" , 'attr' : { 'class' : 'form-control col-12 is-warning' } }) }}
 					<div class="input-group-append">
-						<button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#productsModal" data-target-id="ean">
+						<button class="btn btn-secondary" type="button" id="openProductsModal">
 							<i class="fa-solid fa-magnifying-glass"></i>
 						</button>
 					</div>
 				</div>
-				{{ form_errors(form.ean) }}
+				<div class="form-check form-check-lg mt-2">
+					<input class="form-check-input" type="checkbox" id="openProductsCheckbox" checked>
+					<label class="form-check-label" for="openProductsCheckbox">
+						Uniquement les articles ouverts
+					</label>
+				</div>
 			</div>
+			{{ form_errors(form.ean) }}
 			<div id="panier" class="d-none">
 				<div id="stockFaux" class="custom-control custom-switch">
 					{{ form_widget(form.stockFaux) }}
@@ -248,39 +255,10 @@
 
 	<script src="https://unpkg.com/html5-qrcode"></script>
 	<script src="{{ asset("js/html5-qrcode.min.js")}}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 	<script>{{ eanScannerScript | raw }}</script>
 	<script>{{ productFormScript | raw }}</script>
 	<script>
-		document.addEventListener("DOMContentLoaded", function () { // Sélectionnez tous les éléments avec la classe addFile
-const fileInputs = document.querySelectorAll('.addFile');
-
-// Ajoutez un gestionnaire d'événements pour chaque champ de fichier
-fileInputs.forEach(function (fileInput) {
-fileInput.addEventListener("change", function () { // Vérifiez si un fichier est sélectionné
-if (fileInput.files.length > 0) { // Récupérez l'ID du <i>
-const iconId = fileInput.id;
-
-// Créez un objet FormData pour envoyer le fichier
-const formData = new FormData();
-formData.append("addFile", fileInput.files[0]);
-
-// Effectuez l'envoi AJAX
-$.ajax({
-url: "/ajax/product/add/file/1/" + iconId + "/" + document.getElementById("add_pictures_or_docs_reference").value,
-type: "POST",
-data: formData,
-contentType: false,
-processData: false,
-success: function (response) { // Traitez la réponse si nécessaire
-processEAN();
-},
-error: function (error) { // Traitez les erreurs si nécessaire
-alert('Le nom de fichier existe déjà..., veuillez renommer le fichier ou mettre un autre fichier');
-}
-});
-}
-});
-});
-});
+		
 	</script>
 {% endblock %}

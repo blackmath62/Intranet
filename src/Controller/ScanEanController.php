@@ -71,13 +71,6 @@ class ScanEanController extends AbstractController
 
         $formAddPicturesOrDocs = $this->createForm(AddPicturesOrDocsType::class);
         $formAddPicturesOrDocs->handleRequest($request);
-        //dd($request);
-        /*if ($formAddPicturesOrDocs->isSubmitted() && !$formAddPicturesOrDocs->isValid()) {
-        if ($formAddPicturesOrDocs->get('files')->getErrors(true)->count() > 0) {
-        // Il y a des erreurs dans le champ 'files'
-        dd($formAddPicturesOrDocs->get('files')->getErrors(true));
-        }
-        }*/
 
         if ($formAddPicturesOrDocs->isSubmitted() && $formAddPicturesOrDocs->isValid()) {
             //dd($formAddPicturesOrDocs->getData());
@@ -157,6 +150,55 @@ class ScanEanController extends AbstractController
             'produit' => $produit,
             'chantier' => $chantier,
             "historiques" => $historique,
+            'eanScannerScript' => $this->eanScannerService->getScannerScript(),
+            'productFormScript' => $this->productFormService->getProductFormScript(),
+        ]);
+    }
+
+    #[Route("/search/products", name: "app_search_products")]
+
+    public function search_products(ImageService $imageService, ArtRepository $repo, Request $request): Response
+    {
+        $dos = 1;
+
+        $formAddPicturesOrDocs = $this->createForm(AddPicturesOrDocsType::class);
+        $formAddPicturesOrDocs->handleRequest($request);
+
+        if ($formAddPicturesOrDocs->isSubmitted() && $formAddPicturesOrDocs->isValid()) {
+            $files = $formAddPicturesOrDocs->get('files')->getData();
+            $type = $formAddPicturesOrDocs->get('type')->getData();
+            $ref = $formAddPicturesOrDocs->get('reference')->getData();
+            foreach ($files as $file) {
+                // Logique pour traiter chaque fichier
+                $filename = $type . $ref . '_' . $this->getUser()->getPseudo() . '_' . $file->getClientOriginalName();
+                $cheminRelatif = '//SRVSOFT/FicJoints_R/achat_vente/articles/' . $dos . '/' . strtolower($ref);
+                // Vérifier si le répertoire existe
+                if (!file_exists($cheminRelatif)) {
+                    // Créer le répertoire avec les permissions 0777 (modifiable selon vos besoins)
+                    mkdir($cheminRelatif, 0777, true);
+                }
+                $filepath = $cheminRelatif . '/' . $filename;
+
+                // Vérifier si le fichier existe déjà
+                if (!file_exists($filepath)) {
+                    if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+                        // Appeler la méthode du service pour compresser et redimensionner l'image
+                        $processedImage = $imageService->compressAndResize($file, 1000000);
+                        // Enregistrer l'image dans le répertoire souhaité
+                        $processedImage->save($cheminRelatif . '/' . $filename); // Ajustez le chemin selon vos besoins
+                    } else {
+                        $file->move($cheminRelatif, $filename);
+                    }
+                    $this->addFlash('success', 'Le fichier ' . $file->getClientOriginalName() . ' a été ajouté avec succés.');
+                } else {
+                    // Ajouter ici la logique en cas de fichier existant
+                    $this->addFlash('danger', 'Le fichier ' . $file->getClientOriginalName() . ' existe déjà.');
+                }
+            }
+        }
+        return $this->render('scan_ean/rechercheProduits.html.twig', [
+            'title' => 'Recherche produits',
+            'formAddPicturesOrDocs' => $formAddPicturesOrDocs->createView(),
             'eanScannerScript' => $this->eanScannerService->getScannerScript(),
             'productFormScript' => $this->productFormService->getProductFormScript(),
         ]);
@@ -321,7 +363,9 @@ class ScanEanController extends AbstractController
             $dos = 1; // Valeur par défaut
         }
 
+        $location = [];
         $produit = $repo->getEanStock($dos, $ean);
+        $location = $repo->getStockByLocation($dos, $produit['ean']);
         $imageExtensions = ['jpg', 'jpeg', 'png'];
         $fileExtensions = ['pdf', 'docx'];
         $pictures = [];
@@ -367,7 +411,7 @@ class ScanEanController extends AbstractController
                 'designation' => $produit['designation'],
                 'ean' => $produit['ean'],
                 'uv' => $produit['uv'],
-                'stock' => $produit['stock'],
+                'stock' => $location,
                 'ferme' => $produit['ferme'],
                 'pictures' => $pictures,
                 'files' => $files,
@@ -554,9 +598,9 @@ class ScanEanController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             if (is_numeric($form->getData()['search']) && strlen($form->getData()['search']) == 13) {
-                $produits = $repo->getSearchArt($dos, $form->getData()['search'], 'EAN');
+                $produits = $repo->getSearchArt($dos, $form->getData()['search'], 'EAN', null);
             } else {
-                $produits = $repo->getSearchArt($dos, $form->getData()['search'], 'REF');
+                $produits = $repo->getSearchArt($dos, $form->getData()['search'], 'REF', null);
             }
         }
 
@@ -568,19 +612,15 @@ class ScanEanController extends AbstractController
         ]);
     }
 
-    #[Route("/products/search/ajax/{dos}/{search}", name: "app_products_search")]
-    public function productsSearch(Request $request, ArtRepository $repo, $dos, $search)
+    #[Route("/products/search/ajax/{dos}/{search}/{checkProd}", name: "app_products_search")]
+    public function productsSearch(ArtRepository $repo, $dos, $search, $checkProd)
     {
         if ($dos === null) {
             $dos = 1; // Valeur par défaut
         }
 
         $produits = "";
-        if (is_numeric($search) && strlen($search) == 13) {
-            $produits = $repo->getSearchArt($dos, $search, 'EAN');
-        } else {
-            $produits = $repo->getSearchArt($dos, $search, 'REF');
-        }
+        $produits = $repo->getSearchArt($dos, $search, 'REF', $checkProd);
 
         $imageExtensions = ['jpg', 'jpeg', 'png'];
         $result = [];

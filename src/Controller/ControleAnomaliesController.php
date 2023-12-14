@@ -166,6 +166,7 @@ class ControleAnomaliesController extends AbstractController
         }
 
         if ($this->isWeekend($dateDuJour) == false) {
+            $this->eanEnDouble();
             $this->ControleClient();
             $this->ControleFournisseur();
             $this->ControleArticle();
@@ -383,10 +384,24 @@ class ControleAnomaliesController extends AbstractController
         }
 
     }
+    public function eanEnDouble()
+    {
+        // envoyer un mail
+        $donnees = $this->article->getDoubleEan();
+        if ($donnees) {
+            $template = 'mails/MailEanDouble.html.twig';
+            $html = $this->renderView($template, ['donnees' => $donnees]);
+            $email = (new Email())
+                ->from($this->mailEnvoi)
+                ->to('jpochet@groupe-axis.fr')
+                ->subject('Code Ean en doublon dans Divalto')
+                ->html($html);
+            $this->mailer->send($email);
+        }
+    }
 
     public function Execute($donnees, $libelle, $template, $subject)
     {
-
         $dateDuJour = new DateTime();
         //dd($donnees);
         // TODO il existe un cas de figure ou ma macro ne mets rien à jour, même pas l'update,

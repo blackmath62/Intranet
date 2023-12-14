@@ -392,14 +392,55 @@ class ArtRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
-    public function getSearchArt($dos, $produit, $type): array
+    public function getDoubleEan()
     {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(*) AS nbr_doublon, s.EAN
+        FROM SARTEAN s
+        WHERE s.DOS = 1
+        GROUP BY s.EAN
+        HAVING COUNT(*) > 1
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getStockByLocation($dos, $ean)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT ref, sref1, sref2, designation, uv, ean, empl, natureStock, SUM(qteStock) qteStock
+        FROM(
+        SELECT LTRIM(RTRIM(st.REFERENCE)) AS ref, LTRIM(RTRIM(st.SREFERENCE1)) AS sref1, LTRIM(RTRIM(st.SREFERENCE2)) AS sref2,
+        LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(a.VENUN)) AS uv,LTRIM(RTRIM(st.EMPLACEMENT)) AS empl,
+        LTRIM(RTRIM(nat.LIB)) AS natureStock, st.QTETJSENSTOCK AS qteStock,LTRIM(RTRIM(ean.EAN)) AS ean
+        FROM MVTL_STOCK_V AS st
+        LEFT JOIN SARTEAN ean ON st.DOSSIER = ean.DOS AND st.REFERENCE = ean.REF AND st.SREFERENCE1 = ean.SREF1 AND st.SREFERENCE2 = ean.SREF2
+        INNER JOIN ART a ON a.DOS = st.DOSSIER AND a.REF = st.REFERENCE
+        LEFT JOIN T025 nat ON st.NATURESTOCK = nat.NST
+        WHERE st.DOSSIER = $dos)rep
+        WHERE ean = '$ean'
+        GROUP BY ref, sref1, sref2, designation, uv, empl, natureStock, ean
+        ORDER BY ref
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getSearchArt($dos, $produit, $type, $hsdt): array
+    {
+        if ($hsdt == 0) {
+            $hsdt = "";
+        }
+        if ($hsdt == 1) {
+            $hsdt = " AND ferme IS NULL";
+        }
         if ($type == 'EAN') {
             $where = "ean = '$produit'";
         } elseif ($type == 'REF') {
             $where = "(ref LIKE '%$produit%' OR designation LIKE '%$produit%')";
         }
-
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT ref AS ref, sref1 AS sref1, sref2 AS sref2, designation AS designation, uv AS uv, SUM(stock) AS stock, ean AS ean, ferme AS ferme, color AS color
         FROM(
@@ -421,7 +462,7 @@ class ArtRepository extends ServiceEntityRepository
         LEFT JOIN SART s ON a.DOS = s.DOS AND a.REF = s.REF
         LEFT JOIN MVTL_STOCK_V m ON a.REF = m.REFERENCE AND s.SREF1 = m.SREFERENCE1 AND s.SREF2 = m.SREFERENCE2
         WHERE a.DOS = $dos)reponse
-        WHERE $where
+        WHERE $where $hsdt
         GROUP BY ref, sref1, sref2, designation, uv, ean, ferme, color
         ";
         $stmt = $conn->prepare($sql);

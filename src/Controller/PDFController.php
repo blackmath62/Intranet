@@ -73,9 +73,6 @@ class PDFController extends AbstractController
             array(0, 0, 0, 10) // padding (use absolute or negative values as multiplication factors)
         )->setBackgroundColor('white'); // background color
 
-        // output the barcode as HTML div (see other output formats in the documentation and examples)
-        //echo $bobj->getHtmlDiv();
-
         $produit = $repo->getEanStock($dos, $ean);
         $htmlPdf = $this->renderView('pdf/pdfEtiquette.html.twig', ['produit' => $produit, 'ean' => $bobj->getHtmlDiv()]);
         $pdf->setOption('page-height', '40mm');
@@ -86,19 +83,15 @@ class PDFController extends AbstractController
         $pdf->setOption('margin-top', 1);
         $pdf->setOption('orientation', 'Portrait');
         $pdf->setOption('print-media-type', true);
-        //$pdf->setOption('header-font-size', 10);
         $pdf->setOption('zoom', false);
-        //dd($qte);
         for ($i = 1; $i <= $qte; $i++) {
             $file = 'C:/wamp64/www/Intranet/bin/' . $ean . '-' . $i . '.pdf';
             @unlink($file);
             $pdf->generateFromHtml($htmlPdf, $file);
         }
-        //$this->runPowerShell();
 
-        $this->addFlash('message', 'Ajouté à la file d\'attente d\'impression !');
-        return $this->redirectToRoute('app_scan_emplacement_print');
-
+        $response = new Response("Fichier(s) ajouté(s) à la file", Response::HTTP_OK);
+        return $response;
     }
 
     #[Route("/emplacement/pdf/etiquette/{dos}/{empl1}/{empl2}", name: "app_send_pdf_etiquette_emplacement")]

@@ -1,5 +1,5 @@
-<div id="produit" class="d-none">
-	<div class="col-12 col-sm-6">
+<div id="produit_light" class="d-none card text-center bg-dark">
+	<div class="col-12 card-header ">
 		<h5 class="d-inline-block resultDes"></h5>
 		<span class="float-right resultRef"></span>
 		<div class="row mt-4">
@@ -8,7 +8,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-12 col-sm-6">
+	<div class="col-12 card-body">
 		<ul class="nav flex-column">
 			<li class="nav-item d-flex justify-content-between">
 				<small id="sref1" class="nav-link">
@@ -33,10 +33,14 @@
 			<li class="nav-item d-flex justify-content-between">
 				<small id="ferme" class="nav-link">
 					<b class="mr-1">Date Fermeture :</b>
-					<span class="float-right resultFerme"></span>
+					<span class="float-right resultFerme text-danger"></span>
 				</small>
 			</li>
 		</ul>
 	</div>
-	<a class="btn btn-primary col-12">Ajouter au panier</a>
+	<div class="card-footer">
+		<a class="btn btn-success col-12 trouve">
+			C'est ce que je cherche !
+		</a>
+	</div>
 </div>
