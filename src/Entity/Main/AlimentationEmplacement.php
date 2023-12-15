@@ -30,6 +30,9 @@ class AlimentationEmplacement
     #[ORM\Column(type: "string", length: 13)]
     private $ean;
 
+    #[ORM\Column(length: 255)]
+    private ?string $qte = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -91,6 +94,18 @@ class AlimentationEmplacement
     public function setEan(string $ean): self
     {
         $this->ean = $ean;
+
+        return $this;
+    }
+
+    public function getQte(): ?string
+    {
+        return $this->qte;
+    }
+
+    public function setQte(string $qte): static
+    {
+        $this->qte = $qte;
 
         return $this;
     }

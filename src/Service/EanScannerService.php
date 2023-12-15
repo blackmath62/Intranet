@@ -24,8 +24,15 @@ class EanScannerService
                 txt.textContent = decodedText;
                 // Mettre à jour la valeur de l\'input avec le résultat du scan
                 $("#" + targetId).val(decodedText);
+                // Construire le nom de la fonction
+                const functionName = "process" + targetId.charAt(0).toUpperCase() + targetId.slice(1).toLowerCase();
+                // Vérifier si la fonction existe avant de l\'appeler
+                if (typeof window[functionName] === "function") {
+                    window[functionName]();
+                } else {
+                    console.error("La fonction ${functionName} n\'existe pas.");
+                }
                 closeScannerModal();
-                processEAN();
         }
 
         // Fonction pour démarrer la caméra

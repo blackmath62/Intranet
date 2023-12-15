@@ -63,7 +63,7 @@ class ScanEanController extends AbstractController
 
     #[Route("/scan/ean/{chantier}", name: "app_scan_ean")]
 
-    public function index(ImageService $imageService, ArtRepository $repo, Request $request, RetraitMarchandisesEanRepository $repoRetrait, $chantier = null): Response
+    public function index(ArtRepository $repo, Request $request, RetraitMarchandisesEanRepository $repoRetrait, $chantier = null): Response
     {
         $dos = 1;
         $produit = "";
@@ -92,7 +92,7 @@ class ScanEanController extends AbstractController
                 if (!file_exists($filepath)) {
                     if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
                         // Appeler la méthode du service pour compresser et redimensionner l'image
-                        $processedImage = $imageService->compressAndResize($file, 1000000);
+                        $processedImage = $this->imageService->compressAndResize($file, 1000000);
                         // Enregistrer l'image dans le répertoire souhaité
                         $processedImage->save($cheminRelatif . '/' . $filename); // Ajustez le chemin selon vos besoins
                     } else {
@@ -145,11 +145,11 @@ class ScanEanController extends AbstractController
         return $this->render('scan_ean/index.html.twig', [
             'title' => 'Retrait produits',
             'form' => $form->createView(),
-            'formAddPicturesOrDocs' => $formAddPicturesOrDocs->createView(),
             'productData' => $productData,
             'produit' => $produit,
             'chantier' => $chantier,
             "historiques" => $historique,
+            'formAddPicturesOrDocs' => $formAddPicturesOrDocs->createView(),
             'eanScannerScript' => $this->eanScannerService->getScannerScript(),
             'productFormScript' => $this->productFormService->getProductFormScript(),
         ]);
@@ -468,6 +468,43 @@ class ScanEanController extends AbstractController
                 return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
             }
         }
+        $formAddPicturesOrDocs = $this->createForm(AddPicturesOrDocsType::class);
+        $formAddPicturesOrDocs->handleRequest($request);
+
+        if ($formAddPicturesOrDocs->isSubmitted() && $formAddPicturesOrDocs->isValid()) {
+            //dd($formAddPicturesOrDocs->getData());
+            $files = $formAddPicturesOrDocs->get('files')->getData();
+            $type = $formAddPicturesOrDocs->get('type')->getData();
+            $ref = $formAddPicturesOrDocs->get('reference')->getData();
+            foreach ($files as $file) {
+                // Logique pour traiter chaque fichier
+                $filename = $type . $ref . '_' . $this->getUser()->getPseudo() . '_' . $file->getClientOriginalName();
+                $cheminRelatif = '//SRVSOFT/FicJoints_R/achat_vente/articles/' . $dos . '/' . strtolower($ref);
+                // Vérifier si le répertoire existe
+                if (!file_exists($cheminRelatif)) {
+                    // Créer le répertoire avec les permissions 0777 (modifiable selon vos besoins)
+                    mkdir($cheminRelatif, 0777, true);
+                }
+                $filepath = $cheminRelatif . '/' . $filename;
+
+                // Vérifier si le fichier existe déjà
+                if (!file_exists($filepath)) {
+                    if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+                        // Appeler la méthode du service pour compresser et redimensionner l'image
+                        $processedImage = $this->imageService->compressAndResize($file, 1000000);
+                        // Enregistrer l'image dans le répertoire souhaité
+                        $processedImage->save($cheminRelatif . '/' . $filename); // Ajustez le chemin selon vos besoins
+                    } else {
+                        $file->move($cheminRelatif, $filename);
+                    }
+                    $this->addFlash('success', 'Le fichier ' . $file->getClientOriginalName() . ' a été ajouté avec succés.');
+                } else {
+                    // Ajouter ici la logique en cas de fichier existant
+                    $this->addFlash('danger', 'Le fichier ' . $file->getClientOriginalName() . ' existe déjà.');
+                }
+            }
+        }
+
         if ($emplacement) {
             $histo = $repoRetrait->findBy(['emplacement' => $emplacement, 'sendAt' => null]);
             for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
@@ -488,6 +525,9 @@ class ScanEanController extends AbstractController
             'produit' => $produit,
             'emplacement' => $emplacement,
             "historiques" => $historique,
+            'formAddPicturesOrDocs' => $formAddPicturesOrDocs->createView(),
+            'eanScannerScript' => $this->eanScannerService->getScannerScript(),
+            'productFormScript' => $this->productFormService->getProductFormScript(),
         ]);
     }
 

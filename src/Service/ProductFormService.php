@@ -25,7 +25,38 @@ class ProductFormService
             eanInput.focus();
             }
 
-            function processEAN() {
+            const emplacement = $("#emplacement");
+
+            $(document).ready(function () {
+            if (emplacement.length) {
+            emplacement.on("input change", function () {
+            processEmplacement();
+            });
+            }
+            });
+
+            function processEmplacement() {
+            const emplacementValue = emplacement.val();
+
+            if (emplacementValue) {
+            $.ajax({
+            url: "/emplacement/scan/ajax/1/" + emplacementValue,
+            type: "GET"
+            }).done(function (data) {
+
+            if (data.empl === false) {
+            emplacement.removeClass("is-valid").addClass("is-invalid");
+            } else {
+            emplacement.removeClass("is-invalid").addClass("is-valid");
+            }
+
+            // Fermer la modal ici après avoir traité le scan de l\'emplacement
+            closeScannerModal();
+            });
+            }
+            }
+
+            function processEan() {
                 const ean = $("#ean");
                 if (ean.val().length === 13) {
                 $.ajax({
@@ -48,49 +79,56 @@ class ProductFormService
                 resultDes.textContent = data.designation;
                 // resultEan.textContent = data.ean;
 
-                // Supposons que data.stock soit un tableau avec les trois colonnes empl, natureStock et qteStock
-if (data.stock && Array.isArray(data.stock)) {
-    const resultStock = document.querySelector(".resultStock");
+                if (data.stock && Array.isArray(data.stock) && data.stock.length > 0) {
+                    const resultStock = document.querySelector(".resultStock");
 
-    // Créez une table pour afficher les informations détaillées du stock
-    const table = document.createElement("table");
-    table.classList.add("table"); // Ajoutez des classes Bootstrap si nécessaire
+                    // Supprimez le contenu existant avant d\'ajouter la nouvelle table
+                    resultStock.innerHTML = "";
 
-    // Créez l\'en-tête de la table
-    const thead = document.createElement("thead");
-    const headerRow = document.createElement("tr");
-    const headers = ["Emplacement", "Nature du stock", "Quantité"];
+                    // Créez une table pour afficher les informations détaillées du stock
+                    const table = document.createElement("table");
+                    table.classList.add("table"); // Ajoutez des classes Bootstrap si nécessaire
 
-    headers.forEach(headerText => {
-        const th = document.createElement("th");
-        th.textContent = headerText;
-        headerRow.appendChild(th);
-    });
+                    // Créez l\'en-tête de la table
+                    const thead = document.createElement("thead");
+                    const headerRow = document.createElement("tr");
+                    const headers = ["Emplacement", "Nature du stock", "Quantité"];
 
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
+                    headers.forEach(headerText => {
+                        const th = document.createElement("th");
+                        th.textContent = headerText;
+                        headerRow.appendChild(th);
+                    });
 
-    // Créez le corps de la table
-    const tbody = document.createElement("tbody");
+                    thead.appendChild(headerRow);
+                    table.appendChild(thead);
 
-    data.stock.forEach(stockRow => {
-        const tr = document.createElement("tr");
+                    // Créez le corps de la table
+                    const tbody = document.createElement("tbody");
 
-        // Ajoutez chaque cellule de la ligne
-        ["empl", "natureStock", "qteStock"].forEach(column => {
-            const td = document.createElement("td");
-            td.textContent = stockRow[column];
-            tr.appendChild(td);
-        });
+                    data.stock.forEach(stockRow => {
+                        const tr = document.createElement("tr");
 
-        tbody.appendChild(tr);
-    });
+                        // Ajoutez chaque cellule de la ligne
+                        ["empl", "natureStock", "qteStock"].forEach(column => {
+                            const td = document.createElement("td");
+                            td.textContent = stockRow[column];
+                            tr.appendChild(td);
+                        });
 
-    table.appendChild(tbody);
+                        tbody.appendChild(tr);
+                    });
 
-    // Ajoutez la table à votre élément HTML
-    resultStock.appendChild(table);
-}
+                    table.appendChild(tbody);
+
+                    // Ajoutez la table à votre élément HTML
+                    resultStock.appendChild(table);
+                } else {
+                    // Affichez 0 ou un message approprié
+                    const resultStock = document.querySelector(".resultStock");
+                    resultStock.textContent = "0";
+                }
+
 
 
                 resultUv.textContent = data.uv;
@@ -173,13 +211,13 @@ if (data.stock && Array.isArray(data.stock)) {
                 }
                 }
 
-                $(document).ready(function () { // pour détecter les modifications en temps réel
+                $(document).ready(function () { // pour détecter les modifications en temps réel du champ EAN
                 $("#ean").on("input", function () {
-                processEAN();
+                processEan();
                 });
                 });
                 $("#ean").on("input change", function () {
-                processEAN();
+                processEan();
                 });
 
                 function handleFileDeletion(targetId) { // Vérifier le type d\'élément (image ou fichier)
@@ -207,7 +245,7 @@ if (data.stock && Array.isArray(data.stock)) {
                     url: "/ajax/product/delete/file/1/" + document.getElementById("add_pictures_or_docs_reference").value + "/" + fileName,
                     type: "POST",
                     success: function (response) {
-                    processEAN();
+                    processEan();
                     },
                     error: function (error) {
                     console.error("Erreur lors de la suppression du fichier :", error);
@@ -235,7 +273,6 @@ if (data.stock && Array.isArray(data.stock)) {
                         // Créez un objet FormData pour envoyer le fichier
                         const formData = new FormData();
                         formData.append("addFile", fileInput.files[0]);
-                        console.log(iconId);
 
                         // Effectuez l\'envoi AJAX
                         $.ajax({
@@ -245,7 +282,7 @@ if (data.stock && Array.isArray(data.stock)) {
                         contentType: false,
                         processData: false,
                         success: function (response) { // Traitez la réponse si nécessaire
-                            processEAN();
+                            processEan();
                         },
                         error: function (error) { // Traitez les erreurs si nécessaire
                         alert("Le nom de fichier existe déjà..., veuillez renommer le fichier ou mettre un autre fichier");
@@ -376,7 +413,7 @@ addToCartButton.innerHTML = "C\'est ce que je cherche ! <i class=\'fa-solid fa-f
 addToCartButton.addEventListener(\'click\', function () { // Mettez à jour le champ EAN avec le code EAN du produit
 eanInput.value = product.ean;
 // Fermer la modal après avoir mis à jour le champ EAN
-processEAN();
+processEan();
 modal.hide();
 });
 } else { // Afficher un texte différent si pas d\'EAN

@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Main\AlimentationEmplacement;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,7 +25,7 @@ class AlimentationEmplacementEanType extends AbstractType
                 'label' => 'Emplacement',
                 'attr' => ['class' => 'form-control col-12'],
             ])
-            ->add('ean', IntegerType::class, [
+            ->add('ean', TextType::class, [
                 'required' => true,
                 'label' => 'Code EAN',
                 'attr' => ['class' => 'form-control col-12'],
