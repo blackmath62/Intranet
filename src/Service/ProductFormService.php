@@ -56,6 +56,8 @@ class ProductFormService
             }
             }
 
+            const oldLocationField = $(\'#alimentation_emplacement_ean_oldLocation\');
+
             function processEan() {
                 const ean = $("#ean");
                 if (ean.val().length === 13) {
@@ -130,6 +132,11 @@ class ProductFormService
                 }
 
 
+                if (oldLocationField.length) {
+                    alimSource(data.stock);
+                }
+
+
 
                 resultUv.textContent = data.uv;
                 resultFerme.textContent = data.ferme;
@@ -175,9 +182,15 @@ class ProductFormService
 
                 if (data.ean == null) { // Le produit n\'a pas été trouvé, donc marquez le champ EAN comme invalide
                 $("#ean").attr("class", "form-control col-12 is-invalid");
+                if (oldLocationField.length) {
+                    alimSource(data.stock);
+                }
                 $("#produit").attr("class", "d-none");
                 } else { // Le produit a été trouvé, marquez le champ EAN comme valide
                 $("#ean").attr("class", "form-control col-12 is-valid");
+                if (oldLocationField.length) {
+                    alimSource(data.stock);
+                }
                 $("#produit").attr("class", "mt-3");
                 document.getElementById("add_pictures_or_docs_reference").value = data.ref;
                 }

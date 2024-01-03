@@ -33,6 +33,9 @@ class AlimentationEmplacement
     #[ORM\Column(length: 255)]
     private ?string $qte = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $oldLocation = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -106,6 +109,18 @@ class AlimentationEmplacement
     public function setQte(string $qte): static
     {
         $this->qte = $qte;
+
+        return $this;
+    }
+
+    public function getOldLocation(): ?string
+    {
+        return $this->oldLocation;
+    }
+
+    public function setOldLocation(?string $oldLocation): static
+    {
+        $this->oldLocation = $oldLocation;
 
         return $this;
     }

@@ -1112,7 +1112,7 @@ class StatesController extends AbstractController
         return $this->render('states_lhermitte/client3Ans.html.twig', [
             'form' => $form->createView(),
             'title' => 'States client 3 ans tous métiers',
-            'clients' => $clis,
+            'clients' => $clients,
             'familles' => $familles,
         ]);
     }

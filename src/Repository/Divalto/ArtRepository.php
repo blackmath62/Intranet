@@ -380,6 +380,18 @@ class ArtRepository extends ServiceEntityRepository
         return $resultSet->fetchOne();
     }
 
+    public function getAllEmpl($dos)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(e.LIEU)) AS empl
+        FROM T018 e
+        WHERE e.DOS = $dos
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     public function gettrancheEmpl($dos, $empl1, $empl2)
     {
         $conn = $this->getEntityManager()->getConnection();

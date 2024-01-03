@@ -1,0 +1,41 @@
+<p>Bonjour,</p>
+
+<p>
+	<u>
+		<strong>Veuillez trouver en piéce jointe :</strong>
+	</u>
+</p>
+<p>
+	<u>
+		<strong>Le fichier pour intégrer l'info dépôt sur l'article. (Table article)</strong>
+	</u>
+	<ul>
+		<li>Menu Divalto => Import-Export Articles et Catalogue externe</li>
+		<li>Paramétre 'Phase' => Intégration</li>
+		<li>Paramétre 'Mode' => Mise à jour</li>
+		<li>En validant avec le V, allez chercher le fichier que vous aurez au préalable copié sur votre bureau de session à distance pour l'intégrer !</li>
+	</ul>
+</p>
+<p>
+	<u>
+		<strong>Le fichier pour intégrer les régularisations internes. ( Import Stock 'date')</strong>
+	</u>
+	<ul>
+		<li>Menu Divalto => Import de Piéces par tableur</li>
+		<li>Paramétre 'Type de traitement' => Stock</li>
+		<li>Paramétre 'Phase' => Import</li>
+		<li>Paramétre 'Mise à jour' => Mise à jour réelle</li>
+		<li>Paramétre 'Ouvrir le classeur à la fin du traitement' => Coché</li>
+		<li>En validant avec le V, allez chercher le fichier que vous aurez au préalable copié sur votre bureau de session à distance pour l'intégrer !</li>
+	</ul>
+</p>
+{% if commentaire %}
+
+	<p>Un commentaire a été ajouté :</p>
+
+	<p>
+		<strong>{{ commentaire|raw }}</strong>
+	</p>
+{% endif %}
+<p>Intranet Axis</p>
+<p>Merci de ne pas répondre à l'adresse intranet@groupe-axis.fr</p>

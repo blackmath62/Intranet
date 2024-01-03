@@ -64,8 +64,23 @@
 				</label>
 			</div>
 		</div>
-		<!-- /.card -->
-		<!-- /.card-body -->
+		<div class="form-group mt-2">
+			<label class="col-form-label" for="oldLocation">
+				<i class="fa-solid fa-right-left"></i>
+				{{ form_label(form.oldLocation) }}
+			</label>
+			{{ form_widget(form.oldLocation, {'attr': {'disabled': true}}) }}
+			<small>Transférer le stock d'un autre emplacement ou ajouter la quantité sur cet emplacement</small>
+			{{ form_errors(form.oldLocation) }}
+		</div>
+		<div class="form-group mt-2">
+			<label class="col-form-label" for="qte">
+				<i class="fa-solid fa-calculator"></i>
+				{{ form_label(form.qte) }}
+			</label>
+			{{ form_widget(form.qte, {'id': 'qte', 'type': 'number', 'attr': {'class': 'form-control col-12', 'step': '0.001', 'min': '0'}}) }}
+			{{ form_errors(form.qte) }}
+		</div>
 	</div>
 	<div class='card-footer'>
 		{{ form_row(form.save, {'attr' : { 'class' : 'btn btn-xl btn-warning col-12' } }) }}
@@ -158,6 +173,28 @@
 															<span class="float-right">{{historique.uv}}</span>
 														</small>
 													</li>
+													<li class="nav-item">
+														<small class="nav-link">
+															Ancien emplacement :
+															<span class="float-right">
+																{% if historique.oldLocation != 'Add' %}
+																	{{historique.oldLocation}}
+																{% endif %}
+															</span>
+														</small>
+													</li>
+													<li class="nav-item">
+														<small class="nav-link">
+															Quantité :
+															<span class="float-right">{{historique.qte}}</span>
+														</small>
+													</li>
+													<li class="nav-item">
+														<small class="nav-link">
+															Nouvel emplacement :
+															<span class="float-right">{{historique.emplacement}}</span>
+														</small>
+													</li>
 												</ul>
 											</div>
 											<div class="modal-footer justify-content-between">
@@ -208,4 +245,47 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>{{ productFormScript | raw }}</script>
 <script>{{ eanScannerScript | raw }}</script>
-<script></script>{% endblock %}
+<script>
+	function alimSource(stockData) { // Supprimer toutes les options actuelles du champ oldLocation
+$('#alimentation_emplacement_ean_oldLocation').empty();
+$('#alimentation_emplacement_ean_oldLocation').prop('disabled', true);
+
+// Ajouter l'option 'Ajouter' avec la valeur 'Add'
+$('#alimentation_emplacement_ean_oldLocation').append($('<option>', {
+value: 'Add',
+text: 'Ajouter au stock'
+}));
+
+// Ajouter d'autres options en fonction de vos résultats (emplacements disponibles avec quantités)
+if (stockData && Array.isArray(stockData) && stockData.length > 0) { // Lors du remplissage de la liste déroulante
+stockData.forEach(stockRow => { // Ajoutez une option pour chaque emplacement avec sa valeur et son texte
+$('#alimentation_emplacement_ean_oldLocation').append($('<option>', {
+value: stockRow.empl,
+text: stockRow.empl + ' - ' + stockRow.natureStock + ' - ' + stockRow.qteStock,
+'data-qte': stockRow.qteStock // Stockez la quantité comme attribut de données
+}));
+});
+
+// Activer le champ oldLocation
+$('#alimentation_emplacement_ean_oldLocation').prop('disabled', false);
+}
+
+// Ajouter un gestionnaire d'événements pour le changement de la valeur du champ oldLocation
+$('#alimentation_emplacement_ean_oldLocation').on('change', function () {
+var selectedOption = $(this).find(':selected');
+var qteInput = $('#qte');
+
+// Récupérer la quantité stockée dans l'attribut de données
+var qteEmplacement = parseFloat(selectedOption.data('qte'));
+
+if (!isNaN(qteEmplacement)) { // Extraire la quantité de l'emplacement
+qteInput.val(qteEmplacement);
+qteInput.addClass('disabled');
+} else { // Réactiver le champ qte si la valeur est 'Add'
+qteInput.removeClass('disabled');
+qteInput.val("");
+}
+});
+
+}
+</script>{% endblock %}
