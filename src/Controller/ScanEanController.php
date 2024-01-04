@@ -13,12 +13,11 @@ use App\Repository\Main\AlimentationEmplacementRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
 use App\Service\EanScannerService;
+use App\Service\GenImportXlsxDivaltoService;
 use App\Service\ImageService;
 use App\Service\ProductFormService;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -298,9 +297,6 @@ class ScanEanController extends AbstractController
     {
         $ns = $repo->getRetraiNonSoumis();
 
-        // $route = $request->attributes->get('_route');
-        // $this->setTracking($route);
-
         return $this->render('scan_ean/RetraitNonSoumis.html.twig', [
             'title' => 'Retrait produits',
             'ns' => $ns,
@@ -350,9 +346,6 @@ class ScanEanController extends AbstractController
             $this->addFlash('danger', 'Pas de chantier à cloturer');
             return $this->redirectToRoute('app_scan_ean');
         }
-
-        /*$route = $request->attributes->get('_route');
-        $this->setTracking($route);*/
 
         $this->addFlash('message', 'Retrait cloturé avec succès');
         return $this->redirectToRoute('app_scan_ean');
@@ -586,12 +579,18 @@ class ScanEanController extends AbstractController
 
     #[Route("/emplacement/scan/send/ean", name: "app_emplacement_scan_ean-send")]
 
-    public function EmplacementsSend(Request $request, AlimentationEmplacementRepository $repo, ArtRepository $repoArt)
+    public function EmplacementsSend(Request $request, AlimentationEmplacementRepository $repo, ArtRepository $repoArt, GenImportXlsxDivaltoService $ImportXlsxService)
     {
         $dos = 1;
         $piece = [];
-        $i = 0;
+        $i = 0; // piece
+        $is = 0; // info Stock
+        $id = 0; // info Depôt
         $historique = [];
+        $donneesDepot = [];
+        $donneesStock = [];
+        $mouvXlsx = [];
+        $infoDepotStock = [];
 
         $indexColonnesStock = [
             'FICHE',
@@ -620,12 +619,49 @@ class ScanEanController extends AbstractController
             'QUANTITE_VTL',
         ];
 
+        $indexColonnesInfoStock = [
+            'DOSSIER',
+            'REFERENCE',
+            'DEPOT',
+            'NATURESTOCK',
+            'NUMERONOTE',
+            'DATEINV',
+            'FAMILLEINV',
+            'PERIODEINV',
+            'INVIMPPAGCOD',
+            'INVPAGNB',
+            'CRITEREINV',
+            'Anomalies',
+            'Alertes',
+        ];
+
+        $indexColonnesInfoDepot = [
+            'DOSSIER',
+            'REFERENCE',
+            'SREFERENCE1',
+            'SREFERENCE2',
+            'DEPOT',
+            'NATURESTOCK',
+            'NUMERONOTE',
+            'EMPLACEMENT',
+            'STLGTSORCOD',
+            'FLAGORDOSMC',
+            'FAMRANGEMENT',
+            'ELIGIBLESLOTTING',
+            'WMPROFILCOD',
+            'WMEMPLPREP',
+            'RESJRNB',
+            'WMEMPCONTNB',
+            'Anomalies',
+            'Alertes',
+        ];
+
         $histo = $repo->findBy(['sendAt' => null]);
         // construire l'historique en allant chercher les infos sur l'article grâce à l'EAN
         for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
             $prod = $repoArt->getEanStock($dos, $histo[$ligHisto]->getEan());
             $basculeSend = $repo->findOneBy(['id' => $histo[$ligHisto]->getId()]);
-            // $basculeSend->setSendAt(new DateTime())
+            $basculeSend->setSendAt(new DateTime())
             ;
             $em = $this->entityManager;
             $em->persist($basculeSend);
@@ -690,11 +726,31 @@ class ScanEanController extends AbstractController
                 $i++;
             }
 
+            // Alimenter le tableau pour l'info Stock
+            $donneesStock[$is] = array_fill_keys($indexColonnesInfoStock, ''); // Initialise toutes les colonnes à ''
+            $donneesStock[$is]['DOSSIER'] = 1;
+            $donneesStock[$is]['REFERENCE'] = $prod['ref'];
+            $donneesStock[$is]['DEPOT'] = 2;
+            $is++;
+
+            // Alimenter le tableau pour l'info Depot
+            $donneesDepot[$id] = array_fill_keys($indexColonnesInfoDepot, ''); // Initialise toutes les colonnes à ''
+            $donneesDepot[$id]['DOSSIER'] = 1;
+            $donneesDepot[$id]['REFERENCE'] = $prod['ref'];
+            $donneesDepot[$id]['SREFERENCE1'] = $prod['sref1'];
+            $donneesDepot[$id]['SREFERENCE2'] = $prod['sref2'];
+            $donneesDepot[$id]['DEPOT'] = 2;
+            $donneesDepot[$id]['EMPLACEMENT'] = $histo[$ligHisto]->getEmplacement();
+            $id++;
         }
 
         // Créer les fichiers Excel
         if ($piece) {
-            $mouvXlsx = $this->get_export_excel_stock('Stock ', $piece);
+            $mouvXlsx = $ImportXlsxService->get_export_excel_stock('Stock ', $piece);
+        }
+
+        if ($donneesStock || $donneesDepot) {
+            $infoDepotStock = $ImportXlsxService->get_export_excel_info_stock_depot('Table article', $donneesStock, $donneesDepot);
         }
 
         // envoyer un mail si il y a des infos à envoyer
@@ -708,7 +764,16 @@ class ScanEanController extends AbstractController
                 ->subject('Soumission d\'alimentation d\'emplacement par ' . $this->getUser()->getPseudo() . " le " . $d->format('d-m-Y H:i:s'))
                 ->html($html)
                 ->attachFromPath($mouvXlsx);
+            if ($infoDepotStock) {
+                $email->attachFromPath($infoDepotStock); // Deuxième pièce jointe
+            }
             $this->mailer->send($email);
+            if ($mouvXlsx) {
+                unlink($mouvXlsx);
+            }
+            if ($infoDepotStock) {
+                unlink($infoDepotStock);
+            }
         } else {
             $this->addFlash('danger', 'Pas d\'emplacement à cloturer');
             return $this->redirectToRoute('app_scan_ean_alim_empl');
@@ -874,220 +939,6 @@ class ScanEanController extends AbstractController
         // $result['response'] = $decodedContent;
 
         return new JsonResponse($result, 200);
-    }
-
-// générer un fichier Excel qui sera envoyé par mail à l'utilisateur
-    public function getData($donnees): array
-    {
-        $list = [];
-
-        for ($d = 0; $d < count($donnees); $d++) {
-
-            $donnee = $donnees[$d];
-
-            $list[] = [
-                $donnee['FICHE'],
-                $donnee['DOSSIER'],
-                $donnee['ETABLISSEMENT'],
-                $donnee['REF_PIECE'],
-                $donnee['TYPE_TIERS'],
-                $donnee['TYPE_PIECE'],
-                $donnee['CODE_TIERS'],
-                $donnee['CODE_OP'],
-                $donnee['DEPOT'],
-                $donnee['PIDT'],
-                $donnee['PIREF'],
-                $donnee['NO_SOUS_LIGNE'],
-                $donnee['REFERENCE'],
-                $donnee['SREF1'],
-                $donnee['SREF2'],
-                $donnee['DESIGNATION'],
-                $donnee['REF_FOURNISSEUR'],
-                $donnee['MOUV.OP'],
-                $donnee['EMPLACEMENT'],
-                $donnee['SERIE'],
-                $donnee['QUANTITE_VTL'],
-            ];
-        }
-        return $list;
-    }
-
-    public function get_export_excel($typePiece, $donnees)
-    {
-
-        $spreadsheet = new Spreadsheet();
-
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $sheet->setTitle('Piece');
-        // Entête de colonne
-        $sheet->getCell('A3')->setValue('FICHE'); //IPAR
-        $sheet->getCell('B3')->setValue('DOSSIER'); //IPAR
-        $sheet->getCell('C3')->setValue('ETABLISSEMENT'); //IPAR
-        $sheet->getCell('D3')->setValue('REF_PIECE'); //IPAR
-        $sheet->getCell('E3')->setValue('TYPE_TIERS'); //IPAR
-        $sheet->getCell('F3')->setValue('TYPE_PIECE'); //IPAR
-        $sheet->getCell('G3')->setValue('CODE_TIERS'); //ENT
-        $sheet->getCell('H3')->setValue('CODE_OP'); //ENT
-        $sheet->getCell('I3')->setValue('DEPOT'); //ENT
-        $sheet->getCell('J3')->setValue('ENT.PIDT'); //ENT
-        $sheet->getCell('K3')->setValue('ENT.PIREF'); //ENT
-        $sheet->getCell('L3')->setValue('NO_SOUS_LIGNE'); //MOUV
-        $sheet->getCell('M3')->setValue('REFERENCE'); //MOUV
-        $sheet->getCell('N3')->setValue('SREF1'); //MOUV
-        $sheet->getCell('O3')->setValue('SREF2'); //MOUV
-        $sheet->getCell('P3')->setValue('DESIGNATION'); //MOUV
-        $sheet->getCell('Q3')->setValue('REF_FOURNISSEUR'); //MOUV
-        $sheet->getCell('R3')->setValue('MOUV.OP'); //MOUV
-        $sheet->getCell('S3')->setValue('QUANTITE'); //MOUV
-        $sheet->getCell('T3')->setValue('MOUV.PPAR'); //MOUV
-        $sheet->getCell('U3')->setValue('MOUV.PUB'); //MOUV
-        $sheet->getCell('V3')->setValue('EMPLACEMENT'); //MVTL
-        $sheet->getCell('W3')->setValue('SERIE'); //MVTL
-        $sheet->getCell('X3')->setValue('QUANTITE_VTL'); //MVTL
-        $sheet->getCell('Y3')->setValue('ERREUR');
-
-        // Information sur la piéce IPAR ET ENT
-        $sheet->getCell('A4')->setValue('IPAR'); //IPAR
-        $sheet->getCell('B4')->setValue('1'); //IPAR DOSSIER
-        $sheet->getCell('C4')->setValue(''); //IPAR ETABLISSEMENT
-        $sheet->getCell('D4')->setValue(''); //IPAR REF_PIECE
-        $sheet->getCell('E4')->setValue('C'); //IPAR TYPE_TIERS
-        $sheet->getCell('F4')->setValue('1'); //IPAR TYPE_PIECE
-        $sheet->getCell('A5')->setValue('ENT'); //ENT
-        $sheet->getCell('G5')->setValue('CodeTier'); //ENT CODE_TIERS
-        $sheet->getCell('H5')->setValue('C'); //ENT CODE_OP
-        $sheet->getCell('I5')->setValue('2'); //ENT DEPOT
-        $sheet->getCell('J5')->setValue(new DateTime()); //ENT ENT.PIDT
-        $sheet->getCell('K5')->setValue('Import xlsx par ' . $this->getUser()->getPseudo()); //ENT ENT.PIREF
-
-        // Increase row cursor after header write
-        $sheet->fromArray($this->getData($donnees), null, 'A6', true);
-
-        $d = new DateTime('NOW');
-        $dateTime = $d->format('d-m-Y');
-        $nomFichier = $typePiece . 'Import xlsx par ' . $this->getUser()->getPseudo() . ' Piece alim empl le ' . $dateTime;
-        // Titre de la feuille
-        $sheet->getCell('C1')->setValue('Intégration de pièce: Nouvelle création');
-        $sheet->getCell('A1')->getStyle()->getFont()->setSize(16);
-
-        $writer = new Xlsx($spreadsheet);
-        // Create a Temporary file in the system
-        $fileName = $nomFichier . '.xlsx';
-        // Return the excel file as an attachment
-
-        $chemin = 'doc/Logistique/';
-        $fichier = $chemin . '/' . $fileName;
-        $writer->save($fichier);
-        return $fichier;
-    }
-
-    public function get_export_excel_stock($typePiece, $donnees)
-    {
-
-        $spreadsheet = new Spreadsheet();
-
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $sheet->setTitle('Piece');
-        // Entête de colonne
-        $sheet->getCell('A3')->setValue('FICHE'); //IPAR
-        $sheet->getCell('B3')->setValue('DOSSIER'); //IPAR
-        $sheet->getCell('C3')->setValue('ETABLISSEMENT'); //IPAR
-        $sheet->getCell('D3')->setValue('REF_PIECE'); //IPAR
-        $sheet->getCell('E3')->setValue('CODE_TIERS'); //ENT
-        $sheet->getCell('F3')->setValue('CODE_OP'); //ENT
-        $sheet->getCell('G3')->setValue('DEPOT'); //ENT
-        $sheet->getCell('H3')->setValue('DEPOT_DESTINATION'); //ENT
-        $sheet->getCell('I3')->setValue('ENT.PIDT'); //ENT
-        $sheet->getCell('J3')->setValue('ENT.PIREF'); //ENT
-        $sheet->getCell('K3')->setValue('NO_SOUS_LIGNE'); //MOUV
-        $sheet->getCell('L3')->setValue('REFERENCE'); //MOUV
-        $sheet->getCell('M3')->setValue('SREF1'); //MOUV
-        $sheet->getCell('N3')->setValue('SREF2'); //MOUV
-        $sheet->getCell('O3')->setValue('DESIGNATION'); //MOUV
-        $sheet->getCell('P3')->setValue('REF_FOURNISSEUR'); //MOUV
-        $sheet->getCell('Q3')->setValue('MOUV.OP'); //MOUV
-        $sheet->getCell('R3')->setValue('QUANTITE'); //MOUV
-        $sheet->getCell('S3')->setValue('MOUV.PPAR'); //MOUV
-        $sheet->getCell('T3')->setValue('MOUV.PUB'); //MOUV
-        $sheet->getCell('U3')->setValue('EMPLACEMENT'); //MVTL
-        $sheet->getCell('V3')->setValue('EMPLACEMENT_DESTINATION'); //MVTL
-        $sheet->getCell('W3')->setValue('SERIE'); //MVTL
-        $sheet->getCell('X3')->setValue('QUANTITE_VTL'); //MVTL
-        $sheet->getCell('Y3')->setValue('ERREUR');
-
-        // Information sur la piéce IPAR ET ENT
-        $sheet->getCell('A4')->setValue('IPAR'); //IPAR
-        $sheet->getCell('B4')->setValue('1'); //IPAR DOSSIER
-        $sheet->getCell('C4')->setValue(''); //IPAR ETABLISSEMENT
-        $sheet->getCell('D4')->setValue(''); //IPAR REF_PIECE
-        $sheet->getCell('A5')->setValue('ENT'); //ENT
-        $sheet->getCell('E5')->setValue('I0000000'); //ENT CODE_TIERS
-        $sheet->getCell('F5')->setValue('JI'); //ENT CODE_OP
-        $sheet->getCell('G5')->setValue('2'); //ENT DEPOT
-        $sheet->getCell('H5')->setValue('2'); //ENT DEPOT_DESTINATION
-        $sheet->getCell('I5')->setValue(new DateTime()); //ENT ENT.PIDT
-        $sheet->getCell('J5')->setValue('Import xlsx par ' . $this->getUser()->getPseudo()); //ENT ENT.PIREF
-
-        // Increase row cursor after header write
-        $sheet->fromArray($this->getData_stock($donnees), null, 'A6', true);
-
-        $d = new DateTime('NOW');
-        $dateTime = $d->format('d-m-Y');
-        $nomFichier = 'Import ' . $typePiece . ' ' . $dateTime;
-        // Titre de la feuille
-        $sheet->getCell('C1')->setValue('Mise à jour via Import du Stock');
-        $sheet->getCell('A1')->getStyle()->getFont()->setSize(16);
-
-        $writer = new Xlsx($spreadsheet);
-        // Create a Temporary file in the system
-        $fileName = $nomFichier . '.xlsx';
-        // Return the excel file as an attachment
-
-        $chemin = 'doc/Logistique/';
-        $fichier = $chemin . '/' . $fileName;
-        $writer->save($fichier);
-        return $fichier;
-    }
-
-    // générer un fichier Excel qui sera envoyé par mail à l'utilisateur
-    public function getData_stock($donnees): array
-    {
-        $list = [];
-
-        for ($d = 0; $d < count($donnees); $d++) {
-
-            $donnee = $donnees[$d];
-
-            $list[] = [
-                $donnee['FICHE'],
-                $donnee['DOSSIER'],
-                $donnee['ETABLISSEMENT'],
-                $donnee['REF_PIECE'],
-                $donnee['CODE_TIERS'],
-                $donnee['CODE_OP'],
-                $donnee['DEPOT'],
-                $donnee['DEPOT_DESTINATION'],
-                $donnee['ENT.PIDT'],
-                $donnee['ENT.PIREF'],
-                $donnee['NO_SOUS_LIGNE'],
-                $donnee['REFERENCE'],
-                $donnee['SREF1'],
-                $donnee['SREF2'],
-                $donnee['DESIGNATION'],
-                $donnee['REF_FOURNISSEUR'],
-                $donnee['MOUV.OP'],
-                $donnee['QUANTITE'],
-                $donnee['MOUV.PPAR'],
-                $donnee['MOUV.PUB'],
-                $donnee['EMPLACEMENT'],
-                $donnee['EMPLACEMENT_DESTINATION'],
-                $donnee['SERIE'],
-                $donnee['QUANTITE_VTL'],
-            ];
-        }
-        return $list;
     }
 
 }
