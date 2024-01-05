@@ -126,36 +126,34 @@
 				<i class="fas fa-mug-hot mr-2"></i>Dépôt de congés
 			</a>
 			<a href="{{ path('app_search_products') }}" class="text-white btn btn-lg btn-primary col-11 mt-5">
-				<i class="fa-solid fa-magnifying-glass mr-2"></i></i>Recherche produits
+				<i class="fa-solid fa-magnifying-glass mr-2"></i>Recherche produits
 			</a>
 			{% if is_granted('ROLE_LOGISTIQUE') %}
-				<a href="{{ path('app_scan_ean_alim_empl') }}" class="text-white btn btn-lg btn-danger col-11 mt-5">
-					<i class="fa fa-plus mr-2"></i>Alimenter emplacement
-				</a>
-				<a href="{{ path('app_print_empl') }}" class="text-white btn btn-lg btn-success col-11 mt-5">
-					<i class="fas fa-map-marker-alt mr-2"></i>Imprimer étiquette empl.
+				<a href="{{ path('app_mouv_stock') }}" class="text-white btn btn-lg btn-danger col-11 mt-5">
+					<i class="fa-solid fa-cubes-stacked mr-2"></i>Régularisation de stock
 				</a>
 			{% endif %}
+			<a href="{{ path('app_mouv_tiers') }}" class="btn btn-lg btn-info col-11 mt-5 mt-5">
+				<i class="fa fa-solid fa-arrow-right-arrow-left mr-2"></i>Retrait/Retour marchandise(s)
+			</a>
 			{% if is_granted('ROLE_MONTEUR') %}
-				<a href="{{ path('app_scan_ean') }}" class="btn btn-lg btn-warning col-11 mt-5 mt-5">
-					<i class="fa fa-truck mr-2"></i>Retrait marchandise
+				<a href="{{ path('app_affaire_me_nok') }}" class="btn btn-lg btn-warning col-11 mt-5">
+					<i class="fas fa-solid fa-screwdriver-wrench mr-2"></i>Interventions
 				</a>
-				<a href="{{ path('app_affaire_me_nok') }}" class="text-white btn btn-lg btn-info col-11 mt-5">
-					<i class="fas fa-map-marker-alt mr-2"></i>Interventions
+			{% endif %}
+			{% if is_granted('ROLE_LOGISTIQUE') %}
+				<a href="{{ path('app_print_empl') }}" class="text-white btn btn-lg btn-success col-11 mt-5">
+					<i class="fas fa-solid fa-map-location-dot mr-2"></i>Impr. étiquettes empl.
 				</a>
 			{% endif %}
 		</div>
 	</section>
 {% endblock %}
 {% block javascripts %}
-
 	<script>
 		var myCarousel = document.querySelector('#carousel')
 var carousel = new bootstrap.Carousel(myCarousel, {interval: 2000})
-	</script>
-
-	<!-- fullCalendar -->
-	<script>
+	</script><!-- fullCalendar --><script>
 		/* initialize the calendar
      -----------------------------------------------------------------*/
 window.onload = () => {
@@ -181,6 +179,4 @@ events: {{ data|raw }}
 })
 calendar.render()
 };
-	</script>
-	<!-- End Calendrier -->
-{% endblock %}
+	</script><!-- End Calendrier -->{% endblock %}

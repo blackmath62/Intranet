@@ -37,6 +37,9 @@ class RetraitMarchandisesEan
     #[ORM\Column(type: "boolean", nullable: true)]
     private $stockFaux;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $location = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -122,6 +125,18 @@ class RetraitMarchandisesEan
     public function setStockFaux(bool $stockFaux): self
     {
         $this->stockFaux = $stockFaux;
+
+        return $this;
+    }
+
+    public function getLocation(): ?string
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?string $location): static
+    {
+        $this->location = $location;
 
         return $this;
     }

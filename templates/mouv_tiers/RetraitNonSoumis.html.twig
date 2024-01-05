@@ -4,11 +4,12 @@
 	{{ title }}
 {% endblock %}
 {% block body %}
-	<a href="{{ path('app_scan_ean') }}" class="text-white btn btn-success col-12">Commencer une nouvelle saisie</a>
+	<a href="{{ path('app_mouv_tiers') }}" class="text-white btn btn-success col-12">
+		<i class="fa-solid fa-cart-plus mr-2"></i>Créer un nouveau panier</a>
 	<div class="content-header">
 		<div class="container-fluid">
 			<div class="text-center">
-				<h1>Retraits non soumis</h1>
+				<h1>Paniers non soumis</h1>
 			</div>
 		</div>
 	</div>
@@ -18,7 +19,7 @@
 				<div class="callout callout-warning">
 					<div class="d-flex justify-content-between">
 						<h5>{{ n.chantier }}</h5>
-						<a href="{{path('app_scan_ean', {'chantier' : n.chantier })}}">
+						<a href="{{path('app_mouv_tiers', {'chantier' : n.chantier })}}">
 							<i class="fa-solid fa-eye fa-bounce fa-2xl"></i>
 						</a>
 					</div>
@@ -39,7 +40,7 @@
 		<div class="card-body">
 			<div class="callout callout-success">
 				<div class="d-flex justify-content-between">
-					<h5>Tous les retraits de marchandises ont été soumis</h5>
+					<h5>Tous les paniers de marchandises ont été soumis</h5>
 				</div>
 				<i>
 					<p>il n'y a rien à voir..</p>

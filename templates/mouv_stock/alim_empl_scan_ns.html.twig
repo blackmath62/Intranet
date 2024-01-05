@@ -6,7 +6,7 @@
 {% block body %}
 	{% if ns %}
 		<div class="btn-group mb-2 col-12">
-			<a href="{{ path('app_scan_ean_alim_empl') }}" type="button" class="btn btn-primary col-6">
+			<a href="{{ path('app_mouv_stock') }}" type="button" class="btn btn-primary col-6">
 				<i class="fas fa-plus mr-2"></i>Nouvelle saisie
 			</a>
 			<a data-toggle="modal" data-target="#modal-sm-cloture" type="button" class="btn btn-success col-6">
@@ -16,12 +16,12 @@
 				<div class="modal-dialog modal-sm">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h4 class="modal-title">Voulez vous vraiment soumettre ces emplacements ?</h4>
+							<h4 class="modal-title">Voulez vous vraiment soumettre ces régularisations de stock ?</h4>
 							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 								<span aria-hidden="true">&times;</span>
 							</button>
 						</div>
-						<form action="{{path('app_emplacement_scan_ean-send', {'emplacement' : app.request.attributes.get('emplacement') })}}" method="POST">
+						<form action="{{path('app_mouv_stock_send', {'emplacement' : app.request.attributes.get('emplacement') })}}" method="POST">
 							<div class="modal-body form-group">
 								<label>Commentaires
 									<small>
@@ -33,7 +33,7 @@
 							<div class="modal-footer justify-content-between">
 								<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
 
-								<button class="btn btn-success" type="submit">Soumettre ces emplacements</button>
+								<button class="btn btn-success" type="submit">Soumettre ces régularisations</button>
 							</div>
 						</form>
 					</div>
@@ -44,13 +44,13 @@
 			<!-- /.modal -->
 		</div>
 	{% else %}
-		<a href="{{ path('app_scan_ean_alim_empl') }}" class="text-white btn btn-primary col-12">Commencer une nouvelle saisie</a>
+		<a href="{{ path('app_mouv_stock') }}" class="text-white btn btn-primary col-12">Commencer une nouvelle saisie</a>
 	{% endif %}
 	{% if ns %}
 		<div class="content-header">
 			<div class="container-fluid">
 				<div class="text-center">
-					<h1>Emplacements non soumis</h1>
+					<h2>Régularisations de stock non soumises</h2>
 				</div>
 			</div>
 		</div>
@@ -59,7 +59,7 @@
 				<div class="callout callout-warning">
 					<div class="d-flex justify-content-between">
 						<h5>{{ n.emplacement }}</h5>
-						<a href="{{path('app_scan_ean_alim_empl', {'emplacement' : n.emplacement })}}" class="text-white btn btn-info">Voir</a>
+						<a href="{{path('app_mouv_stock', {'emplacement' : n.emplacement })}}" class="text-white btn btn-info">Voir</a>
 					</div>
 					<i>
 						<p>Saisie par
@@ -78,7 +78,7 @@
 		<div class="card-body">
 			<div class="callout callout-success">
 				<div class="d-flex justify-content-between">
-					<h5>Tous les emplacements ont été soumis</h5>
+					<h5>Toutes les régularisations ont été soumises</h5>
 				</div>
 				<i>
 					<p>il n'y a rien à voir..</p>

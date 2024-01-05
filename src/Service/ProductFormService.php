@@ -57,6 +57,7 @@ class ProductFormService
             }
 
             const oldLocationField = $(\'#alimentation_emplacement_ean_oldLocation\');
+            const locationField = $(\'#retrait_marchandise_ean_location\');
 
             function processEan() {
                 const ean = $("#ean");
@@ -135,8 +136,9 @@ class ProductFormService
                 if (oldLocationField.length) {
                     alimSource(data.stock);
                 }
-
-
+                if (locationField.length) {
+                    alimSource(data.stock);
+                }
 
                 resultUv.textContent = data.uv;
                 resultFerme.textContent = data.ferme;
@@ -185,10 +187,16 @@ class ProductFormService
                 if (oldLocationField.length) {
                     alimSource(data.stock);
                 }
+                if (locationField.length) {
+                    alimSource(data.stock);
+                }
                 $("#produit").attr("class", "d-none");
                 } else { // Le produit a été trouvé, marquez le champ EAN comme valide
                 $("#ean").attr("class", "form-control col-12 is-valid");
                 if (oldLocationField.length) {
+                    alimSource(data.stock);
+                }
+                if (locationField.length) {
                     alimSource(data.stock);
                 }
                 $("#produit").attr("class", "mt-3");

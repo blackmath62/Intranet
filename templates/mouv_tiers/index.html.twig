@@ -8,13 +8,13 @@
 	<!-- general form elements disabled -->
 	<div class="card card-navy">
 		<div class="card-header">
-			<h3 class="card-title">Sortie de stock</h3>
+			<h3 class="card-title">Retrait / Retour</h3>
 			<div class="card-tools">
 				<a href='{{path('app_affaire_me_nok' ) }}' class="badge badge-primary">
 					<i class="fas fa-share mr-1"></i>
 					Affaires
 				</a>
-				<a href="{{ path('app_scan_ean_ns') }}" class="badge badge-danger ml-auto">Retrait non soumis</a>
+				<a href="{{ path('app_mouv_tiers_ns') }}" class="badge badge-danger ml-auto">Retrait non soumis</a>
 			</div>
 		</div>
 		<!-- /.card-header -->
@@ -28,6 +28,7 @@
 			<div class="form-group">
 				{{ form_widget(form.chantier, {'id': 'chantier' ,'attr' : { 'value' : chantier} }) }}
 				{{ form_errors(form.chantier) }}
+				<span id="resultatTiers"></span>
 			</div>
 			<div class="form-group">
 				<div class="input-group">
@@ -52,9 +53,28 @@
 			</div>
 			{{ form_errors(form.ean) }}
 			<div id="panier" class="d-none">
-				<div id="stockFaux" class="custom-control custom-switch">
-					{{ form_widget(form.stockFaux) }}
-					{{ form_label(form.stockFaux) }}
+				<div class="row">
+					<div class="col-md-6 col-6">
+						<div id="stockFaux" class="custom-control custom-switch h5">
+							{{ form_widget(form.stockFaux) }}
+							{{ form_label(form.stockFaux) }}
+						</div>
+					</div>
+					<div class="col-md-6 col-6">
+						<div id="rr" class="custom-control custom-switch h5">
+							{{ form_widget(form.retour) }}
+							{{ form_label(form.retour) }}
+						</div>
+					</div>
+				</div>
+				<div class="form-group mt-2">
+					<label class="col-form-label" for="location">
+						<i class="fa-solid fa-location-dot"></i>
+						{{ form_label(form.location) }}
+					</label>
+					{{ form_widget(form.location, {'attr': {'disabled': true}}) }}
+					<small>Retirer ou retourner le stock sur cet emplacement</small>
+					{{ form_errors(form.location) }}
 				</div>
 
 				<div class="form-group d-flex justify-content-between align-items-center">
@@ -65,17 +85,18 @@
 			</div>
 			{{ form_end(form)}}
 			{% if historiques %}
-				<a data-toggle="modal" data-target="#modal-sm-cloture" class="btn btn-success text-center col-12 mt-3">Soumettre le retrait pour ce chantier</a>
+				<a data-toggle="modal" data-target="#modal-sm-cloture" class="btn btn-success text-center col-12 mt-3">
+					<i class="fa-solid fa-thumbs-up mr-2"></i>Soumettre ce panier</a>
 				<div class="modal fade" id="modal-sm-cloture">
 					<div class="modal-dialog modal-sm">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h4 class="modal-title">Voulez vous vraiment soumettre ce retrait pour ce chantier ?</h4>
+								<h4 class="modal-title">Voulez vous vraiment soumettre ce panier ?</h4>
 								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
 							</div>
-							<form action="{{path('app_scan_ean-send', {'chantier' : app.request.attributes.get('chantier') })}}" method="POST">
+							<form action="{{path('app_mouv_tiers-send', {'chantier' : app.request.attributes.get('chantier') })}}" method="POST">
 								<div class="modal-body form-group">
 									<label>Commentaires
 										<small>
@@ -86,7 +107,10 @@
 								</div>
 								<div class="modal-footer justify-content-between">
 									<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-									<button class="btn btn-success" type="submit">Soumettre ce retrait de marchandise</button>
+									<button class="btn btn-success" type="submit">
+										<i class="fa-solid fa-thumbs-up mr-2"></i>Soumettre ce panier
+									</button>
+									<small>Cette action est irréverssible et va génrérer des fichiers qui auront un impact sur le stock ! en cas d'erreur aprés soumission, veuillez contacter votre responsable.</small>
 								</div>
 							</form>
 						</div>
@@ -105,7 +129,7 @@
 	{% if historiques %}
 		<div class="card card-dark mt-4">
 			<div class="card-header">
-				<h3 class="card-title">Panier de ce chantier</h3>
+				<h3 class="card-title">Votre panier</h3>
 			</div>
 			<!-- /.card-header -->
 			<div class="card-body p-0">
@@ -120,10 +144,18 @@
 					<tbody>
 						{% for historique in historiques %}
 							<tr>
-								<td>{{ historique.designation }}</td>
-								<td class="align-middle">{{ historique.qte }}</td>
+								{% set col = 'text-dark' %}
+								{% set retour = '' %}
+								{% if historique.qte < 0 %}
+									{% set col = 'text-danger' %}
+									{% set retour = '( Retour )' %}
+								{% endif %}
+
+								<td class="{{ col }}">{{ historique.designation }}
+									{{ retour }}</td>
+								<td class="align-middle {{ col }}">{{ historique.qte }}</td>
 								<td class="text-align align-middle">
-									<a data-toggle="modal" data-target={{"#modal-sm#{historique.id}"}} class="text-dark">
+									<a data-toggle="modal" data-target={{"#modal-sm#{historique.id}"}} class="{{ col }}">
 										<i class="fa-solid fa-trash-can fa-bounce"></i>
 									</a>
 									<div class="modal fade" id={{"modal-sm#{historique.id}"}}>
@@ -185,8 +217,18 @@
 														</li>
 														<li class="nav-item">
 															<small class="nav-link">
-																Quantité sortie :
-																<span class="float-right">{{historique.qte}}</span>
+																{% if historique.qte >= 0 %}
+																	Quantité sortie de marchandise :
+																{% else %}
+																	Quantité retour de marchandise :
+																{% endif %}
+																<span class="float-right">{{ historique.qte|abs }}</span>
+															</small>
+														</li>
+														<li class="nav-item">
+															<small class="nav-link">
+																Emplacement :
+																<span class="float-right">{{historique.location}}</span>
 															</small>
 														</li>
 														<li class="nav-item">
@@ -205,7 +247,8 @@
 												</div>
 												<div class="modal-footer justify-content-between">
 													<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-													<a href="{{path('app_scan_ean-delete', {'id' : historique.id, 'chantier' : app.request.attributes.get('chantier') })}}" type="button" class="btn btn-danger">Supprimer cette ligne</a>
+													<a href="{{path('app_mouv_tiers-delete', {'id' : historique.id, 'chantier' : app.request.attributes.get('chantier') })}}" type="button" class="btn btn-danger">
+														<i class="fa-solid fa-thumbs-down mr-2"></i>Supprimer cette ligne</a>
 												</div>
 											</div>
 											<!-- /.modal-content -->
@@ -222,13 +265,13 @@
 			<!-- /.card-body -->
 		</div>
 		<!-- /.card -->
-
-		<a data-toggle="modal" data-target="#modal-sm-supprimer" class="text-white btn btn-danger col-12">Supprimer cette saisie définitivement</a>
+		<a data-toggle="modal" data-target="#modal-sm-supprimer" class="text-white btn btn-danger col-12">
+			<i class="fa-solid fa-thumbs-down mr-2"></i>Supprimer ce panier définitivement</a>
 		<div class="modal fade" id="modal-sm-supprimer">
 			<div class="modal-dialog modal-sm">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h4 class="modal-title">Voulez vous vraiment supprimer intégralement et définitivement le panier de ce chantier
+						<h4 class="modal-title">Voulez vous vraiment supprimer intégralement et définitivement ce panier
 							{{app.request.attributes.get('chantier')}}
 							?</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -237,7 +280,8 @@
 					</div>
 					<div class="modal-footer justify-content-between">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-						<a href="{{path('app_scan_ean_delete_all', {'chantier' : app.request.attributes.get('chantier') })}}" type="button" class="btn btn-danger">Supprimer</a>
+						<a href="{{path('app_mouv_tiers_delete_all', {'chantier' : app.request.attributes.get('chantier') })}}" type="button" class="btn btn-danger">
+							<i class="fa-solid fa-thumbs-down mr-2"></i>Supprimer</a>
 					</div>
 				</div>
 				<!-- /.modal-content -->
@@ -259,6 +303,97 @@
 	<script>{{ eanScannerScript | raw }}</script>
 	<script>{{ productFormScript | raw }}</script>
 	<script>
-		
+
+		function handleLocationChange() {
+var selectedOption = $('#retrait_marchandise_ean_location').find(':selected');
+var qteInput = $('#qte');
+var qteEmplacement = parseFloat(selectedOption.data('qte'));
+
+if (!isNaN(qteEmplacement)) {
+qteInput.removeClass('disabled');
+qteInput.val("");
+qteInput.attr('max', qteEmplacement);
+} else {
+qteInput.val("");
+qteInput.addClass('disabled');
+qteInput.removeAttr('max'); // Retirer l'attribut max
+}
+}
+
+function alimSource(stockData) { // Supprimer toutes les options actuelles du champ location
+$('#retrait_marchandise_ean_retour').prop('checked', false);
+$('#retrait_marchandise_ean_location').empty();
+$('#retrait_marchandise_ean_location').prop('disabled', true);
+var qteInput = $('#qte');
+qteInput.val("");
+qteInput.addClass('disabled');
+
+// Ajouter d'autres options en fonction de vos résultats (emplacements disponibles avec quantités)
+if (stockData && Array.isArray(stockData) && stockData.length > 0) { // Lors du remplissage de la liste déroulante
+stockData.forEach(stockRow => { // Ajoutez une option pour chaque emplacement avec sa valeur et son texte
+$('#retrait_marchandise_ean_location').append($('<option>', {
+value: stockRow.empl,
+text: stockRow.empl + ' - ' + stockRow.natureStock + ' - ' + stockRow.qteStock,
+'data-qte': stockRow.qteStock // Stockez la quantité comme attribut de données
+}));
+});
+// Activer les champs location et qte
+$('#retrait_marchandise_ean_location').prop('disabled', false);
+qteInput.removeClass('disabled');
+// Déclencher manuellement l'événement "change" pour appliquer la limitation de la valeur maximale
+handleLocationChange();
+}
+
+// Ajouter un gestionnaire d'événements pour le changement de la valeur du champ location
+$('#retrait_marchandise_ean_location').on('change', handleLocationChange);
+
+// Ajouter un gestionnaire d'événements pour le bouton "retour"
+$('#retrait_marchandise_ean_retour').on('change', function () {
+var isRetour = this.checked;
+if (isRetour) { // Si le bouton "retour" est coché, désactiver le champ qte et définir l'emplacement sur "ATTENTE"
+qteInput.removeClass('disabled');
+$('#retrait_marchandise_ean_location').empty();
+qteInput.removeAttr('max'); // Retirer l'attribut max
+$('#retrait_marchandise_ean_location').append($('<option>', {
+value: 'ATTENTE',
+text: 'ATTENTE - Neuf - 0', // Modifier le texte selon vos besoins
+'data-qte': 0
+}));
+$('#retrait_marchandise_ean_location').prop('disabled', false);
+} else { // Si le bouton "retour" est décoché, appeler la fonction handleLocationChange
+alimSource(stockData);
+}
+});
+}
+	</script>
+	<script>
+		$(document).ready(function () { // ou $(function () {
+function updateTiers() {
+let chantier = $('#chantier');
+if (chantier) {
+$.ajax({
+url: "/mouv/tiers/ajax/" + chantier.val(),
+type: "GET"
+}).done(function (data) {
+if (data.tiers) {
+$('#resultatTiers').text('Tiers : ' + data.tiers);
+$("#chantier").attr('class', 'form-control col-12 is-valid');
+$("#resultatTiers").attr('class', ''); // Assurez-vous que la classe est vide pour afficher l'élément
+} else {
+$("#chantier").attr('class', 'form-control col-12 is-invalid');
+$('#resultatTiers').text('Tiers : Aucun résultat trouvé.');
+}
+});
+}
+}
+
+// Appeler la fonction updateTiers lors du chargement de la page
+updateTiers();
+
+// Ajouter un gestionnaire d'événements pour le changement de la sélection
+$('#chantier').on('change', function () { // Appeler la fonction updateTiers à chaque changement
+updateTiers();
+});
+});
 	</script>
 {% endblock %}

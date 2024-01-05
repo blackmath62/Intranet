@@ -2,21 +2,14 @@
 
 namespace App\Controller;
 
-use App\Entity\Main\AlimentationEmplacement;
 use App\Form\AddPicturesOrDocsType;
-use App\Form\AlimentationEmplacementEanType;
 use App\Form\GeneralSearchType;
 use App\Form\PrintEmplType;
-use App\Form\RetraitMarchandiseEanType;
 use App\Repository\Divalto\ArtRepository;
-use App\Repository\Main\AlimentationEmplacementRepository;
 use App\Repository\Main\MailListRepository;
-use App\Repository\Main\RetraitMarchandisesEanRepository;
 use App\Service\EanScannerService;
-use App\Service\GenImportXlsxDivaltoService;
 use App\Service\ImageService;
 use App\Service\ProductFormService;
-use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -24,7 +17,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -62,102 +54,8 @@ class ScanEanController extends AbstractController
         //parent::__construct();
     }
 
-    #[Route("/scan/ean/{chantier}", name: "app_scan_ean")]
-
-    public function index(ArtRepository $repo, Request $request, RetraitMarchandisesEanRepository $repoRetrait, $chantier = null): Response
-    {
-        $dos = 1;
-        $produit = "";
-        $historique = [];
-
-        $formAddPicturesOrDocs = $this->createForm(AddPicturesOrDocsType::class);
-        $formAddPicturesOrDocs->handleRequest($request);
-
-        if ($formAddPicturesOrDocs->isSubmitted() && $formAddPicturesOrDocs->isValid()) {
-            //dd($formAddPicturesOrDocs->getData());
-            $files = $formAddPicturesOrDocs->get('files')->getData();
-            $type = $formAddPicturesOrDocs->get('type')->getData();
-            $ref = $formAddPicturesOrDocs->get('reference')->getData();
-            foreach ($files as $file) {
-                // Logique pour traiter chaque fichier
-                $filename = $type . $ref . '_' . $this->getUser()->getPseudo() . '_' . $file->getClientOriginalName();
-                $cheminRelatif = '//SRVSOFT/FicJoints_R/achat_vente/articles/' . $dos . '/' . strtolower($ref);
-                // Vérifier si le répertoire existe
-                if (!file_exists($cheminRelatif)) {
-                    // Créer le répertoire avec les permissions 0777 (modifiable selon vos besoins)
-                    mkdir($cheminRelatif, 0777, true);
-                }
-                $filepath = $cheminRelatif . '/' . $filename;
-
-                // Vérifier si le fichier existe déjà
-                if (!file_exists($filepath)) {
-                    if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
-                        // Appeler la méthode du service pour compresser et redimensionner l'image
-                        $processedImage = $this->imageService->compressAndResize($file, 1000000);
-                        // Enregistrer l'image dans le répertoire souhaité
-                        $processedImage->save($cheminRelatif . '/' . $filename); // Ajustez le chemin selon vos besoins
-                    } else {
-                        $file->move($cheminRelatif, $filename);
-                    }
-                    $this->addFlash('success', 'Le fichier ' . $file->getClientOriginalName() . ' a été ajouté avec succés.');
-                } else {
-                    // Ajouter ici la logique en cas de fichier existant
-                    $this->addFlash('danger', 'Le fichier ' . $file->getClientOriginalName() . ' existe déjà.');
-                }
-            }
-        }
-
-        $form = $this->createForm(RetraitMarchandiseEanType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $produit = $repo->getEanStock($dos, $form->getData()->getEan());
-            if ($produit) {
-                $retrait = $form->getData();
-                $chantier = $form->getData()->getChantier();
-                $retrait->setCreatedAt(new \DateTime())
-                    ->setCreatedBy($this->getUser());
-                $em = $this->entityManager;
-                $em->persist($retrait);
-                $em->flush();
-                $this->addFlash('message', 'Produit ajouté avec succés');
-                return $this->redirectToRoute('app_scan_ean', ['chantier' => $chantier]);
-            } else {
-                $chantier = $form->getData()->getChantier();
-                $this->addFlash('danger', 'Produit introuvable');
-                return $this->redirectToRoute('app_scan_ean', ['chantier' => $chantier]);
-            }
-        }
-        if ($chantier) {
-            $histo = $repoRetrait->findBy(['chantier' => $chantier, 'sendAt' => null]);
-            for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
-                $prod = $repo->getEanStock($dos, $histo[$ligHisto]->getEan());
-                $historique[$ligHisto]['id'] = $histo[$ligHisto]->getId();
-                $historique[$ligHisto]['ref'] = $prod['ref'];
-                $historique[$ligHisto]['sref1'] = $prod['sref1'];
-                $historique[$ligHisto]['sref2'] = $prod['sref2'];
-                $historique[$ligHisto]['designation'] = $prod['designation'];
-                $historique[$ligHisto]['uv'] = $prod['uv'];
-                $historique[$ligHisto]['ean'] = $prod['ean'];
-                $historique[$ligHisto]['qte'] = $histo[$ligHisto]->getQte();
-                $historique[$ligHisto]['stockFaux'] = $histo[$ligHisto]->getStockFaux();
-            }
-        }
-        $productData = "";
-        return $this->render('scan_ean/index.html.twig', [
-            'title' => 'Retrait produits',
-            'form' => $form->createView(),
-            'productData' => $productData,
-            'produit' => $produit,
-            'chantier' => $chantier,
-            "historiques" => $historique,
-            'formAddPicturesOrDocs' => $formAddPicturesOrDocs->createView(),
-            'eanScannerScript' => $this->eanScannerService->getScannerScript(),
-            'productFormScript' => $this->productFormService->getProductFormScript(),
-        ]);
-    }
-
     #[Route("/search/products", name: "app_search_products")]
-
+    // chercher des produits par désignation ou référence avec la loupe
     public function search_products(ImageService $imageService, ArtRepository $repo, Request $request): Response
     {
         $dos = 1;
@@ -206,6 +104,7 @@ class ScanEanController extends AbstractController
     }
 
     #[Route("/ajax/product/delete/file/{dos}/{ref}/{file}", name: "app_product_delete_file")]
+    // supprimer un fichier dans le dossier d'un article
     public function productDeleteFile($dos, $ref, $file)
     {
 
@@ -223,6 +122,7 @@ class ScanEanController extends AbstractController
     }
 
     #[Route("/ajax/product/add/file/{dos}/{type}/{ref}", name: "app_product_add_file")]
+    // Ajouter un fichier dans le dossier d'un article
     public function productAddFile(Request $request, ImageService $imageService, $dos, $type, $ref)
     {
         // Récupérer le fichier depuis la requête
@@ -259,99 +159,8 @@ class ScanEanController extends AbstractController
         return $response;
     }
 
-    #[Route("/scan/ean/delete/{id}/{chantier}", name: "app_scan_ean-delete")]
-
-    public function delete(RetraitMarchandisesEanRepository $repo, $id, $chantier = null)
-    {
-        $retrait = $repo->findOneBy(['id' => $id]);
-        $em = $this->entityManager;
-        $em->remove($retrait);
-        $em->flush();
-
-        $this->addFlash('message', 'Article supprimée avec succès');
-        return $this->redirectToRoute('app_scan_ean', ['chantier' => $chantier]);
-    }
-
-    #[Route("/scan/ean/all/delete/{chantier}", name: "app_scan_ean_delete_all")]
-
-    public function deleteAll($chantier, RetraitMarchandisesEanRepository $repo)
-    {
-        //dd($chantier);
-        $retrait = $repo->findBy(['chantier' => $chantier, 'sendAt' => null]);
-        foreach ($retrait as $value) {
-            $em = $this->entityManager;
-            $em->remove($value);
-            $em->flush();
-        }
-
-        //$route = $request->attributes->get('_route');
-        // $this->setTracking($route);
-
-        $this->addFlash('message', 'Chantier ' . $chantier . ' supprimée avec succès');
-        return $this->redirectToRoute('app_scan_ean');
-    }
-
-    #[Route("/scan/ns", name: "app_scan_ean_ns")]
-
-    public function ns(RetraitMarchandisesEanRepository $repo)
-    {
-        $ns = $repo->getRetraiNonSoumis();
-
-        return $this->render('scan_ean/RetraitNonSoumis.html.twig', [
-            'title' => 'Retrait produits',
-            'ns' => $ns,
-        ]);
-    }
-
-    #[Route("/scan/send/ean/{chantier}", name: "app_scan_ean-send")]
-
-    public function send(Request $request, RetraitMarchandisesEanRepository $repo, ArtRepository $repoArt, $chantier = null)
-    {
-        $dos = 1;
-        if ($chantier) {
-            $histo = $repo->findBy(['chantier' => $chantier, 'sendAt' => null]);
-            for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
-                $prod = $repoArt->getEanStock($dos, $histo[$ligHisto]->getEan());
-                $historique[$ligHisto]['id'] = $histo[$ligHisto]->getId();
-
-                $basculeSend = $repo->findOneBy(['id' => $histo[$ligHisto]->getId()]);
-                $basculeSend->setSendAt(new DateTime());
-                $em = $this->entityManager;
-                $em->persist($basculeSend);
-                $em->flush();
-
-                $historique[$ligHisto]['ref'] = $prod['ref'];
-                $historique[$ligHisto]['sref1'] = $prod['sref1'];
-                $historique[$ligHisto]['sref2'] = $prod['sref2'];
-                $historique[$ligHisto]['designation'] = $prod['designation'];
-                $historique[$ligHisto]['uv'] = $prod['uv'];
-                $historique[$ligHisto]['ean'] = $prod['ean'];
-                $historique[$ligHisto]['qte'] = $histo[$ligHisto]->getQte();
-                $historique[$ligHisto]['stockFaux'] = $histo[$ligHisto]->getStockFaux();
-            }
-            // envoyer un mail si il y a des infos à envoyer
-            if (count($historique) > 0) {
-                // envoyer un mail
-                $html = $this->renderView('mails/listeRetraitProduits.html.twig', ['historiques' => $historique, 'commentaire' => $request->request->get('ta'), 'chantier' => $chantier]);
-                $d = new DateTime();
-                $destinataires = ['adeschodt@lhermitte.fr', 'adefaria@lhermitte.fr'];
-                $email = (new Email())
-                    ->from($this->mailEnvoi)
-                    ->to(...$destinataires)
-                    ->subject('Liste des produits retiré pour ' . $chantier . " par " . $this->getUser()->getPseudo() . " le " . $d->format('d-m-Y H:i:s'))
-                    ->html($html);
-                $this->mailer->send($email);
-            }
-        } else {
-            $this->addFlash('danger', 'Pas de chantier à cloturer');
-            return $this->redirectToRoute('app_scan_ean');
-        }
-
-        $this->addFlash('message', 'Retrait cloturé avec succès');
-        return $this->redirectToRoute('app_scan_ean');
-    }
-
-    #[Route("/scan/ean/ajax/{dos}/{ean}", name: "app_scan_ean_ajax")]
+    #[Route("/scan/ean/ajax/{dos}/{ean}", name: "app_mouv_tiers_ajax")]
+    // récupére une fiche produit pour l'afficher sur les pages
     public function retourProduitAjax(ArtRepository $repo, UrlGeneratorInterface $urlGenerator, $dos = null, $ean = null): JsonResponse
     {
         if ($dos === null) {
@@ -418,7 +227,7 @@ class ScanEanController extends AbstractController
     }
 
     #[Route("/emplacement/scan/ajax/{dos}/{emplacement}", name: "app_emplacement_scan_ajax")]
-
+    // vérifier que l'emplacement existe
     public function EmplacementAjax(ArtRepository $repo, $dos = null, $emplacement = null): Response
     {
         $dos = 1;
@@ -429,362 +238,8 @@ class ScanEanController extends AbstractController
         return new JsonResponse(['empl' => $empl]);
     }
 
-    // Alimentation d'emplacement
-    #[Route("/emplacement/scan/ean/{emplacement}", name: "app_scan_ean_alim_empl")]
-
-    public function alimentationEmplacement(ArtRepository $repo, Request $request, AlimentationEmplacementRepository $repoRetrait, $emplacement = null): Response
-    {
-        $dos = 1;
-        $produit = "";
-        $historique = [];
-
-        $form = $this->createForm(AlimentationEmplacementEanType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $produit = $repo->getEanStock($dos, $form->getData()->getEan());
-            $empl = $repo->getEmpl($dos, $form->getData()->getEmplacement());
-            if (!$empl) {
-                $this->addFlash('danger', 'Emplacement introuvable');
-                return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
-            }
-            if ($produit) {
-                $retrait = $form->getData();
-                $emplacement = $form->getData()->getEmplacement();
-                $retrait->setCreatedAt(new \DateTime())
-                    ->setCreatedBy($this->getUser())
-                    ->setQte($form->getData()->getQte())
-                ;
-                $em = $this->entityManager;
-                $em->persist($retrait);
-                $em->flush();
-                $this->addFlash('message', 'Produit ajouté avec succés');
-                return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
-            } else {
-                $emplacement = $form->getData()->getEmplacement();
-                $this->addFlash('danger', 'Produit introuvable');
-                return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
-            }
-        }
-        $formAddPicturesOrDocs = $this->createForm(AddPicturesOrDocsType::class);
-        $formAddPicturesOrDocs->handleRequest($request);
-
-        if ($formAddPicturesOrDocs->isSubmitted() && $formAddPicturesOrDocs->isValid()) {
-            //dd($formAddPicturesOrDocs->getData());
-            $files = $formAddPicturesOrDocs->get('files')->getData();
-            $type = $formAddPicturesOrDocs->get('type')->getData();
-            $ref = $formAddPicturesOrDocs->get('reference')->getData();
-            foreach ($files as $file) {
-                // Logique pour traiter chaque fichier
-                $filename = $type . $ref . '_' . $this->getUser()->getPseudo() . '_' . $file->getClientOriginalName();
-                $cheminRelatif = '//SRVSOFT/FicJoints_R/achat_vente/articles/' . $dos . '/' . strtolower($ref);
-                // Vérifier si le répertoire existe
-                if (!file_exists($cheminRelatif)) {
-                    // Créer le répertoire avec les permissions 0777 (modifiable selon vos besoins)
-                    mkdir($cheminRelatif, 0777, true);
-                }
-                $filepath = $cheminRelatif . '/' . $filename;
-
-                // Vérifier si le fichier existe déjà
-                if (!file_exists($filepath)) {
-                    if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
-                        // Appeler la méthode du service pour compresser et redimensionner l'image
-                        $processedImage = $this->imageService->compressAndResize($file, 1000000);
-                        // Enregistrer l'image dans le répertoire souhaité
-                        $processedImage->save($cheminRelatif . '/' . $filename); // Ajustez le chemin selon vos besoins
-                    } else {
-                        $file->move($cheminRelatif, $filename);
-                    }
-                    $this->addFlash('success', 'Le fichier ' . $file->getClientOriginalName() . ' a été ajouté avec succés.');
-                } else {
-                    // Ajouter ici la logique en cas de fichier existant
-                    $this->addFlash('danger', 'Le fichier ' . $file->getClientOriginalName() . ' existe déjà.');
-                }
-            }
-        }
-
-        if ($emplacement) {
-            $histo = $repoRetrait->findBy(['emplacement' => $emplacement, 'sendAt' => null]);
-            for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
-                $prod = $repo->getEanStock($dos, $histo[$ligHisto]->getEan());
-                $historique[$ligHisto]['id'] = $histo[$ligHisto]->getId();
-                $historique[$ligHisto]['emplacement'] = $histo[$ligHisto]->getEmplacement();
-                $historique[$ligHisto]['ref'] = $prod['ref'];
-                $historique[$ligHisto]['sref1'] = $prod['sref1'];
-                $historique[$ligHisto]['sref2'] = $prod['sref2'];
-                $historique[$ligHisto]['designation'] = $prod['designation'];
-                $historique[$ligHisto]['uv'] = $prod['uv'];
-                $historique[$ligHisto]['ean'] = $prod['ean'];
-                $historique[$ligHisto]['qte'] = $histo[$ligHisto]->getQte();
-                $historique[$ligHisto]['oldLocation'] = $histo[$ligHisto]->getOldLocation();
-            }
-        }
-        return $this->render('scan_ean/alim_empl_scan.html.twig', [
-            'title' => 'Alim Empl',
-            'form' => $form->createView(),
-            'produit' => $produit,
-            'emplacement' => $emplacement,
-            "historiques" => $historique,
-            'formAddPicturesOrDocs' => $formAddPicturesOrDocs->createView(),
-            'eanScannerScript' => $this->eanScannerService->getScannerScript(),
-            'productFormScript' => $this->productFormService->getProductFormScript(),
-        ]);
-    }
-
-    #[Route("/emplacement/scan/ean/all/delete/{emplacement}", name: "app_emplacement_scan_ean_delete_all")]
-
-    public function emplacementDeleteAll($emplacement, AlimentationEmplacementRepository $repo)
-    {
-        //dd($emplacement);
-        $empl = $repo->findBy(['emplacement' => $emplacement, 'sendAt' => null]);
-        foreach ($empl as $value) {
-            $em = $this->entityManager;
-            $em->remove($value);
-            $em->flush();
-        }
-
-        // $route = $request->attributes->get('_route');
-        //  $this->setTracking($route);
-
-        $this->addFlash('message', 'Emplacement ' . $emplacement . ' supprimée avec succès');
-        return $this->redirectToRoute('app_scan_ean_alim_empl');
-    }
-
-    #[Route("/emplacement/scan/ean/delete/{id}/{emplacement}", name: "app_emplacement_scan_ean-delete")]
-
-    public function deleteEmplacement(AlimentationEmplacementRepository $repo, $id, $emplacement = null)
-    {
-        $empl = $repo->findOneBy(['id' => $id]);
-        $em = $this->entityManager;
-        $em->remove($empl);
-        $em->flush();
-
-        //  $route = $request->attributes->get('_route');
-        //  $this->setTracking($route);
-
-        $this->addFlash('message', 'Article supprimée avec succès');
-        return $this->redirectToRoute('app_scan_ean_alim_empl', ['emplacement' => $emplacement]);
-    }
-
-    #[Route("/emplacement/scan/ns", name: "app_scan_emplacement_ns")]
-
-    public function emplacementNs(AlimentationEmplacementRepository $repo)
-    {
-        $ns = $repo->getEmplacementNonSoumis();
-
-        return $this->render('scan_ean/alim_empl_scan_ns.html.twig', [
-            'title' => 'Empl NS',
-            'ns' => $ns,
-        ]);
-    }
-
-    #[Route("/emplacement/scan/send/ean", name: "app_emplacement_scan_ean-send")]
-
-    public function EmplacementsSend(Request $request, AlimentationEmplacementRepository $repo, ArtRepository $repoArt, GenImportXlsxDivaltoService $ImportXlsxService)
-    {
-        $dos = 1;
-        $piece = [];
-        $i = 0; // piece
-        $is = 0; // info Stock
-        $id = 0; // info Depôt
-        $historique = [];
-        $donneesDepot = [];
-        $donneesStock = [];
-        $mouvXlsx = [];
-        $infoDepotStock = [];
-
-        $indexColonnesStock = [
-            'FICHE',
-            'DOSSIER',
-            'ETABLISSEMENT',
-            'REF_PIECE',
-            'CODE_TIERS',
-            'CODE_OP',
-            'DEPOT',
-            'DEPOT_DESTINATION',
-            'ENT.PIDT',
-            'ENT.PIREF',
-            'NO_SOUS_LIGNE',
-            'REFERENCE',
-            'SREF1',
-            'SREF2',
-            'DESIGNATION',
-            'REF_FOURNISSEUR',
-            'MOUV.OP',
-            'QUANTITE',
-            'MOUV.PPAR',
-            'MOUV.PUB',
-            'EMPLACEMENT',
-            'EMPLACEMENT_DESTINATION',
-            'SERIE',
-            'QUANTITE_VTL',
-        ];
-
-        $indexColonnesInfoStock = [
-            'DOSSIER',
-            'REFERENCE',
-            'DEPOT',
-            'NATURESTOCK',
-            'NUMERONOTE',
-            'DATEINV',
-            'FAMILLEINV',
-            'PERIODEINV',
-            'INVIMPPAGCOD',
-            'INVPAGNB',
-            'CRITEREINV',
-            'Anomalies',
-            'Alertes',
-        ];
-
-        $indexColonnesInfoDepot = [
-            'DOSSIER',
-            'REFERENCE',
-            'SREFERENCE1',
-            'SREFERENCE2',
-            'DEPOT',
-            'NATURESTOCK',
-            'NUMERONOTE',
-            'EMPLACEMENT',
-            'STLGTSORCOD',
-            'FLAGORDOSMC',
-            'FAMRANGEMENT',
-            'ELIGIBLESLOTTING',
-            'WMPROFILCOD',
-            'WMEMPLPREP',
-            'RESJRNB',
-            'WMEMPCONTNB',
-            'Anomalies',
-            'Alertes',
-        ];
-
-        $histo = $repo->findBy(['sendAt' => null]);
-        // construire l'historique en allant chercher les infos sur l'article grâce à l'EAN
-        for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
-            $prod = $repoArt->getEanStock($dos, $histo[$ligHisto]->getEan());
-            $basculeSend = $repo->findOneBy(['id' => $histo[$ligHisto]->getId()]);
-            $basculeSend->setSendAt(new DateTime())
-            ;
-            $em = $this->entityManager;
-            $em->persist($basculeSend);
-            $em->flush();
-
-            $historique[$ligHisto]['emplacement'] = $histo[$ligHisto]->getEmplacement();
-            $historique[$ligHisto]['ref'] = $prod['ref'];
-            $historique[$ligHisto]['sref1'] = $prod['sref1'];
-            $historique[$ligHisto]['sref2'] = $prod['sref2'];
-            $historique[$ligHisto]['designation'] = $prod['designation'];
-            $historique[$ligHisto]['uv'] = $prod['uv'];
-            $historique[$ligHisto]['ean'] = $prod['ean'];
-            $historique[$ligHisto]['qte'] = $histo[$ligHisto]->getQte();
-            $historique[$ligHisto]['oldLocation'] = $histo[$ligHisto]->getOldLocation();
-
-            // Entrée en stock => JI
-            // Alimentation du MOUV
-            $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''
-            $piece[$i]['FICHE'] = 'MOUV';
-            $piece[$i]['REFERENCE'] = $prod['ref']; // MOUV
-            $piece[$i]['SREF1'] = $prod['sref1']; // MOUV
-            $piece[$i]['SREF2'] = $prod['sref2']; // MOUV
-            $piece[$i]['DESIGNATION'] = $prod['designation']; // MOUV
-            $piece[$i]['REF_FOURNISSEUR'] = ''; // MOUV
-            $piece[$i]['MOUV.OP'] = 'JI'; // MOUV
-            $piece[$i]['QUANTITE'] = $histo[$ligHisto]->getQte(); // MOUV
-            $piece[$i]['MOUV.PPAR'] = ''; // MOUV
-            $piece[$i]['MOUV.PUB'] = ''; // MOUV
-
-            // Alimentation du MVTL
-            $i++;
-            $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''
-            $piece[$i]['FICHE'] = 'MVTL';
-            $piece[$i]['EMPLACEMENT'] = $histo[$ligHisto]->getEmplacement(); // MVTL
-            $piece[$i]['SERIE'] = ''; // MVTL
-            $piece[$i]['QUANTITE_VTL'] = $histo[$ligHisto]->getQte(); // MVTL
-            $i++;
-
-            // Sortir le stock de l'emplacement d'origine si nécéssaire
-            if ($histo[$ligHisto]->getOldLocation() != 'Add') {
-                // Sortie de stock => II
-                // Alimentation du MOUV
-                $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''
-                $piece[$i]['FICHE'] = 'MOUV';
-                $piece[$i]['REFERENCE'] = $prod['ref']; // MOUV
-                $piece[$i]['SREF1'] = $prod['sref1']; // MOUV
-                $piece[$i]['SREF2'] = $prod['sref2']; // MOUV
-                $piece[$i]['DESIGNATION'] = $prod['designation']; // MOUV
-                $piece[$i]['REF_FOURNISSEUR'] = ''; // MOUV
-                $piece[$i]['MOUV.OP'] = 'II'; // MOUV
-                $piece[$i]['QUANTITE'] = $histo[$ligHisto]->getQte(); // MOUV
-                $piece[$i]['MOUV.PPAR'] = ''; // MOUV
-                $piece[$i]['MOUV.PUB'] = ''; // MOUV
-
-                // Alimentation du MVTL
-                $i++;
-                $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''
-                $piece[$i]['FICHE'] = 'MVTL';
-                $piece[$i]['EMPLACEMENT'] = $histo[$ligHisto]->getOldLocation(); // MVTL
-                $piece[$i]['SERIE'] = ''; // MVTL
-                $piece[$i]['QUANTITE_VTL'] = $histo[$ligHisto]->getQte(); // MVTL
-                $i++;
-            }
-
-            // Alimenter le tableau pour l'info Stock
-            $donneesStock[$is] = array_fill_keys($indexColonnesInfoStock, ''); // Initialise toutes les colonnes à ''
-            $donneesStock[$is]['DOSSIER'] = 1;
-            $donneesStock[$is]['REFERENCE'] = $prod['ref'];
-            $donneesStock[$is]['DEPOT'] = 2;
-            $is++;
-
-            // Alimenter le tableau pour l'info Depot
-            $donneesDepot[$id] = array_fill_keys($indexColonnesInfoDepot, ''); // Initialise toutes les colonnes à ''
-            $donneesDepot[$id]['DOSSIER'] = 1;
-            $donneesDepot[$id]['REFERENCE'] = $prod['ref'];
-            $donneesDepot[$id]['SREFERENCE1'] = $prod['sref1'];
-            $donneesDepot[$id]['SREFERENCE2'] = $prod['sref2'];
-            $donneesDepot[$id]['DEPOT'] = 2;
-            $donneesDepot[$id]['EMPLACEMENT'] = $histo[$ligHisto]->getEmplacement();
-            $id++;
-        }
-
-        // Créer les fichiers Excel
-        if ($piece) {
-            $mouvXlsx = $ImportXlsxService->get_export_excel_stock('Stock ', $piece);
-        }
-
-        if ($donneesStock || $donneesDepot) {
-            $infoDepotStock = $ImportXlsxService->get_export_excel_info_stock_depot('Table article', $donneesStock, $donneesDepot);
-        }
-
-        // envoyer un mail si il y a des infos à envoyer
-        if ($historique) {
-            // envoyer un mail
-            $html = $this->renderView('scan_ean/mails/AlimentationEmplacementScan.html.twig', ['commentaire' => $request->request->get('ta')]);
-            $d = new DateTime();
-            $email = (new Email())
-                ->from($this->mailEnvoi)
-                ->to($this->getUser()->getEmail())
-                ->subject('Soumission d\'alimentation d\'emplacement par ' . $this->getUser()->getPseudo() . " le " . $d->format('d-m-Y H:i:s'))
-                ->html($html)
-                ->attachFromPath($mouvXlsx);
-            if ($infoDepotStock) {
-                $email->attachFromPath($infoDepotStock); // Deuxième pièce jointe
-            }
-            $this->mailer->send($email);
-            if ($mouvXlsx) {
-                unlink($mouvXlsx);
-            }
-            if ($infoDepotStock) {
-                unlink($infoDepotStock);
-            }
-        } else {
-            $this->addFlash('danger', 'Pas d\'emplacement à cloturer');
-            return $this->redirectToRoute('app_scan_ean_alim_empl');
-        }
-
-        $this->addFlash('message', 'Soumission effectuée avec succès');
-        return $this->redirectToRoute('app_scan_ean_alim_empl');
-    }
-
     #[Route("/produit/print/{emplacement}", name: "app_scan_emplacement_print")]
-
+    // imprimer les étiquettes produits
     public function print(Request $request, ArtRepository $repo, $emplacement = null)
     {
 
@@ -810,6 +265,7 @@ class ScanEanController extends AbstractController
     }
 
     #[Route("/products/search/ajax/{dos}/{search}/{checkProd}", name: "app_products_search")]
+    // rechercher un produit avec Ajax pour l'afficher sur la page
     public function productsSearch(ArtRepository $repo, $dos, $search, $checkProd)
     {
         if ($dos === null) {
@@ -862,8 +318,8 @@ class ScanEanController extends AbstractController
         return new JsonResponse($result);
     }
 
-    // Impression étiquette d'emplacement
-    #[Route("/impression/emplacement", name: "app_print_empl")]
+    // Impression des étiquettes d'emplacement
+    #[Route("/impression/interval/emplacements", name: "app_print_empl")]
 
     public function impressionEmplacement(ArtRepository $repo, Request $request): Response
     {
@@ -890,7 +346,7 @@ class ScanEanController extends AbstractController
     }
 
     #[Route("/impression/imprimante", name: "app_imprimante_ajax")]
-
+    // ça ne sert à rien du tout, il faut que je vois s'il est possible de le supprimer sans faire bugger
     public function checkPrinter(): JsonResponse
     {
         $result = ['success' => false, 'response' => 'Erreur exécution...'];

@@ -6,7 +6,7 @@
 
 {% block body %}
 	<div class="btn-group mb-2 text-center col-12">
-		<a href="{{ path('app_scan_ean_alim_empl') }}" class="text-white btn btn-primary col-6">
+		<a href="{{ path('app_mouv_stock') }}" class="text-white btn btn-primary col-6">
 			<i class="fa fa-plus mr-2"></i>Nouvelle Empl.
 		</a>
 		<a href="{{ path('app_search_products')}}" class="text-white btn btn-secondary col-6">
@@ -17,8 +17,8 @@
 <!-- general form elements disabled -->
 <div class="card card-navy">
 	<div class="card-header d-flex">
-		<h3 class="card-title">Alimentation d'emplacement</h3>
-		<a href="{{ path('app_scan_emplacement_ns') }}" class="badge badge-danger ml-auto">Non soumis</a>
+		<h3 class="card-title">Régularisation de stock</h3>
+		<a href="{{ path('app_mouv_stock_emplacement_ns') }}" class="badge badge-danger ml-auto">Non soumis</a>
 	</div>
 	<!-- /.card-header -->
 	<div class="card-body">
@@ -199,7 +199,7 @@
 											</div>
 											<div class="modal-footer justify-content-between">
 												<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-												<a href="{{path('app_emplacement_scan_ean-delete', {'id' : historique.id, 'emplacement' : app.request.attributes.get('emplacement') })}}" type="button" class="btn btn-danger">Supprimer cette ligne</a>
+												<a href="{{path('app_mouv_stock_emplacement_delete_id', {'id' : historique.id, 'emplacement' : app.request.attributes.get('emplacement') })}}" type="button" class="btn btn-danger">Supprimer cette ligne</a>
 											</div>
 										</div>
 										<!-- /.modal-content -->
@@ -231,7 +231,7 @@
 				</div>
 				<div class="modal-footer justify-content-between">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-					<a href="{{path('app_emplacement_scan_ean_delete_all', {'emplacement' : app.request.attributes.get('emplacement') })}}" type="button" class="btn btn-danger">Supprimer</a>
+					<a href="{{path('app_mouv_stock_emplacement_delete_all', {'emplacement' : app.request.attributes.get('emplacement') })}}" type="button" class="btn btn-danger">Supprimer</a>
 				</div>
 			</div>
 			<!-- /.modal-content -->
