@@ -181,25 +181,24 @@ class ComptaAnalytiqueController extends AbstractController
             if (is_array($achat) && $achat['pinoFou']) {
                 // ramener la somme des montants du transport sur cette piéce
                 $port = $this->repoAnal->getTransportFournisseur($achat['pinoFou'], $exportVentes[$lig]['Article']);
-
-                if (is_array($port) && $port['montant'] > 0 && $port['montant'] != 'null' && $cmat > 0) {
+                if ($port > 0 && $port != 'null' && $cmat > 0) {
                     // ramener le détail de la piéce fournisseur
                     $ventes[$lig]['type'] = 'truck';
                     $ventes[$lig]['color'] = 'secondary';
                     $transport = $this->repoAnal->getDetailPieceFournisseur($achat['pinoFou']);
                     // La quantité pour les produits qui ne sont pas des articles de transport
                     $estim = $this->repoAnal->getQteHorsPortFournisseur($achat['pinoFou']);
-                    if ($estim['qte'] > 0 && $port['montant'] > 0) {
+                    if ($estim > 0 && $port > 0) {
                         try {
-                            $ventes[$lig]['estimation'] = ($port['montant'] / $estim['qte']);
+                            $ventes[$lig]['estimation'] = ($port / $estim);
                         } catch (Exception $e) {
-                            echo 'Exception reçue : ', $e->getMessage() . $port['montant'] . ' - ' . $estim['qte'], "\n";
+                            echo 'Exception reçue : ', $e->getMessage() . $port . ' - ' . $estim, "\n";
                         }
                         if ($exportVentes[$lig]['qteVtl'] != 0) {
-                            $ventes[$lig]['estimationTotal'] = $exportVentes[$lig]['qteVtl'] * ($port['montant'] / $estim['qte']);
+                            $ventes[$lig]['estimationTotal'] = $exportVentes[$lig]['qteVtl'] * ($port / $estim);
                         }
                     }
-                } elseif (is_array($port) && ($port['montant'] == 0 | $port['montant'] == 'null') && $cmat > 0) {
+                } elseif (($port == 0 | $port == 'null') && $cmat > 0) {
                     // ramener le détail de la piéce fournisseur
                     $ventes[$lig]['type'] = 'dollar-sign';
                     $ventes[$lig]['color'] = 'warning';
@@ -220,6 +219,7 @@ class ComptaAnalytiqueController extends AbstractController
             unset($achat);
 
         }
+
         return $ventes;
     }
 

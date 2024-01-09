@@ -1,407 +1,549 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ title }}{% endblock %}
-{% block body %}
-<div class="card collapsed-card card-warning">
-    <div class="card-header">
-        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-        </div>
-    </div>
-    <!-- /.card-header -->
-    <div class="card-body">
-    <h2><u>Avant Propos :</u></h2>
-    <p>Export en cours d'affinage, il est impératif de procéder a des contrôles manuels pour détecter d'éventuelles incohérences.</br>
-    Cette extraction est le reflet de ce qui est présent dans Divalto, elle ne pourra jamais être parfaite et nécéssitera toujours une intervention humaine....</p>
-    <p>L'extraction des données peut prendre un peu de temps, il y a souvent beaucoup d'information à traiter.....</p>
-    <p>CR => Coût de Revient</p>
-    <p>CMP => Coût moyen pondéré</p>
-    <p>CA => Coût d'achat récupéré grâce à la ventilation du mouvement</p>
-    <p>La colonne Total Retenu reprends le prix qui est le plus probablement juste dans cette ordre de priorité => prix d'achat, CMP, CR</p>
-    <p>Le CA est déterminé par la ventilation achat relié à la ventilation vente associé, il est possible que pour une vente il y ai plusieurs achats concernés,
-    pour représenter cela, la quantité vente est éclaté en fonction des ventilations achats dans lesquelles elle pioche</p>
-    <p>Le compte achat est adapté en fonction du mouvement de ventilation en achat qui lui est relié, si aucun mouvement en achat n'est trouvé,
-    le compte achat est déterminé par le fournisseur habituel de l'article</p>
-    <p>L'estimation du transport ne tient pas compte des ZRPO (Redevance) dans la division port/quantités, cette fonctionnalité n'est pas parfaite, 
-    car certains produits ont beau être en plus grande quantité dans la facture fournisseur, cela ne signifie pas qu'ils sont responsables à part égale du transport</p>
-    <p>Exemple : une facture fournisseur avec 5000 étiquettes et 2000 pots, le port (s'il est d'un métier différent du métier client) sera divisé par 7000 ....</p>
-    <p>Le port qui est indiqué ne l'ai que si le métier de l'article du port est différent de celui du client</p>
-    <p>Quand la vente est relier à une piéce fournisseur, il y a un icone pour l'afficher dans la colonne Détail, si sur la piéce fournisseur, il y a un article transport qui a un métier différent du client, c'est un icone de camion, sinon c'est un icone Dollars</p>
-    <p>Les données sont directement piochées dans Divalto, une modification de Divalto aura donc un impact immédiat sur l'export. (il faut évidement le relancer)</p>
-    <p>Il est possible que vous constatiez que certains produits ne sont pas considéré en transport, ce probléme viendrait simplement de la famille du produit dans divalto qui doit être sur 'TRANSPOR'</p>
-    <p>à l'inverse, il est possible certains produits soient considéré comme transport alors que ce n'est pas le cas, pour corriger ce probléme, il suffit d'adapter la famille produit sur Divalto et de relancer l'export.</p>
-    <p>Il est important de signaler tout probléme rencontré pour correctif et toutes évolutions souhaitées pour améliorations</p>
-    </br>
-    <h2><u>Démarrage et paramétrage d'envois automatiques :</u></h2>
-    <p>Une fois le filtrage effectué sur un mois et une année, il est possible d'extraire le tableau remanié au format excel, pour cela vous pouvez cliquer sur le bouton Excel qui apparait à coté de Filtrer</p> 
-    <p>Il est également possible de paramétrer des envois automatiques, pour cela cliquer sur le '-' de la barre "Paramétre d'envoi automatique de la compta analytique" et renseignez votre mail et la date de reception souhaitée puis cliquer sur ajouter</p>
-    <p>Vous pouvez mettre plusieurs mails à la liste d'envoi automatique, pour cela il suffit d'ajouter plusieurs mails en indiquant à chaque fois la date de reception souhaitée</p>
-    <p>Pour supprimer un destinataire d'envoi automatique, cliquez sur la poubelle à coté de son mail</p>
-    </br>
-    <h2><u>Utilisation :</u></h2>
-    <p>Le procédé logique veut que l'on mette à jour le fichier Excel dans les colonnes Roses s'il y a des correctifs à appliquer, les totaux se recalculent automatiquement</p>
-    <p>En paralléle, il est recommandé de consulter le détail des achats reliés à la vente sur le site intranet pour vérifier la cohérence des données</p>
-    <p>le fichier Excel est protégé par un mot de passe pour éviter les mauvaises manipulations, seules les colonnes roses clairs sont modifiables.</p>
-    <p>Même s'il n'est pas recommandé de le dévérrouillé, le mot de passe pour ôter les protections des fichiers Excel est => intranet</p> 
-    <!-- /.card-footer-->
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="card collapsed-card card-dark">
-            <div class="card-header">
-                <h3 class="card-title text-center">Paramétre d'envoi automatique de la compta analytique</h3>
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
-                  </button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-           {{ form_start(formMails)}}
-                <div class="form-group d-flex justify-content-around flex-wrap">
-                    {{ form_label(formMails.SecondOption) }}
-                    {{ form_widget(formMails.SecondOption) }}
-                    {{ form_widget(formMails.email) }}
-                    {{ form_widget(formMails.Ajouter)}}
-                </div>
-                <div class='text-center m-2'>
-                    <span class="text-secondary"><i class="fas fa-clock text-secondary"></i> Le mois envoyé est toujours le mois précédent à celui en cours.... Exemple : si vous selectionnez le jour d'envoi 20, le 20 février à 00h45 vous recevrez le mois de janvier, le 20 mars à 00h45 => le mois de février, etc...</span>
-                </div>
-            {{ form_end(formMails)}}
-            {% if listeMails %}
-                <table id="example2" class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th class="text-center"><span>Email actuellement dans la liste</span></th>
-                            <th class="text-center"><span>Jour d'envoi chaque mois à 00h45</span></th>
-                            <th class="text-center"><span>Action</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for listeMail in listeMails %}
-                            <tr>
-                                <td class="text-center">
-                                    <a class="text-center text-dark">{{ listeMail.email }}</a>
-                                </td>
-                                <td class="text-center">
-                                    <a class="text-center text-dark">{{ listeMail.SecondOption }}</a>
-                                </td>
-                                <td class="text-center">
-                                    <a data-toggle="modal" data-target="#modal-default-{{listeMail.id}}" class="text-center btn btn-xl btn-danger"><i class="fas fa-trash-alt"></i></a>
-                                    <div class="modal fade" id="modal-default-{{listeMail.id}}">
-                                        <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                            <h4 class="modal-title">Voulez vous vraiment supprimer ce mail ?</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                            </div>
-                                            <div class="modal-body">
-                                            <p>Cette action est irréversible !&hellip;</p>
-                                            </div>
-                                            <div class="modal-footer justify-content-between">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                                            <a type="button" href='{{path('app_email_delete_redirect', {'id' : listeMail.id, 'route' : app.request.attributes.get('_route')  } ) }}' class="btn btn-danger">Supprimer</a>
-                                            </div>
-                                        </div>
-                                        <!-- /.modal-content -->
-                                        </div>
-                                        <!-- /.modal-dialog -->
-                                    </div>
-                                    <!-- /.modal -->
-                                </td>
-                            </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-                
-<div class="row">
-            <div class="col-md-12">
-                <div class="card card-dark">
-                    <div class="card-header d-flex justify-content-between">
-                        <h2 class="card-title">Compta Analytique Lhermitte frères 
-                            {% if annee and mois %}{{mois}} - {{annee}}{% endif %}
-                        </h2>
-                        
-                        {{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }} ) }}
-                        <div class='d-flex'>
-                            <div class="p-1 mt-2">
-                                Selectionnez le mois et l'année : 
-                            </div>
-                            <div class="p-1">
-                                {{ form_row(monthYear.month) }}
-                            </div>
-                            <div class="p-1">
-                                {{ form_row(monthYear.year) }}
-                            </div>
-                            <div class="p-1">
-                                {{ form_row(monthYear.filtrer)}}
-                            </div>
-                            {% if ventes %}
-                            <div class="p-1">
-                                <a href="{{path('app_compta_analytique_export_excel', {'annee' : annee, 'mois' : mois, 'type' : 'download' } ) }}" class="btn btn-success">
-                                    <i class="nav-icon fas fa-file-excel"></i>
-                                </a>
-                            </div>
-                            {% endif %}
-                        </div>
-                    {{ form_end(monthYear)}}
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-							{% if ventes %}
-                        <table id="example1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"><span>Facture</span></th>
-                                    <th class="text-center"><span>Tiers</span></th>
-                                    <th class="text-center"><span>Ref</span></th>
-                                    <th class="text-center"><span>Sref1</span></th>
-                                    <th class="text-center"><span>Sref2</span></th>
-                                    <th class="text-center"><span>Designation</span></th>
-                                    <th class="text-center"><span>Uv</span></th>
-                                    <th class="text-center"><span>OP</span></th>
-                                    <th class="text-center table-info"><span>CR</span></th>
-                                    <th class="text-center table-warning"><span>CMP</span></th>
-                                    <th class="text-center table-success"><span>CA</span></th>
-                                    <th class="text-center"><span>Article</span></th>
-                                    <th class="text-center"><span>Client</span></th>
-                                    <th class="text-center"><span>Compte Achat</span></th>
-                                    <th class="text-center table-danger"><span>Qte Vendu</span></th>
-                                    <th class="text-center table-info"><span>Total CR</span></th>
-                                    <th class="text-center table-warning"><span>Total CMP</span></th>
-                                    <th class="text-center table-success"><span>Total CA</span></th>
-                                    <th class="text-center table-primary"><span>Total Proposé</span></th>
-                                    <th class="text-center"><span>Détail</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            
-                                {% for vente in ventes %}
-                                    <tr>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.Facture }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.Tiers }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.Ref}}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.Sref1}}</a>
-                                        </td>
-                                        <td class="text-left">
-                                            <a class="text-dark">{{ vente.Sref2 }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.Designation }}</a>
-                                        </td>
-                                        <td class="text-left">
-                                            <a class="text-dark">{{ vente.Uv }}</a>
-                                        </td>
-                                        <td class="text-left">
-                                            <a class="text-dark">{{ vente.Op }}</a>
-                                        </td>
-                                        <td class="text-center table-info">
-                                            <a class="text-dark">
-                                            {% if vente.CoutRevient %}
-                                                {{ vente.CoutRevient|number_format(4) }}
-                                            {% endif %}
-                                            </a>
-                                        </td>
-                                        <td class="text-center table-warning">
-                                            <a class="text-dark">
-                                            {% if vente.CoutMoyenPondere %}
-                                                {{ vente.CoutMoyenPondere|number_format(4) }}
-                                            {% endif %}
-                                            </a>
-                                        </td>
-                                        <td class="text-center table-success">
-                                            <a class="text-dark">
-                                            {% if vente.Cma %}
-                                                {{ vente.Cma|number_format(4) }}
-                                            {% endif %}
-                                            </a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.Article }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.Client }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ vente.CompteAchat }}</a>
-                                        </td>
-                                        <td class="text-center table-danger">
-                                            <a class="text-dark">
-                                            {% if vente.QteSign %}
-                                                {{ vente.QteSign }}
-                                            {% endif %}
-                                            </a>
-                                        </td>
-                                        <td class="text-center table-info">
-                                            <a class="text-dark">{% if vente.TotalCoutRevient %}{{ vente.TotalCoutRevient|number_format(4) }}{% endif %}</a>
-                                        </td>
-                                        <td class="text-center table-warning">
-                                            <a class="text-dark">{% if vente.TotalCoutMoyenPondere %}{{ vente.TotalCoutMoyenPondere|number_format(4) }}{% endif %}</a>
-                                        </td>
-                                        <td class="text-center table-success">
-                                            <a class="text-dark">{% if vente.TotalCoutCma %}{{ vente.TotalCoutCma|number_format(4) }}{% endif %}</a>
-                                        </td>
-                                        <td class="text-center table-primary">
-                                            <a class="text-dark">{% if vente.prixRetenu %}{{ vente.prixRetenu|number_format(4) }}{% endif %}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            {% if vente.DetailFacture %}<button type="button" class="btn btn-{{vente.color}}" data-toggle="modal" data-target="#modal-xl-{{ vente.Facture }}-{{ vente.Ref|replace({'/': '-', '.' : ''}) }}"><i class="fas fa-{{vente.type}}"></i></button>{% endif %}
-                                        {% if vente.DetailFacture %}
-                                        <!-- modal -->
-                                                <div class="modal fade" id="modal-xl-{{ vente.Facture }}-{{ vente.Ref|replace({'/': '-', '.' : ''}) }}">
-                                                    <div class="modal-dialog modal-xl">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                        <div class='d-flex flex-column'>
-                                                        <h3 class="modal-title">Détail des factures achats</h3>
-                                                        <span class="modal-title text-left">
-                                                            Le produit concerné : ref: {{ vente.Ref }} Des:{{ vente.Designation }}  
-                                                            {% if vente.Sref1 %} Sref1: {{ vente.Sref1 }}{% endif %}
-                                                            {% if vente.Sref2 %} Sref2: {{ vente.Sref2 }}{% endif %}
-                                                        </span>
-                                                        
-                                                        {% if vente.estimation or vente.estimationTotal %}
-                                                            <span class="modal-title text-left">Seul les produits de la famille 'TRANSPOR' sont utilisés pour calculer l'estimation du port par produits et seulement si la famille du coup de transport est différente de la famille du client</span>
-                                                        {% endif %}
-                                                        {% if vente.estimation %}
-                                                            <span class="modal-title text-left">L'estimation du port par unité de vente est de {{ vente.estimation|number_format(2) }} €</span>
-                                                        {% endif %}
-                                                        {% if vente.estimationTotal %}
-                                                            <span class="modal-title text-left">L'estimation du port pour le total des unitées de vente est de {{ vente.estimationTotal|number_format(2) }} €</span>
-                                                        {% endif %}
-                                                        </div>
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                        </div>
-                                                        <div class="modal-body table-responsive p-1" style="height: 350px;">
-                                                        <table class="table table-head-fixed">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th class="text-center"><span>Facture</span></th>
-                                                                    <th class="text-center"><span>Famille</span></th>
-                                                                    <th class="text-center"><span>Article</span></th>
-                                                                    <th class="text-center"><span>Référence</span></th>
-                                                                    <th class="text-center"><span>Sref1</span></th>
-                                                                    <th class="text-center"><span>Sref2</span></th>
-                                                                    <th class="text-center"><span>Désignation</span></th>
-                                                                    <th class="text-center"><span>Op</span></th>
-                                                                    <th class="text-center"><span>Qte</span></th>
-                                                                    <th class="text-center"><span>Prix unitaire</span></th>
-                                                                    <th class="text-center"><span>Montant Signé</span></th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {% for detail in vente.DetailFacture %}
-                                                                    <tr>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">{{ detail.Facture }}</a>
-                                                                        </td>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">{{ detail.famille }}</a>
-                                                                        </td>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">{{ detail.article }}</a>
-                                                                        </td>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">{{ detail.Ref }}</a>
-                                                                        </td>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">{{ detail.Sref1 }}</a>
-                                                                        </td>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">{{ detail.Sref2 }}</a>
-                                                                        </td>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">{{ detail.Designation }}</a>
-                                                                        </td>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">{{ detail.Op }}</a>
-                                                                        </td>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">{{ detail.Qte }}</a>
-                                                                        </td>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">
-                                                                            {% if detail.pu %}
-                                                                                {{ detail.pu|number_format(2) }} €
-                                                                            {% endif %}
-                                                                            </a>
-                                                                        </td>
-                                                                        <td class="text-center">
-                                                                            <a class="text-dark">{{ detail.MontantSign }}</a>
-                                                                        </td>
-                                                                    </tr>
-                                                                {% endfor %}
-                                                            </tbody>
-                                                        </table>
-                                                        </div>
-                                                        <div class="modal-footer d-flex justify-content-between">
-                                                            <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                                                        </div>
-                                                    </div>
-                                                    <!-- /.modal-content -->
-                                                    </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
-                                                <!-- /.modal -->
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th class="text-center"><span>Facture</span></th>
-                                    <th class="text-center"><span>Tiers</span></th>
-                                    <th class="text-center"><span>Ref</span></th>
-                                    <th class="text-center"><span>Sref1</span></th>
-                                    <th class="text-center"><span>Sref2</span></th>
-                                    <th class="text-center"><span>Designation</span></th>
-                                    <th class="text-center"><span>Uv</span></th>
-                                    <th class="text-center"><span>OP</span></th>
-                                    <th class="text-center table-info"><span>CR</span></th>
-                                    <th class="text-center table-warning"><span>CMP</span></th>
-                                    <th class="text-center table-success"><span>CA</span></th>
-                                    <th class="text-center"><span>Article</span></th>
-                                    <th class="text-center"><span>Client</span></th>
-                                    <th class="text-center"><span>Compte Achat</span></th>
-                                    <th class="text-center table-danger"><span>Qte Vendu</span></th>
-                                    <th class="text-center table-info"><span>Total CR</span></th>
-                                    <th class="text-center table-warning"><span>Total CMP</span></th>
-                                    <th class="text-center table-success"><span>Total CA</span></th>
-                                    <th class="text-center table-primary"><span>Total Proposé</span></th>
-                                    <th class="text-center"><span>Transport Fournisseur</span></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                                {% else %}
-                                     <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez selectionner un mois et une année !</h4>
-                            {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
+{% block title %}
+	{{ title }}
 {% endblock %}
+{% block body %}
+	<div class="card collapsed-card card-warning">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-exclamation-triangle"></i>
+				Avertissement</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<h2>
+				<u>Avant Propos :</u>
+			</h2>
+			<p>Export en cours d'affinage, il est impératif de procéder a des contrôles manuels pour détecter d'éventuelles incohérences.</p>
+		</br>
+		Cette extraction est le reflet de ce qui est présent dans Divalto, elle ne pourra jamais être parfaite et nécéssitera toujours une intervention humaine....</p>
+	<p>L'extraction des données peut prendre un peu de temps, il y a souvent beaucoup d'information à traiter.....</p>
+	<p>CR => Coût de Revient</p>
+	<p>CMP => Coût moyen pondéré</p>
+	<p>CA => Coût d'achat récupéré grâce à la ventilation du mouvement</p>
+	<p>La colonne Total Retenu reprends le prix qui est le plus probablement juste dans cette ordre de priorité => prix d'achat, CMP, CR</p>
+	<p>Le CA est déterminé par la ventilation achat relié à la ventilation vente associé, il est possible que pour une vente il y ai plusieurs achats concernés,
+												    pour représenter cela, la quantité vente est éclaté en fonction des ventilations achats dans lesquelles elle pioche</p>
+	<p>Le compte achat est adapté en fonction du mouvement de ventilation en achat qui lui est relié, si aucun mouvement en achat n'est trouvé,
+												    le compte achat est déterminé par le fournisseur habituel de l'article</p>
+	<p>L'estimation du transport ne tient pas compte des ZRPO (Redevance) dans la division port/quantités, cette fonctionnalité n'est pas parfaite, 
+												    car certains produits ont beau être en plus grande quantité dans la facture fournisseur, cela ne signifie pas qu'ils sont responsables à part égale du transport</p>
+	<p>Exemple : une facture fournisseur avec 5000 étiquettes et 2000 pots, le port (s'il est d'un métier différent du métier client) sera divisé par 7000 ....</p>
+	<p>Le port qui est indiqué ne l'ai que si le métier de l'article du port est différent de celui du client</p>
+	<p>Quand la vente est relier à une piéce fournisseur, il y a un icone pour l'afficher dans la colonne Détail, si sur la piéce fournisseur, il y a un article transport qui a un métier différent du client, c'est un icone de camion, sinon c'est un icone Dollars</p>
+	<p>Les données sont directement piochées dans Divalto, une modification de Divalto aura donc un impact immédiat sur l'export. (il faut évidement le relancer)</p>
+	<p>Il est possible que vous constatiez que certains produits ne sont pas considéré en transport, ce probléme viendrait simplement de la famille du produit dans divalto qui doit être sur 'TRANSPOR'</p>
+	<p>à l'inverse, il est possible certains produits soient considéré comme transport alors que ce n'est pas le cas, pour corriger ce probléme, il suffit d'adapter la famille produit sur Divalto et de relancer l'export.</p>
+	<p>Il est important de signaler tout probléme rencontré pour correctif et toutes évolutions souhaitées pour améliorations</p>
+</br>
+<h2>
+	<u>Démarrage et paramétrage d'envois automatiques :</u>
+</h2>
+<p>Une fois le filtrage effectué sur un mois et une année, il est possible d'extraire le tableau remanié au format excel, pour cela vous pouvez cliquer sur le bouton Excel qui apparait à coté de Filtrer</p>
+<p>Il est également possible de paramétrer des envois automatiques, pour cela cliquer sur le '-' de la barre "Paramétre d'envoi automatique de la compta analytique" et renseignez votre mail et la date de reception souhaitée puis cliquer sur ajouter</p>
+<p>Vous pouvez mettre plusieurs mails à la liste d'envoi automatique, pour cela il suffit d'ajouter plusieurs mails en indiquant à chaque fois la date de reception souhaitée</p>
+<p>Pour supprimer un destinataire d'envoi automatique, cliquez sur la poubelle à coté de son mail</p></br><h2>
+<u>Utilisation :</u></h2><p>Le procédé logique veut que l'on mette à jour le fichier Excel dans les colonnes Roses s'il y a des correctifs à appliquer, les totaux se recalculent automatiquement</p><p>En paralléle, il est recommandé de consulter le détail des achats reliés à la vente sur le site intranet pour vérifier la cohérence des données</p><p>le fichier Excel est protégé par un mot de passe pour éviter les mauvaises manipulations, seules les colonnes roses clairs sont modifiables.</p><p>Même s'il n'est pas recommandé de le dévérrouillé, le mot de passe pour ôter les protections des fichiers Excel est => intranet</p><!-- /.card-footer--></div></div><div class="row"><div class="col-md-12"><div class="card collapsed-card card-dark">
+<div class="card-header">
+	<h3 class="card-title text-center">Paramétre d'envoi automatique de la compta analytique</h3>
+	<div class="card-tools">
+		<button type="button" class="btn btn-tool" data-card-widget="collapse">
+			<i class="fas fa-minus"></i>
+		</button>
+		<button type="button" class="btn btn-tool" data-card-widget="remove">
+			<i class="fas fa-times"></i>
+		</button>
+	</div>
+</div>
+<!-- /.card-header -->
+<div class="card-body">
+	{{ form_start(formMails)}}
+	<div class="form-group d-flex justify-content-around flex-wrap">
+		{{ form_label(formMails.SecondOption) }}
+		{{ form_widget(formMails.SecondOption) }}
+		{{ form_widget(formMails.email) }}
+		{{ form_widget(formMails.Ajouter)}}
+	</div>
+	<div class='text-center m-2'>
+		<span class="text-secondary">
+			<i class="fas fa-clock text-secondary"></i>
+			Le mois envoyé est toujours le mois précédent à celui en cours.... Exemple : si vous selectionnez le jour d'envoi 20, le 20 février à 00h45 vous recevrez le mois de janvier, le 20 mars à 00h45 => le mois de février, etc...</span>
+	</div>
+	{{ form_end(formMails)}}
+	{% if listeMails %}
+		<table id="example2" class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th class="text-center">
+						<span>Email actuellement dans la liste</span>
+					</th>
+					<th class="text-center">
+						<span>Jour d'envoi chaque mois à 00h45</span>
+					</th>
+					<th class="text-center">
+						<span>Action</span>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for listeMail in listeMails %}
+					<tr>
+						<td class="text-center">
+							<a class="text-center text-dark">{{ listeMail.email }}</a>
+						</td>
+						<td class="text-center">
+							<a class="text-center text-dark">{{ listeMail.SecondOption }}</a>
+						</td>
+						<td class="text-center">
+							<a data-toggle="modal" data-target="#modal-default-{{listeMail.id}}" class="text-center btn btn-xl btn-danger">
+								<i class="fas fa-trash-alt"></i>
+							</a>
+							<div class="modal fade" id="modal-default-{{listeMail.id}}">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h4 class="modal-title">Voulez vous vraiment supprimer ce mail ?</h4>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
+										</div>
+										<div class="modal-body">
+											<p>Cette action est irréversible !&hellip;</p>
+										</div>
+										<div class="modal-footer justify-content-between">
+											<button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+											<a type="button" href='{{path('app_email_delete_redirect', {'id' : listeMail.id, 'route' : app.request.attributes.get('_route') } ) }}' class="btn btn-danger">Supprimer</a>
+										</div>
+									</div>
+									<!-- /.modal-content -->
+								</div>
+								<!-- /.modal-dialog -->
+							</div>
+							<!-- /.modal -->
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
+</div></div></div></div><div class="row"><div class="col-md-12"><div class="card card-dark">
+<div class="card-header d-flex justify-content-between">
+	<h2 class="card-title">Compta Analytique Lhermitte frères
+		{% if annee and mois %}
+			{{mois}}
+			-
+			{{annee}}
+		{% endif %}
+	</h2>
 
+	{{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }}
+	) }}
+	<div class='d-flex'>
+		<div class="p-1 mt-2">
+			Selectionnez le mois et l'année :
+		</div>
+		<div class="p-1">
+			{{ form_row(monthYear.month) }}
+		</div>
+		<div class="p-1">
+			{{ form_row(monthYear.year) }}
+		</div>
+		<div class="p-1">
+			{{ form_row(monthYear.filtrer)}}
+		</div>
+		{% if ventes %}
+			<div class="p-1">
+				<a href="{{path('app_compta_analytique_export_excel', {'annee' : annee, 'mois' : mois, 'type' : 'download' } ) }}" class="btn btn-success">
+					<i class="nav-icon fas fa-file-excel"></i>
+				</a>
+			</div>
+		{% endif %}
+	</div>
+	{{ form_end(monthYear)}}
+</div>
+<!-- /.card-header -->
+<div class="card-body">
+	{% if ventes %}
+		<table id="example1" class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th class="text-center">
+						<span>Facture</span>
+					</th>
+					<th class="text-center">
+						<span>Tiers</span>
+					</th>
+					<th class="text-center">
+						<span>Ref</span>
+					</th>
+					<th class="text-center">
+						<span>Sref1</span>
+					</th>
+					<th class="text-center">
+						<span>Sref2</span>
+					</th>
+					<th class="text-center">
+						<span>Designation</span>
+					</th>
+					<th class="text-center">
+						<span>Uv</span>
+					</th>
+					<th class="text-center">
+						<span>OP</span>
+					</th>
+					<th class="text-center table-info">
+						<span>CR</span>
+					</th>
+					<th class="text-center table-warning">
+						<span>CMP</span>
+					</th>
+					<th class="text-center table-success">
+						<span>CA</span>
+					</th>
+					<th class="text-center">
+						<span>Article</span>
+					</th>
+					<th class="text-center">
+						<span>Client</span>
+					</th>
+					<th class="text-center">
+						<span>Compte Achat</span>
+					</th>
+					<th class="text-center table-danger">
+						<span>Qte Vendu</span>
+					</th>
+					<th class="text-center table-info">
+						<span>Total CR</span>
+					</th>
+					<th class="text-center table-warning">
+						<span>Total CMP</span>
+					</th>
+					<th class="text-center table-success">
+						<span>Total CA</span>
+					</th>
+					<th class="text-center table-primary">
+						<span>Total Proposé</span>
+					</th>
+					<th class="text-center">
+						<span>Détail</span>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				{% for vente in ventes %}
+					<tr>
+						<td class="text-center">
+							<a class="text-dark">{{ vente.Facture }}</a>
+						</td>
+						<td class="text-center">
+							<a class="text-dark">{{ vente.Tiers }}</a>
+						</td>
+						<td class="text-center">
+							<a class="text-dark">{{ vente.Ref}}</a>
+						</td>
+						<td class="text-center">
+							<a class="text-dark">{{ vente.Sref1}}</a>
+						</td>
+						<td class="text-left">
+							<a class="text-dark">{{ vente.Sref2 }}</a>
+						</td>
+						<td class="text-center">
+							<a class="text-dark">{{ vente.Designation }}</a>
+						</td>
+						<td class="text-left">
+							<a class="text-dark">{{ vente.Uv }}</a>
+						</td>
+						<td class="text-left">
+							<a class="text-dark">{{ vente.Op }}</a>
+						</td>
+						<td class="text-center table-info">
+							<a class="text-dark">
+								{% if vente.CoutRevient %}
+									{{ vente.CoutRevient|number_format(4) }}
+								{% endif %}
+							</a>
+						</td>
+						<td class="text-center table-warning">
+							<a class="text-dark">
+								{% if vente.CoutMoyenPondere %}
+									{{ vente.CoutMoyenPondere|number_format(4) }}
+								{% endif %}
+							</a>
+						</td>
+						<td class="text-center table-success">
+							<a class="text-dark">
+								{% if vente.Cma %}
+									{{ vente.Cma|number_format(4) }}
+								{% endif %}
+							</a>
+						</td>
+						<td class="text-center">
+							<a class="text-dark">{{ vente.Article }}</a>
+						</td>
+						<td class="text-center">
+							<a class="text-dark">{{ vente.Client }}</a>
+						</td>
+						<td class="text-center">
+							<a class="text-dark">{{ vente.CompteAchat }}</a>
+						</td>
+						<td class="text-center table-danger">
+							<a class="text-dark">
+								{% if vente.QteSign %}
+									{{ vente.QteSign }}
+								{% endif %}
+							</a>
+						</td>
+						<td class="text-center table-info">
+							<a class="text-dark">
+								{% if vente.TotalCoutRevient %}
+									{{ vente.TotalCoutRevient|number_format(4) }}
+								{% endif %}
+							</a>
+						</td>
+						<td class="text-center table-warning">
+							<a class="text-dark">
+								{% if vente.TotalCoutMoyenPondere %}
+									{{ vente.TotalCoutMoyenPondere|number_format(4) }}
+								{% endif %}
+							</a>
+						</td>
+						<td class="text-center table-success">
+							<a class="text-dark">
+								{% if vente.TotalCoutCma %}
+									{{ vente.TotalCoutCma|number_format(4) }}
+								{% endif %}
+							</a>
+						</td>
+						<td class="text-center table-primary">
+							<a class="text-dark">
+								{% if vente.prixRetenu %}
+									{{ vente.prixRetenu|number_format(4) }}
+								{% endif %}
+							</a>
+						</td>
+						<td class="text-center">
+							{% if vente.DetailFacture %}
+								<button type="button" class="btn btn-{{vente.color}}" data-toggle="modal" data-target="#modal-xl-{{ vente.Facture }}-{{ vente.Ref|replace({'/': '-', '.' : ''}) }}">
+									<i class="fas fa-{{vente.type}}"></i>
+								</button>
+							{% endif %}
+							{% if vente.DetailFacture %}
+								<!-- modal -->
+								<div class="modal fade" id="modal-xl-{{ vente.Facture }}-{{ vente.Ref|replace({'/': '-', '.' : ''}) }}">
+									<div class="modal-dialog modal-xl">
+										<div class="modal-content">
+											<div class="modal-header">
+												<div class='d-flex flex-column'>
+													<h3 class="modal-title">Détail des factures achats</h3>
+													<span class="modal-title text-left">
+														Le produit concerné : ref:
+														{{ vente.Ref }}
+														Des:{{ vente.Designation }}
+														{% if vente.Sref1 %}
+															Sref1:
+															{{ vente.Sref1 }}
+														{% endif %}
+														{% if vente.Sref2 %}
+															Sref2:
+															{{ vente.Sref2 }}
+														{% endif %}
+													</span>
+
+													{% if vente.estimation or vente.estimationTotal %}
+														<span class="modal-title text-left">Seul les produits de la famille 'TRANSPOR' sont utilisés pour calculer l'estimation du port par produits et seulement si la famille du coup de transport est différente de la famille du client</span>
+													{% endif %}
+													{% if vente.estimation %}
+														<span class="modal-title text-left">L'estimation du port par unité de vente est de
+															{{ vente.estimation|number_format(2) }}
+															€</span>
+													{% endif %}
+													{% if vente.estimationTotal %}
+														<span class="modal-title text-left">L'estimation du port pour le total des unitées de vente est de
+															{{ vente.estimationTotal|number_format(2) }}
+															€</span>
+													{% endif %}
+												</div>
+												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true">&times;</span>
+												</button>
+											</div>
+											<div class="modal-body table-responsive p-1" style="height: 350px;">
+												<table class="table table-head-fixed">
+													<thead>
+														<tr>
+															<th class="text-center">
+																<span>Facture</span>
+															</th>
+															<th class="text-center">
+																<span>Famille</span>
+															</th>
+															<th class="text-center">
+																<span>Article</span>
+															</th>
+															<th class="text-center">
+																<span>Référence</span>
+															</th>
+															<th class="text-center">
+																<span>Sref1</span>
+															</th>
+															<th class="text-center">
+																<span>Sref2</span>
+															</th>
+															<th class="text-center">
+																<span>Désignation</span>
+															</th>
+															<th class="text-center">
+																<span>Op</span>
+															</th>
+															<th class="text-center">
+																<span>Qte</span>
+															</th>
+															<th class="text-center">
+																<span>Prix unitaire</span>
+															</th>
+															<th class="text-center">
+																<span>Montant Signé</span>
+															</th>
+														</tr>
+													</thead>
+													<tbody>
+														{% for detail in vente.DetailFacture %}
+															{% set col = '' %}
+															{% if detail.Ref|trim == vente.Ref|trim and detail.Sref1|trim == vente.Sref1|trim and detail.Sref2|trim == vente.Sref2|trim  %}
+																{% set col = 'table-success' %}
+															{% endif %}
+
+															<tr>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">{{ detail.Facture }}</a>
+																</td>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">{{ detail.famille }}</a>
+																</td>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">{{ detail.article }}</a>
+																</td>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">{{ detail.Ref }}</a>
+																</td>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">{{ detail.Sref1 }}</a>
+																</td>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">{{ detail.Sref2 }}</a>
+																</td>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">{{ detail.Designation }}</a>
+																</td>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">{{ detail.Op }}</a>
+																</td>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">{{ detail.Qte }}</a>
+																</td>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">
+																		{% if detail.pu %}
+																			{{ detail.pu|number_format(2) }}
+																			€
+																		{% endif %}
+																	</a>
+																</td>
+																<td class="text-center">
+																	<a class="text-dark {{col}}">{{ detail.MontantSign }}</a>
+																</td>
+															</tr>
+														{% endfor %}
+													</tbody>
+												</table>
+											</div>
+											<div class="modal-footer d-flex justify-content-between">
+												<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+											</div>
+										</div>
+										<!-- /.modal-content -->
+									</div>
+									<!-- /.modal-dialog -->
+								</div>
+								<!-- /.modal -->
+							{% endif %}
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+			<tfoot>
+				<tr>
+					<th class="text-center">
+						<span>Facture</span>
+					</th>
+					<th class="text-center">
+						<span>Tiers</span>
+					</th>
+					<th class="text-center">
+						<span>Ref</span>
+					</th>
+					<th class="text-center">
+						<span>Sref1</span>
+					</th>
+					<th class="text-center">
+						<span>Sref2</span>
+					</th>
+					<th class="text-center">
+						<span>Designation</span>
+					</th>
+					<th class="text-center">
+						<span>Uv</span>
+					</th>
+					<th class="text-center">
+						<span>OP</span>
+					</th>
+					<th class="text-center table-info">
+						<span>CR</span>
+					</th>
+					<th class="text-center table-warning">
+						<span>CMP</span>
+					</th>
+					<th class="text-center table-success">
+						<span>CA</span>
+					</th>
+					<th class="text-center">
+						<span>Article</span>
+					</th>
+					<th class="text-center">
+						<span>Client</span>
+					</th>
+					<th class="text-center">
+						<span>Compte Achat</span>
+					</th>
+					<th class="text-center table-danger">
+						<span>Qte Vendu</span>
+					</th>
+					<th class="text-center table-info">
+						<span>Total CR</span>
+					</th>
+					<th class="text-center table-warning">
+						<span>Total CMP</span>
+					</th>
+					<th class="text-center table-success">
+						<span>Total CA</span>
+					</th>
+					<th class="text-center table-primary">
+						<span>Total Proposé</span>
+					</th>
+					<th class="text-center">
+						<span>Transport Fournisseur</span>
+					</th>
+				</tr>
+			</tfoot>
+		</table>
+	{% else %}
+		<h4 class="text-left text-dark">
+			<i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez selectionner un mois et une année !</h4>
+	{% endif %}
+</div></div></div></div>{% endblock %}

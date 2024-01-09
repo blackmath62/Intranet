@@ -50,6 +50,12 @@
 						Uniquement les articles ouverts
 					</label>
 				</div>
+				<div class="form-check form-check-lg mt-2">
+					<input class="form-check-input" type="checkbox" id="openProductsStockCheckbox" checked>
+					<label class="form-check-label" for="openProductsStockCheckbox">
+						Uniquement les articles en stock
+					</label>
+				</div>
 			</div>
 			{{ form_errors(form.ean) }}
 			<div id="panier" class="d-none">
@@ -72,7 +78,14 @@
 						<i class="fa-solid fa-location-dot"></i>
 						{{ form_label(form.location) }}
 					</label>
-					{{ form_widget(form.location, {'attr': {'disabled': true}}) }}
+					<div class="input-group">
+						<div class="input-group-prepend">
+							<button id="btn-emplacement" class="btn btn-warning" type="button" data-toggle="modal" data-target="#scannerModal" data-target-id="retrait_marchandise_ean_location">
+								<i class="fa-solid fa-camera"></i>
+							</button>
+						</div>
+						{{ form_widget(form.location, {'attr': {'disabled': true}}) }}
+					</div>
 					<small>Retirer ou retourner le stock sur cet emplacement</small>
 					{{ form_errors(form.location) }}
 				</div>
@@ -84,49 +97,11 @@
 				</div>
 			</div>
 			{{ form_end(form)}}
-			{% if historiques %}
-				<a data-toggle="modal" data-target="#modal-sm-cloture" class="btn btn-success text-center col-12 mt-3">
-					<i class="fa-solid fa-thumbs-up mr-2"></i>Soumettre ce panier</a>
-				<div class="modal fade" id="modal-sm-cloture">
-					<div class="modal-dialog modal-sm">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h4 class="modal-title">Voulez vous vraiment soumettre ce panier ?</h4>
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<form action="{{path('app_mouv_tiers-send', {'chantier' : app.request.attributes.get('chantier') })}}" method="POST">
-								<div class="modal-body form-group">
-									<label>Commentaires
-										<small>
-											<i>(facultatif)</i>
-										</small>
-									</label>
-									<textarea type="text" name="ta" class="form-control" rows="10" placeholder="Vous pouvez ajouter un commentaire, des produits qui n'avaient pas de code barre, etc ..."></textarea>
-								</div>
-								<div class="modal-footer justify-content-between">
-									<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-									<button class="btn btn-success" type="submit">
-										<i class="fa-solid fa-thumbs-up mr-2"></i>Soumettre ce panier
-									</button>
-									<small>Cette action est irréverssible et va génrérer des fichiers qui auront un impact sur le stock ! en cas d'erreur aprés soumission, veuillez contacter votre responsable.</small>
-								</div>
-							</form>
-						</div>
-						<!-- /.modal-content -->
-					</div>
-					<!-- /.modal-dialog -->
-				</div>
-				<!-- /.modal -->
-			{% endif %}
-			<!-- /.card -->
-			<!-- /.card-body -->
+
 		</div>
-		<!-- /.card -->
 	</div>
 
-	{% if historiques %}
+	{% if paniers %}
 		<div class="card card-dark mt-4">
 			<div class="card-header">
 				<h3 class="card-title">Votre panier</h3>
@@ -142,23 +117,23 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for historique in historiques %}
+						{% for panier in paniers %}
 							<tr>
 								{% set col = 'text-dark' %}
 								{% set retour = '' %}
-								{% if historique.qte < 0 %}
+								{% if panier.qte < 0 %}
 									{% set col = 'text-danger' %}
 									{% set retour = '( Retour )' %}
 								{% endif %}
 
-								<td class="{{ col }}">{{ historique.designation }}
+								<td class="{{ col }}">{{ panier.designation }}
 									{{ retour }}</td>
-								<td class="align-middle {{ col }}">{{ historique.qte }}</td>
+								<td class="align-middle {{ col }}">{{ panier.qte }}</td>
 								<td class="text-align align-middle">
-									<a data-toggle="modal" data-target={{"#modal-sm#{historique.id}"}} class="{{ col }}">
+									<a data-toggle="modal" data-target={{"#modal-sm#{panier.id}"}} class="{{ col }}">
 										<i class="fa-solid fa-trash-can fa-bounce"></i>
 									</a>
-									<div class="modal fade" id={{"modal-sm#{historique.id}"}}>
+									<div class="modal fade" id={{"modal-sm#{panier.id}"}}>
 										<div class="modal-dialog modal-sm">
 											<div class="modal-content">
 												<div class="modal-header">
@@ -172,70 +147,70 @@
 														<li class="nav-item">
 															<small class="nav-link">
 																Id :
-																<span class="float-right">{{ historique.id }}</span>
+																<span class="float-right">{{ panier.id }}</span>
 															</small>
 														</li>
 														<li class="nav-item">
 															<small class="nav-link">
 																Ean :
-																<span class="float-right">{{ historique.ean }}</span>
+																<span class="float-right">{{ panier.ean }}</span>
 															</small>
 														</li>
 														<li class="nav-item">
 															<small class="nav-link">
 																Référence :
-																<span class="float-right">{{historique.ref}}</span>
+																<span class="float-right">{{panier.ref}}</span>
 															</small>
 														</li>
-														{% if historique.sref1 %}
+														{% if panier.sref1 %}
 															<li class="nav-item">
 																<small class="nav-link">
 																	Sref1 :
-																	<span class="float-right">{{historique.sref1}}</span>
+																	<span class="float-right">{{panier.sref1}}</span>
 																</small>
 															</li>
 														{% endif %}
-														{% if historique.sref2 %}
+														{% if panier.sref2 %}
 															<li class="nav-item">
 																<small class="nav-link">
 																	Sref2 :
-																	<span class="float-right">{{historique.sref2}}</span>
+																	<span class="float-right">{{panier.sref2}}</span>
 																</small>
 															</li>
 														{% endif %}
 														<li class="nav-item">
 															<small class="nav-link">
 																Désignation :
-																<span class="float-right">{{historique.designation}}</span>
+																<span class="float-right">{{panier.designation}}</span>
 															</small>
 														</li>
 														<li class="nav-item">
 															<small class="nav-link">
 																Unité de vente :
-																<span class="float-right">{{historique.uv}}</span>
+																<span class="float-right">{{panier.uv}}</span>
 															</small>
 														</li>
 														<li class="nav-item">
 															<small class="nav-link">
-																{% if historique.qte >= 0 %}
+																{% if panier.qte >= 0 %}
 																	Quantité sortie de marchandise :
 																{% else %}
 																	Quantité retour de marchandise :
 																{% endif %}
-																<span class="float-right">{{ historique.qte|abs }}</span>
+																<span class="float-right">{{ panier.qte|abs }}</span>
 															</small>
 														</li>
 														<li class="nav-item">
 															<small class="nav-link">
 																Emplacement :
-																<span class="float-right">{{historique.location}}</span>
+																<span class="float-right">{{panier.location}}</span>
 															</small>
 														</li>
 														<li class="nav-item">
 															<small class="nav-link">
 																Stock Faux ? :
 																<span class="float-right">
-																	{% if historique.stockFaux == 1 %}
+																	{% if panier.stockFaux == 1 %}
 																		Oui
 																	{% else %}
 																		Non
@@ -247,7 +222,7 @@
 												</div>
 												<div class="modal-footer justify-content-between">
 													<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-													<a href="{{path('app_mouv_tiers-delete', {'id' : historique.id, 'chantier' : app.request.attributes.get('chantier') })}}" type="button" class="btn btn-danger">
+													<a href="{{path('app_mouv_tiers-delete', {'id' : panier.id, 'chantier' : app.request.attributes.get('chantier') })}}" type="button" class="btn btn-danger">
 														<i class="fa-solid fa-thumbs-down mr-2"></i>Supprimer cette ligne</a>
 												</div>
 											</div>
@@ -261,34 +236,65 @@
 						{% endfor %}
 					</tbody>
 				</table>
-			</div>
-			<!-- /.card-body -->
-		</div>
-		<!-- /.card -->
-		<a data-toggle="modal" data-target="#modal-sm-supprimer" class="text-white btn btn-danger col-12">
-			<i class="fa-solid fa-thumbs-down mr-2"></i>Supprimer ce panier définitivement</a>
-		<div class="modal fade" id="modal-sm-supprimer">
-			<div class="modal-dialog modal-sm">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h4 class="modal-title">Voulez vous vraiment supprimer intégralement et définitivement ce panier
-							{{app.request.attributes.get('chantier')}}
-							?</h4>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
+				{% if paniers %}
+					<a data-toggle="modal" data-target="#modal-sm-cloture" class="btn btn-success text-center col-12 mt-3 mb-3">
+						<i class="fa-solid fa-thumbs-up mr-2"></i>Soumettre ce panier</a>
+					<div class="modal fade" id="modal-sm-cloture">
+						<div class="modal-dialog modal-sm">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title">Voulez vous vraiment soumettre ce panier ?</h4>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<form action="{{path('app_mouv_tiers-send', {'chantier' : app.request.attributes.get('chantier') })}}" method="POST">
+									<div class="modal-body form-group">
+										<label>Commentaires
+											<small>
+												<i>(facultatif)</i>
+											</small>
+										</label>
+										<textarea type="text" name="ta" class="form-control" rows="10" placeholder="Vous pouvez ajouter un commentaire, des produits qui n'avaient pas de code barre, etc ..."></textarea>
+									</div>
+									<div class="modal-footer justify-content-between">
+										<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+										<button class="btn btn-success" type="submit">
+											<i class="fa-solid fa-thumbs-up mr-2"></i>Soumettre ce panier
+										</button>
+										<small>Cette action est irréverssible et va générer des fichiers qui auront un impact sur le stock ! en cas d'erreur aprés soumission, veuillez contacter votre responsable.</small>
+									</div>
+								</form>
+							</div>
+						</div>
 					</div>
-					<div class="modal-footer justify-content-between">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-						<a href="{{path('app_mouv_tiers_delete_all', {'chantier' : app.request.attributes.get('chantier') })}}" type="button" class="btn btn-danger">
-							<i class="fa-solid fa-thumbs-down mr-2"></i>Supprimer</a>
+
+					<a data-toggle="modal" data-target="#modal-sm-supprimer" class="text-white btn btn-danger col-12">
+						<i class="fa-solid fa-thumbs-down mr-2"></i>Supprimer ce panier définitivement</a>
+					<div class="modal fade" id="modal-sm-supprimer">
+						<div class="modal-dialog modal-sm">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title">Voulez vous vraiment supprimer intégralement et définitivement ce panier
+										{{app.request.attributes.get('chantier')}}
+										?</h4>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-footer justify-content-between">
+									<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+									<a href="{{path('app_mouv_tiers_delete_all', {'chantier' : app.request.attributes.get('chantier') })}}" type="button" class="btn btn-danger">
+										<i class="fa-solid fa-thumbs-down mr-2"></i>Supprimer</a>
+								</div>
+							</div>
+							<!-- /.modal-content -->
+						</div>
+						<!-- /.modal-dialog -->
 					</div>
-				</div>
-				<!-- /.modal-content -->
+				{% endif %}
 			</div>
-			<!-- /.modal-dialog -->
 		</div>
-		<!-- /.modal -->
 
 	{% endif %}
 
@@ -307,6 +313,7 @@
 		function handleLocationChange() {
 var selectedOption = $('#retrait_marchandise_ean_location').find(':selected');
 var qteInput = $('#qte');
+var scanEmpl = $('#btn-emplacement');
 var qteEmplacement = parseFloat(selectedOption.data('qte'));
 
 if (!isNaN(qteEmplacement)) {
@@ -320,13 +327,20 @@ qteInput.removeAttr('max'); // Retirer l'attribut max
 }
 }
 
-function alimSource(stockData) { // Supprimer toutes les options actuelles du champ location
+function alimSource(stockData) { // Cloner le contenu de #retrait_marchandise_ean_location avant de le vider
+var cloneOptions = $('#retrait_marchandise_ean_location').children().clone();
+// Stockez le champ de localisation initial
+var originalLocationField = $('#retrait_marchandise_ean_location').clone();
+
+// Supprimer toutes les options actuelles du champ location
 $('#retrait_marchandise_ean_retour').prop('checked', false);
 $('#retrait_marchandise_ean_location').empty();
 $('#retrait_marchandise_ean_location').prop('disabled', true);
 var qteInput = $('#qte');
+var scanEmpl = $('#btn-emplacement');
 qteInput.val("");
 qteInput.addClass('disabled');
+scanEmpl.addClass('disabled');
 
 // Ajouter d'autres options en fonction de vos résultats (emplacements disponibles avec quantités)
 if (stockData && Array.isArray(stockData) && stockData.length > 0) { // Lors du remplissage de la liste déroulante
@@ -352,15 +366,29 @@ $('#retrait_marchandise_ean_retour').on('change', function () {
 var isRetour = this.checked;
 if (isRetour) { // Si le bouton "retour" est coché, désactiver le champ qte et définir l'emplacement sur "ATTENTE"
 qteInput.removeClass('disabled');
+scanEmpl.removeClass('disabled');
 $('#retrait_marchandise_ean_location').empty();
-qteInput.removeAttr('max'); // Retirer l'attribut max
-$('#retrait_marchandise_ean_location').append($('<option>', {
-value: 'ATTENTE',
-text: 'ATTENTE - Neuf - 0', // Modifier le texte selon vos besoins
-'data-qte': 0
+qteInput.removeAttr('max');
+// Retirer l'attribut max
+
+// Ajouter un champ de texte pour "Saisir manuellement"
+$('#retrait_marchandise_ean_location').replaceWith($('<input>', {
+type: 'text',
+id: 'retrait_marchandise_ean_location',
+name: 'retrait_marchandise_ean[location]',
+class: 'form-control col-12',
+placeholder: 'Saisir manuellement'
 }));
+
 $('#retrait_marchandise_ean_location').prop('disabled', false);
+// Ajouter un gestionnaire d'événements pour le champ de texte "Saisie manuelle"
+$(document).on('input', '#retrait_marchandise_ean_location', function () {
+var inputValue = $(this).val();
+$(this).val(inputValue.toUpperCase());
+});
+
 } else { // Si le bouton "retour" est décoché, appeler la fonction handleLocationChange
+$('#retrait_marchandise_ean_location').replaceWith(originalLocationField.clone());
 alimSource(stockData);
 }
 });

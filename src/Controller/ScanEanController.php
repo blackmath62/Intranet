@@ -264,16 +264,16 @@ class ScanEanController extends AbstractController
         ]);
     }
 
-    #[Route("/products/search/ajax/{dos}/{search}/{checkProd}", name: "app_products_search")]
+    #[Route("/products/search/ajax/{dos}/{search}/{checkProd}/{checkStock}", name: "app_products_search")]
     // rechercher un produit avec Ajax pour l'afficher sur la page
-    public function productsSearch(ArtRepository $repo, $dos, $search, $checkProd)
+    public function productsSearch(ArtRepository $repo, $dos, $search, $checkProd, $checkStock)
     {
         if ($dos === null) {
             $dos = 1; // Valeur par défaut
         }
 
         $produits = "";
-        $produits = $repo->getSearchArt($dos, $search, 'REF', $checkProd);
+        $produits = $repo->getSearchArt($dos, $search, 'REF', $checkProd, $checkStock);
 
         $imageExtensions = ['jpg', 'jpeg', 'png'];
         $result = [];

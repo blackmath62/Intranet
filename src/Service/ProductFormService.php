@@ -366,7 +366,13 @@ var checkProd = 0;
 if (openProductCheck.checked) {
 checkProd = 1; // Si cochée, assigner la valeur correspondante
 }
-var searchProducts = \'/products/search/ajax/\' + dosValue + \'/\' + searchValue + \'/\' + checkProd;
+var openProductStockCheck = document.getElementById(\'openProductsStockCheckbox\');
+var checkStock = 0;
+// Tester si la case à cocher est cochée
+if (openProductStockCheck.checked) {
+checkStock = 1; // Si cochée, assigner la valeur correspondante
+}
+var searchProducts = \'/products/search/ajax/\' + dosValue + \'/\' + searchValue + \'/\' + checkProd + \'/\' + checkStock;
 
 // Effectuer une requête AJAX
 axios.get(searchProducts).then(function (response) { // Traitez la réponse de la requête AJAX ici

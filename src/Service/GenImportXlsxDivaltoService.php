@@ -33,7 +33,143 @@ class GenImportXlsxDivaltoService
 
         return null;
     }
-    // Alimentation de la date du dernier inventaire sur la fiche produit
+
+    public function getTypePiece($tiers = null)
+    {
+        if ($tiers) {
+            if (strpos($tiers, "C") === 0) {
+                $typeMouv['entree'] = 'C';
+                $typeMouv['sortie'] = 'D';
+                $typeMouv['typePiece'] = '3-Bl Client ';
+            } elseif (strpos($tiers, "F") === 0) {
+                $typeMouv['entree'] = 'F';
+                $typeMouv['sortie'] = 'G';
+                $typeMouv['typePiece'] = '3-Bl Fourn ';
+            }
+            $typeMouv['indexColonne'] = $this->getEnteteMouvTiers();
+        } else {
+            $typeMouv['entree'] = 'JI';
+            $typeMouv['sortie'] = 'II';
+            $typeMouv['typePiece'] = 'Stock ';
+            $typeMouv['indexColonne'] = $this->getEnteteMouvStock();
+        }
+        return $typeMouv;
+    }
+    // Entête de colonne pour les mouvements tiers
+    public function getEnteteMouvTiers()
+    {
+        $entete = [
+            'FICHE',
+            'DOSSIER',
+            'ETABLISSEMENT',
+            'REF_PIECE',
+            'TYPE_TIERS',
+            'TYPE_PIECE',
+            'CODE_TIERS',
+            'CODE_OP',
+            'DEPOT',
+            'ENT.PIDT',
+            'ENT.PIREF',
+            'NO_SOUS_LIGNE',
+            'REFERENCE',
+            'SREF1',
+            'SREF2',
+            'DESIGNATION',
+            'REF_FOURNISSEUR',
+            'MOUV.OP',
+            'QUANTITE',
+            'MOUV.PPAR',
+            'MOUV.PUB',
+            'EMPLACEMENT',
+            'SERIE',
+            'QUANTITE_VTL',
+            'ERREUR',
+        ];
+
+        return $entete;
+    }
+    // Entête de colonne pour les mouvements interne stock
+    public function getEnteteMouvStock()
+    {
+        $entete = [
+            'FICHE',
+            'DOSSIER',
+            'ETABLISSEMENT',
+            'REF_PIECE',
+            'CODE_TIERS',
+            'CODE_OP',
+            'DEPOT',
+            'DEPOT_DESTINATION',
+            'ENT.PIDT',
+            'ENT.PIREF',
+            'NO_SOUS_LIGNE',
+            'REFERENCE',
+            'SREF1',
+            'SREF2',
+            'DESIGNATION',
+            'REF_FOURNISSEUR',
+            'MOUV.OP',
+            'QUANTITE',
+            'MOUV.PPAR',
+            'MOUV.PUB',
+            'EMPLACEMENT',
+            'EMPLACEMENT_DESTINATION',
+            'SERIE',
+            'QUANTITE_VTL',
+        ];
+
+        return $entete;
+    }
+    // Entête de colonne pour les mouvements info dépôt
+
+    public function getEnteteInfoDepot()
+    {
+        $entete = [
+            'DOSSIER',
+            'REFERENCE',
+            'SREFERENCE1',
+            'SREFERENCE2',
+            'DEPOT',
+            'NATURESTOCK',
+            'NUMERONOTE',
+            'EMPLACEMENT',
+            'STLGTSORCOD',
+            'FLAGORDOSMC',
+            'FAMRANGEMENT',
+            'ELIGIBLESLOTTING',
+            'WMPROFILCOD',
+            'WMEMPLPREP',
+            'RESJRNB',
+            'WMEMPCONTNB',
+            'Anomalies',
+            'Alertes',
+        ];
+
+        return $entete;
+    }
+    // Entête de colonne pour les mouvements info stock
+    public function getEnteteInfoStock()
+    {
+        $entete = [
+            'DOSSIER',
+            'REFERENCE',
+            'DEPOT',
+            'NATURESTOCK',
+            'NUMERONOTE',
+            'DATEINV',
+            'FAMILLEINV',
+            'PERIODEINV',
+            'INVIMPPAGCOD',
+            'INVPAGNB',
+            'CRITEREINV',
+            'Anomalies',
+            'Alertes',
+        ];
+
+        return $entete;
+    }
+
+    // Création du fichier excel info depot et info stock
     public function get_export_excel_info_stock_depot($typePiece, $donneesStock, $donneesDepot)
     {
 
@@ -278,6 +414,115 @@ class GenImportXlsxDivaltoService
                 $donnee['MOUV.PUB'],
                 $donnee['EMPLACEMENT'],
                 $donnee['EMPLACEMENT_DESTINATION'],
+                $donnee['SERIE'],
+                $donnee['QUANTITE_VTL'],
+            ];
+        }
+        return $list;
+    }
+
+    public function get_export_excel_mouv_tiers($typePiece, $donnees, $tiers)
+    {
+
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setTitle('Piece');
+        // Entête de colonne
+        $sheet->getCell('A3')->setValue('FICHE'); //IPAR
+        $sheet->getCell('B3')->setValue('DOSSIER'); //IPAR
+        $sheet->getCell('C3')->setValue('ETABLISSEMENT'); //IPAR
+        $sheet->getCell('D3')->setValue('REF_PIECE'); //IPAR
+        $sheet->getCell('E3')->setValue('TYPE_TIERS'); //IPAR
+        $sheet->getCell('F3')->setValue('TYPE_PIECE'); //IPAR
+        $sheet->getCell('G3')->setValue('CODE_TIERS'); //ENT
+        $sheet->getCell('H3')->setValue('CODE_OP'); //ENT
+        $sheet->getCell('I3')->setValue('DEPOT'); //ENT
+        $sheet->getCell('J3')->setValue('ENT.PIDT'); //ENT
+        $sheet->getCell('K3')->setValue('ENT.PIREF'); //ENT
+        $sheet->getCell('L3')->setValue('NO_SOUS_LIGNE'); //MOUV
+        $sheet->getCell('M3')->setValue('REFERENCE'); //MOUV
+        $sheet->getCell('N3')->setValue('SREF1'); //MOUV
+        $sheet->getCell('O3')->setValue('SREF2'); //MOUV
+        $sheet->getCell('P3')->setValue('DESIGNATION'); //MOUV
+        $sheet->getCell('Q3')->setValue('REF_FOURNISSEUR'); //MOUV
+        $sheet->getCell('R3')->setValue('MOUV.OP'); //MOUV
+        $sheet->getCell('S3')->setValue('QUANTITE'); //MOUV
+        $sheet->getCell('T3')->setValue('MOUV.PPAR'); //MOUV
+        $sheet->getCell('U3')->setValue('MOUV.PUB'); //MOUV
+        $sheet->getCell('V3')->setValue('EMPLACEMENT'); //MVTL
+        $sheet->getCell('W3')->setValue('SERIE'); //MVTL
+        $sheet->getCell('X3')->setValue('QUANTITE_VTL'); //MVTL
+        $sheet->getCell('Y3')->setValue('ERREUR');
+
+        // Information sur la piéce IPAR ET ENT
+        $sheet->getCell('A4')->setValue('IPAR'); //IPAR
+        $sheet->getCell('B4')->setValue('1'); //IPAR DOSSIER
+        $sheet->getCell('C4')->setValue(''); //IPAR ETABLISSEMENT
+        $sheet->getCell('D4')->setValue(''); //IPAR REF_PIECE
+        $sheet->getCell('E4')->setValue(substr($tiers, 0, 1)); //IPAR TYPE_TIERS
+        $sheet->getCell('F4')->setValue(substr($typePiece, 0, 1)); //IPAR TYPE_PIECE
+        $sheet->getCell('A5')->setValue('ENT'); //ENT
+        $sheet->getCell('G5')->setValue($tiers); //ENT CODE_TIERS
+        $sheet->getCell('H5')->setValue(substr($tiers, 0, 1)); //ENT CODE_OP
+        $sheet->getCell('I5')->setValue('2'); //ENT DEPOT
+        $sheet->getCell('J5')->setValue(new DateTime()); //ENT ENT.PIDT
+        $sheet->getCell('K5')->setValue('Import xlsx par ' . $this->getUserPseudo()); //ENT ENT.PIREF
+
+        // Increase row cursor after header write
+        $sheet->fromArray($this->getData_Mouv_tiers($donnees), null, 'A6', true);
+
+        $d = new DateTime('NOW');
+        $dateTime = $d->format('d-m-Y');
+        $nomFichier = $typePiece . ' ' . $dateTime;
+        // Titre de la feuille
+        $sheet->getCell('C1')->setValue('Intégration piéce tiers');
+        $sheet->getCell('A1')->getStyle()->getFont()->setSize(16);
+
+        $writer = new Xlsx($spreadsheet);
+        // Create a Temporary file in the system
+        $fileName = $nomFichier . '.xlsx';
+        // Return the excel file as an attachment
+
+        $chemin = 'doc/Logistique/';
+        $fichier = $chemin . '/' . $fileName;
+        $writer->save($fichier);
+        return $fichier;
+    }
+
+    // générer un fichier Excel qui sera envoyé par mail à l'utilisateur
+    public function getData_Mouv_tiers($donnees): array
+    {
+        $list = [];
+
+        for ($d = 0; $d < count($donnees); $d++) {
+
+            $donnee = $donnees[$d];
+
+            $list[] = [
+                $donnee['FICHE'],
+                $donnee['DOSSIER'],
+                $donnee['ETABLISSEMENT'],
+                $donnee['REF_PIECE'],
+                $donnee['TYPE_TIERS'],
+                $donnee['TYPE_PIECE'],
+                $donnee['CODE_TIERS'],
+                $donnee['CODE_OP'],
+                $donnee['DEPOT'],
+                $donnee['ENT.PIDT'],
+                $donnee['ENT.PIREF'],
+                $donnee['NO_SOUS_LIGNE'],
+                $donnee['REFERENCE'],
+                $donnee['SREF1'],
+                $donnee['SREF2'],
+                $donnee['DESIGNATION'],
+                $donnee['REF_FOURNISSEUR'],
+                $donnee['MOUV.OP'],
+                $donnee['QUANTITE'],
+                $donnee['MOUV.PPAR'],
+                $donnee['MOUV.PUB'],
+                $donnee['EMPLACEMENT'],
                 $donnee['SERIE'],
                 $donnee['QUANTITE_VTL'],
             ];

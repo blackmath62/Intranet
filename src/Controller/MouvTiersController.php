@@ -9,6 +9,7 @@ use App\Repository\Main\AffairesRepository;
 use App\Repository\Main\MailListRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
 use App\Service\EanScannerService;
+use App\Service\GenImportXlsxDivaltoService;
 use App\Service\ImageService;
 use App\Service\ProductFormService;
 use DateTime;
@@ -32,17 +33,23 @@ class MouvTiersController extends AbstractController
     private $entityManager;
     private $eanScannerService;
     private $productFormService;
+    private $importXlsxDivaltoService;
     private $imageService;
+    private $repoAffaire;
 
     public function __construct(
         EanScannerService $eanScannerService,
         ManagerRegistry $registry,
         MailListRepository $repoMail,
         MailerInterface $mailer,
+        GenImportXlsxDivaltoService $importXlsxDivaltoService,
         ProductFormService $productFormService,
-        ImageService $imageService
+        ImageService $imageService,
+        AffairesRepository $repoAffaire,
     ) {
         $this->mailer = $mailer;
+        $this->repoAffaire = $repoAffaire;
+        $this->importXlsxDivaltoService = $importXlsxDivaltoService;
         $this->repoMail = $repoMail;
         $this->eanScannerService = $eanScannerService;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
@@ -58,7 +65,7 @@ class MouvTiersController extends AbstractController
     {
         $dos = 1;
         $produit = "";
-        $historique = [];
+        $panier = [];
 
         // Pour pouvoir ajouter plusieurs fichiers en même temps
         $formAddPicturesOrDocs = $this->createForm(AddPicturesOrDocsType::class);
@@ -124,19 +131,19 @@ class MouvTiersController extends AbstractController
             }
         }
         if ($chantier) {
-            $histo = $repoRetrait->findBy(['chantier' => $chantier, 'sendAt' => null]);
-            for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
-                $prod = $repo->getEanStock($dos, $histo[$ligHisto]->getEan());
-                $historique[$ligHisto]['id'] = $histo[$ligHisto]->getId();
-                $historique[$ligHisto]['ref'] = $prod['ref'];
-                $historique[$ligHisto]['sref1'] = $prod['sref1'];
-                $historique[$ligHisto]['sref2'] = $prod['sref2'];
-                $historique[$ligHisto]['designation'] = $prod['designation'];
-                $historique[$ligHisto]['uv'] = $prod['uv'];
-                $historique[$ligHisto]['ean'] = $prod['ean'];
-                $historique[$ligHisto]['qte'] = $histo[$ligHisto]->getQte();
-                $historique[$ligHisto]['stockFaux'] = $histo[$ligHisto]->getStockFaux();
-                $historique[$ligHisto]['location'] = $histo[$ligHisto]->getLocation();
+            $produitsPanier = $repoRetrait->findBy(['chantier' => $chantier, 'sendAt' => null]);
+            for ($ligPanier = 0; $ligPanier < count($produitsPanier); $ligPanier++) {
+                $prod = $repo->getEanStock($dos, $produitsPanier[$ligPanier]->getEan());
+                $panier[$ligPanier]['id'] = $produitsPanier[$ligPanier]->getId();
+                $panier[$ligPanier]['ref'] = $prod['ref'];
+                $panier[$ligPanier]['sref1'] = $prod['sref1'];
+                $panier[$ligPanier]['sref2'] = $prod['sref2'];
+                $panier[$ligPanier]['designation'] = $prod['designation'];
+                $panier[$ligPanier]['uv'] = $prod['uv'];
+                $panier[$ligPanier]['ean'] = $prod['ean'];
+                $panier[$ligPanier]['qte'] = $produitsPanier[$ligPanier]->getQte();
+                $panier[$ligPanier]['stockFaux'] = $produitsPanier[$ligPanier]->getStockFaux();
+                $panier[$ligPanier]['location'] = $produitsPanier[$ligPanier]->getLocation();
             }
         }
         $productData = "";
@@ -146,7 +153,7 @@ class MouvTiersController extends AbstractController
             'productData' => $productData,
             'produit' => $produit,
             'chantier' => $chantier,
-            "historiques" => $historique,
+            "paniers" => $panier,
             'formAddPicturesOrDocs' => $formAddPicturesOrDocs->createView(),
             'eanScannerScript' => $this->eanScannerService->getScannerScript(),
             'productFormScript' => $this->productFormService->getProductFormScript(),
@@ -215,37 +222,76 @@ class MouvTiersController extends AbstractController
     public function send(Request $request, RetraitMarchandisesEanRepository $repo, ArtRepository $repoArt, $chantier = null)
     {
         $dos = 1;
+        $i = 0;
+        $sf = 0;
+        $retrait = "";
+        $tiers = "";
+        $donnees = [];
+        $stockfaux = [];
+        $retrait = $this->repoAffaire->findOneBy(['code' => $chantier]);
+        if ($retrait) {
+            $tiers = $retrait->getTiers();
+        }
+        $typePiece = $this->importXlsxDivaltoService->getTypePiece($tiers);
+        $indexColonnes = $typePiece['indexColonne'];
         if ($chantier) {
-            $histo = $repo->findBy(['chantier' => $chantier, 'sendAt' => null]);
-            for ($ligHisto = 0; $ligHisto < count($histo); $ligHisto++) {
-                $prod = $repoArt->getEanStock($dos, $histo[$ligHisto]->getEan());
-                $historique[$ligHisto]['id'] = $histo[$ligHisto]->getId();
 
-                $basculeSend = $repo->findOneBy(['id' => $histo[$ligHisto]->getId()]);
+            $panier = $repo->findBy(['chantier' => $chantier, 'sendAt' => null]);
+            for ($ligPanier = 0; $ligPanier < count($panier); $ligPanier++) {
+                $prod = $repoArt->getEanStock($dos, $panier[$ligPanier]->getEan());
+
+                $basculeSend = $repo->findOneBy(['id' => $panier[$ligPanier]->getId()]);
                 $basculeSend->setSendAt(new DateTime());
                 $em = $this->entityManager;
                 $em->persist($basculeSend);
                 $em->flush();
 
-                $historique[$ligHisto]['ref'] = $prod['ref'];
-                $historique[$ligHisto]['sref1'] = $prod['sref1'];
-                $historique[$ligHisto]['sref2'] = $prod['sref2'];
-                $historique[$ligHisto]['designation'] = $prod['designation'];
-                $historique[$ligHisto]['uv'] = $prod['uv'];
-                $historique[$ligHisto]['ean'] = $prod['ean'];
-                $historique[$ligHisto]['qte'] = $histo[$ligHisto]->getQte();
-                $historique[$ligHisto]['stockFaux'] = $histo[$ligHisto]->getStockFaux();
+                if ($panier[$ligPanier]->getStockFaux() == 1) {
+                    $stockfaux[$sf] = 'Un stock faux a été signalé sur l\'article ' . $prod['ref'] . ' - ' . $prod['sref1'] . ' - ' . $prod['sref2'] . ' - ' . $prod['designation'] . ' à l\'emplacement ' . $panier[$ligPanier]->getLocation();
+                    $sf++;
+                }
+
+                // Alimentation du MOUV
+                $donnees[$i] = array_fill_keys($indexColonnes, ''); // Initialise toutes les colonnes à ''
+                $donnees[$i]['FICHE'] = 'MOUV';
+                $donnees[$i]['REFERENCE'] = $prod['ref']; // MOUV
+                $donnees[$i]['SREF1'] = $prod['sref1']; // MOUV
+                $donnees[$i]['SREF2'] = $prod['sref2']; // MOUV
+                $donnees[$i]['DESIGNATION'] = $prod['designation']; // MOUV
+                if ($panier[$ligPanier]->getQte() < 0) {
+                    $donnees[$i]['MOUV.OP'] = $typePiece['sortie']; // MOUV
+                } else {
+                    $donnees[$i]['MOUV.OP'] = $typePiece['entree']; // MOUV
+                }
+
+                $donnees[$i]['QUANTITE'] = abs($panier[$ligPanier]->getQte()); // MOUV
+                $donnees[$i]['MOUV.PPAR'] = ''; // MOUV
+                $donnees[$i]['MOUV.PUB'] = ''; // MOUV
+
+                // Alimentation du MVTL
+                $i++;
+                $donnees[$i] = array_fill_keys($indexColonnes, ''); // Initialise toutes les colonnes à ''
+                $donnees[$i]['FICHE'] = 'MVTL';
+                $donnees[$i]['EMPLACEMENT'] = $panier[$ligPanier]->getLocation(); // MVTL
+                $donnees[$i]['QUANTITE_VTL'] = abs($panier[$ligPanier]->getQte()); // MVTL
+                $i++;
             }
             // envoyer un mail si il y a des infos à envoyer
-            if (count($historique) > 0) {
+            if (count($donnees) > 0) {
+                if ($tiers) {
+                    $mouvXlsx = $this->importXlsxDivaltoService->get_export_excel_mouv_tiers($typePiece['typePiece'], $donnees, $tiers);
+                } else {
+                    $mouvXlsx = $this->importXlsxDivaltoService->get_export_excel_stock($typePiece['typePiece'], $donnees);
+                }
                 // envoyer un mail
-                $html = $this->renderView('mouv_tiers/mails/listeRetraitProduits.html.twig', ['historiques' => $historique, 'commentaire' => $request->request->get('ta'), 'chantier' => $chantier]);
+                $html = $this->renderView('mouv_tiers/mails/listeRetraitProduits.html.twig', ['stockfaux' => $stockfaux, 'commentaire' => $request->request->get('ta'), 'chantier' => $chantier, 'retrait' => $retrait]);
                 $d = new DateTime();
-                $destinataires = [$this->getUser()->getEmail()];
+                $destinataires = ['adeschodt@lhermitte.fr', 'adefaria@lhermitte.fr'];
                 $email = (new Email())
                     ->from($this->mailEnvoi)
                     ->to(...$destinataires)
-                    ->subject('Liste des produits retiré pour ' . $chantier . " par " . $this->getUser()->getPseudo() . " le " . $d->format('d-m-Y H:i:s'))
+                    ->subject('Import pour le ' . $chantier . " par " . $this->getUser()->getPseudo() . " le " . $d->format('d-m-Y H:i:s'))
+                    ->attachFromPath($mouvXlsx)
                     ->html($html);
                 $this->mailer->send($email);
             }
@@ -254,7 +300,7 @@ class MouvTiersController extends AbstractController
             return $this->redirectToRoute('app_mouv_tiers');
         }
 
-        $this->addFlash('message', 'Retrait cloturé avec succès');
+        $this->addFlash('message', 'Panier cloturé avec succès');
         return $this->redirectToRoute('app_mouv_tiers');
     }
 }

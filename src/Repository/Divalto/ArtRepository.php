@@ -440,13 +440,19 @@ class ArtRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
-    public function getSearchArt($dos, $produit, $type, $hsdt): array
+    public function getSearchArt($dos, $produit, $type, $hsdt, $stock): array
     {
         if ($hsdt == 0) {
             $hsdt = "";
         }
         if ($hsdt == 1) {
             $hsdt = " AND ferme IS NULL";
+        }
+        if ($stock == 0) {
+            $stock = "";
+        }
+        if ($stock == 1) {
+            $stock = " AND stock > 0";
         }
         if ($type == 'EAN') {
             $where = "ean = '$produit'";
@@ -474,7 +480,7 @@ class ArtRepository extends ServiceEntityRepository
         LEFT JOIN SART s ON a.DOS = s.DOS AND a.REF = s.REF
         LEFT JOIN MVTL_STOCK_V m ON a.REF = m.REFERENCE AND s.SREF1 = m.SREFERENCE1 AND s.SREF2 = m.SREFERENCE2
         WHERE a.DOS = $dos)reponse
-        WHERE $where $hsdt
+        WHERE $where $hsdt $stock
         GROUP BY ref, sref1, sref2, designation, uv, ean, ferme, color
         ";
         $stmt = $conn->prepare($sql);

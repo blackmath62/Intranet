@@ -32,7 +32,7 @@ class AlimentationEmplacementEanType extends AbstractType
         $i = 0;
         foreach ($arts as $art) {
             if ($i == 0) {
-                $arrayArts['Ajouter'] = $art["Add"];
+                $arrayArts['Ajouter'] = "Add";
             } elseif (!empty($art['empl'])) {
                 $arrayArts[$art['empl']] = $art['empl'];
             }

@@ -3,45 +3,55 @@
 <p>De la marchandise a été retiré pour le Chantier
 	<strong>{{ chantier }}</strong>
 </p>
-
-{% if historiques %}
+{% if retrait %}
+	<p>Pour le tiers =>
+		<strong>{{ retrait.tiers }}
+			-
+			{{ retrait.nom }}
+		</strong>
+	</p>
 	<p>
 		<u>
-			<strong>Veuillez trouver ci dessous la liste des produits:
+			<strong>Le fichier pour intégrer les mouvements tiers. ('TypePiece' 'Type Tiers' 'date')</strong>
+		</u>
+		<ul>
+			<li>Menu Divalto => Import de Piéces par tableur</li>
+			<li>Paramétre 'Type de traitement' => Création</li>
+			<li>Paramétre 'Phase' => Import</li>
+			<li>Paramétre 'Mise à jour' => Mise à jour réelle</li>
+			<li>Paramétre 'Ouvrir le classeur à la fin du traitement' => Coché</li>
+			<li>En validant avec le V, allez chercher le fichier que vous aurez au préalable copié sur votre bureau de session à distance pour l'intégrer !</li>
+		</ul>
+	</p>
+{% else %}
+	<p>
+		<strong>Client non identifié donc piéce interne</strong>
+	</p>
+	<p>
+		<u>
+			<strong>Le fichier pour intégrer les régularisations internes. ( Import Stock 'date')</strong>
+		</u>
+		<ul>
+			<li>Menu Divalto => Import de Piéces par tableur</li>
+			<li>Paramétre 'Type de traitement' => Stock</li>
+			<li>Paramétre 'Phase' => Import</li>
+			<li>Paramétre 'Mise à jour' => Mise à jour réelle</li>
+			<li>Paramétre 'Ouvrir le classeur à la fin du traitement' => Coché</li>
+			<li>En validant avec le V, allez chercher le fichier que vous aurez au préalable copié sur votre bureau de session à distance pour l'intégrer !</li>
+		</ul>
+	</p>
+{% endif %}
+
+{% if stockfaux %}
+	<p>
+		<u>
+			<strong>Veuillez trouver ci dessous la liste des stocks faux produits rapportés:
 			</strong>
 		</u>
 	</p>
-	<table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
-		<thead>
-			<tr class="text-center">
-				<th>Référence</th>
-				<th>Sref1</th>
-				<th>Sref2</th>
-				<th>Désignation</th>
-				<th>U.V</th>
-				<th>Quantité</th>
-				<th>Stock Faux ?</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for historique in historiques %}
-				<tr>
-					<td>{{ historique.ref }}</td>
-					<td>{{ historique.sref1 }}</td>
-					<td>{{ historique.sref2 }}</td>
-					<td>{{ historique.designation }}</td>
-					<td>{{ historique.uv }}</td>
-					<td class="text-center">{{ historique.qte }}</td>
-					<td>
-						{% if historique.stockFaux > 0 %}
-							Oui
-							{% else %}
-						{% endif %}
-					</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+	{% for stockfau in stockfaux %}
+		<p>{{ stockfau }}</p>
+	{% endfor %}
 {% endif %}
 
 {% if commentaire %}
