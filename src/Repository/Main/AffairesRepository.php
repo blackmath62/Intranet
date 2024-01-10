@@ -67,14 +67,14 @@ class AffairesRepository extends ServiceEntityRepository
         a.etat AS etat,
         a.backgroundColor AS backgroundColor,
         a.textColor AS textColor,
-        COUNT(p.entId) AS nbe
+        COUNT(p.cdno) AS nbe
     FROM
         affaires a
     LEFT JOIN
         affairepiece p ON a.code = p.affaire
     WHERE
         a.etat <> 'Termine'
-        AND (p.etat <> 'Termine' OR p.entId IS NULL)
+        AND (p.etat <> 'Termine')
     GROUP BY
         a.id, a.code, a.libelle, a.tiers, a.nom, a.start, a.end, a.progress, a.duration, a.etat, a.backgroundColor, a.textColor
     ORDER BY
@@ -92,7 +92,7 @@ class AffairesRepository extends ServiceEntityRepository
         a.tiers AS tiers, a.nom AS nom, a.start AS start, a.end AS end,
         a.progress AS progress, a.duration AS duration, a.etat AS etat,
         a.backgroundColor AS backgroundColor, a.textColor AS textColor,
-        COUNT(p.entId) AS nbe
+        COUNT(p.cdno) AS nbe
         FROM affairepiece p
         INNER JOIN affaires a ON a.code = p.affaire
         WHERE a.etat IN ('Termine')

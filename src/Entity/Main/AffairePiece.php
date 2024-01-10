@@ -17,17 +17,8 @@ class AffairePiece
 
     private $id;
 
-    #[ORM\Column(type: "integer")]
-    private $entId;
-
     #[ORM\Column(type: "string", length: 255)]
     private $adresse;
-
-    #[ORM\Column(type: "integer")]
-    private $typePiece;
-
-    #[ORM\Column(type: "integer")]
-    private $piece;
 
     #[ORM\Column(type: "string", length: 2)]
     private $op;
@@ -41,32 +32,26 @@ class AffairePiece
     #[ORM\Column(type: "string", length: 255, nullable: true)]
     private $affaire;
 
-    #[ORM\ManyToMany(targetEntity: InterventionMonteurs::class, mappedBy: "pieces")]
-    private $interventionMonteurs;
-
     #[ORM\Column(type: "datetime", nullable: true)]
     private $closedAt;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $cdno = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $blno = null;
+
+    #[ORM\ManyToMany(targetEntity: InterventionMonteurs::class, mappedBy: 'pieces')]
+    private Collection $interventionMonteursPieces;
+
     public function __construct()
     {
-        $this->interventionMonteurs = new ArrayCollection();
+        $this->interventionMonteursPieces = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getEntId(): ?int
-    {
-        return $this->entId;
-    }
-
-    public function setEntId(int $entId): self
-    {
-        $this->entId = $entId;
-
-        return $this;
     }
 
     public function getAdresse(): ?string
@@ -77,30 +62,6 @@ class AffairePiece
     public function setAdresse(string $adresse): self
     {
         $this->adresse = $adresse;
-
-        return $this;
-    }
-
-    public function getTypePiece(): ?int
-    {
-        return $this->typePiece;
-    }
-
-    public function setTypePiece(int $typePiece): self
-    {
-        $this->typePiece = $typePiece;
-
-        return $this;
-    }
-
-    public function getPiece(): ?int
-    {
-        return $this->piece;
-    }
-
-    public function setPiece(int $piece): self
-    {
-        $this->piece = $piece;
 
         return $this;
     }
@@ -153,33 +114,6 @@ class AffairePiece
         return $this;
     }
 
-    /**
-     * @return Collection<int, InterventionMonteurs>
-     */
-    public function getInterventionMonteurs(): Collection
-    {
-        return $this->interventionMonteurs;
-    }
-
-    public function addInterventionMonteur(InterventionMonteurs $interventionMonteur): self
-    {
-        if (!$this->interventionMonteurs->contains($interventionMonteur)) {
-            $this->interventionMonteurs[] = $interventionMonteur;
-            $interventionMonteur->addPiece($this);
-        }
-
-        return $this;
-    }
-
-    public function removeInterventionMonteur(InterventionMonteurs $interventionMonteur): self
-    {
-        if ($this->interventionMonteurs->removeElement($interventionMonteur)) {
-            $interventionMonteur->removePiece($this);
-        }
-
-        return $this;
-    }
-
     public function getClosedAt(): ?\DateTimeInterface
     {
         return $this->closedAt;
@@ -188,6 +122,57 @@ class AffairePiece
     public function setClosedAt(?\DateTimeInterface $closedAt) : self
     {
         $this->closedAt = $closedAt;
+
+        return $this;
+    }
+
+    public function getCdno(): ?int
+    {
+        return $this->cdno;
+    }
+
+    public function setCdno(?int $cdno): static
+    {
+        $this->cdno = $cdno;
+
+        return $this;
+    }
+
+    public function getBlno(): ?int
+    {
+        return $this->blno;
+    }
+
+    public function setBlno(?int $blno): static
+    {
+        $this->blno = $blno;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InterventionMonteurs>
+     */
+    public function getInterventionMonteursPieces(): Collection
+    {
+        return $this->interventionMonteursPieces;
+    }
+
+    public function addInterventionMonteursPiece(InterventionMonteurs $interventionMonteursPiece): static
+    {
+        if (!$this->interventionMonteursPieces->contains($interventionMonteursPiece)) {
+            $this->interventionMonteursPieces->add($interventionMonteursPiece);
+            $interventionMonteursPiece->addPiece($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInterventionMonteursPiece(InterventionMonteurs $interventionMonteursPiece): static
+    {
+        if ($this->interventionMonteursPieces->removeElement($interventionMonteursPiece)) {
+            $interventionMonteursPiece->removePiece($this);
+        }
 
         return $this;
     }

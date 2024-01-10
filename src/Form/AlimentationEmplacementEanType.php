@@ -59,13 +59,10 @@ class AlimentationEmplacementEanType extends AbstractType
                 'required' => true,
                 'label' => 'Transférer ou Ajouter',
                 'attr' => ['class' => 'form-control col-12'],
-                'choices' => [
-                    'Ajouter' => "Add",
-                ],
                 'choices' => $arrayArts,
                 'expanded' => false,
                 'multiple' => false,
-                'mapped' => false,
+
             ])
             ->add('qte', NumberType::class, [
                 'required' => true,

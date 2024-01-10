@@ -101,14 +101,14 @@ class InterventionsMonteursType extends AbstractType
                     return $er->createQueryBuilder('a')
                         ->where('a.affaire = ' . "'" . $this->code . "'");
                 },
-                'choice_label' => 'piece',
+                'choice_label' => 'id',
                 'choice_name' => 'id',
                 'multiple' => true,
                 'expanded' => false,
                 'by_reference' => false,
                 'required' => false,
                 'attr' => [
-                    'id' => 'pieces',
+                    'id' => 'interventionMonteursPieces',
                     'class' => 'form-control select2',
                 ],
                 'label' => "Piéces",

@@ -39,9 +39,6 @@ class InterventionMonteurs
     #[ORM\Column(type: "datetime", nullable: true)]
     private $createdAt;
 
-    #[ORM\ManyToMany(targetEntity: AffairePiece::class, inversedBy: "interventionMonteurs")]
-    private $pieces;
-
     #[ORM\ManyToOne(targetEntity: Affaires::class, inversedBy: "interventionMonteurs")]
     private $code;
 
@@ -65,12 +62,15 @@ class InterventionMonteurs
     #[ORM\ManyToOne(inversedBy: 'statutInverventionMonteurs')]
     private ?StatutsGeneraux $typeIntervention = null;
 
+    #[ORM\ManyToMany(targetEntity: AffairePiece::class, inversedBy: 'interventionMonteursPieces')]
+    private Collection $pieces;
+
     public function __construct()
     {
         $this->Equipes = new ArrayCollection();
-        $this->pieces = new ArrayCollection();
         $this->signatureElectroniques = new ArrayCollection();
         $this->interventionFicheMonteurs = new ArrayCollection();
+        $this->pieces = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -182,30 +182,6 @@ class InterventionMonteurs
     public function setCreatedAt(?\DateTimeInterface $createdAt) : self
     {
         $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, AffairePiece>
-     */
-    public function getPieces() : Collection
-    {
-        return $this->pieces;
-    }
-
-    public function addPiece(AffairePiece $piece): self
-    {
-        if (!$this->pieces->contains($piece)) {
-            $this->pieces[] = $piece;
-        }
-
-        return $this;
-    }
-
-    public function removePiece(AffairePiece $piece): self
-    {
-        $this->pieces->removeElement($piece);
 
         return $this;
     }
@@ -336,6 +312,30 @@ class InterventionMonteurs
     public function setTypeIntervention(?StatutsGeneraux $typeIntervention): static
     {
         $this->typeIntervention = $typeIntervention;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AffairePiece>
+     */
+    public function getPieces(): Collection
+    {
+        return $this->pieces;
+    }
+
+    public function addPiece(AffairePiece $piece): static
+    {
+        if (!$this->pieces->contains($piece)) {
+            $this->pieces->add($piece);
+        }
+
+        return $this;
+    }
+
+    public function removePiece(AffairePiece $piece): static
+    {
+        $this->pieces->removeElement($piece);
 
         return $this;
     }

@@ -153,7 +153,8 @@
 													<ul>
 														{% for piece in Intervention.pieces %}
 															<li>
-																{{ piece.piece }}
+																{{ piece.id }}
+																-> Cmd ({{ piece.cdno }}) - BL ({{ piece.blno }})
 															</li>
 														{% endfor %}
 													</ul>
@@ -518,10 +519,10 @@
 			<table class="table table-bordered table-hover">
 				<thead>
 					<tr>
-						<th>Id (nbe Art.)</th>
+						<th>Id (nbe Art)</th>
 						<th>Adresse du Chantier</th>
-						<th>Type Piéce</th>
-						<th>Piece</th>
+						<th>N° Cmd</th>
+						<th>N° Bl</th>
 						<th>OP</th>
 						<th>Mode Transport</th>
 						<th class="text-center">Etat Pieces</th>
@@ -534,11 +535,10 @@
 							{% if piecesAffaire.interventions|length %}
 								{% set rowColor = 'table-success' %}
 							{% endif %}
-							<tr id="{{piecesAffaire.piece}}" data-widget="expandable-table" aria-expanded="false" class="{{rowColor}}">
-								<td>{{ piecesAffaire.entId }}
-									(
-									{{piecesAffaire.produits|length}}
-									)</td>
+							<tr id="{{piecesAffaire.id}}" data-widget="expandable-table" aria-expanded="false" class="{{rowColor}}">
+								<td>
+									{{piecesAffaire.id}}
+									({{piecesAffaire.produits|length}})</td>
 								<td>
 									<i class="fas fa-caret-right fa-fw"></i>
 									{{ piecesAffaire.adresse}}
@@ -567,17 +567,8 @@
 										</ul>
 									{% endif %}
 								</td>
-								{% if piecesAffaire.typePiece == 2 %}
-									{% set type = 'Cmd' %}
-								{% elseif piecesAffaire.typePiece == 1 %}
-									{% set type = 'Devis' %}
-								{% elseif piecesAffaire.typePiece == 3 %}
-									{% set type = 'Bl' %}
-								{% elseif piecesAffaire.typePiece == 4 %}
-									{% set type = 'Fact' %}
-								{% endif %}
-								<td>{{ type }}</td>
-								<td>{{ piecesAffaire.piece}}</td>
+								<td>{{ piecesAffaire.cdno}}</td>
+								<td>{{ piecesAffaire.blno}}</td>
 								<td>{{ piecesAffaire.op}}</td>
 								<td>{{ piecesAffaire.transport}}</td>
 								<td class="text-center">
@@ -646,7 +637,6 @@
 													<th>U.V</th>
 													<th class="text-center">Op</th>
 													<th class="text-center">Qte</th>
-													<th class="text-center">Empl.</th>
 													<th class="text-center">Ean.</th>
 													<th class="text-center">Cmd Fou.</th>
 													<th class="text-center">Stock</th>
@@ -664,8 +654,7 @@
 														<td>{{ produit.designation}}</td>
 														<td class="text-center">{{ produit.uv}}</td>
 														<td class="text-center">{{ produit.op}}</td>
-														<td class="text-center">{{ produit.qte}}</td>
-														<td class="text-center">{{ produit.lieu}}</td>
+														<td class="text-center">{{ produit.cmdQte}}</td>
 														<td class="text-center">
 															{% if produit.ean %}
 																{{ produit.ean}}{% else %}aucun
@@ -681,7 +670,13 @@
 																{{ produit.stock}}
 															{% endif %}
 														</td>
-														<td class="text-center">{{ produit.fermeture}}</td>
+														<td class="text-center">
+															{% if produit.codeSref == 1 %}
+																{{produit.ferme}}
+															{% else %}
+																{{produit.fermeSart}}
+															{% endif %}
+														</td>
 													</tr>
 													{% set i = i + 1 %}
 												{% endfor %}

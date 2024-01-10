@@ -185,6 +185,8 @@
 															<span class="float-right">
 																{% if historique.oldLocation != 'Add' %}
 																	{{historique.oldLocation}}
+																{% else %}
+																	Produit retrouvé sans emplacement
 																{% endif %}
 															</span>
 														</small>
@@ -252,7 +254,10 @@
 <script>{{ productFormScript | raw }}</script>
 <script>{{ eanScannerScript | raw }}</script>
 <script>
-	function alimSource(stockData) { // Supprimer toutes les options actuelles du champ oldLocation
+
+	// Déclarer oldLocationValue en dehors de la fonction de gestionnaire d'événements
+var oldLocationValue;
+function alimSource(stockData) { // Supprimer toutes les options actuelles du champ oldLocation
 $('#alimentation_emplacement_ean_oldLocation').empty();
 $('#alimentation_emplacement_ean_oldLocation').prop('disabled', true);
 
@@ -279,8 +284,9 @@ $('#alimentation_emplacement_ean_oldLocation').prop('disabled', false);
 // Ajouter un gestionnaire d'événements pour le changement de la valeur du champ oldLocation
 $('#alimentation_emplacement_ean_oldLocation').on('change', function () {
 var selectedOption = $(this).find(':selected');
+oldLocationValue = selectedOption.val(); // Définir la valeur de oldLocationValue
 var qteInput = $('#qte');
-
+console.log('oldLocation:', oldLocationValue);
 // Récupérer la quantité stockée dans l'attribut de données
 var qteEmplacement = parseFloat(selectedOption.data('qte'));
 

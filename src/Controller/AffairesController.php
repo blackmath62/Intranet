@@ -192,9 +192,8 @@ class AffairesController extends AbstractController
                 $em->flush();
                 // Création de la piéce de ce chantier
                 $pieceChantier = new AffairePiece();
-                $pieceChantier->setEntId('999999')
-                    ->setTypePiece('2')
-                    ->setPiece('99999999')
+                $pieceChantier->setCdno('999999')
+                    ->setBlno('999999')
                     ->setOp('C')
                     ->setEtat('Nouvelle')
                     ->setAffaire($data['code'] . 'Manuelle');
@@ -294,7 +293,6 @@ class AffairesController extends AbstractController
             $pieces = $this->repoAffairePiece->findBy(['etat' => 'Termine', 'affaire' => $affaire]);
         } elseif ($request->attributes->get('_route') == 'app_piece_affaire_nok') {
             $pieces = $this->repoAffairePiece->findBy(['affaire' => $affaire, 'closedAt' => null]);
-
         }
         $pieces = $this->mettreProduitsSurPieces($pieces);
         $form = $this->createForm(AffaireType::class);
@@ -478,17 +476,23 @@ class AffairesController extends AbstractController
         foreach ($affaires as $affaire) {
             $pieces = $this->repoMouv->getPiecesAffaires($affaire->getCode());
             foreach ($pieces as $p) {
-                $piece = $this->repoAffairePiece->findOneBy(['entId' => $p['id']]);
-
+                $piece = $this->repoAffairePiece->findOneBy(['cdno' => $p['cdno']]);
+                $ent = $this->repoMouv->getEntetePiecesAffaires($p['cdno'], 2);
+                if ($p['blno'] != 0 || $p['cdno'] == 0) {
+                    $piece = $this->repoAffairePiece->findOneBy(['blno' => $p['blno']]);
+                    if ($p['blno'] != 0) {
+                        $ent = $this->repoMouv->getEntetePiecesAffaires($p['blno'], 3);
+                    }
+                }
                 if (!$piece) {
                     $piece = new AffairePiece;
+
                     $piece->setAffaire($p['affaire'])
-                        ->setEntId($p['id'])
-                        ->setAdresse($p['adresse'])
-                        ->setTypePiece($p['typeP'])
-                        ->setPiece($p['piece'])
-                        ->setOp($p['op'])
-                        ->setTransport($p['transport'])
+                        ->setCdno($p['cdno'])
+                        ->setBlno($p['blno'])
+                        ->setAdresse($ent['adresse'])
+                        ->setOp($ent['op'])
+                        ->setTransport($ent['transport'])
                         ->setEtat('Nouvelle');
                     $entityManager = $this->entityManager;
                     $entityManager->persist($piece);
@@ -504,12 +508,11 @@ class AffairesController extends AbstractController
 
                 } else {
                     $piece->setAffaire($p['affaire'])
-                        ->setEntId($p['id'])
-                        ->setAdresse($p['adresse'])
-                        ->setTypePiece($p['typeP'])
-                        ->setPiece($p['piece'])
-                        ->setOp($p['op'])
-                        ->setTransport($p['transport']);
+                        ->setAdresse($ent['adresse'])
+                        ->setCdno($p['cdno'])
+                        ->setBlno($p['blno'])
+                        ->setOp($ent['op'])
+                        ->setTransport($ent['transport']);
                     $entityManager = $this->entityManager;
                     $entityManager->persist($piece);
                     $entityManager->flush();
@@ -734,14 +737,21 @@ class AffairesController extends AbstractController
         $i = 0;
         foreach ($pieces as $piece) {
             if ($i == 0) {
-                $ids = $piece->getEntId();
+                $ids = $piece->getId();
             } else {
-                $ids = $ids . ',' . $piece->getEntId();
+                $ids = $ids . ',' . $piece->getId();
             }
             $i++;
         }
         if ($i > 0) {
-            $produits = $this->repoMouv->getDetailPiecesAffaires($ids);
+            if ($piece->getBlno() > 0) {
+                $pino = $piece->getBlno();
+                $picod = 3;
+            } else {
+                $pino = $piece->getCdno();
+                $picod = 2;
+            }
+            $produits = $this->repoMouv->getDetailPiecesAffaires($pino, $picod);
         }
         $retraits = $this->repoRetrait->findBy(['chantier' => $intervention->getCode()->getCode()]);
         foreach ($retraits as $retrait) {
@@ -930,19 +940,25 @@ class AffairesController extends AbstractController
     {
         $lesPieces = [];
         foreach ($pieces as $piece) {
-            $produits = $this->repoMouv->getDetailPiecesAffaires($piece->getEntId());
+            $pino = $piece->getCdno();
+            $picod = 2;
+            if ($piece->getBlno() > 0 || $piece->getCdno() == 0) {
+                $pino = $piece->getBlno();
+                $picod = 3;
+            }
+
+            $produits = $this->repoMouv->getDetailPiecesAffaires($pino, $picod);
             $lesPieces[] = $piece = [
                 'id' => $piece->getId(),
-                'entId' => $piece->getEntId(),
+                'cdno' => $piece->getCdno(),
+                'blno' => $piece->getBlno(),
                 'adresse' => $piece->getAdresse(),
-                'typePiece' => $piece->getTypePiece(),
-                'piece' => $piece->getPiece(),
                 'op' => $piece->getOp(),
                 'transport' => $piece->getTransport(),
                 'etat' => $piece->getEtat(),
                 'affaire' => $piece->getAffaire(),
                 'produits' => $produits,
-                'interventions' => $piece->getInterventionMonteurs(),
+                'interventions' => $piece->getInterventionMonteursPieces(),
             ];
         }
         return $lesPieces;

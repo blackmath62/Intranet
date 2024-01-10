@@ -392,6 +392,38 @@ $('#retrait_marchandise_ean_location').replaceWith(originalLocationField.clone()
 alimSource(stockData);
 }
 });
+
+// Ajouter un gestionnaire d'événements pour le bouton "stockFaux"
+$('#retrait_marchandise_ean_stockFaux').on('change', function () {
+var isStockFaux = this.checked;
+if (isStockFaux) { // Si le bouton "retour" est coché, désactiver le champ qte et définir l'emplacement sur "ATTENTE"
+qteInput.removeClass('disabled');
+scanEmpl.removeClass('disabled');
+$('#retrait_marchandise_ean_location').empty();
+qteInput.removeAttr('max');
+// Retirer l'attribut max
+
+// Ajouter un champ de texte pour "Saisir manuellement"
+$('#retrait_marchandise_ean_location').replaceWith($('<input>', {
+type: 'text',
+id: 'retrait_marchandise_ean_location',
+name: 'retrait_marchandise_ean[location]',
+class: 'form-control col-12',
+placeholder: 'Saisir manuellement'
+}));
+
+$('#retrait_marchandise_ean_location').prop('disabled', false);
+// Ajouter un gestionnaire d'événements pour le champ de texte "Saisie manuelle"
+$(document).on('input', '#retrait_marchandise_ean_location', function () {
+var inputValue = $(this).val();
+$(this).val(inputValue.toUpperCase());
+});
+
+} else { // Si le bouton "retour" est décoché, appeler la fonction handleLocationChange
+$('#retrait_marchandise_ean_location').replaceWith(originalLocationField.clone());
+alimSource(stockData);
+}
+});
 }
 	</script>
 	<script>

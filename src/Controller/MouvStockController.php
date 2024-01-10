@@ -174,7 +174,7 @@ class MouvStockController extends AbstractController
             $i++;
 
             // Sortir le stock de l'emplacement d'origine si nécéssaire
-            if ($histo[$ligHisto]->getOldLocation() != 'Add') {
+            if ($histo[$ligHisto]->getOldLocation() != 'Add' && $histo[$ligHisto]->getOldLocation() != '') {
                 // Sortie de stock => II
                 // Alimentation du MOUV
                 $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''

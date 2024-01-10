@@ -108,7 +108,7 @@ class MouvTiersController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $produit = $repo->getEanStock($dos, $form->getData()->getEan());
-            //dd($form->getData());
+
             if ($produit) {
                 $retrait = $form->getData();
                 $chantier = $form->getData()->getChantier();
@@ -129,6 +129,10 @@ class MouvTiersController extends AbstractController
                 $this->addFlash('danger', 'Produit introuvable');
                 return $this->redirectToRoute('app_mouv_tiers', ['chantier' => $chantier]);
             }
+        }
+        if ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('danger', 'Données érronés, vos données n\'ont pas été enregistrées');
+            return $this->redirectToRoute('app_mouv_tiers', ['chantier' => $chantier]);
         }
         if ($chantier) {
             $produitsPanier = $repoRetrait->findBy(['chantier' => $chantier, 'sendAt' => null]);
