@@ -67,7 +67,7 @@ class AffairesRepository extends ServiceEntityRepository
         a.etat AS etat,
         a.backgroundColor AS backgroundColor,
         a.textColor AS textColor,
-        COUNT(p.cdno) AS nbe
+        COUNT(p.id) AS nbe
     FROM
         affaires a
     LEFT JOIN
@@ -92,7 +92,7 @@ class AffairesRepository extends ServiceEntityRepository
         a.tiers AS tiers, a.nom AS nom, a.start AS start, a.end AS end,
         a.progress AS progress, a.duration AS duration, a.etat AS etat,
         a.backgroundColor AS backgroundColor, a.textColor AS textColor,
-        COUNT(p.cdno) AS nbe
+        COUNT(p.id) AS nbe
         FROM affairepiece p
         INNER JOIN affaires a ON a.code = p.affaire
         WHERE a.etat IN ('Termine')

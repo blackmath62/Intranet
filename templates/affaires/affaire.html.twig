@@ -475,10 +475,10 @@
 													<a class="dropdown-item" href='{{path('app_affaire_change_etat', {'id' : affaire.id, 'etat' : 'En cours' } ) }}'>En cours</a>
 												</li>
 												<li>
-													<a class="dropdown-item" data-toggle="modal" data-target="#modal-lg-termine">Termine</a>
+													<a class="dropdown-item" data-toggle="modal" data-target="#modal-lg-termine{{affaire.id}}">Termine</a>
 												</li>
 											</ul>
-											<div class="modal fade" id="modal-lg-termine">
+											<div class="modal fade" id="modal-lg-termine{{affaire.id}}">
 												<div class="modal-dialog modal-lg">
 													<div class="modal-content">
 														<div class="modal-header">

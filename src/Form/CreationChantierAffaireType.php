@@ -33,7 +33,7 @@ class CreationChantierAffaireType extends AbstractType
         $arrayClis = [];
         foreach ($clis as $cli) {
             if (!empty($cli['tiers'])) {
-                $arrayClis[$cli['nom'] . ', Adresse :' . $cli['rue'] . ' ' . $cli['cp'] . ' ' . $cli['ville']] = $cli['nom'] . ', Adresse :' . $cli['rue'] . ' ' . $cli['cp'] . ' ' . $cli['ville'];
+                $arrayClis[$cli['nom'] . ', Adresse :' . $cli['rue'] . ' ' . $cli['cp'] . ' ' . $cli['ville']] = $cli['tiers'] . '-' . $cli['nom'] . '-' . $cli['rue'] . ' ' . $cli['cp'] . ' ' . $cli['ville'];
             }
         }
 

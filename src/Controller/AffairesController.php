@@ -173,18 +173,19 @@ class AffairesController extends AbstractController
         $form = $this->createForm(CreationChantierAffaireType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $chantierManu = $this->repoAffaires->findOneBy(['code' => $data['code'] . 'Manuelle']);
+            $dataCreationChantier = $form->getData();
+            $tiers = explode('-', $dataCreationChantier['tiers']);
+            $chantierManu = $this->repoAffaires->findOneBy(['code' => $dataCreationChantier['code'] . 'Manuelle']);
             if ($chantierManu) {
                 $this->addFlash('danger', 'Ce code chantier est déjà utilisé, veuillez en choisir un autre');
                 return $this->redirectToRoute('app_affaire_me_nok');
             } else {
                 //Création du chantier
                 $chantier = new Affaires();
-                $chantier->setCode($data['code'] . 'Manuelle')
-                    ->setLibelle($data['libelle'])
-                    ->setTiers($data['tiers'])
-                    ->setNom($data['tiers']);
+                $chantier->setCode(str_replace(' ', '', strtoupper($dataCreationChantier['code']) . 'Manuelle'))
+                    ->setLibelle($dataCreationChantier['libelle'])
+                    ->setTiers($tiers[0]) // mettre le code client en place de l'adresse
+                    ->setNom($tiers[1]);
                 $chantier->setStart(new DateTime())
                     ->setEtat('Nouvelle');
                 $em = $this->entityManager;
@@ -196,11 +197,11 @@ class AffairesController extends AbstractController
                     ->setBlno('999999')
                     ->setOp('C')
                     ->setEtat('Nouvelle')
-                    ->setAffaire($data['code'] . 'Manuelle');
-                if ($data['adresse']) {
-                    $pieceChantier->setAdresse($data['adresse']);
+                    ->setAffaire(str_replace(' ', '', strtoupper($dataCreationChantier['code']) . 'Manuelle'));
+                if ($dataCreationChantier['adresse']) {
+                    $pieceChantier->setAdresse($dataCreationChantier['adresse']);
                 } else {
-                    $pieceChantier->setAdresse($data['tiers']);
+                    $pieceChantier->setAdresse($tiers[2]);
                 }
                 $em = $this->entityManager;
                 $em->persist($pieceChantier);
@@ -210,29 +211,29 @@ class AffairesController extends AbstractController
                 $intervention = new InterventionMonteurs();
                 $intervention->setCreatedAt(new DateTime())
                     ->setUserCr($this->getUser())
-                    ->setStart($data['start'])
-                    ->setEnd($data['end'])
+                    ->setStart($dataCreationChantier['start'])
+                    ->setEnd($dataCreationChantier['end'])
                     ->addPiece($pieceChantier)
                     ->setTypeIntervention($this->repoStatusGeneraux->findOneBy(['id' => 2]))
                     ->setCode($chantier);
-                foreach ($data['Equipes'] as $monteur) {
+                foreach ($dataCreationChantier['Equipes'] as $monteur) {
                     $intervention->addEquipe($monteur);
                 }
-                if ($data['adresse']) {
-                    $intervention->setAdresse($data['adresse']);
+                if ($dataCreationChantier['adresse']) {
+                    $intervention->setAdresse($dataCreationChantier['adresse']);
                 } else {
-                    $intervention->setAdresse($data['tiers']);
+                    $intervention->setAdresse($tiers[2]);
                 }
             }
             $entityManager = $this->entityManager;
             $entityManager->persist($intervention);
             $entityManager->flush();
             // on ajoute le commentaire s'il y en a un
-            if ($data['comment']) {
+            if ($dataCreationChantier['comment']) {
                 $chat = new Chats;
                 $chat->setCreatedAt(new \DateTime())
                     ->setUser($this->getUser())
-                    ->setContent($data['comment'])
+                    ->setContent($dataCreationChantier['comment'])
                     ->setFonction('chatAffaire')
                     ->setIdentifiant($intervention->getCode()->getId())
                     ->setTables($intervention->getId());
@@ -244,8 +245,8 @@ class AffairesController extends AbstractController
 
             $subjet = "Un chantier en Urgence à été déposé => " . $intervention->getCode()->getLibelle();
             $donnees = $intervention;
-            if ($data['comment']) {
-                $donnees->setChampTemporaire($data['comment']);
+            if ($dataCreationChantier['comment']) {
+                $donnees->setChampTemporaire($dataCreationChantier['comment']);
             }
             $emails = null;
             $equipes = $intervention->getEquipes();
@@ -529,16 +530,24 @@ class AffairesController extends AbstractController
     {
 
         $affaire = $this->repoAffaires->findOneBy(['id' => $id]);
-        $affaire->setEtat($etat);
+
         if ($etat == 'Termine') {
             $affaire->setEnd(new DateTime());
             $pieces = $this->repoAffairePiece->findBy(['affaire' => $affaire->getCode()]);
             foreach ($pieces as $value) {
-                $this->changeEtatPiece($value->getId(), $etat);
+                $this->changeEtatPieceFunction($value->getId(), $etat);
             }
         } else {
+            if ($affaire->getEtat() == 'Termine' && $etat != 'Termine') {
+                $pieces = $this->repoAffairePiece->findBy(['affaire' => $affaire->getCode()]);
+
+                foreach ($pieces as $value) {
+                    $this->changeEtatPieceFunction($value->getId(), $etat);
+                }
+            }
             $affaire->setEnd(null);
         }
+        $affaire->setEtat($etat);
         $entityManager = $this->entityManager;
         $entityManager->persist($affaire);
         $entityManager->flush();
@@ -565,6 +574,21 @@ class AffairesController extends AbstractController
 
         $this->addFlash('message', 'Mise à jour effectuée avec succés');
         return $this->redirectToRoute('app_piece_affaire_nok', ['affaire' => $piece->getAffaire()]);
+
+    }
+
+    public function changeEtatPieceFunction($id, $etat)
+    {
+        $piece = $this->repoAffairePiece->findOneBy(['id' => $id]);
+        if ($etat == 'Termine') {
+            $piece->setClosedAt(new DateTime());
+        } else {
+            $piece->setClosedAt(null);
+        }
+        $piece->setEtat($etat);
+        $entityManager = $this->entityManager;
+        $entityManager->persist($piece);
+        $entityManager->flush();
 
     }
 
