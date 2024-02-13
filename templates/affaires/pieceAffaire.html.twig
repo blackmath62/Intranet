@@ -499,15 +499,6 @@
 	</div>
 	<div class="card">
 		<div class="card-header">
-			<div class="card-tools col-12 col-sm-2">
-				{% if app.request.attributes.get('_route')  == 'app_piece_affaire_ok' %}
-					<a title='Affaires à traiter !' href="{{ path('app_piece_affaire_nok', {'affaire' : affaire.code}) }}" class="btn btn-warning text-dark col-12 m-1">
-						<i class="fas fa-thumbs-down pr-2"></i>Piéces à traitrer</a>
-				{% else %}
-					<a title='Affaires traitées !' href="{{ path('app_piece_affaire_ok', {'affaire' : affaire.code}) }}" class="btn btn-success col-12 m-1">
-						<i class="fas fa-thumbs-up pr-2"></i>Piéces traitées</a>
-				{% endif %}
-			</div>
 			{% if app.request.attributes.get('_route')  == 'app_piece_affaire_ok' %}
 				<h2 class="card-title">Piéce(s) traitée(s)</h2>
 			{% elseif app.request.attributes.get('_route')  == 'app_piece_affaire_nok' %}
@@ -516,6 +507,13 @@
 		</div>
 		<!-- /.card-header -->
 		<div class="card-body">
+			{% if app.request.attributes.get('_route')  == 'app_piece_affaire_ok' %}
+				<a title='Affaires à traiter !' href="{{ path('app_piece_affaire_nok', {'affaire' : affaire.code}) }}" class="btn btn-warning text-dark col-12 my-3">
+					<i class="fas fa-thumbs-down pr-2"></i>Piéces à traitrer</a>
+			{% else %}
+				<a title='Affaires traitées !' href="{{ path('app_piece_affaire_ok', {'affaire' : affaire.code}) }}" class="btn btn-success col-12 my-3">
+					<i class="fas fa-thumbs-up pr-2"></i>Piéces traitées</a>
+			{% endif %}
 			<table class="table table-bordered table-hover">
 				<thead>
 					<tr>

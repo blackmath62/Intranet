@@ -5,72 +5,73 @@
 {% endblock %}
 
 {% block body %}
-	
-		<!-- /.login-logo -->
-		<div class="card">
-			<div class="card-body login-card-body">
-				<p class="login-box-msg">Veuillez renseigner votre identifiant et mot de passe de connexion</p>
 
-				<form class="" action='{{path('app_login')}}' method='POST'>
-					<div class="input-group mb-3">
-						<input type="email" value="{{ app.session.get(constant('App\\Controller\\SecurityController::LAST_EMAIL')) }}" name='email' class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Veuillez entrer votre adresse mail..." required autofocus>
-						<div class="input-group-append">
-							<div class="input-group-text">
-								<span class="fas fa-envelope"></span>
-							</div>
-						</div>
-					</div>
-					<div class="input-group mb-3">
-						<input type="password" name='password' class="form-control" id="password" placeholder="Mot de passe" required>
-						<div class="input-group-append">
-							<div class="input-group-text">
-								<span class="fas fa-lock"></span>
-							</div>
-						</div>
-					</div>
-					<div class="col-12">
-						<div class="icheck-secondary">
-							<input type="checkbox" id="viewPassword" name='viewPassword' onclick="myFunction()">
-							<label for="viewPassword">
-								Voir le Mot de passe 
-							</label>
-						</div>
-					</div>
-					<div class="col-12">
-						<div class="icheck-secondary">
-							<input type="checkbox" id="remember" name='_remember_me'>
-							<label for="remember">
-								Garder ma session active
-							</label>
-						</div>
-					</div>
+	<!-- /.login-logo -->
+	<div class="card">
+		<div class="card-body login-card-body">
+			<p class="login-box-msg">Veuillez renseigner votre identifiant et mot de passe de connexion</p>
 
-					<input type="hidden" name="csrf_token" value="{{ csrf_token('login_form') }}">
-					<div class="row d-flex justify-content-center">
-						<div class="col-6">
-							<button type="submit" class="btn btn-dark btn-block">connexion</button>
+			<form class="" action='{{path('app_login')}}' method='POST'>
+				<div class="input-group mb-3">
+					<input type="email" value="{{ app.session.get(constant('App\\Controller\\SecurityController::LAST_EMAIL')) }}" name='email' class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Veuillez entrer votre adresse mail..." required autofocus autocomplete="on">
+					<div class="input-group-append">
+						<div class="input-group-text">
+							<span class="fas fa-envelope"></span>
 						</div>
-						<!-- /.col -->
 					</div>
-				</form>
-				<p class="mb-0 text-center">
-					<a href="{{path('app_register')}}">Inscription</a>
-				</p>
-				<p class="mb-0 text-center">
-					<a href="{{path('app_password_forgot')}}">Mot de passe oublié ?</a>
-				</p>
-			</div>
-			<!-- /.login-card-body -->
+				</div>
+				<div class="input-group mb-3">
+					<input type="password" name='password' class="form-control" id="password" placeholder="Mot de passe" required autocomplete="on">
+					<div class="input-group-append">
+						<div class="input-group-text">
+							<span class="fas fa-lock"></span>
+						</div>
+					</div>
+				</div>
+				<div class="col-12">
+					<div class="icheck-secondary">
+						<input type="checkbox" id="viewPassword" name='viewPassword' onclick="myFunction()">
+						<label for="viewPassword">
+							Voir le Mot de passe
+						</label>
+					</div>
+				</div>
+				<div class="col-12">
+					<div class="icheck-secondary">
+						<input type="checkbox" id="remember" name='_remember_me'>
+						<label for="remember">
+							Garder ma session active
+						</label>
+					</div>
+				</div>
+
+				<input type="hidden" name="csrf_token" value="{{ csrf_token('login_form') }}">
+				<div class="row d-flex justify-content-center">
+					<div class="col-6">
+						<button type="submit" class="btn btn-dark btn-block">connexion</button>
+					</div>
+					<!-- /.col -->
+				</div>
+			</form>
+			<p class="mb-0 text-center">
+				<a href="{{path('app_register')}}">Inscription</a>
+			</p>
+			<p class="mb-0 text-center">
+				<a href="{{path('app_password_forgot')}}">Mot de passe oublié ?</a>
+			</p>
 		</div>
+		<!-- /.login-card-body -->
+	</div>
 
-<script>
-	function myFunction() {
-		var x = document.getElementById("password");
-		if (x.type === "password") {
-		x.type = "text";
-		} else {
-		x.type = "password";
-		}
-	} 
-</script>
+	<script>
+		function myFunction() {
+var x = document.getElementById("password");
+if (x.type === "password") {
+x.type = "text";
+} else {
+x.type = "password";
+}
+}
+	</script>
+
 {% endblock %}

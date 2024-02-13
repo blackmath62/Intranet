@@ -21,7 +21,7 @@ class StatesDateFilterType extends AbstractType
                 'widget' => 'single_text',
                 'label_attr' => ['class' => 'd-none'],
                 'attr' => [
-                    'class' => 'form-control',
+                    'class' => 'form-control col-12',
                 ],
             ])
             ->add('endDate', DateType::class, [
@@ -32,11 +32,11 @@ class StatesDateFilterType extends AbstractType
                 'widget' => 'single_text',
                 'label_attr' => ['class' => 'd-none'],
                 'attr' => [
-                    'class' => 'form-control',
+                    'class' => 'form-control col-12',
                 ],
             ])
             ->add('filtrer', SubmitType::class, [
-                'attr' => ['class' => 'btn btn-dark'],
+                'attr' => ['class' => 'btn btn-dark col-12'],
                 'label' => 'Filtrer',
             ])
         ;

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Form\StatesDateFilterType;
 use App\Repository\Divalto\StatesByTiersRepository;
 use DateTime;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,13 +19,11 @@ class ResumeStatesController extends AbstractController
     #[Route("/resume/states/{dos}", name: "app_resume_states")]
     #[Route("/resume/states/{dos}/{dd}/{df}", name: "app_resume_states_dd_df")]
 
-    public function index(Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle, $dos, $dd = null, $df = null): Response
+    public function index(LoggerInterface $logger, Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle, $dos, $dd = null, $df = null): Response
     {
 
-        // tracking user page for stats
-        //$tracking = $request->attributes->get('_route');
-        //$this->setTracking($tracking);
-
+        // pas de limite en temps d'execution
+        ini_set('max_execution_time', 0);
         $total = '';
         $familleProduit = [];
         $colorProduit = [];
@@ -77,59 +76,122 @@ class ResumeStatesController extends AbstractController
         }
 
         // Données stats camenbert Produits
+        $timeStart = microtime(true);
         $dataProduit = $repoTiers->getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dos, $startN, $endN, "produits");
         for ($ligFamProduit = 0; $ligFamProduit < count($dataProduit); $ligFamProduit++) {
             $familleProduit[] = $dataProduit[$ligFamProduit]['famille'];
             $montantProduit[] = $dataProduit[$ligFamProduit]['montantN'];
             $colorProduit[] = 'rgba(' . $this->listeCouleur($ligFamProduit) . ')';
         }
-
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête dataProduit : {$executionTime} secondes");
+        $executionTime = 0;
         // Données stats camenbert Client
+        $timeStart = microtime(true);
         $dataClient = $repoTiers->getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dos, $startN, $endN, "clients");
         for ($ligFamClient = 0; $ligFamClient < count($dataClient); $ligFamClient++) {
             $familleClient[] = $dataClient[$ligFamClient]['famille'];
             $montantClient[] = $dataClient[$ligFamClient]['montantN'];
             $colorClient[] = 'rgba(' . $this->listeCouleur($ligFamClient) . ')';
         }
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête dataClient : {$executionTime} secondes");
+        $executionTime = 0;
         // Données stats diagramme mois
+        $timeStart = microtime(true);
         $dataMois = $repoTiers->getStatesRobyTotalParClientArticle($dos, $startN, $endN, $startN1, $endN1, 'mois');
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête dataMoisRequete : {$executionTime} secondes");
+        $executionTime = 0;
+
+        $timeStart = microtime(true);
         for ($ligMois = 0; $ligMois < count($dataMois); $ligMois++) {
             $mois[] = $dataMois[$ligMois]['mois'];
             $moisMontantN[] = $dataMois[$ligMois]['montantN'];
             $moisMontantN1[] = $dataMois[$ligMois]['montantN1'];
         }
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête dataMoisBoucle : {$executionTime} secondes");
+        $executionTime = 0;
+
+        // totaux
+        $timeStart = microtime(true);
         $total = $repoTiers->getStatesRobyTotal($dos, $startN, $endN);
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête getStatesRobyTotal : {$executionTime} secondes");
+        $executionTime = 0;
+
+        $timeStart = microtime(true);
         $nbClients = count($repoTiers->getStatesRobyTotalParClient($dos, $startN, $endN));
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête getStatesRobyTotalParClient : {$executionTime} secondes");
+        $executionTime = 0;
+
+        $timeStart = microtime(true);
         $nbProduits = count($repoTiers->getStatesRobyTotalParProduit($dos, $startN, $endN));
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête getStatesRobyTotalParProduit : {$executionTime} secondes");
+        $executionTime = 0;
+
+        $timeStart = microtime(true);
         $pourcTotaux = $repoTiers->getStatesParFamilleRobyTotaux($dos, $startN, $endN, $startN1, $endN1, 'produits');
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête getStatesParFamilleRobyTotaux : {$executionTime} secondes");
+        $executionTime = 0;
 
         // données line sur 7 ans
+        $timeStart = microtime(true);
         $dataSeven = $repoTiers->getStatesSevenYearsAgo($dos, 'annee');
 
         for ($ligSeven = 0; $ligSeven < count($dataSeven); $ligSeven++) {
             $sevenAnnee[] = $dataSeven[$ligSeven]['annee'];
             $sevenMontant[] = $dataSeven[$ligSeven]['montant'];
         }
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête dataSeven : {$executionTime} secondes");
+        $executionTime = 0;
 
         // données diagramme famille et type article
-
-        $dataFamilleTypeArt = $repoTiers->getStatesParFamilleTypeArticle($dos, $startN, $endN);
+        // j'ai retiré cette partie car elle est trop conssomatrice en temps de traitement.
+        $timeStart = microtime(true);
+        //$dataFamilleTypeArt = $repoTiers->getStatesParFamilleTypeArticle($dos, $startN, $endN);
         $artFamilleTypeTab = array();
+        $ArtFamille = [];
+        $ArtType = [];
+        $ArtMontantType = [];
+        $ArtTotalFamille = [];
+        /*
         for ($ligTypeArt = 0; $ligTypeArt < count($dataFamilleTypeArt); $ligTypeArt++) {
-            $ArtFamille[] = $dataFamilleTypeArt[$ligTypeArt]['famille'];
-            $ArtType[] = $dataFamilleTypeArt[$ligTypeArt]['typeArt'];
-            $ArtMontantType[] = $dataFamilleTypeArt[$ligTypeArt]['montant'];
-            $ArtTotalFamille[] = $repoTiers->getStatesTotalParFamille($dos, $startN, $endN, $dataFamilleTypeArt[$ligTypeArt]['famille']);
+        $varArtTotalFamille = $repoTiers->getStatesTotalParFamille($dos, $startN, $endN, $dataFamilleTypeArt[$ligTypeArt]['famille']);
+        $ArtFamille[] = $dataFamilleTypeArt[$ligTypeArt]['famille'];
+        $ArtType[] = $dataFamilleTypeArt[$ligTypeArt]['typeArt'];
+        $ArtMontantType[] = $dataFamilleTypeArt[$ligTypeArt]['montant'];
+        $ArtTotalFamille[] = $varArtTotalFamille;
 
-            $artFamilleTypeTab[] = [$dataFamilleTypeArt[$ligTypeArt]['famille'],
-                $dataFamilleTypeArt[$ligTypeArt]['typeArt'],
-                $dataFamilleTypeArt[$ligTypeArt]['montant'],
-                $repoTiers->getStatesTotalParFamille($dos, $startN, $endN, $dataFamilleTypeArt[$ligTypeArt]['famille']),
-                $repoTiers->getStatesTotalParType($dos, $startN, $endN, $dataFamilleTypeArt[$ligTypeArt]['typeArt']),
-            ];
+        $artFamilleTypeTab[] = [$dataFamilleTypeArt[$ligTypeArt]['famille'],
+        $dataFamilleTypeArt[$ligTypeArt]['typeArt'],
+        $dataFamilleTypeArt[$ligTypeArt]['montant'],
+        $varArtTotalFamille,
+        $repoTiers->getStatesTotalParType($dos, $startN, $endN, $dataFamilleTypeArt[$ligTypeArt]['typeArt']),
+        ];
 
-        }
+        }*/
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête dataFamilleTypeArtTab : {$executionTime} secondes");
+        $executionTime = 0;
+
         // données line par commerciaux sur 6 ans
+        $timeStart = microtime(true);
         $nomCommerciaux = [];
         $donneesCommerciaux = [];
         $anneeCommerciaux = [];
@@ -158,6 +220,10 @@ class ResumeStatesController extends AbstractController
             ];
             $couleurCommercial[] = 'rgb(' . $color[$i] . ')';
         }
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $logger->info("Temps d'exécution de la requête dataCommerciaux : {$executionTime} secondes");
+        $executionTime = 0;
 
         $trancheF = "du " . $startN . " au " . $endN;
         $trancheD = "du " . $startN1 . " au " . $endN1;

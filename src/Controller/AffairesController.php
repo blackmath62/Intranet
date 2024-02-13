@@ -10,6 +10,7 @@ use App\Entity\Main\InterventionFicheMonteur;
 use App\Entity\Main\InterventionFichesMonteursHeures;
 use App\Entity\Main\InterventionMonteurs;
 use App\Entity\Main\OthersDocuments;
+use App\Form\AddPicturesOrDocsType;
 use App\Form\AffaireType;
 use App\Form\ChatsType;
 use App\Form\CreationChantierAffaireType;
@@ -33,6 +34,8 @@ use App\Repository\Main\RetraitMarchandisesEanRepository;
 use App\Repository\Main\StatutsGenerauxRepository;
 use App\Repository\Main\UsersRepository;
 use App\Service\EmailTreatementService;
+use App\Service\ImageService;
+use App\Service\ProductFormService;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
 use RecursiveArrayIterator;
@@ -45,7 +48,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted("ROLE_MONTEUR")]
+#[IsGranted("ROLE_ME")]
 
 class AffairesController extends AbstractController
 {
@@ -58,6 +61,7 @@ class AffairesController extends AbstractController
     private $repoCli;
     private $repoDocs;
     private $repoComments;
+    private $productFormService;
     private $repoChats;
     private $repoIntervertionsMonteurs;
     private $repoInterventionFicheMonteur;
@@ -80,6 +84,7 @@ class AffairesController extends AbstractController
         InterventionFichesMonteursHeuresRepository $repoInterventionFichesMonteursHeures,
         InterventionFicheMonteurRepository $repoInterventionFicheMonteur,
         InterventionMonteursRepository $repoIntervertionsMonteurs,
+        ProductFormService $productFormService,
         CliRepository $repoCli,
         UsersRepository $repoUsers,
         ChatsRepository $repoChats,
@@ -96,6 +101,7 @@ class AffairesController extends AbstractController
         $this->repoAffaires = $repoAffaires;
         $this->repoComments = $repoComments;
         $this->repoDocs = $repoDocs;
+        $this->productFormService = $productFormService;
         $this->mailer = $mailer;
         $this->repoAffairePiece = $repoAffairePiece;
         $this->repoStatusGeneraux = $repoStatusGeneraux;
@@ -675,7 +681,7 @@ class AffairesController extends AbstractController
 
     #[Route("/Lhermitte/affaire/show/intervention/{id}", name: "app_affaire_show_intervention")]
 
-    public function showIntervention($id, Request $request): Response
+    public function showIntervention(ImageService $imageService, $id, Request $request): Response
     {
 
         $produits = '';
@@ -791,6 +797,42 @@ class AffairesController extends AbstractController
             $retrait->stock = $r['stock'];
         }
 
+        $formAddPicturesOrDocs = $this->createForm(AddPicturesOrDocsType::class);
+        $formAddPicturesOrDocs->handleRequest($request);
+
+        if ($formAddPicturesOrDocs->isSubmitted() && $formAddPicturesOrDocs->isValid()) {
+            $files = $formAddPicturesOrDocs->get('files')->getData();
+            $type = $formAddPicturesOrDocs->get('type')->getData();
+            $ref = $formAddPicturesOrDocs->get('reference')->getData();
+            foreach ($files as $file) {
+                // Logique pour traiter chaque fichier
+                $filename = $type . $ref . '_' . $this->getUser()->getPseudo() . '_' . $file->getClientOriginalName();
+                $cheminRelatif = '//SRVSOFT/FicJoints_R/achat_vente/articles/' . $dos . '/' . strtolower($ref);
+                // Vérifier si le répertoire existe
+                if (!file_exists($cheminRelatif)) {
+                    // Créer le répertoire avec les permissions 0777 (modifiable selon vos besoins)
+                    mkdir($cheminRelatif, 0777, true);
+                }
+                $filepath = $cheminRelatif . '/' . $filename;
+
+                // Vérifier si le fichier existe déjà
+                if (!file_exists($filepath)) {
+                    if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+                        // Appeler la méthode du service pour compresser et redimensionner l'image
+                        $processedImage = $imageService->compressAndResize($file, 1000000);
+                        // Enregistrer l'image dans le répertoire souhaité
+                        $processedImage->save($cheminRelatif . '/' . $filename); // Ajustez le chemin selon vos besoins
+                    } else {
+                        $file->move($cheminRelatif, $filename);
+                    }
+                    $this->addFlash('success', 'Le fichier ' . $file->getClientOriginalName() . ' a été ajouté avec succés.');
+                } else {
+                    // Ajouter ici la logique en cas de fichier existant
+                    $this->addFlash('danger', 'Le fichier ' . $file->getClientOriginalName() . ' existe déjà.');
+                }
+            }
+        }
+
         return $this->render('affaires/showIntervention.html.twig', [
             'title' => "Voir intervention",
             'intervention' => $intervention,
@@ -798,6 +840,8 @@ class AffairesController extends AbstractController
             'usersMes' => $usersMes,
             'docs' => $docs,
             'formFiles' => $formFiles->createView(),
+            'formAddPicturesOrDocs' => $formAddPicturesOrDocs->createView(),
+            'productFormScript' => $this->productFormService->getProductFormScript(),
             'chats' => $chats,
             'retraits' => $retraits,
             'ChatsForm' => $ChatsForm->createView(),

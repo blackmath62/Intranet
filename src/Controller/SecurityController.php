@@ -42,13 +42,13 @@ class SecurityController extends AbstractController
     public function login(): Response
     {
         return $this->render('security/login.html.twig', [
-            'controller_name' => 'SecurityController',
             'title' => "connexion",
         ]);
     }
+
     #[Route("/register", name: "app_register", methods: ["GET", "POST"])]
 
-    function register(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder, MailerInterface $mailerInterface, SluggerInterface $slugger): Response
+    public function register(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder, MailerInterface $mailerInterface, SluggerInterface $slugger): Response
     {
         $form = $this->createForm(UserRegistrationFormType::class);
         $form->handleRequest($request);
@@ -126,7 +126,7 @@ class SecurityController extends AbstractController
     #[Route("/passwordForgot", name: "app_password_forgot")]
 
     // envoyer un mail pour réinitialiser le mot de passe
-    function passwordforgot(Request $request, MailerInterface $mailerInterface, UsersRepository $usersRepo, EntityManagerInterface $em)
+    public function passwordforgot(Request $request, MailerInterface $mailerInterface, UsersRepository $usersRepo, EntityManagerInterface $em)
     {
         $form = $this->createForm(PasswordForgotType::class);
         // lecture des données
@@ -169,7 +169,7 @@ class SecurityController extends AbstractController
     }
     #[Route("/changePassword/{token}", name: "app_change_password")]
 
-    function changePassword($token, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder, UsersRepository $usersRepo)
+    public function changePassword($token, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder, UsersRepository $usersRepo)
     {
         $form = $this->createForm(ModifiedPasswordType::class);
         $form->handleRequest($request);
@@ -207,14 +207,15 @@ class SecurityController extends AbstractController
 
     #[Route("/logout", name: "app_logout", methods: ["GET"])]
 
-    function logout()
+    public function logout()
     {
         $this->addFlash('warning', 'Vous avez bien été déconnecté !');
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
+
     #[Route("/activation/{token}", name: "app_activation", methods: ["GET"])]
 
-    function activation($token, UsersRepository $usersRepo)
+    public function activation($token, UsersRepository $usersRepo)
     {
         // On verifie si un utilisateur a ce token
         $user = $usersRepo->findOneBy(['token' => $token]);

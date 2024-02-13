@@ -29,7 +29,7 @@
 			<div class="d-flex flex-wrap justify-content-start col-12 text-right">
 
 				{% for interventionsActuel in interventionsActuels %}
-					<a class="col-12 col-sm-4 text-dark" href='{{path('app_affaire_show_intervention', {'id' : interventionsActuel.id } ) }}'>
+					<a class="col-12 col-lg-4 text-dark" href='{{path('app_affaire_show_intervention', {'id' : interventionsActuel.id } ) }}'>
 						<div class="card elevation-5 p-0">
 							<div class="card-header p-0" style="font-size: 70%; border-bottom: 0px none {{ interventionsActuel.typeIntervention.backgroundColor }}; background-color: {{ interventionsActuel.typeIntervention.backgroundColor }}; color: {{ interventionsActuel.typeIntervention.textColor }};">
 								<b class="p-1">{{ interventionsActuel.typeIntervention.libelle }}</b>
@@ -114,7 +114,7 @@
 
 										</td>
 										<div class="modal fade" id="modal-creer-{{f}}">
-											<div class="modal-dialog modal-sm">
+											<div class="modal-dialog modal-xl">
 												<div class="modal-content">
 													<div class="modal-header">
 														<h4 class="modal-title">Voulez vous vraiment créer cette fiche ?</h4>
@@ -195,7 +195,7 @@
 											</a>
 										</td>
 										<div class="modal fade" id="modal-nv-{{fichesNonVerrouillee.id}}">
-											<div class="modal-dialog modal-sm">
+											<div class="modal-dialog modal-lg">
 												<div class="modal-content">
 													<div class="modal-header">
 														<h4 class="modal-title">Compte rendu</h4>
@@ -338,13 +338,13 @@
 		<div class="card">
 			<div class="card-header d-flex flex-column m-0">
 				<div class="card-tools">
-					<a class="btn btn-xl btn-warning col-sm-1 col-12 m-1 float-right" href='{{path('app_affaires_admin') }}'>
+					<a class="btn btn-xl btn-warning col-lg-1 col-12 m-1 float-right" href='{{path('app_affaires_admin') }}'>
 						<strong>Admin</strong>
 					</a>
-					<a class="btn btn-xl btn-secondary col-sm-1 col-12 m-1 float-right" href='{{path('app_update_affaires') }}'>
+					<a class="btn btn-xl btn-secondary col-lg-1 col-12 m-1 float-right" href='{{path('app_update_affaires') }}'>
 						<i class="fas fa-redo-alt"></i>
 					</a>
-					<a class="btn btn-xl btn-danger col-sm-1 col-12 m-1 float-right" data-toggle="modal" data-target="#modal-lg">
+					<a class="btn btn-xl btn-danger col-lg-1 col-12 m-1 float-right" data-toggle="modal" data-target="#modal-lg">
 						<i class="fas fa-plus"></i>
 					</a>
 					<div class="modal fade" id="modal-lg">
@@ -359,13 +359,15 @@
 								<div class="modal-body">
 									{{ form_start(form) }}
 									{{ form_end(form) }}</div>
-							</div><!-- /.modal-content --></div><!-- /.modal-dialog --></div>
+							</div>
+						</div>
+					</div>
 					{% if app.request.attributes.get('_route')  == 'app_affaire_me_ok' %}
-						<a title='Affaires à traiter !' href="{{ path('app_affaire_me_nok') }}" class="btn btn-warning text-dark col-sm-1 col-12 m-1 float-right">
+						<a title='Affaires à traiter !' href="{{ path('app_affaire_me_nok') }}" class="btn btn-warning text-dark col-lg-1 col-12 m-1 float-right">
 							<i class="fas fa-thumbs-down"></i>
 						</a>
 					{% else %}
-						<a title='Affaires traitées !' href="{{ path('app_affaire_me_ok') }}" class="btn btn-success col-sm-1 col-12 m-1 float-right">
+						<a title='Affaires traitées !' href="{{ path('app_affaire_me_ok') }}" class="btn btn-success col-lg-1 col-12 m-1 float-right">
 							<i class="fas fa-thumbs-up"></i>
 						</a>
 					{% endif %}
@@ -479,7 +481,7 @@
 												</li>
 											</ul>
 											<div class="modal fade" id="modal-lg-termine{{affaire.id}}">
-												<div class="modal-dialog modal-lg">
+												<div class="modal-dialog modal-xl">
 													<div class="modal-content">
 														<div class="modal-header">
 															<h4 class="modal-title">Basculer cette affaire en Terminé ?</h4>

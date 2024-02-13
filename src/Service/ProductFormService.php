@@ -147,6 +147,7 @@ class ProductFormService
                 resultFiles.textContent = data.files;
 
                 // Traiter la liste de fichiers
+
                 if (data.files && data.files.length > 0) {
                 resultFiles.innerHTML = \'<div class="btn-group-vertical">\';
                 var fileId = 0;
@@ -159,6 +160,7 @@ class ProductFormService
                 } else {
                 resultFiles.innerHTML = "Aucun fichier trouvé.";
                 }
+                document.getElementById("nbFiles").innerText = data.files.length;
 
                 // Traiter la liste d\'images
                 var mainImage = document.getElementById("product-image");
@@ -181,6 +183,7 @@ class ProductFormService
                 // Afficher un message si aucune image n\'est trouvée
                 thumbsContainer.innerHTML = "Aucune image trouvée.";
                 }
+                document.getElementById("nbPictures").innerText = data.pictures.length;
 
                 if (data.ean == null) { // Le produit n\'a pas été trouvé, donc marquez le champ EAN comme invalide
                 $("#ean").attr("class", "form-control col-12 is-invalid");

@@ -7,16 +7,19 @@ use App\Form\DateSecteurLhDebutFinType;
 use App\Form\DateSecteurRbDebutFinType;
 use App\Repository\Divalto\MouvRepository;
 use App\Repository\Divalto\StatesByTiersRepository;
+use App\Repository\Main\MailListRepository;
 use App\Service\ProgressManager;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Psr\Log\LoggerInterface;
 use RtfHtmlPhp\Document;
 use RtfHtmlPhp\Html\HtmlFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -25,10 +28,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class StatesController extends AbstractController
 {
     private $progressManager;
+    private $repoMail;
+    private $mailEnvoi;
+    private $logger;
 
-    public function __construct(ProgressManager $progressManager)
+    public function __construct(LoggerInterface $logger, ProgressManager $progressManager, MailListRepository $repoMail)
     {
         $this->progressManager = $progressManager;
+        $this->repoMail = $repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
+        $this->logger = $logger;
     }
 
     #[Route("/Lhermitte/states", name: "app_states_lhermitte")]
@@ -380,15 +389,9 @@ class StatesController extends AbstractController
     {
         ini_set('memory_limit', '4G');
         ini_set('max_execution_time', 0);
-        $file = 'progress.txt';
         $list = [];
         $donnees = [];
-
         $donnees = $repo->getStatesExcelParMetier($metier, $dateDebutN, $dateFinN, $dossier);
-        // désactiver le Garbage Collector
-        gc_disable();
-        file_put_contents($file, $this->progressManager->initializeProgress(count($donnees)));
-
         // Calculez combien de données vous pouvez traiter en un lot
         $batchSize = 100; // Ajustez cette valeur en fonction de vos besoins
 
@@ -424,36 +427,26 @@ class StatesController extends AbstractController
                     $this->calcul_pu($donnee['MontantSignN2'], $donnee['QteSignN2']),
                     $donnee['MontantSignN2'],
                 ];
-
-                // Lancer le Garbage Collector après chaque itération
-                gc_collect_cycles();
             }
 
             // Ajoutez le lot de données à la liste principale
             $list = array_merge($list, $batchList);
 
-            // Mettez à jour la progression
-            $this->progressManager->incrementIteration();
-            file_put_contents($file, $this->progressManager->updateProgress());
         }
-
-        // Finalisez la barre de progression
-        $this->progressManager->finalizeProgress();
 
         return $list;
     }
 
-    #[Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name: "app_states_excel_metier_Lh")]
-    #[Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name: "app_states_excel_metier_Rb")]
+    #[Route("/old/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name: "app_states_excel_metier_Lh")]
+    #[Route("/old/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name: "app_states_excel_metier_Rb")]
 
-    public function get_states_excel_metier($metier, $dateDebutN, $dateFinN, $dossier, StatesByTiersRepository $repo)
+    public function get_states_excel_metier_old($metier, $dateDebutN, $dateFinN, $dossier, StatesByTiersRepository $repo, MailerInterface $mailer)
     {
         ini_set('memory_limit', '4G');
         ini_set('max_execution_time', 0);
 
+        $timeStart = microtime(true);
         $secteur = $this->metierParameter($metier);
-        $file = 'progress.txt';
-        $fileText = 'progress-text.txt';
         $metier = $secteur['metiers'];
         $spreadsheet = new Spreadsheet();
 
@@ -484,22 +477,7 @@ class StatesController extends AbstractController
         $sheet->getCell('U5')->setValue('QteSignN-2');
         $sheet->getCell('V5')->setValue('Pu_N-2');
         $sheet->getCell('W5')->setValue('MontantSignN-2');
-        file_put_contents($file, 10);
-        file_put_contents($fileText, 'Extraction des données de Divalto');
-        // Increase row cursor after header write
-        $dataMetier = $this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo);
-        $sheet->fromArray($dataMetier, null, 'A6', true);
-        $dernLign = count($dataMetier) + 5;
 
-        file_put_contents($file, 30);
-        file_put_contents($fileText, 'Cosmétique des colonnes années du fichier excel');
-        $d = new DateTime('NOW');
-        $dateTime = $d->format('d-m-Y');
-        $nomFichier = 'States Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le ' . $dateTime;
-        // Titre de la feuille
-        $sheet->getCell('A1')->setValue($nomFichier);
-        $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
-        $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
         // Le style du tableau
         $styleArray = [
             'font' => [
@@ -516,25 +494,52 @@ class StatesController extends AbstractController
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                 'startColor' => [
-                    'argb' => 'FFFFFFFF',
+                    'rgba' => 'FFFFFFFF',
                 ],
             ],
         ];
+
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $this->logger->info("Temps d'exécution de la requête entête : {$executionTime} secondes");
+        $executionTime = 0;
+
+        // Increase row cursor after header write
+        $dataMetier = $this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo);
+
+        $timeStart = microtime(true);
+        $sheet->fromArray($dataMetier, null, 'A6', true);
+        $dernLign = count($dataMetier) + 5;
+
+        $d = new DateTime('NOW');
+        $dateTime = $d->format('d-m-Y');
+        $nomFichier = 'States Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le ' . $dateTime;
+        // Titre de la feuille
+        $sheet->getCell('A1')->setValue($nomFichier);
+        $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
+        $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
+
+        // appliquer le style au tableau
         $spreadsheet->getActiveSheet()->getStyle("A5:W{$dernLign}")->applyFromArray($styleArray);
-        // Le style N en vert
+        /* Ne fonctionne pas, Le style N en vert
         $spreadsheet->getActiveSheet()->getStyle("M1:O{$dernLign}")->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('F92D050');
+        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('F92D050');
         // Le style N-1 en orange
         $spreadsheet->getActiveSheet()->getStyle("Q1:S{$dernLign}")->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FFFC000');
+        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('FFFC000');
         // Le style N-2 en jaune
         $spreadsheet->getActiveSheet()->getStyle("U1:W{$dernLign}")->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FFFFF00');
-        file_put_contents($file, 40);
-        file_put_contents($fileText, 'Alignement des données dans les cellules');
+        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('FFFFF00');
+         */
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $this->logger->info("Temps d'exécution de la requête styleTableau : {$executionTime} secondes");
+        $executionTime = 0;
+
+        $timeStart = microtime(true);
         // Le style de l'entête
         $styleEntete = [
             'font' => [
@@ -555,39 +560,30 @@ class StatesController extends AbstractController
                 ],
             ],
         ];
-
-        file_put_contents($file, 50);
         $spreadsheet->getActiveSheet()->getStyle("A5:W5")->applyFromArray($styleEntete);
+
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $this->logger->info("Temps d'exécution de la requête styleEntete : {$executionTime} secondes");
+        $executionTime = 0;
+
+        $timeStart = microtime(true);
 
         $sheet->getStyle("H1:W{$dernLign}")
             ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         // Espacement automatique sur toutes les colonnes sauf la A
         $sheet->setAutoFilter("A5:W{$dernLign}");
-        $sheet->getColumnDimension('A')->setWidth(30, 'pt');
-        $sheet->getColumnDimension('B')->setAutoSize(true);
-        $sheet->getColumnDimension('C')->setAutoSize(true);
-        $sheet->getColumnDimension('D')->setAutoSize(true);
-        $sheet->getColumnDimension('E')->setAutoSize(true);
-        $sheet->getColumnDimension('F')->setAutoSize(true);
-        $sheet->getColumnDimension('G')->setAutoSize(true);
-        $sheet->getColumnDimension('H')->setAutoSize(true);
-        $sheet->getColumnDimension('I')->setAutoSize(true);
-        $sheet->getColumnDimension('J')->setAutoSize(true);
-        $sheet->getColumnDimension('K')->setAutoSize(true);
-        $sheet->getColumnDimension('L')->setAutoSize(true);
-        $sheet->getColumnDimension('M')->setAutoSize(true);
-        $sheet->getColumnDimension('N')->setAutoSize(true);
-        $sheet->getColumnDimension('O')->setAutoSize(true);
-        $sheet->getColumnDimension('P')->setAutoSize(true);
-        $sheet->getColumnDimension('Q')->setAutoSize(true);
-        $sheet->getColumnDimension('R')->setAutoSize(true);
-        $sheet->getColumnDimension('S')->setAutoSize(true);
-        $sheet->getColumnDimension('T')->setAutoSize(true);
-        $sheet->getColumnDimension('U')->setAutoSize(true);
-        $sheet->getColumnDimension('V')->setAutoSize(true);
-        $sheet->getColumnDimension('W')->setAutoSize(true);
-        file_put_contents($file, 60);
-        file_put_contents($fileText, 'Mise en place des formules dans l\'entête');
+        // Ajuster la largeur des colonnes après insertion des données
+        foreach (range('A', 'W') as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
+        //$sheet->getColumnDimension('A')->setWidth(30, 'pt');
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $this->logger->info("Temps d'exécution de la requête EspacementAuto : {$executionTime} secondes");
+        $executionTime = 0;
+        $timeStart = microtime(true);
+
         // Sous Total des colonnes pour les colonnes Quantités et montants de chaque années
         $sheet->setCellValue("M4", "=SUBTOTAL(9,M6:M{$dernLign})"); // Quantité N
         $sheet->setCellValue("O4", "=SUBTOTAL(9,O6:O{$dernLign})"); // Montant N
@@ -597,8 +593,13 @@ class StatesController extends AbstractController
         $sheet->setCellValue("W4", "=SUBTOTAL(9,W6:W{$dernLign})"); // Montant N-2
         $sheet->setCellValue("P4", "=(O4/S4)-1"); // Delta n-1 / n
         $sheet->setCellValue("T4", "=(S4/W4)-1"); // Delta n-2 / n-1
-        file_put_contents($file, 70);
-        file_put_contents($fileText, 'Mise en place des formats de données de pourcentages et monétaires');
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $this->logger->info("Temps d'exécution de la requête SousTotaux : {$executionTime} secondes");
+        $executionTime = 0;
+
+        $timeStart = microtime(true);
+
         // Format nombre € colonne PU et montant N
         $sheet->getStyle("N1:O{$dernLign}")
             ->getNumberFormat()
@@ -627,22 +628,226 @@ class StatesController extends AbstractController
         $sheet->getStyle("T6:T{$dernLign}")
             ->getNumberFormat()
             ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $this->logger->info("Temps d'exécution de la requête conversionMonétaire : {$executionTime} secondes");
+        $executionTime = 0;
 
-        file_put_contents($file, 80);
-        file_put_contents($fileText, 'Création d\'un classeur excel');
+        $timeStart = microtime(true);
+
         $writer = new Xlsx($spreadsheet);
         // Create a Temporary file in the system
         $fileName = $nomFichier . '.xlsx';
         $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $this->logger->info("Temps d'exécution de la requête creationClasseur : {$executionTime} secondes");
+        $executionTime = 0;
+        $timeStart = microtime(true);
 
-        file_put_contents($file, 90);
-        file_put_contents($fileText, 'Enregistrement du fichier Excel');
         $writer->save($temp_file);
-        file_put_contents($fileText, 'Traitement terminé ! votre fichier est dans vos Téléchargements');
-        file_put_contents($file, 100);
+
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        $this->logger->info("Temps d'exécution de la requête enregistrementFichierTmp : {$executionTime} secondes");
+        $executionTime = 0;
+
         // Return the excel file as an attachment
-        return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
-        die();
+        //return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+        //die();
+        // Créez un message e-mail avec Swift Mailer
+        $email = (new Email())
+            ->from($this->mailEnvoi)
+            ->to($this->getUser()->getEmail())
+            ->subject('States au format excel')
+            ->text('Veuillez trouver votre fichier Excel en pièce jointe.')
+            ->attachFromPath($temp_file, $fileName);
+
+        // Envoyez l'e-mail avec le fichier Excel en pièce jointe
+        $mailer->send($email);
+
+        // Supprimez le fichier temporaire après l'envoi de l'e-mail
+        unlink($temp_file);
+        return $this->redirectToRoute('app_home');
+
+    }
+
+    #[Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name: "app_states_excel_metier_Lh")]
+    #[Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{dossier}", name: "app_states_excel_metier_Rb")]
+
+    public function get_states_excel_metier($metier, $dateDebutN, $dateFinN, $dossier, Request $request, StatesByTiersRepository $repo, MailerInterface $mailer)
+    {
+        ini_set('memory_limit', '4G');
+        ini_set('max_execution_time', 0);
+        $tempsExec = "";
+        $timeStart = microtime(true);
+
+        if ($request->attributes->get('_route') == 'app_states_excel_metier_Rb') {
+            $page = 'app_states_roby';
+        } elseif ($request->attributes->get('_route') == 'app_states_excel_metier_Lh') {
+            $page = 'app_states_lhermitte';
+        }
+        $timeStartEntete = 0;
+        $timeStartEntete = microtime(true);
+        $secteur = $this->metierParameter($metier);
+        $metier = $secteur['metiers'];
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setTitle('States');
+        // Entête de colonne
+        $sheet->getCell('A5')->setValue('Commercial');
+        $sheet->getCell('B5')->setValue('Famille_client');
+        $sheet->getCell('C5')->setValue('Tiers');
+        $sheet->getCell('D5')->setValue('Nom');
+        $sheet->getCell('E5')->setValue('Pays');
+        $sheet->getCell('F5')->setValue('Famille_article');
+        $sheet->getCell('G5')->setValue('Ref');
+        $sheet->getCell('H5')->setValue('Designation');
+        $sheet->getCell('I5')->setValue('Sref1');
+        $sheet->getCell('J5')->setValue('Sref2');
+        $sheet->getCell('K5')->setValue('Uv');
+        $sheet->getCell('L5')->setValue('Mois');
+        $sheet->getCell('M5')->setValue('QteSignN');
+        $sheet->getCell('N5')->setValue('Pu_N');
+        $sheet->getCell('O5')->setValue('MontantSignN');
+        $sheet->getCell('P5')->setValue('Delta_N-1_N');
+        $sheet->getCell('Q5')->setValue('QteSignN-1');
+        $sheet->getCell('R5')->setValue('Pu_N-1');
+        $sheet->getCell('S5')->setValue('MontantSignN-1');
+        $sheet->getCell('T5')->setValue('Delta_N-2_N-1');
+        $sheet->getCell('U5')->setValue('QteSignN-2');
+        $sheet->getCell('V5')->setValue('Pu_N-2');
+        $sheet->getCell('W5')->setValue('MontantSignN-2');
+
+        $d = new DateTime('NOW');
+        $dateTime = $d->format('d-m-Y');
+        $nomFichier = 'States Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le ' . $dateTime;
+        // Titre de la feuille
+        $sheet->getCell('A1')->setValue($nomFichier);
+        $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
+        $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
+
+        // Le style de l'entête
+        $styleEntete = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'F17A2B8',
+                ],
+            ],
+        ];
+        $spreadsheet->getActiveSheet()->getStyle("A5:W5")->applyFromArray($styleEntete);
+        $timeEndEntete = microtime(true);
+        $executionTimeEntete = $timeEndEntete - $timeStartEntete;
+        $this->logger->info("Temps d'exécution de la requête Entête : {$executionTimeEntete} secondes");
+
+        $tempsExec = "Temps d'exécution de la requête Entête : {$executionTimeEntete} secondes" . '</br>';
+
+        $timeStartFormatCellule = 0;
+        $timeStartFormatCellule = microtime(true);
+        // Définir les colonnes concernées par les formats
+        $columnsToFormat = ['N', 'O', 'R', 'S', 'V', 'W'];
+        $percentageColumns = ['P', 'T'];
+
+        // Appliquer le format de l'euro à toute la colonne
+        foreach ($columnsToFormat as $column) {
+            $sheet->getStyle("{$column}:{$column}")
+                ->getNumberFormat()
+                ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_INTEGER);
+        }
+
+        // Appliquer le format de pourcentage à toute la colonne
+        foreach ($percentageColumns as $column) {
+            $sheet->getStyle("{$column}")
+                ->getNumberFormat()
+                ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_PERCENTAGE_00);
+        }
+        $timeEndFormatCellule = microtime(true);
+        $executionTimeFormatCellule = $timeEndFormatCellule - $timeStartFormatCellule;
+        $this->logger->info("Temps d'exécution de la requête Formatage Monétaire/Poucentage : {$executionTimeFormatCellule} secondes");
+        $tempsExec = $tempsExec . "Temps d'exécution de la requête Formatage Monétaire/Poucentage : {$executionTimeFormatCellule} secondes" . '</br>';
+
+        $timeStartExportDonnees = 0;
+        $timeStartExportDonnees = microtime(true);
+        // Increase row cursor after header write
+        $dataMetier = $this->getDataMetier($metier, $dateDebutN, $dateFinN, $dossier, $repo);
+
+        $sheet->fromArray($dataMetier, null, 'A6', true);
+        $dernLign = count($dataMetier) + 5;
+
+        $timeEndExportDonnees = microtime(true);
+        $executionTimeExportDonnees = $timeEndExportDonnees - $timeStartExportDonnees;
+        $this->logger->info("Temps d'exécution de la requête Export Données Divalto : {$executionTimeExportDonnees} secondes");
+        $tempsExec = $tempsExec . "Temps d'exécution de la requête Export Données Divalto : {$executionTimeExportDonnees} secondes" . '</br>';
+
+        $timeStartSommeEtFiltre = 0;
+        $timeStartSommeEtFiltre = microtime(true);
+
+        // Sous Total des colonnes pour les colonnes Quantités et montants de chaque années
+        $sheet->setCellValue("M4", "=SUBTOTAL(9,M6:M{$dernLign})"); // Quantité N
+        $sheet->setCellValue("O4", "=SUBTOTAL(9,O6:O{$dernLign})"); // Montant N
+        $sheet->setCellValue("Q4", "=SUBTOTAL(9,Q6:Q{$dernLign})"); // Quantité N-1
+        $sheet->setCellValue("S4", "=SUBTOTAL(9,S6:S{$dernLign})"); // Montant N-1
+        $sheet->setCellValue("U4", "=SUBTOTAL(9,U6:U{$dernLign})"); // Quantité N-2
+        $sheet->setCellValue("W4", "=SUBTOTAL(9,W6:W{$dernLign})"); // Montant N-2
+        $sheet->setCellValue("P4", "=(O4/S4)-1"); // Delta n-1 / n
+        $sheet->setCellValue("T4", "=(S4/W4)-1"); // Delta n-2 / n-1
+
+        // Espacement automatique sur toutes les colonnes sauf la A
+        $sheet->setAutoFilter("A5:W{$dernLign}");
+
+        $timeEndSommeEtFiltre = microtime(true);
+        $executionTimeSommeEtFiltre = $timeEndSommeEtFiltre - $timeStartSommeEtFiltre;
+        $this->logger->info("Temps d'exécution de la requête ajout Sommes et filtres : {$executionTimeSommeEtFiltre} secondes");
+        $tempsExec = $tempsExec . "Temps d'exécution de la requête ajout Sommes et filtres : {$executionTimeSommeEtFiltre} secondes" . '</br>';
+
+        $timeStartCreation = 0;
+        $timeStartCreation = microtime(true);
+
+        $writer = new Xlsx($spreadsheet);
+        // Create a Temporary file in the system
+        $fileName = $nomFichier . '.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+        $writer->save($temp_file);
+
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+
+        $executionTimeCreation = $timeEnd - $timeStartCreation;
+        $this->logger->info("Temps d'exécution de la requête Création du fichier : {$executionTimeCreation} secondes");
+        $tempsExec = $tempsExec . "Temps d'exécution de la requête Création du fichier : {$executionTimeCreation} secondes" . '</br>';
+
+        $this->logger->info("Temps d'exécution de la requête Total : {$executionTime} secondes");
+        $tempsExec = $tempsExec . "Temps d'exécution de la requête Total : {$executionTime} secondes" . '</br>';
+        // Créez un message e-mail avec Swift Mailer
+        $email = (new Email())
+            ->from($this->mailEnvoi)
+            ->to('jpochet@groupe-axis.fr')
+            ->subject('States au format excel')
+            ->html('Veuillez trouver votre fichier Excel en pièce jointe.' . '</br>' . $tempsExec) // . "Temps d'exécution de la requête : {$executionTime} secondes"
+            ->attachFromPath($temp_file, $fileName);
+
+        // Envoyez l'e-mail avec le fichier Excel en pièce jointe
+        $mailer->send($email);
+
+        // Supprimez le fichier temporaire après l'envoi de l'e-mail
+        unlink($temp_file);
+
+        //$this->addFlash('message', 'Veuillez consulter votre boite mail, le fichier Excel va vous être envoyé');
+        //return $this->redirectToRoute($page);
 
     }
 
@@ -655,7 +860,6 @@ class StatesController extends AbstractController
          */
         ini_set('memory_limit', '4G');
         ini_set('max_execution_time', 0);
-        $file = 'progress.txt';
 
         $list = [];
         $donnee = [];
@@ -696,25 +900,16 @@ class StatesController extends AbstractController
 
             ];
         }
-        file_put_contents($file, 20);
         return $list;
     }
 
     #[Route("/Lhermitte/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name: "app_states_excel_commercial_Lh")]
     #[Route("/Roby/excel/{metier}/{dateDebutN}/{dateFinN}/{commercialId}/{dossier}", name: "app_states_excel_commercial_Rb")]
 
-    public function get_states_excel_commercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, StatesByTiersRepository $repo)
+    public function get_states_excel_commercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, StatesByTiersRepository $repo, MailerInterface $mailer)
     {
-
-        // tracking user page for stats
-        // $tracking = $request->attributes->get('_route');
-        // $this->setTracking($tracking);
-
         ini_set('memory_limit', '4G');
         ini_set('max_execution_time', 0);
-
-        $file = 'progress.txt';
-        $fileText = 'progress-text.txt';
 
         $secteur = $this->metierParameter($metier);
         $metier = $secteur['metiers'];
@@ -748,13 +943,12 @@ class StatesController extends AbstractController
         $sheet->getCell('U5')->setValue('QteSignN-2');
         $sheet->getCell('V5')->setValue('Pu_N-2');
         $sheet->getCell('W5')->setValue('MontantSignN-2');
-        file_put_contents($file, 10);
-        file_put_contents($fileText, 'Extraction des données de Divalto');
+
         // Increase row cursor after header write
-        $sheet->fromArray($this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo), null, 'A6', true);
-        $dernLign = count($this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo)) + 5;
-        file_put_contents($file, 30);
-        file_put_contents($fileText, 'Cosmétique des colonnes années du fichier excel');
+        $getDataCommercial = $this->getDataCommercial($metier, $dateDebutN, $dateFinN, $commercialId, $dossier, $repo);
+        $sheet->fromArray($getDataCommercial, null, 'A6', true);
+        $dernLign = count($getDataCommercial) + 5;
+
         $d = new DateTime('NOW');
         $dateTime = $d->format('d-m-Y');
         $nomFichier = 'States Métier =>' . $metier . ' du ' . $dateDebutN . ' au ' . $dateFinN . ' le ' . $dateTime;
@@ -763,8 +957,7 @@ class StatesController extends AbstractController
         $sheet->getCell('A1')->getStyle()->getFont()->setSize(20);
         $sheet->getCell('A1')->getStyle()->getFont()->setUnderline(true);
         // Le style du tableau
-        file_put_contents($file, 40);
-        file_put_contents($fileText, 'Alignement des données dans les cellules');
+
         $styleArray = [
             'font' => [
                 'bold' => false,
@@ -784,7 +977,7 @@ class StatesController extends AbstractController
                 ],
             ],
         ];
-        file_put_contents($file, 50);
+
         $spreadsheet->getActiveSheet()->getStyle("A5:W{$dernLign}")->applyFromArray($styleArray);
         // Le style N en vert
         $spreadsheet->getActiveSheet()->getStyle("M1:O{$dernLign}")->getFill()
@@ -849,8 +1042,6 @@ class StatesController extends AbstractController
         $sheet->getColumnDimension('V')->setAutoSize(true);
         $sheet->getColumnDimension('W')->setAutoSize(true);
         // Sous Total des colonnes pour les colonnes Quantités et montants de chaque années
-        file_put_contents($file, 60);
-        file_put_contents($fileText, 'Mise en place des formules dans l\'entête');
         $sheet->setCellValue("M4", "=SUBTOTAL(9,M6:M{$dernLign})"); // Quantité N
         $sheet->setCellValue("O4", "=SUBTOTAL(9,O6:O{$dernLign})"); // Montant N
         $sheet->setCellValue("Q4", "=SUBTOTAL(9,Q6:Q{$dernLign})"); // Quantité N-1
@@ -860,8 +1051,7 @@ class StatesController extends AbstractController
         $sheet->setCellValue("P4", "=(O4/S4)-1"); // Delta n-1 / n
         $sheet->setCellValue("T4", "=(S4/W4)-1"); // Delta n-2 / n-1
         // Format nombre € colonne PU et montant N
-        file_put_contents($file, 70);
-        file_put_contents($fileText, 'Mise en place des formats de données de pourcentages et monétaires');
+
         $sheet->getStyle("N1:O{$dernLign}")
             ->getNumberFormat()
             ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_CURRENCY_EUR_INTEGER);
@@ -890,21 +1080,31 @@ class StatesController extends AbstractController
             ->getNumberFormat()
             ->setFormatCode('[Green][>=0]#.##0%;[Red][<0]#.##0%;#.##0%');
 
-        file_put_contents($file, 80);
-        file_put_contents($fileText, 'Création d\'un classeur excel');
         $writer = new Xlsx($spreadsheet);
 
         // Create a Temporary file in the system
         $fileName = $nomFichier . '.xlsx';
         $temp_file = tempnam(sys_get_temp_dir(), $fileName);
 
-        file_put_contents($file, 90);
-        file_put_contents($fileText, 'Enregistrement du fichier Excel');
         $writer->save($temp_file);
-        file_put_contents($fileText, 'Traitement terminé ! votre fichier est dans vos Téléchargements');
-        file_put_contents($file, 100);
+
         // Return the excel file as an attachment
-        return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+        //return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+
+        // Créez un message e-mail avec Swift Mailer
+        $email = (new Email())
+            ->from($this->mailEnvoi)
+            ->to($this->getUser()->getEmail())
+            ->subject('States au format excel')
+            ->text('Veuillez trouver votre fichier Excel en pièce jointe.')
+            ->attachFromPath($temp_file, $fileName);
+
+        // Envoyez l'e-mail avec le fichier Excel en pièce jointe
+        $mailer->send($email);
+
+        // Supprimez le fichier temporaire après l'envoi de l'e-mail
+        unlink($temp_file);
+        return $this->redirectToRoute('app_home');
 
     }
 

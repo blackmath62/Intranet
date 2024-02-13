@@ -1,19 +1,31 @@
 .callout-orange {
     border-left-color: orange;
 }
+.b_orange {
+    background-color: orange;
+}
 .select2-container--default .select2-selection--single{
     background-color: #000;
 }
 html { font-size: 1rem; }
 
+/* taille pour telephone */
+@media (max-width: 767px) {
+    .pc{display:none;}
+    html { font-size: 1rem; }
+}
+/* taille pour tablette */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .pc{display:none;}
+    html { font-size: 1.125rem; }
+}
+/* taille pour PC */
+@media (min-width: 1025px) {
+    .mobile{display:none;}
+}
+/*
 @media (min-width: 576px) {
     html { font-size: 0.5rem; }
-}
-@media (min-width: 200px) and (max-width: 480px) {
-    .pc{display:none;}
-}
-@media (min-width: 481px) {
-    .mobile{display:none;}
 }
 @media (min-width: 768px) {
     html { font-size: 0.6rem; }
@@ -23,7 +35,7 @@ html { font-size: 1rem; }
 }
 @media (min-width: 1200px) {
     html { font-size: 0.9rem; }
-}
+}*/
 
 .barcode {
 

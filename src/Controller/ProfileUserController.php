@@ -30,9 +30,7 @@ class ProfileUserController extends AbstractController
 
     public function index(Request $request, SluggerInterface $slugger, HolidayRepository $repoHoliday, InterventionFicheMonteurRepository $repoInterventions)
     {
-        // tracking user page for stats
-        // $tracking = $request->attributes->get('_route');
-        // $this->setTracking($tracking);
+
         $interventions = '';
         $user = $this->getUser();
         $form = $this->createForm(ProfileUserType::class, $user);
@@ -42,7 +40,6 @@ class ProfileUserController extends AbstractController
             // On récupére le fichier dans le formulaire
             $userImg = $form->getData();
             $file = $form->get('img')->getData();
-            //dd($file);
 
             if ($file) {
                 $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);

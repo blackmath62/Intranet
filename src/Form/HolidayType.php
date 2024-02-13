@@ -23,8 +23,8 @@ class HolidayType extends AbstractType
                 'widget' => 'single_text',
                 'required' => true,
                 'label' => "Date début (inclus)",
-                'attr' => ['class' => 'form-control col-6 col-sm-1 text-center'],
-                'label_attr' => ['class' => 'col-12 col-sm-2 mt-3 text-center'],
+                'attr' => ['class' => 'form-control col-6 col-lg-1 text-center'],
+                'label_attr' => ['class' => 'col-12 col-lg-2 mt-3 text-center'],
             ])
             ->add('sliceStart', ChoiceType::class, [
                 'choices' => [
@@ -35,15 +35,15 @@ class HolidayType extends AbstractType
                 'expanded' => false,
                 'multiple' => false,
                 'label' => 'Tranche début',
-                'attr' => ['class' => 'form-control col-6 col-sm-1 text-center'],
+                'attr' => ['class' => 'form-control col-6 col-lg-1 text-center'],
             ])
             ->add('end', DateType::class, [
                 'widget' => 'single_text',
                 'required' => true,
                 //'data' => date_time_set(new \DateTime("now"), 23, 59),
                 'label' => "Date fin (inclus)",
-                'attr' => ['class' => 'form-control col-6 col-sm-1 text-center'],
-                'label_attr' => ['class' => 'col-12 col-sm-2 text-center mt-3'],
+                'attr' => ['class' => 'form-control col-6 col-lg-1 text-center'],
+                'label_attr' => ['class' => 'col-12 col-lg-2 text-center mt-3'],
             ])
             ->add('sliceEnd', ChoiceType::class, [
                 'choices' => [
@@ -54,14 +54,14 @@ class HolidayType extends AbstractType
                 'expanded' => false,
                 'multiple' => false,
                 'label' => 'Tranche fin',
-                'attr' => ['class' => 'form-control col-6 col-sm-1 text-center'],
+                'attr' => ['class' => 'form-control col-6 col-lg-1 text-center'],
             ])
             ->add('holidayType', EntityType::class, [
                 'class' => HolidayTypes::class,
                 'choice_label' => 'name',
                 'label' => 'Type',
-                'attr' => ['class' => 'mr-3 form-control col-12 col-sm-2 text-center'],
-                'label_attr' => ['class' => 'col-12 col-sm-1 text-center mt-3'],
+                'attr' => ['class' => 'mr-3 form-control col-12 col-lg-2 text-center'],
+                'label_attr' => ['class' => 'col-12 col-lg-1 text-center mt-3'],
             ])
             ->add('details', TextareaType::class, [
                 'required' => false,
@@ -73,7 +73,7 @@ class HolidayType extends AbstractType
                 'label' => 'Détail de la demande',
             ])
             ->add('Envoyer', SubmitType::class, [
-                'attr' => ['class' => 'col-12 col-sm-1 form-control btn btn-dark mt-3 float-right'],
+                'attr' => ['class' => 'col-12 col-12 col-lg-1 form-control btn btn-dark mt-3 float-right'],
             ])
         ;
     }

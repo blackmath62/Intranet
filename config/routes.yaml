@@ -4,5 +4,10 @@ controllers:
         namespace: App\Controller
     type: attribute
 
+execute_command:
+    path: /execute-command
+    controller: App\Controller\ExecuteCommandController::executeCommand
+
+
 
 

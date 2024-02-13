@@ -42,4 +42,7 @@ services:
             $entityManager: '@doctrine.orm.entity_manager'
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.request' }
+
+    App\Command\ProcessInBackgroundCommand:
+        tags: [console.command]
     

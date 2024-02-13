@@ -15,17 +15,12 @@
 					</div>
 				</div>
 			</div>
-			<!-- /.container-fluid -->
 		</section>
 
-		<!-- Main content -->
 		<section class="content">
 			<div class="container-fluid">
 				<div class="row">
-					<div
-						class="col-md-3">
-
-						<!-- Profile Image -->
+					<div class="col-12 col-lg-3">
 						<div class="card card-primary card-outline">
 							<div class="card-body box-profile">
 								<div class="text-center">
@@ -47,12 +42,9 @@
 									</li>
 								</ul>
 							</div>
-							<!-- /.card-body -->
 						</div>
-						<!-- /.card -->
 					</div>
-					<!-- /.col -->
-					<div class="col-md-9">
+					<div class="col-12 col-lg-9">
 						<div class="card">
 							<div class="card-header p-2">
 								<ul class="nav nav-pills">
@@ -69,11 +61,11 @@
 								<div class="tab-content">
 									<div class="active tab-pane" id="conges">
 										{{ form_start(formDates) }}
-										<div class="d-flex flex-wrap justify-content-around p-2">
-											<div>
-												<strong>Veuillez selectionner la période :
-												</strong>
-											</div>
+										<div>
+											<strong>Période :
+											</strong>
+										</div>
+										<div class="col-12 d-flex flex-wrap justify-content-around">
 											<div>
 												{{ form_widget(formDates.startDate) }}
 											</div>
@@ -88,7 +80,7 @@
 										{{ form_end(formDates) }}
 										<div class="d-flex flex-wrap justify-content-around">
 											{% if acceptes %}
-												<div class="card card-success col-3 p-0 m-0" id="accordionAcceptes">
+												<div class="card card-success col-12 p-0 m-2" id="accordionAcceptes">
 													<div class="card-header">
 														<h3 class="card-title">Total des congés Acceptés</h3>
 													</div>
@@ -140,7 +132,7 @@
 													<i class="fas fa-info-circle pr-2 text-info"></i>Pas de Congés Acceptés pour cette période !</h5>
 											{% endif %}
 											{% if attentes %}
-												<div class="card card-warning col-3 p-0 m-0" id="accordionAttentes">
+												<div class="card card-warning col-12 p-0 m-2" id="accordionAttentes">
 													<div class="card-header">
 														<h3 class="card-title">Total des congés En attente de validation</h3>
 													</div>
@@ -192,7 +184,7 @@
 													<i class="fas fa-info-circle pr-2 text-info"></i>Pas de Congés en attente pour cette période !</h5>
 											{% endif %}
 											{% if refuses %}
-												<div class="card card-danger col-3 p-0 m-0" id="accordionRefuses">
+												<div class="card card-danger col-12 p-0 m-2" id="accordionRefuses">
 													<div class="card-header">
 														<h3 class="card-title">Total des congés Refusés</h3>
 													</div>
@@ -280,18 +272,18 @@
 		<section class="content">
 			<div class="card">
 				<div class="card-header">
-					<h3 class="card-title">Liste des fiches d'intervention</h3>
-					<div>
+					<h3 class="card-title col-12">Fiches d'interventions</h3>
+					<div class="col-12">
 						{{ form_start(formFiches) }}
-						<div class="d-flex justify-content-end">
-							<div class="col-12 col-sm-2">Date de Début :
+						<div class="col-12 my-2">
+							<div>Date de Début :
 							</div>
 							{{ form_widget(formFiches.startDate) }}
-							<div class="col-12 col-sm-2">Date de Fin :
+							<div>Date de Fin :
 							</div>
 							{{ form_widget(formFiches.endDate) }}
-							{{ form_widget(formFiches.filtrer) }}
 						</div>
+						{{ form_widget(formFiches.filtrer) }}
 						{{ form_end(formFiches) }}
 					</div>
 				</div>

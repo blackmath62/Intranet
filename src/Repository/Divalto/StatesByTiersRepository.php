@@ -61,9 +61,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHEN MOUV.OP IN('DD','D') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 END AS MontantSign
                 FROM MOUV
-                LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-                LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
-                LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
+                LEFT JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+                LEFT JOIN CLI WITH (INDEX = INDEX_C_CLI) ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
+                LEFT JOIN VRP WITH (INDEX = INDEX_C_VRP) ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
 
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
@@ -120,41 +120,41 @@ class StatesByTiersRepository extends ServiceEntityRepository
                         WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 2
                         END AS CommercialId,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN' AND '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT BETWEEN '$dateDebutN' AND '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN' AND '$dateFinN' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT BETWEEN '$dateDebutN' AND '$dateFinN' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN1' AND '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT BETWEEN '$dateDebutN1' AND '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN1,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN1' AND '$dateFinN1' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT BETWEEN '$dateDebutN1' AND '$dateFinN1' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN1,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN2' AND '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT BETWEEN '$dateDebutN2' AND '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN2,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT BETWEEN '$dateDebutN2' AND '$dateFinN2' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT BETWEEN '$dateDebutN2' AND '$dateFinN2' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN2
         FROM MOUV
-        INNER JOIN ART ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
-        INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND CLI.DOS = MOUV.DOS
-        LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
+        INNER JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
+        INNER JOIN CLI WITH (INDEX = INDEX_C_CLI) ON MOUV.TIERS = CLI.TIERS AND CLI.DOS = MOUV.DOS
+        LEFT JOIN VRP WITH (INDEX = INDEX_C_VRP) ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
         WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
-        AND MOUV.FADT BETWEEN '$dateDebutN2' AND '$dateFinN'
+        AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN'
         AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
         AND MOUV.OP IN('C','CD','DD','D')) Reponse
         WHERE SecteurMouvement IN( $metiers ) AND CommercialId IN ($commercial)
@@ -239,9 +239,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
             ELSE 0
         END AS QteSignN2
         FROM MOUV
-        INNER JOIN ART ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
-        INNER JOIN CLI ON MOUV.TIERS = CLI.TIERS AND CLI.DOS = MOUV.DOS
-        LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
+        INNER JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
+        INNER JOIN CLI WITH (INDEX = INDEX_C_CLI) ON MOUV.TIERS = CLI.TIERS AND CLI.DOS = MOUV.DOS
+        LEFT JOIN VRP WITH (INDEX = INDEX_C_VRP) ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
         WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
         AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ) )
         AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
@@ -297,7 +297,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 ELSE 0
         END AS MontantSignN1
         FROM MOUV
-        INNER JOIN ART ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
+        INNER JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND ART.DOS = MOUV.DOS
         WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) )
         AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL') AND ART.FAM_0001 NOT IN ('REMISE')
 
@@ -344,9 +344,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHEN MOUV.OP IN('DD','D') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 END AS MontantSign
                 FROM MOUV
-                LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-                LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
-                LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
+                LEFT JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+                LEFT JOIN CLI WITH (INDEX = INDEX_C_CLI) ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
+                LEFT JOIN VRP WITH (INDEX = INDEX_C_VRP) ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
 
                 AND CLI.STAT_0002 IN( 'EV','HP','RB' ) AND ART.FAM_0002 IN( 'EV','HP','ME','MO', 'RB', 'D', 'RG', 'RL', 'S', 'BL' )
@@ -392,9 +392,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 END AS MontantSignN
                 FROM MOUV
-                LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-                LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
-                LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
+                LEFT JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+                LEFT JOIN CLI WITH (INDEX = INDEX_C_CLI) ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
+                LEFT JOIN VRP WITH (INDEX = INDEX_C_VRP) ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
 
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
@@ -449,8 +449,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 ELSE 0
                 END AS MontantSignN
                 FROM MOUV
-                LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-                LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
+                LEFT JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+                LEFT JOIN CLI WITH (INDEX = INDEX_C_CLI) ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
 
                 AND CLI.STAT_0002 IN('EV','HP', 'RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
@@ -517,9 +517,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
 				ELSE 0
                 END AS MontantSignN
                 FROM MOUV
-                LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-                LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
-                LEFT JOIN VRP ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
+                LEFT JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+                LEFT JOIN CLI WITH (INDEX = INDEX_C_CLI) ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
+                LEFT JOIN VRP WITH (INDEX = INDEX_C_VRP) ON CLI.REPR_0001 = VRP.TIERS AND MOUV.DOS = VRP.DOS
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND MOUV.TIERS = '$tiers'
 
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
@@ -569,8 +569,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
 				ELSE 0
                 END AS MontantSignN
                 FROM MOUV
-                LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-                LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
+                LEFT JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+                LEFT JOIN CLI WITH (INDEX = INDEX_C_CLI) ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND MOUV.TIERS = '$tiers'
 
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
@@ -620,8 +620,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
 				ELSE 0
                 END AS MontantSignN
                 FROM MOUV
-                LEFT JOIN ART ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
-                LEFT JOIN CLI ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
+                LEFT JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
+                LEFT JOIN CLI WITH (INDEX = INDEX_C_CLI) ON MOUV.TIERS = CLI.TIERS AND MOUV.DOS = CLI.DOS
                 WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND (CLI.REPR_0001 = $commercial OR CLI.REPR_0002 = $commercial )
 
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
@@ -661,9 +661,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
             WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT >= '$startN' AND m.FADT <= '$endN' or m.FADT >= '$startN1' AND m.FADT <= '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse
         GROUP BY tiers, nom, famille";
@@ -677,9 +677,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
     {
 
         if ($famille == "produits") {
-            $type = "RTRIM(LTRIM(a.FAM_0001))";
+            $type = "a.FAM_0001";
         } elseif ($famille == "clients") {
-            $type = "RTRIM(LTRIM(c.STAT_0001))";
+            $type = "c.STAT_0001";
         }
 
         if ($dossier == 3) {
@@ -691,7 +691,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
         FROM(
-        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
+        SELECT m.TIERS AS tiers, c.NOM AS nom, $type AS famille,
         CASE
             WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
             WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
@@ -701,9 +701,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
             WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT >= '$startN' AND m.FADT <= '$endN' or m.FADT >= '$startN1' AND m.FADT <= '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse";
         $stmt = $conn->prepare($sql);
@@ -724,15 +724,15 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT SUM(montantSignN) AS montantN
         FROM(
-        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,
+        SELECT m.TIERS AS tiers,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT >= '$startN' AND m.FADT <= '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse";
         $stmt = $conn->prepare($sql);
@@ -751,17 +751,17 @@ class StatesByTiersRepository extends ServiceEntityRepository
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT tiers, nom, SUM(montantSignN) AS montantN
+        $sql = "SELECT RTRIM(LTRIM(tiers)) AS tiers, RTRIM(LTRIM(nom)) AS nom, SUM(montantSignN) AS montantN
         FROM(
-        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom,
+        SELECT m.TIERS AS tiers, c.NOM AS nom,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT >= '$startN' AND m.FADT <= '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse
         GROUP BY tiers, nom";
@@ -781,17 +781,18 @@ class StatesByTiersRepository extends ServiceEntityRepository
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT ref, sref1, sref2, designation,uv, SUM(montantSignN) AS montantN
+        $sql = "SELECT RTRIM(LTRIM(ref)) AS ref, RTRIM(LTRIM(sref1)) AS sref1, RTRIM(LTRIM(sref2)) AS sref2,
+        RTRIM(LTRIM(designation)) AS designation, RTRIM(LTRIM(uv)) AS uv, SUM(montantSignN) AS montantN
         FROM(
-        SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1, RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
+        SELECT m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, a.VENUN as uv,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT >= '$startN' AND m.FADT <= '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse
         GROUP BY ref, sref1, sref2, designation,uv";
@@ -804,9 +805,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
     public function getStatesRobyTotalParClientArticle($dossier, $startN, $endN, $startN1, $endN1, $famille): array
     {
         if ($famille == "produits") {
-            $type = "ref, sref1, sref2, designation, uv";
+            $type = "RTRIM(LTRIM(ref)) AS ref, RTRIM(LTRIM(sref1)) AS sref1, RTRIM(LTRIM(sref2)) AS sref2, RTRIM(LTRIM(designation)) AS designation, RTRIM(LTRIM(uv)) AS uv";
         } elseif ($famille == "clients") {
-            $type = "tiers, nom";
+            $type = "RTRIM(LTRIM(tiers)) AS tiers, RTRIM(LTRIM(nom)) AS nom";
         } elseif ($famille == "mois") {
             $type = "mois";
         }
@@ -820,7 +821,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT $type, SUM(montantSignN) AS montantN , SUM(montantSignN1) AS montantN1
         FROM(
-        SELECT  MONTH(m.FADT) AS mois,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1, RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
+        SELECT  MONTH(m.FADT) AS mois,m.TIERS AS tiers, c.NOM AS nom,
+        m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, a.VENUN as uv,
         CASE
             WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
             WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
@@ -830,9 +832,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
             WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN1
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT >= '$startN' AND m.FADT <= '$endN' or m.FADT >= '$startN1' AND m.FADT <= '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse
         GROUP BY $type";
@@ -870,9 +872,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
             WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND (m.FADT BETWEEN '$startN' AND '$endN' or m.FADT BETWEEN '$startN1' AND '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND (m.FADT >= '$startN' AND m.FADT <= '$endN' or m.FADT >= '$startN1' AND m.FADT <= '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse
         GROUP BY famille
@@ -903,13 +905,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT >= '$startN' AND m.FADT <= '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse
         GROUP BY famille
@@ -953,9 +955,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
             WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSign
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        INNER JOIN VRP v ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        INNER JOIN VRP v WITH (INDEX = INDEX_C_VRP) ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
         WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ( $n1, $n2, $n3, $n4, $n5) AND m.PICOD = 4 AND m.TICOD = 'C'
 		AND a.REF NOT IN($this->artBan)
         $metier
@@ -1015,9 +1017,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n5 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSign5
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        INNER JOIN VRP v ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        INNER JOIN VRP v WITH (INDEX = INDEX_C_VRP) ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
         WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ( $n1, $n2, $n3, $n4, $n5) AND m.PICOD = 4 AND m.TICOD = 'C'
 		AND a.REF NOT IN($this->artBan)
         $metier
@@ -1089,9 +1091,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
              WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n4 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
          END AS montantSign4
          FROM MOUV m
-         INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-         INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-         INNER JOIN VRP v ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
+         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+         INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+         INNER JOIN VRP v WITH (INDEX = INDEX_C_VRP) ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
          WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ($n1, $n2, $n3, $n4) AND m.PICOD = 4 AND m.TICOD = 'C'
          AND a.REF NOT IN($this->artBan)
          $metier
@@ -1153,9 +1155,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
              WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n4 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
          END AS montantSign4
          FROM MOUV m
-         INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-         INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-         INNER JOIN VRP v ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
+         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+         INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+         INNER JOIN VRP v WITH (INDEX = INDEX_C_VRP) ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
          WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ($n1, $n2, $n3, $n4) AND m.PICOD = 4 AND m.TICOD = 'C'
          AND a.REF NOT IN($this->artBan)
          $metier
@@ -1186,9 +1188,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
         WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
         END AS montant
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN'
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT >= '$startN' AND m.FADT <= '$endN'
         AND m.TICOD = 'C' AND m.PICOD = 4 --AND a.TYPEARTCOD NOT IN ('DIVERS')
         $metier
         AND a.REF NOT IN($this->artBan))reponse
@@ -1218,9 +1220,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
         WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
         END AS montant
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN'
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT >= '$startN' AND m.FADT <= '$endN'
         AND m.TICOD = 'C' AND m.PICOD = 4 AND a.FAM_0001 = '$famille'
         $metier
         AND a.REF NOT IN($this->artBan))reponse
@@ -1241,7 +1243,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = " SELECT SUM(montant) AS montant
+        $sql = "SELECT SUM(montant) AS montant
         FROM(
         SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille,m.OP AS op,
         CASE
@@ -1249,9 +1251,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
         WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
         END AS montant
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
-        INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
-        WHERE m.DOS = $dossier AND m.FADT BETWEEN '$startN' AND '$endN'
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+        WHERE m.DOS = $dossier AND m.FADT >= '$startN' AND m.FADT <= '$endN'
         AND m.TICOD = 'C' AND m.PICOD = 4 AND a.TYPEARTCOD = '$type'
         $metier
         AND a.REF NOT IN($this->artBan))reponse";

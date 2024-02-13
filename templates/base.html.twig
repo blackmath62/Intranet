@@ -58,11 +58,8 @@
 			href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
 			<!-- FullCalendar -->
-			<link
-			rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" integrity="sha256-5veQuRbWaECuYxwap/IOE/DAwNxgm4ikX7nrgsqYp88=" crossorigin="anonymous">
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" integrity="sha256-5veQuRbWaECuYxwap/IOE/DAwNxgm4ikX7nrgsqYp88=" crossorigin="anonymous">
 
-
-			<!-- Mon Css -->
 			<link rel="stylesheet" href="{{ asset("css/style.css") }}">
 			<title>
 				{% block title %}{% endblock %}
@@ -70,26 +67,21 @@
 		{% endblock %}
 	</head>
 	<body class="hold-transition sidebar-mini sidebar-collapse">
-		<div
-			class="wrapper">
-			<!-- début Entête des pages -->
-			<nav
-				id="content-wrapper" class="main-header navbar navbar-expand navbar-white navbar-light">
-				<!-- Left navbar links -->
+		<div class="wrapper">
+			<nav id="content-wrapper" class="main-header navbar navbar-expand navbar-white navbar-light">
 				<ul class="navbar-nav">
-					<li class="nav-item">
-						<a class="nav-link" data-widget="pushmenu" href="#">
-							<i class="fas fa-bars"></i>
-						</a>
-					</li>
+					{% if is_granted('ROLE_USER') %}
+						<li class="nav-item">
+							<a class="nav-link" data-widget="pushmenu" href="#">
+								<i class="fas fa-bars"></i>
+							</a>
+						</li>
+					{% endif %}
 					<li class="nav-item d-sm-inline-block">
 						<a href="{{path('app_home')}}" class="nav-link">Accueil</a>
 					</li>
 				</ul>
-				<!-- Right navbar links -->
-				<ul
-					class="navbar-nav ml-auto">
-					<!-- User Dropdown Menu -->
+				<ul class="navbar-nav ml-auto">
 					<li class="nav-item dropdown">
 						<a class="nav-link" data-toggle="dropdown" href="">
 							<div class="user-panel d-flex">
@@ -101,7 +93,6 @@
 									{{ app.user.token }}
 								</div>
 							</div>
-
 						</a>
 						<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 
@@ -134,335 +125,506 @@
 			</nav>
 
 			<!-- fin Entête des pages -->
-			<aside
-				class="main-sidebar sidebar-dark-primary elevation-4">
-				<!-- Sidebar -->
-				<div
-					class="sidebar">
-					<!-- Brand Logo -->
-					<a class="brand-link" href="{{path('app_home')}}">
-						<img src="{{ asset("dist/img/AdminLTELogo.png")}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="width: 2em; height: 2em;opacity: .8;">
-						<span class="brand-text font-weight-light">Intranet Axis</span>
-					</a>
-					<nav class="mt-2">
-						<ul
-							class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-							<!-- Table Commune -->
-							<li class="nav-header">Général</li>
+			{% if is_granted('ROLE_USER') %}
+				<aside class="main-sidebar sidebar-dark-primary elevation-4">
+					<div class="sidebar">
+						<a class="brand-link" href="{{path('app_home')}}">
+							<img src="{{ asset("dist/img/AdminLTELogo.png")}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="width: 2em; height: 2em;opacity: .8;">
+							<span class="brand-text font-weight-light">Intranet Axis</span>
+						</a>
+						<nav class="mt-2">
+							<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+								<li class="nav-header">Général</li>
 
-							<li class="nav-item">
-								<a href="{{path('app_home')}}" class="nav-link">
-									<i class="nav-icon fas fa-newspaper"></i>
-									<p>
-										Accueil
-									</p>
-									<!-- <span class="badge badge-danger right">8</span> -->
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="{{path('app_holiday_list')}}" class="nav-link">
-									<i class="nav-icon fas fa-mug-hot"></i>
-									<p>
-										Demande de congés
-									</p>
-									<!-- <span class="badge badge-danger right">8</span> -->
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="{{path('app_video')}}" class="nav-link">
-									<i class="nav-icon fas fa-video"></i>
-									<p>
-										Vidéos
-									</p>
-									<!-- <span class="badge badge-danger right">8</span> -->
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="{{ path('app_tickets')}}" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-bug "></i>
-									<p>
-										Tickets
-									</p>
-									<!-- <span class="badge badge-danger right">8</span> -->
-								</a>
-							</li>
-							<li class="nav-item has-treeview">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-brands fa-product-hunt"></i>
-									<p>
-										Produits
-										<i class="fas fa-angle-left right"></i>
-									</p>
-								</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item">
-										<a href="{{ path('app_search_products')}}" class="nav-link">
-											<i class="nav-icon fas fa-magnifying-glass text-primary"></i>
+								<li class="nav-item">
+									<a href="{{path('app_home')}}" class="nav-link">
+										<i class="nav-icon fas fa-newspaper"></i>
+										<p>
+											Accueil
+										</p>
+
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="{{path('app_holiday_list')}}" class="nav-link">
+										<i class="nav-icon fas fa-mug-hot"></i>
+										<p>
+											Demande de congés
+										</p>
+
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="{{path('app_video')}}" class="nav-link">
+										<i class="nav-icon fas fa-video"></i>
+										<p>
+											Vidéos
+										</p>
+
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="{{ path('app_tickets')}}" class="nav-link">
+										<i class="nav-icon fas fa-fw fa-bug "></i>
+										<p>
+											Tickets
+										</p>
+
+									</a>
+								</li>
+								{% if is_granted('ROLE_LOGISTIQUE') or is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL') %}
+									<li class="nav-item has-treeview">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-brands fa-product-hunt"></i>
 											<p>
-												Recherche produit
+												Produits
+												<i class="fas fa-angle-left right"></i>
 											</p>
-											<!-- <span class="badge badge-info right">1</span> -->
 										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_matiere_dangeureuse')}}" class="nav-link">
-											<i class="nav-icon fas fa-skull-crossbones text-danger"></i>
-											<p>Matiéres Dangeureuses</p>
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_controle_produit_stock_mouv_ef')}}" class="nav-link">
-											<i class="nav-icon fa-solid fa-circle-xmark text-warning"></i>
-											<p>Article impossible à fermer</p>
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_article_blob')}}" class="nav-link">
-											<i class="nav-icon fa-solid fa-download text-info"></i>
-											<p>
-												Export article avec Blob
-											</p>
-											<i class="fa-sharp fa-solid fa-memo-circle-success"></i>
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_sref_by_art')}}" class="nav-link">
-											<i class="nav-icon fab fa-product-hunt text-success"></i>
-											<p>
-												Sous réf ouvertes par Articles
-											</p>
-											<i class="fa-sharp fa-solid fa-memo-circle-info"></i>
-											<!-- <span class="badge badge-danger right">8</span> -->
-										</a>
-									</li>
-								</ul>
-							</li>
-							<li class="nav-item has-treeview">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-solid fa-users"></i>
-									<p>
-										Clients
-										<i class="fas fa-angle-left right"></i>
-									</p>
-								</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item">
-										<a href="{{path('app_search_tiers')}}" class="nav-link">
-											<i class="nav-icon fas fa-magnifying-glass text-primary"></i>
-											<p>
-												Chercher client par contact
-											</p>
-											<!-- <span class="badge badge-danger right">8</span> -->
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{path('app_dernieres_pieces_ par_client')}}" class="nav-link">
-											<i class="nav-icon fab fa-audible text-danger"></i>
-											<p>Derniéres intéractions Tiers</p>
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_coupe_station_chargeur_maj')}}" class="nav-link">
-											<i class="nav-icon fas fa-truck-moving text-warning"></i>
-											<p>
-												Csv Client Coupé
-											</p>
-											<!-- <span class="badge badge-info right">1</span> -->
-										</a>
-									</li>
-									{% if is_granted('ROLE_LHERMITTE') %}
-										{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
+										<ul class="nav nav-treeview">
 											<li class="nav-item">
-												<a href="{{path('app_lhermitte_clients_secteur')}}" class="nav-link">
-													<i class="nav-icon fas fa-address-book text-success"></i>
+												<a href="{{ path('app_search_products')}}" class="nav-link">
+													<i class="nav-icon fas fa-magnifying-glass text-primary"></i>
 													<p>
-														Liste des Clients
+														Recherche produit
+													</p>
+
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_matiere_dangeureuse')}}" class="nav-link">
+													<i class="nav-icon fas fa-skull-crossbones text-danger"></i>
+													<p>Matiéres Dangeureuses</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_controle_produit_stock_mouv_ef')}}" class="nav-link">
+													<i class="nav-icon fa-solid fa-circle-xmark text-warning"></i>
+													<p>Article impossible à fermer</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_article_blob')}}" class="nav-link">
+													<i class="nav-icon fa-solid fa-download text-info"></i>
+													<p>
+														Export article avec Blob
+													</p>
+													<i class="fa-sharp fa-solid fa-memo-circle-success"></i>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_sref_by_art')}}" class="nav-link">
+													<i class="nav-icon fab fa-product-hunt text-success"></i>
+													<p>
+														Sous réf ouvertes par Articles
+													</p>
+													<i class="fa-sharp fa-solid fa-memo-circle-info"></i>
+
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="nav-item has-treeview">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-solid fa-users"></i>
+											<p>
+												Clients
+												<i class="fas fa-angle-left right"></i>
+											</p>
+										</a>
+										<ul class="nav nav-treeview">
+											<li class="nav-item">
+												<a href="{{path('app_search_tiers')}}" class="nav-link">
+													<i class="nav-icon fas fa-magnifying-glass text-primary"></i>
+													<p>
+														Chercher client par contact
+													</p>
+
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{path('app_dernieres_pieces_ par_client')}}" class="nav-link">
+													<i class="nav-icon fab fa-audible text-danger"></i>
+													<p>Derniéres intéractions Tiers</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_coupe_station_chargeur_maj')}}" class="nav-link">
+													<i class="nav-icon fas fa-truck-moving text-warning"></i>
+													<p>
+														Csv Client Coupé
+													</p>
+
+												</a>
+											</li>
+											{% if is_granted('ROLE_LHERMITTE') %}
+												{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
+													<li class="nav-item">
+														<a href="{{path('app_lhermitte_clients_secteur')}}" class="nav-link">
+															<i class="nav-icon fas fa-address-book text-success"></i>
+															<p>
+																Liste des Clients
+															</p>
+														</a>
+													</li>
+												{% endif %}
+											{% endif %}
+										</ul>
+									</li>
+								{% endif %}
+								{% if is_granted('ROLE_INFORMATIQUE') %}
+									<li class="nav-item has-treeview">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-skull-crossbones"></i>
+											<p>
+												Phyto
+												<i class="fas fa-angle-left right"></i>
+											</p>
+										</a>
+										<ul class="nav nav-treeview">
+											<li class="nav-item">
+												<a href="{{ path('app_declaration_agence_eau')}}" class="nav-link">
+													<i class="nav-icon fas fa-tint text-info"></i>
+													<p>Agence de l'eau</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_audit_afnor')}}" class="nav-link">
+													<i class="nav-icon fas fa-certificate text-warning"></i>
+													<p>Audit AFNOR</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_matiere_dangeureuse')}}" class="nav-link">
+													<i class="nav-icon fas fa-skull-crossbones text-danger"></i>
+													<p>D9 - Matiéres Dangeureuses</p>
+												</a>
+											</li>
+										</ul>
+									</li>
+								{% endif %}
+								{% if is_granted('ROLE_LOGISTIQUE') or is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL') %}
+									<li class="nav-item has-treeview">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-box-open"></i>
+											<p>
+												Logistique
+												<i class="fas fa-angle-left right"></i>
+											</p>
+										</a>
+										<ul class="nav nav-treeview">
+											<li class="nav-item">
+												<a href="{{ path('app_stock')}}" class="nav-link">
+													<i class="nav-icon fa-solid fa-cubes text-primary"></i>
+													<p>Stocks</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_stock_direct')}}" class="nav-link">
+													<i class="nav-icon fab fa-confluence text-info"></i>
+													<p>Stock Direct</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_mouv_stock')}}" class="nav-link">
+													<i class="nav-icon fa-solid fa-cubes-stacked text-danger"></i>
+													<p>
+														Régularisation de stock
 													</p>
 												</a>
 											</li>
-										{% endif %}
+											<li class="nav-item">
+												<a href="{{ path('app_mouv_tiers')}}" class="nav-link">
+													<i class="nav-icon fa-solid fa-arrow-right-arrow-left text-info"></i>
+													<p>
+														Retrait/Retour marchandise(s)
+													</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_emplacement_depot')}}" class="nav-link">
+													<i class="nav-icon fas fa-map-marker-alt text-warning"></i>
+													<p>
+														Gestion Emplacement
+													</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_empl_stock_dif_empl_piece')}}" class="nav-link">
+													<i class="nav-icon fas fa-search-location text-danger"></i>
+													<p>
+														Probléme Emplacement
+													</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_print_empl')}}" class="nav-link">
+													<i class="nav-icon fa-solid fa-map-location-dot text-success"></i>
+													<p>
+														Impr. étiquettes empl.
+													</p>
+												</a>
+											</li>
+										</ul>
+									</li>
+								{% endif %}
+								{% if is_granted('ROLE_LOGISTIQUE') or is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL') %}
+									<li class="nav-item has-treeview">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-broadcast-tower"></i>
+											<p>
+												Probléme
+												<i class="fas fa-angle-left right"></i>
+											</p>
+										</a>
+										<ul class="nav nav-treeview">
+											<li class="nav-item">
+												<a href="{{ path('app_controle_anomalies')}}" class="nav-link">
+													<i class="nav-icon fas fa-exclamation-triangle text-warning"></i>
+													<p>Anomalies Divalto</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_old_cmd')}}" class="nav-link">
+													<i class="nav-icon fas fa-blind text-info"></i>
+													<p>Vieilles commandes</p>
+												</a>
+											</li>
+										</ul>
+									</li>
+								{% endif %}
+								<li class="nav-item">
+									<a href="{{ path('app_faq')}}" class="nav-link">
+										<i class="nav-icon fas fa-question-circle"></i>
+										<p>FAQ</p>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="{{ path('annuaire')}}" class="nav-link">
+										<i class="nav-icon fas fa-fw fa-phone"></i>
+										<p>
+											Annuaire
+										</p>
+									</a>
+								</li>
+
+								{% if is_granted('ROLE_ADMIN') %}
+									<li class="nav-item">
+										<a href="{{path('app_admin')}}" class="nav-link">
+											<i class="nav-icon fas fa-chalkboard-teacher"></i>
+											<p>
+												Administration
+											</p>
+										</a>
+									</li>
+								{% endif %}
+								{% if is_granted('ROLE_RSE') %}
+									<li class="nav-header">RSE</li>
+									<li class="nav-item">
+										<a href="{{ path('app_rse', {'dos' : '1' }) }}" class="nav-link">
+											<i class="nav-icon fas fa-chart-pie text-primary"></i>
+											<p>
+												RSE Lhermitte
+											</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{ path('app_rse', {'dos' : '3' }) }}" class="nav-link">
+											<i class="nav-icon fas fa-chart-pie text-danger"></i>
+											<p>
+												RSE Roby
+											</p>
+										</a>
+									</li>
+								{% endif %}
+
+								<li class="nav-header">Lhermitte</li>
+								{% if is_granted('ROLE_LHERMITTE') %}
+
+									{% if (is_granted('ROLE_EV') or is_granted('ROLE_HP') or is_granted('ROLE_MA') or is_granted('ROLE_ME')) and (is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL')) %}
+										<li class="nav-item has-treeview">
+											<a href="" class="nav-link">
+												<i class="nav-icon fas fa-tachometer-alt"></i>
+												<p>
+													States
+													<i class="fas fa-angle-left right"></i>
+												</p>
+											</a>
+											<ul class="nav nav-treeview">
+												<li class="nav-item">
+													<a href="{{ path('app_states_lhermitte') }}" class="nav-link">
+														<i class="fas fa-globe nav-icon text-primary"></i>
+														<p>States ventes</p>
+													</a>
+												</li>
+												<li class="nav-item">
+													<a href="{{ path('app_states_par_client_Lh') }}" class="nav-link">
+														<i class="fas fa-globe nav-icon text-warning"></i>
+														<p>States par client sur 3 ans tous métiers</p>
+													</a>
+												</li>
+												{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
+													<li class="nav-item">
+														<a href="{{ path('app_resume_states', {'dos' : '1' }) }}" class="nav-link">
+															<i class="nav-icon fas fa-chart-pie text-danger"></i>
+															<p>
+																Résumé des states EV
+															</p>
+														</a>
+													</li>
+												{% endif %}
+												<li class="nav-item">
+													<a href="{{ path('app_activite_metier_Lhermitte') }}" class="nav-link">
+														<i class="fas fa-store nav-icon text-success"></i>
+														<p>Activités Métier</p>
+													</a>
+												</li>
+												{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
+													<li class="nav-item">
+														<a href="{{path('app_stats_achat', {'dos' : '1'})}}" class="nav-link">
+															<i class="nav-icon fas fa-shopping-basket text-warning"></i>
+															<p>
+																States achats par article
+															</p>
+														</a>
+													</li>
+													<li class="nav-item">
+														<a href="{{path('app_dernier_achat_par_produit', {'dos' : '1'})}}" class="nav-link">
+															<i class="nav-icon fas fa-th text-info"></i>
+															<p>
+																Factures achats par article
+															</p>
+														</a>
+													</li>
+												{% endif %}
+												<li class="nav-item">
+													<a href="{{ path('app_tarif_vente_divalto') }}" class="nav-link">
+														<i class="fas fa-dollar nav-icon text-warning"></i>
+														<p>Prix de vente Divalto</p>
+													</a>
+												</li>
+											</ul>
+										</li>
 									{% endif %}
-								</ul>
-							</li>
-							{% if is_granted('ROLE_INFORMATIQUE') %}
-								<li class="nav-item has-treeview">
-									<a href="" class="nav-link">
-										<i class="nav-icon fas fa-skull-crossbones"></i>
-										<p>
-											Phyto
-											<i class="fas fa-angle-left right"></i>
-										</p>
-									</a>
-									<ul class="nav nav-treeview">
+									{% if (is_granted('ROLE_LOGISTIQUE') or is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL')) %}
 										<li class="nav-item">
-											<a href="{{ path('app_declaration_agence_eau')}}" class="nav-link">
-												<i class="nav-icon fas fa-tint text-info"></i>
-												<p>Agence de l'eau</p>
+											<a href="{{path('app_lhermitte_rossignols')}}" class="nav-link">
+												<i class="nav-icon fas fa-dove text-light"></i>
+												<p>Rossignols</p>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="{{ path('app_audit_afnor')}}" class="nav-link">
-												<i class="nav-icon fas fa-certificate text-warning"></i>
-												<p>Audit AFNOR</p>
+											<a href="{{ path('app_contrat_commissionnaire') }}" class="nav-link">
+												<i class="fas fa-file-signature nav-icon text-light"></i>
+												<p>Contrats Commissionnaires</p>
 											</a>
 										</li>
+									{% endif %}
+
+									{% if is_granted('ROLE_ME') and is_granted('ROLE_RESPONSABLE_SECTEUR') %}
+										<li class="nav-item has-treeview">
+											<a href="" class="nav-link">
+												<i class="nav-icon fas fa-solid fa-igloo"></i>
+												<p>
+													Matériel équipement
+													<i class="fas fa-angle-left right"></i>
+												</p>
+											</a>
+											<ul class="nav nav-treeview">
+												<li class="nav-item">
+													<a href="{{path('app_affaire_me_nok')}}" class="nav-link">
+														<i class="nav-icon fa-solid fa-signature text-primary"></i>
+														<p>
+															Affaire (Béta)
+														</p>
+													</a>
+												</li>
+												<li class="nav-item">
+													<a href="{{ path('app_mouv_tiers')}}" class="nav-link">
+														<i class="nav-icon fa-solid fa-arrow-right-arrow-left text-info"></i>
+														<p>
+															Retrait/Retour marchandise(s)
+														</p>
+
+													</a>
+												</li>
+												<li class="nav-item">
+													<a href="{{ path('app_affaire_me_nok')}}" class="nav-link">
+														<i class="nav-icon fa-solid fa-screwdriver-wrench text-warning"></i>
+														<p>
+															Interventions
+														</p>
+
+													</a>
+												</li>
+											</ul>
+										</li>
+									{% endif %}
+
+									{% if (is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL')) and app.user.commercial %}
 										<li class="nav-item">
-											<a href="{{ path('app_matiere_dangeureuse')}}" class="nav-link">
-												<i class="nav-icon fas fa-skull-crossbones text-danger"></i>
-												<p>D9 - Matiéres Dangeureuses</p>
+											<a href="{{path('app_mes_clients', {'commercial' : app.user.commercial})}}" class="nav-link">
+												<i class="nav-icon fa fa-address-card" aria-hidden="true"></i>
+												<p>
+													Mes Clients
+												</p>
 											</a>
 										</li>
-									</ul>
-								</li>
-							{% endif %}
+									{% endif %}
 
-							<li class="nav-item has-treeview">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-box-open"></i>
-									<p>
-										Logistique
-										<i class="fas fa-angle-left right"></i>
-									</p>
-								</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item">
-										<a href="{{ path('app_stock')}}" class="nav-link">
-											<i class="nav-icon fa-solid fa-cubes text-primary"></i>
-											<p>Stocks</p>
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_stock_direct')}}" class="nav-link">
-											<i class="nav-icon fab fa-confluence text-info"></i>
-											<p>Stock Direct</p>
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_mouv_stock')}}" class="nav-link">
-											<i class="nav-icon fa-solid fa-cubes-stacked text-danger"></i>
-											<p>
-												Régularisation de stock
-											</p>
-											<!-- <span class="badge badge-info right">1</span> -->
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_mouv_tiers')}}" class="nav-link">
-											<i class="nav-icon fa-solid fa-arrow-right-arrow-left text-info"></i>
-											<p>
-												Retrait/Retour marchandise(s)
-											</p>
-											<!-- <span class="badge badge-info right">1</span> -->
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_emplacement_depot')}}" class="nav-link">
-											<i class="nav-icon fas fa-map-marker-alt text-warning"></i>
-											<p>
-												Gestion Emplacement
-											</p>
-											<!-- <span class="badge badge-info right">1</span> -->
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_empl_stock_dif_empl_piece')}}" class="nav-link">
-											<i class="nav-icon fas fa-search-location text-danger"></i>
-											<p>
-												Probléme Emplacement
-											</p>
-											<!-- <span class="badge badge-info right">1</span> -->
-										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_print_empl')}}" class="nav-link">
-											<i class="nav-icon fa-solid fa-map-location-dot text-success"></i>
-											<p>
-												Impr. étiquettes empl.
-											</p>
-											<!-- <span class="badge badge-info right">1</span> -->
-										</a>
-									</li>
-								</ul>
-							</li>
+								{% endif %}
+								{% if is_granted('ROLE_COMPTA') %}
 
-							<li class="nav-item has-treeview">
-								<a href="" class="nav-link">
-									<i class="nav-icon fas fa-broadcast-tower"></i>
-									<p>
-										Probléme
-										<i class="fas fa-angle-left right"></i>
-									</p>
-								</a>
-								<ul class="nav nav-treeview">
-									<li class="nav-item">
-										<a href="{{ path('app_controle_anomalies')}}" class="nav-link">
-											<i class="nav-icon fas fa-exclamation-triangle text-warning"></i>
-											<p>Anomalies Divalto</p>
+									<li class="nav-item has-treeview">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-calculator"></i>
+											<p>
+												Comptabilité
+												<i class="fas fa-angle-left right"></i>
+											</p>
 										</a>
-									</li>
-									<li class="nav-item">
-										<a href="{{ path('app_old_cmd')}}" class="nav-link">
-											<i class="nav-icon fas fa-blind text-info"></i>
-											<p>Vieilles commandes</p>
-										</a>
-									</li>
-								</ul>
-							</li>
-							<li class="nav-item">
-								<a href="{{ path('app_faq')}}" class="nav-link">
-									<i class="nav-icon fas fa-question-circle"></i>
-									<p>
-										FAQ
-									</p>
-									<!-- <span class="badge badge-info right">1</span> -->
-								</a>
-							</li>
-							<li class="nav-item">
-								<a href="{{ path('annuaire')}}" class="nav-link">
-									<i class="nav-icon fas fa-fw fa-phone"></i>
-									<p>
-										Annuaire
-									</p>
-								</a>
-							</li>
+										<ul class="nav nav-treeview">
+											<li class="nav-item">
+												<a href="{{path('app_controle_comptabilite', {'slug' : 'F'}) }}" class="nav-link">
+													<i class="nav-icon fas fa-balance-scale-left text-danger"></i>
+													<p>Contrôle Achat</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{path('app_controle_comptabilite', {'slug' : 'C'}) }}" class="nav-link">
+													<i class="nav-icon fas fa-balance-scale-right text-success"></i>
+													<p>Contrôle Vente</p>
+												</a>
+											</li>
 
-							{% if is_granted('ROLE_ADMIN') %}
+											<li class="nav-item">
+												<a href="{{path('app_compta_analytique') }}" class="nav-link">
+													<i class="nav-icon fas fa-project-diagram text-info"></i>
+													<p>Compta Analytique</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_dernier_achat_par_produit', {'dos' : '1' })}}" class="nav-link">
+													<i class="fas fa-file-signature nav-icon text-primary"></i>
+													<p>
+														Aide à l'ICD
+													</p>
+
+												</a>
+											</li>
+										</ul>
+									</li>
+								{% endif %}
 								<li class="nav-item">
-									<a href="{{path('app_admin')}}" class="nav-link">
-										<i class="nav-icon fas fa-chalkboard-teacher"></i>
+									<a href="{{path('app_lhermitte_documents')}}" class="nav-link">
+										<i class="nav-icon fas fa-copy"></i>
 										<p>
-											Administration
+											Documents
 										</p>
 									</a>
 								</li>
-							{% endif %}
-							<!-- Fin Table Commune -->
-							<!-- Table Menu Lhermitte-->
-
-							{% if is_granted('ROLE_RSE') %}
-								<li class="nav-header">RSE</li>
-								<li class="nav-item">
-									<a href="{{ path('app_rse', {'dos' : '1' }) }}" class="nav-link">
-										<i class="nav-icon fas fa-chart-pie text-primary"></i>
-										<p>
-											RSE Lhermitte
-										</p>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a href="{{ path('app_rse', {'dos' : '3' }) }}" class="nav-link">
-										<i class="nav-icon fas fa-chart-pie text-danger"></i>
-										<p>
-											RSE Roby
-										</p>
-									</a>
-								</li>
-							{% endif %}
-
-							<li class="nav-header">Lhermitte</li>
-							{% if is_granted('ROLE_LHERMITTE') %}
-
-								{% if is_granted('ROLE_EV') or is_granted('ROLE_HP') or is_granted('ROLE_MA') or is_granted('ROLE_ME') %}
+								<li class="nav-header">Roby</li>
+								{% if is_granted('ROLE_ROBY') %}
 									<li class="nav-item has-treeview">
 										<a href="" class="nav-link">
 											<i class="nav-icon fas fa-tachometer-alt"></i>
@@ -473,360 +635,173 @@
 										</a>
 										<ul class="nav nav-treeview">
 											<li class="nav-item">
-												<a href="{{ path('app_states_lhermitte') }}" class="nav-link">
-													<i class="fas fa-globe nav-icon text-primary"></i>
+												<a href="{{path('app_states_roby')}}" class="nav-link">
+													<i class="nav-icon fas fa-tree text-success"></i>
 													<p>States ventes</p>
 												</a>
 											</li>
 											<li class="nav-item">
-												<a href="{{ path('app_states_par_client_Lh') }}" class="nav-link">
-													<i class="fas fa-globe nav-icon text-warning"></i>
-													<p>States par client sur 3 ans tous métiers</p>
+												<a href="{{ path('app_resume_states', {'dos' : '3' }) }}" class="nav-link">
+													<i class="nav-icon fas fa-chart-pie text-danger"></i>
+													<p>
+														Résumé des states
+													</p>
 												</a>
 											</li>
-											{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
-												<li class="nav-item">
-													<a href="{{ path('app_resume_states', {'dos' : '1' }) }}" class="nav-link">
-														<i class="nav-icon fas fa-chart-pie text-danger"></i>
-														<p>
-															Résumé des states EV
-														</p>
-													</a>
-												</li>
-											{% endif %}
 											<li class="nav-item">
-												<a href="{{ path('app_activite_metier_Lhermitte') }}" class="nav-link">
+												<a href="{{path('app_stats_achat', {'dos' : '3'})}}" class="nav-link">
+													<i class="nav-icon fas fa-shopping-basket text-warning"></i>
+													<p>
+														States achats par article
+													</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_activite_metier_Roby') }}" class="nav-link">
 													<i class="fas fa-store nav-icon text-success"></i>
 													<p>Activités Métier</p>
 												</a>
 											</li>
-											{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
-												<li class="nav-item">
-													<a href="{{path('app_stats_achat', {'dos' : '1'})}}" class="nav-link">
-														<i class="nav-icon fas fa-shopping-basket text-warning"></i>
-														<p>
-															States achats par article
-														</p>
-													</a>
-												</li>
-												<li class="nav-item">
-													<a href="{{path('app_dernier_achat_par_produit', {'dos' : '1'})}}" class="nav-link">
-														<i class="nav-icon fas fa-th text-info"></i>
-														<p>
-															Factures achats par article
-														</p>
-													</a>
-												</li>
-											{% endif %}
-											<li class="nav-item">
-												<a href="{{ path('app_tarif_vente_divalto') }}" class="nav-link">
-													<i class="fas fa-dollar nav-icon text-warning"></i>
-													<p>Prix de vente Divalto</p>
-												</a>
-											</li>
 										</ul>
 									</li>
-								{% endif %}
-								<li class="nav-item">
-									<a href="{{path('app_lhermitte_rossignols')}}" class="nav-link">
-										<i class="nav-icon fas fa-dove text-light"></i>
-										<p>Rossignols</p>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a href="{{ path('app_contrat_commissionnaire') }}" class="nav-link">
-										<i class="fas fa-file-signature nav-icon text-light"></i>
-										<p>Contrats Commissionnaires</p>
-									</a>
-								</li>
-
-								{% if is_granted('ROLE_ME') %}
+									<li class="nav-item">
+										<a href="{{path('app_cmd_roby_delai_accepte_reporte_active')}}" class="nav-link">
+											<i class="nav-icon fas fa-hourglass-half"></i>
+											<p>Commandes</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="{{path('app_rbue')}}" class="nav-link">
+											<i class="nav-icon fas fa-arrow-right"></i>
+											<p>Mouvements RBUE</p>
+										</a>
+									</li>
 									<li class="nav-item has-treeview">
 										<a href="" class="nav-link">
-											<i class="nav-icon fas fa-solid fa-igloo"></i>
+											<i class="nav-icon fas fa-tree"></i>
 											<p>
-												Matériel équipement
+												FSC
 												<i class="fas fa-angle-left right"></i>
 											</p>
 										</a>
 										<ul class="nav nav-treeview">
 											<li class="nav-item">
-												<a href="{{path('app_affaire_me_nok')}}" class="nav-link">
-													<i class="nav-icon fa-solid fa-signature text-primary"></i>
-													<p>
-														Affaire (Béta)
-													</p>
+												<a href="{{path('app_documents_reglementaires_fsc')}}" class="nav-link">
+													<i class="nav-icon fas fa-file-signature text-primary"></i>
+													<p>Documents réglementaires</p>
+												</a>
+											</li>
+										</ul>
+										<ul class="nav nav-treeview">
+											<li class="nav-item">
+												<a href="{{path('app_movement_fsc_view_list')}}" class="nav-link">
+													<i class="nav-icon fab fa-product-hunt text-success"></i>
+													<p>Mouvements articles FSC</p>
+												</a>
+											</li>
+										</ul>
+										<ul class="nav nav-treeview">
+											<li class="nav-item">
+												<a href="{{path('app_fsc_extract_periode')}}" class="nav-link">
+													<i class="nav-icon fas fa-download text-warning"></i>
+													<p>Extraction Période (Béta)</p>
+												</a>
+											</li>
+										</ul>
+										<ul class="nav nav-treeview">
+											<li class="nav-item">
+												<a href="{{path('app_fsc_piece_client')}}" class="nav-link">
+													<i class="nav-icon fas fa-arrow-right text-info"></i>
+													<p>Factures Clients FSC</p>
+												</a>
+											</li>
+										</ul>
+										<ul class="nav nav-treeview">
+											<li class="nav-item">
+												<a href="{{path('app_fsc_attached_file')}}" class="nav-link">
+													<i class="nav-icon fas fa-arrow-left text-danger"></i>
+													<p>Factures Fournisseurs FSC</p>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="nav-item">
+										<a href="{{path('app_deb_roby')}}" class="nav-link">
+											<i class="nav-icon fas fa-fw fa-plane"></i>
+											<p>D.E.B</p>
+										</a>
+									</li>
+								{% endif %}
+								<li class="nav-item">
+									<a href="{{path('app_Roby_documents')}}" class="nav-link">
+										<i class="nav-icon fas fa-copy"></i>
+										<p>Documents</p>
+									</a>
+								</li>
+								{% if is_granted('ROLE_ADMIN') %}
+									<li class="nav-header">Développeur</li>
+									<li class="nav-item">
+										<a href="https://adminlte.io/themes/v3/iframe.html#" class="nav-link">
+											<i class="nav-icon fas fa-atlas"></i>
+											<p>
+												Théme Utilisé
+											</p>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-atlas"></i>
+											<p>
+												Page de test
+											</p>
+										</a>
+									</li>
+									<li class="nav-item has-treeview">
+										<a href="" class="nav-link">
+											<i class="nav-icon fas fa-truck-moving"></i>
+											<p>
+												à faire
+												<i class="fas fa-angle-left right"></i>
+											</p>
+										</a>
+										<ul class="nav nav-treeview">
+											<li class="nav-item">
+												<a href="{{path('app_mailing')}}" class="nav-link">
+													<i class="nav-icon fas fa-hourglass-end text-warning"></i>
+													<p>Mailing</p>
 												</a>
 											</li>
 											<li class="nav-item">
-												<a href="{{ path('app_mouv_tiers')}}" class="nav-link">
-													<i class="nav-icon fa-solid fa-arrow-right-arrow-left text-info"></i>
-													<p>
-														Retrait/Retour marchandise(s)
-													</p>
-													<!-- <span class="badge badge-info right">1</span> -->
+												<a href="{{ path('app_old_cmd')}}" class="nav-link">
+													<i class="nav-icon fas fa-blind text-success"></i>
+													<p>Vieux Bls</p>
 												</a>
 											</li>
 											<li class="nav-item">
-												<a href="{{ path('app_affaire_me_nok')}}" class="nav-link">
-													<i class="nav-icon fa-solid fa-screwdriver-wrench text-warning"></i>
-													<p>
-														Interventions
-													</p>
-													<!-- <span class="badge badge-info right">1</span> -->
+												<a href="" class="nav-link">
+													<i class="nav-icon fas fa-fw fa-plane text-light"></i>
+													<p>DEB Lhermitte</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{path('app_pays_interdit_commandes_fsc')}}" class="nav-link">
+													<i class="nav-icon fas fa-ban text-warning"></i>
+													<p>Ban Pays fournisseurs</p>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a href="{{ path('app_anomalies_produits_fermes')}}" class="nav-link">
+													<i class="nav-icon fas fa-bullhorn text-danger"></i>
+													<p>Anomalies (Articles fermés)</p>
 												</a>
 											</li>
 										</ul>
 									</li>
 								{% endif %}
-
-								{% if (is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_COMMERCIAL')) and app.user.commercial %}
-									<li class="nav-item">
-										<a href="{{path('app_mes_clients', {'commercial' : app.user.commercial})}}" class="nav-link">
-											<i class="nav-icon fa fa-address-card" aria-hidden="true"></i>
-											<p>
-												Mes Clients
-											</p>
-										</a>
-									</li>
-								{% endif %}
-
-							{% endif %}
-							{% if is_granted('ROLE_COMPTA') %}
-
-								<li class="nav-item has-treeview">
-									<a href="" class="nav-link">
-										<i class="nav-icon fas fa-calculator"></i>
-										<p>
-											Comptabilité
-											<i class="fas fa-angle-left right"></i>
-										</p>
-									</a>
-									<ul class="nav nav-treeview">
-										<li class="nav-item">
-											<a href="{{path('app_controle_comptabilite', {'slug' : 'F'}) }}" class="nav-link">
-												<i class="nav-icon fas fa-balance-scale-left text-danger"></i>
-												<p>Contrôle Achat</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="{{path('app_controle_comptabilite', {'slug' : 'C'}) }}" class="nav-link">
-												<i class="nav-icon fas fa-balance-scale-right text-success"></i>
-												<p>Contrôle Vente</p>
-											</a>
-										</li>
-
-										<li class="nav-item">
-											<a href="{{path('app_compta_analytique') }}" class="nav-link">
-												<i class="nav-icon fas fa-project-diagram text-info"></i>
-												<p>Compta Analytique</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="{{ path('app_dernier_achat_par_produit', {'dos' : '1' })}}" class="nav-link">
-												<i class="fas fa-file-signature nav-icon text-primary"></i>
-												<p>
-													Aide à l'ICD
-												</p>
-												<!-- <span class="badge badge-info right">1</span> -->
-											</a>
-										</li>
-									</ul>
-								</li>
-							{% endif %}
-							<li class="nav-item">
-								<a href="{{path('app_lhermitte_documents')}}" class="nav-link">
-									<i class="nav-icon fas fa-copy"></i>
-									<p>
-										Documents
-									</p>
-								</a>
-							</li>
-							<!--Fin Table Menu Lhermitte -->
-							<!--Table Menu Roby -->
-							<li class="nav-header">Roby</li>
-							{% if is_granted('ROLE_ROBY') %}
-								<li class="nav-item has-treeview">
-									<a href="" class="nav-link">
-										<i class="nav-icon fas fa-tachometer-alt"></i>
-										<p>
-											States
-											<i class="fas fa-angle-left right"></i>
-										</p>
-									</a>
-									<ul class="nav nav-treeview">
-										<li class="nav-item">
-											<a href="{{path('app_states_roby')}}" class="nav-link">
-												<i class="nav-icon fas fa-tree text-success"></i>
-												<p>States ventes</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="{{ path('app_resume_states', {'dos' : '3' }) }}" class="nav-link">
-												<i class="nav-icon fas fa-chart-pie text-danger"></i>
-												<p>
-													Résumé des states
-												</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="{{path('app_stats_achat', {'dos' : '3'})}}" class="nav-link">
-												<i class="nav-icon fas fa-shopping-basket text-warning"></i>
-												<p>
-													States achats par article
-												</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="{{ path('app_activite_metier_Roby') }}" class="nav-link">
-												<i class="fas fa-store nav-icon text-success"></i>
-												<p>Activités Métier</p>
-											</a>
-										</li>
-									</ul>
-								</li>
-								<li class="nav-item">
-									<a href="{{path('app_cmd_roby_delai_accepte_reporte_active')}}" class="nav-link">
-										<i class="nav-icon fas fa-hourglass-half"></i>
-										<p>Commandes</p>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a href="{{path('app_rbue')}}" class="nav-link">
-										<i class="nav-icon fas fa-arrow-right"></i>
-										<p>Mouvements RBUE</p>
-									</a>
-								</li>
-								<li class="nav-item has-treeview">
-									<a href="" class="nav-link">
-										<i class="nav-icon fas fa-tree"></i>
-										<p>
-											FSC
-											<i class="fas fa-angle-left right"></i>
-										</p>
-									</a>
-									<ul class="nav nav-treeview">
-										<li class="nav-item">
-											<a href="{{path('app_documents_reglementaires_fsc')}}" class="nav-link">
-												<i class="nav-icon fas fa-file-signature text-primary"></i>
-												<p>Documents réglementaires</p>
-											</a>
-										</li>
-									</ul>
-									<ul class="nav nav-treeview">
-										<li class="nav-item">
-											<a href="{{path('app_movement_fsc_view_list')}}" class="nav-link">
-												<i class="nav-icon fab fa-product-hunt text-success"></i>
-												<p>Mouvements articles FSC</p>
-											</a>
-										</li>
-									</ul>
-									<ul class="nav nav-treeview">
-										<li class="nav-item">
-											<a href="{{path('app_fsc_extract_periode')}}" class="nav-link">
-												<i class="nav-icon fas fa-download text-warning"></i>
-												<p>Extraction Période (Béta)</p>
-											</a>
-										</li>
-									</ul>
-									<ul class="nav nav-treeview">
-										<li class="nav-item">
-											<a href="{{path('app_fsc_piece_client')}}" class="nav-link">
-												<i class="nav-icon fas fa-arrow-right text-info"></i>
-												<p>Factures Clients FSC</p>
-											</a>
-										</li>
-									</ul>
-									<ul class="nav nav-treeview">
-										<li class="nav-item">
-											<a href="{{path('app_fsc_attached_file')}}" class="nav-link">
-												<i class="nav-icon fas fa-arrow-left text-danger"></i>
-												<p>Factures Fournisseurs FSC</p>
-											</a>
-										</li>
-									</ul>
-								</li>
-								<li class="nav-item">
-									<a href="{{path('app_deb_roby')}}" class="nav-link">
-										<i class="nav-icon fas fa-fw fa-plane"></i>
-										<p>D.E.B</p>
-									</a>
-								</li>
-							{% endif %}
-							<li class="nav-item">
-								<a href="{{path('app_Roby_documents')}}" class="nav-link">
-									<i class="nav-icon fas fa-copy"></i>
-									<p>Documents</p>
-								</a>
-							</li>
-							<!--fin Table Menu Roby -->
-							{% if is_granted('ROLE_ADMIN') %}
-								<li class="nav-header">Développeur</li>
-								<li class="nav-item">
-									<a href="https://adminlte.io/themes/v3/iframe.html#" class="nav-link">
-										<i class="nav-icon fas fa-atlas"></i>
-										<p>
-											Théme Utilisé
-										</p>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a href="" class="nav-link">
-										<i class="nav-icon fas fa-atlas"></i>
-										<p>
-											Page de test
-										</p>
-									</a>
-								</li>
-								<li class="nav-item has-treeview">
-									<a href="" class="nav-link">
-										<i class="nav-icon fas fa-truck-moving"></i>
-										<p>
-											à faire
-											<i class="fas fa-angle-left right"></i>
-										</p>
-									</a>
-									<ul class="nav nav-treeview">
-										<li class="nav-item">
-											<a href="{{path('app_mailing')}}" class="nav-link">
-												<i class="nav-icon fas fa-hourglass-end text-warning"></i>
-												<p>Mailing</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="{{ path('app_old_cmd')}}" class="nav-link">
-												<i class="nav-icon fas fa-blind text-success"></i>
-												<p>Vieux Bls</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="" class="nav-link">
-												<i class="nav-icon fas fa-fw fa-plane text-light"></i>
-												<p>DEB Lhermitte</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="{{path('app_pays_interdit_commandes_fsc')}}" class="nav-link">
-												<i class="nav-icon fas fa-ban text-warning"></i>
-												<p>Ban Pays fournisseurs</p>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="{{ path('app_anomalies_produits_fermes')}}" class="nav-link">
-												<i class="nav-icon fas fa-bullhorn text-danger"></i>
-												<p>Anomalies (Articles fermés)</p>
-											</a>
-										</li>
-									</ul>
-								</li>
-							{% endif %}
-						</nav>
-					</div>
-					<!-- /.sidebar-menu -->
-					<!-- /.sidebar -->
-				</aside>
-
-
+							</nav>
+						</div>
+					</aside>
+				{% endif %}
 				<section class="content-wrapper" id="content" style="min-height: 1419.6px;">
 					<div class="content-header">
 						{% for message in app.flashes('message') %}

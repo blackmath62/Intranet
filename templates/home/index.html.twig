@@ -133,10 +133,12 @@
 					<i class="fa-solid fa-cubes-stacked mr-2"></i>Régularisation de stock
 				</a>
 			{% endif %}
-			<a href="{{ path('app_mouv_tiers') }}" class="btn btn-lg btn-info col-11 mt-5 mt-5">
-				<i class="fa fa-solid fa-arrow-right-arrow-left mr-2"></i>Retrait/Retour marchandise(s)
-			</a>
-			{% if is_granted('ROLE_MONTEUR') %}
+			{% if not is_granted('ROLE_MONTEUR') %}
+				<a href="{{ path('app_mouv_tiers') }}" class="btn btn-lg btn-info col-11 mt-5 mt-5">
+					<i class="fa fa-solid fa-arrow-right-arrow-left mr-2"></i>Retrait/Retour marchandise(s)
+				</a>
+			{% endif %}
+			{% if is_granted('ROLE_ME') %}
 				<a href="{{ path('app_affaire_me_nok') }}" class="btn btn-lg btn-warning col-11 mt-5">
 					<i class="fas fa-solid fa-screwdriver-wrench mr-2"></i>Interventions
 				</a>
