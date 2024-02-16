@@ -6,6 +6,42 @@ awareness about deprecated code.
 - Use of our low-overhead runtime deprecation API, details:
   https://github.com/doctrine/deprecations/
 
+# Upgrade to 3.8
+
+## Deprecated lock-related `AbstractPlatform` methods
+
+The usage of `AbstractPlatform::getReadLockSQL()`, `::getWriteLockSQL()` and `::getForUpdateSQL()` is deprecated as
+this API is not portable. Use `QueryBuilder::forUpdate()` as a replacement for the latter.
+
+## Deprecated `AbstractMySQLPlatform` methods
+
+* `AbstractMySQLPlatform::getColumnTypeSQLSnippets()` has been deprecated
+  in favor of `AbstractMySQLPlatform::getColumnTypeSQLSnippet()`.
+* `AbstractMySQLPlatform::getDatabaseNameSQL()` has been deprecated without replacement.
+* Not passing a database name to `AbstractMySQLPlatform::getColumnTypeSQLSnippet()` has been deprecated.
+
+## Deprecated reset methods from `QueryBuilder`
+
+`QueryBuilder::resetQueryParts()` has been deprecated.
+
+Resetting individual query parts through the generic `resetQueryPart()` method has been deprecated as well.
+However, several replacements have been put in place depending on the `$queryPartName` parameter:
+
+| `$queryPartName` | suggested replacement                      |
+|------------------|--------------------------------------------|
+| `'select'`       | Call `select()` with a new set of columns. |
+| `'distinct'`     | `distinct(false)`                          |
+| `'where'`        | `resetWhere()`                             |
+| `'groupBy'`      | `resetGroupBy()`                           |
+| `'having'`       | `resetHaving()`                            |
+| `'orderBy'`      | `resetOrderBy()`                           |
+| `'values'`       | Call `values()` with a new set of values.  |
+
+## Deprecated getting query parts from `QueryBuilder`
+
+The usage of `QueryBuilder::getQueryPart()` and `::getQueryParts()` is deprecated. The query parts
+are implementation details and should not be relied upon.
+
 # Upgrade to 3.6
 
 ## Deprecated not setting a schema manager factory
@@ -420,7 +456,7 @@ The `Connection::ARRAY_PARAM_OFFSET` constant has been marked as internal. It wi
 
 ## Deprecated using NULL as prepared statement parameter type.
 
-Omit the type or use `Parameter::STRING` instead.
+Omit the type or use `ParameterType::STRING` instead.
 
 ## Deprecated passing asset names as assets in `AbstractPlatform` and `AbstractSchemaManager` methods.
 

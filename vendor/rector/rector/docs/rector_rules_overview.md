@@ -6,11 +6,11 @@
 
 - [Arguments](#arguments) (4)
 
-- [CodeQuality](#codequality) (72)
+- [CodeQuality](#codequality) (73)
 
-- [CodingStyle](#codingstyle) (28)
+- [CodingStyle](#codingstyle) (27)
 
-- [DeadCode](#deadcode) (42)
+- [DeadCode](#deadcode) (43)
 
 - [EarlyReturn](#earlyreturn) (9)
 
@@ -30,7 +30,7 @@
 
 - [Php70](#php70) (19)
 
-- [Php71](#php71) (8)
+- [Php71](#php71) (7)
 
 - [Php72](#php72) (9)
 
@@ -44,7 +44,7 @@
 
 - [Php82](#php82) (4)
 
-- [Php83](#php83) (1)
+- [Php83](#php83) (2)
 
 - [Privatization](#privatization) (4)
 
@@ -56,7 +56,7 @@
 
 - [Transform](#transform) (22)
 
-- [TypeDeclaration](#typedeclaration) (41)
+- [TypeDeclaration](#typedeclaration) (40)
 
 - [Visibility](#visibility) (3)
 
@@ -942,6 +942,19 @@ Remove `sprintf()` wrapper if not needed
 
 <br>
 
+### RemoveUselessIsObjectCheckRector
+
+Remove useless `is_object()` check on combine with instanceof check
+
+- class: [`Rector\CodeQuality\Rector\BooleanAnd\RemoveUselessIsObjectCheckRector`](../rules/CodeQuality/Rector/BooleanAnd/RemoveUselessIsObjectCheckRector.php)
+
+```diff
+-is_object($obj) && $obj instanceof DateTime
++$obj instanceof DateTime
+```
+
+<br>
+
 ### ReplaceMultipleBooleanNotRector
 
 Replace the Double not operator (!!) by type-casting to boolean
@@ -1111,12 +1124,12 @@ Changes foreach that returns set value to ??
 ```diff
 -foreach ($this->oldToNewFunctions as $oldFunction => $newFunction) {
 -    if ($currentFunction === $oldFunction) {
--        innerForeachReturn $newFunction;
+-        return $newFunction;
 -    }
 -}
 -
--innerForeachReturn null;
-+innerForeachReturn $this->oldToNewFunctions[$currentFunction] ?? null;
+-return null;
++return $this->oldToNewFunctions[$currentFunction] ?? null;
 ```
 
 <br>
@@ -1571,31 +1584,6 @@ Use ===/!== over ==/!=, it values have the same type
 <br>
 
 ## CodingStyle
-
-### AddArrayDefaultToArrayPropertyRector
-
-Adds array default value to property to prevent foreach over null error
-
-- class: [`Rector\CodingStyle\Rector\Class_\AddArrayDefaultToArrayPropertyRector`](../rules/CodingStyle/Rector/Class_/AddArrayDefaultToArrayPropertyRector.php)
-
-```diff
- class SomeClass
- {
-     /**
-      * @var int[]
-      */
--    private $values;
-+    private $values = [];
-
-     public function isEmpty()
-     {
--        return $this->values === null;
-+        return $this->values === [];
-     }
- }
-```
-
-<br>
 
 ### ArraySpreadInsteadOfArrayMergeRector
 
@@ -2516,6 +2504,27 @@ Remove initialization with null value from property declarations
  {
 -    private $myVar = null;
 +    private $myVar;
+ }
+```
+
+<br>
+
+### RemoveNullTagValueNodeRector
+
+Remove `@var/@param/@return` null docblock
+
+- class: [`Rector\DeadCode\Rector\ClassMethod\RemoveNullTagValueNodeRector`](../rules/DeadCode/Rector/ClassMethod/RemoveNullTagValueNodeRector.php)
+
+```diff
+ class SomeClass
+ {
+-    /**
+-     * @return null
+-     */
+     public function foo()
+     {
+         return null;
+     }
  }
 ```
 
@@ -3843,7 +3852,7 @@ Changes PHP 4 style constructor to __construct.
 
 ### RandomFunctionRector
 
-Changes rand, srand, mt_rand and getrandmax to newer alternatives.
+Changes rand, srand, and getrandmax to newer alternatives
 
 - class: [`Rector\Php70\Rector\FuncCall\RandomFunctionRector`](../rules/Php70/Rector/FuncCall/RandomFunctionRector.php)
 
@@ -4026,20 +4035,6 @@ Change binary operation between some number + string to PHP 7.1 compatible versi
 +        $value = 5.0 + 0;
      }
  }
-```
-
-<br>
-
-### CountOnNullRector
-
-Changes `count()` on null to safe ternary check
-
-- class: [`Rector\Php71\Rector\FuncCall\CountOnNullRector`](../rules/Php71/Rector/FuncCall/CountOnNullRector.php)
-
-```diff
- $values = null;
--$count = count($values);
-+$count = $values === null ? 0 : count($values);
 ```
 
 <br>
@@ -5288,6 +5283,22 @@ Add override attribute to overridden methods
 
 <br>
 
+### AddTypeToConstRector
+
+Add const to type
+
+- class: [`Rector\Php83\Rector\ClassConst\AddTypeToConstRector`](../rules/Php83/Rector/ClassConst/AddTypeToConstRector.php)
+
+```diff
+ final class SomeClass
+ {
+-    public const TYPE = 'some_type';
++    public const string TYPE = 'some_type';
+ }
+```
+
+<br>
+
 ## Privatization
 
 ### FinalizeClassesWithoutChildrenRector
@@ -6526,6 +6537,25 @@ Change `empty()` on nullable object to instanceof check
 
 <br>
 
+### MergeDateTimePropertyTypeDeclarationRector
+
+Set DateTime to DateTimeInterface for DateTime property with DateTimeInterface docblock
+
+- class: [`Rector\TypeDeclaration\Rector\Class_\MergeDateTimePropertyTypeDeclarationRector`](../rules/TypeDeclaration/Rector/Class_/MergeDateTimePropertyTypeDeclarationRector.php)
+
+```diff
+ final class SomeClass
+ {
+-    /**
+-     * @var DateTimeInterface
+-     */
+-    private DateTime $dateTime;
++    private DateTimeInterface $dateTime;
+ }
+```
+
+<br>
+
 ### NumericReturnTypeFromStrictScalarReturnsRector
 
 Change numeric return type based on strict returns type operations
@@ -6596,27 +6626,6 @@ Change param type based on parent param type
 +    public function __construct(string $name)
      {
          parent::__construct($name);
-     }
- }
-```
-
-<br>
-
-### ParamTypeFromStrictTypedPropertyRector
-
-Add param type from `$param` set to typed property
-
-- class: [`Rector\TypeDeclaration\Rector\Param\ParamTypeFromStrictTypedPropertyRector`](../rules/TypeDeclaration/Rector/Param/ParamTypeFromStrictTypedPropertyRector.php)
-
-```diff
- final class SomeClass
- {
-     private int $age;
-
--    public function setAge($age)
-+    public function setAge(int $age)
-     {
-         $this->age = $age;
      }
  }
 ```
@@ -7014,27 +7023,6 @@ Add typed properties based only on strict constructor types
      public function __construct(string $name)
      {
          $this->name = $name;
-     }
- }
-```
-
-<br>
-
-### TypedPropertyFromStrictGetterMethodReturnTypeRector
-
-Complete property type based on getter strict types
-
-- class: [`Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictGetterMethodReturnTypeRector`](../rules/TypeDeclaration/Rector/Property/TypedPropertyFromStrictGetterMethodReturnTypeRector.php)
-
-```diff
- final class SomeClass
- {
--    public $name;
-+    public ?string $name = null;
-
-     public function getName(): string|null
-     {
-         return $this->name;
      }
  }
 ```

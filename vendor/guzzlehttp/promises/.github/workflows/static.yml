@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -23,7 +23,6 @@ jobs:
           php-version: '7.4'
           coverage: none
           extensions: mbstring
-          tools: composer
 
       - name: Download dependencies
         run: composer update --no-interaction --no-progress
@@ -40,7 +39,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -48,7 +47,6 @@ jobs:
           php-version: '7.4'
           coverage: none
           extensions: mbstring
-          tools: composer
 
       - name: Download dependencies
         run: composer update --no-interaction --no-progress
@@ -65,7 +63,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -73,7 +71,6 @@ jobs:
           php-version: '7.4'
           coverage: none
           extensions: mbstring
-          tools: composer
 
       - name: Download dependencies
         run: composer update --no-interaction --no-progress

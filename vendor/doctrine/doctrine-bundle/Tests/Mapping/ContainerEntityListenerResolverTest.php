@@ -80,8 +80,8 @@ class ContainerEntityListenerResolverTest extends TestCase
 
     public function testClearOne(): void
     {
-        $className1 = '\Doctrine\Bundle\DoctrineBundle\Tests\Mapping\EntityListener1';
-        $className2 = '\Doctrine\Bundle\DoctrineBundle\Tests\Mapping\EntityListener2';
+        $className1 = EntityListener1::class;
+        $className2 = EntityListener2::class;
 
         $obj1 = $this->resolver->resolve($className1);
         $obj2 = $this->resolver->resolve($className2);
@@ -128,7 +128,6 @@ class ContainerEntityListenerResolverTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('An object was expected, but got "string".');
-        /** @psalm-suppress InvalidArgument */
         $this->resolver->register('CompanyContractListener');
     }
 }

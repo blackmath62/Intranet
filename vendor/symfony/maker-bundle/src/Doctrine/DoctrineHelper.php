@@ -17,13 +17,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\ORM\Mapping\NamingStrategy;
-use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\AbstractClassMetadataFactory;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\MappingException as PersistenceMappingException;
+use Doctrine\Persistence\Mapping\StaticReflectionService;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
@@ -174,8 +174,8 @@ final class DoctrineHelper
                     $loaded = $this->isInstanceOf($cmf, AbstractClassMetadataFactory::class) ? $cmf->getLoadedMetadata() : [];
                 }
 
-                $cmf = new DisconnectedClassMetadataFactory();
-                $cmf->setEntityManager($em);
+                // Set the reflection service that was used in the now removed DisconnectedClassMetadataFactory::class
+                $cmf->setReflectionService(new StaticReflectionService());
 
                 foreach ($loaded as $m) {
                     $cmf->setMetadataFor($m->getName(), $m);
@@ -259,14 +259,14 @@ final class DoctrineHelper
     {
         return match ($columnType) {
             Types::STRING, Types::TEXT, Types::GUID, Types::BIGINT, Types::DECIMAL => 'string',
-            Types::ARRAY, Types::SIMPLE_ARRAY, Types::JSON => 'array',
+            'array', Types::SIMPLE_ARRAY, Types::JSON => 'array',
             Types::BOOLEAN => 'bool',
             Types::INTEGER, Types::SMALLINT => 'int',
             Types::FLOAT => 'float',
             Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, Types::DATE_MUTABLE, Types::TIME_MUTABLE => '\\'.\DateTimeInterface::class,
             Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE => '\\'.\DateTimeImmutable::class,
             Types::DATEINTERVAL => '\\'.\DateInterval::class,
-            Types::OBJECT => 'object',
+            'object' => 'object',
             'uuid' => '\\'.Uuid::class,
             'ulid' => '\\'.Ulid::class,
             default => null,

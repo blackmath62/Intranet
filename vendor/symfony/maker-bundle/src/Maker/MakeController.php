@@ -26,7 +26,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
@@ -34,9 +34,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class MakeController extends AbstractMaker
 {
-    private PhpCompatUtil $phpCompatUtil;
-
-    public function __construct(PhpCompatUtil $phpCompatUtil = null)
+    public function __construct(private ?PhpCompatUtil $phpCompatUtil = null)
     {
         if (null === $phpCompatUtil) {
             @trigger_error(sprintf('Passing a "%s" instance is mandatory since version 1.42.0', PhpCompatUtil::class), \E_USER_DEPRECATED);

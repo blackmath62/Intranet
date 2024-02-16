@@ -134,8 +134,8 @@ class AffairesController extends AbstractController
             $color = $event->getTypeIntervention()->getBackgroundColor();
             $textColor = $event->getTypeIntervention()->getTextColor();
             if ($event->getStart() && $event->getEnd()) {
-                $start = $event->getStart()->format('Y-m-d');
-                $end = $event->getEnd()->format('Y-m-d');
+                $start = $event->getStart()->format('Y-m-d H:i:s');
+                $end = $event->getEnd()->format('Y-m-d H:i:s');
                 if ($event->getStart()->format('Y-m-d') == $event->getEnd()->format('Y-m-d') && $event->getStart()->format('H:i') == '00:00' && $event->getEnd()->format('H:i') == '23:00') {
                     $start = $event->getStart()->format('Y-m-d');
                     $end = $event->getEnd()->format('Y-m-d');

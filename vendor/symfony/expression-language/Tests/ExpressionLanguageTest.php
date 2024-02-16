@@ -366,7 +366,7 @@ class ExpressionLanguageTest extends TestCase
 
         $this->expectException(\ErrorException::class);
 
-        set_error_handler(static function (int $errno, string $errstr, string $errfile = null, int $errline = null): bool {
+        set_error_handler(static function (int $errno, string $errstr, ?string $errfile = null, ?int $errline = null): bool {
             if ($errno & (\E_WARNING | \E_USER_WARNING) && (str_contains($errstr, 'Attempt to read property') || str_contains($errstr, 'Trying to access'))) {
                 throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
             }
@@ -424,6 +424,9 @@ class ExpressionLanguageTest extends TestCase
         yield ['foo["bar"]["baz"] ?? "default"', ['bar' => null]];
         yield ['foo["bar"].baz ?? "default"', ['bar' => null]];
         yield ['foo.bar().baz ?? "default"', $foo];
+        yield ['foo.bar.baz.bam ?? "default"', (object) ['bar' => null]];
+        yield ['foo?.bar?.baz?.qux ?? "default"', (object) ['bar' => null]];
+        yield ['foo[123][456][789] ?? "default"', [123 => []]];
     }
 
     /**

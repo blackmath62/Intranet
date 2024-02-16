@@ -1,0 +1,516 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block body %}
+
+	<div class="d-flex align-items-center">
+		<div class="mr-auto p-2">
+			<h5>Commande
+				{{ products[0].cdNo }}</h5>
+		</div>
+		<div class="p-2">
+			<button type="button" class="btn btn-outline-primary m-2" data-toggle="modal" data-target="#modal-default">
+				<i class="fa-solid fa-border-top-left"></i>
+			</button>
+		</div>
+		<div class="p-2" id="productNumber">1 /
+			{{ products|length }}
+		</div>
+	</div>
+	<div class="modal fade" id="modal-default">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Lexique des couleurs de bordure</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div>
+						<i class="fa-solid fa-border-top-left text-warning"></i>
+						La quantité préparé n'est pas suffisante
+					</div>
+					<div>
+						<i class="fa-solid fa-border-top-left text-success"></i>
+						Parfaitement parfait
+					</div>
+					<div>
+						<i class="fa-solid fa-border-top-left text-danger"></i>
+						La quantité préparé est supérieur à la commande
+					</div>
+				</div>
+				<div class="modal-footer justify-content-end">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="card-product" class="card border mb-3 rounded">
+		<div class="card-header text-center">
+			<a href="#" class="open-modal" data-ean="{{ products[0].ean }}">
+				<h5 id='designation' class="card-title mb-1">{{ products[0].designation }}</h5>
+			</a>
+		</div>
+		<div class="card-body">
+			<div class=" col-12 my-1 p-0 d-flex flex-wrap justify-content-between">
+				<p class="card-text">
+					ref   :
+					{{ products[0].ref }}
+				</p>
+				<p class="card-text">
+					sref1 :
+					{{ products[0].sref1 }}
+				</p>
+				<p class="card-text">
+					sref2 :
+					{{ products[0].sref2 }}
+				</p>
+			</div>
+			<div class="col-12 my-1 p-0 d-flex flex-wrap justify-content-between">
+				<p class="card-text">
+					OP  :
+					{{ products[0].op }}
+				</p>
+				<p class="card-text">
+					U.V :
+					{{ products[0].uv }}
+				</p>
+				<p class="card-text text-lg font-weight-bold">
+					Qte :
+					{{ products[0].cdQte }}
+				</p>
+			</div>
+			<p class="card-text d-none">
+				Enregistrement  :
+				{{ products[0].enrNo }}
+			</p>
+			<p class="card-text ">
+				Ean  :
+				{{ products[0].ean }}
+			</p>
+
+			<div id="accordion">
+				<div class="card card-dark">
+					<div class="card-header">
+						<h4 class="card-title w-100">
+							<a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
+								<div class="d-flex justify-content-between">
+									<div>En stock</div>
+									<span class="badge badge-light right" id="qteTotalStock"></span>
+								</div>
+							</a>
+						</h4>
+					</div>
+					<div id="collapseOne" class="collapse show" data-parent="#accordion">
+						<div class="card-body p-0">
+							<table class="table table-sm text-center tableauStock ">
+								<thead>
+									<tr>
+										<th>Emplacement</th>
+										<th>Quantité</th>
+									</tr>
+								</thead>
+								<tbody id="stockTableBody">
+									{% for stock in products[0].stock %}
+										<tr>
+											<td>{{ stock.empl }}</td>
+											<td>{{ stock.qte }}</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+							<div id="noStockMessage" class="container d-none card text-center">
+								<p>Pas de stock disponible.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card d-none" id="card-prepare">
+					<div class="card-header">
+						<h4 class="card-title w-100">
+							<a class="d-block w-100" data-toggle="collapse" href="#collapseTwo">
+								<div class="d-flex justify-content-between">
+									<div>Préparé</div>
+									<span class="badge badge-light right" id="qteTotalPrepare">0</span>
+								</div>
+							</a>
+						</h4>
+					</div>
+					<div id="collapseTwo" class="collapse" data-parent="#accordion">
+						<div class="card-body">
+							<table class="table table-sm text-center">
+								<thead>
+									<tr>
+										<th>Id</th>
+										<th>Emplacement</th>
+										<th>Qte</th>
+										<th>X</th>
+									</tr>
+								</thead>
+								<tbody id="avancementTableBody"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="input-group mb-2">
+				<div class="input-group-prepend">
+					<button id="btn-eanProduit" class="btn btn-warning" type="button" data-toggle="modal" data-target="#scannerModal" data-target-id="eanProduit">
+						<i class="fa-solid fa-camera"></i>
+					</button>
+				</div>
+				<input type="text" id="eanProduit" name="eanProduit" class="form-control col-12" placeholder="Scannez l'EAN produit" type="number" maxlength="13"/>
+			</div>
+			<div class="input-group mb-2">
+				<div class="input-group-prepend">
+					<button id="btn-eanEmplacement" class="btn btn-warning" type="button" data-toggle="modal" data-target="#scannerModal" data-target-id="eanEmplacement">
+						<i class="fa-solid fa-camera"></i>
+					</button>
+				</div>
+				<input type="text" id="eanEmplacement" name="eanEmplacement" class="form-control col-12" placeholder="Scannez l'EAN de l'emplacement" type="text"/>
+			</div>
+			<input class="col-12 form-control" id='qtePreparation' name='qtePreparation' placeholder="renseignez la quantité préparée" type="number" step="0.001"/>
+			<div class="col-12 my-4 p-0">
+				<div class="d-flex flex-wrap float-left">
+					<button class="btn btn-dark previous-btn mr-2">
+						<i class="fa-solid fa-chevron-left"></i>
+					</button>
+					<button class="btn btn-dark next-btn">
+						<i class="fa-solid fa-chevron-right"></i>
+					</button>
+				</div>
+				<div class="float-right">
+					<button class="btn btn-dark validate-btn">Valider</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<input type="hidden" id="currentProductIndex" value="0">
+	<input type="hidden" id="totalProducts" value="{{ products|length }}">
+	{% include 'components/modal_search_product.html.twig' %}
+	{% include 'components/modal_scanner.html.twig' %}
+{% endblock %}
+
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="https://unpkg.com/html5-qrcode"></script>
+	<script src="{{ asset("js/html5-qrcode.min.js")}}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script>{{ eanScannerScript | raw }}</script>
+	<script>{{ productFormScript | raw }}</script>
+	<script>
+		$(document).ready(function () {
+$('.open-modal').click(function (e) {
+e.preventDefault();
+
+// Récupérer la valeur de "ean" à partir de l'attribut data
+var eanValue = $(this).data('ean');
+
+// Remplir le champ "ean" avec la valeur récupérée
+$('#ean').val(eanValue);
+
+// Ouvrir la modal
+$('#productModal').modal('show');
+});
+});
+	</script>
+	<script>
+		$(document).ready(function () {
+var currentProductIndex = 0;
+var totalProducts = parseInt($("#totalProducts").val());
+var products = {{ products|json_encode|raw }};
+
+$(".next-btn").click(function () {
+currentProductIndex++;
+if (currentProductIndex >= totalProducts) {
+currentProductIndex = 0;
+}
+showProduct(currentProductIndex);
+});
+
+$(".previous-btn").click(function () {
+currentProductIndex--;
+if (currentProductIndex < 0) {
+currentProductIndex = totalProducts - 1;
+}
+showProduct(currentProductIndex);
+});
+
+
+function showProduct(index) {
+var product = products[index];
+$("#productNumber").text((index + 1) + " / " + totalProducts);
+$("#designation").text(product.designation);
+$(".card-text:eq(0)").text("ref : " + product.ref);
+$(".card-text:eq(1)").text("sref1 : " + product.sref1);
+$(".card-text:eq(2)").text("sref2 : " + product.sref2);
+$(".card-text:eq(3)").text("OP : " + product.op);
+$(".card-text:eq(4)").text("U.V : " + product.uv);
+$(".card-text:eq(5)").text("Qte à préparer : " + parseInt(product.cdQte.replace(',', '.')));
+$(".card-text:eq(6)").text("Enregistrement : " + product.enrNo);
+$(".card-text:eq(7)").text("Ean : " + product.ean);
+
+var currentEan = $('#ean').val();
+if (currentEan !== product.ean) {
+$('#ean').val(product.ean).trigger('change'); // Déclencher manuellement l'événement "change" sur #ean
+}
+// Mettre à jour le contenu du tableau de stock avec le stock et le total
+updateStockTable(product.stock);
+// Mettre à jour l'avancement de la préparation produit
+getAvancement(product.enrNo, product.cdNo);
+};
+
+showProduct(currentProductIndex);
+
+$(".validate-btn").click(function () {
+var cdNo = "{{ products[0].cdNo }}";
+var enrNo = $(".card-text:eq(6)").text().split(' : ')[1]; // Récupère le numéro d'enregistrement du produit affiché
+var ean = $(".card-text:eq(7)").text().split(' : ')[1]; // Récupère l'ean' du produit affiché
+var eanProduit = $("input[name='eanProduit']").val();
+var eanEmplacement = $("input[name='eanEmplacement']").val();
+var qtePreparation = $("input[name='qtePreparation']").val();
+
+if (ean === eanProduit) {
+$("#eanProduit").removeClass("is-invalid").addClass("is-valid");
+} else { // Afficher une alerte
+alert("Le code EAN ne correspond pas !, vous n'avez pas scanné le bon produit");
+clearInputFields();
+$("#eanProduit").removeClass("is-valid").addClass("is-invalid");
+// Arrêter l'exécution du code
+return;
+}
+if (eanProduit && eanEmplacement && qtePreparation) {
+
+$.ajax({
+url: "/mouv/preparation/cmd/saisie/set/avancement/" + enrNo + "/" + cdNo + "/" + qtePreparation + "/" + eanEmplacement + "/",
+type: "GET",
+success: function (response) {
+showProduct(currentProductIndex);
+// Afficher la réponse dans la console
+// alert('Avancement enregistré avec succès!');
+},
+error: function (xhr, status, error) {
+console.error(error);
+// Afficher les erreurs dans la console
+// alert('Une erreur s\'est produite lors de l\'enregistrement de l\'avancement.');
+}
+});
+} else {
+alert('Veuillez remplir tous les champs.');
+} clearInputFields();
+});
+// fin validate-btn
+
+// écouter le champs EAN pour voir s'il y a  des couac
+$("#eanProduit").on("input", function () {
+var inputValue = $(this).val();
+var ean = $(".card-text:eq(7)").text().split(' : ')[1]; // Récupère l'ean' du produit affiché
+if (inputValue.length === 13) {
+if (inputValue === ean) { // La valeur est valide
+$("#eanProduit").removeClass("is-invalid").addClass("is-valid");
+$("#eanProduit").attr("placeholder", "Scannez l'EAN produit");
+$("#eanEmplacement").focus();
+} else { // La valeur n'est pas valide
+$("#eanProduit").attr("placeholder", "Scannez le bon code EAN !!!!!!");
+clearInputFields();
+$("#eanProduit").removeClass("is-valid").addClass("is-invalid");
+$("#eanProduit").focus();
+}
+} else { // La valeur n'est pas de la bonne longueur
+$("#eanProduit").removeClass("is-valid").removeClass("is-invalid");
+}
+});
+// fin écouter le champs EAN pour voir s'il y a  des couac
+
+// écouter le champs Emplacement pour voir s'il y a  des couac
+$("#eanEmplacement").on("input", function () {
+var inputValue = $(this).val().toUpperCase();
+if (inputValue.length >= 4) {
+$.ajax({
+url: "/mouv/preparation/cmd/saisie/emplacement/scan/ajax/" + 1 + "/" + inputValue,
+type: "GET",
+success: function (response) { // Traitement de la réponse
+console.log(response.empl);
+if (inputValue === response.empl) {
+$("#eanEmplacement").removeClass("is-invalid").addClass("is-valid");
+$("#eanEmplacement").attr("placeholder", "Scannez l'EAN de l'emplacement");
+$("#qtePreparation").focus();
+} else {
+$("#eanEmplacement").attr("placeholder", "Scannez le bon code EAN emplacement !!!!!!");
+$("#eanEmplacement").removeClass("is-valid").addClass("is-invalid");
+$("#eanEmplacement").focus();
+}
+// Afficher la réponse dans la console
+// Vous pouvez effectuer d'autres actions ici en fonction de la réponse
+},
+error: function (xhr, status, error) {
+console.error(error);
+$("#eanEmplacement").attr("placeholder", "Scannez le bon code EAN emplacement !!!!!!");
+$("#eanEmplacement").removeClass("is-valid").addClass("is-invalid");
+$("#eanEmplacement").focus();
+// Gérer les erreurs ici
+}
+});
+
+}
+});
+// fin écouter le champs Emplacement pour voir s'il y a  des couac
+
+});
+// Alimenter le tableau des stock
+function updateStockTable(stockData) { // Supprimer toutes les lignes existantes du tableau
+$("#stockTableBody").empty();
+// Initialiser le total des quantités de stock
+var qteTotalStock = 0;
+
+// Afficher le message "Pas de stock"
+$("#noStockMessage").removeClass("d-none");
+$(".tableauStock").hide();
+
+// Vérifier si des données de stock sont disponibles
+if (stockData.length > 0) { // Afficher le tableau
+$(".tableauStock").show();
+// Masquer le message "Pas de stock"
+$("#noStockMessage").addClass("d-none");
+
+// Ajouter chaque élément de stock au tableau
+$.each(stockData, function (index, stock) {
+var row = $("<tr>");
+$("<td>").text(stock.empl).appendTo(row);
+$("<td>").text(stock.qte).appendTo(row);
+row.appendTo("#stockTableBody");
+// Ajouter la quantité de stock actuelle au total
+qteTotalStock += parseInt(stock.qte);
+});
+}
+// Mettre à jour l'élément avec l'identifiant qteTotalStock avec le total calculé
+$("#qteTotalStock").text(qteTotalStock);
+}
+// fin updateStockTable
+
+
+function getAvancement(enrNo, cdNo) {
+$.ajax({
+url: "/mouv/preparation/cmd/saisie/get/avancement/" + enrNo + "/" + cdNo,
+type: "GET",
+success: function (response) { // Vider le tableau existant
+$("#avancementTableBody").empty();
+
+// Initialiser la quantité totale à zéro
+var qteTotalPrepare = 0;
+
+// Parcourir chaque élément d'avancement dans la réponse
+response.forEach(function (item) { // Créer une nouvelle ligne de tableau
+var row = $("<tr>");
+
+// Colonne ID
+var idCell = $("<td>").text(item.id);
+row.append(idCell);
+
+// Colonne Emplacement
+var emplacementCell = $("<td>").text(item.empl);
+row.append(emplacementCell);
+
+// Colonne Quantité
+var qteCell = $("<td>").text(item.qte);
+row.append(qteCell);
+
+// Colonne Suppression avec bouton
+var deleteLink = $("<a>").addClass("delete-btn").append('<i class="fas fa-trash-alt text-dark"></i>');
+deleteLink.attr('href', '#'); // Ajoutez l'URL souhaitée ici
+deleteLink.click(function (event) {
+event.preventDefault();
+// Pour éviter que le lien ne déclenche une action de navigation
+// Demander une confirmation à l'utilisateur
+if (confirm("Êtes-vous sûr de vouloir supprimer cet avancement ?")) { // Si l'utilisateur confirme, appeler la fonction pour supprimer l'avancement
+deleteAvancement(item.id, enrNo, cdNo);
+} else { // Si l'utilisateur annule, ne rien faire
+return;
+}
+});
+var deleteCell = $("<td>").append(deleteLink);
+row.append(deleteCell);
+
+// Ajouter la ligne au corps du tableau
+$("#avancementTableBody").append(row);
+
+// Incrémenter la quantité totale
+qteTotalPrepare += parseInt(item.qte);
+});
+
+// Mettre à jour le total dans le footer
+$("#qteTotalPrepare").text(qteTotalPrepare);
+var qteCmd = $(".card-text:eq(5)").text().split(' : ')[1]; // Récupère la quantité commandée du produit affiché
+qteCmd = qteCmd.replace(".", ",");
+updateFooterAndCard(qteTotalPrepare, qteCmd)
+
+},
+error: function (xhr, status, error) {
+console.error(error);
+alert("Une erreur s'est produite lors de la récupération des données d'avancement.");
+}
+});
+}
+// fin de getAvancement
+
+
+// vider les 3 input
+function clearInputFields() {
+$("input[name='eanProduit']").val("");
+$("input[name='eanEmplacement']").val("");
+$("input[name='qtePreparation']").val("");
+}
+
+// supprimer un avancement
+function deleteAvancement(avancementId, enrNo, cdNo) {
+$.ajax({
+url: "/mouv/preparation/cmd/saisie/delete/avancement/" + avancementId,
+type: "DELETE",
+success: function (response) { // Actualiser la liste des avancements après la suppression
+getAvancement(enrNo, cdNo);
+},
+error: function (xhr, status, error) {
+console.error(error);
+alert('Une erreur s\'est produite lors de la suppression de l\'avancement.');
+}
+});
+}
+// fin deleteAvancement
+
+
+function updateFooterAndCard(qteTotalPrepare, qteCmd) { // Mettre à jour le total dans le footer
+
+var cardPrepare = $("#card-prepare");
+var cardProduct = $("#card-product");
+
+console.log(qteTotalPrepare);
+console.log(qteCmd);
+
+// Vérifier si qteTotalPrepare > qteCmd
+if (qteTotalPrepare > qteCmd) {
+cardProduct.removeClass("border-warning border-success").addClass("border-danger");
+cardPrepare.removeClass("card-warning card-success").addClass("card-danger");
+} else if (qteTotalPrepare === qteCmd) {
+cardProduct.removeClass("border-warning border-danger").addClass("border-success");
+cardPrepare.removeClass("card-warning card-danger").addClass("card-success");
+} else if (qteTotalPrepare < qteCmd) {
+cardProduct.removeClass("border-danger border-success").addClass("border-warning");
+cardPrepare.removeClass("card-danger card-success").addClass("card-warning");
+}
+
+// Vérifier si qteTotalPrepare > 0 pour afficher ou masquer le card
+if (qteTotalPrepare > 0) {
+cardPrepare.removeClass("d-none");
+} else {
+cardPrepare.addClass("d-none");
+}
+}
+	</script>
+
+{% endblock %}

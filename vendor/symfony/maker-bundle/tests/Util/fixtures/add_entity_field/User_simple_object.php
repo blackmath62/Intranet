@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -13,7 +12,7 @@ class User
     #[ORM\Column()]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::OBJECT)]
+    #[ORM\Column(type: 'object')]
     private ?object $someObject = null;
 
     public function getId(): ?int

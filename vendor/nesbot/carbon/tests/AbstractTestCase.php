@@ -18,6 +18,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Carbon\CarbonInterval;
 use Carbon\CarbonPeriod;
+use Carbon\CarbonTimeZone;
 use Carbon\Translator;
 use Closure;
 use DateTime;
@@ -181,6 +182,9 @@ abstract class AbstractTestCase extends TestCase
         $this->assertSame($expected, $actual);
     }
 
+    /**
+     * @phpstan-assert CarbonInterface $d
+     */
     public function assertInstanceOfCarbon($d)
     {
         $this->assertInstanceOf(CarbonInterface::class, $d);
@@ -229,6 +233,9 @@ abstract class AbstractTestCase extends TestCase
         }
     }
 
+    /**
+     * @phpstan-assert CarbonInterval $d
+     */
     public function assertInstanceOfCarbonInterval($d)
     {
         $this->assertInstanceOf(CarbonInterval::class, $d);
@@ -321,5 +328,20 @@ abstract class AbstractTestCase extends TestCase
         $b = $aliases[$b] ?? $b;
 
         return $a === $b;
+    }
+
+    protected function firstValidTimezoneAmong(array $timezones): CarbonTimeZone
+    {
+        $firstError = null;
+
+        foreach ($timezones as $timezone) {
+            try {
+                return new CarbonTimeZone($timezone);
+            } catch (Throwable $exception) {
+                $firstError = $firstError ?? $exception;
+            }
+        }
+
+        throw $firstError;
     }
 }

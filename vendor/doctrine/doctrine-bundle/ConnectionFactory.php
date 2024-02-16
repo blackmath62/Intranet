@@ -78,6 +78,7 @@ class ConnectionFactory
         }
 
         $overriddenOptions = [];
+        /** @psalm-suppress InvalidArrayOffset We should adjust when https://github.com/vimeo/psalm/issues/8984 is fixed */
         if (isset($params['connection_override_options'])) {
             trigger_deprecation('doctrine/doctrine-bundle', '2.4', 'The "connection_override_options" connection parameter is deprecated');
             $overriddenOptions = $params['connection_override_options'];
@@ -97,6 +98,7 @@ class ConnectionFactory
             }
         }
 
+        /** @psalm-suppress InvalidArrayOffset We should adjust when https://github.com/vimeo/psalm/issues/8984 is fixed */
         if (! isset($params['pdo']) && (! isset($params['charset']) || $overriddenOptions || isset($params['dbname_suffix']))) {
             $wrapperClass = null;
 
@@ -116,7 +118,8 @@ class ConnectionFactory
             $connection = DriverManager::getConnection(...array_merge([$params, $config], $eventManager ? [$eventManager] : []));
             $params     = $this->addDatabaseSuffix(array_merge($connection->getParams(), $overriddenOptions));
             $driver     = $connection->getDriver();
-            $platform   = $driver->getDatabasePlatform(
+            /** @psalm-suppress InvalidScalarArgument Bogus error, StaticServerVersionProvider implements Doctrine\DBAL\ServerVersionProvider  */
+            $platform = $driver->getDatabasePlatform(
                 ...(class_exists(StaticServerVersionProvider::class) ? [new StaticServerVersionProvider($params['serverVersion'] ?? '')] : []),
             );
 
@@ -248,6 +251,7 @@ class ConnectionFactory
      */
     private function parseDatabaseUrl(array $params): array
     {
+        /** @psalm-suppress InvalidArrayOffset Need to be compatible with DBAL < 4, which still has `$params['url']` */
         if (! isset($params['url'])) {
             return $params;
         }

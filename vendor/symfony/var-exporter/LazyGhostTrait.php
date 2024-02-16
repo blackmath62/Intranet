@@ -31,7 +31,7 @@ trait LazyGhostTrait
      *                                                    that the initializer doesn't initialize, if any
      * @param static|null              $instance
      */
-    public static function createLazyGhost(\Closure|array $initializer, array $skippedProperties = null, object $instance = null): static
+    public static function createLazyGhost(\Closure|array $initializer, ?array $skippedProperties = null, ?object $instance = null): static
     {
         if (\is_array($initializer)) {
             trigger_deprecation('symfony/var-exporter', '6.4', 'Per-property lazy-initializers are deprecated and won\'t be supported anymore in 7.0, use an object initializer instead.');
@@ -166,8 +166,9 @@ trait LazyGhostTrait
             if ($state && (null === $scope || isset($propertyScopes["\0$scope\0$name"]))) {
                 if (LazyObjectState::STATUS_INITIALIZED_FULL === $state->status) {
                     // Work around php/php-src#12695
-                    $property = $propertyScopes[null === $scope ? $name : "\0$scope\0$name"][3]
-                        ?? (Hydrator::$propertyScopes[$this::class] = Hydrator::getPropertyScopes($this::class))[3];
+                    $property = null === $scope ? $name : "\0$scope\0$name";
+                    $property = $propertyScopes[$property][3]
+                        ?? Hydrator::$propertyScopes[$this::class][$property][3] = new \ReflectionProperty($scope ?? $class, $name);
                 } else {
                     $property = null;
                 }

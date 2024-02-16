@@ -55,11 +55,17 @@ class ServiceEntityRepositoryProxy extends EntityRepository implements ServiceEn
 
     public function find(mixed $id, LockMode|int|null $lockMode = null, int|null $lockVersion = null): object|null
     {
+        /** @psalm-suppress InvalidReturnStatement This proxy is used only in combination with newer parent class */
         return ($this->repository ??= $this->resolveRepository())
             ->find($id, $lockMode, $lockVersion);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * @psalm-suppress InvalidReturnStatement This proxy is used only in combination with newer parent class
+     * @psalm-suppress InvalidReturnType This proxy is used only in combination with newer parent class
+     */
     public function findBy(array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array
     {
         return ($this->repository ??= $this->resolveRepository())
@@ -69,6 +75,7 @@ class ServiceEntityRepositoryProxy extends EntityRepository implements ServiceEn
     /** {@inheritDoc} */
     public function findOneBy(array $criteria, ?array $orderBy = null): object|null
     {
+        /** @psalm-suppress InvalidReturnStatement This proxy is used only in combination with newer parent class */
         return ($this->repository ??= $this->resolveRepository())
             ->findOneBy($criteria, $orderBy);
     }
@@ -79,7 +86,9 @@ class ServiceEntityRepositoryProxy extends EntityRepository implements ServiceEn
         return ($this->repository ??= $this->resolveRepository())->count($criteria);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public function __call(string $method, array $arguments): mixed
     {
         return ($this->repository ??= $this->resolveRepository())->$method(...$arguments);
@@ -95,8 +104,10 @@ class ServiceEntityRepositoryProxy extends EntityRepository implements ServiceEn
         return ($this->repository ??= $this->resolveRepository())->getEntityManager();
     }
 
+    /** @psalm-suppress InvalidReturnType This proxy is used only in combination with newer parent class */
     protected function getClassMetadata(): ClassMetadata
     {
+        /** @psalm-suppress InvalidReturnStatement This proxy is used only in combination with newer parent class */
         return ($this->repository ??= $this->resolveRepository())->getClassMetadata();
     }
 

@@ -754,7 +754,7 @@ class StatesController extends AbstractController
         $executionTimeEntete = $timeEndEntete - $timeStartEntete;
         $this->logger->info("Temps d'exécution de la requête Entête : {$executionTimeEntete} secondes");
 
-        $tempsExec = "Temps d'exécution de la requête Entête : {$executionTimeEntete} secondes" . '</br>';
+        $tempsExec = "Rapport d'éxécution : " . '</br>' . "Temps d'exécution de la requête Entête : {$executionTimeEntete} secondes" . '</br>';
 
         $timeStartFormatCellule = 0;
         $timeStartFormatCellule = microtime(true);
@@ -792,8 +792,8 @@ class StatesController extends AbstractController
         $executionTimeExportDonnees = $timeEndExportDonnees - $timeStartExportDonnees;
         $this->logger->info("Temps d'exécution de la requête Export Données Divalto : {$executionTimeExportDonnees} secondes");
         $tempsExec = $tempsExec . "Temps d'exécution de la requête Export Données Divalto : {$executionTimeExportDonnees} secondes" . '</br>';
-
         $timeStartSommeEtFiltre = 0;
+
         $timeStartSommeEtFiltre = microtime(true);
 
         // Sous Total des colonnes pour les colonnes Quantités et montants de chaque années
@@ -835,7 +835,7 @@ class StatesController extends AbstractController
         // Créez un message e-mail avec Swift Mailer
         $email = (new Email())
             ->from($this->mailEnvoi)
-            ->to('jpochet@groupe-axis.fr')
+            ->to($this->getUser()->getEmail())
             ->subject('States au format excel')
             ->html('Veuillez trouver votre fichier Excel en pièce jointe.' . '</br>' . $tempsExec) // . "Temps d'exécution de la requête : {$executionTime} secondes"
             ->attachFromPath($temp_file, $fileName);
@@ -846,8 +846,8 @@ class StatesController extends AbstractController
         // Supprimez le fichier temporaire après l'envoi de l'e-mail
         unlink($temp_file);
 
-        //$this->addFlash('message', 'Veuillez consulter votre boite mail, le fichier Excel va vous être envoyé');
-        //return $this->redirectToRoute($page);
+        $this->addFlash('message', 'Veuillez consulter votre boite mail, le fichier Excel va vous être envoyé');
+        return $this->redirectToRoute($page);
 
     }
 

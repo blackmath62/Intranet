@@ -222,7 +222,7 @@
 								<a class='btn btn-secondary m-3' href='{{path('app_lhermitte_rossignols', {'annee' : annee } ) }}' title="Attention cette année n'est pas compléte">Année
 									{{ annee }}</a>
 							</div>
-							<table id="example3" class="table table-bordered table-striped">
+							<table id="example15" class="table table-bordered table-striped">
 								<thead>
 									<tr>
 										<th class="text-center">
@@ -279,8 +279,6 @@
 									</tr>
 								</thead>
 								<tbody>
-
-									<!-- >boucle -->
 									{% for venteRossignol in venteRossignols %}
 										<tr>
 											<td class="text-center">
@@ -372,8 +370,6 @@
 											</td>
 										</tr>
 									{% endfor %}
-									<!-- >boucle -->
-
 								</tbody>
 								<tfoot>
 									<tr>

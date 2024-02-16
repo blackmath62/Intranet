@@ -2,26 +2,23 @@
 
 namespace DoctrineExtensions\Tests\Entities;
 
-/**
- * @Entity
- * @Table
- */
+use Doctrine\ORM\Mapping as ORM;
+
+/** @ORM\Entity */
 class ZendDate
 {
     /**
-     * @Id
-     * @Column(type="integer")
+     * @ORM\Id
+     * @ORM\Column(type="integer")
      */
     public $id;
 
-    /**
-     * @Column(type="ZendDate")
-     */
+    /** @ORM\Column(type="ZendDate") */
     public $date;
 
     public function __construct($id, $date)
     {
-        $this->id = $id;
+        $this->id   = $id;
         $this->date = $date;
     }
 }

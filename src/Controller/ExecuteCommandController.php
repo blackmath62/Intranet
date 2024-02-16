@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+// actuellement non utilisé ça devait servir pour envoyer les fichiers excels de maniére asynchrone mais ça n'a jamais fonctionné
+
 class ExecuteCommandController extends AbstractController
 {
     public function executeCommand(Request $request, KernelInterface $kernel): Response

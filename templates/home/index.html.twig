@@ -129,6 +129,11 @@
 				<i class="fa-solid fa-magnifying-glass mr-2"></i>Recherche produits
 			</a>
 			{% if is_granted('ROLE_LOGISTIQUE') %}
+				<a href="{{ path('app_mouv_preparation_cmd') }}" class="text-white btn btn-lg btn-info col-11 mt-5">
+					<i class="fas fa-solid fa-box-open mr-2"></i>Préparation (Béta)
+				</a>
+			{% endif %}
+			{% if is_granted('ROLE_LOGISTIQUE') %}
 				<a href="{{ path('app_mouv_stock') }}" class="text-white btn btn-lg btn-danger col-11 mt-5">
 					<i class="fa-solid fa-cubes-stacked mr-2"></i>Régularisation de stock
 				</a>

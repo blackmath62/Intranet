@@ -6,12 +6,15 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Query\QueryException;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\SQL\Builder\DefaultSelectSQLBuilder;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -19,6 +22,8 @@ use function hex2bin;
 
 class QueryBuilderTest extends TestCase
 {
+    use VerifyDeprecations;
+
     /** @var Connection&MockObject */
     protected Connection $conn;
 
@@ -28,9 +33,15 @@ class QueryBuilderTest extends TestCase
 
         $expressionBuilder = new ExpressionBuilder($this->conn);
 
-        $this->conn->expects(self::any())
-                   ->method('getExpressionBuilder')
-                   ->willReturn($expressionBuilder);
+        $this->conn->method('getExpressionBuilder')
+           ->willReturn($expressionBuilder);
+
+        $platform = $this->createMock(AbstractPlatform::class);
+        $platform->method('createSelectSQLBuilder')
+            ->willReturn(new DefaultSelectSQLBuilder($platform, null, null));
+
+        $this->conn->method('getDatabasePlatform')
+            ->willReturn($platform);
     }
 
     public function testSimpleSelectWithoutFrom(): void
@@ -606,26 +617,167 @@ class QueryBuilderTest extends TestCase
         self::assertEquals(10, $qb->getFirstResult());
     }
 
-    public function testResetQueryPart(): void
+    private function prepareQueryBuilderToReset(): QueryBuilder
     {
-        $qb = new QueryBuilder($this->conn);
+        $qb = (new QueryBuilder($this->conn))
+            ->select('u.*')
+            ->distinct()
+            ->from('users', 'u')
+            ->where('u.name = ?')
+            ->orderBy('u.name', 'ASC');
 
-        $qb->select('u.*')->from('users', 'u')->where('u.name = ?');
+        self::assertEquals('SELECT DISTINCT u.* FROM users u WHERE u.name = ? ORDER BY u.name ASC', (string) $qb);
 
-        self::assertEquals('SELECT u.* FROM users u WHERE u.name = ?', (string) $qb);
-        $qb->resetQueryPart('where');
-        self::assertEquals('SELECT u.* FROM users u', (string) $qb);
+        return $qb;
     }
 
     public function testResetQueryParts(): void
     {
-        $qb = new QueryBuilder($this->conn);
+        $qb = $this->prepareQueryBuilderToReset();
 
-        $qb->select('u.*')->from('users', 'u')->where('u.name = ?')->orderBy('u.name');
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetQueryParts(['distinct', 'where', 'orderBy']);
+
+        self::assertEquals('SELECT u.* FROM users u', (string) $qb);
+    }
+
+    public function testLegacyResetSelect(): void
+    {
+        $qb = $this->prepareQueryBuilderToReset();
+
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetQueryPart('select')->addSelect('u.name');
+
+        self::assertEquals('SELECT DISTINCT u.name FROM users u WHERE u.name = ? ORDER BY u.name ASC', (string) $qb);
+    }
+
+    public function testLegacyResetDistinct(): void
+    {
+        $qb = $this->prepareQueryBuilderToReset();
+
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetQueryPart('distinct');
 
         self::assertEquals('SELECT u.* FROM users u WHERE u.name = ? ORDER BY u.name ASC', (string) $qb);
-        $qb->resetQueryParts(['where', 'orderBy']);
-        self::assertEquals('SELECT u.* FROM users u', (string) $qb);
+    }
+
+    public function testResetDistinct(): void
+    {
+        $qb = $this->prepareQueryBuilderToReset();
+
+        $this->expectNoDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->distinct(false);
+
+        self::assertEquals('SELECT u.* FROM users u WHERE u.name = ? ORDER BY u.name ASC', (string) $qb);
+    }
+
+    public function testLegacyResetWhere(): void
+    {
+        $qb = $this->prepareQueryBuilderToReset();
+
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetQueryPart('where');
+
+        self::assertEquals('SELECT DISTINCT u.* FROM users u ORDER BY u.name ASC', (string) $qb);
+    }
+
+    public function testResetWhere(): void
+    {
+        $qb = $this->prepareQueryBuilderToReset();
+
+        $this->expectNoDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetWhere();
+
+        self::assertEquals('SELECT DISTINCT u.* FROM users u ORDER BY u.name ASC', (string) $qb);
+    }
+
+    public function testLegacyResetOrderBy(): void
+    {
+        $qb = $this->prepareQueryBuilderToReset();
+
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetQueryPart('orderBy');
+
+        self::assertEquals('SELECT DISTINCT u.* FROM users u WHERE u.name = ?', (string) $qb);
+    }
+
+    public function testResetOrderBy(): void
+    {
+        $qb = $this->prepareQueryBuilderToReset();
+
+        $this->expectNoDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetOrderBy();
+
+        self::assertEquals('SELECT DISTINCT u.* FROM users u WHERE u.name = ?', (string) $qb);
+    }
+
+    private function prepareGroupedQueryBuilderToReset(): QueryBuilder
+    {
+        $qb = (new QueryBuilder($this->conn))
+            ->select('u.country', 'COUNT(*)')
+            ->from('users', 'u')
+            ->groupBy('u.country')
+            ->having('COUNT(*) > ?')
+            ->orderBy('COUNT(*)', 'DESC');
+
+        self::assertEquals(
+            'SELECT u.country, COUNT(*) FROM users u GROUP BY u.country HAVING COUNT(*) > ? ORDER BY COUNT(*) DESC',
+            (string) $qb,
+        );
+
+        return $qb;
+    }
+
+    public function testLegacyResetHaving(): void
+    {
+        $qb = $this->prepareGroupedQueryBuilderToReset();
+
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetQueryPart('having');
+
+        self::assertEquals(
+            'SELECT u.country, COUNT(*) FROM users u GROUP BY u.country ORDER BY COUNT(*) DESC',
+            (string) $qb,
+        );
+    }
+
+    public function testResetHaving(): void
+    {
+        $qb = $this->prepareGroupedQueryBuilderToReset();
+
+        $this->expectNoDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetHaving();
+
+        self::assertEquals(
+            'SELECT u.country, COUNT(*) FROM users u GROUP BY u.country ORDER BY COUNT(*) DESC',
+            (string) $qb,
+        );
+    }
+
+    public function testLegacyResetGroupBy(): void
+    {
+        $qb = $this->prepareGroupedQueryBuilderToReset();
+
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetQueryPart('groupBy');
+
+        self::assertEquals(
+            'SELECT u.country, COUNT(*) FROM users u HAVING COUNT(*) > ? ORDER BY COUNT(*) DESC',
+            (string) $qb,
+        );
+    }
+
+    public function testResetGroupBy(): void
+    {
+        $qb = $this->prepareGroupedQueryBuilderToReset();
+
+        $this->expectNoDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6193');
+        $qb->resetGroupBy();
+
+        self::assertEquals(
+            'SELECT u.country, COUNT(*) FROM users u HAVING COUNT(*) > ? ORDER BY COUNT(*) DESC',
+            (string) $qb,
+        );
     }
 
     public function testCreateNamedParameter(): void
@@ -791,6 +943,8 @@ class QueryBuilderTest extends TestCase
         self::assertEquals((string) $qb, (string) $qbClone);
 
         $qb->andWhere('u.id = 1');
+
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/dbal/pull/6179');
 
         self::assertNotSame($qb->getQueryParts(), $qbClone->getQueryParts());
         self::assertNotSame($qb->getParameters(), $qbClone->getParameters());

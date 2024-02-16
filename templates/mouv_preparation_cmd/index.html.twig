@@ -1,0 +1,152 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-xl-6">
+					<h3>Préparation de Romuald</h3>
+					<span class="badge bg-danger">Commandes à traiter :
+						{{listCmds|length}}</span>
+				</div>
+				<div class="col-xl-6">
+					<ol class="breadcrumb float-right">
+						<li class="breadcrumb-item">
+							<i class="far fa-solid fa-box-open text-warning mr-1"></i>
+							ME
+						</li>
+						<li class="breadcrumb-item">
+							<i class="far fa-solid fa-box-open text-danger mr-1"></i>
+							HP
+						</li>
+						<li class="breadcrumb-item">
+							<i class="far fa-solid fa-box-open text-success mr-1"></i>
+							EV
+						</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+	<div class="input-group mb-3">
+		<input type="text" class="form-control" id="searchInput" placeholder="Rechercher par nom..." aria-label="Rechercher par nom..." aria-describedby="basic-addon2">
+	</div>
+	<div class="d-flex justify-content-around mb-3">
+		<a href="{{ path('app_mouv_preparation_cmd', {'tri': 'dateCmd_asc'}) }}">Date croissante</a>
+		<a href="{{ path('app_mouv_preparation_cmd', {'tri': 'dateCmd_desc'}) }}">Date décroissante</a>
+	</div>
+	<div class="d-flex flex-wrap" style="max-height: 600px; overflow-y: auto;">
+		{% for listCmd in listCmds %}
+			<div class="col-xl-3 col-12">
+				<div class="info-box border-primary">
+					<a href="{{path('app_mouv_preparation_cmd_saisie', {'cdNo' : listCmd.cmd })}}">
+						<div class="d-flex text-dark">
+							<div class="d-flex flex-column justify-content-around">
+								{% if listCmd.nbP_HP %}
+									<span class="info-box-icon">
+										<span class="badge">
+											{{ listCmd.nbP_HP }}
+										</span>
+										<i class="far fa-solid fa-box-open text-danger"></i>
+									</span>
+								{% endif %}
+								{% if listCmd.nbP_EV %}
+									<span class="info-box-icon ml-0">
+										<span class="badge">
+											{{ listCmd.nbP_EV }}
+										</span>
+										<i class="far fa-solid fa-box-open text-success"></i>
+									</span>
+								{% endif %}
+								{% if listCmd.nbP_ME %}
+									<span class="info-box-icon ml-0">
+										<span class="badge">
+											{{ listCmd.nbP_ME }}
+										</span>
+										<i class="far fa-solid fa-box-open text-warning"></i>
+									</span>
+								{% endif %}
+							</div>
+							<div class="info-box-content">
+								<span class="info-box-text">{{ listCmd.nom|slice(0, 25) }}</span>
+								<span class="info-box-number">
+									Cmd :
+									{{listCmd.cmd}}
+									du
+									{{listCmd.dateCmd|date("d/m/Y")}}
+								</span>
+								<div class="progress">
+									<div class="progress-bar" style="width: {{ (0 / listCmd.nbP) * 100 }}%"></div>
+								</div>
+								<span class="progress-description">
+									0 produit sur
+									{{ listCmd.nbP }}
+									déjà préparés
+								</span>
+								<span class="progress-description">
+									Délai demandé :
+									{% if listCmd.delaiDemande %}
+										{{ listCmd.delaiDemande|date("d/m/Y") }}
+									{% endif %}
+								</span>
+							</div>
+						</div>
+					</a>
+					{% if listCmd.nDb or listCmd.nFb %}
+						<div class="d-flex justify-content-end">
+							<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#Modal{{listCmd.cmd}}">
+								<i class="fa-solid fa-info"></i>
+							</button>
+						</div>
+						<div class="modal fade" id="Modal{{listCmd.cmd}}">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h4 class="modal-title text-dark">Texte entête et pied de piéce</h4>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body">
+										<p>
+											{{ listCmd.nDb|replace({'<br>': '', 'style="[^"]*"': ''})|raw }}
+											{{ listCmd.nFb|replace({'<br>': '', 'style="[^"]*"': ''})|raw }}
+										</p>
+									</div>
+									<div class="modal-footer justify-content-end">
+										<button type="button" class="btn btn-primary" data-dismiss="modal">Fermer</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	<script>
+		$(document).ready(function () {
+$('#searchInput').on('input', function () {
+var searchText = $(this).val().toLowerCase();
+$('.info-box').each(function () {
+var nomText = $(this).find('.info-box-text').text().toLowerCase();
+if (nomText.indexOf(searchText) === -1) {
+$(this).hide();
+} else {
+$(this).show();
+}
+});
+});
+});
+	</script>
+
+
+{% endblock %}

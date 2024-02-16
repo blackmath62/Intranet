@@ -7,6 +7,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+// actuellement non utilisé ça devait servir pour envoyer les fichiers excels de maniére asynchrone mais ça n'a jamais fonctionné
+
 class ProcessInBackgroundCommand extends Command
 {
     protected static $defaultName = 'app:process-in-background';

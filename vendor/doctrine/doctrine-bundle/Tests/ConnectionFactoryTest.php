@@ -3,7 +3,6 @@
 namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
-use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
@@ -96,6 +95,7 @@ class ConnectionFactoryTest extends TestCase
             'password' => 'wordpass',
         ];
 
+        /** @psalm-suppress InvalidArgument We should adjust when https://github.com/vimeo/psalm/issues/8984 is fixed */
         $connection = (new ConnectionFactory([]))->createConnection(
             [
                 'url' => 'mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8',
@@ -109,6 +109,7 @@ class ConnectionFactoryTest extends TestCase
 
     public function testConnectionCharsetFromUrl()
     {
+        /** @psalm-suppress InvalidArgument Need to be compatible with DBAL < 4, which still has `$params['url']` */
         $connection = (new ConnectionFactory([]))->createConnection(
             ['url' => 'mysql://root:password@database:3306/main?charset=utf8mb4_unicode_ci'],
             $this->configuration,
@@ -119,6 +120,7 @@ class ConnectionFactoryTest extends TestCase
 
     public function testDbnameSuffix(): void
     {
+        /** @psalm-suppress InvalidArgument We should adjust when https://github.com/vimeo/psalm/issues/8984 is fixed */
         $connection = (new ConnectionFactory([]))->createConnection(
             [
                 'url' => 'mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8',
@@ -132,6 +134,7 @@ class ConnectionFactoryTest extends TestCase
 
     public function testDbnameSuffixForReplicas(): void
     {
+        /** @psalm-suppress InvalidArgument We should adjust when https://github.com/vimeo/psalm/issues/8984 is fixed */
         $connection = (new ConnectionFactory([]))->createConnection(
             [
                 'driver' => 'pdo_mysql',
@@ -166,10 +169,10 @@ class FakeConnection extends Connection
     /**
      * {@inheritDoc}
      */
-    public function __construct(array $params, Driver $driver, ?Configuration $config = null, ?EventManager $eventManager = null)
+    public function __construct(array $params, Driver $driver, ?Configuration $config = null)
     {
         ++self::$creationCount;
 
-        parent::__construct($params, $driver, $config, $eventManager);
+        parent::__construct($params, $driver, $config);
     }
 }

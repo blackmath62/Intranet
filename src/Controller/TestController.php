@@ -2,11 +2,10 @@
 
 namespace App\Controller;
 
-use App\Repository\Main\HolidayRepository;
-use App\Repository\Main\UsersRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -23,17 +22,10 @@ class TestController extends AbstractController
 
     #[Route("/test", name: "app_test")]
 
-    public function test(HolidayRepository $repo, UsersRepository $repoUsers)
+    public function test()
     {
 
-        $thisRoleUser = $repo->findHolidayWithUserRole(735, 'ROLE_MONTEUR');
-        if ($thisRoleUser) {
-            dd($repoUsers->findUsersByRole('ROLE_ADMIN_MONTEUR'));
-        }
-
-        return $this->render('test/index.html.twig', [
-            'title' => 'page de test',
-        ]);
+        return $this->render('test/info.php');
 
     }
 
@@ -60,6 +52,26 @@ class TestController extends AbstractController
     {
         $weekDay = date('w', strtotime($date));
         return ($weekDay == 0 || $weekDay == 6);
+    }
+
+    #[Route("/test/excel", name: "app_test_excel")]
+
+    public function test_excel(MailerInterface $mailer)
+    {
+        $fileName = 'excel.xlsx';
+
+        $email = (new Email())
+            ->from('intranet@groupe-axis.fr')
+            ->to($this->getUser()->getEmail())
+            ->subject('test envoi excel')
+            ->html('Ceci est un test')
+            ->attachFromPath($temp_file, $fileName);
+
+        // Envoyez l'e-mail avec le fichier Excel en pièce jointe
+        $mailer->send($email);
+
+        return $this->redirectToRoute('app_test');
+
     }
 
 }

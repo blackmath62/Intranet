@@ -806,10 +806,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
     {
         if ($famille == "produits") {
             $type = "RTRIM(LTRIM(ref)) AS ref, RTRIM(LTRIM(sref1)) AS sref1, RTRIM(LTRIM(sref2)) AS sref2, RTRIM(LTRIM(designation)) AS designation, RTRIM(LTRIM(uv)) AS uv";
+            $groupBy = "ref, sref1, sref2, designation, uv";
         } elseif ($famille == "clients") {
             $type = "RTRIM(LTRIM(tiers)) AS tiers, RTRIM(LTRIM(nom)) AS nom";
+            $groupBy = "tiers, nom";
         } elseif ($famille == "mois") {
             $type = "mois";
+            $groupBy = "mois";
         }
 
         if ($dossier == 3) {
@@ -837,7 +840,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         WHERE m.DOS = $dossier AND (m.FADT >= '$startN' AND m.FADT <= '$endN' or m.FADT >= '$startN1' AND m.FADT <= '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse
-        GROUP BY $type";
+        GROUP BY $groupBy ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();

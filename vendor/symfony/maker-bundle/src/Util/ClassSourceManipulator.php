@@ -28,6 +28,7 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\Parser;
+use PhpParser\PhpVersion;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\Doctrine\BaseCollectionRelation;
 use Symfony\Bundle\MakerBundle\Doctrine\BaseRelation;
@@ -37,6 +38,7 @@ use Symfony\Bundle\MakerBundle\Doctrine\RelationManyToOne;
 use Symfony\Bundle\MakerBundle\Doctrine\RelationOneToMany;
 use Symfony\Bundle\MakerBundle\Doctrine\RelationOneToOne;
 use Symfony\Bundle\MakerBundle\Str;
+use Symfony\Bundle\MakerBundle\Util\ClassSource\Model\ClassProperty;
 
 /**
  * @internal
@@ -48,7 +50,7 @@ final class ClassSourceManipulator
     private const CONTEXT_CLASS_METHOD = 'class_method';
     private const DEFAULT_VALUE_NONE = '__default_value_none';
 
-    private Parser\Php7 $parser;
+    private Parser $parser;
     private Lexer\Emulative $lexer;
     private PrettyPrinter $printer;
     private ?ConsoleStyle $io = null;
@@ -64,14 +66,22 @@ final class ClassSourceManipulator
         private bool $overwrite = false,
         private bool $useAttributesForDoctrineMapping = true,
     ) {
-        $this->lexer = new Lexer\Emulative([
-            'usedAttributes' => [
-                'comments',
-                'startLine', 'endLine',
-                'startTokenPos', 'endTokenPos',
-            ],
-        ]);
-        $this->parser = new Parser\Php7($this->lexer);
+        /* @legacy Support for nikic/php-parser v4 */
+        if (class_exists(PhpVersion::class)) {
+            $version = PhpVersion::fromString(\PHP_VERSION);
+            $this->lexer = new Lexer\Emulative($version);
+            $this->parser = new Parser\Php8($this->lexer, $version);
+        } else {
+            $this->lexer = new Lexer\Emulative([
+                'usedAttributes' => [
+                    'comments',
+                    'startLine', 'endLine',
+                    'startTokenPos', 'endTokenPos',
+                ],
+            ]);
+            $this->parser = new Parser\Php7($this->lexer);
+        }
+
         $this->printer = new PrettyPrinter();
 
         $this->setSourceCode($sourceCode);
@@ -87,27 +97,27 @@ final class ClassSourceManipulator
         return $this->sourceCode;
     }
 
-    public function addEntityField(string $propertyName, array $columnOptions, array $comments = []): void
+    public function addEntityField(ClassProperty $mapping): void
     {
-        $typeHint = DoctrineHelper::getPropertyTypeForColumn($columnOptions['type']);
-        if ($typeHint && DoctrineHelper::canColumnTypeBeInferredByPropertyType($columnOptions['type'], $typeHint)) {
-            unset($columnOptions['type']);
+        $typeHint = DoctrineHelper::getPropertyTypeForColumn($mapping->type);
+        if ($typeHint && DoctrineHelper::canColumnTypeBeInferredByPropertyType($mapping->type, $typeHint)) {
+            $mapping->needsTypeHint = false;
         }
 
-        if (isset($columnOptions['type'])) {
-            $typeConstant = DoctrineHelper::getTypeConstant($columnOptions['type']);
+        if ($mapping->needsTypeHint) {
+            $typeConstant = DoctrineHelper::getTypeConstant($mapping->type);
             if ($typeConstant) {
                 $this->addUseStatementIfNecessary(Types::class);
-                $columnOptions['type'] = $typeConstant;
+                $mapping->type = $typeConstant;
             }
         }
 
         // 2) USE property type on property below, nullable
         // 3) If default value, then NOT nullable
 
-        $nullable = $columnOptions['nullable'] ?? false;
-        $isId = (bool) ($columnOptions['id'] ?? false);
-        $attributes[] = $this->buildAttributeNode(Column::class, $columnOptions, 'ORM');
+        $nullable = $mapping->nullable ?? false;
+
+        $attributes[] = $this->buildAttributeNode(Column::class, $mapping->getAttributes(), 'ORM');
 
         $defaultValue = null;
         if ('array' === $typeHint && !$nullable) {
@@ -123,15 +133,15 @@ final class ClassSourceManipulator
         }
 
         $this->addProperty(
-            name: $propertyName,
+            name: $mapping->propertyName,
             defaultValue: $defaultValue,
             attributes: $attributes,
-            comments: $comments,
+            comments: $mapping->comments,
             propertyType: $propertyType
         );
 
         $this->addGetter(
-            $propertyName,
+            $mapping->propertyName,
             $typeHint,
             // getter methods always have nullable return values
             // because even though these are required in the db, they may not be set yet
@@ -140,8 +150,8 @@ final class ClassSourceManipulator
         );
 
         // don't generate setters for id fields
-        if (!$isId) {
-            $this->addSetter($propertyName, $typeHint, $nullable);
+        if (!($mapping->id ?? false)) {
+            $this->addSetter($mapping->propertyName, $typeHint, $nullable);
         }
     }
 
@@ -301,7 +311,7 @@ final class ClassSourceManipulator
     /**
      * @param Node[] $params
      */
-    public function addMethodBuilder(Builder\Method $methodBuilder, array $params = [], string $methodBody = null): void
+    public function addMethodBuilder(Builder\Method $methodBuilder, array $params = [], ?string $methodBody = null): void
     {
         $this->addMethodParams($methodBuilder, $params);
 
@@ -327,7 +337,7 @@ final class ClassSourceManipulator
             if (class_exists($returnType) || interface_exists($returnType)) {
                 $returnType = $this->addUseStatementIfNecessary($returnType);
             }
-            $methodNodeBuilder->setReturnType($isReturnTypeNullable ? new Node\NullableType($returnType) : $returnType);
+            $methodNodeBuilder->setReturnType($isReturnTypeNullable ? new Node\NullableType(new Node\Identifier($returnType)) : $returnType);
         }
 
         if ($commentLines) {
@@ -350,7 +360,7 @@ final class ClassSourceManipulator
     /**
      * @param array<Node\Attribute|Node\AttributeGroup> $attributes
      */
-    public function addProperty(string $name, $defaultValue = self::DEFAULT_VALUE_NONE, array $attributes = [], array $comments = [], string $propertyType = null): void
+    public function addProperty(string $name, $defaultValue = self::DEFAULT_VALUE_NONE, array $attributes = [], array $comments = [], ?string $propertyType = null): void
     {
         if ($this->propertyExists($name)) {
             // we never overwrite properties
@@ -414,7 +424,7 @@ final class ClassSourceManipulator
             );
 
         if (null !== $returnType) {
-            $getterNodeBuilder->setReturnType($isReturnTypeNullable ? new Node\NullableType($returnType) : $returnType);
+            $getterNodeBuilder->setReturnType($isReturnTypeNullable ? new Node\NullableType(new Node\Identifier($returnType)) : $returnType);
         }
 
         if ($commentLines) {
@@ -435,7 +445,7 @@ final class ClassSourceManipulator
 
         $paramBuilder = new Builder\Param($propertyName);
         if (null !== $type) {
-            $paramBuilder->setType($isNullable ? new Node\NullableType($type) : $type);
+            $paramBuilder->setType($isNullable ? new Node\NullableType(new Node\Identifier($type)) : $type);
         }
         $setterNodeBuilder->addParam($paramBuilder->getNode());
 
@@ -641,7 +651,7 @@ final class ClassSourceManipulator
         $removerNodeBuilder = (new Builder\Method($relation->getRemoverMethodName()))->makePublic();
 
         $paramBuilder = new Builder\Param($argName);
-        $paramBuilder->setTypeHint($typeHint);
+        $paramBuilder->setType($typeHint);
         $removerNodeBuilder->addParam($paramBuilder->getNode());
 
         // $this->avatars->removeElement($avatar)
@@ -834,14 +844,14 @@ final class ClassSourceManipulator
      * @param array   $options         The named arguments for the attribute ($key = argument name, $value = argument value)
      * @param ?string $attributePrefix If a prefix is provided, the node is built using the prefix. E.g. #[ORM\Column()]
      */
-    public function buildAttributeNode(string $attributeClass, array $options, string $attributePrefix = null): Node\Attribute
+    public function buildAttributeNode(string $attributeClass, array $options, ?string $attributePrefix = null): Node\Attribute
     {
         $options = $this->sortOptionsByClassConstructorParameters($options, $attributeClass);
 
         $context = $this;
         $nodeArguments = array_map(static function (string $option, mixed $value) use ($context) {
             if (null === $value) {
-                return new Node\NullableType($option);
+                return new Node\NullableType(new Node\Identifier($option));
             }
 
             // Use the Doctrine Types constant
@@ -900,7 +910,13 @@ final class ClassSourceManipulator
     {
         $this->sourceCode = $sourceCode;
         $this->oldStmts = $this->parser->parse($sourceCode);
-        $this->oldTokens = $this->lexer->getTokens();
+
+        /* @legacy Support for nikic/php-parser v4 */
+        if (\is_callable([$this->parser, 'getTokens'])) {
+            $this->oldTokens = $this->parser->getTokens();
+        } elseif (\is_callable([$this->lexer, 'getTokens'])) {
+            $this->oldTokens = $this->lexer->getTokens();
+        }
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new NodeVisitor\CloningVisitor());

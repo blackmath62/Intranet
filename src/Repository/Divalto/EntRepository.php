@@ -115,6 +115,78 @@ class EntRepository extends ServiceEntityRepository
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
+
+    // Obtenir la liste des commandes à traiter pour préparation de commande
+    public function getListMouvPreparationCmd(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT
+        e.TIERS AS tiers,
+        c.NOM AS nom,
+        e.PINO AS cmd,
+        e.PIDT AS dateCmd,
+        e.PIREF AS notreREF,
+        e.USERCR AS userCr,
+        e.OP AS op,
+        e.DELDEMDT AS delaiDemande,
+        e.DELACCDT AS delaiAccepte,
+        e.DELREPDT AS delaiReporte,
+        nD.NOTEBLOB AS nDb,
+        nF.NOTEBLOB AS nFb,
+        COUNT(*) AS nbP,
+        SUM(CASE WHEN a.FAM_0002 = 'ME' THEN 1 ELSE 0 END) AS nbP_ME,
+        SUM(CASE WHEN a.FAM_0002 = 'HP' THEN 1 ELSE 0 END) AS nbP_HP,
+        SUM(CASE WHEN a.FAM_0002 = 'EV' THEN 1 ELSE 0 END) AS nbP_EV
+    FROM
+        ENT e
+    INNER JOIN
+        CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = e.DOS AND c.TIERS = e.TIERS
+    INNER JOIN
+        MOUV m WITH (INDEX = INDEX_I) ON m.DOS = e.DOS AND e.TICOD = m.TICOD AND e.PINO = m.CDNO
+    INNER JOIN
+        ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = e.DOS AND a.REF = m.REF
+    LEFT JOIN
+        MNOTE nD ON nD.NOTE = e.TXTNOTED
+    LEFT JOIN
+        MNOTE nF ON nF.NOTE = e.TXTNOTEF
+    WHERE
+        e.DOS = 1
+        AND e.PICOD = 2
+        AND e.TICOD = 'C'
+        AND e.CE4 = 1
+        AND e.OP IN ('C', 'D')
+        AND NOT a.REF IN ('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20', 'DIVPRESTM','DIMTOTAL', 'RITOTAL', 'AFTOTAL')
+        AND NOT a.FAM_0001 IN ('TRANSPOR', 'ACOMPTE', 'LOCATION', 'PRESTA') AND NOT a.FAM_0002 IN ('MO')
+        AND m.CDQTE <> 0
+        AND NOT a.REF LIKE ('DIV%')
+    GROUP BY
+        e.TIERS , c.NOM, e.PINO, e.PIDT, e.PIREF, e.USERCR, e.OP,
+        e.DELDEMDT, e.DELACCDT, e.DELREPDT, nD.NOTEBLOB, nF.NOTEBLOB
+    ORDER BY e.PINO ASC
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // Liste des produits à préparer sur la commande
+    public function getMouvPreparationCmdList($cdno): array
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT m.CDNO AS cdNo, m.TIERS AS tiers, m.REF AS ref, m.SREF1 AS sref1,
+         m.SREF2 AS sref2, m.DES AS designation, m.VENUN AS uv,
+        m.CDQTE AS cdQte, m.OP AS op, ean.EAN AS ean, m.ENRNO AS enrNo
+        FROM MOUV m WITH (INDEX = INDEX_A)
+        LEFT JOIN SARTEAN ean WITH (INDEX = INDEX_F_MINI) ON m.REF = ean.REF
+        AND m.SREF1 = ean.SREF1 AND m.SREF2 = ean.SREF2 AND m.DOS = ean.DOS
+        WHERE m.CDNO = $cdno AND m.DOS = 1 AND m.TICOD = 'C' AND m.PICOD = 2
+    ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     // vérifier le statut d'une commande dans divalto (CE4)
     public function controleStatusOfCmd($cmd)
     {

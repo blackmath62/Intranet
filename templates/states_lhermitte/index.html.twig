@@ -86,7 +86,7 @@
 								<div class="d-flex justify-content-around">
 									<h2 class="info-box-text">{{ Metier.SecteurMouvement }}</h2>
 									{% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted("ROLE_#{Metier.SecteurMouvement}") ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') or is_granted('ROLE_BUREAU_RB') ) %}
-										<a class="btn btn-success mb-1 start-button" id='states{{Metier.SecteurMouvement}}' data-url="{{path('app_states_excel_metier_' ~ sufixeMetier , {'metier' : Metier.SecteurMouvement, 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'dossier' : dossier } ) }}">
+										<a class="btn btn-success mb-1 start-button" id='states{{Metier.SecteurMouvement}}' href="{{path('app_states_excel_metier_' ~ sufixeMetier , {'metier' : Metier.SecteurMouvement, 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'dossier' : dossier } ) }}">
 											<i class="fas fa-file-excel text-white"></i>
 										</a>
 									{% endif %}
@@ -152,7 +152,7 @@
 								<div class="d-flex justify-content-around">
 									<h2 class="info-box-text">Global</h2>
 									{% if ((is_granted('ROLE_RESPONSABLE_SECTEUR')) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS')) %}
-										<a class="btn btn-success mb-1 float-right start-button" id='statesTous' data-url="{{path('app_states_excel_metier_' ~ sufixeMetier , {'metier' : 'Tous', 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'dossier' : dossier } ) }}">
+										<a class="btn btn-success mb-1 float-right start-button" id='statesTous' href="{{path('app_states_excel_metier_' ~ sufixeMetier , {'metier' : 'Tous', 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'dossier' : dossier } ) }}">
 											<i class="fas fa-file-excel text-white"></i>
 										</a>
 									{% endif %}
@@ -219,7 +219,7 @@
 											{% if metier == 'Tous' %}
 												{% else %}
 													{% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted("ROLE_#{metier}")  ) or ( is_granted('ROLE_COMMERCIAL') and app.user.commercial == state.CommercialId ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') ) %}
-														<a class="btn btn-success mb-1" href="{{path('app_states_excel_commercial_' ~ sufixeMetier , {'metier' : metier, 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'commercialId' : state.CommercialId, 'dossier' : dossier } ) }}">
+														<a class="btn btn-success mb-1 start-button" href="{{path('app_states_excel_commercial_' ~ sufixeMetier , {'metier' : metier, 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'commercialId' : state.CommercialId, 'dossier' : dossier } ) }}">
 															<i class="fas fa-file-excel text-white"></i>
 														</a>
 													{% endif %}
@@ -570,10 +570,45 @@
 			</div>
 		{% endif %}
 	</div>
+</div>
+<div class="modal fade" id="modal-overlay">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="overlay">
+				<i class="fas fa-sync fa-spin"></i>
+			</div>
+			<div class="modal-header">
+				<h4 class="modal-title">Traitement des données</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>Veuillez patienter jusqu'a la fin du traitement des données, un mail vous sera envoyer avec votre fichier.</p>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
 </div>{% endblock %}{% block javascripts %}
 {{ parent() }}
+
 <script>
-	// Sélectionnez tous les boutons ayant la classe "start-button"
+	$(document).ready(function () { // Écoute de l'événement de clic sur les boutons avec la classe 'start-button'
+$('.start-button').click(function () { // Affichage du modal
+$('#modal-overlay').modal('show');
+
+// Attente du chargement complet de la page
+$(window).on('load', function () { // Masquer le modal une fois le chargement terminé
+$('#modal-overlay').modal('hide');
+});
+});
+});
+</script>
+
+
+<script>// Sélectionnez tous les boutons ayant la classe "start-button"
+/*
 const startButtons = document.querySelectorAll('.start-button');
 
 // Parcourez chaque bouton et ajoutez un écouteur d'événements pour le clic
@@ -603,4 +638,4 @@ alert('Une erreur s\'est produite lors de la récupération de l\'URL.');
 });
 });
 // alert(`Le processus de génération du fichier Excel a démarré. Vous recevrez le fichier par e-mail une fois terminé.`);
-</script>{% endblock %}
+*/</script>{% endblock %}
