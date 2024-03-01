@@ -313,12 +313,22 @@
 											</p>
 										</a>
 										<ul class="nav nav-treeview">
-											<li class="nav-item">
-												<a href="{{ path('app_mouv_preparation_cmd')}}" class="nav-link">
-													<i class="nav-icon fa-solid fa-box-open text-info"></i>
-													<p>Préparation (béta)</p>
-												</a>
-											</li>
+											{% if (is_granted('ROLE_LOGISTIQUE_ADMIN') or is_granted('ROLE_ADMIN')) %}
+												<li class="nav-item">
+													<a href="{{ path('app_mouv_preparation_cmd_administration')}}" class="nav-link">
+														<i class="nav-icon fa-solid fa-network-wired text-danger"></i>
+														<p>Admin Préparation (béta)</p>
+													</a>
+												</li>
+											{% endif %}
+											{% if (is_granted('ROLE_PREPARATEUR') or is_granted('ROLE_LOGISTIQUE_ADMIN') or is_granted('ROLE_ADMIN')) %}
+												<li class="nav-item">
+													<a href="{{ path('app_mouv_preparation_cmd')}}" class="nav-link">
+														<i class="nav-icon fa-solid fa-box-open text-info"></i>
+														<p>Préparation (béta)</p>
+													</a>
+												</li>
+											{% endif %}
 											<li class="nav-item">
 												<a href="{{ path('app_stock')}}" class="nav-link">
 													<i class="nav-icon fa-solid fa-cubes text-primary"></i>
@@ -1102,4 +1112,4 @@ $('[data-toggle="tooltip"]').tooltip()
 			</body>
 		</body>
 	</html>
-</body></html>
+</body></html></body></html>

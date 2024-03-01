@@ -1,0 +1,47 @@
+{# xml_template.xml.twig #}
+<?xml version="1.0" encoding="UTF-8"?>
+<REGISTRE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://redevancephyto.developpement-durable.gouv.fr/ressources/registre_{{annee}}.xsd" ANNEE_REGISTRE="{{annee}}" SOURCE="WEB" VERSION="x.y.z" DATE_CREATION="{{ 'now'|date('Y-m-d H:i:s') }}">
+	<OBSERVATIONS/>
+	<DISTRIBUTEUR>
+		<NOM_ORGANISME>{{ xmlData.distributeur.NOM_ORGANISME }}</NOM_ORGANISME>
+		<NOM_SIEGE>{{ xmlData.distributeur.NOM_SIEGE }}</NOM_SIEGE>
+		<CONTACT>
+			<NOM>{{ xmlData.distributeur.CONTACT.NOM }}</NOM>
+			<FONCTION>{{ xmlData.distributeur.CONTACT.FONCTION }}</FONCTION>
+			<TELEPHONE>{{ xmlData.distributeur.CONTACT.TELEPHONE }}</TELEPHONE>
+			<COURRIEL>{{ xmlData.distributeur.CONTACT.COURRIEL }}</COURRIEL>
+		</CONTACT>
+		<ADRESSE>
+			<BATIMENT>{{ xmlData.distributeur.ADRESSE.BATIMENT }}</BATIMENT>
+			<NUMERO_ET_VOIE>{{ xmlData.distributeur.ADRESSE.NUMERO_ET_VOIE }}</NUMERO_ET_VOIE>
+			<LIEU_DIT>{{ xmlData.distributeur.ADRESSE.LIEU_DIT }}</LIEU_DIT>
+			<INSEE>{{ xmlData.distributeur.ADRESSE.INSEE }}</INSEE>
+		</ADRESSE>
+		<NUMERO_AGREMENT>{{ xmlData.distributeur.NUMERO_AGREMENT }}</NUMERO_AGREMENT>
+		<SIRET>{{ xmlData.distributeur.SIRET }}</SIRET>
+		<CODE_NAF>{{ xmlData.distributeur.CODE_NAF }}</CODE_NAF>
+	</DISTRIBUTEUR>
+	<ETABLISSEMENTS>
+		<ETABLISSEMENT>
+			<NOM>
+				{{ xmlData.distributeur.NOM_ORGANISME }}
+			</NOM>
+			<SIRET>{{ xmlData.distributeur.SIRET }}</SIRET>
+			<ADRESSE>
+				<BATIMENT>{{ xmlData.distributeur.ADRESSE.BATIMENT }}</BATIMENT>
+				<NUMERO_ET_VOIE>{{ xmlData.distributeur.ADRESSE.NUMERO_ET_VOIE }}</NUMERO_ET_VOIE>
+				<LIEU_DIT/>
+				<INSEE>{{ xmlData.distributeur.ADRESSE.INSEE }}</INSEE>
+			</ADRESSE>
+			<VENTES>
+				{% for vente in xmlData.ventes %}
+					<PRODUIT>
+						<AMM>{{vente.amm|trim}}</AMM>
+						<CP>{{vente.cp|trim}}</CP>
+						<QUANTITE>{{'%0.3f'|format(vente.quantite)}}</QUANTITE>
+					</PRODUIT>
+				{% endfor %}
+			</VENTES>
+		</ETABLISSEMENT>
+	</ETABLISSEMENTS>
+</REGISTRE>

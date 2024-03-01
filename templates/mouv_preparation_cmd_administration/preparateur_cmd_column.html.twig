@@ -1,0 +1,26 @@
+{% set color = "lightblue" %}
+{% if preparateur.id == 9999 %}
+	{% set color = "secondary" %}
+{% endif %}
+
+<div class="card card-row card-{{color}} col p-0 m-1">
+	<div class="card-header">
+		<h3 class="card-title pseudo_preparateur text-center">{{preparateur.pseudo}}</h3>
+		<div class="card-tools">
+			<span class="badge badge-light">
+				<small id="cmds_{{preparateur.id}}">0</small>
+				<i class="fa-solid fa-cart-shopping text-navy"></i>
+			</span>
+		</div>
+	</div>
+	<div id="{{preparateur.id}}" class="card-body container dragparent overflow-auto preparateur" style="max-height: 70vh;">
+		{% for cmd in cmds %}
+			{% if cmd.preparateur.id == preparateur.id %}
+				{% if cmd.preparateur.preparedAt %}
+					{% else %}
+						{% include 'mouv_preparation_cmd_administration/card_cmd.html.twig' with {'cmd': cmd} %}
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+	</div>
+</div>

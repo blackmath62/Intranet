@@ -172,7 +172,7 @@ class AdminEmailController extends AbstractController
                     ->from($this->mailEnvoi)
                     ->to($this->mailTreatement)
                     ->subject('Probléme formatage de mail automatique')
-                    ->html("Voici le probléme => " . $value->getEmail());
+                    ->html("Voici le probléme => " . $value);
                 $this->mailer->send($email);
             }
         }

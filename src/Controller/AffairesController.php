@@ -33,6 +33,7 @@ use App\Repository\Main\OthersDocumentsRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
 use App\Repository\Main\StatutsGenerauxRepository;
 use App\Repository\Main\UsersRepository;
+use App\Service\BlogFormaterService;
 use App\Service\EmailTreatementService;
 use App\Service\ImageService;
 use App\Service\ProductFormService;
@@ -71,6 +72,7 @@ class AffairesController extends AbstractController
     private $mailer;
     private $repoRetrait;
     private $emailTreatementService;
+    private $blobFormater;
     private $entityManager;
     private $repoStatusGeneraux;
 
@@ -90,6 +92,7 @@ class AffairesController extends AbstractController
         ChatsRepository $repoChats,
         AffairePieceRepository $repoAffairePiece,
         OthersDocumentsRepository $repoDocs,
+        BlogFormaterService $blobFormater,
         MailerInterface $mailer,
         CommentairesRepository $repoComments,
         AffairesRepository $repoAffaires,
@@ -103,6 +106,7 @@ class AffairesController extends AbstractController
         $this->repoDocs = $repoDocs;
         $this->productFormService = $productFormService;
         $this->mailer = $mailer;
+        $this->blobFormater = $blobFormater;
         $this->repoAffairePiece = $repoAffairePiece;
         $this->repoStatusGeneraux = $repoStatusGeneraux;
         $this->repoChats = $repoChats;
@@ -782,6 +786,9 @@ class AffairesController extends AbstractController
                 $picod = 2;
             }
             $produits = $this->repoMouv->getDetailPiecesAffaires($pino, $picod);
+            foreach ($produits as &$produit) {
+                $produit['note'] = $this->blobFormater->getFormate($produit['note']);
+            }
         }
         $retraits = $this->repoRetrait->findBy(['chantier' => $intervention->getCode()->getCode()]);
         foreach ($retraits as $retrait) {
@@ -1016,6 +1023,10 @@ class AffairesController extends AbstractController
             }
 
             $produits = $this->repoMouv->getDetailPiecesAffaires($pino, $picod);
+            foreach ($produits as &$produit) {
+                $produit['note'] = $this->blobFormater->getFormate($produit['note']);
+            }
+
             $lesPieces[] = $piece = [
                 'id' => $piece->getId(),
                 'cdno' => $piece->getCdno(),

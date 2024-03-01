@@ -128,7 +128,7 @@
 			<a href="{{ path('app_search_products') }}" class="text-white btn btn-lg btn-primary col-11 mt-5">
 				<i class="fa-solid fa-magnifying-glass mr-2"></i>Recherche produits
 			</a>
-			{% if is_granted('ROLE_LOGISTIQUE') %}
+			{% if (is_granted('ROLE_PREPARATEUR') or is_granted('ROLE_LOGISTIQUE_ADMIN') or is_granted('ROLE_ADMIN')) %}
 				<a href="{{ path('app_mouv_preparation_cmd') }}" class="text-white btn btn-lg btn-info col-11 mt-5">
 					<i class="fas fa-solid fa-box-open mr-2"></i>Préparation (Béta)
 				</a>

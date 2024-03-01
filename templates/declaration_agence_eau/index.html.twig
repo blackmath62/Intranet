@@ -16,139 +16,147 @@
 		</div>
 		<!-- /.card-header -->
 		<div class="card-body">
-			La déclaration est généralement à envoyer avant le 31-03 de chaque année pour déclarer l'année échue.
-		</br>
-		Il est important de contrôler que tous les articles sont bien au KG ou au LITRE, les PACKS doivent être décomposés pour avoir une ligne par département pour chaque composant du pack.</br>
-	Contrôler s'il y a bien toujours un AMM et que toutes les quantités soient positives, sans quoi il faut creuser sur Divalto.
-</br>
-<p>identifiant : 78401372400041</p>
-<p>mdp : AP8983P76b</p>
-Il est recommandé de télécharger systématiquement le fichier permettant la déclaration sur le site
-<a href="https://redevancephyto.developpement-durable.gouv.fr/">https://redevancephyto.developpement-durable.gouv.fr/</a>
-,</br>la réglementation et le degré de détail demandé pouvant évoluer, cette extraction n'est valable que sur le modèle de celle 2020.
-    Créer un nouveau dossier pour l'année de déclaration sur le serveur dans le dossier<u>
-<strong>//192.168.50.241/direction/DOCUMENTS LIES AU PHYTO/declaration RPD</strong></u>(il faut avoir les droits serveur du dossier Direction), y stocker les fichiers excels permettant la déclaration et l'accusé réception de la déclaration.<!-- /.card-footer--></div></div><div class="row"><div class="col-md-12"><div class="card card-dark">
-<div class="card-header d-flex justify-content-between">
-	<h3 class="card-title text-center">Déclaration à l'agence de l'eau Annuelle</h3>
-	{{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }}
-	) }}
-	<div class='d-flex'>
-		<div class="p-1 mt-2">
-			Selectionnez l'année :
-		</div>
-		<div class="p-1 d-none">
-			{{ form_row(monthYear.month) }}
-		</div>
-		<div class="p-1">
-			{{ form_row(monthYear.year) }}
-		</div>
-		<div class="p-1">
-			{{ form_row(monthYear.filtrer)}}
+			<p>La déclaration est généralement à envoyer avant le 31-03 de chaque année pour déclarer l'année échue.</p>
+			<p>Il est important de contrôler que tous les articles sont bien au KG ou au LITRE, les PACKS doivent être décomposés pour avoir une ligne par département pour chaque composant du pack.
+								Contrôler s'il y a bien toujours un AMM et que toutes les quantités soient positives, sans quoi il faut creuser sur Divalto.</p>
+			<p>identifiant : 78401372400041</p>
+			<p>mdp : AP8983P76b</p>
+			<p>Il est recommandé de télécharger systématiquement le fichier permettant la déclaration sur le site
+				<a href="https://redevancephyto.developpement-durable.gouv.fr/">https://redevancephyto.developpement-durable.gouv.fr/</a>
+				,la réglementation et le degré de détail demandé pouvant évoluer, cette extraction n'est valable que sur le modèle de celle 2020.
+													    Créer un nouveau dossier pour l'année de déclaration sur le serveur dans le dossier<u>
+					<strong>//192.168.50.241/direction/DOCUMENTS LIES AU PHYTO/declaration RPD</strong>
+				</u>(il faut avoir les droits serveur du dossier Direction), y stocker les fichiers excels permettant la déclaration et l'accusé réception de la déclaration.</p>
 		</div>
 	</div>
-	{{ form_end(monthYear)}}
-</div>
-<!-- /.card-header -->
-<div class="card-body">
-	<table id="example1" class="table table-bordered table-striped">
-		<thead>
-			<tr>
-				<th class="text-center">
-					<span>Siret</span>
-				</th>
-				<th class="text-center">
-					<span>Code INSEE</span>
-				</th>
-				<th class="text-center">
-					<span>AMM</span>
-				</th>
-				<th class="text-center">
-					<span>Qte</span>
-				</th>
-				<th class="text-center">
-					<span>Code Postal</span>
-				</th>
-				<th class="text-center">
-					<span>Référence</span>
-				</th>
-				<th class="text-center">
-					<span>Désignation</span>
-				</th>
-				<th class="text-center">
-					<span>Uv</span>
-				</th>
-				<th class="text-center">
-					<span>Type Article</span>
-				</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for declaration in declarations %}
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header d-flex justify-content-between">
+					<h3 class="card-title text-center">Déclaration à l'agence de l'eau Annuelle</h3>
+					{{ form_start(monthYear, { 'attr' : { 'class' : 'ml-auto' }}
+					) }}
+					<div class='d-flex'>
+						<div class="p-1 mt-2">
+							Selectionnez l'année :
+						</div>
+						<div class="p-1 d-none">
+							{{ form_row(monthYear.month) }}
+						</div>
+						<div class="p-1">
+							{{ form_row(monthYear.year) }}
+						</div>
+						<div class="p-1">
+							{{ form_row(monthYear.filtrer)}}
+						</div>
+					</div>
+					{{ form_end(monthYear)}}
+				</div>
+				<!-- /.card-header -->
+				<div class="card-body">
+					<table id="example1" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="text-center">
+									<span>Siret</span>
+								</th>
+								<th class="text-center">
+									<span>Code INSEE</span>
+								</th>
+								<th class="text-center">
+									<span>AMM</span>
+								</th>
+								<th class="text-center">
+									<span>Qte</span>
+								</th>
+								<th class="text-center">
+									<span>Code Postal</span>
+								</th>
+								<th class="text-center">
+									<span>Référence</span>
+								</th>
+								<th class="text-center">
+									<span>Désignation</span>
+								</th>
+								<th class="text-center">
+									<span>Uv</span>
+								</th>
+								<th class="text-center">
+									<span>Type Article</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for declaration in declarations %}
 
 
-				<tr>
-					<td class="text-center">
-						<a class="text-center text-dark">78401372400041</a>
-					</td>
-					<td class="text-center">
-						<a class="text-center text-dark">62498</a>
-					</td>
-					<td class="text-center">
-						<a class="text-center text-dark">{{ declaration.amm }}</a>
-					</td>
-					<td class="text-center">
-						<a class="text-center text-dark">{{ declaration.qte }}</a>
-					</td>
-					<td class="text-center">
-						<a class="text-center text-dark">{{ declaration.cp }}</a>
-					</td>
-					<td class="text-center">
-						<a class="text-center text-dark">{{ declaration.ref }}</a>
-					</td>
-					<td class="text-center">
-						<a class="text-center text-dark">{{ declaration.designation }}</a>
-					</td>
-					<td class="text-center">
-						<a class="text-center text-dark">{{ declaration.uv }}</a>
-					</td>
-					<td class="text-center">
-						<a class="text-center text-dark">{{ declaration.typeArt }}</a>
-					</td>
-				</tr>
+								<tr>
+									<td class="text-center">
+										<a class="text-center text-dark">78401372400041</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">62498</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ declaration.amm }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ declaration.qte }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ declaration.cp }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ declaration.ref }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ declaration.designation }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ declaration.uv }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ declaration.typeArt }}</a>
+									</td>
+								</tr>
 
-			{% endfor %}
+							{% endfor %}
 
-		</tbody>
-		<tfoot>
-			<tr>
-				<th class="text-center">
-					<span>Siret</span>
-				</th>
-				<th class="text-center">
-					<span>Code INSEE</span>
-				</th>
-				<th class="text-center">
-					<span>AMM</span>
-				</th>
-				<th class="text-center">
-					<span>Qte</span>
-				</th>
-				<th class="text-center">
-					<span>Code Postal</span>
-				</th>
-				<th class="text-center">
-					<span>Référence</span>
-				</th>
-				<th class="text-center">
-					<span>Désignation</span>
-				</th>
-				<th class="text-center">
-					<span>Uv</span>
-				</th>
-				<th class="text-center">
-					<span>Type Article</span>
-				</th>
-			</tr>
-		</tfoot>
-	</table>
-</div></div></div></div>{% endblock %}
+						</tbody>
+						<tfoot>
+							<tr>
+								<th class="text-center">
+									<span>Siret</span>
+								</th>
+								<th class="text-center">
+									<span>Code INSEE</span>
+								</th>
+								<th class="text-center">
+									<span>AMM</span>
+								</th>
+								<th class="text-center">
+									<span>Qte</span>
+								</th>
+								<th class="text-center">
+									<span>Code Postal</span>
+								</th>
+								<th class="text-center">
+									<span>Référence</span>
+								</th>
+								<th class="text-center">
+									<span>Désignation</span>
+								</th>
+								<th class="text-center">
+									<span>Uv</span>
+								</th>
+								<th class="text-center">
+									<span>Type Article</span>
+								</th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

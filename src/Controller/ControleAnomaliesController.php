@@ -153,15 +153,39 @@ class ControleAnomaliesController extends AbstractController
 
         if ($heure >= 0 && $heure < 2) {
             // envoi automatique de la compta analytique
-            $this->comptaAnalytiqueController->sendMail();
-            // envoi automatique des piéces clients feu rouge et orange
-            $this->clientFeuRougeOrangeController->sendMail();
+            try {
+                $this->comptaAnalytiqueController->sendMail();
+            } catch (\Throwable $th) {
+                $email = (new Email())
+                    ->from($this->mailEnvoi)
+                    ->to("jpochet@groupe-axis.fr")
+                    ->subject("ERREUR sur comptaAnalytiqueController->sendMail");
+                $this->mailer->send($email);
+            }
+            try {
+                // envoi automatique des piéces clients feu rouge et orange
+                $this->clientFeuRougeOrangeController->sendMail();
+            } catch (\Throwable $th) {
+                $email = (new Email())
+                    ->from($this->mailEnvoi)
+                    ->to("jpochet@groupe-axis.fr")
+                    ->subject("ERREUR sur clientFeuRougeOrangeController->sendMail");
+                $this->mailer->send($email);
+            }
         }
 
         // envoie d'un mail le 20 de chaque mois
         if ($d == 20) {
             if ($heure >= 8 && $heure < 20) {
-                $this->contratCommissionnaireController->sendMail();
+                try {
+                    $this->contratCommissionnaireController->sendMail();
+                } catch (\Throwable $th) {
+                    $email = (new Email())
+                        ->from($this->mailEnvoi)
+                        ->to("jpochet@groupe-axis.fr")
+                        ->subject("ERREUR sur contratCommissionnaireController->sendMail");
+                    $this->mailer->send($email);
+                }
             }
         }
 
@@ -171,17 +195,73 @@ class ControleAnomaliesController extends AbstractController
             $this->ControleFournisseur();
             $this->ControleArticle();
             $this->ControlStockDirect();
-            $this->affairesController->update();
-            $this->movementBillFscController->update(); // Envoyer les mails à la référente sur les ventes FSC.
-            if ($heure >= 8 && $heure < 20) {
-                $this->fscAttachedFileController->majFscOrderListFromDivalto();
-                if ($jour == 5 || $jour == 1) {
-                    $this->MajCmdRobyAccepteReporte();
-                    $this->cmdRobyController->sendMail();
-                }
-                $this->ControlePieces();
+            try {
+                $this->affairesController->update();
+            } catch (\Throwable $th) {
+                $email = (new Email())
+                    ->from($this->mailEnvoi)
+                    ->to("jpochet@groupe-axis.fr")
+                    ->subject("ERREUR sur affairesController->update");
+                $this->mailer->send($email);
             }
-            $this->run_auto_wash();
+            try {
+                $this->movementBillFscController->update(); // Envoyer les mails à la référente sur les ventes FSC.
+            } catch (\Throwable $th) {
+                $email = (new Email())
+                    ->from($this->mailEnvoi)
+                    ->to("jpochet@groupe-axis.fr")
+                    ->subject("ERREUR sur movementBillFscController->update");
+                $this->mailer->send($email);
+            }
+            if ($heure >= 8 && $heure < 20) {
+                try {
+                    $this->fscAttachedFileController->majFscOrderListFromDivalto();
+                } catch (\Throwable $th) {
+                    $email = (new Email())
+                        ->from($this->mailEnvoi)
+                        ->to("jpochet@groupe-axis.fr")
+                        ->subject("ERREUR sur fscAttachedFileController->majFscOrderListFromDivalto");
+                    $this->mailer->send($email);
+                }
+                if ($jour == 5 || $jour == 1) {
+                    try {
+                        $this->MajCmdRobyAccepteReporte();
+                    } catch (\Throwable $th) {
+                        $email = (new Email())
+                            ->from($this->mailEnvoi)
+                            ->to("jpochet@groupe-axis.fr")
+                            ->subject("ERREUR sur MajCmdRobyAccepteReporte");
+                        $this->mailer->send($email);
+                    }
+                    try {
+                        $this->cmdRobyController->sendMail();
+                    } catch (\Throwable $th) {
+                        $email = (new Email())
+                            ->from($this->mailEnvoi)
+                            ->to("jpochet@groupe-axis.fr")
+                            ->subject("ERREUR sur cmdRobyController->sendMail");
+                        $this->mailer->send($email);
+                    }
+                }
+                try {
+                    $this->ControlePieces();
+                } catch (\Throwable $th) {
+                    $email = (new Email())
+                        ->from($this->mailEnvoi)
+                        ->to("jpochet@groupe-axis.fr")
+                        ->subject("ERREUR sur ControlePieces");
+                    $this->mailer->send($email);
+                }
+            }
+            try {
+                $this->run_auto_wash();
+            } catch (\Throwable $th) {
+                $email = (new Email())
+                    ->from($this->mailEnvoi)
+                    ->to("jpochet@groupe-axis.fr")
+                    ->subject("ERREUR sur run_auto_wash");
+                $this->mailer->send($email);
+            }
         }
         $this->addFlash('message', 'Les scripts ont bien été lancés !');
         return $this->redirectToRoute('app_controle_anomalies');
@@ -195,52 +275,59 @@ class ControleAnomaliesController extends AbstractController
 
     public function MajCmdRobyAccepteReporte()
     {
-        $donnees = $this->entete->majCmdsRobyDelaiAccepteReporte();
-        for ($lig = 0; $lig < count($donnees); $lig++) {
-            $id = $donnees[$lig]['Identification'];
-            $search = $this->cmdRoby->findOneBy(['identification' => $id]);
-            // si elle n'existe pas, on la créér
-            if (empty($search)) {
-                $listCmd = new CmdRobyDelaiAccepteReporte();
-                $listCmd->setIdentification($donnees[$lig]['Identification']);
-                $listCmd->setStatut('en cours ...');
-                $listCmd->setCreatedAt(new DateTime);
-                $listCmd->setTiers($donnees[$lig]['Tiers']);
-                $listCmd->setNom($donnees[$lig]['Nom']);
-                $listCmd->setCmd($donnees[$lig]['Cmd']);
-                $listCmd->setTel($donnees[$lig]['Tel']);
-                $listCmd->setDateCmd(new DateTime($donnees[$lig]['DateCmd']));
-                $listCmd->setNotreRef($donnees[$lig]['NotreRef']);
-                if ($donnees[$lig]['DelaiAccepte']) {
-                    $listCmd->setDelaiAccepte(new DateTime($donnees[$lig]['DelaiAccepte']));
-                } else {
-                    $listCmd->setDelaiAccepte(null);
+        try {
+            $donnees = $this->entete->majCmdsRobyDelaiAccepteReporte();
+            for ($lig = 0; $lig < count($donnees); $lig++) {
+                $id = $donnees[$lig]['Identification'];
+                $search = $this->cmdRoby->findOneBy(['identification' => $id]);
+                // si elle n'existe pas, on la créér
+                if (empty($search)) {
+                    $listCmd = new CmdRobyDelaiAccepteReporte();
+                    $listCmd->setIdentification($donnees[$lig]['Identification']);
+                    $listCmd->setStatut('en cours ...');
+                    $listCmd->setCreatedAt(new DateTime);
+                    $listCmd->setTiers($donnees[$lig]['Tiers']);
+                    $listCmd->setNom($donnees[$lig]['Nom']);
+                    $listCmd->setCmd($donnees[$lig]['Cmd']);
+                    $listCmd->setTel($donnees[$lig]['Tel']);
+                    $listCmd->setDateCmd(new DateTime($donnees[$lig]['DateCmd']));
+                    $listCmd->setNotreRef($donnees[$lig]['NotreRef']);
+                    if ($donnees[$lig]['DelaiAccepte']) {
+                        $listCmd->setDelaiAccepte(new DateTime($donnees[$lig]['DelaiAccepte']));
+                    } else {
+                        $listCmd->setDelaiAccepte(null);
+                    }
+                    if ($donnees[$lig]['DelaiReporte']) {
+                        $listCmd->setDelaiReporte(new DateTime($donnees[$lig]['DelaiReporte']));
+                    } else {
+                        $listCmd->setDelaiReporte(null);
+                    }
+                } elseif (!is_null($search)) {
+                    $listCmd = $search;
+                    $listCmd->setNotreRef($donnees[$lig]['NotreRef']);
+                    $listCmd->setTel($donnees[$lig]['Tel']);
+                    if ($donnees[$lig]['DelaiAccepte']) {
+                        $listCmd->setDelaiAccepte(new DateTime($donnees[$lig]['DelaiAccepte']));
+                    } else {
+                        $listCmd->setDelaiAccepte(null);
+                    }
+                    if ($donnees[$lig]['DelaiReporte']) {
+                        $listCmd->setDelaiReporte(new DateTime($donnees[$lig]['DelaiReporte']));
+                    } else {
+                        $listCmd->setDelaiReporte(null);
+                    }
                 }
-                if ($donnees[$lig]['DelaiReporte']) {
-                    $listCmd->setDelaiReporte(new DateTime($donnees[$lig]['DelaiReporte']));
-                } else {
-                    $listCmd->setDelaiReporte(null);
-                }
-            } elseif (!is_null($search)) {
-                $listCmd = $search;
-                $listCmd->setNotreRef($donnees[$lig]['NotreRef']);
-                $listCmd->setTel($donnees[$lig]['Tel']);
-                if ($donnees[$lig]['DelaiAccepte']) {
-                    $listCmd->setDelaiAccepte(new DateTime($donnees[$lig]['DelaiAccepte']));
-                } else {
-                    $listCmd->setDelaiAccepte(null);
-                }
-                if ($donnees[$lig]['DelaiReporte']) {
-                    $listCmd->setDelaiReporte(new DateTime($donnees[$lig]['DelaiReporte']));
-                } else {
-                    $listCmd->setDelaiReporte(null);
-                }
+                $em = $this->entityManager;
+                $em->persist($listCmd);
+                $em->flush();
             }
-            $em = $this->entityManager;
-            $em->persist($listCmd);
-            $em->flush();
+        } catch (\Throwable $th) {
+            $email = (new Email())
+                ->from($this->mailEnvoi)
+                ->to("jpochet@groupe-axis.fr")
+                ->subject("ERREUR sur MajCmdRobyAccepteReporte");
+            $this->mailer->send($email);
         }
-
     }
 
     public function ControleFournisseur()
@@ -386,16 +473,25 @@ class ControleAnomaliesController extends AbstractController
     }
     public function eanEnDouble()
     {
-        // envoyer un mail
-        $donnees = $this->article->getDoubleEan();
-        if ($donnees) {
-            $template = 'mails/MailEanDouble.html.twig';
-            $html = $this->renderView($template, ['donnees' => $donnees]);
+        try {
+            // envoyer un mail
+            $donnees = $this->article->getDoubleEan();
+            //dd($donnees);
+            if ($donnees) {
+                $template = 'mails/MailEanDouble.html.twig';
+                $html = $this->renderView($template, ['donnees' => $donnees]);
+                $email = (new Email())
+                    ->from($this->mailEnvoi)
+                    ->to('jpochet@groupe-axis.fr')
+                    ->subject('Code Ean en doublon dans Divalto')
+                    ->html($html);
+                $this->mailer->send($email);
+            }
+        } catch (\Throwable $th) {
             $email = (new Email())
                 ->from($this->mailEnvoi)
-                ->to('jpochet@groupe-axis.fr')
-                ->subject('Code Ean en doublon dans Divalto')
-                ->html($html);
+                ->to("jpochet@groupe-axis.fr")
+                ->subject("ERREUR sur eanEnDouble");
             $this->mailer->send($email);
         }
     }
@@ -406,41 +502,27 @@ class ControleAnomaliesController extends AbstractController
         //dd($donnees);
         // TODO il existe un cas de figure ou ma macro ne mets rien à jour, même pas l'update,
         //c'est quand $donnees est vide ! donc je peux encore attendre d'avoir une mise à jour de la updatedAt, car elle n'arrivera jamais
-        for ($lig = 0; $lig < count($donnees); $lig++) {
-            $id = $donnees[$lig]['Identification'];
-            $ano = $this->anomalies->findOneBy(['idAnomalie' => $id, 'type' => $libelle]);
+        try {
+            for ($lig = 0; $lig < count($donnees); $lig++) {
+                $id = $donnees[$lig]['Identification'];
+                $ano = $this->anomalies->findOneBy(['idAnomalie' => $id, 'type' => $libelle]);
 
-            // si elle n'existe pas, on la créér
-            if (empty($ano)) {
+                // si elle n'existe pas, on la créér
+                if (empty($ano)) {
 
-                // créer une nouvelle anomalie
-                $createAnomalie = new ControlesAnomalies();
+                    // créer une nouvelle anomalie
+                    $createAnomalie = new ControlesAnomalies();
 
-                $createAnomalie->setIdAnomalie($id)
-                    ->setUser($donnees[$lig]['Utilisateur'])
-                    ->setUpdatedAt($dateDuJour)
-                    ->setCreatedAt($dateDuJour)
-                    ->setModifiedAt($dateDuJour)
-                    ->setType($libelle);
-                $em = $this->entityManager;
-                $em->persist($createAnomalie);
-                $em->flush();
+                    $createAnomalie->setIdAnomalie($id)
+                        ->setUser($donnees[$lig]['Utilisateur'])
+                        ->setUpdatedAt($dateDuJour)
+                        ->setCreatedAt($dateDuJour)
+                        ->setModifiedAt($dateDuJour)
+                        ->setType($libelle);
+                    $em = $this->entityManager;
+                    $em->persist($createAnomalie);
+                    $em->flush();
 
-                // envoyer un mail
-                $html = $this->renderView($template, ['anomalie' => $donnees[$lig]]);
-                $email = (new Email())
-                    ->from($this->mailEnvoi)
-                    ->to($donnees[$lig]['Email'])
-                    ->subject($subject . '- id: ' . $donnees[$lig]['Identification'] . ' - Type: ' . $libelle)
-                    ->html($html);
-                $this->mailer->send($email);
-
-                // si elle existe on envoit un mail et on mets à jours la date
-            } elseif (!is_null($ano)) {
-                // mettre la date de modification à jour si ça fait plus de 0 jours que le mail à été envoyé
-                $dateModif = $ano->getModifiedAt();
-                $datediff = $dateModif->diff($dateDuJour)->format("%a");
-                if ($datediff > 0) {
                     // envoyer un mail
                     $html = $this->renderView($template, ['anomalie' => $donnees[$lig]]);
                     $email = (new Email())
@@ -450,20 +532,42 @@ class ControleAnomaliesController extends AbstractController
                         ->html($html);
                     $this->mailer->send($email);
 
-                    $ano->setUser($donnees[$lig]['Utilisateur']);
-                    $ano->setUpdatedAt($dateDuJour);
-                    $ano->setModifiedAt($dateDuJour);
-                    $em = $this->entityManager;
-                    $em->persist($ano);
-                    $em->flush();
-                } else {
-                    $ano->setUser($donnees[$lig]['Utilisateur']);
-                    $ano->setUpdatedAt($dateDuJour);
-                    $em = $this->entityManager;
-                    $em->persist($ano);
-                    $em->flush();
+                    // si elle existe on envoit un mail et on mets à jours la date
+                } elseif (!is_null($ano)) {
+                    // mettre la date de modification à jour si ça fait plus de 0 jours que le mail à été envoyé
+                    $dateModif = $ano->getModifiedAt();
+                    $datediff = $dateModif->diff($dateDuJour)->format("%a");
+                    if ($datediff > 0) {
+                        // envoyer un mail
+                        $html = $this->renderView($template, ['anomalie' => $donnees[$lig]]);
+                        $email = (new Email())
+                            ->from($this->mailEnvoi)
+                            ->to($donnees[$lig]['Email'])
+                            ->subject($subject . '- id: ' . $donnees[$lig]['Identification'] . ' - Type: ' . $libelle)
+                            ->html($html);
+                        $this->mailer->send($email);
+
+                        $ano->setUser($donnees[$lig]['Utilisateur']);
+                        $ano->setUpdatedAt($dateDuJour);
+                        $ano->setModifiedAt($dateDuJour);
+                        $em = $this->entityManager;
+                        $em->persist($ano);
+                        $em->flush();
+                    } else {
+                        $ano->setUser($donnees[$lig]['Utilisateur']);
+                        $ano->setUpdatedAt($dateDuJour);
+                        $em = $this->entityManager;
+                        $em->persist($ano);
+                        $em->flush();
+                    }
                 }
             }
+        } catch (\Throwable $th) {
+            $email = (new Email())
+                ->from($this->mailEnvoi)
+                ->to("jpochet@groupe-axis.fr")
+                ->subject("ERREUR sur" . $subject);
+            $this->mailer->send($email);
         }
 
     }
@@ -872,23 +976,30 @@ class ControleAnomaliesController extends AbstractController
 
     public function ControlStockDirect()
     {
-
-        $ano = $this->anomalies->findOneBy(['idAnomalie' => '999999999999', 'type' => 'StockDirect']);
-        $dateDuJour = new DateTime();
-        $dateModif = $ano->getModifiedAt();
-        $datediff = $dateModif->diff($dateDuJour)->format("%a");
-        if ($datediff > 7) {
-            $this->exportStockDirect();
-            $ano->setUpdatedAt($dateDuJour);
-            $ano->setModifiedAt($dateDuJour);
-            $em = $this->entityManager;
-            $em->persist($ano);
-            $em->flush();
-        } else {
-            $ano->setUpdatedAt($dateDuJour);
-            $em = $this->entityManager;
-            $em->persist($ano);
-            $em->flush();
+        try {
+            $ano = $this->anomalies->findOneBy(['idAnomalie' => '999999999999', 'type' => 'StockDirect']);
+            $dateDuJour = new DateTime();
+            $dateModif = $ano->getModifiedAt();
+            $datediff = $dateModif->diff($dateDuJour)->format("%a");
+            if ($datediff > 7) {
+                $this->exportStockDirect();
+                $ano->setUpdatedAt($dateDuJour);
+                $ano->setModifiedAt($dateDuJour);
+                $em = $this->entityManager;
+                $em->persist($ano);
+                $em->flush();
+            } else {
+                $ano->setUpdatedAt($dateDuJour);
+                $em = $this->entityManager;
+                $em->persist($ano);
+                $em->flush();
+            }
+        } catch (\Throwable $th) {
+            $email = (new Email())
+                ->from($this->mailEnvoi)
+                ->to("jpochet@groupe-axis.fr")
+                ->subject("ERREUR sur ControlStockDirect");
+            $this->mailer->send($email);
         }
     }
 

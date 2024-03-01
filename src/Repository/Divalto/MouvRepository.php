@@ -620,15 +620,16 @@ class MouvRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT LTRIM(RTRIM(m.DOS)) as dos, LTRIM(RTRIM(m.TIERS)) AS tiers, LTRIM(RTRIM(m.REF)) AS ref, LTRIM(RTRIM(m.SREF1)) AS sref1, LTRIM(RTRIM(m.SREF2)) AS sref2, LTRIM(RTRIM(m.DES)) AS designation, LTRIM(RTRIM(m.VENUN)) AS uv,
         LTRIM(RTRIM(m.OP)) AS op, LTRIM(RTRIM(a.CDEFOQTE)) AS cmdFou,SUM(s.QTETJSENSTOCK) AS stock, LTRIM(RTRIM(a.SREFCOD)) AS codeSref, LTRIM(RTRIM(sean.EAN)) as ean, LTRIM(RTRIM(a.HSDT)) AS ferme, LTRIM(RTRIM(sart.CONF)) AS fermeSart,
-        LTRIM(RTRIM(m.TICOD)) AS ticod, SUM(m.CDQTE) AS cmdQte, SUM(m.BLQTE) AS blQte
+        LTRIM(RTRIM(m.TICOD)) AS ticod, SUM(m.CDQTE) AS cmdQte, SUM(m.BLQTE) AS blQte, noteLig.NOTEBLOB as note
         FROM MOUV m
-        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF AND a.SREF1 = m.SREF1 AND m.SREF2 = a.SREF2
+        INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
         LEFT JOIN MVTL_STOCK_V s ON a.DOS = s.DOSSIER AND m.REF = s.REFERENCE AND m.SREF1 = s.SREFERENCE1 AND m.SREF2 = s.SREFERENCE2
         LEFT JOIN SARTEAN sean ON a.DOS = sean.DOS AND m.REF = sean.REF AND m.SREF1 = sean.SREF1 AND m.SREF2 = sean.SREF2
         LEFT JOIN SART sart ON a.DOS = sart.DOS AND m.REF = sart.REF AND m.SREF1 = sart.SREF1 AND m.SREF2 = sart.SREF2
+        LEFT JOIN MNOTE noteLig WITH (INDEX = INDEX_A) ON m.TXTNOTE = noteLig.NOTE
         WHERE m.DOS = 1 AND m.TICOD = 'C' $pino
         GROUP BY m.TIERS, m.PICOD, m.DOS, m.REF, m.SREF1, m.SREF2, m.DES, m.VENUN, m.OP,m.CDQTE,m.BLQTE,
-        m.FAQTE,m.CDNO,m.BLNO, a.CDEFOQTE, a.SREFCOD, a.EAN, a.HSDT, m.TICOD, sean.EAN, sart.CONF
+        m.FAQTE,m.CDNO,m.BLNO, a.CDEFOQTE, a.SREFCOD, a.EAN, a.HSDT, m.TICOD, sean.EAN, sart.CONF, noteLig.NOTEBLOB
     ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

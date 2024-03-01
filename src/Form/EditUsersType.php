@@ -102,6 +102,8 @@ class EditUsersType extends AbstractType
                     'ME' => "ROLE_ME",
                     'RB' => "ROLE_RB",
                     'BUREAU_RB' => "ROLE_BUREAU_RB",
+                    'PREPARATEUR' => "ROLE_PREPARATEUR",
+                    'ADMIN LOGISTIQUE' => "ROLE_LOGISTIQUE_ADMIN",
                     'BOSS' => "ROLE_BOSS",
                     'COMPTA' => "ROLE_COMPTA",
                     'ADMIN MONTEUR' => "ROLE_ADMIN_MONTEUR",

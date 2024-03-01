@@ -475,6 +475,18 @@
 									{% endif %}
 								</td>
 							</tr>
+							<tr>
+								<td colspan="11">
+									{% if produit.note %}
+										<p>
+											<span class="badge badge-info text-white">
+												Note :
+												{{ produit.note|raw|striptags }}
+											</span>
+										</p>
+									{% endif %}
+								</td>
+							</tr>
 						{% endfor %}
 				{% else %}
 					</tbody>

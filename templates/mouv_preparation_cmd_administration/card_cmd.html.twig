@@ -1,0 +1,74 @@
+<div id="{{ cmd.cmd }}" class="card card-cmd-filter d-flex flex-row">
+	<a href="#" class="detail-btn col-10" data-cmd="{{ cmd.cmd }}" data-toggle="modal" data-target="#generiqueModal">
+		<div class="card-header">
+			<h3 class="card-title card-cmd-title">{{ cmd.nom }}</h3>
+		</div>
+		<div class="card-body">
+			<h6 class="card-subtitle mb-2 text-muted">
+				Cmd :
+				{{cmd.cmd}}
+				du
+				{{cmd.dateCmd|date("d/m/Y")}}
+			</h6>
+			{% if cmd.delaiDemande %}
+				<h6 class="card-subtitle mb-2 text-muted">
+					Délai demandé :
+					{{ cmd.delaiDemande|date("d/m/Y") }}
+				</h6>
+			{% endif %}
+			<div>
+				{% if cmd.nbP_HP %}
+					<span class="badge badge-light">
+						{{ cmd.nbP_HP }}
+						<i class="far fa-solid fa-box-open text-danger"></i>
+					</span>
+				{% endif %}
+				{% if cmd.nbP_EV %}
+					<span class="badge badge-light">
+						{{ cmd.nbP_EV }}
+						<i class="far fa-solid fa-box-open text-success"></i>
+					</span>
+				{% endif %}
+				{% if cmd.nbP_ME %}
+					<span class="badge badge-light">
+						{{ cmd.nbP_ME }}
+						<i class="far fa-solid fa-box-open text-warning"></i>
+					</span>
+				{% endif %}
+				<span class="badge badge-light">
+					{{ cmd.nbP }}
+					<i class="far fa-solid fa-box-open text-secondary"></i>
+				</span>
+			</div>
+		</div>
+	</a>
+	<div class="col-2 mt-1 text-right">
+		{% if cmd.nDb or cmd.nFb %}
+			<button type="button" class="badge badge-pill badge-primary" data-toggle="modal" data-target="#Modal{{cmd.cmd}}">
+				<i class="fa-solid fa-info"></i>
+			</button>
+			<div class="modal fade" id="Modal{{cmd.cmd}}">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title text-dark">Texte entête et pied de piéce</h4>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<p>
+								{{ cmd.nDb|replace({'<br>': '', 'style="[^"]*"': ''})|raw }}
+								{{ cmd.nFb|replace({'<br>': '', 'style="[^"]*"': ''})|raw }}
+							</p>
+						</div>
+						<div class="modal-footer justify-content-end">
+							<button type="button" class="btn btn-primary" data-dismiss="modal">Fermer</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+</div>

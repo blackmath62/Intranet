@@ -15,9 +15,13 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class EntRepository extends ServiceEntityRepository
 {
+    private $artBanPreparation;
+    private $fam1BanPreparation;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Ent::class);
+        $this->artBanPreparation = "'DIVDALBETON','RDDTOTAL20%','RIDIVERS','ASSTOTAL','STATOTAL20','ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20', 'DIVPRESTM','DIMTOTAL', 'RITOTAL', 'AFTOTAL'";
+        $this->fam1BanPreparation = "'TRANSPOR', 'ACOMPTE', 'LOCATION', 'PRESTA'";
     }
     // Controle des vielles commandes actives dans le systéme
     public function getOldCmds($dos, $numeros): array
@@ -117,8 +121,13 @@ class EntRepository extends ServiceEntityRepository
     }
 
     // Obtenir la liste des commandes à traiter pour préparation de commande
-    public function getListMouvPreparationCmd(): array
+    public function getListMouvPreparationCmd($filtreCmds): array
     {
+        $and = "";
+        if ($filtreCmds) {
+            $and = " AND e.PINO IN (" . $filtreCmds . ")";
+        }
+
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT
         e.TIERS AS tiers,
@@ -155,10 +164,11 @@ class EntRepository extends ServiceEntityRepository
         AND e.TICOD = 'C'
         AND e.CE4 = 1
         AND e.OP IN ('C', 'D')
-        AND NOT a.REF IN ('ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20', 'DIVPRESTM','DIMTOTAL', 'RITOTAL', 'AFTOTAL')
-        AND NOT a.FAM_0001 IN ('TRANSPOR', 'ACOMPTE', 'LOCATION', 'PRESTA') AND NOT a.FAM_0002 IN ('MO')
+        AND NOT a.REF IN ($this->artBanPreparation)
+        AND NOT a.FAM_0001 IN ($this->fam1BanPreparation) AND NOT a.FAM_0002 IN ('MO')
         AND m.CDQTE <> 0
-        AND NOT a.REF LIKE ('DIV%')
+        AND m.CE8 <> 1 AND m.OP IN ('C','D')
+        $and
     GROUP BY
         e.TIERS , c.NOM, e.PINO, e.PIDT, e.PIREF, e.USERCR, e.OP,
         e.DELDEMDT, e.DELACCDT, e.DELREPDT, nD.NOTEBLOB, nF.NOTEBLOB
@@ -169,6 +179,42 @@ class EntRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    public function getTextHeaderAndFooter($cmd): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT nD.NOTEBLOB AS nDb, nF.NOTEBLOB AS nFb
+            FROM ENT e
+            LEFT JOIN MNOTE nD ON nD.NOTE = e.TXTNOTED
+            LEFT JOIN MNOTE nF ON nF.NOTE = e.TXTNOTEF
+            WHERE e.PINO = $cmd AND e.TICOD = 'C' AND e.DOS = 1 AND e.PICOD = 2
+    ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative() ?: ['nDb' => null, 'nFb' => null];
+    }
+    // quantité en stock d'un EAN sur un emplacement
+    public function getQteEanInLocation($dos, $ean, $empl)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT SUM(qteStock) qteStock
+        FROM(
+        SELECT LTRIM(RTRIM(st.REFERENCE)) AS ref, LTRIM(RTRIM(st.SREFERENCE1)) AS sref1, LTRIM(RTRIM(st.SREFERENCE2)) AS sref2,
+        LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(a.VENUN)) AS uv,LTRIM(RTRIM(st.EMPLACEMENT)) AS empl,
+        LTRIM(RTRIM(nat.LIB)) AS natureStock, st.QTETJSENSTOCK AS qteStock,LTRIM(RTRIM(ean.EAN)) AS ean
+        FROM MVTL_STOCK_V AS st
+        LEFT JOIN SARTEAN ean ON st.DOSSIER = ean.DOS AND st.REFERENCE = ean.REF AND st.SREFERENCE1 = ean.SREF1 AND st.SREFERENCE2 = ean.SREF2
+        INNER JOIN ART a ON a.DOS = st.DOSSIER AND a.REF = st.REFERENCE
+        LEFT JOIN T025 nat ON st.NATURESTOCK = nat.NST
+        WHERE st.DOSSIER = $dos)rep
+        WHERE ean = '$ean' AND empl = '$empl'
+        GROUP BY ref, sref1, sref2, designation, uv, empl, natureStock, ean
+        ORDER BY ref
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchOne();
+    }
+
     // Liste des produits à préparer sur la commande
     public function getMouvPreparationCmdList($cdno): array
     {
@@ -176,11 +222,34 @@ class EntRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT m.CDNO AS cdNo, m.TIERS AS tiers, m.REF AS ref, m.SREF1 AS sref1,
          m.SREF2 AS sref2, m.DES AS designation, m.VENUN AS uv,
-        m.CDQTE AS cdQte, m.OP AS op, ean.EAN AS ean, m.ENRNO AS enrNo
+        m.CDQTE AS cdQte, m.OP AS op, ean.EAN AS ean, m.ENRNO AS enrNo, noteLig.NOTEBLOB as note
         FROM MOUV m WITH (INDEX = INDEX_A)
-        LEFT JOIN SARTEAN ean WITH (INDEX = INDEX_F_MINI) ON m.REF = ean.REF
-        AND m.SREF1 = ean.SREF1 AND m.SREF2 = ean.SREF2 AND m.DOS = ean.DOS
-        WHERE m.CDNO = $cdno AND m.DOS = 1 AND m.TICOD = 'C' AND m.PICOD = 2
+        LEFT JOIN SARTEAN ean WITH (INDEX = INDEX_F_MINI) ON m.REF = ean.REF AND m.SREF1 = ean.SREF1 AND m.SREF2 = ean.SREF2 AND m.DOS = ean.DOS
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        LEFT JOIN MNOTE noteLig WITH (INDEX = INDEX_A) ON m.TXTNOTE = noteLig.NOTE
+        WHERE m.CDNO = $cdno AND m.DOS = 1 AND m.TICOD = 'C' AND m.PICOD = 2 AND m.OP IN ('C','D')
+        AND NOT a.REF IN ($this->artBanPreparation)
+        AND NOT a.FAM_0001 IN ($this->fam1BanPreparation) AND NOT a.FAM_0002 IN ('MO')
+        AND m.CE8 <> 1 AND m.OP IN ('C','D') AND m.CDQTE <> 0
+    ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // Liste des produits à préparer sur la commande
+    public function getMouvCmdListWithoutFilter($cmd): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT m.CDNO AS cdNo, m.TIERS AS tiers, c.NOM AS nom, m.REF AS ref, m.SREF1 AS sref1,
+        m.SREF2 AS sref2, m.DES AS designation, m.VENUN AS uv,
+        m.CDQTE AS cdQte, m.OP AS op, ean.EAN AS ean, m.ENRNO AS enrNo, noteLig.NOTEBLOB as note
+        FROM MOUV m WITH (INDEX = INDEX_A)
+        LEFT JOIN SARTEAN ean WITH (INDEX = INDEX_F_MINI) ON m.REF = ean.REF AND m.SREF1 = ean.SREF1 AND m.SREF2 = ean.SREF2 AND m.DOS = ean.DOS
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+        INNER JOIN CLI c ON m.TIERS = c.TIERS AND m.DOS = c.DOS
+        LEFT JOIN MNOTE noteLig WITH (INDEX = INDEX_A) ON m.TXTNOTE = noteLig.NOTE
+        WHERE m.CDNO = $cmd AND m.DOS = 1 AND m.TICOD = 'C' AND m.PICOD = 2
     ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

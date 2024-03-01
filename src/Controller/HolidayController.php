@@ -72,19 +72,27 @@ class HolidayController extends AbstractController
 
     public function sendMailSummerForAllUsers()
     {
-        $usersMails = $this->repoUser->getFindAllEmails();
-        $listMails = $this->adminEmailController->formateEmailList($usersMails);
+        try {
+            $usersMails = $this->repoUser->getFindAllEmails();
+            $listMails = $this->adminEmailController->formateEmailList($usersMails);
 
-        // Avertir chaque utilisateur par mail
-        $html = $this->renderView('mails/pleaseDeposeSummerHoliday.html.twig');
-        $email = (new Email())
-            ->from($this->mailEnvoi)
-            ->to(...$listMails)
-            ->priority(Email::PRIORITY_HIGH)
-            ->subject("Veuillez déposer vos congés d'été sur le site intranet avant le 31 Mars")
-            ->html($html);
+            // Avertir chaque utilisateur par mail
+            $html = $this->renderView('mails/pleaseDeposeSummerHoliday.html.twig');
+            $email = (new Email())
+                ->from($this->mailEnvoi)
+                ->to(...$listMails)
+                ->priority(Email::PRIORITY_HIGH)
+                ->subject("Veuillez déposer vos congés d'été sur le site intranet avant le 31 Mars")
+                ->html($html);
 
-        $this->mailer->send($email);
+            $this->mailer->send($email);
+        } catch (\Throwable $th) {
+            $email = (new Email())
+                ->from($this->mailEnvoi)
+                ->to("jpochet@groupe-axis.fr")
+                ->subject("ERREUR sur sendMailSummerForAllUsers");
+            $this->mailer->send($email);
+        }
 
     }
 

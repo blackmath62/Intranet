@@ -649,7 +649,16 @@
 														<td>{{ produit.ref}}</td>
 														<td>{{ produit.sref1 }}</td>
 														<td>{{ produit.sref2 }}</td>
-														<td>{{ produit.designation}}</td>
+														<td>{{ produit.designation}}
+															{% if produit.note %}
+																<p>
+																	<span class="badge badge-info text-white">
+																		Note :
+																		{{ produit.note|raw|striptags }}
+																	</span>
+																</p>
+															{% endif %}
+														</td>
 														<td class="text-center">{{ produit.uv}}</td>
 														<td class="text-center">{{ produit.op}}</td>
 														<td class="text-center">{{ produit.cmdQte}}</td>

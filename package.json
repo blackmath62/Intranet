@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "@ericblade/quagga2": "^1.8.4",
+        "angularjs-dragula": "^2.0.0",
         "instascan": "^1.0.0",
         "quagga": "^0.6.16",
         "uuid": "^9.0.1",

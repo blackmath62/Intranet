@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('dist/css/dragula.css') }}">
+	<style>
+		.dragthing {
+			cursor: pointer;
+			margin-bottom: 10px;
+			padding: 10px;
+			border: 1px solid #ccc;
+			background-color: #f9f9f9;
+		}
+		.dragparent {
+			border: 2px dashed #ccc;
+			padding: 10px;
+			margin-bottom: 20px;
+			width: 20%;
+			float: left;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div id="dragparent1" class="dragparent">
+		<div class="dragthing" draggable="true">Draggable Item 1</div>
+		<div class="dragthing" draggable="true">Draggable Item 2</div>
+		<div class="dragthing" draggable="true">Draggable Item 3</div>
+		<div class="dragthing" draggable="true">Draggable Item 4</div>
+		<div class="dragthing" draggable="true">Draggable Item 5</div>
+	</div>
+
+	<div id="dragparent2" class="dragparent">
+		<div class="dragthing" draggable="true">Draggable Item 6</div>
+		<div class="dragthing" draggable="true">Draggable Item 7</div>
+		<div class="dragthing" draggable="true">Draggable Item 8</div>
+		<div class="dragthing" draggable="true">Draggable Item 9</div>
+		<div class="dragthing" draggable="true">Draggable Item 10</div>
+	</div>
+
+	<div id="dragparent3" class="dragparent">
+		<div class="dragthing" draggable="true">Draggable Item 11</div>
+		<div class="dragthing" draggable="true">Draggable Item 12</div>
+		<div class="dragthing" draggable="true">Draggable Item 13</div>
+		<div class="dragthing" draggable="true">Draggable Item 14</div>
+		<div class="dragthing" draggable="true">Draggable Item 15</div>
+	</div>
+
+	<div id="dragparent4" class="dragparent">
+		<div class="dragthing" draggable="true">Draggable Item 16</div>
+		<div class="dragthing" draggable="true">Draggable Item 17</div>
+		<div class="dragthing" draggable="true">Draggable Item 18</div>
+		<div class="dragthing" draggable="true">Draggable Item 19</div>
+		<div class="dragthing" draggable="true">Draggable Item 20</div>
+	</div>
+
+	<div id="dragparent5" class="dragparent">
+		<div class="dragthing" draggable="true">Draggable Item 21</div>
+		<div class="dragthing" draggable="true">Draggable Item 22</div>
+		<div class="dragthing" draggable="true">Draggable Item 23</div>
+		<div class="dragthing" draggable="true">Draggable Item 24</div>
+		<div class="dragthing" draggable="true">Draggable Item 25</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('vendor/dragula/dist/dragula.min.js') }}"></script>
+	<script>
+		$(document).ready(function () {
+var drake = dragula({
+isContainer: function (el) {
+return el.classList.contains('dragparent');
+}
+});
+
+drake.on('drop', function (el, target, source, sibling) { // Déclencher une action appropriée ici
+console.log("Element dropped from", source.id, "to", target.id);
+});
+});
+	</script>
+{% endblock %}

@@ -55,7 +55,7 @@ class GenImportXlsxDivaltoService
         }
         return $typeMouv;
     }
-    // Entête de colonne pour les mouvements tiers
+    // Entête de colonne pour la création de mouvements tiers
     public function getEnteteMouvTiers()
     {
         $entete = [
@@ -88,7 +88,8 @@ class GenImportXlsxDivaltoService
 
         return $entete;
     }
-    // Entête de colonne pour les mouvements interne stock
+
+    // Entête de colonne pour la création de mouvements interne stock
     public function getEnteteMouvStock()
     {
         $entete = [
@@ -120,7 +121,7 @@ class GenImportXlsxDivaltoService
 
         return $entete;
     }
-    // Entête de colonne pour les mouvements info dépôt
+    // Entête de colonne pour la création de mouvements info dépôt
 
     public function getEnteteInfoDepot()
     {
@@ -147,7 +148,7 @@ class GenImportXlsxDivaltoService
 
         return $entete;
     }
-    // Entête de colonne pour les mouvements info stock
+    // Entête de colonne pour la création de mouvements info stock
     public function getEnteteInfoStock()
     {
         $entete = [
@@ -522,6 +523,167 @@ class GenImportXlsxDivaltoService
                 $donnee['QUANTITE'],
                 $donnee['MOUV.PPAR'],
                 $donnee['MOUV.PUB'],
+                $donnee['EMPLACEMENT'],
+                $donnee['SERIE'],
+                $donnee['QUANTITE_VTL'],
+            ];
+        }
+        return $list;
+    }
+
+    // Entête de colonne pour les validations de mouvements tiers
+    public function getEnteteMouvValidationTiers()
+    {
+        $entete = [
+            'FICHE',
+            'DOSSIER',
+            'ETABLISSEMENT',
+            'REF_PIECE',
+            'TYPE_TIERS',
+            'TYPE_PIECE',
+            'TYPE_PIECE_FINALE',
+            'NO_PIECE',
+            'NO_PIECE_FINALE',
+            'CODE_TIERS',
+            'CODE_OP',
+            'DEPOT',
+            'ENT.PIDT',
+            'ENT.PIREF',
+            'ENRNO',
+            'NO_SOUS_LIGNE',
+            'REFERENCE',
+            'SREF1',
+            'SREF2',
+            'DESIGNATION',
+            'REF_FOURNISSEUR',
+            'QUANTITE',
+            'MOUV.OP',
+            'MOUV.PPAR',
+            'MOUV.PUB',
+            'VTLNO',
+            'EMPLACEMENT',
+            'SERIE',
+            'QUANTITE_VTL',
+            'ERREUR',
+        ];
+
+        return $entete;
+    }
+
+    public function get_export_excel_mouv_tiers_validation($cmd, $donnees, $tiers)
+    {
+
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Piece');
+        // Entête de colonne
+        $sheet->getCell('A3')->setValue('FICHE'); //IPAR
+        $sheet->getCell('B3')->setValue('DOSSIER'); //IPAR
+        $sheet->getCell('C3')->setValue('ETABLISSEMENT'); //IPAR
+        $sheet->getCell('D3')->setValue('REF_PIECE'); //IPAR
+        $sheet->getCell('E3')->setValue('TYPE_TIERS'); //IPAR
+        $sheet->getCell('F3')->setValue('TYPE_PIECE'); //IPAR
+        $sheet->getCell('G3')->setValue('TYPE_PIECE_FINALE'); //IPAR
+        $sheet->getCell('H3')->setValue('NO_PIECE'); //IPAR
+        $sheet->getCell('I3')->setValue('NO_PIECE_FINALE'); //IPAR
+        $sheet->getCell('J3')->setValue('CODE_TIERS'); //ENT
+        $sheet->getCell('K3')->setValue('CODE_OP'); //ENT
+        $sheet->getCell('L3')->setValue('DEPOT'); //ENT
+        $sheet->getCell('M3')->setValue('ENT.PIDT'); //ENT
+        $sheet->getCell('N3')->setValue('ENT.PIREF'); //ENT
+        $sheet->getCell('O3')->setValue('ENRNO'); //MOUV
+        $sheet->getCell('P3')->setValue('NO_SOUS_LIGNE'); //MOUV
+        $sheet->getCell('Q3')->setValue('REFERENCE'); //MOUV
+        $sheet->getCell('R3')->setValue('SREF1'); //MOUV
+        $sheet->getCell('S3')->setValue('SREF2'); //MOUV
+        $sheet->getCell('T3')->setValue('DESIGNATION'); //MOUV
+        $sheet->getCell('U3')->setValue('REF_FOURNISSEUR'); //MOUV
+        $sheet->getCell('V3')->setValue('QUANTITE'); //MOUV
+        $sheet->getCell('W3')->setValue('MOUV.OP'); //MOUV
+        $sheet->getCell('X3')->setValue('MOUV.PPAR'); //MOUV
+        $sheet->getCell('Y3')->setValue('MOUV.PUB'); //MOUV
+        $sheet->getCell('Z3')->setValue('VTLNO'); //MVTL
+        $sheet->getCell('AA3')->setValue('EMPLACEMENT'); //MVTL
+        $sheet->getCell('AB3')->setValue('SERIE'); //MVTL
+        $sheet->getCell('AC3')->setValue('QUANTITE_VTL'); //MVTL
+        $sheet->getCell('AD3')->setValue('ERREUR');
+
+        // Information sur la piéce IPAR ET ENT
+        $sheet->getCell('A4')->setValue('IPAR'); //IPAR
+        $sheet->getCell('B4')->setValue('1'); //IPAR DOSSIER
+        $sheet->getCell('C4')->setValue(''); //IPAR ETABLISSEMENT
+        $sheet->getCell('D4')->setValue(''); //IPAR REF_PIECE
+        $sheet->getCell('E4')->setValue(substr($tiers, 0, 1)); //IPAR TYPE_TIERS
+        $sheet->getCell('F4')->setValue(2); //IPAR TYPE_PIECE
+        $sheet->getCell('G4')->setValue(3); //IPAR TYPE_PIECE_FINALE
+        $sheet->getCell('H4')->setValue($cmd); //IPAR NO_PIECE
+        $sheet->getCell('I4')->setValue(''); //IPAR NO_PIECE_FINALE
+
+        $sheet->getCell('A5')->setValue('ENT'); //ENT
+        $sheet->getCell('J5')->setValue($tiers); //ENT CODE_TIERS
+        $sheet->getCell('K5')->setValue(substr($tiers, 0, 1)); //ENT CODE_OP
+        $sheet->getCell('L5')->setValue('2'); //ENT DEPOT
+        $sheet->getCell('M5')->setValue(''); //ENT ENT.PIDT
+        $sheet->getCell('N5')->setValue('Import xlsx par ' . $this->getUserPseudo()); //ENT ENT.PIREF
+
+        // Increase row cursor after header write
+        $sheet->fromArray($this->getData_Mouv_tiers_validation($donnees), null, 'A6', true);
+
+        $d = new DateTime('NOW');
+        $dateTime = $d->format('dmYHis');
+        $nomFichier = 'v' . $dateTime;
+        // Titre de la feuille
+        $sheet->getCell('C1')->setValue('Intégration piéce tiers - Validation Commande en BL');
+        $sheet->getCell('A1')->getStyle()->getFont()->setSize(16);
+
+        $writer = new Xlsx($spreadsheet);
+        // Create a Temporary file in the system
+        $fileName = $nomFichier . '.xlsx';
+        // Return the excel file as an attachment
+
+        $chemin = 'doc/Logistique/';
+        $fichier = $chemin . '/' . $fileName;
+        $writer->save($fichier);
+        return $fichier;
+    }
+
+    // générer un fichier Excel qui sera envoyé par mail à l'utilisateur pour la validation de commande en BL
+    public function getData_Mouv_tiers_validation($donnees): array
+    {
+        $list = [];
+
+        for ($d = 0; $d < count($donnees); $d++) {
+
+            $donnee = $donnees[$d];
+
+            $list[] = [
+                $donnee['FICHE'],
+                $donnee['DOSSIER'],
+                $donnee['ETABLISSEMENT'],
+                $donnee['REF_PIECE'],
+                $donnee['TYPE_TIERS'],
+                $donnee['TYPE_PIECE'],
+                $donnee['TYPE_PIECE_FINALE'],
+                $donnee['NO_PIECE'],
+                $donnee['NO_PIECE_FINALE'],
+                $donnee['CODE_TIERS'],
+                $donnee['CODE_OP'],
+                $donnee['DEPOT'],
+                $donnee['ENT.PIDT'],
+                $donnee['ENT.PIREF'],
+                $donnee['ENRNO'],
+                $donnee['NO_SOUS_LIGNE'],
+                $donnee['REFERENCE'],
+                $donnee['SREF1'],
+                $donnee['SREF2'],
+                $donnee['DESIGNATION'],
+                $donnee['REF_FOURNISSEUR'],
+                $donnee['QUANTITE'],
+                $donnee['MOUV.OP'],
+                $donnee['MOUV.PPAR'],
+                $donnee['MOUV.PUB'],
+                $donnee['VTLNO'],
                 $donnee['EMPLACEMENT'],
                 $donnee['SERIE'],
                 $donnee['QUANTITE_VTL'],

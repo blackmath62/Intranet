@@ -173,6 +173,12 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: InterventionMonteurs::class, mappedBy: "lockedBy")]
     private $interventionMonteursLockedBy;
 
+    #[ORM\OneToMany(mappedBy: 'assignedBy', targetEntity: MouvPreparationCmdAdmin::class)]
+    private Collection $mouvPreparationCmdAdminAssignedBy;
+
+    #[ORM\OneToMany(mappedBy: 'preparedBy', targetEntity: MouvPreparationCmdAdmin::class)]
+    private Collection $mouvPreparationCmdAdminPreparedBy;
+
     public function __construct()
     {
         $this->documents = new ArrayCollection();
@@ -205,6 +211,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         $this->interventionFicheMonteursCreatedBy = new ArrayCollection();
         $this->interventionFicheMonteursIntervenant = new ArrayCollection();
         $this->cmdRobyDelaiAccepteReportesModifiedBy = new ArrayCollection();
+        $this->mouvPreparationCmdAdminAssignedBy = new ArrayCollection();
+        $this->mouvPreparationCmdAdminPreparedBy = new ArrayCollection();
     }
 
     public function getUserIdentifier(): string
@@ -1388,6 +1396,66 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($cmdRobyDelaiAccepteReportesModifiedBy->getModifiedBy() === $this) {
                 $cmdRobyDelaiAccepteReportesModifiedBy->setModifiedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MouvPreparationCmdAdmin>
+     */
+    public function getMouvPreparationCmdAdminAssignedBy(): Collection
+    {
+        return $this->mouvPreparationCmdAdminAssignedBy;
+    }
+
+    public function addMouvPreparationCmdAdminAssignedBy(MouvPreparationCmdAdmin $mouvPreparationCmdAdminAssignedBy): static
+    {
+        if (!$this->mouvPreparationCmdAdminAssignedBy->contains($mouvPreparationCmdAdminAssignedBy)) {
+            $this->mouvPreparationCmdAdminAssignedBy->add($mouvPreparationCmdAdminAssignedBy);
+            $mouvPreparationCmdAdminAssignedBy->setAssignedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMouvPreparationCmdAdminAssignedBy(MouvPreparationCmdAdmin $mouvPreparationCmdAdminAssignedBy): static
+    {
+        if ($this->mouvPreparationCmdAdminAssignedBy->removeElement($mouvPreparationCmdAdminAssignedBy)) {
+            // set the owning side to null (unless already changed)
+            if ($mouvPreparationCmdAdminAssignedBy->getAssignedBy() === $this) {
+                $mouvPreparationCmdAdminAssignedBy->setAssignedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MouvPreparationCmdAdmin>
+     */
+    public function getMouvPreparationCmdAdminPreparedBy(): Collection
+    {
+        return $this->mouvPreparationCmdAdminPreparedBy;
+    }
+
+    public function addMouvPreparationCmdAdminPreparedBy(MouvPreparationCmdAdmin $mouvPreparationCmdAdminPreparedBy): static
+    {
+        if (!$this->mouvPreparationCmdAdminPreparedBy->contains($mouvPreparationCmdAdminPreparedBy)) {
+            $this->mouvPreparationCmdAdminPreparedBy->add($mouvPreparationCmdAdminPreparedBy);
+            $mouvPreparationCmdAdminPreparedBy->setPreparedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMouvPreparationCmdAdminPreparedBy(MouvPreparationCmdAdmin $mouvPreparationCmdAdminPreparedBy): static
+    {
+        if ($this->mouvPreparationCmdAdminPreparedBy->removeElement($mouvPreparationCmdAdminPreparedBy)) {
+            // set the owning side to null (unless already changed)
+            if ($mouvPreparationCmdAdminPreparedBy->getPreparedBy() === $this) {
+                $mouvPreparationCmdAdminPreparedBy->setPreparedBy(null);
             }
         }
 

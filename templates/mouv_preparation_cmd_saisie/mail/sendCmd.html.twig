@@ -1,0 +1,92 @@
+<p>Bonjour,</p>
+<h3>Commande
+	{{ products[0].cdNo }}
+	saisie par
+	{{ app.user.pseudo }}
+	le
+	{{ "now"|date("d-m-Y H:i:s") }}
+</h3>
+<small>L'intégration du fichier excel va transformer cette commande en BL pour le client
+	{{ products[0].tiers }}
+	-
+	{{ products[0].nom }}
+</small>
+<h4>
+	Compte rendu :
+</h4>
+{% if textHeadearAndFooter.nDb %}
+	<strong>Texte entête de page =>
+		{{ textHeadearAndFooter.nDb|raw }}</strong>
+{% endif %}
+
+<table class="table table-bordered table-striped" cellspacing="0" cellpadding="10" border="1">
+	<thead>
+		<tr>
+			<th>EnrNo</th>
+			<th>Référence</th>
+			<th>Sref1</th>
+			<th>Sref2</th>
+			<th>Désignation</th>
+			<th>Uv</th>
+			<th>Qté</th>
+			<th>Op</th>
+			<th>Prélévement</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for product in products %}
+			<tr>
+				<td>{{ product.enrNo }}</td>
+				<td>{{ product.ref }}</td>
+				<td>{{ product.sref1 }}</td>
+				<td>{{ product.sref2 }}</td>
+				<td>{{ product.designation }}</td>
+				<td>{{ product.uv }}</td>
+				<td>{{ product.cdQte }}</td>
+				<td>{{ product.op }}</td>
+				<td>
+					{% for levy in product.levy %}
+						<p>
+							{{ levy.qte }}
+							sur
+							{{ levy.empl }}
+							{% if levy.comment %}
+								<strong>
+									<font color="red">{{ levy.comment }}</font>
+								</strong>
+							{% endif %}
+						</p>
+					{% endfor %}
+				</td>
+			</tr>
+			{% if product.note %}
+				<tr>
+					<td colspan="9">{{ product.note|raw }}</td>
+				</tr>
+			{% endif %}
+		{% endfor %}
+	</tbody>
+</table>
+{% if textHeadearAndFooter.nFb %}
+	<strong>Texte Pied de page =>
+		{{ textHeadearAndFooter.nFb|raw }}</strong>
+{% endif %}
+
+<p>
+	<strong>ATTENTION, IL EST IMPORTANT DE VOUS ASSURER QUE L'IMPORTATION S'EST DEROULÉE CORRECTEMENT EN CONSULTANT LES MESSAGES D'ERREURS DANS LES FICHIERS EXCELS D'IMPORT</strong>
+</p>
+<p>
+	<u>
+		<strong>Le fichier pour intégrer la validation de commande.</strong>
+	</u>
+	<ul>
+		<li>Menu Divalto => Import de Piéces par tableur</li>
+		<li>Paramétre 'Type de traitement' => Validation Partielle</li>
+		<li>Paramétre 'Phase' => Import</li>
+		<li>Paramétre 'Mise à jour' => Mise à jour réelle</li>
+		<li>Paramétre 'Ouvrir le classeur à la fin du traitement' => Coché</li>
+		<li>En validant avec le V, allez chercher le fichier que vous aurez au préalable copié sur votre bureau de session à distance pour l'intégrer !</li>
+	</ul>
+</p>
+<p>Mail envoyer par intranet@groupe-axis.fr, ne pas répondre à ce mail.</p>
+<p>En cas de probléme, veuillez contacter l'administrateur.</p>

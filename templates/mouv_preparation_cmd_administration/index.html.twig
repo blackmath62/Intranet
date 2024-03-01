@@ -1,0 +1,213 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('dist/css/dragula.css') }}">
+{% endblock %}
+{% block body %}
+
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-xl-6">
+					<h3>Administration des commandes</h3>
+
+					Commandes à traiter :
+					<span id="cmdsQte" class="badge bg-danger">{{ listCmds|length }}</span>
+				</div>
+				<div class="col-xl-6">
+					<ol class="breadcrumb float-right">
+						<li class="breadcrumb-item">
+							<i class="far fa-solid fa-box-open text-warning mr-1"></i>
+							ME
+						</li>
+						<li class="breadcrumb-item">
+							<i class="far fa-solid fa-box-open text-danger mr-1"></i>
+							HP
+						</li>
+						<li class="breadcrumb-item">
+							<i class="far fa-solid fa-box-open text-success mr-1"></i>
+							EV
+						</li>
+						<li class="breadcrumb-item">
+							<i class="far fa-solid fa-box-open text-secondary mr-1"></i>
+							Total
+						</li>
+						<li class="breadcrumb-item">
+							<i class="far fa-solid fa-cart-shopping text-navy mr-1"></i>
+							Cmds
+						</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+	<div class="input-group mb-3">
+		<input type="text" class="form-control" id="searchInput" placeholder="Rechercher par nom..." aria-label="Rechercher par nom..." aria-describedby="basic-addon2">
+	</div>
+	<div class="d-flex justify-content-around mb-3">
+		<a href="{{ path('app_mouv_preparation_cmd_administration', {'tri': 'dateCmd_asc'}) }}">Date croissante</a>
+		<a href="{{ path('app_mouv_preparation_cmd_administration', {'tri': 'dateCmd_desc'}) }}">Date décroissante</a>
+	</div>
+	<div class="container-fluid mt-4">
+		<div id="dragparentparent" class="d-flex justify-content-between flex-wrap">
+			{% for preparateur in preparateurs %}
+				{% include 'mouv_preparation_cmd_administration/preparateur_cmd_column.html.twig' with {'preparateur': preparateur, 'cmds': listCmds } %}
+			{% endfor %}
+		</div>
+	</div>
+
+	{% include 'components/modal_generique.html.twig' %}
+
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('vendor/dragula/dist/dragula.min.js') }}"></script>
+	<script>
+		$(document).ready(function () {
+var drake = dragula({
+isContainer: function (el) {
+return el.classList.contains('dragparent');
+}
+});
+
+drake.on('drop', function (el, target, source, sibling) {
+var commandId = el.getAttribute('id');
+var sourceColumn = source.getAttribute('id');
+var targetColumn = target.getAttribute('id');
+console.log("Déplacement de la commande '" + commandId + "' de la colonne '" + sourceColumn + "' vers la colonne '" + targetColumn + "'");
+
+// Effectuer une requête AJAX vers la route Symfony pour déplacer la commande
+$.ajax({
+url: '/mouv/preparation/cmd/move/' + commandId + '/' + targetColumn,
+method: 'GET',
+success: function (response) {
+updateCountersCmdsForAllPreparateurs();
+// Afficher le message de succès dans la console
+// Rafraîchir la page ou effectuer d'autres actions si nécessaire
+},
+error: function (xhr, status, error) {
+console.error(error); // Gérer les erreurs éventuelles
+}
+});
+
+
+});
+
+
+$('.detail-btn').click(function (e) {
+e.preventDefault();
+var cmdId = $(this).data('cmd');
+
+$('.generique-title').text('Chargement');
+$('.generique-body').text('Veuillez patienter jusqu\'au chargement complet des données.');
+
+// Effectuer une requête AJAX pour charger les détails de la commande
+$.ajax({
+url: '/mouv/preparation/cmd/detail/' + cmdId,
+method: 'GET',
+beforeSend: function () { // Afficher l'overlay avant le chargement
+$('.overlay').show();
+},
+success: function (response) { // Initialiser une variable pour stocker le contenu du tableau
+var tableContent = '';
+
+// Parcourir chaque ligne de la réponse
+response.forEach(function (item) { // Ajouter une nouvelle ligne pour chaque élément de la réponse
+tableContent += '<tr>';
+tableContent += '<td class="ref_modal">' + item.ref + '</td>';
+tableContent += '<td class="sref1_modal">' + item.sref1 + '</td>';
+tableContent += '<td class="sref2_modal">' + item.sref2 + '</td>';
+tableContent += '<td class="designation_modal">' + item.designation + '</td>';
+tableContent += '<td class="uv_modal">' + item.uv + '</td>';
+tableContent += '<td class="op_modal">' + item.op + '</td>';
+tableContent += '<td class="cdQte_modal">' + item.cdQte + '</td>';
+tableContent += '</tr>';
+
+// Vérifier si la note est présente dans la réponse
+if (item.note) { // Si oui, ajouter une ligne avec colspan pour la note
+tableContent += '<tr>';
+tableContent += '<td colspan="7">' + item.note + '</td>';
+tableContent += '</tr>';
+}
+});
+$('.generique-title').text('Commande n° ' + response[0].cdNo);
+// Insérer le contenu du tableau dans le corps de la modal
+$('.generique-body').html('<table class="table table-sm">' + '<thead>' + '<tr>' + '<th>ref</th>' + '<th>sref1</th>' + '<th>sref2</th>' + '<th>Désignation</th>' + '<th>u.v</th>' + '<th>Op</th>' + '<th>Qte</th>' + '</tr>' + '</thead>' + '<tbody>' + tableContent + // Ajouter le contenu du tableau
+'</tbody>' + '</table>');
+
+// Retirer l'indicateur de chargement de la modal
+$('.overlay').hide();
+
+// Afficher la modal
+$('#modal_generique').modal('show');
+},
+error: function (xhr, status, error) { // Gérer les erreurs
+console.error(error);
+// Retirer l'overlay en cas d'erreur
+$('.overlay').hide();
+}
+});
+});
+
+function updateCountersCmdsForAllPreparateurs() { // Récupérer tous les préparateurs dans la page
+var preparateurs = document.querySelectorAll('.preparateur');
+var cmdsQte = parseInt($('#cmdsQte').text().trim());
+// Boucler sur chaque préparateur
+preparateurs.forEach(function (preparateur) {
+var preparateurId = preparateur.getAttribute('id');
+
+// Vérifier si l'ID du préparateur est différent de 9999
+if (preparateurId !== '9999') { // Effectuer une requête AJAX pour obtenir les compteurs de produits et de commandes
+$.ajax({
+url: '/mouv/preparation/cmd/count/cmd/' + preparateurId,
+method: 'GET',
+success: function (data) { // Mettre à jour les compteurs de produits et de commandes dans le DOM pour ce préparateur
+$('#cmds_' + preparateurId).text(data);
+cmdsQte -= data;
+$('#cmds_9999').text(cmdsQte);
+},
+error: function (xhr, status, error) {
+console.error(error); // Gérer les erreurs éventuelles
+}
+});
+}
+});
+}
+
+updateCountersCmdsForAllPreparateurs();
+
+// Sélection du champ de recherche
+var searchInput = document.getElementById('searchInput');
+
+// Ajout d'un écouteur d'événements sur l'événement input
+searchInput.addEventListener('input', function () { // Récupération de la valeur saisie dans le champ de recherche
+var searchString = this.value.trim().toLowerCase();
+
+// Sélection de tous les éléments à filtrer
+var cards = document.querySelectorAll('.card-cmd-filter');
+
+// Parcours des éléments à filtrer
+cards.forEach(function (card) {
+var cmdNom = card.querySelector('.card-cmd-title').innerText.trim().toLowerCase();
+// Récupération du nom de la commande
+
+// Vérification si la saisie correspond au nom de la commande
+if (cmdNom.includes(searchString)) { // Affichage de l'élément s'il correspond à la saisie
+card.style.display = 'block';
+// Suppression du style inline
+card.removeAttribute('style');
+} else { // Masquage de l'élément s'il ne correspond pas à la saisie
+card.style.display = 'none';
+}
+});
+});
+
+
+});
+	</script>
+{% endblock %}
