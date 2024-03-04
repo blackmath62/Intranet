@@ -131,8 +131,17 @@ class AffairesController extends AbstractController
         $events = $this->repoIntervertionsMonteurs->findAll();
         $interventionsActuels = $this->repoIntervertionsMonteurs->findInterventionDuMoment();
         $rdvs = [];
-
         foreach ($events as $event) {
+
+            $monteurs = '';
+            if ($event->getEquipes()) {
+                foreach ($event->getEquipes() as $monteur) {
+                    $monteurs .= $monteur->getPseudo() . ', ';
+                }
+            }
+            // Supprimer la virgule en trop à la fin
+            $monteurs = rtrim($monteurs, ', ');
+
             $id = $event->getId();
             $libelle = $event->getCode()->getLibelle();
             $color = $event->getTypeIntervention()->getBackgroundColor();
@@ -151,7 +160,7 @@ class AffairesController extends AbstractController
                     'start' => $start,
                     'end' => $end,
                     'url' => $urlGenerator->generate('app_affaire_show_intervention', ['id' => $id]),
-                    'title' => $libelle . ' du ' . $event->getStart()->format('d-m-y H:i') . ' au ' . $event->getEnd()->format('d-m-y H:i'),
+                    'title' => $libelle . ' du ' . $event->getStart()->format('d-m-y H:i') . ' au ' . $event->getEnd()->format('d-m-y H:i') . ' - ' . $monteurs,
                     'icon' => $event->getTypeIntervention()->getFaIconsClass(),
                     'backgroundColor' => $color,
                     'borderColor' => '#FFFFFF',
@@ -955,9 +964,9 @@ class AffairesController extends AbstractController
         ]);
     }
 
-    #[Route("/Lhermitte/affaire/remove/fiche/intervention/{id}/{fiche}", name: "app_affaire_remove_fiche_intervention")]
+    #[Route("/Lhermitte/affaire/remove/fiche/intervention/{fiche}", name: "app_affaire_remove_fiche_intervention")]
 
-    public function removeFicheIntervention($id, $fiche, Request $request): Response
+    public function removeFicheIntervention($fiche, Request $request): Response
     {
         // suppression des heures en rapport avec la fiche monteur
         $heures = $this->repoInterventionFichesMonteursHeures->findBy(['interventionFicheMonteur' => $fiche]);
@@ -974,7 +983,7 @@ class AffairesController extends AbstractController
 
         $this->addFlash('message', 'Fiche supprimée avec succès');
 
-        return $this->redirectToRoute('app_affaire_saisie_fiche_intervention', ['id' => $id]);
+        return $this->redirectToRoute('app_affaire_me_ok');
     }
 
     #[Route("/Lhermitte/affaire/remove/heure/intervention/{id}/{ficheId}/{heureId}", name: "app_affaire_remove_heure_intervention")]

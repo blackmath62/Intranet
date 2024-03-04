@@ -40,60 +40,6 @@
 					</small>
 				</div>
 				<div class="card-body">
-					{% if app.request.attributes.get('ficheId') %}
-						<a class="btn btn-info col-12 mt-2" data-toggle="modal" data-target="#modal-commentaire">
-							<i class="fas fa-comments mr-2"></i>Ajouter un commentaire
-						</a>
-						<div class="modal fade" id="modal-commentaire">
-							<div class="modal-dialog modal-xl">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h4 class="modal-title">Déposer un commentaire pour cette fiche</h4>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									{{ form_start(formCommentaire)}}
-									<div class="modal-body text-center">
-										{{ form_row(formCommentaire.comment )}}
-									</div>
-									<div class="modal-footer justify-content-between">
-										<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-										{{ form_row(formCommentaire.ajouter)}}
-									</div>
-									{{ form_end(formCommentaire)}}
-								</div>
-							</div>
-						</div>
-						{% if fiche.here == 1 %}
-							<a class="btn btn-secondary col-12 col-sm-12 mt-2" data-toggle="modal" data-target="#modal-heures">
-								<i class="fa-solid fa-truck pr-2"></i>Déclarer Heures Déplac, Dépôt et Travaux<i class="fa-solid fa-hammer pl-2"></i>
-							</a>
-						{% endif %}
-						<div class="modal fade" id="modal-heures">
-							<div class="modal-dialog modal-xl">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h4 class="modal-title">Déclarer des heures</h4>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									{{ form_start(formHeureIntervention)}}
-									<div class="modal-body text-center">
-										{{ form_row(formHeureIntervention.type)}}
-										{{ form_row(formHeureIntervention.start)}}
-										{{ form_row(formHeureIntervention.end)}}
-									</div>
-									<div class="modal-footer justify-content-between">
-										<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-										{{ form_row(formHeureIntervention.envoyer)}}
-									</div>
-									{{ form_end(formHeureIntervention)}}
-								</div>
-							</div>
-						</div>
-					{% endif %}
 					{{ form_start(formFicheIntervention)}}
 					{{ form_row(formFicheIntervention.here) }}
 					{% if app.request.attributes.get('ficheId') %}
@@ -117,6 +63,38 @@
 				</div>
 			</div>
 	{% endif %}
+
+	{% if fiche.here == 1 %}
+		{% if fiche.lockedAt %}
+			{% else %}
+				<a class="btn btn-secondary col-12 col-sm-12 mb-2" data-toggle="modal" data-target="#modal-heures">
+					<i class="fa-solid fa-truck pr-2"></i>Déclarer Heures Déplac, Dépôt et Travaux<i class="fa-solid fa-hammer pl-2"></i>
+				</a>
+		{% endif %}
+	{% endif %}
+	<div class="modal fade" id="modal-heures">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Déclarer des heures</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				{{ form_start(formHeureIntervention)}}
+				<div class="modal-body text-center">
+					{{ form_row(formHeureIntervention.type)}}
+					{{ form_row(formHeureIntervention.start)}}
+					{{ form_row(formHeureIntervention.end)}}
+				</div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+					{{ form_row(formHeureIntervention.envoyer)}}
+				</div>
+				{{ form_end(formHeureIntervention)}}
+			</div>
+		</div>
+	</div>
 	{% if fiche and fiche.lockedAt %}
 		{% else %}
 			{% if heures %}
@@ -289,6 +267,10 @@
 						{{ fiche.intervention.code.libelle }}
 					</li>
 					<li>
+						<strong>Client :</strong>
+						{{ fiche.intervention.code.nom }}
+					</li>
+					<li>
 						<strong>Adresse :</strong>
 						{{ fiche.intervention.adresse }}
 					</li>
@@ -304,36 +286,93 @@
 			{% if fiche and fiche.lockedAt %}
 				{% else %}
 					<div class="card-footer">
-						<a class="btn btn-success col-12 mt-2" data-toggle="modal" data-target="#modal-verrou">
-							<i class="fas fa-lock mr-2"></i>
-							Verrouiler cette fiche
-						</a>
-						<div class="modal fade" id="modal-verrou">
-							<div class="modal-dialog modal-xl">
-								<div class="modal-content">
-									<div class="modal-header">
-										<div class="d-flex flex-column">
-											<h4 class="modal-title">
-												Voulez vous vraiment verrouiller cette fiche ?
-											</h4>
-
+						{% if app.request.attributes.get('ficheId') %}
+							<a class="btn btn-info col-12 mt-2" data-toggle="modal" data-target="#modal-commentaire">
+								<i class="fas fa-comments mr-2"></i>Ajouter un commentaire
+							</a>
+							<div class="modal fade" id="modal-commentaire">
+								<div class="modal-dialog modal-xl">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h4 class="modal-title">Déposer un commentaire pour cette fiche</h4>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
 										</div>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body">
-										<p>Le verrouillage de fiche est indispensable pour partir en pointage des heures.</p>
-										<p>Vous ne pourrez plus modifier votre fiche aprés verrouillage, assurez vous qu'elle soit correcte !</p>
-									</div>
-									<div class="modal-footer justify-content-between">
-										<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
-										<a href='{{path('app_affaire_verrouiller_fiche_intervention', {'id' : app.request.attributes.get('id'), 'ficheId' : app.request.attributes.get('ficheId')} ) }}' type="button" class="btn btn-danger">Verrouiller cette fiche</a>
+										{{ form_start(formCommentaire)}}
+										<div class="modal-body text-center">
+											{{ form_row(formCommentaire.comment )}}
+										</div>
+										<div class="modal-footer justify-content-between">
+											<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+											{{ form_row(formCommentaire.ajouter)}}
+										</div>
+										{{ form_end(formCommentaire)}}
 									</div>
 								</div>
-								<!-- /.modal-content -->
 							</div>
-							<!-- /.modal-dialog -->
+						{% endif %}
+						<div class="btn-group col-12 p-0" role="group" aria-label="Basic example">
+							<button class="btn btn-danger col-2 mt-2" type="button" data-toggle="modal" data-target="#modal-delete">
+								<i class="fas fa-trash mr-2"></i>
+							</button>
+							<div class="modal fade" id="modal-delete">
+								<div class="modal-dialog modal-xl">
+									<div class="modal-content">
+										<div class="modal-header">
+											<div class="d-flex flex-column">
+												<h4 class="modal-title">
+													Voulez vous vraiment supprimer cette fiche ?
+												</h4>
+
+											</div>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
+										</div>
+										<div class="modal-body">
+											<p>Cette suppression est irréversible, vous pourrez resaisir la fiche.</p>
+										</div>
+										<div class="modal-footer justify-content-between">
+											<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
+											<a href='{{path('app_affaire_remove_fiche_intervention', {'fiche' : app.request.attributes.get('ficheId')} ) }}' type="button" class="btn btn-danger">Supprimer cette fiche</a>
+										</div>
+									</div>
+									<!-- /.modal-content -->
+								</div>
+								<!-- /.modal-dialog -->
+							</div>
+							<button class="btn btn-success col-10 mt-2" type="button" data-toggle="modal" data-target="#modal-verrou">
+								<i class="fas fa-lock mr-2"></i>
+								Verrouiler cette fiche
+							</button>
+							<div class="modal fade" id="modal-verrou">
+								<div class="modal-dialog modal-xl">
+									<div class="modal-content">
+										<div class="modal-header">
+											<div class="d-flex flex-column">
+												<h4 class="modal-title">
+													Voulez vous vraiment verrouiller cette fiche ?
+												</h4>
+
+											</div>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
+										</div>
+										<div class="modal-body">
+											<p>Le verrouillage de fiche est indispensable pour partir en pointage des heures.</p>
+											<p>Vous ne pourrez plus modifier votre fiche aprés verrouillage, assurez vous qu'elle soit correcte !</p>
+										</div>
+										<div class="modal-footer justify-content-between">
+											<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
+											<a href='{{path('app_affaire_verrouiller_fiche_intervention', {'id' : app.request.attributes.get('id'), 'ficheId' : app.request.attributes.get('ficheId')} ) }}' type="button" class="btn btn-success">Verrouiller cette fiche</a>
+										</div>
+									</div>
+									<!-- /.modal-content -->
+								</div>
+								<!-- /.modal-dialog -->
+							</div>
 						</div>
 					</div>
 			{% endif %}

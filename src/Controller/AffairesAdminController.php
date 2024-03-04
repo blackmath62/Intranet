@@ -211,6 +211,7 @@ class AffairesAdminController extends AbstractController
         // pour chaque interventions
         $fichesManquantes = [];
         $interventions = $this->repoIntervention->findBy(['lockedAt' => null]);
+        //dd($interventions);
         foreach ($interventions as $intervention) {
             // Pour chaque interval de date hors férier et weekend
             $interval = DateInterval::createFromDateString('1 day');
@@ -225,7 +226,7 @@ class AffairesAdminController extends AbstractController
                         // Pour chaque intervenant de cette intervention pour ce jour
                         foreach ($intervention->getEquipes() as $intervenant) {
                             $day = new DateTime($day->format('Y-m-d'));
-                            $fiche = $this->repoFiche->findBy(['intervenant' => $intervenant, 'createdAt' => $day]);
+                            $fiche = $this->repoFiche->findBy(['intervenant' => $intervenant, 'createdAt' => $day, 'intervention' => $intervention]);
                             if (!$fiche) {
                                 // liste des fiches manquantes
                                 $fichesManquantes[] = [

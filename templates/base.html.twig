@@ -537,7 +537,7 @@
 										</li>
 									{% endif %}
 
-									{% if is_granted('ROLE_ME') and is_granted('ROLE_RESPONSABLE_SECTEUR') %}
+									{% if is_granted('ROLE_ME') %}
 										<li class="nav-item has-treeview">
 											<a href="" class="nav-link">
 												<i class="nav-icon fas fa-solid fa-igloo"></i>
@@ -547,23 +547,25 @@
 												</p>
 											</a>
 											<ul class="nav nav-treeview">
-												<li class="nav-item">
-													<a href="{{path('app_affaire_me_nok')}}" class="nav-link">
-														<i class="nav-icon fa-solid fa-signature text-primary"></i>
-														<p>
-															Affaire (Béta)
-														</p>
-													</a>
-												</li>
-												<li class="nav-item">
-													<a href="{{ path('app_mouv_tiers')}}" class="nav-link">
-														<i class="nav-icon fa-solid fa-arrow-right-arrow-left text-info"></i>
-														<p>
-															Retrait/Retour marchandise(s)
-														</p>
+												{% if is_granted('ROLE_ADMIN_MONTEUR') %}
+													<li class="nav-item">
+														<a href="{{path('app_affaire_me_nok')}}" class="nav-link">
+															<i class="nav-icon fa-solid fa-signature text-primary"></i>
+															<p>
+																Affaire (Béta)
+															</p>
+														</a>
+													</li>
+													<li class="nav-item">
+														<a href="{{ path('app_mouv_tiers')}}" class="nav-link">
+															<i class="nav-icon fa-solid fa-arrow-right-arrow-left text-info"></i>
+															<p>
+																Retrait/Retour marchandise(s)
+															</p>
 
-													</a>
-												</li>
+														</a>
+													</li>
+												{% endif %}
 												<li class="nav-item">
 													<a href="{{ path('app_affaire_me_nok')}}" class="nav-link">
 														<i class="nav-icon fa-solid fa-screwdriver-wrench text-warning"></i>
