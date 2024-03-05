@@ -14,21 +14,19 @@
 				</button>
 			</div>
 		</div>
-		<!-- /.card-header -->
 		<div class="card-body">
-			<p>Selectionnez le(s) fournisseur(s) souhaitez en commencant à saisir sont nom, le selectionnant puis en appuyant sur entrée</p>
-			<p>Selectionnez le type d'export souhaité dans le menu déroulant</p>
-			<p>Selectionnez la date de début et la date de fin</p>
-			<p>Cliquez sur filtrer</p>
+			<p>Selectionnez le(s) fournisseur(s) souhaitez en commencant à saisir sont nom, le selectionnant puis en appuyant sur entrée (facultatif)</p>
+			<p>Selectionnez le type d'export souhaité dans le menu déroulant et avec les différentes options (facultatif)</p>
+			<p>Selectionnez la date de début et la date de fin (obligatoire)</p>
+			<p>Cliquez sur filtrer(obligatoire)</p>
 		</div>
 	</div>
-
 	{% if totauxFournisseurs %}
 		<div class='row'>
 			<div class="col-md-12">
 				<div class="card card-secondary">
 					<div class="card-header">
-						<h3 class="card-title">Totaux par Fournisseur pour cette période</h3>
+						<h3 class="card-title">Totaux par tiers pour cette période</h3>
 					</div>
 					<div class="card-body">
 						<table id="example12" class="table table-sm">
@@ -64,7 +62,6 @@
 										<td class='text-center'>{{ top }}</td>
 										<td class='text-center'>{{ totauxFournisseur.tiers }}</td>
 										<td class='text-left'>{{ totauxFournisseur.nom }}</td>
-										<!-- Pourcentage Dépôt -->
 										<td class='text-center bg-warning'>{{ totauxFournisseur.montantDepot|number_format(2) }}
 											€</td>
 										<td class='text-left'>
@@ -79,8 +76,6 @@
 										<td class='text-center'>
 											<span class="badge bg-warning">{{ progressTotauxDepot|format_number(style='percent') }}</span>
 										</td>
-
-										<!-- Pourcentage Direct -->
 										<td class='text-center bg-success'>{{ totauxFournisseur.montantDirect|number_format(2) }}
 											€</td>
 										<td class='text-left'>
@@ -95,8 +90,6 @@
 										<td class='text-center'>
 											<span class="badge bg-success">{{ progressTotauxDirect|format_number(style='percent') }}</span>
 										</td>
-
-										<!-- Pourcentage Total -->
 										<td class='text-center bg-primary'>{{ totauxFournisseur.montant|number_format(2) }}
 											€</td>
 										<td class='text-left'>
@@ -117,48 +110,46 @@
 							</tbody>
 						</table>
 					</div>
-					<!-- /.card-body -->
 				</div>
-				<!-- /.card -->
 			</div>
-			<!-- /.col -->
 		</div>
-
 	{% endif %}
-
-
 	<div class="row">
 		<div class="col-md-12">
 			<div class="card card-dark">
 				<div class="card-header d-flex justify-content-between">
-					<h2 class="card-title">Liste des achats fournisseurs par produit</h2>
+					<h2 class="card-title">States par produit</h2>
 				</div>
-				<!-- /.card-header -->
 				<div class="card-body">
 					{{ form_start(form) }}
 					<div>{{ form_label(form.fournisseurs) }}</div>
 					<div>{{ form_widget(form.fournisseurs) }}</div>
 					<div>{{ form_label(form.familles) }}</div>
 					<div>{{ form_widget(form.familles) }}</div>
-					<div class='d-flex justify-content-between'>
-						<div>
+					<div class='form-group d-flex justify-content-between flex-wrap'>
+						<div class="col-12 col-xl-6">
 							<div>{{ form_label(form.type) }}</div>
 							<div>{{ form_widget(form.type) }}</div>
 						</div>
-						<div>
-							<div>{{ form_label(form.metier) }}</div>
-							<div>{{ form_widget(form.metier) }}</div>
+						<div class="col-12 col-xl-6">
+							<div class="text-center">{{ form_label(form.metier) }}</div>
+							<div class="text-center">{{ form_widget(form.metier) }}</div>
 						</div>
 					</div>
-					<div class="d-flex flex-wrap justify-content-around align-items-center p-2">
-						<div>
-							<strong>Veuillez selectionner la période :</strong>
+					<div class="d-flex flex-wrap justify-content-between text-center">
+						<div class="col-12 col-xl-4">
+							<div>{{ form_label(form.tiers) }}</div>
+							<div>{{ form_widget(form.tiers) }}</div>
 						</div>
-						<div>{{ form_label(form.start) }}</div>
-						<div>{{ form_widget(form.start) }}</div>
-						<div>{{ form_label(form.end) }}</div>
-						<div>{{ form_widget(form.end) }}</div>
-						<div>{{ form_widget(form.filtrer) }}</div>
+						<div class="col-12 col-xl-4">
+							<div>{{ form_label(form.start) }}</div>
+							<div>{{ form_widget(form.start) }}</div>
+						</div>
+						<div class="col-12 col-xl-4">
+							<div>{{ form_label(form.end) }}</div>
+							<div>{{ form_widget(form.end) }}</div>
+						</div>
+						<div class="col-12 float-right">{{ form_widget(form.filtrer) }}</div>
 					</div>
 					<hr>
 					{{ form_end(form) }}
@@ -186,6 +177,9 @@
 									</th>
 									<th class="text-center">
 										<span>Qte</span>
+									</th>
+									<th class="text-center">
+										<span>U.v</span>
 									</th>
 									<th class="text-center">
 										<span>Prix Unitaire</span>
@@ -218,9 +212,12 @@
 										</td>
 										<td class="text-center">
 											<a class="text-dark">
-
 												{{ state.qte }}
-
+											</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">
+												{{ state.uv }}
 											</a>
 										</td>
 										<td class="text-center">
@@ -266,6 +263,9 @@
 										<span>Qte</span>
 									</th>
 									<th class="text-center">
+										<span>U.v</span>
+									</th>
+									<th class="text-center">
 										<span>Prix Unitaire</span>
 									</th>
 									<th class="text-center">
@@ -276,7 +276,7 @@
 						</table>
 					{% else %}
 						<h4 class="text-left text-dark">
-							<i class="fas fa-info-circle pr-2 text-primary"></i>Aucuns achats fournisseurs à afficher
+							<i class="fas fa-info-circle pr-2 text-primary"></i>Aucune state à afficher
 						</h4>
 					{% endif %}
 				</div>

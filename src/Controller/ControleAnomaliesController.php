@@ -159,7 +159,8 @@ class ControleAnomaliesController extends AbstractController
                 $email = (new Email())
                     ->from($this->mailEnvoi)
                     ->to("jpochet@groupe-axis.fr")
-                    ->subject("ERREUR sur comptaAnalytiqueController->sendMail");
+                    ->subject("ERREUR sur comptaAnalytiqueController->sendMail")
+                    ->html('Erreur');
                 $this->mailer->send($email);
             }
             try {
@@ -169,7 +170,8 @@ class ControleAnomaliesController extends AbstractController
                 $email = (new Email())
                     ->from($this->mailEnvoi)
                     ->to("jpochet@groupe-axis.fr")
-                    ->subject("ERREUR sur clientFeuRougeOrangeController->sendMail");
+                    ->subject("ERREUR sur clientFeuRougeOrangeController->sendMail")
+                    ->html('Erreur');
                 $this->mailer->send($email);
             }
         }
@@ -183,7 +185,8 @@ class ControleAnomaliesController extends AbstractController
                     $email = (new Email())
                         ->from($this->mailEnvoi)
                         ->to("jpochet@groupe-axis.fr")
-                        ->subject("ERREUR sur contratCommissionnaireController->sendMail");
+                        ->subject("ERREUR sur contratCommissionnaireController->sendMail")
+                        ->html('Erreur');
                     $this->mailer->send($email);
                 }
             }
@@ -201,7 +204,8 @@ class ControleAnomaliesController extends AbstractController
                 $email = (new Email())
                     ->from($this->mailEnvoi)
                     ->to("jpochet@groupe-axis.fr")
-                    ->subject("ERREUR sur affairesController->update");
+                    ->subject("ERREUR sur affairesController->update")
+                    ->html('Erreur');
                 $this->mailer->send($email);
             }
             try {
@@ -210,7 +214,8 @@ class ControleAnomaliesController extends AbstractController
                 $email = (new Email())
                     ->from($this->mailEnvoi)
                     ->to("jpochet@groupe-axis.fr")
-                    ->subject("ERREUR sur movementBillFscController->update");
+                    ->subject("ERREUR sur movementBillFscController->update")
+                    ->html('Erreur');
                 $this->mailer->send($email);
             }
             if ($heure >= 8 && $heure < 20) {
@@ -220,7 +225,8 @@ class ControleAnomaliesController extends AbstractController
                     $email = (new Email())
                         ->from($this->mailEnvoi)
                         ->to("jpochet@groupe-axis.fr")
-                        ->subject("ERREUR sur fscAttachedFileController->majFscOrderListFromDivalto");
+                        ->subject("ERREUR sur fscAttachedFileController->majFscOrderListFromDivalto")
+                        ->html('Erreur');
                     $this->mailer->send($email);
                 }
                 if ($jour == 5 || $jour == 1) {
@@ -230,7 +236,8 @@ class ControleAnomaliesController extends AbstractController
                         $email = (new Email())
                             ->from($this->mailEnvoi)
                             ->to("jpochet@groupe-axis.fr")
-                            ->subject("ERREUR sur MajCmdRobyAccepteReporte");
+                            ->subject("ERREUR sur MajCmdRobyAccepteReporte")
+                            ->html('Erreur');
                         $this->mailer->send($email);
                     }
                     try {
@@ -239,7 +246,8 @@ class ControleAnomaliesController extends AbstractController
                         $email = (new Email())
                             ->from($this->mailEnvoi)
                             ->to("jpochet@groupe-axis.fr")
-                            ->subject("ERREUR sur cmdRobyController->sendMail");
+                            ->subject("ERREUR sur cmdRobyController->sendMail")
+                            ->html('Erreur');
                         $this->mailer->send($email);
                     }
                 }
@@ -249,7 +257,8 @@ class ControleAnomaliesController extends AbstractController
                     $email = (new Email())
                         ->from($this->mailEnvoi)
                         ->to("jpochet@groupe-axis.fr")
-                        ->subject("ERREUR sur ControlePieces");
+                        ->subject("ERREUR sur ControlePieces")
+                        ->html('Erreur');
                     $this->mailer->send($email);
                 }
             }
@@ -259,7 +268,8 @@ class ControleAnomaliesController extends AbstractController
                 $email = (new Email())
                     ->from($this->mailEnvoi)
                     ->to("jpochet@groupe-axis.fr")
-                    ->subject("ERREUR sur run_auto_wash");
+                    ->subject("ERREUR sur run_auto_wash")
+                    ->html('Erreur');
                 $this->mailer->send($email);
             }
         }
@@ -325,7 +335,8 @@ class ControleAnomaliesController extends AbstractController
             $email = (new Email())
                 ->from($this->mailEnvoi)
                 ->to("jpochet@groupe-axis.fr")
-                ->subject("ERREUR sur MajCmdRobyAccepteReporte");
+                ->subject("ERREUR sur MajCmdRobyAccepteReporte")
+                ->html('Erreur');
             $this->mailer->send($email);
         }
     }
@@ -382,13 +393,6 @@ class ControleAnomaliesController extends AbstractController
         $libelle = 'ArticleSrefFerme';
         $template = 'mails/sendMailSaisieArticlesSrefFermes.html.twig';
         $subject = 'Saisie sur un article ou une sous référence article fermé';
-        $this->Execute($donnees, $libelle, $template, $subject);
-
-        // Contrôle la présence de BL Direct
-        $donnees = $this->movRepo->getListBlDirect(); // j'ai mis Utilisateur
-        $libelle = 'BlDirectPasNormal';
-        $template = 'mails/sendMailBlDirect.html.twig';
-        $subject = 'BL Direct qui ne devrait pas exister';
         $this->Execute($donnees, $libelle, $template, $subject);
 
         // Contrôle que toutes les sous références ne sont pas fermées sur un article
@@ -491,7 +495,8 @@ class ControleAnomaliesController extends AbstractController
             $email = (new Email())
                 ->from($this->mailEnvoi)
                 ->to("jpochet@groupe-axis.fr")
-                ->subject("ERREUR sur eanEnDouble");
+                ->subject("ERREUR sur eanEnDouble")
+                ->html('Erreur');
             $this->mailer->send($email);
         }
     }
@@ -566,7 +571,8 @@ class ControleAnomaliesController extends AbstractController
             $email = (new Email())
                 ->from($this->mailEnvoi)
                 ->to("jpochet@groupe-axis.fr")
-                ->subject("ERREUR sur" . $subject);
+                ->subject("ERREUR sur" . $subject)
+                ->html('Erreur');
             $this->mailer->send($email);
         }
 
@@ -998,7 +1004,8 @@ class ControleAnomaliesController extends AbstractController
             $email = (new Email())
                 ->from($this->mailEnvoi)
                 ->to("jpochet@groupe-axis.fr")
-                ->subject("ERREUR sur ControlStockDirect");
+                ->subject("ERREUR sur ControlStockDirect")
+                ->html('Erreur');
             $this->mailer->send($email);
         }
     }

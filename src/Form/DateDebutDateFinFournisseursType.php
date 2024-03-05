@@ -33,7 +33,7 @@ class DateDebutDateFinFournisseursType extends AbstractType
         $arrayFous = [];
         foreach ($fous as $fou) {
             if (!empty($fou['tiers'])) {
-                $arrayFous[$fou['tiers']] = $fou['tiers'];
+                $arrayFous[$fou['nom']] = $fou['tiers'];
             }
         }
         $arrayFamilles = [];
@@ -109,6 +109,22 @@ class DateDebutDateFinFournisseursType extends AbstractType
                 'required' => false,
                 'multiple' => true,
                 'label' => 'Choisissez un ou plusieurs métiers (optionnel)',
+                'attr' => ['class' => ''],
+
+            ])
+            ->add('tiers', ChoiceType::class, [
+                'choices' => [
+                    'Client' => "C",
+                    'Fournisseur' => "F",
+                ],
+                'choice_attr' => [
+                    'Client' => ['class' => 'm-3'],
+                    'Fournisseur' => ['class' => 'm-3'],
+                ],
+                'expanded' => true,
+                'required' => true,
+                'multiple' => false,
+                'label' => 'Type de tiers',
                 'attr' => ['class' => ''],
 
             ])

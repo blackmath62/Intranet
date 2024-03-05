@@ -34,22 +34,23 @@ class StatsAchatController extends AbstractController
             // Mise en forme de la liste des fournisseurs pour l'envoyer à la requête
             $fous = $this->miseEnForme($form->getData()['fournisseurs']);
             $fams = $this->miseEnForme($form->getData()['familles']);
+            $tiers = $form->getData()['tiers'];
             $dd = $form->getData()['start']->format('Y-m-d');
             $df = $form->getData()['end']->format('Y-m-d');
             $metier = $this->miseEnForme($form->getData()['metier']);
             if ($form->getData()['type'] == 'dateOp') {
-                $states = $repo->getStatesDetaillees($dos, $dd, $df, $fous, $fams, $metier);
+                $states = $repo->getStatesDetaillees($dos, $dd, $df, $fous, $fams, $metier, $tiers);
                 $template = 'stats_achat/statesDetaillees.html.twig';
             }
             if ($form->getData()['type'] == 'basique') {
-                $states = $repo->getStatesBasiques($dos, $dd, $df, $fous, $fams, $metier);
+                $states = $repo->getStatesBasiques($dos, $dd, $df, $fous, $fams, $metier, $tiers);
             }
             if ($form->getData()['type'] == 'sansFournisseurs') {
-                $states = $repo->getStatesSansFournisseurs($dos, $dd, $df, $fous, $fams, $metier);
+                $states = $repo->getStatesSansFournisseurs($dos, $dd, $df, $fous, $fams, $metier, $tiers);
                 $template = 'stats_achat/statesSansFournisseurs.html.twig';
             }
-            $totauxFournisseurs = $repo->getTotauxStatesParFournisseurs($dos, $dd, $df, $fous, $fams, $metier);
-            $totaux = $repo->getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous, $fams, $metier);
+            $totauxFournisseurs = $repo->getTotauxStatesParFournisseurs($dos, $dd, $df, $fous, $fams, $metier, $tiers);
+            $totaux = $repo->getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous, $fams, $metier, $tiers);
         }
 
         return $this->render($template, [
@@ -64,7 +65,6 @@ class StatsAchatController extends AbstractController
     public function miseEnForme($donnees)
     {
         $Mef = '';
-        //dd($donnees);
         foreach ($donnees as $value) {
             if ($Mef == '') {
                 $Mef = "'" . $value . "'";
