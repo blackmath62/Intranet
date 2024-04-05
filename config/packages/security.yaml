@@ -24,7 +24,7 @@ security:
 
             remember_me:
                 secret: '%kernel.secret%'
-                lifetime: 3600 # 1 hour in seconds
+                lifetime: 36000 # 1 hour in seconds
                 path: /
 
             custom_authenticators:

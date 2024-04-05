@@ -520,7 +520,7 @@ class ArtRepository extends ServiceEntityRepository
         $produit = str_replace('#', '/', $produit);
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT m.FADT AS dateFacture, REPLACE(LTRIM(RTRIM(m.REF)), '/', '#') AS ref, REPLACE(LTRIM(RTRIM(m.SREF1)), '/', '#') AS sref1, REPLACE(LTRIM(RTRIM(m.SREF2)), '/', '#') AS sref2, LTRIM(RTRIM(m.DES)) AS designation, LTRIM(RTRIM(m.VENUN)) AS uv, LTRIM(RTRIM(m.PUSTAT)) AS pu, LTRIM(RTRIM(a.FAM_0002)) AS metier,
+        $sql = "SELECT m.FADT AS dateFacture, m.FANO AS nFacture, REPLACE(LTRIM(RTRIM(m.REF)), '/', '#') AS ref, REPLACE(LTRIM(RTRIM(m.SREF1)), '/', '#') AS sref1, REPLACE(LTRIM(RTRIM(m.SREF2)), '/', '#') AS sref2, LTRIM(RTRIM(m.DES)) AS designation, LTRIM(RTRIM(m.VENUN)) AS uv, LTRIM(RTRIM(m.PUSTAT)) AS pu, LTRIM(RTRIM(a.FAM_0002)) AS metier,
         CASE
         WHEN m.OP IN ('F', 'FD') THEN m.FAQTE
         WHEN m.OP IN ('G', 'GD') THEN -1 * m.FAQTE
@@ -552,7 +552,7 @@ class ArtRepository extends ServiceEntityRepository
         $produit = str_replace('#', '/', $produit);
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT m.FADT AS dateFacture, REPLACE(LTRIM(RTRIM(m.REF)), '/', '#') AS ref, REPLACE(LTRIM(RTRIM(m.SREF1)), '/', '#') AS sref1, REPLACE(LTRIM(RTRIM(m.SREF2)), '/', '#') AS sref2, LTRIM(RTRIM(m.DES)) AS designation, LTRIM(RTRIM(m.VENUN)) AS uv, LTRIM(RTRIM(m.PUSTAT)) AS pu, LTRIM(RTRIM(a.FAM_0002)) AS metier,
+        $sql = "SELECT m.FADT AS dateFacture, m.FANO AS nFacture, REPLACE(LTRIM(RTRIM(m.REF)), '/', '#') AS ref, REPLACE(LTRIM(RTRIM(m.SREF1)), '/', '#') AS sref1, REPLACE(LTRIM(RTRIM(m.SREF2)), '/', '#') AS sref2, LTRIM(RTRIM(m.DES)) AS designation, LTRIM(RTRIM(m.VENUN)) AS uv, LTRIM(RTRIM(m.PUSTAT)) AS pu, LTRIM(RTRIM(a.FAM_0002)) AS metier,
         CASE
         WHEN m.OP IN ('F', 'FD') THEN m.FAQTE
         WHEN m.OP IN ('G', 'GD') THEN -1 * m.FAQTE
@@ -584,7 +584,7 @@ class ArtRepository extends ServiceEntityRepository
         $produit = str_replace('#', '/', $produit);
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT TOP 1 m.FADT AS dateFacture, REPLACE(LTRIM(RTRIM(m.REF)), '/', '#') AS ref, REPLACE(LTRIM(RTRIM(m.SREF1)), '/', '#') AS sref1, REPLACE(LTRIM(RTRIM(m.SREF2)), '/', '#') AS sref2, LTRIM(RTRIM(m.DES)) AS designation, LTRIM(RTRIM(m.VENUN)) AS uv, LTRIM(RTRIM(m.PUSTAT)) AS pu, LTRIM(RTRIM(a.FAM_0002)) AS metier,
+        $sql = "SELECT TOP 1 m.FADT AS dateFacture, m.FANO AS nFacture, REPLACE(LTRIM(RTRIM(m.REF)), '/', '#') AS ref, REPLACE(LTRIM(RTRIM(m.SREF1)), '/', '#') AS sref1, REPLACE(LTRIM(RTRIM(m.SREF2)), '/', '#') AS sref2, LTRIM(RTRIM(m.DES)) AS designation, LTRIM(RTRIM(m.VENUN)) AS uv, LTRIM(RTRIM(m.PUSTAT)) AS pu, LTRIM(RTRIM(a.FAM_0002)) AS metier,
         CASE
         WHEN m.OP IN ('F', 'FD') THEN m.FAQTE
         WHEN m.OP IN ('G', 'GD') THEN -1 * m.FAQTE

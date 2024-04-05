@@ -35,7 +35,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class HolidayController extends AbstractController
 {
 
-    private $mailerInterface;
     private $repoHoliday;
     private $repoStatuts;
     private $repoUser;
@@ -52,12 +51,10 @@ class HolidayController extends AbstractController
         AdminEmailController $adminEmailController,
         MailListRepository $repoMail,
         MailerInterface $mailer,
-        MailerInterface $mailerInterface,
         HolidayRepository $repoHoliday,
         UsersRepository $repoUsers,
         statusHolidayRepository $repoStatuts,
         UsersRepository $repoUser) {
-        $this->mailerInterface = $mailerInterface;
         $this->repoHoliday = $repoHoliday;
         $this->repoStatuts = $repoStatuts;
         $this->repoUser = $repoUser;
@@ -286,7 +283,7 @@ class HolidayController extends AbstractController
                     ->subject('Dépôt d\'un nouveau congés en votre nom')
                     ->html($html);
 
-                $this->mailerInterface->send($email);
+                $this->mailer->send($email);
                 end: ;
             }
             if ($i > 1) {
@@ -855,7 +852,7 @@ class HolidayController extends AbstractController
                 ->subject($object)
                 ->html($html);
 
-            $this->mailerInterface->send($email);
+            $this->mailer->send($email);
         }
         // envoyer un mail au dépositaire
         if ($role == 'depositaire') {
@@ -868,7 +865,7 @@ class HolidayController extends AbstractController
                 ->subject($object)
                 ->html($html);
 
-            $this->mailerInterface->send($email);
+            $this->mailer->send($email);
         }
     }
 

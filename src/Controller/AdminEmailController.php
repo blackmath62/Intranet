@@ -164,16 +164,20 @@ class AdminEmailController extends AbstractController
     public function formateEmailList($listMails)
     {
         $MailsList = [];
-        foreach ($listMails as $value) {
-            try {
-                array_push($MailsList, new Address($value->getEmail()));
-            } catch (\Throwable $th) {
-                $email = (new Email())
-                    ->from($this->mailEnvoi)
-                    ->to($this->mailTreatement)
-                    ->subject('Probléme formatage de mail automatique formateEmailList')
-                    ->html('Erreur');
-                $this->mailer->send($email);
+        if ($listMails) {
+            foreach ($listMails as $value) {
+                if ($value->getEmail()) {
+                    try {
+                        array_push($MailsList, new Address($value->getEmail()));
+                    } catch (\Throwable $th) {
+                        $email = (new Email())
+                            ->from($this->mailEnvoi)
+                            ->to($this->mailTreatement)
+                            ->subject('Probléme formatage de mail automatique formateEmailList')
+                            ->html('Erreur');
+                        $this->mailer->send($email);
+                    }
+                }
             }
         }
         return $MailsList;

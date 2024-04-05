@@ -11,9 +11,7 @@ use App\Entity\Main\InterventionFichesMonteursHeures;
 use App\Entity\Main\InterventionMonteurs;
 use App\Entity\Main\OthersDocuments;
 use App\Form\AddPicturesOrDocsType;
-use App\Form\AffaireType;
 use App\Form\ChatsType;
-use App\Form\CreationChantierAffaireType;
 use App\Form\InterventionFicheCommentType;
 use App\Form\InterventionFichesMonteursHeuresType;
 use App\Form\InterventionFicheType;
@@ -21,6 +19,7 @@ use App\Form\InterventionsMonteursType;
 use App\Form\OthersDocumentsMultipleType;
 use App\Repository\Divalto\ArtRepository;
 use App\Repository\Divalto\CliRepository;
+use App\Repository\Divalto\EntRepository;
 use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\AffairePieceRepository;
 use App\Repository\Main\AffairesRepository;
@@ -29,11 +28,13 @@ use App\Repository\Main\CommentairesRepository;
 use App\Repository\Main\InterventionFicheMonteurRepository;
 use App\Repository\Main\InterventionFichesMonteursHeuresRepository;
 use App\Repository\Main\InterventionMonteursRepository;
+use App\Repository\Main\MailListRepository;
 use App\Repository\Main\OthersDocumentsRepository;
 use App\Repository\Main\RetraitMarchandisesEanRepository;
 use App\Repository\Main\StatutsGenerauxRepository;
 use App\Repository\Main\UsersRepository;
 use App\Service\BlogFormaterService;
+use App\Service\DateCheckerIsWorkingDayService;
 use App\Service\EmailTreatementService;
 use App\Service\ImageService;
 use App\Service\ProductFormService;
@@ -42,6 +43,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -60,6 +62,9 @@ class AffairesController extends AbstractController
     private $repoAffairePiece;
     private $repoUsers;
     private $repoCli;
+    private $repoEnt;
+    private $repoMail;
+    private $mailEnvoi;
     private $repoDocs;
     private $repoComments;
     private $productFormService;
@@ -70,11 +75,14 @@ class AffairesController extends AbstractController
     private $affaireAdminController;
     private $repoFiche;
     private $mailer;
+    private $mailTreatement;
     private $repoRetrait;
     private $emailTreatementService;
     private $blobFormater;
     private $entityManager;
     private $repoStatusGeneraux;
+    private $isWorkingDay;
+    private $urlGenerator;
 
     public function __construct(
         ManagerRegistry $registry,
@@ -86,24 +94,35 @@ class AffairesController extends AbstractController
         InterventionFichesMonteursHeuresRepository $repoInterventionFichesMonteursHeures,
         InterventionFicheMonteurRepository $repoInterventionFicheMonteur,
         InterventionMonteursRepository $repoIntervertionsMonteurs,
+        StatutsGenerauxRepository $repoStatusGeneraux,
         ProductFormService $productFormService,
         CliRepository $repoCli,
         UsersRepository $repoUsers,
         ChatsRepository $repoChats,
         AffairePieceRepository $repoAffairePiece,
+        MailListRepository $repoMail,
         OthersDocumentsRepository $repoDocs,
         BlogFormaterService $blobFormater,
+        EntRepository $repoEnt,
         MailerInterface $mailer,
         CommentairesRepository $repoComments,
         AffairesRepository $repoAffaires,
         MouvRepository $repoMouv,
-        StatutsGenerauxRepository $repoStatusGeneraux) {
+        DateCheckerIsWorkingDayService $isWorkingDay,
+        UrlGeneratorInterface $urlGenerator,
+    ) {
         $this->repoMouv = $repoMouv;
         $this->repoIntervertionsMonteurs = $repoIntervertionsMonteurs;
         $this->repoCli = $repoCli;
         $this->repoAffaires = $repoAffaires;
         $this->repoComments = $repoComments;
         $this->repoDocs = $repoDocs;
+        $this->repoMail = $repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
+        $this->mailTreatement = $this->repoMail->getEmailTreatement();
+        $this->isWorkingDay = $isWorkingDay;
+        $this->urlGenerator = $urlGenerator;
+        $this->repoEnt = $repoEnt;
         $this->productFormService = $productFormService;
         $this->mailer = $mailer;
         $this->blobFormater = $blobFormater;
@@ -127,9 +146,30 @@ class AffairesController extends AbstractController
 
     public function affaire(UrlGeneratorInterface $urlGenerator, Request $request): Response
     {
+        $interventionsActuels = $this->repoIntervertionsMonteurs->findInterventionDuMoment();
+        if ($request->attributes->get('_route') == 'app_affaire_me_ok') {
+            $affaires = $this->repoAffaires->findFinish();
+        } elseif ($request->attributes->get('_route') == 'app_affaire_me_nok') {
+            $affaires = $this->repoAffaires->findNotFinish();
+        }
+        $fichesManquantes = $this->affaireAdminController->recupFichesManquantes();
+        $fichesNonVerrouillees = $this->repoFiche->findBy(['lockedAt' => null]);
+
+        return $this->render('affaires/affaire.html.twig', [
+            'affaires' => $affaires,
+            'title' => 'Affaires',
+            'data' => $this->interventionsCalendar(),
+            'interventionsActuels' => $interventionsActuels,
+            'fichesManquantes' => $fichesManquantes,
+            'fichesNonVerrouillees' => $fichesNonVerrouillees,
+            'cmdsWithProblem' => $this->repoEnt->getRowsWithoutAffair(),
+        ]);
+    }
+
+    public function interventionsCalendar()
+    {
         // Calendrier des congés
         $events = $this->repoIntervertionsMonteurs->findAll();
-        $interventionsActuels = $this->repoIntervertionsMonteurs->findInterventionDuMoment();
         $rdvs = [];
         foreach ($events as $event) {
 
@@ -146,25 +186,63 @@ class AffairesController extends AbstractController
             $libelle = $event->getCode()->getLibelle();
             $color = $event->getTypeIntervention()->getBackgroundColor();
             $textColor = $event->getTypeIntervention()->getTextColor();
-            if ($event->getStart() && $event->getEnd()) {
-                $start = $event->getStart()->format('Y-m-d H:i:s');
-                $end = $event->getEnd()->format('Y-m-d H:i:s');
-                if ($event->getStart()->format('Y-m-d') == $event->getEnd()->format('Y-m-d') && $event->getStart()->format('H:i') == '00:00' && $event->getEnd()->format('H:i') == '23:00') {
-                    $start = $event->getStart()->format('Y-m-d');
-                    $end = $event->getEnd()->format('Y-m-d');
-                }
+            $end = clone $event->getEnd();
+            $allDay = false;
+            if ($event->isAllDay() == 1) {
+                //$end->modify('+1 day');
+                $allDay = true;
             }
+            if ($event->getStart() && $event->getEnd()) {
+                $start = $event->getStart()->format('Y-m-d H:i');
+                $end = $event->getEnd()->format('Y-m-d H:i');
+            }
+            if ($this->isGranted('ROLE_ADMIN_MONTEUR')) {
+                $editable = true;
+                $startEditable = true;
+                $url = $this->urlGenerator->generate('app_piece_affaire_nok', ['affaire' => $event->getCode()->getCode()]);
+            } else {
+                $editable = false;
+                $startEditable = false;
+                $url = $this->urlGenerator->generate('app_affaire_show_intervention', ['id' => $id]);
+            }
+            $maxCreatedAt = null;
+            $minEndDate = null;
+            if (count($event->getInterventionFicheMonteurs()) > 0) {
+                // Initialiser la date de création maximale à null
+                // Parcourir les fiches d'intervention pour trouver la date de création maximale
+                foreach ($event->getInterventionFicheMonteurs() as $ficheIntervention) {
+                    // Récupérer la date de création de la fiche d'intervention
+                    $createdAt = $ficheIntervention->getCreatedAt();
+
+                    // Comparer avec la date de création maximale actuelle
+                    if ($maxCreatedAt === null || $createdAt > $maxCreatedAt) {
+                        $maxCreatedAt = $createdAt;
+                    }
+                }
+                $minEndDate = $maxCreatedAt;
+                if ($maxCreatedAt >= new DateTime()) {
+                    $editable = false;
+                }
+                $startEditable = false;
+            }
+
             if ($event->getStart() && $event->getEnd()) {
                 $rdvs[] = [
                     'id' => $event->getId(),
                     'start' => $start,
                     'end' => $end,
-                    'url' => $urlGenerator->generate('app_affaire_show_intervention', ['id' => $id]),
+                    'url' => $url,
                     'title' => $libelle . ' du ' . $event->getStart()->format('d-m-y H:i') . ' au ' . $event->getEnd()->format('d-m-y H:i') . ' - ' . $monteurs,
                     'icon' => $event->getTypeIntervention()->getFaIconsClass(),
                     'backgroundColor' => $color,
                     'borderColor' => '#FFFFFF',
+                    'allDay' => $allDay,
                     'textColor' => $textColor,
+                    'editable' => $editable,
+                    'display' => 'block',
+                    'startEditable' => $startEditable,
+                    'tooltips' => 'Client : ' . $event->getCode()->getNom() . ' Intervenants : ' . $monteurs,
+                    'minEndDate' => $minEndDate, // Ajout de la date de fin minimale
                 ];
             }
         }
@@ -184,124 +262,13 @@ class AffairesController extends AbstractController
                 'backgroundColor' => '#6c757d',
                 'borderColor' => '#FFFFFF',
                 'textColor' => '#FFFFFF',
+                'editable' => false,
             ];
         }
 
         $data = json_encode($rdvs);
-        // création d'un nouveau chantier en Urgence
-        $form = $this->createForm(CreationChantierAffaireType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $dataCreationChantier = $form->getData();
-            $tiers = explode('-', $dataCreationChantier['tiers']);
-            $chantierManu = $this->repoAffaires->findOneBy(['code' => $dataCreationChantier['code'] . 'Manuelle']);
-            if ($chantierManu) {
-                $this->addFlash('danger', 'Ce code chantier est déjà utilisé, veuillez en choisir un autre');
-                return $this->redirectToRoute('app_affaire_me_nok');
-            } else {
-                //Création du chantier
-                $chantier = new Affaires();
-                $chantier->setCode(str_replace(' ', '', strtoupper($dataCreationChantier['code']) . 'Manuelle'))
-                    ->setLibelle($dataCreationChantier['libelle'])
-                    ->setTiers($tiers[0]) // mettre le code client en place de l'adresse
-                    ->setNom($tiers[1]);
-                $chantier->setStart(new DateTime())
-                    ->setEtat('Nouvelle');
-                $em = $this->entityManager;
-                $em->persist($chantier);
-                $em->flush();
-                // Création de la piéce de ce chantier
-                $pieceChantier = new AffairePiece();
-                $pieceChantier->setCdno('999999')
-                    ->setBlno('999999')
-                    ->setOp('C')
-                    ->setEtat('Nouvelle')
-                    ->setAffaire(str_replace(' ', '', strtoupper($dataCreationChantier['code']) . 'Manuelle'));
-                if ($dataCreationChantier['adresse']) {
-                    $pieceChantier->setAdresse($dataCreationChantier['adresse']);
-                } else {
-                    $pieceChantier->setAdresse($tiers[2]);
-                }
-                $em = $this->entityManager;
-                $em->persist($pieceChantier);
-                $em->flush();
 
-                // création de l'intervention pour ce chantier
-                $intervention = new InterventionMonteurs();
-                $intervention->setCreatedAt(new DateTime())
-                    ->setUserCr($this->getUser())
-                    ->setStart($dataCreationChantier['start'])
-                    ->setEnd($dataCreationChantier['end'])
-                    ->addPiece($pieceChantier)
-                    ->setTypeIntervention($this->repoStatusGeneraux->findOneBy(['id' => 2]))
-                    ->setCode($chantier);
-                foreach ($dataCreationChantier['Equipes'] as $monteur) {
-                    $intervention->addEquipe($monteur);
-                }
-                if ($dataCreationChantier['adresse']) {
-                    $intervention->setAdresse($dataCreationChantier['adresse']);
-                } else {
-                    $intervention->setAdresse($tiers[2]);
-                }
-            }
-            $entityManager = $this->entityManager;
-            $entityManager->persist($intervention);
-            $entityManager->flush();
-            // on ajoute le commentaire s'il y en a un
-            if ($dataCreationChantier['comment']) {
-                $chat = new Chats;
-                $chat->setCreatedAt(new \DateTime())
-                    ->setUser($this->getUser())
-                    ->setContent($dataCreationChantier['comment'])
-                    ->setFonction('chatAffaire')
-                    ->setIdentifiant($intervention->getCode()->getId())
-                    ->setTables($intervention->getId());
-                $entityManager = $this->entityManager;
-                $entityManager->persist($chat);
-                $entityManager->flush();
-
-            }
-
-            $subjet = "Un chantier en Urgence à été déposé => " . $intervention->getCode()->getLibelle();
-            $donnees = $intervention;
-            if ($dataCreationChantier['comment']) {
-                $donnees->setChampTemporaire($dataCreationChantier['comment']);
-            }
-            $emails = null;
-            $equipes = $intervention->getEquipes();
-            if ($equipes) {
-                $equipesArray = $equipes->toArray(); // Convertir la collection en un tableau
-                $emails = array_map(function ($equipe) {
-                    return $equipe->getEmail();
-                }, $equipesArray);
-            }
-            $pageUrl = "affaires/mails/mailChantierUrgence.html.twig";
-            $mails = $this->emailTreatementService->treatementMails('app_affaires_admin', null, $emails);
-            $urlFiles = [];
-            $this->emailTreatementService->sendMail($subjet, $mails, $donnees, $pageUrl, $urlFiles);
-
-            $this->changeEtat($chantier->getId(), 'Planifiee');
-            $this->addFlash('message', 'Votre chantier a été créé avec succés !');
-            return $this->redirectToRoute('app_affaire_me_nok');
-
-        }
-        if ($request->attributes->get('_route') == 'app_affaire_me_ok') {
-            $affaires = $this->repoAffaires->findFinish();
-        } elseif ($request->attributes->get('_route') == 'app_affaire_me_nok') {
-            $affaires = $this->repoAffaires->findNotFinish();
-        }
-        $fichesManquantes = $this->affaireAdminController->recupFichesManquantes();
-        $fichesNonVerrouillees = $this->repoFiche->findBy(['lockedAt' => null]);
-
-        return $this->render('affaires/affaire.html.twig', [
-            'affaires' => $affaires,
-            'title' => 'Affaires',
-            'data' => $data,
-            'interventionsActuels' => $interventionsActuels,
-            'form' => $form->createView(),
-            'fichesManquantes' => $fichesManquantes,
-            'fichesNonVerrouillees' => $fichesNonVerrouillees,
-        ]);
+        return $data;
     }
 
     #[Route("/Lhermitte/pieces/affaire/nok/{{affaire}}", name: "app_piece_affaire_nok")]
@@ -314,30 +281,10 @@ class AffairesController extends AbstractController
         } elseif ($request->attributes->get('_route') == 'app_piece_affaire_nok') {
             $pieces = $this->repoAffairePiece->findBy(['affaire' => $affaire, 'closedAt' => null]);
         }
+
+        // ramener le planning des monteurs
+
         $pieces = $this->mettreProduitsSurPieces($pieces);
-        $form = $this->createForm(AffaireType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $affaire = $this->repoAffaires->findOneBy(['code' => $affaire]);
-            $data = $form->getData();
-            if ($data->getProgress()) {
-                $affaire->setProgress($data->getProgress());
-            }
-            if ($data->getStart()) {
-                $affaire->setStart(new DateTime($data->getStart()->format('Y-m-d H:i')));
-            }
-            if ($data->getEnd()) {
-                $affaire->setEnd(new DateTime($data->getEnd()->format('Y-m-d H:i')));
-            }
-            if ($data->getDuration()) {
-                $affaire->setDuration($data->getDuration());
-            }
-            $em = $this->entityManager;
-            $em->persist($affaire);
-            $em->flush();
-            $this->addFlash('message', 'Mise à jour effectuée avec succés');
-            return $this->redirectToRoute('app_piece_affaire_nok', ['affaire' => $affaire->getCode()]);
-        }
         $table = 'affaire';
         $id = $this->repoAffaires->findOneBy(['code' => $affaire])->getId();
 
@@ -348,6 +295,7 @@ class AffairesController extends AbstractController
         $InterventionsMonteursForm->handleRequest($request);
 
         if ($InterventionsMonteursForm->isSubmitted() && $InterventionsMonteursForm->isValid()) {
+
             $intervention->setCreatedAt(new DateTime())
                 ->setUserCr($this->getUser())
                 ->setCode($affaire);
@@ -372,6 +320,7 @@ class AffairesController extends AbstractController
                     $adresse = 'Pas de donnée adresse';
                 }
                 $intervention->setAdresse($adresse);
+                $intervention->setAllDay(true);
             }
             $entityManager = $this->entityManager;
             $entityManager->persist($intervention);
@@ -424,6 +373,9 @@ class AffairesController extends AbstractController
 
             $this->changeEtat($affaire->getId(), 'Planifiee');
 
+            $this->addFlash('message', 'Création d\'intervention effectuée avec succés');
+            return $this->redirectToRoute('app_piece_affaire_nok', ['affaire' => $affaire->getCode()]);
+
         }
         $Interventions = $this->repoIntervertionsMonteurs->findBy(['code' => $affaire]);
         $chats = $this->repoChats->findBy(['fonction' => 'chatAffaire', 'identifiant' => $affaire->getId()], ['createdAt' => 'DESC']);
@@ -442,13 +394,16 @@ class AffairesController extends AbstractController
             $retrait->stock = $r['stock'];
         }
 
+        $types = $this->repoStatusGeneraux->findBy(['entity' => 'interventionMonteurs', 'pilotage' => 'type']);
+
         return $this->render('affaires/pieceAffaire.html.twig', [
             // todo à voir pour filtrer l'état en fonction de la page affichée
             'piecesAffaires' => $pieces,
             'title' => 'piecesAffaires',
             'affaire' => $affaire,
-            'form' => $form->createView(),
             'docs' => $docs,
+            'types' => $types,
+            'data' => $this->interventionsCalendar(),
             'chats' => $chats,
             'retraits' => $retraits,
             'InterventionsMonteursForm' => $InterventionsMonteursForm->createView(),
@@ -458,23 +413,31 @@ class AffairesController extends AbstractController
 
     #[Route("/Lhermitte/update/affaire", name: "app_update_affaires")]
 
-    public function update(): Response
+    public function updateAffaire(): Response
     {
         $affaires = $this->repoMouv->getAffaires();
         foreach ($affaires as $value) {
             $affaire = $this->repoAffaires->findOneBy(['code' => $value['affaire']]);
+            $new = false;
             if (!$affaire) {
                 $affaire = new Affaires;
+                $new = true;
                 $affaire->setCode($value['affaire'])
+                    ->setDuration($value['duration'])
                     ->setLibelle($value['libelle'])
                     ->setTiers($value['tiers'])
                     ->setNom($value['nom'])
                     ->setStart(new Datetime($value['dateCreation']))
                     ->setEtat('Nouvelle');
-                $entityManager = $this->entityManager;
-                $entityManager->persist($affaire);
-                $entityManager->flush();
+            }
 
+            $affaire->setDuration($value['duration'])
+                ->setLibelle($value['libelle'])
+                ->setNom($value['nom']);
+            $entityManager = $this->entityManager;
+            $entityManager->persist($affaire);
+            $entityManager->flush();
+            if ($new == true) {
                 $subjet = "Une nouvelle affaire a été créé => " . $affaire->getLibelle();
                 $donnees = $affaire;
                 $pageUrl = "affaires/mails/mailNewAffaire.html.twig";
@@ -490,7 +453,7 @@ class AffairesController extends AbstractController
 
     #[Route("/Lhermitte/update/pieces/affaire", name: "app_update_piece_affaires")]
 
-    public function updatePieces(): Response
+    public function updatePiecesAffaires(): Response
     {
         $affaires = $this->repoAffaires->findAll();
         foreach ($affaires as $affaire) {
@@ -543,9 +506,7 @@ class AffairesController extends AbstractController
         return $this->redirectToRoute('app_affaire_me_nok');
     }
 
-    #[Route("/Lhermitte/affaire/change/etat/{id}/{etat}", name: "app_affaire_change_etat")]
-
-    public function changeEtat($id, $etat): Response
+    public function changeEtat($id, $etat)
     {
 
         $affaire = $this->repoAffaires->findOneBy(['id' => $id]);
@@ -570,6 +531,15 @@ class AffairesController extends AbstractController
         $entityManager = $this->entityManager;
         $entityManager->persist($affaire);
         $entityManager->flush();
+
+    }
+
+    #[Route("/Lhermitte/affaire/change/etat/{id}/{etat}", name: "app_affaire_change_etat")]
+
+    public function changeEtatWithMessage($id, $etat): Response
+    {
+
+        $this->changeEtat($id, $etat);
 
         $this->addFlash('message', 'Mise à jour effectuée avec succés');
         return $this->redirectToRoute('app_affaire_me_nok');
@@ -616,6 +586,11 @@ class AffairesController extends AbstractController
     public function removeIntervention($id): Response
     {
         $intervention = $this->repoIntervertionsMonteurs->findOneBy(['id' => $id]);
+        // supprimer les liaisons avec les piéces
+        $pieces = $intervention->getPieces();
+        foreach ($pieces as $value) {
+            $intervention->removePiece($value);
+        }
         // suppression des fichiers de cette intervention
         $fichiers = $this->repoDocs->findBy(['tables' => 'affaire', 'Parametre' => $id, 'identifiant' => $intervention->getCode()->getId()]);
         if ($fichiers) {
@@ -644,6 +619,43 @@ class AffairesController extends AbstractController
 
         $this->addFlash('message', 'Intervention supprimée avec succés');
         return $this->redirectToRoute('app_piece_affaire_nok', ['affaire' => $affaire]);
+
+    }
+
+    public function removeInterventionAction($id)
+    {
+
+        try {
+            $intervention = $this->repoIntervertionsMonteurs->findOneBy(['id' => $id]);
+            // supprimer les liaisons avec les piéces
+            $pieces = $intervention->getPieces();
+            if ($pieces) {
+                foreach ($pieces as $value) {
+                    $intervention->removePiece($value);
+                }
+            }
+            // suppression des fichiers de cette intervention
+            $fichiers = $this->repoDocs->findBy(['tables' => 'affaire', 'Parametre' => $id, 'identifiant' => $intervention->getCode()->getId()]);
+            if ($fichiers) {
+                foreach ($fichiers as $fichier) {
+                    $chemin = $this->getParameter('doc_lhermitte_affaires') . '/' . $fichier->getFile();
+                    $this->entityManager->remove($fichier);
+                    unset($chemin);
+                }
+            }
+
+            // suppression des commentaires de cette intervention
+            $commentaires = $this->repoChats->findBy(['fonction' => 'chatAffaire', 'identifiant' => $intervention->getCode()->getId(), 'tables' => $id]);
+            if ($commentaires) {
+                foreach ($commentaires as $commentaire) {
+                    $this->entityManager->remove($commentaire);
+                }
+            }
+            $this->entityManager->remove($intervention);
+            $this->entityManager->flush();
+        } catch (\Throwable $th) {
+            dd($th);
+        }
 
     }
 
@@ -690,6 +702,53 @@ class AffairesController extends AbstractController
             'intervention' => $intervention,
         ]);
 
+    }
+
+    #[Route("/Lhermitte/affaire/drag/and/drop/intervention/{id}/{start}/{end}", name: "app_affaire_edit_drag_and_drop_intervention")]
+
+    public function dragAndDropIntervention($id, $start, $end): Response
+    {
+        try {
+            $intervention = $this->repoIntervertionsMonteurs->findOneBy(['id' => $id]);
+            $start = new DateTime($start);
+            $end = new DateTime($end);
+            $startClone = clone $start;
+            $endClone = clone $end;
+
+            $startHour = $startClone->format('H:i:s');
+            $endHour = $endClone->format('H:i:s');
+
+            $isAllDay = ($startHour === '00:00:00' && $endHour === '00:00:00');
+
+            $intervention->setStart($start)
+                ->setEnd($end)
+                ->setAllDay($isAllDay);
+            $this->entityManager->persist($intervention);
+            $this->entityManager->flush();
+            $intervenants = '';
+            foreach ($intervention->getEquipes() as $intervenant) {
+                $intervenants = $intervenant->getPseudo() . ', ';
+            }
+            $intervenants = rtrim($intervenants, ', ');
+            $message = $intervention->getCode()->getLibelle() . ' du ' . $intervention->getStart()->format('d-m-y H:i') . ' au ' . $intervention->getEnd()->format('d-m-y H:i') . ' - ' . $intervenants;
+            return new JsonResponse(['message' => $message]);
+        } catch (\Exception $e) {
+            // Gérer les erreurs
+            return new JsonResponse(['message' => 'Erreur lors de la mise à jour de l\'intervention : ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function createInterventionRow($nom, $libelle, $oldStart, $oldEnd, $start, $end, $commentaire)
+    {
+        return [
+            'nom' => $nom,
+            'libelle' => $libelle,
+            'oldStart' => $oldStart->format('d/m/Y H:i'),
+            'oldEnd' => $oldEnd->format('d/m/Y H:i'),
+            'start' => $start->format('d/m/Y H:i'),
+            'end' => $end->format('d/m/Y H:i'),
+            'commentaire' => $commentaire,
+        ];
     }
 
     #[Route("/Lhermitte/affaire/show/intervention/{id}", name: "app_affaire_show_intervention")]
@@ -983,7 +1042,7 @@ class AffairesController extends AbstractController
 
         $this->addFlash('message', 'Fiche supprimée avec succès');
 
-        return $this->redirectToRoute('app_affaire_me_ok');
+        return $this->redirectToRoute('app_affaire_me_nok');
     }
 
     #[Route("/Lhermitte/affaire/remove/heure/intervention/{id}/{ficheId}/{heureId}", name: "app_affaire_remove_heure_intervention")]

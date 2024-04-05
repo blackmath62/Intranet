@@ -19,6 +19,9 @@
     },
     "dependencies": {
         "@ericblade/quagga2": "^1.8.4",
+        "@fullcalendar/core": "^6.1.11",
+        "@fullcalendar/interaction": "^6.1.11",
+        "@fullcalendar/multimonth": "^6.1.11",
         "angularjs-dragula": "^2.0.0",
         "instascan": "^1.0.0",
         "quagga": "^0.6.16",

@@ -154,6 +154,7 @@ class MouvStockController extends AbstractController
             $historique[$ligHisto]['oldLocation'] = $histo[$ligHisto]->getOldLocation();
 
             // Entrée en stock => JI
+
             // Alimentation du MOUV
             $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''
             $piece[$i]['FICHE'] = 'MOUV';
@@ -166,9 +167,9 @@ class MouvStockController extends AbstractController
             $piece[$i]['QUANTITE'] = $histo[$ligHisto]->getQte(); // MOUV
             $piece[$i]['MOUV.PPAR'] = ''; // MOUV
             $piece[$i]['MOUV.PUB'] = ''; // MOUV
+            $i++;
 
             // Alimentation du MVTL
-            $i++;
             $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''
             $piece[$i]['FICHE'] = 'MVTL';
             $piece[$i]['EMPLACEMENT'] = $histo[$ligHisto]->getEmplacement(); // MVTL

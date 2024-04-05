@@ -302,4 +302,32 @@ class EntRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // Affaire avec ligne sans code affaire
+    public function getRowsWithoutAffair(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT e.PINO AS cmd,
+        e.PROJET AS affaire, e.PIDT AS dateCmd,
+        COUNT(CASE WHEN m.TIERS = e.TIERS AND m.DOS = e.DOS AND m.TICOD = e.TICOD AND m.PICOD = e.PICOD AND m.CDNO = e.PINO AND m.CDCE4 = 1 THEN 1 END) AS totalMouvement,
+        COUNT(CASE WHEN m.TIERS = e.TIERS AND m.DOS = e.DOS AND m.TICOD = e.TICOD AND m.PICOD = e.PICOD AND m.CDNO = e.PINO AND m.CDCE4 = 1 AND m.PROJET = e.PROJET THEN 1 END) AS totalMouvementProjet
+            FROM ENT e
+            INNER JOIN MOUV m ON m.TIERS = e.TIERS
+                                AND m.DOS = e.DOS
+                                AND m.TICOD = e.TICOD
+                                AND m.PICOD = e.PICOD
+                                AND m.CDNO = e.PINO
+            WHERE e.DOS = 1
+                AND e.TICOD = 'C'
+                AND e.PICOD IN (2)
+                AND e.PROJET IS NOT NULL
+                AND e.PROJET <> ''
+                AND e.CE4 = 1
+            GROUP BY e.PINO, e.PROJET, e.PIDT
+            HAVING COUNT(CASE WHEN m.TIERS = e.TIERS AND m.DOS = e.DOS AND m.TICOD = e.TICOD AND m.PICOD = e.PICOD AND m.CDNO = e.PINO AND m.CDCE4 = 1 THEN 1 END) <> COUNT(CASE WHEN m.TIERS = e.TIERS AND m.DOS = e.DOS AND m.TICOD = e.TICOD AND m.PICOD = e.PICOD AND m.CDNO = e.PINO AND m.CDCE4 = 1 AND m.PROJET = e.PROJET THEN 1 END)
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
 }

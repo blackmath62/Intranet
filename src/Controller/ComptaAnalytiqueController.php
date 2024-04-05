@@ -236,7 +236,6 @@ class ComptaAnalytiqueController extends AbstractController
         // envoyer un mail
         $treatementMails = $this->repoMail->findBy(['page' => 'app_compta_analytique', 'SecondOption' => $day]);
         if ($treatementMails) {
-
             $mails = $this->adminEmailController->formateEmailList($treatementMails);
             $excel = $this->get_compta_analytique_excel($annee, $mois, 'mail');
             $html = $this->renderView('mails/sendMailComptaAnalytique.html.twig');

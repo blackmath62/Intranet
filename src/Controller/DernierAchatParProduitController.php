@@ -7,6 +7,9 @@ use App\Form\MetierProdType;
 use App\Form\OthersDocumentsType;
 use App\Repository\Divalto\ArtRepository;
 use App\Repository\Main\IcdRepository;
+use App\Repository\Main\MailListRepository;
+use App\Service\GenImportDivaltoXlsxService;
+use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
 use Shuchkin\SimpleXLSX;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,6 +17,8 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -26,11 +31,23 @@ class DernierAchatParProduitController extends AbstractController
 
     private $repoArt;
     private $entityManager;
+    private $importDivaltoXlsxService;
+    private $repoMail;
+    private $mailEnvoi;
+    private $mailer;
 
-    public function __construct(ManagerRegistry $registry, ArtRepository $repoArt)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        ArtRepository $repoArt,
+        GenImportDivaltoXlsxService $importDivaltoXlsxService,
+        MailListRepository $repoMail,
+        MailerInterface $mailer) {
         $this->repoArt = $repoArt;
         $this->entityManager = $registry->getManager();
+        $this->importDivaltoXlsxService = $importDivaltoXlsxService;
+        $this->mailer = $mailer;
+        $this->repoMail = $repoMail;
+        $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         //parent::__construct();
     }
 
@@ -157,11 +174,84 @@ class DernierAchatParProduitController extends AbstractController
 
         }
         $produits = $repoIcd->findAll();
+
+        // Obtenez la date actuelle
+        $dateActuelle = new DateTime();
+        $date2912 = $dateActuelle->modify('-1 year');
+        $date2912->setDate($date2912->format('Y'), 12, 29);
+        $date3012 = clone $date2912;
+        $date3012 = $date3012->modify('+1 day');
+        $date2912 = $date2912->format('Y-m-d');
+        $date3012 = $date3012->format('Y-m-d');
+
+        // Générer le fichier pour la date 29/12
+        $param = $this->importDivaltoXlsxService->param('I', 1, 2, $date2912, null, null);
+        $regulsS = $this->generateXlsxRegularisation($param, $produits, 'II');
+        $sorties = $this->importDivaltoXlsxService->get_export_excel($param, $regulsS);
+        sleep(1);
+        // Générer le fichier pour la date 30/12
+        $param = $this->importDivaltoXlsxService->param('I', 1, 2, $date3012, null, null);
+        $regulsE = $this->generateXlsxRegularisation($param, $produits, 'JI');
+        $entree = $this->importDivaltoXlsxService->get_export_excel($param, $regulsE);
+        //dd($entree);
+        $email = (new Email())
+            ->from($this->mailEnvoi)
+            ->to($this->getUser()->getEmail())
+            ->subject('Fichier d\'import correction CMP Divalto')
+            ->html('Veuillez intégrer ces fichiers avec toutes les précautions nécéssaires')
+            ->attachFromPath($sorties)
+            ->attachFromPath($entree);
+        $this->mailer->send($email);
+        //unlink($sorties);
+        //unlink($entree);
+
+        //dd($produits);
+
+        // Créer les fichiers d'import pour mettre à jour les CMP dans Divalto
+
         return $this->render('dernier_achat_par_produit/import.html.twig', [
             'produits' => $produits,
             'title' => 'Achat produit',
             'form' => $form->createView(),
         ]);
+    }
+    // régularisation de stock
+    public function generateXlsxRegularisation($param, $produits, $op)
+    {
+
+        $piece = [];
+        $i = 0;
+        foreach ($produits as $produit) {
+
+            if ($produit->getPuCorrige() != $produit->getPu()) {
+
+                $piece[$i] = array_fill_keys($param['entetes'], ''); // Initialise toutes les colonnes à ''
+                $piece[$i]['FICHE'] = 'MOUV';
+                $piece[$i]['REFERENCE'] = $produit->getRef(); // MOUV
+                $piece[$i]['SREF1'] = $produit->getSref1(); // MOUV
+                $piece[$i]['SREF2'] = $produit->getSref2(); // MOUV
+                $piece[$i]['DESIGNATION'] = $produit->getDesignation(); // MOUV
+                $piece[$i]['REF_FOURNISSEUR'] = ''; // MOUV
+                $piece[$i]['MOUV.OP'] = $op; // MOUV
+                $piece[$i]['QUANTITE'] = $produit->getQte(); // MOUV
+                $piece[$i]['MOUV.PPAR'] = ''; // MOUV
+                $piece[$i]['MOUV.PUB'] = $produit->getPuCorrige(); // MOUV
+                $i++;
+
+            }
+
+            // Alimentation du MVTL
+            /*$piece[$i] = array_fill_keys($param['entetes'], ''); // Initialise toutes les colonnes à ''
+        $piece[$i]['FICHE'] = 'MVTL';
+        $piece[$i]['EMPLACEMENT'] = $prodByLocation['emplacement']; // MVTL
+        $piece[$i]['SERIE'] = ''; // MVTL
+        $piece[$i]['QUANTITE_VTL'] = $prodByLocation['emplacementQte']; // MVTL
+        $i++;*/
+
+        }
+
+        return $piece;
+
     }
 
     #[Route("/calcul/Cmp/dernier/achat/{dos}/{produit}/{sref1}/{sref2}", name: "app_dernier_achat_calcul_cmp")]
@@ -245,21 +335,14 @@ class DernierAchatParProduitController extends AbstractController
                         goto fin;
                     } else {
                         if ($qte > $prod['qte']) {
-                            //if ($prod['qte'] < 0 && $i == 0) {
-                            //} else {
                             // multiplier la quantité max par le pu
                             $cmp += ($prod['qte'] * $prod['pu']);
                             $qte = $qte - $prod['qte'];
                             $i = $i + $prod['qte'];
-                            //}
                         } else {
                             // multiplier par la quantité restante
                             $cmp += ($qte * $prod['pu']);
                             $i = $i + $prod['qte'];
-                            //dd($qte);
-                            /*if ($prod['ref'] == 'STABENCH2000-1500MM') {
-                            dd($i);
-                            }*/
 
                             goto fin;
                         }

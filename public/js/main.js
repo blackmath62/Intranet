@@ -1,4 +1,6 @@
-jQuery(function($) {
+// Votre code JavaScript ici
+
+jQuery(function ($) {
 
     var monAlert = $('#monAlert');
     console.log(monAlert);

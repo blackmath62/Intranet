@@ -65,6 +65,9 @@ class InterventionMonteurs
     #[ORM\ManyToMany(targetEntity: AffairePiece::class, inversedBy: 'interventionMonteursPieces')]
     private Collection $pieces;
 
+    #[ORM\Column]
+    private ?bool $allDay = null;
+
     public function __construct()
     {
         $this->Equipes = new ArrayCollection();
@@ -336,6 +339,18 @@ class InterventionMonteurs
     public function removePiece(AffairePiece $piece): static
     {
         $this->pieces->removeElement($piece);
+
+        return $this;
+    }
+
+    public function isAllDay(): ?bool
+    {
+        return $this->allDay;
+    }
+
+    public function setAllDay(bool $allDay): static
+    {
+        $this->allDay = $allDay;
 
         return $this;
     }

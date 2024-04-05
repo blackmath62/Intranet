@@ -129,13 +129,13 @@
 															<strong>{{ fichesManquante.intervenant.pseudo }}
 															</strong>
 														</p>
-														<p>Date du :
+														<p>Créer le :
 															<strong>{{ fichesManquante.createdAt|date("d/m/Y", "Europe/Paris") }}</strong>
 														</p>
 														<p>Affaire :
 															<strong>{{ fichesManquante.intervention.code.code }}</strong>
 														</p>
-														<p>Libelle :
+														<p>Libellé :
 															<strong>{{ fichesManquante.intervention.code.libelle }}</strong>
 														</p>
 														<p>Nom :
@@ -351,6 +351,50 @@
 		</div>
 	{% endif %}
 	{% if is_granted('ROLE_ADMIN_MONTEUR') %}
+		{% if cmdsWithProblem %}
+			<div class="row">
+				<div class="col-12">
+					<div class="card collapsed-card card-orange">
+						<div class="card-header text-white">
+							<h3 class="card-title">
+								<i class="fas fa-solid fa-bug"></i>
+								Commandes avec des lignes sans code Affaire
+							</h3>
+							<div class="card-tools">
+								<span class="badge badge-light">{{ cmdsWithProblem|length }}</span>
+								<button type="button" class="btn btn-tool" data-card-widget="collapse">
+									<i class="fas fa-minus"></i>
+								</button>
+							</div>
+						</div>
+						<div class="card-body">
+							<table id="example13" class="table table-bordered table-striped table-sm text-center">
+								<thead>
+									<tr>
+										<th>Cmd</th>
+										<th>Affaire</th>
+										<th>Date</th>
+										<th>Total Ligne active</th>
+										<th>Total Ligne active sans code Affaire</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for cmd in cmdsWithProblem %}
+										<tr>
+											<td>{{ cmd.cmd }}</td>
+											<td>{{ cmd.affaire }}</td>
+											<td>{{ cmd.dateCmd }}</td>
+											<td>{{ cmd.totalMouvement }}</td>
+											<td>{{ cmd.totalMouvementProjet }}</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
 		<div class="card">
 			<div class="card-header d-flex flex-column m-0">
 				<div class="card-tools">
@@ -360,24 +404,6 @@
 					<a class="btn btn-xl btn-secondary col-lg-1 col-12 m-1 float-right" href='{{path('app_update_affaires') }}'>
 						<i class="fas fa-redo-alt"></i>
 					</a>
-					<a class="btn btn-xl btn-danger col-lg-1 col-12 m-1 float-right" data-toggle="modal" data-target="#modal-lg">
-						<i class="fas fa-plus"></i>
-					</a>
-					<div class="modal fade" id="modal-lg">
-						<div class="modal-dialog modal-lg">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h4 class="modal-title">Création d'un chantier hors Affaire (Uniquement en cas d'urgence)</h4>
-									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-										<span aria-hidden="true">&times;</span>
-									</button>
-								</div>
-								<div class="modal-body">
-									{{ form_start(form) }}
-									{{ form_end(form) }}</div>
-							</div>
-						</div>
-					</div>
 					{% if app.request.attributes.get('_route')  == 'app_affaire_me_ok' %}
 						<a title='Affaires à traiter !' href="{{ path('app_affaire_me_nok') }}" class="btn btn-warning text-dark col-lg-1 col-12 m-1 float-right">
 							<i class="fas fa-thumbs-down"></i>
@@ -399,7 +425,7 @@
 						<tr>
 							<th style="width: 10px">#</th>
 							<th>Code affaire</th>
-							<th>Libéllé</th>
+							<th>Libellé</th>
 							<th>Tiers</th>
 							<th>Nom</th>
 							<th>Date Début</th>
@@ -549,30 +575,141 @@
 	</div>
 {% endblock %}
 {% block javascripts %}
-	{{  parent() }}<!-- fullCalendar --><script>
-		window.onload = () => {
-let calendarElt = document.querySelector("#calendar")
+	{{  parent() }}
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+let calendarElt = document.querySelector("#calendar");
+var containerEl = document.getElementById('external-events');
+
 let calendar = new FullCalendar.Calendar(calendarElt, {
-weekNumbers: true, // numéro de semaine
+weekNumbers: true,
 weekNumberCalculation: 'ISO',
 initialView: 'dayGridMonth',
 locale: 'fr',
 timeZone: 'Europe/Paris',
 headerToolbar: {
-left: 'prev,next today',
-center: 'title',
-right: 'dayGridMonth,timeGridWeek,timeGridDay'
+right: 'prev,next today dayGridMonth,timeGridWeek,listYear',
+left: 'title'
 },
 buttonText: {
 today: 'Aujourd\'hui',
 month: 'Mois',
-day: 'Jour',
-week: 'Semaine'
+week: 'Semaine',
+list: 'Liste'
 },
-events: {{ data|raw }}
-})
-calendar.render()
-};
+events: {{ data|raw }},
+editable: true,
+// Activer l'édition par glisser-déposer
+droppable: true,
+// this allows things to be dropped onto the calendar
+dayMaxEvents: true,
+eventResizableFromStart: true,
+
+eventDrop: function (info) { // Extraire les dates avec heures et minutes
+updateEvent(info.event);
+},
+
+eventResize: function (info) { // Pour gérer l'étirement des événements
+if (info.event.extendedProps.minEndDate != null) {
+let minEndDate = new Date(info.event.extendedProps.minEndDate.date);
+let end = new Date(info.event.end);
+end.setDate(end.getDate() - 1);
+if (minEndDate && minEndDate <= end) {
+updateEvent(info.event);
+} else { // Extraire le jour, le mois et l'année de minEndDate
+let day = minEndDate.getDate();
+let month = minEndDate.getMonth() + 1; // Les mois commencent à 0, donc ajoutez 1
+let year = minEndDate.getFullYear();
+
+// Formater la date dans le format "d-m-Y"
+let formattedDate = day + '-' + month + '-' + year;
+alert('Mise à jour impossible, des fiches existes jusqu\'au ' + formattedDate + '....');
+// Rafraîchissez l'affichage de l'événement
+info.revert();
+}
+} else {
+let minEndDate = null;
+updateEvent(info.event);
+}
+},
+
+eventDidMount: function (info) {
+info.el.setAttribute('title', info.event.extendedProps.tooltips);
+},
+
+eventDragStop: function (info) {
+if (info.jsEvent.clientX === 0 || info.jsEvent.clientY === 0) { // L'événement a été lâché en dehors du calendrier
+if (confirm('Voulez-vous vraiment supprimer cet événement ?')) { // Effectuer une requête AJAX pour supprimer l'intervention
+fetch('/Lhermitte/affaires/admin/intervention/delete/' + info.event.id, {method: 'POST'}).then(response => {
+if (response.ok) { // Suppression réussie, actualiser la page ou effectuer d'autres actions nécessaires
+info.event.remove();
+} else { // Gérer les erreurs de suppression
+alert('Des pièces et/ou des fiches sont reliées à cette intervention, merci de régulariser avant de supprimer...');
+}
+}).catch(error => {
+console.error('Erreur réseau:', error);
+});
+}
+}
+}
+});
+
+calendar.render();
+});
+	</script>
+
+	<script>
+		function updateEvent(event) {
+
+let startDate = event.start;
+let endDate = event.end;
+// Vérifier si endDate est null ou undefined
+if (endDate == null) { // Si l'heure de startDate n'est pas 00:00
+if (event.allDay == true) { // endDate devient startDate + 30 minutes
+endDate = new Date(startDate.getTime());
+endDate.setDate(endDate.getDate() + 1);
+} else { // Sinon, endDate devient startDate + 1 jour
+endDate = new Date(startDate.getTime());
+endDate.setMinutes(endDate.getMinutes() + 30);
+}
+}
+
+// Convertir les dates en format ISO complet
+let startDateISO = startDate.toISOString();
+let endDateISO = endDate.toISOString();
+
+// Construire l'URL avec les nouvelles dates
+let url = `/Lhermitte/affaire/drag/and/drop/intervention/${
+event.id
+}/${
+encodeURIComponent(startDateISO)
+}/${
+encodeURIComponent(endDateISO)
+}`;
+
+// Envoyer une requête AJAX pour mettre à jour la date dans la base de données
+fetch(url, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({})
+}).then(response => {
+if (!response.ok) {
+throw new Error('Erreur lors de la mise à jour de l\'intervention.');
+}
+return response.json();
+}).then(data => {
+console.log('Intervention mise à jour avec succès:', data.message);
+// Mettre à jour le titre de l'événement avec le message retourné dans la réponse
+event.setProp('title', data.message);
+}).catch(error => {
+console.error('Erreur:', error);
+// Afficher un message d'erreur à l'utilisateur si nécessaire
+});
+
+
+}
 	</script>
 	<script type="text/javascript">
 		function ChangeStatut(formulaire) {

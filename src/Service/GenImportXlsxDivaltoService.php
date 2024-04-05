@@ -34,6 +34,8 @@ class GenImportXlsxDivaltoService
         return null;
     }
 
+    // Ce fichier est l'ancienne version, il faut le remplacer à droite à gauche par GenImportDivaltoXlsxService qui est plus conscit et facile à maintenir
+
     public function getTypePiece($tiers = null)
     {
         if ($tiers) {
@@ -55,6 +57,7 @@ class GenImportXlsxDivaltoService
         }
         return $typeMouv;
     }
+
     // Entête de colonne pour la création de mouvements tiers
     public function getEnteteMouvTiers()
     {

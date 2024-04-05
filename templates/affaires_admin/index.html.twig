@@ -170,9 +170,9 @@
 		</div>
 	</section>
 	<section class="content">
-		<div class="row">
+		<div class="d-flex flex-wrap">
 			{% if fichesNonVerrouillees %}
-				<div class="col-md-6">
+				<div class="col-md-12 col-12">
 					<div class="card card-info">
 						<div class="card-header">
 							<h3 class="card-title">Fiche(s) non Verrouillée(s)</h3>
@@ -186,6 +186,8 @@
 										<th>Présence</th>
 										<th>Nbes Heures</th>
 										<th>Affaire</th>
+										<th>Libellé</th>
+										<th>Client</th>
 										<th>Intervention</th>
 										<th>Actions</th>
 									</tr>
@@ -204,6 +206,8 @@
 											</td>
 											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Heures|length }}</td>
 											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Intervention.code.code }}</td>
+											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Intervention.code.libelle }}</td>
+											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Intervention.code.nom }}</td>
 											<td {% if fichesNonVerrouillee.Heures|length == 0 %} class="table-danger" {% endif %}>{{ fichesNonVerrouillee.Intervention.start|date("d/m/Y", "Europe/Paris") }}
 												au
 												{{ fichesNonVerrouillee.Intervention.end|date("d/m/Y", "Europe/Paris") }}
@@ -222,7 +226,7 @@
 				</div>
 			{% endif %}
 			{% if fichesAttenteValidations %}
-				<div class="col-md-6">
+				<div class="col-md-6 col-12">
 					<div class="card card-success">
 						<div class="card-header">
 							<h3 class="card-title">Fiche(s) en attente de validation</h3>
@@ -277,6 +281,10 @@
 																<p>
 																	<strong>Affaire :</strong>
 																	{{ fichesAttenteValidation.intervention.code.libelle }}
+																</p>
+																<p>
+																	<strong>Client :</strong>
+																	{{ fichesAttenteValidation.intervention.code.nom }}
 																</p>
 																<p>
 																	<strong>Adresse :</strong>
@@ -356,13 +364,13 @@
 															</div>
 														</div>
 														<div class="modal-footer justify-content-between">
-															<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+															<a href='{{path('app_affaire_edit_fiche_intervention', {'id' : fichesAttenteValidation.Intervention.id, 'ficheId' : fichesAttenteValidation.id } ) }}'>
+																<i class="nav-icon fas fa-eye fa-2x text-secondary m-2"></i>
+															</a>
 															<a href='{{path('app_affaire_valider_fiche_intervention', {'id' : fichesAttenteValidation.id } ) }}' type="button" class="btn btn-success">Valider</a>
 														</div>
 													</div>
-													<!-- /.modal-content -->
 												</div>
-												<!-- /.modal-dialog -->
 											</div>
 										</tr>
 									{% endfor %}
@@ -373,7 +381,7 @@
 				</div>
 			{% endif %}
 			{% if fichesManquantes %}
-				<div class="col-md-6">
+				<div class="col-md-6 col-12">
 					<div class="card card-warning">
 						<div class="card-header">
 							<h3 class="card-title">Fiche(s) Manquante(s)</h3>
@@ -406,7 +414,7 @@
 												</a>
 											</td>
 											<div class="modal fade" id="modal-creer-{{f}}">
-												<div class="modal-dialog modal-sm">
+												<div class="modal-dialog">
 													<div class="modal-content">
 														<div class="modal-header">
 															<h4 class="modal-title">Voulez vous vraiment créer cette fiche ?</h4>
@@ -415,25 +423,48 @@
 															</button>
 														</div>
 														<div class="modal-body">
-															<p>Pour
-																{{ fichesManquante.intervenant.pseudo }}</p>
-															<p>Pour le
-																{{ fichesManquante.createdAt|date("d/m/Y", "Europe/Paris") }}</p>
-															<p>Affaire
-																{{ fichesManquante.intervention.code.code }}</p>
-															<p>Intervention du
+															<p>
+																<strong>Intervenants :
+																</strong>
+																{{ fichesManquante.intervenant.pseudo }}
+															</p>
+															<p>
+																<strong>Date :
+																</strong>
+																{{ fichesManquante.createdAt|date("d/m/Y", "Europe/Paris") }}
+															</p>
+															<p>
+																<strong>Affaire :
+																</strong>
+																{{ fichesManquante.intervention.code.code }}
+															</p>
+															<p>
+																<strong>Libellé :
+																</strong>
+																{{ fichesManquante.intervention.code.libelle }}
+															</p>
+															<p>
+																<strong>Client :
+																</strong>
+																{{ fichesManquante.intervention.code.nom }}
+															</p>
+															<p>
+																<strong>Intervention
+																</strong><br><strong>du
+																</strong>
 																{{ fichesManquante.intervention.start|date("d/m/Y", "Europe/Paris") }}
-																au
-																{{ fichesManquante.intervention.end|date("d/m/Y", "Europe/Paris") }}</p>
+																<strong><br>
+																	au
+																</strong>
+																{{ fichesManquante.intervention.end|date("d/m/Y", "Europe/Paris") }}
+															</p>
 														</div>
 														<div class="modal-footer justify-content-between">
 															<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
 															<a href='{{path('app_affaire_creer_fiche_intervention', {'id' : fichesManquante.intervention.id, 'intervenant' : fichesManquante.intervenant.id, 'createdAt' : fichesManquante.createdAt|date("Y-m-d", "Europe/Paris") } ) }}' type="button" class="btn btn-primary">Créer</a>
 														</div>
 													</div>
-													<!-- /.modal-content -->
 												</div>
-												<!-- /.modal-dialog -->
 											</div>
 										</tr>
 										{% set f = f + 1 %}
@@ -445,7 +476,7 @@
 				</div>
 			{% endif %}
 			{% if fichesDatesIncoherentes %}
-				<div class="col-md-6">
+				<div class="col-md-6 col-12">
 					<div class="card card-primary">
 						<div class="card-header">
 							<h3 class="card-title">Fiche(s) date(s) incohérente(s)</h3>
@@ -493,14 +524,16 @@
 				<h3 class="card-title">Pointage d'heures par salarié</h3>
 				<div>
 					{{ form_start(formFiches) }}
-					<div class="d-flex justify-content-end">
-						<div class="col-12 col-sm-2">Date de Début :
+					<div class="d-flex justify-content-end align-items-center">
+						<div>
+							du
 						</div>
-						{{ form_widget(formFiches.startDate) }}
-						<div class="col-12 col-sm-2">Date de Fin :
+						{{ form_widget(formFiches.startDate, {'attr' : {'class' : "form-control col-3 mx-2"}}) }}
+						<div>
+							au
 						</div>
-						{{ form_widget(formFiches.endDate) }}
-						{{ form_widget(formFiches.filtrer) }}
+						{{ form_widget(formFiches.endDate, {'attr' : {'class' : "form-control col-3 mx-2"}}) }}
+						{{ form_widget(formFiches.filtrer, {'attr' : {'class' : "form-control col-3 btn btn-dark"}}) }}
 					</div>
 					{{ form_end(formFiches) }}
 				</div>
@@ -548,7 +581,7 @@
 														-
 														{{ heure.end|date("H:i", "Europe/Paris") }}
 														{% set difference = heure.end|date("U") - heure.start|date("U") %}
-														-
+														=
 														{% set hours = (difference // 3600) %}
 														{% set minutes = ((difference % 3600) // 60) %}
 														{{ hours }}

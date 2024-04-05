@@ -561,9 +561,10 @@ class MouvRepository extends ServiceEntityRepository
     public function getAffaires(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT LTRIM(RTRIM(p.AFFAIRE)) AS affaire, LTRIM(RTRIM(p.LIB80)) AS libelle, LTRIM(RTRIM(p.TIERS)) AS tiers, LTRIM(RTRIM(c.NOM)) AS nom, LTRIM(RTRIM(p.USERCRDH)) AS dateCreation
+        $sql = "SELECT LTRIM(RTRIM(p.AFFAIRE)) AS affaire, LTRIM(RTRIM(r.RBQVAL)) AS duration, LTRIM(RTRIM(p.LIB80)) AS libelle, LTRIM(RTRIM(p.TIERS)) AS tiers, LTRIM(RTRIM(c.NOM)) AS nom, LTRIM(RTRIM(p.USERCRDH)) AS dateCreation
        FROM PRJAP p
        INNER JOIN CLI c ON p.DOS = c.DOS AND p.TIERS = c.TIERS
+       LEFT JOIN MRBQVAL r ON p.DOS = r.DOS AND p.AFFAIRE = r.ENTITEINDEX AND 'JOURS' = r.RUBRIQUE
        WHERE p.DOS = 1
     ";
         $stmt = $conn->prepare($sql);

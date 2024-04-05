@@ -1,126 +1,252 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ title }}{% endblock %}
-{% block body %}
-<div class="card collapsed-card card-warning">
-    <div class="card-header">
-        <h3 class="card-title"><i class="icon fas fa-exclamation-triangle"></i> Avertissement</h3>
-        <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-        </div>
-    </div>
-    <!-- /.card-header -->
-    <div class="card-body">
-                  <p>Cette liste d'anomalies ce mets à jours à 00h45 et à 12h45 par le biais d'une tâche automatique, celle-ci supprime les anomalies qui n'apparaissent plus dans le systéme durant plus de 2 jours</p>
-    <!-- /.card-footer-->
-    </div>
-</div>
-
-<div class="row">
-
-{% for anomalie in anomaliesCount %}
-  
-  <!-- /.col -->
-          <div class="col-md-3 col-sm-6 col-12">
-            <div class="info-box shadow-lg">
-              <span class="info-box-icon bg-danger"><i class="fas fa-exclamation-triangle"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">{{ anomalie.Type }}</span>
-                <span class="info-box-number">Actuellement {{ anomalie.Nombre }} problèmes non résolus</span>
-              </div>
-              <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-          </div>
-          <!-- /.col -->
-{% endfor %}
-
-</div>
-<!-- /.row -->
-                
-<div class="row">
-            <div class="col-md-12">
-                <div class="card card-dark">
-                    <div class="card-header d-flex justify-content-between">
-                        <h2 class="card-title">Liste des anomalies<span class="badge badge-info ml-2">{{ anomalies|length }} détectées</span></h2>
-                        <a href="{{ path('app_controle_anomalies_run') }}" class="badge badge-success ml-auto pr-2 pl-2">Lancer les scripts</a>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-							{% if anomalies %}
-                        <table id="example1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"><span>Id</span></th>
-                                    <th class="text-center"><span>IdAnomalie</span></th>
-                                    <th class="text-center"><span>Type</span></th>
-                                    <th class="text-center"><span>Date de création</span></th>
-                                    <th class="text-center"><span>Dernier Email rappel en jour</span></th>
-                                    <th class="text-center"><span>Date dernier mail</span></th>
-                                    <th class="text-center"><span>Utilisateur</span></th>
-                                    <th class="text-center"><span>Nbe Jour depuis création</span></th>
-                                    <th class="text-center"><span>Date de mise à jours</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            
-                                {% for anomalie in anomalies %}
-                                    <tr>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ anomalie.id }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ anomalie.idAnomalie}}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ anomalie.type }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ anomalie.createdAt|date("d/m/Y h:i") }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                        {% set differenceMod = date(anomalie.modifiedAt).diff(date("now")) %}
-                                            <a class="text-dark">{{ differenceMod.days }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ anomalie.modifiedAt|date("d/m/Y h:i") }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ anomalie.User }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                        {% set differenceUp = date(anomalie.updatedAt).diff(date(anomalie.createdAt)) %}
-                                            <a class="text-dark">{{ differenceUp.days }}</a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a class="text-dark">{{ anomalie.updatedAt|date("d/m/Y h:i") }}</a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th class="text-center"><span>Id</span></th>
-                                    <th class="text-center"><span>IdAnomalie</span></th>
-                                    <th class="text-center"><span>Type</span></th>
-                                    <th class="text-center"><span>Date de création</span></th>
-                                    <th class="text-center"><span>Dernier Email rappel en jour</span></th>
-                                    <th class="text-center"><span>Date dernier mail</span></th>
-                                    <th class="text-center"><span>Utilisateur</span></th>
-                                    <th class="text-center"><span>Nbe Jour depuis création</span></th>
-                                    <th class="text-center"><span>Date de mise à jours</span></th>
-                                </tr>
-                                </tr>
-                            </tfoot>
-                        </table>
-                                {% else %}
-                                     <h4 class="text-left text-dark"><i class="fas fa-info-circle pr-2 text-primary"></i>Aucunes anomalies actuellement, Félicitation !</h4>
-                            {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
+{% block title %}
+	{{ title }}
 {% endblock %}
+{% block body %}
+	<div class="card collapsed-card card-warning">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-exclamation-triangle"></i>
+				Avertissement</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<div class="card-body">
+			<p>Cette liste d'anomalies ce mets à jours à 00h45 et à 12h45 par le biais d'une tâche automatique, celle-ci supprime les anomalies qui n'apparaissent plus dans le systéme durant plus de 2 jours</p>
+		</div>
+	</div>
+	<div class="row">
+		{% for anomalie in anomaliesCount %}
+			<div class="col-md-3 col-sm-6 col-12">
+				<div class="info-box shadow-lg">
+					<span class="info-box-icon bg-danger">
+						<i class="fas fa-exclamation-triangle"></i>
+					</span>
 
+					<div class="info-box-content">
+						<span class="info-box-text">{{ anomalie.Type }}</span>
+						<span class="info-box-number">Actuellement
+							{{ anomalie.Nombre }}
+							problèmes non résolus</span>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header d-flex justify-content-between">
+					<h2 class="card-title">Liste des anomalies<span class="badge badge-info ml-2">{{ anomalies|length }}
+							détectées</span>
+					</h2>
+					<a href="{{ path('app_controle_anomalies_run') }}" class="badge badge-success ml-auto pr-2 pl-2">Lancer les scripts</a>
+				</div>
+				<div class="card-body">
+					{% if anomalies %}
+						<table id="example1" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th class="text-center">
+										<span>Id</span>
+									</th>
+									<th class="text-center">
+										<span>IdAnomalie</span>
+									</th>
+									<th class="text-center">
+										<span>Type</span>
+									</th>
+									<th class="text-center">
+										<span>Date de création</span>
+									</th>
+									<th class="text-center">
+										<span>Dernier Email rappel en jour</span>
+									</th>
+									<th class="text-center">
+										<span>Date dernier mail</span>
+									</th>
+									<th class="text-center">
+										<span>Utilisateur</span>
+									</th>
+									<th class="text-center">
+										<span>Nbe Jour depuis création</span>
+									</th>
+									<th class="text-center">
+										<span>Date de mise à jours</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
 
+								{% for anomalie in anomalies %}
+									<tr>
+										<td class="text-center">
+											<a class="text-dark">{{ anomalie.id }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ anomalie.idAnomalie}}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ anomalie.type }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ anomalie.createdAt|date("d/m/Y h:i") }}</a>
+										</td>
+										<td class="text-center">
+											{% set differenceMod = date(anomalie.modifiedAt).diff(date("now")) %}
+											<a class="text-dark">{{ differenceMod.days }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ anomalie.modifiedAt|date("d/m/Y h:i") }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ anomalie.User }}</a>
+										</td>
+										<td class="text-center">
+											{% set differenceUp = date(anomalie.updatedAt).diff(date(anomalie.createdAt)) %}
+											<a class="text-dark">{{ differenceUp.days }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ anomalie.updatedAt|date("d/m/Y h:i") }}</a>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+							<tfoot>
+								<tr>
+									<th class="text-center">
+										<span>Id</span>
+									</th>
+									<th class="text-center">
+										<span>IdAnomalie</span>
+									</th>
+									<th class="text-center">
+										<span>Type</span>
+									</th>
+									<th class="text-center">
+										<span>Date de création</span>
+									</th>
+									<th class="text-center">
+										<span>Dernier Email rappel en jour</span>
+									</th>
+									<th class="text-center">
+										<span>Date dernier mail</span>
+									</th>
+									<th class="text-center">
+										<span>Utilisateur</span>
+									</th>
+									<th class="text-center">
+										<span>Nbe Jour depuis création</span>
+									</th>
+									<th class="text-center">
+										<span>Date de mise à jours</span>
+									</th>
+								</tr>
+							</tfoot>
+						</table>
+					{% else %}
+						<h4 class="text-left text-dark">
+							<i class="fas fa-info-circle pr-2 text-primary"></i>Aucunes anomalies actuellement, Félicitation !
+						</h4>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-dark">
+				<div class="card-header d-flex justify-content-between">
+					<h2 class="card-title">Liste des produits à fermer
+						<span class="badge badge-info ml-2">{{ fermerProduits|length }}
+							détectées</span>
+					</h2>
+				</div>
+				<div class="card-body">
+					{% if fermerProduits %}
+						<table id="example12" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th class="text-center">
+										<span>Dos</span>
+									</th>
+									<th class="text-center">
+										<span>Référence</span>
+									</th>
+									<th class="text-center">
+										<span>Sref1</span>
+									</th>
+									<th class="text-center">
+										<span>Sref2</span>
+									</th>
+									<th class="text-center">
+										<span>Désignation</span>
+									</th>
+									<th class="text-center">
+										<span>Stock</span>
+									</th>
+									<th class="text-center">
+										<span>Alerte</span>
+									</th>
+									<th class="text-center">
+										<span>Cmd</span>
+									</th>
+									<th class="text-center">
+										<span>Bl</span>
+									</th>
+									<th class="text-center">
+										<span>Op</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+
+								{% for fermerProduit in fermerProduits %}
+									<tr>
+										<td class="text-center">
+											<a class="text-dark">{{ fermerProduit.Dos }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ fermerProduit.Ref}}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ fermerProduit.Sref1 }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ fermerProduit.Sref2 }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ fermerProduit.Designation }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ fermerProduit.Stock }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ fermerProduit.Alerte }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ fermerProduit.Cmd }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ fermerProduit.Bl }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ fermerProduit.Op }}</a>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					{% else %}
+						<h4 class="text-left text-dark">
+							<i class="fas fa-info-circle pr-2 text-primary"></i>Articles à fermer actuellement, Félicitation !
+						</h4>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

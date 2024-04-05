@@ -78,7 +78,9 @@
 						</li>
 					{% endif %}
 					<li class="nav-item d-sm-inline-block">
-						<a href="{{path('app_home')}}" class="nav-link">Accueil</a>
+						<a href="{{path('app_home')}}" class="nav-link">
+							<i class="fa-solid fa-house"></i>
+						</a>
 					</li>
 				</ul>
 				<ul class="navbar-nav ml-auto">
@@ -86,9 +88,9 @@
 						<a class="nav-link" data-toggle="dropdown" href="">
 							<div class="user-panel d-flex">
 								<img class="direct-chat-img" src="{{ asset(asset('img/profile/' ~ app.user.img))}}" alt="User Image">
-								<div class="info">
+								<small class="info">
 									{{ app.user.email }}
-								</div>
+								</small>
 								<div class="info">
 									{{ app.user.token }}
 								</div>

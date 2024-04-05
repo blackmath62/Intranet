@@ -9,7 +9,8 @@ use App\Entity\Main\Users;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -33,19 +34,31 @@ class InterventionsMonteursType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('start', DateTimeType::class, [
+            ->add('start', DateType::class, [
                 'widget' => 'single_text',
                 'required' => true,
                 'label' => "Date Début : ",
-                'attr' => ['class' => 'form-control col-12 text-center'],
+                'attr' => ['class' => 'form-control col-12 text-center start-date'],
                 'label_attr' => ['class' => 'col-12 text-center'],
             ])
-            ->add('end', DateTimeType::class, [
+            ->add('end', DateType::class, [
                 'widget' => 'single_text',
                 'required' => true,
                 'label' => "Date fin : ",
-                'attr' => ['class' => 'form-control col-12 text-center'],
+                'attr' => ['class' => 'form-control col-12 text-center end-date'],
                 'label_attr' => ['class' => 'col-12 text-center'],
+            ])
+            ->add('allDay', CheckboxType::class, [
+                'label' => 'Toute la journée',
+                'required' => false, // Dépend de vos besoins
+                'attr' => [
+                    'id' => 'all_day_checkbox',
+                    'class' => 'form-check-input d-none',
+                ], // Ajoutez des attributs si nécessaire
+                'label_attr' => [
+                    'class' => 'form-check-label d-none',
+                ],
+                'data' => true,
             ])
             ->add('adresse', TextType::class, [
                 'required' => false,
@@ -66,7 +79,7 @@ class InterventionsMonteursType extends AbstractType
                 'by_reference' => false,
                 'required' => false,
                 'attr' => [
-                    'class' => 'form-control',
+                    'class' => 'form-control typeIntervention',
                 ],
                 'choice_attr' => function ($choice) {
                     $backgroundColor = $choice->getBackgroundColor();
@@ -91,7 +104,7 @@ class InterventionsMonteursType extends AbstractType
                 'by_reference' => false,
                 'required' => false,
                 'attr' => [
-                    'class' => 'form-control select2',
+                    'class' => 'form-control select2 custom-select',
                 ],
                 'label' => "Equipe",
             ])
@@ -131,8 +144,8 @@ class InterventionsMonteursType extends AbstractType
                 'attr' => ['class' => 'form-control col-12 text-center'],
             ])
             ->add('ajouter', SubmitType::class, [
-                'attr' => ['class' => 'btn btn-success mt-3 float-right col-12 col-sm-3'],
-                'label' => 'Ajouter une intervention',
+                'attr' => ['class' => 'btn btn-success float-right col-12 col-sm-3'],
+                'label' => 'Ajouter cette intervention',
             ])
         ;
     }

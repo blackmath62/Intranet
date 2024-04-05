@@ -43,7 +43,7 @@ class InterventionFicheType extends AbstractType
             ])
             ->add('pension', ChoiceType::class, [
                 'choices' => [
-                    'Hotel' => "Hotel",
+                    'Hôtel' => "Hotel",
                     'Panier Repas Midi' => "Panier Repas Midi",
                     'Panier Repas Soir' => "Panier Repas Soir",
                     'Restaurant Repas Midi' => "Restaurant Repas Midi",

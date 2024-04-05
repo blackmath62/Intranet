@@ -183,6 +183,8 @@ class AffairesAdminController extends AbstractController
     public function controlDay($day)
     {
 
+        $d = clone $day;
+        $d = $d->format('Y-m-d');
         // récupérer les fériers en JSON sur le site etalab
         $ferierJson = file_get_contents("https://etalab.github.io/jours-feries-france-data/json/metropole.json");
 
@@ -192,7 +194,7 @@ class AffairesAdminController extends AbstractController
             RecursiveIteratorIterator::SELF_FIRST);
         $ferierDurantConges = array();
         foreach ($jsonIterator as $key => $val) {
-            if ($key == $day) {
+            if ($key == $d) {
                 return true;
             }
         }
@@ -211,36 +213,55 @@ class AffairesAdminController extends AbstractController
         // pour chaque interventions
         $fichesManquantes = [];
         $interventions = $this->repoIntervention->findBy(['lockedAt' => null]);
-        //dd($interventions);
         foreach ($interventions as $intervention) {
             // Pour chaque interval de date hors férier et weekend
             $interval = DateInterval::createFromDateString('1 day');
             $days = new DatePeriod($intervention->getStart(), $interval, $intervention->getEnd());
             $status = true;
+            if (count($intervention->getEquipes()) === 0) {
+                $status = false;
+                $this->addFlash('danger', 'Attention, Intervention ' . $intervention->getCode()->getLibelle() . ' du ' . $intervention->getStart()->format("d/m/y") . ' au ' . $intervention->getEnd()->format("d/m/y") . ' sans intervenants.');
+            }
+            /*if ($intervention->getId() == 205) {
+            dd($intervention);
+            }*/
 
             /** @var DateTimeInterface $day */
             foreach ($days as $day) {
-                if ($day <= new Datetime) {
-                    $valid = $this->controlDay($day);
-                    if ($valid == false) {
-                        // Pour chaque intervenant de cette intervention pour ce jour
-                        foreach ($intervention->getEquipes() as $intervenant) {
-                            $day = new DateTime($day->format('Y-m-d'));
-                            $fiche = $this->repoFiche->findBy(['intervenant' => $intervenant, 'createdAt' => $day, 'intervention' => $intervention]);
-                            if (!$fiche) {
-                                // liste des fiches manquantes
-                                $fichesManquantes[] = [
-                                    'createdAt' => $day,
-                                    'intervenant' => $intervenant,
-                                    'intervention' => $intervention,
-
-                                ];
-                                // s'il manque une fiche on ne verrouillera pas l'intervention
-                                $status = false;
-                            } elseif (!$fiche[0]->getValidedBy()) {
-                                // si la fiche n'a pas été validé, on ne verrouille pas l'intervention
-                                $status = false;
+                $end = clone $intervention->getEnd();
+                $endDateTime = clone $intervention->getEnd();
+                $hi = $endDateTime->format('H:i'); // Récupérer les heures
+                $nc = false;
+                if ($day === $end && $hi != '00:00') {
+                    $nc = true;
+                }
+                // revoir cette partie
+                if ($nc === false) {
+                    if ($day >= new DateTime('2024/03/25')) {
+                        if ($day <= new Datetime) {
+                            $valid = $this->controlDay($day);
+                            if ($valid == false) {
+                                // Pour chaque intervenant de cette intervention pour ce jour
+                                foreach ($intervention->getEquipes() as $intervenant) {
+                                    $day = new DateTime($day->format('Y-m-d'));
+                                    $fiche = $this->repoFiche->findBy(['intervenant' => $intervenant, 'createdAt' => $day, 'intervention' => $intervention]);
+                                    if (!$fiche) {
+                                        // liste des fiches manquantes
+                                        $fichesManquantes[] = [
+                                            'createdAt' => $day,
+                                            'intervenant' => $intervenant,
+                                            'intervention' => $intervention,
+                                        ];
+                                        // s'il manque une fiche on ne verrouillera pas l'intervention
+                                        $status = false;
+                                    } elseif (!$fiche[0]->getValidedBy()) {
+                                        // si la fiche n'a pas été validé, on ne verrouille pas l'intervention
+                                        $status = false;
+                                    }
+                                }
                             }
+                        } else {
+                            $status = false;
                         }
                     }
                 }
@@ -255,6 +276,31 @@ class AffairesAdminController extends AbstractController
             }
         }
         return $fichesManquantes;
+    }
+
+    /**
+     * @Route("/Lhermitte/affaires/admin/intervention/delete/{id}", name="app_admin_intervention_delete", methods={"POST"})
+     */
+    public function delete(int $id): JsonResponse
+    {
+        // Récupérer l'intervention par son ID
+        $intervention = $this->repoIntervention->find($id);
+
+        // Vérifier si l'intervention existe
+        if (!$intervention) {
+            return new JsonResponse(['error' => 'Intervention not found'], 404);
+        }
+
+        // Vérifier s'il existe des pièces reliées à cette intervention
+        if ($intervention->getPieces()->count() > 0) {
+            return new JsonResponse(['error' => 'Des pièces sont reliées à cette intervention'], 400);
+        }
+
+        // Supprimer l'intervention
+        $this->entityManager->remove($intervention);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['message' => 'Intervention deleted successfully']);
     }
 
     // TODO CETTE PARTIE PLUS COMPLEXE EST A FAIRE

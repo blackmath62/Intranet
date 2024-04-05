@@ -31,11 +31,22 @@
 			<div class="card mt-2">
 				<div class="card-header d-flex flex-wrap flex-column">
 					<h3 class="card-title">Saisie fiche intervention</h3>
-					<small>pour
-						{{intervention.code.libelle }}</small>
-					<small>du
+					<small>
+						<strong>Affaire :
+						</strong>
+						{{intervention.code.libelle }}
+					</small>
+					<small>
+						<strong>Client :
+						</strong>
+						{{intervention.code.nom }}
+					</small>
+					<small>
+						<strong>du
+						</strong>
 						{{ intervention.start|date("d-m-Y H:i", "Europe/Paris") }}
-						au
+						<strong>au
+						</strong>
 						{{ intervention.end|date("d-m-Y H:i", "Europe/Paris") }}
 					</small>
 				</div>

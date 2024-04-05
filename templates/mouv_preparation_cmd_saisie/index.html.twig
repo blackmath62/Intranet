@@ -86,10 +86,15 @@
 				Enregistrement  :
 				{{ products[0].enrNo }}
 			</p>
-			<p class="card-text">
-				Ean  :
-				{{ products[0].ean }}
-			</p>
+
+			<span id="copyButton" class="d-flex text-secondary ml-2">
+				<p class="card-text">
+					Ean  :
+					{{ products[0].ean }}
+				</p>
+				<i class="fa-solid fa-copy p-2"></i>
+			</span>
+
 			<div id="accordion">
 				<div class="card card-dark">
 					<div class="card-header">
@@ -425,12 +430,31 @@ $("#noStockMessage").addClass("d-none");
 // Ajouter chaque élément de stock au tableau
 $.each(stockData, function (index, stock) {
 var row = $("<tr>");
-$("<td>").text(stock.empl).appendTo(row);
+
+var emplacementCell = $("<td>").append(stock.empl).append('<i class="fa-solid fa-copy p-2 text-secondary"></i>');
+
+// Ajouter un gestionnaire d'événements clic à la cellule d'emplacement
+emplacementCell.click(function () { // Récupérer le texte de la cellule d'emplacement
+var emplacement = $(this).text();
+
+// Mettre à jour la valeur de l'input avec l'emplacement
+$("#eanEmplacement").val(emplacement);
+processEanemplacement();
+});
+
+// Ajouter la cellule d'emplacement à la ligne
+emplacementCell.appendTo(row);
+
+// Créer la cellule de quantité avec le texte
 $("<td>").text(stock.qte).appendTo(row);
+
+// Ajouter la ligne au corps du tableau
 row.appendTo("#stockTableBody");
+
 // Ajouter la quantité de stock actuelle au total
 qteTotalStock += parseFloat(stock.qte.replace(".", ","));
 });
+
 }
 // Mettre à jour l'élément avec l'identifiant qteTotalStock avec le total calculé
 $("#qteTotalStock").text(qteTotalStock);
@@ -678,6 +702,16 @@ sendLink.setAttribute("href", baseUrl);
 console.log('j ai lancé setBadgeCount');
 }
 
+document.getElementById('copyButton').addEventListener('click', function () {
+var eanValue = products[currentProductIndex].ean;
+document.getElementById('eanProduit').value = eanValue;
+processEanproduit();
+});
+
+function copyEmplacement(emplacement) {
+document.getElementById('eanEmplacement').value = emplacement;
+console.log(emplacement);
+}
 
 });
 // fin de $(document).ready(function ()

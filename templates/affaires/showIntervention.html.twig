@@ -39,37 +39,46 @@
 			<span class=" info-box-icon" style=" background-color: {{ intervention.typeIntervention.backgroundColor }} ; color: {{ intervention.typeIntervention.textColor }} " ;>
 				<i class="{{ intervention.typeIntervention.faIconsClass }}"></i>
 			</span>
-			<div class="info-box-content">
+			<div class="info-box-content text-center">
 				<h5 class="">{{ intervention.code.Libelle}}</h5>
-				<span class="m-1">
-					Du
-					{{intervention.start|date("d/m/Y H:i", "Europe/Paris") }}
-					au
-					{{intervention.end|date("d/m/Y H:i", "Europe/Paris") }}
-				</span>
 				<div class="d-flex justify-content-around flex-wrap">
-					<p class="m-1">
-						<ul>
+					<ul class="text-center">
+						<li style="list-style-type: none;">
+							<u>Dates :</u>
+						</li>
+						<li style="list-style-type: none;">du
+							{{ intervention.start|date("d/m/Y H:i") }}
+						</li>
+						<li style="list-style-type: none;">au
+							{{ intervention.end|date("d/m/Y H:i") }}
+						</li>
+					</ul>
+					<ul class="text-center">
+						<li style="list-style-type: none;">
+							<u>Equipe :</u>
+						</li>
+						{% for monteur in intervention.Equipes %}
 							<li style="list-style-type: none;">
-								<u>Equipe :</u>
+								{{ monteur.Pseudo }}
 							</li>
-							{% for monteur in intervention.Equipes %}
-								<li>
-									{{ monteur.Pseudo }}
-								</li>
-							{% endfor %}
-						</ul>
-					</p>
-					<p class="m-1 d-flex flex-row">
-						<ul>
-							<li style="list-style-type: none;">
-								<u>Adresse :</u>
-							</li>
-							<li>
-								{{ intervention.adresse }}
-							</li>
-						</ul>
-					</p>
+						{% endfor %}
+					</ul>
+					<ul class="text-center">
+						<li style="list-style-type: none;">
+							<u>Client :</u>
+						</li>
+						<li style="list-style-type: none;">
+							{{ intervention.code.nom }}
+						</li>
+					</ul>
+					<ul class="text-center">
+						<li style="list-style-type: none;">
+							<u>Adresse :</u>
+						</li>
+						<li style="list-style-type: none;">
+							{{ intervention.adresse }}
+						</li>
+					</ul>
 				</div>
 			</div>
 			<!-- /.info-box-content -->
@@ -351,7 +360,7 @@
 
 							{% else %}
 								<h4 class="text-left text-dark m-2">
-									<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de documents pour cette intervention....
+									<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de document pour cette intervention....
 								</h4>
 							{% endif %}
 						</div>
@@ -390,7 +399,7 @@
 								</table>
 							{% else %}
 								<h4 class="text-left text-dark m-2">
-									<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de documents pour cette intervention....
+									<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de document pour cette intervention....
 								</h4>
 							{% endif %}
 						</div>
@@ -491,7 +500,7 @@
 				{% else %}
 					</tbody>
 					<h4 class="text-left text-dark">
-						<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de piéces pour cette intervention....
+						<i class="fas fa-info-circle pr-2 text-primary"></i>Pas de piéce pour cette intervention....
 					</h4>
 				{% endif %}
 			</table>
