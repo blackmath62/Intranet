@@ -303,6 +303,7 @@ class HolidayController extends AbstractController
             $end = $formDates->getData()['endDate']->format('Y-m-d');
 
             $listCountConges = $this->repoHoliday->getListeCongesDurantPeriode($start, $end);
+            //dd($listCountConges);
             // TODO Modifier la page fermeture pour qu'elle utilise le même procédé (ajouter des colonnes)
 
             for ($d = 0; $d < count($listCountConges); $d++) {
@@ -336,6 +337,7 @@ class HolidayController extends AbstractController
             // Initialisation des types de congé pour chaque nom
             foreach ($listCountConges as $conge) {
                 $nom = $conge['nom'];
+                $societe = $conge['societe'];
 
                 if (!isset($formattedData[$nom])) {
                     $formattedData[$nom] = array_fill_keys($typesDeConge, 0);
@@ -346,14 +348,18 @@ class HolidayController extends AbstractController
             // Remplissage des types de congé avec les valeurs réelles et calcul du total
             foreach ($listCountConges as $conge) {
                 $nom = $conge['nom'];
+                $societe = $conge['societe'];
                 $type = $conge['typeCp'];
                 $nbeJours = $conge['NbeJoursPeriode'];
+                $formattedData[$nom]['societe'] = $societe;
 
                 if (isset($formattedData[$nom][$type])) {
                     $formattedData[$nom][$type] += $nbeJours;
                     $formattedData[$nom]['total'] += $nbeJours; // Calcul du total
                 }
             }
+
+            //dd($formattedData);
         }
 
         return $this->render('holiday/closing.html.twig', [
@@ -519,9 +525,6 @@ class HolidayController extends AbstractController
     // Voir un congés
     public function showHoliday($id)
     {
-        // tracking user page for stats
-        //$tracking = $request->attributes->get('_route');
-        //$this->setTracking($tracking);
 
         $holiday = $this->repoHoliday->findOneBy(['id' => $id]);
 
@@ -670,9 +673,6 @@ class HolidayController extends AbstractController
     // accepter un congés
     public function acceptHoliday($id)
     {
-        // tracking user page for stats
-        //$tracking = $request->attributes->get('_route');
-        //$this->setTracking($tracking);
 
         $holiday = $this->repoHoliday->findOneBy(['id' => $id]);
         $statut = $this->repoStatuts->findOneBy(['id' => 3]);
@@ -1070,7 +1070,7 @@ class HolidayController extends AbstractController
 
         // Entête de colonne
         $sheetResume->getCell('A5')->setValue('Pseudo');
-        $sheetResume->getCell('B5')->setValue('Email');
+        $sheetResume->getCell('B5')->setValue('Société');
         $sheetResume->getCell('C5')->setValue('Congés Payés');
         $sheetResume->getCell('D5')->setValue('RTT');
         $sheetResume->getCell('E5')->setValue('Sans Solde');
@@ -1086,12 +1086,12 @@ class HolidayController extends AbstractController
         // Extraire les valeurs uniques de la colonne spécifiée
         $donnees = $this->repoHoliday->getVacationTypeListByUsers($start, $end);
         $donnees = array_reduce($donnees, function ($carry, $item) {
-            $key = $item['pseudo'] . '_' . $item['email'];
+            $key = $item['pseudo'] . '_' . $item['societe'];
 
             if (!isset($carry[$key])) {
                 $carry[$key] = array(
                     "pseudo" => $item['pseudo'],
-                    "email" => $item['email'],
+                    "societe" => $item['societe'],
                 );
             }
 

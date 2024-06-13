@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Main\Services;
+use App\Entity\Main\Societe;
 use App\Entity\Main\Users;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -89,6 +90,17 @@ class EditUsersType extends AbstractType
                         ->orderBy('s.title', 'ASC');
                 },
 
+            ])
+            ->add('societe', EntityType::class, [
+                'class' => Societe::class,
+                'required' => true,
+                'choice_label' => 'nom',
+                'multiple' => false,
+                'expanded' => false,
+                'attr' => [
+                    'class' => 'form-control col-12 mt-2 mb-2',
+                    'data-placeholder' => 'Selectionnez la société',
+                ],
             ])
             ->add('roles', ChoiceType::class, [
                 'choices' => [

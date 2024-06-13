@@ -26,6 +26,7 @@ class StatsAchatController extends AbstractController
         $states = '';
         $totauxFournisseurs = '';
         $totaux = '';
+        $title = 'States Achats';
         $template = 'stats_achat/statesBasiques.html.twig';
 
         $form = $this->createForm(DateDebutDateFinFournisseursType::class);
@@ -38,6 +39,7 @@ class StatsAchatController extends AbstractController
             $dd = $form->getData()['start']->format('Y-m-d');
             $df = $form->getData()['end']->format('Y-m-d');
             $metier = $this->miseEnForme($form->getData()['metier']);
+            $title = 'States ' . $fous . ' ' . $tiers . ' du ' . $dd . ' au ' . $df;
             if ($form->getData()['type'] == 'dateOp') {
                 $states = $repo->getStatesDetaillees($dos, $dd, $df, $fous, $fams, $metier, $tiers);
                 $template = 'stats_achat/statesDetaillees.html.twig';
@@ -49,15 +51,21 @@ class StatsAchatController extends AbstractController
                 $states = $repo->getStatesSansFournisseurs($dos, $dd, $df, $fous, $fams, $metier, $tiers);
                 $template = 'stats_achat/statesSansFournisseurs.html.twig';
             }
+            if ($form->getData()['type'] == 'commerciaux') {
+                $states = $repo->getStatesCommerciaux($dos, $dd, $df, $fous, $fams, $metier, $tiers);
+                $template = 'stats_achat/statesCommerciaux.html.twig';
+            }
             $totauxFournisseurs = $repo->getTotauxStatesParFournisseurs($dos, $dd, $df, $fous, $fams, $metier, $tiers);
             $totaux = $repo->getTotauxStatesTousFournisseurs($dos, $dd, $df, $fous, $fams, $metier, $tiers);
         }
+
+        //dd($states);
 
         return $this->render($template, [
             'states' => $states,
             'totauxFournisseurs' => $totauxFournisseurs,
             'totaux' => $totaux,
-            'title' => 'States Achats',
+            'title' => $title,
             'form' => $form->createView(),
         ]);
     }

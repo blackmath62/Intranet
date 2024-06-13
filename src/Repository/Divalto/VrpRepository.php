@@ -33,4 +33,17 @@ class VrpRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // liste des utilisateurs de Divalto pour la mise à jour
+    public function listCommerciauxDivalto(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(v.TIERS)) AS tiers, LTRIM(RTRIM(v.NOM))AS nom
+        FROM VRP v
+        WHERE v.DOS = 1
+    ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
 }

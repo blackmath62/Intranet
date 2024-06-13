@@ -27,7 +27,6 @@ class CommentairesType extends AbstractType
                 ],
                 'label' => 'Nouveau commentaire...',
                 'required' => false,
-                'data' => '',
             ])
             ->add('ajouter', SubmitType::class, [
                 'label' => "Ajouter",

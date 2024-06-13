@@ -34,7 +34,7 @@ class EmplRepository extends ServiceEntityRepository
         WHERE e.DOS NOT IN (777)) reponse
         LEFT JOIN MVTL v ON dos = v.DOS AND ref = v.REF AND sref1 = v.SREF1 AND sref2 = v.SREF2
         INNER JOIN ART a ON a.DOS = dos AND a.REF = ref
-        WHERE v.LIEU <> empl AND v.TICOD NOT IN ('I') AND v.PICOD IN (2,3) -- AND v.OP NOT IN ('CD','DD','FD','GD')
+        WHERE v.LIEU <> empl AND v.TICOD NOT IN ('I') AND v.PICOD IN (2,3) AND v.OP NOT IN ('CD','DD','FD','GD')
         ORDER BY ref
         ";
         $stmt = $conn->prepare($sql);

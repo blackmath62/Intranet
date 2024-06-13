@@ -15,7 +15,9 @@
 						{% elseif app.request.attributes.get('_route')  == 'app_states_par_famille_clients' or app.request.attributes.get('_route')  == 'app_states_par_famille_clients_dd_df' or app.request.attributes.get('_route')  == 'app_states_par_famille_clientsLh' or app.request.attributes.get('_route')  == 'app_states_par_famille_clients_dd_dfLh' %}
 							{% set type = "clients" %}
 						{% endif %}
-						<h3 class="card-title text-center">States par famille de
+						<h3 class="card-title text-center">States
+							{{ app.request.attributes.get('metier') }}
+							par famille de
 							{{ type }}
 							{% if trancheD and trancheF %}
 								{{ trancheF }}
@@ -41,7 +43,7 @@
 								) }}
 							</div>
 							<div class="p-1">
-								<a class="btn btn-success" href="{{path('app_resume_states_dd_df', {'dos' : app.request.attributes.get('dos'),'dd' : dd, 'df' : df})}}">Résumé</a>
+								<a class="btn btn-success" href="{{path('app_resume_states_dd_df', {'dos' : app.request.attributes.get('dos'),'metier' : app.request.attributes.get('metier'),'dd' : dd, 'df' : df})}}">Résumé</a>
 							</div>
 						</div>
 						{{ form_end(form) }}
@@ -78,7 +80,7 @@
 										<i class="fas fa-caret-{{fleche}}"></i>
 										{{ ( ( (totaux[0].montantN - totaux[0].montantN1) / totaux[0].montantN1 ) * 100) |number_format(2, '.', ' ')}}
 										%</span>
-									<h5 class="description-header">{{ (totaux[0].montantN - totaux[0].montantN1)}}</h5>
+									<h5 class="description-header">{{ (totaux[0].montantN - totaux[0].montantN1)|format_currency('EUR', locale='fr') }}</h5>
 									<span class="description-text">Delta</span>
 								</div>
 								<!-- /.description-block -->
@@ -155,12 +157,13 @@
 															<td>{{famille.famille}}</td>
 															<td class='table-info'>
 																{% if famille.montantN1 < 0 or famille.montantN1 > 0 %}
-																	{{famille.montantN1}}
+																	{{famille.montantN1|format_currency('EUR', locale='fr')}}
 																{% endif %}
 															</td>
 															<td class='table-info'>
 																{% if famille.montantN1 > 0 %}
 																	{{ (( famille.montantN1 * 100 ) / totaux[0].montantN1 )|number_format(2, '.', ' ') }}
+																	%
 																{% endif %}
 															</td>
 															{% set color = "text-dark" %}
@@ -172,22 +175,23 @@
 																	{% set color = "text-danger" %}
 																{% endif %}
 																<td class="{{ color }}">
-																	<b>{{ delta|number_format(2, '.', ' ') }}</b>
+																	<b>{{ delta|number_format(2, '.', ' ') }}
+																		%</b>
 																</td>
 															{% elseif famille.montantN > 0 and (famille.montantN1 == 0 or famille.montantN1 == "") %}
 																{% set color = "text-success" %}
 																<td class="{{ color }}">
-																	<b>100</b>
+																	<b>100 %</b>
 																</td>
 															{% elseif (famille.montantN == 0 or famille.montantN == "") and famille.montantN1 > 0 %}
 																{% set color = "text-danger" %}
 																<td class="{{ color }}">
-																	<b>- 100</b>
+																	<b>- 100 %</b>
 																</td>
 															{% else %}
 																{% set color = "text-warning" %}
 																<td class="{{ color }}">
-																	<b>0</b>
+																	<b>0 %</b>
 																</td>
 															{% endif %}
 															{% if famille.montantN - famille.montantN1 > 0 %}
@@ -198,16 +202,17 @@
 																{% set couleur = 'text-warning' %}
 															{% endif %}
 															<td class="{{ couleur }}">
-																<b>{{(famille.montantN - famille.montantN1)}}</b>
+																<b>{{(famille.montantN - famille.montantN1)|format_currency('EUR', locale='fr')}}</b>
 															</td>
 															<td class='table-success'>
 																{% if famille.montantN < 0 or famille.montantN > 0 %}
-																	{{famille.montantN}}
+																	{{famille.montantN|format_currency('EUR', locale='fr')}}
 																{% endif %}
 															</td>
 															<td class='table-success'>
 																{% if famille.montantN > 0 %}
 																	{{ (( famille.montantN * 100 ) / totaux[0].montantN )|number_format(2, '.', ' ') }}
+																	%
 																{% endif %}
 															</td>
 														</tr>
@@ -257,7 +262,7 @@
 													<td>{{state.tiers}}</td>
 													<td>{{state.nom}}</td>
 													<td>{{state.famille}}</td>
-													<td>{{state.montantN1}}</td>
+													<td>{{state.montantN1|format_currency('EUR', locale='fr')}}</td>
 													{% set color = "text-dark" %}
 													{% if state.montantN > 0 and state.montantN1 > 0 %}
 														{% set delta = ((state.montantN - state.montantN1) / state.montantN1)* 100 %}
@@ -267,22 +272,23 @@
 															{% set color = "text-danger" %}
 														{% endif %}
 														<td class="{{ color }}">
-															<b>{{ delta|number_format(2, '.', ' ') }}</b>
+															<b>{{ delta|number_format(2, '.', ' ') }}
+																%</b>
 														</td>
 													{% elseif state.montantN > 0 and (state.montantN1 == 0 or state.montantN1 == "") %}
 														{% set color = "text-success" %}
 														<td class="{{ color }}">
-															<b>100</b>
+															<b>100 %</b>
 														</td>
 													{% elseif (state.montantN == 0 or state.montantN == "") and state.montantN1 > 0 %}
 														{% set color = "text-danger" %}
 														<td class="{{ color }}">
-															<b>- 100</b>
+															<b>- 100 %</b>
 														</td>
 													{% else %}
 														{% set color = "text-warning" %}
 														<td class="{{ color }}">
-															<b>0</b>
+															<b>0 %</b>
 														</td>
 													{% endif %}
 													{% if state.montantN - state.montantN1 > 0 %}
@@ -293,9 +299,9 @@
 														{% set couleur = 'text-warning' %}
 													{% endif %}
 													<td class="{{ couleur }}">
-														<b>{{(state.montantN - state.montantN1)}}</b>
+														<b>{{(state.montantN - state.montantN1)|format_currency('EUR', locale='fr')}}</b>
 													</td>
-													<td>{{state.montantN}}</td>
+													<td>{{state.montantN|format_currency('EUR', locale='fr')}}</td>
 												</tr>
 											{% endfor %}
 										</tbody>

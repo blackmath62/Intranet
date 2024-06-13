@@ -141,6 +141,19 @@
 		</div>
 		<div class="card-body">
 			<div id="accordion">
+				<div class="card card-primary">
+					<div class="card-header">
+						<a class="d-block w-100" data-toggle="collapse" href="#collapseTeen">
+							Note sur cette affaire (non partagé)
+						</a>
+					</div>
+					<div id="collapseTeen" class="collapse" data-parent="#accordion">
+						<div class="card-body">
+							{{ form_start(formComment)}}
+							{{ form_end(formComment)}}
+						</div>
+					</div>
+				</div>
 				{% if Interventions %}
 					<div class="card card-secondary">
 						<div class="card-header">
@@ -155,8 +168,6 @@
 						</div>
 						<div id="collapseOne" class="collapse" data-parent="#accordion">
 							<div class="card-body">
-
-
 								<table id="example2" class="table">
 									<thead>
 										<tr>

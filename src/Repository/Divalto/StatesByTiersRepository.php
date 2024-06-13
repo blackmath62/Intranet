@@ -2,6 +2,7 @@
 
 namespace App\Repository\Divalto;
 
+use App\Controller\StatesParFamilleController;
 use App\Entity\Divalto\Mouv;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -10,12 +11,14 @@ use Doctrine\Persistence\ManagerRegistry;
 class StatesByTiersRepository extends ServiceEntityRepository
 {
     private $artBan;
+    private $statesParFamilleController;
 
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, StatesParFamilleController $statesParFamilleController)
     {
         parent::__construct($registry, Mouv::class);
         $artBan = "'ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20'";
         $this->artBan = $artBan;
+        $this->statesParFamilleController = $statesParFamilleController;
     }
 
     // bandeau avec les states par commerciaux
@@ -633,7 +636,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States par famille société Roby
-    public function getStatesParFamilleRoby($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    public function getStatesParFamilleRoby($dossier, $metier, $startN, $endN, $startN1, $endN1, $famille): array
     {
 
         if ($famille == "produits") {
@@ -644,8 +647,15 @@ class StatesByTiersRepository extends ServiceEntityRepository
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $commercial = null;
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -673,7 +683,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States par famille société Roby Totaux
-    public function getStatesParFamilleRobyTotaux($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    public function getStatesParFamilleRobyTotaux($dossier, $metier, $startN, $endN, $startN1, $endN1, $famille): array
     {
 
         if ($famille == "produits") {
@@ -684,8 +694,14 @@ class StatesByTiersRepository extends ServiceEntityRepository
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == "EV") {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -712,13 +728,19 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States société Roby Total
-    public function getStatesRobyTotal($dossier, $startN, $endN)
+    public function getStatesRobyTotal($dossier, $metier, $startN, $endN)
     {
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -741,13 +763,19 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States société Roby par clients
-    public function getStatesRobyTotalParClient($dossier, $startN, $endN): array
+    public function getStatesRobyTotalParClient($dossier, $metier, $startN, $endN): array
     {
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -771,13 +799,19 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States société Roby par produits
-    public function getStatesRobyTotalParProduit($dossier, $startN, $endN): array
+    public function getStatesRobyTotalParProduit($dossier, $metier, $startN, $endN): array
     {
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -802,7 +836,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States société Roby par clients/article 2 ans
-    public function getStatesRobyTotalParClientArticle($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    public function getStatesRobyTotalParClientArticle($dossier, $metier, $startN, $endN, $startN1, $endN1, $famille): array
     {
         if ($famille == "produits") {
             $type = "RTRIM(LTRIM(ref)) AS ref, RTRIM(LTRIM(sref1)) AS sref1, RTRIM(LTRIM(sref2)) AS sref2, RTRIM(LTRIM(designation)) AS designation, RTRIM(LTRIM(uv)) AS uv";
@@ -817,8 +851,14 @@ class StatesByTiersRepository extends ServiceEntityRepository
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -847,7 +887,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States par famille société Roby Totaux PAR FAMILLE
-    public function getStatesParFamilleRobyTotauxParFamille($dossier, $startN, $endN, $startN1, $endN1, $famille): array
+    public function getStatesParFamilleRobyTotauxParFamille($dossier, $metier, $startN, $endN, $startN1, $endN1, $famille): array
     {
 
         if ($famille == "produits") {
@@ -858,8 +898,15 @@ class StatesByTiersRepository extends ServiceEntityRepository
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $commercial = null;
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -888,7 +935,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States par famille société Roby Totaux PAR FAMILLE produit
-    public function getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dossier, $startN, $endN, $famille): array
+    public function getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dossier, $metier, $startN, $endN, $famille): array
     {
 
         if ($famille == "produits") {
@@ -899,8 +946,14 @@ class StatesByTiersRepository extends ServiceEntityRepository
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -925,13 +978,22 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States CA par année sur 6 années
-    public function getStatesSevenYearsAgo($dossier, $type): array
+    public function getStatesSevenYearsAgo($dossier, $metier, $type): array
     {
+
+        $commercial = ',RTRIM(LTRIM(v.SELCOD)) AS commercial';
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == "EV") {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $commercial = ",a.FAM_0002 AS commercial";
         }
 
         if ($type == "annee") {
@@ -951,7 +1013,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT $type, SUM(montantSign) AS montant
         FROM(
-        SELECT  YEAR(m.FADT) AS annee, RTRIM(LTRIM(v.SELCOD)) AS commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
+        SELECT  YEAR(m.FADT) AS annee $commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
 		RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
         CASE
             WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
@@ -961,7 +1023,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
         INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
         INNER JOIN VRP v WITH (INDEX = INDEX_C_VRP) ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
-        WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ( $n1, $n2, $n3, $n4, $n5) AND m.PICOD = 4 AND m.TICOD = 'C'
+        WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ($n, $n1, $n2, $n3, $n4, $n5) AND m.PICOD = 4 AND m.TICOD = 'C'
 		AND a.REF NOT IN($this->artBan)
         $metier
         )reponse
@@ -972,13 +1034,21 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States CA par année sur 6 années Commerciaux
-    public function getStatesSixYearsAgoCommerciaux($dossier): array
+    public function getStatesSixYearsAgoCommerciaux($dossier, $metier): array
     {
 
+        $commercial = ', RTRIM(LTRIM(v.SELCOD)) AS commercial';
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $commercial = ",a.FAM_0002 AS commercial";
         }
 
         $d = new DateTime('now');
@@ -993,37 +1063,37 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $sql = "SELECT commercial, SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1, SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
         , SUM(montantSign4) AS montantN4, SUM(montantSign5) AS montantN5
         FROM(
-        SELECT  YEAR(m.FADT) AS annee, RTRIM(LTRIM(v.SELCOD)) AS commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
+        SELECT  YEAR(m.FADT) AS annee $commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
 		RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
         CASE
-            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-        END AS montantSign,
+             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+         END AS montantSign,
+         CASE
+             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+         END AS montantSign1,
+         CASE
+             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n2' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n2' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+         END AS montantSign2,
+         CASE
+             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n3' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n3' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+         END AS montantSign3,
+         CASE
+             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n4' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n4' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+         END AS montantSign4,
         CASE
-            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n1 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n1 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-        END AS montantSign1,
-        CASE
-            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n2 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n2 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-        END AS montantSign2,
-        CASE
-            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n3 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n3 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-        END AS montantSign3,
-        CASE
-            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n4 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n4 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-        END AS montantSign4,
-        CASE
-            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n5 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n5 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n5' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n5' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSign5
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
         INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
         INNER JOIN VRP v WITH (INDEX = INDEX_C_VRP) ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
-        WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ( $n1, $n2, $n3, $n4, $n5) AND m.PICOD = 4 AND m.TICOD = 'C'
+        WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ( $n ,$n1, $n2, $n3, $n4, $n5) AND m.PICOD = 4 AND m.TICOD = 'C'
 		AND a.REF NOT IN($this->artBan)
         $metier
         )reponse
@@ -1034,22 +1104,102 @@ class StatesByTiersRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // States CA par année sur 6 années Commerciaux
+    public function getStatesSixYearsAgoCommerciauxPeriode($dossier, $metier, $ddN, $dfN): array
+    {
+
+        $commercial = ", RTRIM(LTRIM(v.SELCOD)) AS commercial";
+        if ($dossier == 3) {
+            $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
+        } elseif ($dossier == 1 && $metier == 'EV') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $commercial = ",a.FAM_0002 AS commercial";
+        }
+
+        $datesDiff = $this->statesParFamilleController->generateDateDiffs($ddN, $dfN, 5);
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT commercial, SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1, SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
+            , SUM(montantSign4) AS montantN4, SUM(montantSign5) AS montantN5
+            FROM(
+            SELECT  YEAR(m.FADT) AS annee $commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
+            RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
+            CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign1,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign2,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign3,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign4,
+            CASE
+                WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            END AS montantSign5
+            FROM MOUV m
+            INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
+            INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+            INNER JOIN VRP v WITH (INDEX = INDEX_C_VRP) ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
+            WHERE m.DOS = $dossier AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '$dfN' AND m.PICOD = 4 AND m.TICOD = 'C'
+            AND a.REF NOT IN($this->artBan)
+            $metier
+            )reponse
+            GROUP BY commercial
+            ORDER BY montantN1 DESC";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     // States par client, famille client, famille produit, produit
-    public function StatesCommercial($dossier, $commercial, $type): array
+    public function StatesCommercial($dossier, $metier, $ddN, $dfN, $commercial, $type): array
     {
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $commercial = trim($commercial);
+            if ($commercial != null) {
+                $metier = " AND a.FAM_0002 IN('$commercial')";
+            } else {
+                $metier = " AND a.FAM_0002 IN( 'ME', 'MO')";
+            }
         }
 
-        if ($commercial != null) {
+        if ($commercial != null && $commercial != 'ME' && $commercial != 'MO') {
             $commercial = "AND v.SELCOD = '$commercial'";
+        } else {
+            $commercial = "";
         }
 
         if ($type == 'topClient') {
             $requete = 'tiers, nom';
+        } elseif ($type == 'topFournisseur') {
+            $requete = 'tiersFou, nomFou';
         } elseif ($type == 'topFamilleProduit') {
             $requete = 'familleProduit';
         } elseif ($type == 'topFamilleClient') {
@@ -1060,76 +1210,80 @@ class StatesByTiersRepository extends ServiceEntityRepository
             $requete = 'ref, designation,familleProduit';
         }
 
-        $d = new DateTime('now');
-        $n = $d->format('Y');
-        $n1 = $n - 1;
-        $n2 = $n1 - 1;
-        $n3 = $n2 - 1;
-        $n4 = $n3 - 1;
+        $datesDiff = $this->statesParFamilleController->generateDateDiffs($ddN, $dfN, 5);
 
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT $requete, SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1,SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
          , SUM(montantSign4) AS montantN4
          FROM(
-         SELECT  YEAR(m.FADT) AS annee, RTRIM(LTRIM(v.SELCOD)) AS commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(c.STAT_0001)) AS familleClient, RTRIM(LTRIM(a.FAM_0001)) AS familleProduit, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
-         RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
+         SELECT  YEAR(m.FADT) AS annee, RTRIM(LTRIM(v.SELCOD)) AS commercial, f.TIERS AS tiersFou, f.NOM AS nomFou ,RTRIM(LTRIM(m.TIERS)) AS tiers,
+         RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(c.STAT_0001)) AS familleClient, RTRIM(LTRIM(a.FAM_0001)) AS familleProduit, RTRIM(LTRIM(m.REF)) AS ref,
+         RTRIM(LTRIM(m.SREF1)) AS sref1,RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
          CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-         END AS montantSign,
-         CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n1 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n1 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-         END AS montantSign1,
-         CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n2 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n2 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-         END AS montantSign2,
-         CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n3 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n3 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-         END AS montantSign3,
-         CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n4 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n4 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-         END AS montantSign4
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign1,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign2,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign3,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign4
          FROM MOUV m
          INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
          INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+         INNER JOIN FOU f WITH (INDEX = INDEX_C_FOU) ON f.DOS = m.DOS AND f.TIERS = a.TIERS
          INNER JOIN VRP v WITH (INDEX = INDEX_C_VRP) ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
-         WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ($n1, $n2, $n3, $n4) AND m.PICOD = 4 AND m.TICOD = 'C'
+         WHERE m.DOS = $dossier AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '$dfN' AND m.PICOD = 4 AND m.TICOD = 'C'
          AND a.REF NOT IN($this->artBan)
          $metier
          $commercial
          )reponse
          GROUP BY $requete
-         ORDER BY montantN1 DESC";
-
+         ORDER BY montantN DESC";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
 
     // Totaux des states commerciaux
-    public function totauxStatesCommerciaux($dossier, $commercial): array
+    public function totauxStatesCommerciaux($dossier, $metier, $ddN, $dfN, $commercial): array
     {
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $commercial = trim($commercial);
+            if ($commercial != null) {
+                $metier = " AND a.FAM_0002 IN('$commercial')";
+            } else {
+                $metier = " AND a.FAM_0002 IN( 'ME', 'MO')";
+            }
         }
 
-        if ($commercial != null) {
+        if ($commercial != null && $commercial != 'ME' && $commercial != 'MO') {
             $commercial = "AND v.SELCOD = '$commercial'";
+        } else {
+            $commercial = "";
         }
 
-        $d = new DateTime('now');
-        $n = $d->format('Y');
-        $n1 = $n - 1;
-        $n2 = $n1 - 1;
-        $n3 = $n2 - 1;
-        $n4 = $n3 - 1;
+        $datesDiff = $this->statesParFamilleController->generateDateDiffs($ddN, $dfN, 5);
 
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1,SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
@@ -1138,30 +1292,34 @@ class StatesByTiersRepository extends ServiceEntityRepository
          SELECT  YEAR(m.FADT) AS annee, RTRIM(LTRIM(v.SELCOD)) AS commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(c.STAT_0001)) AS familleClient, RTRIM(LTRIM(a.FAM_0001)) AS familleProduit, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
          RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
          CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-         END AS montantSign,
-         CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n1 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n1 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-         END AS montantSign1,
-         CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n2 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n2 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-         END AS montantSign2,
-         CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n3 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n3 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-         END AS montantSign3,
-         CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = $n4 THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = $n4 THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
-         END AS montantSign4
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign1,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign2,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign3,
+             CASE
+                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             END AS montantSign4,
+            CASE
+                WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            END AS montantSign5
          FROM MOUV m
          INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
          INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON c.DOS = m.DOS AND c.TIERS = m.TIERS
          INNER JOIN VRP v WITH (INDEX = INDEX_C_VRP) ON v.DOS = m.DOS AND v.TIERS = c.REPR_0001
-         WHERE m.DOS = $dossier AND YEAR(m.FADT) IN ($n1, $n2, $n3, $n4) AND m.PICOD = 4 AND m.TICOD = 'C'
+         WHERE m.DOS = $dossier AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '$dfN' AND m.PICOD = 4 AND m.TICOD = 'C'
          AND a.REF NOT IN($this->artBan)
          $metier
          $commercial
@@ -1173,13 +1331,20 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States par famille et type Article
-    public function getStatesParFamilleTypeArticle($dossier, $startN, $endN): array
+    public function getStatesParFamilleTypeArticle($dossier, $startN, $endN, $metier): array
     {
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $commercial = null;
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -1205,13 +1370,20 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States montant total par famille produit
-    public function getStatesTotalParFamille($dossier, $startN, $endN, $famille)
+    public function getStatesTotalParFamille($dossier, $startN, $endN, $metier, $famille)
     {
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $commercial = null;
         }
 
         $conn = $this->getEntityManager()->getConnection();
@@ -1236,13 +1408,20 @@ class StatesByTiersRepository extends ServiceEntityRepository
     }
 
     // States montant total par Type produit
-    public function getStatesTotalParType($dossier, $startN, $endN, $type)
+    public function getStatesTotalParType($dossier, $startN, $endN, $metier, $type)
     {
 
         if ($dossier == 3) {
             $metier = "AND a.FAM_0002 IN( 'RB', 'D', 'RG', 'RL', 'S', 'BL' ) AND c.STAT_0002 IN('RB')";
-        } elseif ($dossier == 1) {
+        } elseif ($dossier == 1 && $metier == 'EV') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('EV')";
+        } elseif ($dossier == 1 && $metier == 'HP') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 NOT IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'MA') {
+            $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
+        } elseif ($dossier == 1 && $metier == 'ME') {
+            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $commercial = null;
         }
 
         $conn = $this->getEntityManager()->getConnection();

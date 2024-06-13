@@ -3,6 +3,7 @@ namespace App\Command;
 
 use App\Repository\Main\MailListRepository;
 use App\Service\ContinuousExecutionService;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,38 +40,45 @@ class ContinuousExecutionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        while (true) {
-            // Vérifiez si c'est un samedi ou un dimanche
-            $currentDayOfWeek = date('N'); // Renvoie 1 pour lundi, 2 pour mardi, etc.
-            if ($currentDayOfWeek >= 6) {
-                // Si c'est un samedi ou un dimanche, calculer le temps à attendre jusqu'au prochain lundi
-                $nextMondayTime = strtotime('next Monday');
+        try {
+            while (true) {
+                // Vérifiez si c'est un samedi ou un dimanche
+                $currentDayOfWeek = date('N'); // Renvoie 1 pour lundi, 2 pour mardi, etc.
+                if ($currentDayOfWeek >= 6) {
+                    // Si c'est un samedi ou un dimanche, calculer le temps à attendre jusqu'au prochain lundi
+                    $nextMondayTime = strtotime('next Monday');
+                    $currentTime = time();
+                    $sleepTime = $nextMondayTime - $currentTime;
+                    sleep($sleepTime);
+                }
+
+                // Définissez les horaires d'exécution pour la journée
+                $firstExecutionTime = strtotime('today 12:45');
+                $secondExecutionTime = strtotime('today 00:45') + 24 * 3600; // Ajouter un jour pour le prochain jour
+
+                $sleep = 0;
+                // Attendre jusqu'à ce que l'heure actuelle soit dans le créneau horaire souhaité
                 $currentTime = time();
-                $sleepTime = $nextMondayTime - $currentTime;
-                sleep($sleepTime);
+                if ($currentTime < $firstExecutionTime) {
+                    $sleep = $firstExecutionTime - $currentTime;
+                } elseif ($currentTime < $secondExecutionTime) {
+                    $sleep = $secondExecutionTime - $currentTime;
+                }
+
+                $this->sendEmailTreatment($sleep);
+                sleep($sleep);
+
+                error_log("Début de l'exécution des fonctions selon les critères");
+                $this->continuousExecutionService->executeFunctionsAccordingToCriteria();
+                error_log("Fin de l'exécution des fonctions selon les critères");
             }
 
-            // Définissez les horaires d'exécution pour la journée
-            $firstExecutionTime = strtotime('today 12:45');
-            $secondExecutionTime = strtotime('today 00:45') + 24 * 3600; // Ajouter un jour pour le prochain jour
-
-            $sleep = 0;
-            // Attendre jusqu'à ce que l'heure actuelle soit dans le créneau horaire souhaité
-            $currentTime = time();
-            if ($currentTime < $firstExecutionTime) {
-                $sleep = $firstExecutionTime - $currentTime;
-            } elseif ($currentTime < $secondExecutionTime) {
-                $sleep = $secondExecutionTime - $currentTime;
-            }
-
-            $this->sendEmailTreatment($sleep);
-            sleep($sleep);
-
-            // Exécuter les fonctions lorsque l'heure est dans le créneau horaire souhaité
-            $this->continuousExecutionService->executeFunctionsAccordingToCriteria();
+            return Command::SUCCESS;
+        } catch (Exception $e) {
+            error_log("Erreur dans ContinuousExecutionCommand : " . $e->getMessage());
+            error_log("Trace de l'erreur : " . $e->getTraceAsString());
+            return Command::FAILURE;
         }
-
-        return Command::SUCCESS;
     }
 
     private function sendEmailTreatment($sleep)

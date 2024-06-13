@@ -1,0 +1,252 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+{% block body %}
+
+	<div class="card collapsed-card card-info">
+		<div class="card-header">
+			<h3 class="card-title">
+				<i class="icon fas fa-solid fa-circle-info"></i>
+				à propos</h3>
+			<div class="card-tools">
+				<button type="button" class="btn btn-tool" data-card-widget="collapse">
+					<i class="fas fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<!-- /.card-header -->
+		<div class="card-body">
+			<p>Pour obtenir des states, selectionnez un type de piéce, un ou plusieurs commercial, une date de début et de fin puis cliquez sur filtrer.</p>
+			<p>Ces states ne sont pas extraites comme habituellement puisqu'elles se basent sur le commercial renseigné dans l'entête de piéce pour être édité.</p>
+			<p>Cette subtilité permet d'obtenir les states pour des salariés qui ne font plus parti de l'entreprise et ne tient pas compte des changements de commercial sur la fiche client.</p>
+			<p>Les piéces ne sont comptées que si elles possédent un numéro de piéce, sans quoi on considére que l'étape à été sauté.</p>
+			<p>Ces chiffres différent des autres states car les produits HP et EV saisient par les ME ne seront pas pris en compte étant donné qu'on se base sur le commercial de l'entête de piéce.</p>
+			<p>Merci d'accepter les différences de résultat obtenu en considérant sérieusement ces subtilités.</p>
+			<p>Ces states ne fonctionnent que pour les EV et les HP, pour débloquer la fonctionnalité pour le ME merci de contacter l'administrateur du site.</p>
+			<!-- /.card-footer-->
+		</div>
+	</div>
+
+	{{ form_start(form) }}
+	<div class="d-flex flex-wrap justify-content-between">
+		<div class="mt-2">{{ form_label(form.pieces) }}</div>
+		<div class="col-12 col-sm-1">{{ form_widget(form.pieces) }}</div>
+		<div class="mt-2">{{ form_label(form.commerciaux) }}</div>
+		<div class="col-12 col-sm-5">{{ form_widget(form.commerciaux) }}</div>
+		<div class="mt-2">{{ form_label(form.start) }}</div>
+		<div class="col-12 col-sm-1">{{ form_widget(form.start) }}</div>
+		<div class="mt-2">{{ form_label(form.end) }}</div>
+		<div class="col-12 col-sm-1">{{ form_widget(form.end) }}</div>
+		<div class="col-12 col-sm-1">{{ form_widget(form.filtrer) }}</div>
+	</div>
+	{{ form_end(form) }}
+	{% if donnees %}
+
+		{# Convertir les chaînes en objets DateTime #}
+		{% set start_date = periode[0]|date_modify('midnight') %}
+		{% set end_date = periode[1]|date_modify('midnight') %}
+
+		{# Calcul de la différence en années #}
+		{% set diff_years = end_date|date('Y') - start_date|date('Y') + 1 %}
+
+		{# Ajuster les années de start et end en conséquence #}
+		{% set adjusted_start_date = start_date|date_modify("-" ~ (diff_years) ~ " year") %}
+		{% set adjusted_end_date = end_date|date_modify("-" ~ (diff_years) ~ " year") %}
+
+		{# Ajuster les années de start et end en conséquence #}
+		{% set adjusted_start_date_1 = adjusted_start_date|date_modify("-" ~ (diff_years) ~ " year") %}
+		{% set adjusted_end_date_1 = adjusted_end_date|date_modify("-" ~ (diff_years) ~ " year") %}
+
+		{# Ajuster les années de start et end en conséquence #}
+		{% set adjusted_start_date_2 = adjusted_start_date_1|date_modify("-" ~ (diff_years) ~ " year") %}
+		{% set adjusted_end_date_2 = adjusted_end_date_1|date_modify("-" ~ (diff_years) ~ " year") %}
+
+		<div class="card mt-5">
+			<div class="card-body">
+				<table id="example1" class="table table-bordered table-striped">
+					<thead>
+						<tr class='text-center'>
+							<th>Commercial</th>
+							<th>Qte / montant Facture
+								<br>
+								du
+								{{ adjusted_start_date_2|date("d-m-Y") }}
+								au
+								{{ adjusted_end_date_2|date("d-m-Y") }}
+							</th>
+							<th>Qte piéce / montant Facture
+								<br>
+								du
+								{{ adjusted_start_date_1|date("d-m-Y") }}
+								au
+								{{ adjusted_end_date_1|date("d-m-Y") }}
+							</th>
+							<th>Qte piéce / montant Facture
+								<br>
+								du
+								{{ adjusted_start_date|date("d-m-Y") }}
+								au
+								{{ adjusted_end_date|date("d-m-Y") }}
+							</th>
+							<th>Qte piéce/ montant Facture
+								<br>
+								du
+								{{ periode[0]}}
+								au
+								{{ periode[1]}}
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for donnee in donnees %}
+							<tr class='text-center'>
+								<td>{{donnee.nom}}</td>
+								<td>{{donnee.qte3}}
+									<br>
+									{{ donnee.mont3|format_currency('EUR', locale='fr')}}
+								</td>
+								<td>{{donnee.qte2}}
+									{% set poucQte2 = 0 %}
+									{% set colQte2 = 'text-warning' %}
+									{% set icoQte2 = 'fa-caret-left' %}
+									{% if donnee.qte3 > 0 and donnee.qte2 > 0 %}
+										{% set poucQte2 = ((donnee.qte2 - donnee.qte3) / donnee.qte3 * 100) %}
+										{% if poucQte2 > 0 %}
+											{% set colQte2 = 'text-success' %}
+											{% set icoQte2 = 'fa-caret-up' %}
+										{% else %}
+											{% set colQte2 = 'text-danger' %}
+											{% set icoQte2 = 'fa-caret-down' %}
+										{% endif %}
+
+									{% endif %}
+
+									{% set poucMont2 = 0 %}
+									{% set colMont2 = 'text-warning' %}
+									{% set icoMont2 = 'fa-caret-left' %}
+									{% if donnee.mont3 > 0 and donnee.mont2 > 0 %}
+										{% set poucMont2 = ((donnee.mont2 - donnee.mont3) / donnee.mont3 * 100) %}
+										{% if poucMont2 > 0 %}
+											{% set colMont2 = 'text-success' %}
+											{% set icoMont2 = 'fa-caret-up' %}
+										{% else %}
+											{% set colMont2 = 'text-danger' %}
+											{% set icoMont2 = 'fa-caret-down' %}
+										{% endif %}
+
+									{% endif %}
+									<span class="description-percentage {{ colQte2 }}">
+										<i class="ml-1 mr-1 fas {{ icoQte2 }}"></i>
+										{{ poucQte2| number_format(2, '.', ',') }}
+										%
+									</span>
+									<br>
+									{{ donnee.mont2|format_currency('EUR', locale='fr')}}
+									<span class="description-percentage {{ colMont2 }}">
+										<i class="ml-1 mr-1 fas {{ icoMont2 }}"></i>
+										{{ poucMont2| number_format(2, '.', ',') }}
+										%
+									</span>
+								</td>
+								{% set poucQte1 = 0 %}
+								{% set colQte1 = 'text-warning' %}
+								{% set icoQte1 = 'fa-caret-left' %}
+								{% if donnee.qte1 > 0 and donnee.qte2 > 0 %}
+									{% set poucQte1 = ((donnee.qte1 - donnee.qte2) / donnee.qte2 * 100) %}
+									{% if poucQte1 > 0 %}
+										{% set colQte1 = 'text-success' %}
+										{% set icoQte1 = 'fa-caret-up' %}
+									{% else %}
+										{% set colQte1 = 'text-danger' %}
+										{% set icoQte1 = 'fa-caret-down' %}
+									{% endif %}
+
+								{% endif %}
+
+								{% set poucMont1 = 0 %}
+								{% set colMont1 = 'text-warning' %}
+								{% set icoMont1 = 'fa-caret-left' %}
+								{% if donnee.mont1 > 0 and donnee.mont2 > 0 %}
+									{% set poucMont1 = ((donnee.mont1 - donnee.mont2) / donnee.mont2 * 100) %}
+									{% if poucMont1 > 0 %}
+										{% set colMont1 = 'text-success' %}
+										{% set icoMont1 = 'fa-caret-up' %}
+									{% else %}
+										{% set colMont1 = 'text-danger' %}
+										{% set icoMont1 = 'fa-caret-down' %}
+									{% endif %}
+
+								{% endif %}
+								<td>{{donnee.qte1}}
+									<span class="description-percentage {{ colQte1 }}">
+										<i class="ml-1 mr-1 fas {{ icoQte1 }}"></i>
+										{{ poucQte1| number_format(2, '.', ',') }}
+										%
+									</span>
+									<br>
+									{{ donnee.mont1|format_currency('EUR', locale='fr')}}
+									<span class="description-percentage {{ colMont1 }}">
+										<i class="ml-1 mr-1 fas {{ icoMont1 }}"></i>
+										{{ poucMont1| number_format(2, '.', ',') }}
+										%
+									</span>
+								</td>
+								{% set poucQte = 0 %}
+								{% set colQte = 'text-warning' %}
+								{% set icoQte = 'fa-caret-left' %}
+								{% if donnee.qte1 > 0 and donnee.qte > 0 %}
+									{% set poucQte = ((donnee.qte - donnee.qte1) / donnee.qte1 * 100) %}
+									{% if poucQte > 0 %}
+										{% set colQte = 'text-success' %}
+										{% set icoQte = 'fa-caret-up' %}
+									{% else %}
+										{% set colQte = 'text-danger' %}
+										{% set icoQte = 'fa-caret-down' %}
+									{% endif %}
+
+								{% endif %}
+
+								{% set poucMont = 0 %}
+								{% set colMont = 'text-warning' %}
+								{% set icoMont = 'fa-caret-left' %}
+								{% if donnee.mont1 > 0 and donnee.mont > 0 %}
+									{% set poucMont = ((donnee.mont - donnee.mont1) / donnee.mont1 * 100) %}
+									{% if poucMont > 0 %}
+										{% set colMont = 'text-success' %}
+										{% set icoMont = 'fa-caret-up' %}
+									{% else %}
+										{% set colMont = 'text-danger' %}
+										{% set icoMont = 'fa-caret-down' %}
+									{% endif %}
+
+								{% endif %}
+								<td>{{donnee.qte}}
+									<span class="description-percentage {{ colQte }}">
+										<i class="ml-1 mr-1 fas {{ icoQte }}"></i>
+										{{ poucQte| number_format(2, '.', ',') }}
+										%
+									</span>
+									<br>
+									{{ donnee.mont|format_currency('EUR', locale='fr')}}
+									<span class="description-percentage {{ colMont }}">
+										<i class="ml-1 mr-1 fas {{ icoMont }}"></i>
+										{{ poucMont| number_format(2, '.', ',') }}
+										%
+									</span>
+								</td>
+							</tr>
+
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{% else %}
+		<h5 class="text-left text-dark mt-5">
+			<i class="fas fa-info-circle pr-2 text-info"></i>Veuillez selectionner des filtres !
+		</h5>
+	{% endif %}
+
+{% endblock %}

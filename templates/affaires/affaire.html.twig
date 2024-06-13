@@ -375,7 +375,7 @@
 										<th>Affaire</th>
 										<th>Date</th>
 										<th>Total Ligne active</th>
-										<th>Total Ligne active sans code Affaire</th>
+										<th>Total Ligne active avec code Affaire</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -386,6 +386,50 @@
 											<td>{{ cmd.dateCmd }}</td>
 											<td>{{ cmd.totalMouvement }}</td>
 											<td>{{ cmd.totalMouvementProjet }}</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+		{% if blsWithProblem %}
+			<div class="row">
+				<div class="col-12">
+					<div class="card collapsed-card card-secondary">
+						<div class="card-header text-white">
+							<h3 class="card-title">
+								<i class="fas fa-solid fa-bug"></i>
+								Bls avec des lignes sans code Affaire
+							</h3>
+							<div class="card-tools">
+								<span class="badge badge-light">{{ blsWithProblem|length }}</span>
+								<button type="button" class="btn btn-tool" data-card-widget="collapse">
+									<i class="fas fa-minus"></i>
+								</button>
+							</div>
+						</div>
+						<div class="card-body">
+							<table id="example13" class="table table-bordered table-striped table-sm text-center">
+								<thead>
+									<tr>
+										<th>BL</th>
+										<th>Affaire</th>
+										<th>Date</th>
+										<th>Total Ligne active</th>
+										<th>Total Ligne active avec code Affaire</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for bl in blsWithProblem %}
+										<tr>
+											<td>{{ bl.bl }}</td>
+											<td>{{ bl.affaire }}</td>
+											<td>{{ bl.dateBl }}</td>
+											<td>{{ bl.totalMouvement }}</td>
+											<td>{{ bl.totalMouvementProjet }}</td>
 										</tr>
 									{% endfor %}
 								</tbody>

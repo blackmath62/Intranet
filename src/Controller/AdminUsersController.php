@@ -31,10 +31,6 @@ class AdminUsersController extends AbstractController
 
         $users = $repo->findAll();
 
-        // tracking user page for stats
-        //$tracking = $request->attributes->get('_route');
-        // $this->setTracking($tracking);
-
         return $this->render('admin_users/index.html.twig', [
             'controller_name' => 'AdminUsersController',
             'title' => 'Administration des Utilisateurs',
@@ -58,10 +54,6 @@ class AdminUsersController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        // tracking user page for stats
-        //$tracking = $request->attributes->get('_route');
-        //$this->setTracking($tracking);
-
         $this->addFlash('message', 'Utilisateur modifié avec succès');
         return $this->redirectToRoute('app_admin_users');
     }
@@ -75,10 +67,6 @@ class AdminUsersController extends AbstractController
 
         $form = $this->createForm(EditUsersType::class, $user);
         $form->handleRequest($request);
-
-        // tracking user page for stats
-        //$tracking = $request->attributes->get('_route');
-        //$this->setTracking($tracking);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();

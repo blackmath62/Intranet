@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Repository\Divalto\MouvRepository;
 use App\Repository\Main\MailListRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
@@ -40,7 +39,7 @@ class ClientFeuRougeOrangeController extends AbstractController
 
     #[Route("/client/feu/rouge/orange/send/mail", name: "app_client_feu_rouge_orange_send_mail")]
 
-    public function sendMail(): Response
+    public function sendMail()
     {
         // envoyer un mail
         $treatementMails = $this->repoMail->findBy(['page' => 'app_admin_email', 'SecondOption' => 'feu']);
@@ -55,7 +54,5 @@ class ClientFeuRougeOrangeController extends AbstractController
                 ->html($html);
             $this->mailer->send($email);
         }
-
-        return $this->redirectToRoute('app_home');
     }
 }

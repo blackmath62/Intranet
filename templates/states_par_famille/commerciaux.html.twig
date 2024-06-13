@@ -17,12 +17,12 @@
 			<div class="card card-dark">
 				<div class="card-header d-flex bd-highlight">
 					<div class="p-2 flex-grow-1 bd-highlight">
-						<h3 class="card-title text-center">States par Commerciaux de
-							{% if trancheD and trancheF %}
-								{{ trancheF }}
-								et
-								{{ trancheD }}
-							{% endif %}
+						<h3 class="card-title text-center">States
+							{{ app.request.attributes.get('metier') }}
+							par Commerciaux de
+							{{ app.request.attributes.get('dd')|date("d-m-Y") }}
+							au
+							{{ app.request.attributes.get('df')|date("d-m-Y") }}
 						</h3>
 					</div>
 					<div class="p-2 bd-highlight">
@@ -42,7 +42,7 @@
 								) }}
 							</div>
 							<div class="p-1">
-								<a class="btn btn-success" href="{{path('app_resume_states_dd_df', {'dos' : app.request.attributes.get('dos'),'dd' : dd, 'df' : df})}}">Résumé</a>
+								<a class="btn btn-success" href="{{path('app_resume_states_dd_df', {'dos' : app.request.attributes.get('dos'),'metier' : app.request.attributes.get('metier'),'dd' : dd, 'df' : df})}}">Résumé</a>
 							</div>
 						</div>
 						{{ form_end(form) }}
@@ -73,41 +73,32 @@
 
 
 										<div class="col-12 col-sm-12 col-md-12 col-lg-6">
-											<a data-toggle="modal" data-target="#modal-xl" class="btn btn-dark float-right">Philippe LICOUR
-											</a>
-											<!-- modal -->
-											<div class="modal fade" id="modal-xl">
-												<div class="modal-dialog modal-xl">
-													<div class="modal-content">
-														<div class="modal-header">
-															<h4 class="modal-title">Philippe LICOUR</h4>
-															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-																<span aria-hidden="true">&times;</span>
-															</button>
-														</div>
-														<div class="modal-body">
-															<img class="img-fluid pl-5" src="{{ asset(asset('img/profile/Plicour.jpg'))}}" alt="User Image">
-														</div>
-														<div class="modal-footer justify-content-between">
-															<button type="button" class="btn btn-default" data-dismiss="modal">fermer</button>
-														</div>
-													</div>
-													<!-- /.modal-content -->
-												</div>
-												<!-- /.modal-dialog -->
-											</div>
-											<!-- /.modal -->
-
 											<span>* Année de référence</span>
 											<table id="example2" class="table table-hover">
 												<thead>
 													<tr class="text-center">
 														<th>Commercial</th>
-														<th>{{ "now"|date("Y") - 5 }}</th>
-														<th>{{ "now"|date("Y") - 4 }}</th>
-														<th>{{ "now"|date("Y") - 3 }}</th>
-														<th>{{ "now"|date("Y") - 2 }}</th>
-														<th>{{ "now"|date("Y") - 1 }}*</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 5 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 5 }}
+														</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 4 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 4 }}
+														</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 3 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 3 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 2 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 2 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 1 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 1 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m-Y") }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m-Y") }}*
+														</th>
 													</tr>
 												</thead>
 												<tbody>
@@ -115,7 +106,7 @@
 
 														<tr class='text-center'>
 															<td class="align-middle">
-																<a href="{{path(commercial, {'dos' : app.request.attributes.get('dos'), 'commercial' : dataCommerciau.commercial,'dd' : dd, 'df' : df})}}" class="text-center">
+																<a href="{{path(commercial, {'dos' : app.request.attributes.get('dos'),'metier' : app.request.attributes.get('metier'), 'commercial' : dataCommerciau.commercial,'dd' : dd, 'df' : df})}}" class="text-center">
 																	{{ dataCommerciau.commercial}}
 																	<i class="far fa-eye ml-1"></i>
 																</a>
@@ -198,6 +189,25 @@
 																	<div class="badge bg-{{colorDeltaN1}}">{{deltaN1|format_percent_number}}</div>
 																</div>
 															</td>
+															{% if dataCommerciau.montantN1 != 0 and dataCommerciau.montantN != 0 %}
+																{% set deltaN = ((dataCommerciau.montantN / dataCommerciau.montantN1) - 1) %}
+																{% if deltaN > 0 %}
+																	{% set colorDeltaN = 'success' %}
+																{% elseif deltaN == 0  %}
+																	{% set colorDeltaN = 'warning' %}
+																{% elseif deltaN < 0  %}
+																	{% set colorDeltaN = 'danger' %}
+																{% endif %}
+															{% else %}
+																{% set colorDeltaN = 'warning' %}
+																{% set deltaN = 0 %}
+															{% endif %}
+															<td>
+																<div class="d-flex flex-column">
+																	<div class="p-1">{{ dataCommerciau.montantN|format_currency('EUR', locale='fr')}}</div>
+																	<div class="badge bg-{{colorDeltaN}}">{{deltaN|format_percent_number}}</div>
+																</div>
+															</td>
 														</tr>
 													{% endfor %}
 
@@ -219,8 +229,7 @@
 
 								<div class="card card-olive">
 									<div class="card-header">
-										<h3 class="card-title">Par famille de produit pour
-											{{app.request.attributes.get('commercial')}}</h3>
+										<h3 class="card-title">Par famille de produit global</h3>
 										<div class="card-tools">
 											<button type="button" class="btn btn-tool" data-card-widget="maximize">
 												<i class="fas fa-expand"></i>
@@ -242,13 +251,28 @@
 													<tr class="text-center">
 														<th style="width: 10px">Top</th>
 														<th class="text-left">Famille Produit</th>
-														<th class="table-info">{{ "now"|date("Y") - 4 }}</th>
+														<th class="table-info">
+															{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 3 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 3 }}
+														</th>
 														<th class="table-info">% CA</th>
-														<th class="table-success">{{ "now"|date("Y") - 3 }}</th>
+														<th class="table-success">
+															{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 2 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 2 }}
+														</th>
 														<th class="table-success">% CA</th>
-														<th class="table-danger">{{ "now"|date("Y") - 2 }}</th>
+														<th class="table-danger">
+															{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 1 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 1 }}
+														</th>
 														<th class="table-danger">% CA</th>
-														<th class="table-warning">{{ "now"|date("Y") - 1 }}
+														<th class="table-warning">
+															{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") }}
 															*</th>
 														<th class="table-warning">% CA</th>
 													</tr>
@@ -260,36 +284,14 @@
 															<td class="align-middle">{{ famProduit }}</td>
 															<td class="text-left align-middle">{{ topFamilleProduit.familleProduit }}</td>
 															<td class="align-middle table-info">
-																{{ topFamilleProduit.montantN4|format_currency('EUR', locale='fr') }}
+																{{ topFamilleProduit.montantN3|format_currency('EUR', locale='fr') }}
 															</td>
 															<td class="table-info">
-																{% if topFamilleProduit.montantN4 > 0 %}
-																	{{ (( topFamilleProduit.montantN4 * 100 ) / totaux[0].montantN4 )|number_format(2, '.', ' ') }}
-																{% endif %}
-															</td>
-															<td class="align-middle table-success">
-																{% if topFamilleProduit.montantN3 != 0 and topFamilleProduit.montantN4 != 0 %}
-																	{% set deltaFamilleProduitN3 = ((topFamilleProduit.montantN3 / topFamilleProduit.montantN4) - 1) %}
-																	{% if deltaFamilleProduitN3 > 0 %}
-																		{% set colorDeltaFamilleProduitN3 = 'success' %}
-																	{% elseif deltaFamilleProduitN3 == 0  %}
-																		{% set colorDeltaFamilleProduitN3 = 'warning' %}
-																	{% elseif deltaFamilleProduitN3 < 0  %}
-																		{% set colorDeltaFamilleProduitN3 = 'danger' %}
-																	{% endif %}
-																{% else %}
-																	{% set colorDeltaFamilleProduitN3 = 'warning' %}
-																	{% set deltaFamilleProduitN3 = 0 %}
-																{% endif %}
-																{{ topFamilleProduit.montantN3|format_currency('EUR', locale='fr') }}
-																<span class="badge bg-{{colorDeltaFamilleProduitN3}} ml-2">{{ deltaFamilleProduitN3|format_percent_number }}</span>
-															</td>
-															<td class="table-success">
 																{% if topFamilleProduit.montantN3 > 0 %}
 																	{{ (( topFamilleProduit.montantN3 * 100 ) / totaux[0].montantN3 )|number_format(2, '.', ' ') }}
 																{% endif %}
 															</td>
-															<td class="align-middle table-danger">
+															<td class="align-middle table-success">
 																{% if topFamilleProduit.montantN2 != 0 and topFamilleProduit.montantN3 != 0 %}
 																	{% set deltaFamilleProduitN2 = ((topFamilleProduit.montantN2 / topFamilleProduit.montantN3) - 1) %}
 																	{% if deltaFamilleProduitN2 > 0 %}
@@ -306,13 +308,13 @@
 																{{ topFamilleProduit.montantN2|format_currency('EUR', locale='fr') }}
 																<span class="badge bg-{{colorDeltaFamilleProduitN2}} ml-2">{{ deltaFamilleProduitN2|format_percent_number }}</span>
 															</td>
-															<td class="table-danger">
+															<td class="table-success">
 																{% if topFamilleProduit.montantN2 > 0 %}
 																	{{ (( topFamilleProduit.montantN2 * 100 ) / totaux[0].montantN2 )|number_format(2, '.', ' ') }}
 																{% endif %}
 															</td>
-															<td class="align-middle table-warning">
-																{% if topFamilleProduit.montantN1 != 0 and topFamilleProduit.montantN2 != 0 %}
+															<td class="align-middle table-danger">
+																{% if topFamilleProduit.montantN2 != 0 and topFamilleProduit.montantN1 != 0 %}
 																	{% set deltaFamilleProduitN1 = ((topFamilleProduit.montantN1 / topFamilleProduit.montantN2) - 1) %}
 																	{% if deltaFamilleProduitN1 > 0 %}
 																		{% set colorDeltaFamilleProduitN1 = 'success' %}
@@ -328,9 +330,31 @@
 																{{ topFamilleProduit.montantN1|format_currency('EUR', locale='fr') }}
 																<span class="badge bg-{{colorDeltaFamilleProduitN1}} ml-2">{{ deltaFamilleProduitN1|format_percent_number }}</span>
 															</td>
-															<td class="table-warning">
+															<td class="table-danger">
 																{% if topFamilleProduit.montantN1 > 0 %}
-																	{{ (( topFamilleProduit.montantN1 * 100 ) / totaux[0].montantN1 )|number_format(2, '.', ' ') }}
+																	{{ (( topFamilleProduit.montantN1 * 100 ) / totaux[0].montantN2 )|number_format(2, '.', ' ') }}
+																{% endif %}
+															</td>
+															<td class="align-middle table-warning">
+																{% if topFamilleProduit.montantN1 != 0 and topFamilleProduit.montantN != 0 %}
+																	{% set deltaFamilleProduitN = ((topFamilleProduit.montantN / topFamilleProduit.montantN1) - 1) %}
+																	{% if deltaFamilleProduitN > 0 %}
+																		{% set colorDeltaFamilleProduitN = 'success' %}
+																	{% elseif deltaFamilleProduitN == 0  %}
+																		{% set colorDeltaFamilleProduitN = 'warning' %}
+																	{% elseif deltaFamilleProduitN < 0  %}
+																		{% set colorDeltaFamilleProduitN = 'danger' %}
+																	{% endif %}
+																{% else %}
+																	{% set colorDeltaFamilleProduitN = 'warning' %}
+																	{% set deltaFamilleProduitN = 0 %}
+																{% endif %}
+																{{ topFamilleProduit.montantN|format_currency('EUR', locale='fr') }}
+																<span class="badge bg-{{colorDeltaFamilleProduitN}} ml-2">{{ deltaFamilleProduitN|format_percent_number }}</span>
+															</td>
+															<td class="table-warning">
+																{% if topFamilleProduit.montantN > 0 %}
+																	{{ (( topFamilleProduit.montantN * 100 ) / totaux[0].montantN )|number_format(2, '.', ' ') }}
 																{% endif %}
 															</td>
 														</tr>
@@ -349,11 +373,19 @@
 														<th class="text-left">Référence</th>
 														<th class="text-left">Désignation</th>
 														<th class="text-left">Famille</th>
-														<th>{{ "now"|date("Y") - 4 }}</th>
-														<th>{{ "now"|date("Y") - 3 }}</th>
-														<th>{{ "now"|date("Y") - 2 }}</th>
-														<th>{{ "now"|date("Y") - 1 }}
-															*</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 3 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 3 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 2 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 2 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 1 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 1 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m-Y") }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m-Y") }}*
+														</th>
 													</tr>
 												</thead>
 												<tbody>
@@ -365,24 +397,7 @@
 															<td class="text-left align-middle">{{ topProduit.designation }}</td>
 															<td class="text-left align-middle">{{ topProduit.familleProduit }}</td>
 															<td class="align-middle">
-																{{ topProduit.montantN4|format_currency('EUR', locale='fr') }}
-															</td>
-															<td class="align-middle">
-																{% if topProduit.montantN3 != 0 and topProduit.montantN4 != 0 %}
-																	{% set deltaN3 = ((topProduit.montantN3 / topProduit.montantN4) - 1) %}
-																	{% if deltaN3 > 0 %}
-																		{% set colorDeltaN3 = 'success' %}
-																	{% elseif deltaN3 == 0  %}
-																		{% set colorDeltaN3 = 'warning' %}
-																	{% elseif deltaN3 < 0  %}
-																		{% set colorDeltaN3 = 'danger' %}
-																	{% endif %}
-																{% else %}
-																	{% set colorDeltaN3 = 'warning' %}
-																	{% set deltaN3 = 0 %}
-																{% endif %}
 																{{ topProduit.montantN3|format_currency('EUR', locale='fr') }}
-																<span class="badge bg-{{colorDeltaN3}} ml-2">{{ deltaN3|format_percent_number }}</span>
 															</td>
 															<td class="align-middle">
 																{% if topProduit.montantN2 != 0 and topProduit.montantN3 != 0 %}
@@ -418,6 +433,23 @@
 																{{ topProduit.montantN1|format_currency('EUR', locale='fr') }}
 																<span class="badge bg-{{colorDeltaN1}} ml-2">{{ deltaN1|format_percent_number }}</span>
 															</td>
+															<td class="align-middle">
+																{% if topProduit.montantN1 != 0 and topProduit.montantN != 0 %}
+																	{% set deltaN = ((topProduit.montantN / topProduit.montantN1) - 1) %}
+																	{% if deltaN > 0 %}
+																		{% set colorDeltaN = 'success' %}
+																	{% elseif deltaN == 0  %}
+																		{% set colorDeltaN = 'warning' %}
+																	{% elseif deltaN < 0  %}
+																		{% set colorDeltaN = 'danger' %}
+																	{% endif %}
+																{% else %}
+																	{% set colorDeltaN = 'warning' %}
+																	{% set deltaN = 0 %}
+																{% endif %}
+																{{ topProduit.montantN|format_currency('EUR', locale='fr') }}
+																<span class="badge bg-{{colorDeltaN}} ml-2">{{ deltaN|format_percent_number }}</span>
+															</td>
 														</tr>
 														{% set produit = produit + 1 %}
 													{% endfor %}
@@ -431,8 +463,7 @@
 							<div class="">
 								<div class="card card-lightblue">
 									<div class="card-header">
-										<h3 class="card-title">Par famille de client pour
-											{{app.request.attributes.get('commercial')}}</h3>
+										<h3 class="card-title">Par famille de client global</h3>
 										<div class="card-tools">
 											<button type="button" class="btn btn-tool" data-card-widget="maximize">
 												<i class="fas fa-expand"></i>
@@ -455,13 +486,28 @@
 														<tr class="text-center">
 															<th style="width: 10px">Top</th>
 															<th class="text-left">Famille client</th>
-															<th class="table-info">{{ "now"|date("Y") - 4 }}</th>
+															<th class="table-info">
+																{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 3 }}
+																au
+																{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 3 }}
+															</th>
 															<th class="table-info">% CA</th>
-															<th class="table-success">{{ "now"|date("Y") - 3 }}</th>
+															<th class="table-success">
+																{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 2 }}
+																au
+																{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 2 }}
+															</th>
 															<th class="table-success">% CA</th>
-															<th class="table-danger">{{ "now"|date("Y") - 2 }}</th>
+															<th class="table-danger">
+																{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 1 }}
+																au
+																{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 1 }}
+															</th>
 															<th class="table-danger">% CA</th>
-															<th class="table-warning">{{ "now"|date("Y") - 1 }}
+															<th class="table-warning">
+																{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") }}
+																au
+																{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") }}
 																*</th>
 															<th class="table-warning">% CA</th>
 														</tr>
@@ -476,33 +522,11 @@
 																	{{ topFamilleClient.montantN4|format_currency('EUR', locale='fr') }}
 																</td>
 																<td class="table-info">
-																	{% if topFamilleClient.montantN4 > 0 %}
-																		{{ (( topFamilleClient.montantN4 * 100 ) / totaux[0].montantN4 )|number_format(2, '.', ' ') }}
-																	{% endif %}
-																</td>
-																<td class="align-middle table-success">
-																	{% if topFamilleClient.montantN3 != 0 and topFamilleClient.montantN4 != 0 %}
-																		{% set deltaFamilleClientN3 = ((topFamilleClient.montantN3 / topFamilleClient.montantN4) - 1) %}
-																		{% if deltaFamilleClientN3 > 0 %}
-																			{% set colorDeltaFamilleClientN3 = 'success' %}
-																		{% elseif deltaFamilleClientN3 == 0  %}
-																			{% set colorDeltaFamilleClientN3 = 'warning' %}
-																		{% elseif deltaFamilleClientN3 < 0  %}
-																			{% set colorDeltaFamilleClientN3 = 'danger' %}
-																		{% endif %}
-																	{% else %}
-																		{% set colorDeltaFamilleClientN3 = 'warning' %}
-																		{% set deltaFamilleClientN3 = 0 %}
-																	{% endif %}
-																	{{ topFamilleClient.montantN3|format_currency('EUR', locale='fr') }}
-																	<span class="badge bg-{{colorDeltaFamilleClientN3}} ml-2">{{ deltaFamilleClientN3|format_percent_number }}</span>
-																</td>
-																<td class="table-success">
 																	{% if topFamilleClient.montantN3 > 0 %}
 																		{{ (( topFamilleClient.montantN3 * 100 ) / totaux[0].montantN3 )|number_format(2, '.', ' ') }}
 																	{% endif %}
 																</td>
-																<td class="align-middle table-danger">
+																<td class="align-middle table-success">
 																	{% if topFamilleClient.montantN2 != 0 and topFamilleClient.montantN3 != 0 %}
 																		{% set deltaFamilleClientN2 = ((topFamilleClient.montantN2 / topFamilleClient.montantN3) - 1) %}
 																		{% if deltaFamilleClientN2 > 0 %}
@@ -519,12 +543,12 @@
 																	{{ topFamilleClient.montantN2|format_currency('EUR', locale='fr') }}
 																	<span class="badge bg-{{colorDeltaFamilleClientN2}} ml-2">{{ deltaFamilleClientN2|format_percent_number }}</span>
 																</td>
-																<td class="table-danger">
+																<td class="table-success">
 																	{% if topFamilleClient.montantN2 > 0 %}
 																		{{ (( topFamilleClient.montantN2 * 100 ) / totaux[0].montantN2 )|number_format(2, '.', ' ') }}
 																	{% endif %}
 																</td>
-																<td class="align-middle table-warning">
+																<td class="align-middle table-danger">
 																	{% if topFamilleClient.montantN1 != 0 and topFamilleClient.montantN2 != 0 %}
 																		{% set deltaFamilleClientN1 = ((topFamilleClient.montantN1 / topFamilleClient.montantN2) - 1) %}
 																		{% if deltaFamilleClientN1 > 0 %}
@@ -541,9 +565,31 @@
 																	{{ topFamilleClient.montantN1|format_currency('EUR', locale='fr') }}
 																	<span class="badge bg-{{colorDeltaFamilleClientN1}} ml-2">{{ deltaFamilleClientN1|format_percent_number }}</span>
 																</td>
-																<td class="table-warning">
+																<td class="table-danger">
 																	{% if topFamilleClient.montantN1 > 0 %}
 																		{{ (( topFamilleClient.montantN1 * 100 ) / totaux[0].montantN1 )|number_format(2, '.', ' ') }}
+																	{% endif %}
+																</td>
+																<td class="align-middle table-warning">
+																	{% if topFamilleClient.montantN1 != 0 and topFamilleClient.montantN != 0 %}
+																		{% set deltaFamilleClientN = ((topFamilleClient.montantN / topFamilleClient.montantN1) - 1) %}
+																		{% if deltaFamilleClientN > 0 %}
+																			{% set colorDeltaFamilleClientN = 'success' %}
+																		{% elseif deltaFamilleClientN == 0  %}
+																			{% set colorDeltaFamilleClientN = 'warning' %}
+																		{% elseif deltaFamilleClientN < 0  %}
+																			{% set colorDeltaFamilleClientN = 'danger' %}
+																		{% endif %}
+																	{% else %}
+																		{% set colorDeltaFamilleClientN = 'warning' %}
+																		{% set deltaFamilleClientN = 0 %}
+																	{% endif %}
+																	{{ topFamilleClient.montantN|format_currency('EUR', locale='fr') }}
+																	<span class="badge bg-{{colorDeltaFamilleClientN}} ml-2">{{ deltaFamilleClientN|format_percent_number }}</span>
+																</td>
+																<td class="table-warning">
+																	{% if topFamilleClient.montantN > 0 %}
+																		{{ (( topFamilleClient.montantN * 100 ) / totaux[0].montantN )|number_format(2, '.', ' ') }}
 																	{% endif %}
 																</td>
 															</tr>
@@ -563,11 +609,20 @@
 													<tr class="text-center">
 														<th style="width: 10px">Top</th>
 														<th class="text-left">client</th>
-														<th>{{ "now"|date("Y") - 4 }}</th>
-														<th>{{ "now"|date("Y") - 3 }}</th>
-														<th>{{ "now"|date("Y") - 2 }}</th>
-														<th>{{ "now"|date("Y") - 1 }}
-															*</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 3 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 3 }}
+														</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 2 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 2 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 1 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 1 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m-Y") }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m-Y") }}*
+														</th>
 													</tr>
 												</thead>
 												<tbody>
@@ -577,24 +632,7 @@
 															<td class="align-middle">{{ client }}</td>
 															<td class="text-left align-middle">{{ topClient.nom }}</td>
 															<td class="align-middle">
-																{{ topClient.montantN4|format_currency('EUR', locale='fr') }}
-															</td>
-															<td class="align-middle">
-																{% if topClient.montantN3 != 0 and topClient.montantN4 != 0 %}
-																	{% set deltaN3 = ((topClient.montantN3 / topClient.montantN4) - 1) %}
-																	{% if deltaN3 > 0 %}
-																		{% set colorDeltaN3 = 'success' %}
-																	{% elseif deltaN3 == 0  %}
-																		{% set colorDeltaN3 = 'warning' %}
-																	{% elseif deltaN3 < 0  %}
-																		{% set colorDeltaN3 = 'danger' %}
-																	{% endif %}
-																{% else %}
-																	{% set colorDeltaN3 = 'warning' %}
-																	{% set deltaN3 = 0 %}
-																{% endif %}
 																{{ topClient.montantN3|format_currency('EUR', locale='fr') }}
-																<span class="badge bg-{{colorDeltaN3}} ml-2">{{ deltaN3|format_percent_number }}</span>
 															</td>
 															<td class="align-middle">
 																{% if topClient.montantN2 != 0 and topClient.montantN3 != 0 %}
@@ -630,8 +668,115 @@
 																{{ topClient.montantN1|format_currency('EUR', locale='fr') }}
 																<span class="badge bg-{{colorDeltaN1}} ml-2">{{ deltaN1|format_percent_number }}</span>
 															</td>
+															<td class="align-middle">
+																{% if topClient.montantN1 != 0 and topClient.montantN != 0 %}
+																	{% set deltaN = ((topClient.montantN / topClient.montantN1) - 1) %}
+																	{% if deltaN > 0 %}
+																		{% set colorDeltaN = 'success' %}
+																	{% elseif deltaN == 0  %}
+																		{% set colorDeltaN = 'warning' %}
+																	{% elseif deltaN < 0  %}
+																		{% set colorDeltaN = 'danger' %}
+																	{% endif %}
+																{% else %}
+																	{% set colorDeltaN = 'warning' %}
+																	{% set deltaN = 0 %}
+																{% endif %}
+																{{ topClient.montantN|format_currency('EUR', locale='fr') }}
+																<span class="badge bg-{{colorDeltaN}} ml-2">{{ deltaN|format_percent_number }}</span>
+															</td>
 														</tr>
 														{% set client = client + 1 %}
+													{% endfor %}
+
+												</tbody>
+											</table>
+										</div>
+										<div class="col-md-12">
+											<h1 class="pt-4">TOP DES FOURNISSEURS</h1>
+											<span>* Année de référence</span>
+											<table id="example11" class="table table-sm">
+												<thead>
+													<tr class="text-center">
+														<th style="width: 10px">Top</th>
+														<th class="text-left">fournisseur</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 3 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 3 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 2 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 2 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m") }}-{{ app.request.attributes.get('dd')|date("Y") - 1 }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m") }}-{{ app.request.attributes.get('df')|date("Y") - 1 }}</th>
+														<th>{{ app.request.attributes.get('dd')|date("d-m-Y") }}
+															au
+															{{ app.request.attributes.get('df')|date("d-m-Y") }}*
+														</th>
+													</tr>
+												</thead>
+												<tbody>
+													{% set fournisseur = 1 %}
+													{% for topFournisseur in topFournisseurs %}
+														<tr class="text-center">
+															<td class="align-middle">{{ fournisseur }}</td>
+															<td class="text-left align-middle">{{ topFournisseur.nomFou }}</td>
+															<td class="align-middle">
+																{{ topFournisseur.montantN3|format_currency('EUR', locale='fr') }}
+															</td>
+															<td class="align-middle">
+																{% if topFournisseur.montantN2 != 0 and topFournisseur.montantN3 != 0 %}
+																	{% set deltaN2 = ((topFournisseur.montantN2 / topFournisseur.montantN3) - 1) %}
+																	{% if deltaN2 > 0 %}
+																		{% set colorDeltaN2 = 'success' %}
+																	{% elseif deltaN2 == 0  %}
+																		{% set colorDeltaN2 = 'warning' %}
+																	{% elseif deltaN2 < 0  %}
+																		{% set colorDeltaN2 = 'danger' %}
+																	{% endif %}
+																{% else %}
+																	{% set colorDeltaN2 = 'warning' %}
+																	{% set deltaN2 = 0 %}
+																{% endif %}
+																{{ topFournisseur.montantN2|format_currency('EUR', locale='fr') }}
+																<span class="badge bg-{{colorDeltaN2}} ml-2">{{ deltaN2|format_percent_number }}</span>
+															</td>
+															<td class="align-middle">
+																{% if topFournisseur.montantN1 != 0 and topFournisseur.montantN2 != 0 %}
+																	{% set deltaN1 = ((topFournisseur.montantN1 / topFournisseur.montantN2) - 1) %}
+																	{% if deltaN1 > 0 %}
+																		{% set colorDeltaN1 = 'success' %}
+																	{% elseif deltaN1 == 0  %}
+																		{% set colorDeltaN1 = 'warning' %}
+																	{% elseif deltaN1 < 0  %}
+																		{% set colorDeltaN1 = 'danger' %}
+																	{% endif %}
+																{% else %}
+																	{% set colorDeltaN1 = 'warning' %}
+																	{% set deltaN1 = 0 %}
+																{% endif %}
+																{{ topFournisseur.montantN1|format_currency('EUR', locale='fr') }}
+																<span class="badge bg-{{colorDeltaN1}} ml-2">{{ deltaN1|format_percent_number }}</span>
+															</td>
+															<td class="align-middle">
+																{% if topFournisseur.montantN1 != 0 and topFournisseur.montantN != 0 %}
+																	{% set deltaN = ((topFournisseur.montantN / topFournisseur.montantN1) - 1) %}
+																	{% if deltaN > 0 %}
+																		{% set colorDeltaN = 'success' %}
+																	{% elseif deltaN == 0  %}
+																		{% set colorDeltaN = 'warning' %}
+																	{% elseif deltaN < 0  %}
+																		{% set colorDeltaN = 'danger' %}
+																	{% endif %}
+																{% else %}
+																	{% set colorDeltaN = 'warning' %}
+																	{% set deltaN = 0 %}
+																{% endif %}
+																{{ topFournisseur.montantN|format_currency('EUR', locale='fr') }}
+																<span class="badge bg-{{colorDeltaN}} ml-2">{{ deltaN|format_percent_number }}</span>
+															</td>
+														</tr>
+														{% set fournisseur = fournisseur + 1 %}
 													{% endfor %}
 
 												</tbody>
@@ -675,6 +820,22 @@ $("#example1").DataTable({
 "colvis"
 ]
 }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+$("#example11").DataTable({
+"responsive": true,
+"lengthChange": false,
+"autoWidth": false,
+"order": [
+[0, "asc"]
+],
+"buttons": [
+"copy",
+"csv",
+"excel",
+"pdf",
+"print",
+"colvis"
+]
+}).buttons().container().appendTo('#example11_wrapper .col-md-6:eq(0)');
 $("#example10").DataTable({
 "responsive": true,
 "lengthChange": false,

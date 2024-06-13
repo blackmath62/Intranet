@@ -106,15 +106,18 @@
 											{% endif %}
 										</a>
 									</td>
+									{% set col = 'warning' %}
+									{% if produit.puCorrige == 0 %}
+										{% set col = 'danger' %}
+									{% endif %}
+
 									{% if produit.puCorrige != 0 and produit.pu != 0 %}
 										{% set var = ((produit.puCorrige / produit.pu) -1)|abs %}
-										{% if var >= 0.01 %}
+										{% if var >= 0.1 %}
 											{% set col = 'danger' %}
-										{% elseif produit.puCorrige == produit.pu  %}
+										{% elseif var == 0  %}
 											{% set col = 'success' %}
 										{% endif %}
-									{% else %}
-										{% set col = 'warning' %}
 									{% endif %}
 									<td class="text-center table-{{ col }}">
 										<a class="text-center text-dark">{{ produit.puCorrige }}</a>

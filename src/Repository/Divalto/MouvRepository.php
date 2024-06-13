@@ -95,6 +95,103 @@ class MouvRepository extends ServiceEntityRepository
         return $resultSet->fetchOne();
     }
 
+    public function getPiecesByCommercialByPeriods($piece, $commerciaux, $start, $end)
+    {
+        if ($piece == 1) {
+            $p = 'm.DVDT';
+            $pino = 'm.DVNO';
+        } elseif ($piece == 2) {
+            $p = 'm.CDDT';
+            $pino = 'm.CDNO';
+        } elseif ($piece == 3) {
+            $p = 'm.BLDT';
+            $pino = 'm.BLNO';
+        } elseif ($piece == 4) {
+            $p = 'm.FADT';
+            $pino = 'm.FANO';
+        }
+        // Création d'objets DateTime pour $start et $end
+        $start_date = new DateTime($start);
+        $end_date = new DateTime($end);
+
+        // Calcul de la différence entre les deux dates
+        $diff = $start_date->diff($end_date);
+
+        // Récupération de la différence en années
+        $diff_years = $diff->y;
+        $start1 = clone $start_date;
+        $start1->modify('-' . $diff_years + 1 . ' year');
+        $start1 = $start1->format('Y-m-d');
+        $start_date1 = new DateTime($start1);
+
+        $start2 = clone $start_date1;
+        $start2->modify('-' . $diff_years + 1 . ' year');
+        $start2 = $start2->format('Y-m-d');
+        $start_date2 = new DateTime($start2);
+
+        $start3 = clone $start_date2;
+        $start3->modify('-' . $diff_years + 1 . ' year');
+        $start3 = $start3->format('Y-m-d');
+
+        // Création d'une nouvelle date avec l'année de $start moins un an, et le mois et le jour de $end
+        $end1 = clone $start_date;
+        $end1->modify('-1 year');
+        $end1->setDate($end1->format('Y'), $end_date->format('m'), $end_date->format('d'));
+        $end1 = $end1->format('Y-m-d');
+
+        $end2 = clone $start_date1;
+        $end2->modify('-1 year');
+        $end2->setDate($end2->format('Y'), $end_date->format('m'), $end_date->format('d'));
+        $end2 = $end2->format('Y-m-d');
+
+        $end3 = clone $start_date2;
+        $end3->modify('-1 year');
+        $end3->setDate($end3->format('Y'), $end_date->format('m'), $end_date->format('d'));
+        $end3 = $end3->format('Y-m-d');
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT v.NOM AS nom,
+	SUM(CASE WHEN $p >= '$start' AND $p <= '$end' AND $pino <> 0 THEN 1 ELSE 0 END) AS qte,
+	SUM(
+	CASE
+		WHEN m.FADT >= '$start' AND m.FADT <= '$end' AND m.PICOD = 4 AND m.OP IN ('C','CD') AND m.FANO <> 0 THEN  m.MONT - m.REMPIEMT_0004
+		WHEN m.FADT >= '$start' AND m.FADT <= '$end' AND m.PICOD = 4 AND m.OP IN ('D','DD') AND m.FANO <> 0 THEN  (-1 * m.MONT) + m.REMPIEMT_0004
+		END
+		) AS mont,
+	SUM(CASE WHEN $p >= '$start1' AND $p <= '$end1' AND $pino <> 0 THEN 1 ELSE 0 END) AS qte1,
+	SUM(
+	CASE
+		WHEN m.FADT >= '$start1' AND m.FADT <= '$end1' AND m.PICOD = 4 AND m.OP IN ('C','CD') AND m.FANO <> 0 THEN  m.MONT - m.REMPIEMT_0004
+		WHEN m.FADT >= '$start1' AND m.FADT <= '$end1' AND m.PICOD = 4 AND m.OP IN ('D','DD') AND m.FANO <> 0 THEN  (-1 * m.MONT) + m.REMPIEMT_0004
+		END
+		) AS mont1,
+	SUM(CASE WHEN $p >= '$start2' AND $p <= '$end2' AND $pino <> 0  THEN 1 ELSE 0 END) AS qte2,
+	SUM(
+	CASE
+		WHEN m.FADT >= '$start2' AND m.FADT <= '$end2' AND m.PICOD = 4 AND m.OP IN ('C','CD') AND m.FANO <> 0 THEN  m.MONT - m.REMPIEMT_0004
+		WHEN m.FADT >= '$start2' AND m.FADT <= '$end2' AND m.PICOD = 4 AND m.OP IN ('D','DD') AND m.FANO <> 0 THEN  (-1 * m.MONT) + m.REMPIEMT_0004
+		END
+		) AS mont2,
+	SUM(CASE WHEN $p >= '$start3' AND $p <= '$end3' AND $pino <> 0 THEN 1 ELSE 0 END) AS qte3,
+	SUM(
+	CASE
+		WHEN m.FADT >= '$start3' AND m.FADT <= '$end3' AND m.PICOD = 4 AND m.OP IN ('C','CD') AND m.FANO <> 0 THEN  m.MONT - m.REMPIEMT_0004
+		WHEN m.FADT >= '$start3' AND m.FADT <= '$end3' AND m.PICOD = 4 AND m.OP IN ('D','DD') AND m.FANO <> 0 THEN  (-1 * m.MONT) + m.REMPIEMT_0004
+		END
+		) AS mont3
+    FROM MOUV m
+    INNER JOIN CLI c ON c.DOS = m.DOS AND c.TIERS = m.TIERS
+    INNER JOIN VRP v ON v.DOS = m.DOS AND m.REPR_0001 = v.TIERS
+    INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+    WHERE m.DOS = 1 AND $p >= '$start3' AND $p <= '$end' AND m.TICOD = 'C'
+    AND a.FAM_0002 IN ('HP','EV') AND m.REPR_0001 IN ($commerciaux)
+    GROUP BY v.NOM
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     public function searchCodeAffairePiece($tiers, $piece)
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -774,8 +871,8 @@ class MouvRepository extends ServiceEntityRepository
         FROM ENT
         INNER JOIN CLI ON CLI.DOS = ENT.DOS AND CLI.TIERS = ENT.TIERS
         INNER JOIN VRP ON VRP.TIERS = CLI.REPR_0001 AND VRP.DOS = ENT.DOS
-        WHERE ENT.PIDT = DATEADD(day,-1,CAST(GETDATE() as date)) AND ENT.CE4 = 1 )reponse
-        WHERE feu = 'rouge' AND ENT.DOS = 1
+        WHERE ENT.PIDT = DATEADD(day,-1,CAST(GETDATE() as date)) AND ENT.CE4 = 1 AND ENT.DOS = 1 )reponse
+        WHERE feu = 'rouge'
     ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

@@ -200,6 +200,17 @@ class FscPieceClientController extends AbstractController
     // on ajoute les factures clients qui n'y sont pas déjà
     public function update(): Response
     {
+        $this->updateWithoutFlash();
+
+        $this->addFlash('message', 'Mise à jour effectuée avec succés');
+        return $this->redirectToRoute('app_fsc_piece_client');
+    }
+
+    #[Route("/Roby/fsc/pieces/clients/update/without/flash", name: "app_fsc_piece_client_update_wihout_flash")]
+
+    // on ajoute les factures clients qui n'y sont pas déjà
+    public function updateWithoutFlash()
+    {
         $user = $this->repoUsers->findOneBy(['pseudo' => 'intranet']);
         $factures = $this->repoEnt->getMouvfactCliFsc();
         if ($factures) {
@@ -224,9 +235,6 @@ class FscPieceClientController extends AbstractController
             }
             $this->sendMailVenteSansLiaison();
         }
-
-        $this->addFlash('message', 'Mise à jour effectuée avec succés');
-        return $this->redirectToRoute('app_fsc_piece_client');
     }
 
     // mail automatique pour demander la liaison avec les achats

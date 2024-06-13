@@ -80,11 +80,13 @@ class DateDebutDateFinFournisseursType extends AbstractType
                 'choices' => [
                     'Tiers | Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => "basique",
                     'Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => "sansFournisseurs",
+                    'Commercial | Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => "commerciaux",
                     'Tiers | Famille | Référence | Sref1 | Sref2 | Désignation | Op | Date Facture | Facture | Qte | Prix Unitaire | Montant | Adresse Livraison' => "dateOp",
                 ],
                 'choice_attr' => [
                     'Tiers | Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => ['class' => 'm-3'],
                     'Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => ['class' => 'm-3'],
+                    'Commercial | Famille | Référence | Sref1 | Sref2 | Désignation | Qte | Prix Unitaire | Montant' => ['class' => 'm-3'],
                     'Tiers | Famille | Référence | Sref1 | Sref2 | Désignation | Op | Date Facture | Facture | Qte | Prix Unitaire | Montant | Adresse Livraison' => ['class' => 'm-3'],
                 ],
                 'expanded' => false,

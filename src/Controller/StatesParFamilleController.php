@@ -15,20 +15,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class StatesParFamilleController extends AbstractController
 {
-    #[Route("/Roby/states/par/famille/produits/{dos}", name: "app_states_par_famille")]
-    #[Route("/Roby/states/par/famille/produits/{dos}/{dd}/{df}", name: "app_states_par_famille_dd_df")]
-    #[Route("/Roby/states/par/famille/clients/{dos}", name: "app_states_par_famille_clients")]
-    #[Route("/Roby/states/par/famille/clients/{dos}/{dd}/{df}", name: "app_states_par_famille_clients_dd_df")]
-    #[Route("/Lhermitte/states/par/famille/produits/{dos}", name: "app_states_par_familleLh")]
-    #[Route("/Lhermitte/states/par/famille/produits/{dos}/{dd}/{df}", name: "app_states_par_famille_dd_dfLh")]
-    #[Route("/Lhermitte/states/par/famille/clients/{dos}", name: "app_states_par_famille_clientsLh")]
-    #[Route("/Lhermitte/states/par/famille/clients/{dos}/{dd}/{df}", name: "app_states_par_famille_clients_dd_dfLh")]
+    #[Route("/Roby/states/par/famille/produits/{dos}/{metier}", name: "app_states_par_famille")]
+    #[Route("/Roby/states/par/famille/produits/{dos}/{metier}/{dd}/{df}", name: "app_states_par_famille_dd_df")]
+    #[Route("/Roby/states/par/famille/clients/{dos}/{metier}", name: "app_states_par_famille_clients")]
+    #[Route("/Roby/states/par/famille/clients/{dos}/{metier}/{dd}/{df}", name: "app_states_par_famille_clients_dd_df")]
+    #[Route("/Lhermitte/states/par/famille/produits/{dos}/{metier}", name: "app_states_par_familleLh")]
+    #[Route("/Lhermitte/states/par/famille/produits/{dos}/{metier}/{dd}/{df}", name: "app_states_par_famille_dd_dfLh")]
+    #[Route("/Lhermitte/states/par/famille/clients/{dos}/{metier}", name: "app_states_par_famille_clientsLh")]
+    #[Route("/Lhermitte/states/par/famille/clients/{dos}/{metier}/{dd}/{df}", name: "app_states_par_famille_clients_dd_dfLh")]
 
-    public function index(Request $request, StatesByTiersRepository $repo, $dos, $dd = null, $df = null): Response
+    public function index(Request $request, StatesByTiersRepository $repo, $dos, $metier, $dd = null, $df = null): Response
     {
-        // tracking user page for stats
-        // $tracking = $request->attributes->get('_route');
-        //$this->setTracking($tracking);
         $states = "";
         $start = "";
         $end = "";
@@ -72,12 +69,12 @@ class StatesParFamilleController extends AbstractController
             $famille = "clients";
         }
 
-        $states = $repo->getStatesParFamilleRoby($dos, $startN, $endN, $startN1, $endN1, $famille);
-        $totaux = $repo->getStatesParFamilleRobyTotaux($dos, $startN, $endN, $startN1, $endN1, $famille);
-        $familles = $repo->getStatesParFamilleRobyTotauxParFamille($dos, $startN, $endN, $startN1, $endN1, $famille);
+        $states = $repo->getStatesParFamilleRoby($dos, $metier, $startN, $endN, $startN1, $endN1, $famille);
+        $totaux = $repo->getStatesParFamilleRobyTotaux($dos, $metier, $startN, $endN, $startN1, $endN1, $famille);
+        $familles = $repo->getStatesParFamilleRobyTotauxParFamille($dos, $metier, $startN, $endN, $startN1, $endN1, $famille);
 
         // Données stats diagramme famille
-        $dataFamille = $repo->getStatesParFamilleRobyTotauxParFamille($dos, $startN, $endN, $startN1, $endN1, $famille);
+        $dataFamille = $familles;
         for ($ligFamille = 0; $ligFamille < count($dataFamille); $ligFamille++) {
             $familleNom[] = $dataFamille[$ligFamille]['famille'];
             $familleMontantN[] = $dataFamille[$ligFamille]['montantN'];
@@ -103,20 +100,17 @@ class StatesParFamilleController extends AbstractController
         ]);
     }
 
-    #[Route("/Roby/states/produits/{dos}", name: "app_states_par_produits")]
-    #[Route("/Roby/states/produits/{dos}/{dd}/{df}", name: "app_states_par_produits_dd_df")]
-    #[Route("/Roby/states/clients/{dos}", name: "app_states_par_clients")]
-    #[Route("/Roby/states/clients/{dos}/{dd}/{df}", name: "app_states_par_clients_dd_df")]
-    #[Route("/Lhermitte/states/produits/{dos}", name: "app_states_par_produitsLh")]
-    #[Route("/Lhermitte/states/produits/{dos}/{dd}/{df}", name: "app_states_par_produits_dd_dfLh")]
-    #[Route("/Lhermitte/states/clients/{dos}", name: "app_states_par_clientsLh")]
-    #[Route("/Lhermitte/states/clients/{dos}/{dd}/{df}", name: "app_states_par_clients_dd_dfLh")]
+    #[Route("/Roby/states/produits/{dos}/{metier}", name: "app_states_par_produits")]
+    #[Route("/Roby/states/produits/{dos}/{metier}/{dd}/{df}", name: "app_states_par_produits_dd_df")]
+    #[Route("/Roby/states/clients/{dos}/{metier}", name: "app_states_par_clients")]
+    #[Route("/Roby/states/clients/{dos}/{metier}/{dd}/{df}", name: "app_states_par_clients_dd_df")]
+    #[Route("/Lhermitte/states/produits/{dos}/{metier}", name: "app_states_par_produitsLh")]
+    #[Route("/Lhermitte/states/produits/{dos}/{metier}/{dd}/{df}", name: "app_states_par_produits_dd_dfLh")]
+    #[Route("/Lhermitte/states/clients/{dos}/{metier}", name: "app_states_par_clientsLh")]
+    #[Route("/Lhermitte/states/clients/{dos}/{metier}/{dd}/{df}", name: "app_states_par_clients_dd_dfLh")]
 
-    public function getClientArticle(Request $request, StatesByTiersRepository $repo, $dos, $dd = null, $df = null): Response
+    public function getClientArticle(Request $request, StatesByTiersRepository $repo, $dos, $metier, $dd = null, $df = null): Response
     {
-        // tracking user page for stats
-        // $tracking = $request->attributes->get('_route');
-        //$this->setTracking($tracking);
         $states = "";
         $start = "";
         $end = "";
@@ -159,8 +153,8 @@ class StatesParFamilleController extends AbstractController
             $famille = "clients";
         }
 
-        $states = $repo->getStatesRobyTotalParClientArticle($dos, $startN, $endN, $startN1, $endN1, $famille);
-        $totaux = $repo->getStatesParFamilleRobyTotaux($dos, $startN, $endN, $startN1, $endN1, $famille);
+        $states = $repo->getStatesRobyTotalParClientArticle($dos, $metier, $startN, $endN, $startN1, $endN1, $famille);
+        $totaux = $repo->getStatesParFamilleRobyTotaux($dos, $metier, $startN, $endN, $startN1, $endN1, $famille);
         //dd($totaux);
         return $this->render('states_par_famille/clientArticle.html.twig', [
             'states' => $states,
@@ -175,14 +169,11 @@ class StatesParFamilleController extends AbstractController
         ]);
     }
 
-    #[Route("/Roby/states/commerciaux/{dos}/{dd}/{df}", name: "app_states_commerciaux_dd_df")]
-    #[Route("/Lhermitte/states/commerciaux/{dos}/{dd}/{df}", name: "app_states_commerciaux_dd_dfLh")]
+    #[Route("/Roby/states/commerciaux/{dos}/{metier}/{dd}/{df}", name: "app_states_commerciaux_dd_df")]
+    #[Route("/Lhermitte/states/commerciaux/{dos}/{metier}/{dd}/{df}", name: "app_states_commerciaux_dd_dfLh")]
 
-    public function commerciaux(Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume, $dos, $dd = null, $df = null): Response
+    public function commerciaux(Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume, $dos, $metier, $dd = null, $df = null): Response
     {
-        // tracking user page for stats
-        // $tracking = $request->attributes->get('_route');
-        //$this->setTracking($tracking);
 
         $start = "";
         $end = "";
@@ -195,7 +186,6 @@ class StatesParFamilleController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $start = $form->getData()["startDate"];
             $end = $form->getData()["endDate"];
-
             $d = new DateTime($start->format('Y-m-d'));
             $startN = $this->getYmd($d);
             $startN1 = $this->getDateDiff($d, $start, $end);
@@ -203,6 +193,13 @@ class StatesParFamilleController extends AbstractController
             $d = new DateTime($end->format('Y-m-d'));
             $endN = $this->getYmd($d);
             $endN1 = $this->getDateDiff($d, $start, $end);
+
+            return $this->redirectToRoute($request->attributes->get('_route'), [
+                'dos' => $dos,
+                'metier' => $metier,
+                'dd' => $startN,
+                'df' => $endN,
+            ]);
 
         } else {
             $d = new DateTime($dd);
@@ -223,9 +220,9 @@ class StatesParFamilleController extends AbstractController
         $donneesCommerciaux = [];
         $anneeCommerciaux = [];
         $startCommerciaux = new DateTime('now');
-        $startyear = $startCommerciaux->format('Y');
-        $dataCommerciaux = $repo->getStatesSixYearsAgoCommerciaux($dos);
+        $dataCommerciaux = $repo->getStatesSixYearsAgoCommerciauxPeriode($dos, $metier, $dd, $df);
         $color = [$resume->listeCouleur(0), $resume->listeCouleur(4), $resume->listeCouleur(10), $resume->listeCouleur(6), $resume->listeCouleur(9), $resume->listeCouleur(2)];
+        $datesDiff = $this->generateDateDiffs($dd, $df, 5);
         for ($i = 0; $i < count($dataCommerciaux); $i++) {
 
             $nomCommerciaux[] = $dataCommerciaux[$i]['commercial'];
@@ -235,83 +232,78 @@ class StatesParFamilleController extends AbstractController
                 $dataCommerciaux[$i]['montantN3'],
                 $dataCommerciaux[$i]['montantN2'],
                 $dataCommerciaux[$i]['montantN1'],
-                //$dataCommerciaux[$i]['montantN'],
+                $dataCommerciaux[$i]['montantN'],
             ]; //[[], [], []];
             $anneeCommerciaux = [
-                $startyear - 5,
-                $startyear - 4,
-                $startyear - 3,
-                $startyear - 2,
-                $startyear - 1,
-                //$startyear,
+                $datesDiff[4]['dd'] . ' => ' . $datesDiff[4]['df'],
+                $datesDiff[3]['dd'] . ' => ' . $datesDiff[3]['df'],
+                $datesDiff[2]['dd'] . ' => ' . $datesDiff[2]['df'],
+                $datesDiff[1]['dd'] . ' => ' . $datesDiff[1]['df'],
+                $datesDiff[0]['dd'] . ' => ' . $datesDiff[0]['df'],
+                $dd . ' => ' . $df,
             ];
             $couleurCommercial[] = 'rgb(' . $color[$i] . ')';
         }
 
         // Données Produits
-        $topProduit = $repo->StatesCommercial($dos, null, 'topProduitResume');
-        $topFamilleProduit = $repo->StatesCommercial($dos, null, 'topFamilleProduit');
+        $topProduit = $repo->StatesCommercial($dos, $metier, $startN, $endN, null, 'topProduitResume');
+        $topFamilleProduit = $repo->StatesCommercial($dos, $metier, $startN, $endN, null, 'topFamilleProduit');
 
-        // données line par commercial sur 5 ans
+        // données ligne par commercial sur 5 ans
         $nomCommercialFamilleProduit = [];
         $donneesCommercialFamilleProduit = [];
         $anneeCommercialFamilleProduit = [];
-        $startCommercialFamilleProduit = new DateTime('now');
-        $startyear = $startCommercialFamilleProduit->format('Y');
-        $dataCommercialFamilleProduit = $repo->StatesCommercial($dos, null, 'topFamilleProduit');
+        $dataCommercialFamilleProduit = $repo->StatesCommercial($dos, $metier, $startN, $endN, null, 'topFamilleProduit');
+
+        //dd($dataCommercialFamilleProduit);
 
         for ($i = 0; $i < count($dataCommercialFamilleProduit); $i++) {
 
             $nomCommercialFamilleProduit[] = $dataCommercialFamilleProduit[$i]['familleProduit'];
             $donneesCommercialFamilleProduit[] = [
-                $dataCommercialFamilleProduit[$i]['montantN4'],
                 $dataCommercialFamilleProduit[$i]['montantN3'],
                 $dataCommercialFamilleProduit[$i]['montantN2'],
                 $dataCommercialFamilleProduit[$i]['montantN1'],
-                //$dataCommercialFamilleProduit[$i]['montantN'],
+                $dataCommercialFamilleProduit[$i]['montantN'],
             ]; //[[], [], []];
             $anneeCommercialFamilleProduit = [
-                $startyear - 4,
-                $startyear - 3,
-                $startyear - 2,
-                $startyear - 1,
-                //$startyear,
+                $datesDiff[2]['dd'] . ' => ' . $datesDiff[2]['df'],
+                $datesDiff[1]['dd'] . ' => ' . $datesDiff[1]['df'],
+                $datesDiff[0]['dd'] . ' => ' . $datesDiff[0]['df'],
+                $dd . ' => ' . $df,
             ];
             $couleurCommercialFamilleProduit[] = 'rgb(' . $resume->listeCouleur($i) . ')';
         }
 
         // Données Clients
-        $topClient = $repo->StatesCommercial($dos, null, 'topClient');
-        $topFamilleClient = $repo->StatesCommercial($dos, null, 'topFamilleClient');
+        $topClient = $repo->StatesCommercial($dos, $metier, $startN, $endN, null, 'topClient');
+        $topFournisseur = $repo->StatesCommercial($dos, $metier, $startN, $endN, null, 'topFournisseur');
+        $topFamilleClient = $repo->StatesCommercial($dos, $metier, $startN, $endN, null, 'topFamilleClient');
 
         // données line par commercial sur 5 ans
         $nomCommercialFamilleClient = [];
         $donneesCommercialFamilleClient = [];
         $anneeCommercialFamilleClient = [];
-        $startCommercialFamilleClient = new DateTime('now');
-        $startyear = $startCommercialFamilleClient->format('Y');
-        $dataCommercialFamilleClient = $repo->StatesCommercial($dos, null, 'topFamilleClient');
+        $dataCommercialFamilleClient = $repo->StatesCommercial($dos, $metier, $startN, $endN, null, 'topFamilleClient');
 
         for ($i = 0; $i < count($dataCommercialFamilleClient); $i++) {
 
             $nomCommercialFamilleClient[] = $dataCommercialFamilleClient[$i]['familleClient'];
             $donneesCommercialFamilleClient[] = [
-                $dataCommercialFamilleClient[$i]['montantN4'],
                 $dataCommercialFamilleClient[$i]['montantN3'],
                 $dataCommercialFamilleClient[$i]['montantN2'],
                 $dataCommercialFamilleClient[$i]['montantN1'],
-                //$dataCommercialFamilleClient[$i]['montantN'],
+                $dataCommercialFamilleClient[$i]['montantN'],
             ]; //[[], [], []];
             $anneeCommercialFamilleClient = [
-                $startyear - 4,
-                $startyear - 3,
-                $startyear - 2,
-                $startyear - 1,
-                //$startyear,
+                $datesDiff[2]['dd'] . ' => ' . $datesDiff[2]['df'],
+                $datesDiff[1]['dd'] . ' => ' . $datesDiff[1]['df'],
+                $datesDiff[0]['dd'] . ' => ' . $datesDiff[0]['df'],
+                $dd . ' => ' . $df,
             ];
             $couleurCommercialFamilleClient[] = 'rgb(' . $resume->listeCouleur($i) . ')';
         }
-        $totaux = $repo->totauxStatesCommerciaux($dos, null);
+        $totaux = $repo->totauxStatesCommerciaux($dos, $metier, $dd, $df, null);
         //dd($totaux);
         return $this->render('states_par_famille/commerciaux.html.twig', [
             'title' => 'States par commerciaux',
@@ -332,6 +324,7 @@ class StatesParFamilleController extends AbstractController
             'donneesCommercialFamilleProduit' => json_encode($donneesCommercialFamilleProduit),
             'couleurCommercialFamilleProduit' => json_encode($couleurCommercialFamilleProduit),
             'topClients' => $topClient,
+            'topFournisseurs' => $topFournisseur,
             'topFamilleClients' => $topFamilleClient,
             'nomCommercialFamilleClient' => json_encode($nomCommercialFamilleClient),
             'anneeCommercialFamilleClient' => json_encode($anneeCommercialFamilleClient),
@@ -341,14 +334,11 @@ class StatesParFamilleController extends AbstractController
         ]);
     }
 
-    #[Route("/Roby/states/commercial/{dos}/{commercial}/{dd}/{df}", name: "app_states_commercial_dd_df")]
-    #[Route("/Lhermitte/states/commercial/{dos}/{commercial}/{dd}/{df}", name: "app_states_commercial_dd_dfLh")]
+    #[Route("/Roby/states/commercial/{dos}/{metier}/{commercial}/{dd}/{df}", name: "app_states_commercial_dd_df")]
+    #[Route("/Lhermitte/states/commercial/{dos}/{metier}/{commercial}/{dd}/{df}", name: "app_states_commercial_dd_dfLh")]
 
-    public function commercial(Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume, $dos, $commercial = null, $dd = null, $df = null): Response
+    public function commercial(Request $request, StatesByTiersRepository $repo, ResumeStatesController $resume, $dos, $metier, $commercial = null, $dd = null, $df = null): Response
     {
-        // tracking user page for stats
-        // $tracking = $request->attributes->get('_route');
-        // $this->setTracking($tracking);
 
         $start = "";
         $end = "";
@@ -379,65 +369,60 @@ class StatesParFamilleController extends AbstractController
         }
 
         // Données Clients
-        $topClient = $repo->StatesCommercial($dos, $commercial, 'topClient');
-        $topFamilleClient = $repo->StatesCommercial($dos, $commercial, 'topFamilleClient');
+        $topClient = $repo->StatesCommercial($dos, $metier, $startN, $endN, $commercial, 'topClient');
+        $topFamilleClient = $repo->StatesCommercial($dos, $metier, $startN, $endN, $commercial, 'topFamilleClient');
 
-        // données line par commercial sur 5 ans
+        // données ligne par commercial sur 5 ans
         $nomCommercialFamilleClient = [];
         $donneesCommercialFamilleClient = [];
         $anneeCommercialFamilleClient = [];
-        $startCommercialFamilleClient = new DateTime('now');
-        $startyear = $startCommercialFamilleClient->format('Y');
-        $dataCommercialFamilleClient = $repo->StatesCommercial($dos, $commercial, 'topFamilleClient');
+        $dataCommercialFamilleClient = $repo->StatesCommercial($dos, $metier, $startN, $endN, $commercial, 'topFamilleClient');
+        $datesDiff = $this->generateDateDiffs($dd, $df, 5);
+
+        //dd($dataCommercialFamilleClient);
 
         for ($i = 0; $i < count($dataCommercialFamilleClient); $i++) {
 
             $nomCommercialFamilleClient[] = $dataCommercialFamilleClient[$i]['familleClient'];
             $donneesCommercialFamilleClient[] = [
-                $dataCommercialFamilleClient[$i]['montantN4'],
                 $dataCommercialFamilleClient[$i]['montantN3'],
                 $dataCommercialFamilleClient[$i]['montantN2'],
                 $dataCommercialFamilleClient[$i]['montantN1'],
-                //$dataCommercialFamilleClient[$i]['montantN'],
+                $dataCommercialFamilleClient[$i]['montantN'],
             ]; //[[], [], []];
             $anneeCommercialFamilleClient = [
-                $startyear - 4,
-                $startyear - 3,
-                $startyear - 2,
-                $startyear - 1,
-                //$startyear,
+                $datesDiff[2]['dd'] . ' => ' . $datesDiff[2]['df'],
+                $datesDiff[1]['dd'] . ' => ' . $datesDiff[1]['df'],
+                $datesDiff[0]['dd'] . ' => ' . $datesDiff[0]['df'],
+                $dd . ' => ' . $df,
             ];
             $couleurCommercialFamilleClient[] = 'rgb(' . $resume->listeCouleur($i) . ')';
         }
 
         // Données Produits
-        $topProduit = $repo->StatesCommercial($dos, $commercial, 'topProduit');
-        $topFamilleProduit = $repo->StatesCommercial($dos, $commercial, 'topFamilleProduit');
+        $topProduit = $repo->StatesCommercial($dos, $metier, $startN, $endN, $commercial, 'topProduit');
+        $topFamilleProduit = $repo->StatesCommercial($dos, $metier, $startN, $endN, $commercial, 'topFamilleProduit');
 
         // données line par commercial sur 5 ans
         $nomCommercialFamilleProduit = [];
         $donneesCommercialFamilleProduit = [];
         $anneeCommercialFamilleProduit = [];
-        $startCommercialFamilleProduit = new DateTime('now');
-        $startyear = $startCommercialFamilleProduit->format('Y');
-        $dataCommercialFamilleProduit = $repo->StatesCommercial($dos, $commercial, 'topFamilleProduit');
+        $dataCommercialFamilleProduit = $repo->StatesCommercial($dos, $metier, $startN, $endN, $commercial, 'topFamilleProduit');
 
         for ($i = 0; $i < count($dataCommercialFamilleProduit); $i++) {
 
             $nomCommercialFamilleProduit[] = $dataCommercialFamilleProduit[$i]['familleProduit'];
             $donneesCommercialFamilleProduit[] = [
-                $dataCommercialFamilleProduit[$i]['montantN4'],
                 $dataCommercialFamilleProduit[$i]['montantN3'],
                 $dataCommercialFamilleProduit[$i]['montantN2'],
                 $dataCommercialFamilleProduit[$i]['montantN1'],
-                //$dataCommercialFamilleProduit[$i]['montantN'],
+                $dataCommercialFamilleProduit[$i]['montantN'],
             ]; //[[], [], []];
             $anneeCommercialFamilleProduit = [
-                $startyear - 4,
-                $startyear - 3,
-                $startyear - 2,
-                $startyear - 1,
-                //$startyear,
+                $datesDiff[2]['dd'] . ' => ' . $datesDiff[2]['df'],
+                $datesDiff[1]['dd'] . ' => ' . $datesDiff[1]['df'],
+                $datesDiff[0]['dd'] . ' => ' . $datesDiff[0]['df'],
+                $dd . ' => ' . $df,
             ];
             $couleurCommercialFamilleProduit[] = 'rgb(' . $resume->listeCouleur($i) . ')';
         }
@@ -448,7 +433,7 @@ class StatesParFamilleController extends AbstractController
         $dd = $startN;
         $df = $endN;
 
-        $totaux = $repo->totauxStatesCommerciaux($dos, $commercial);
+        $totaux = $repo->totauxStatesCommerciaux($dos, $metier, $dd, $df, $commercial);
         return $this->render('states_par_famille/commercial.html.twig', [
             'title' => 'States ' . $commercial,
             'form' => $form->createView(),
@@ -472,8 +457,18 @@ class StatesParFamilleController extends AbstractController
         ]);
     }
 
+    // date à modifier / date de début de référence / date de fin de référence
     public function getDateDiff($d, $dd, $df)
     {
+        // Vérifiez et convertissez les paramètres en objets DateTime si nécessaire
+        $d = $this->ensureDateTime($d);
+        $dd = $this->ensureDateTime($dd);
+        $df = $this->ensureDateTime($df);
+
+        // Si une des dates n'a pas pu être convertie, retournez un message d'erreur
+        if (!$d || !$dd || !$df) {
+            return "Une des dates fournies est invalide.";
+        }
 
         $yearStart = $dd->format('Y');
         $yearEnd = $df->format('Y');
@@ -487,5 +482,41 @@ class StatesParFamilleController extends AbstractController
     public function getYmd($d)
     {
         return $d->format('Y') . '-' . $d->format('m') . '-' . $d->format('d');
+    }
+
+    private function ensureDateTime($date)
+    {
+        if ($date instanceof \DateTime) {
+            return $date;
+        }
+
+        try {
+            return new \DateTime($date);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public function generateDateDiffs($startN, $endN, $iterations): array
+    {
+        $results = [];
+
+        $dd = $startN;
+        $df = $endN;
+
+        for ($i = 1; $i <= $iterations; $i++) {
+            $ddN = $this->getDateDiff($dd, $startN, $endN);
+            $dfN = $this->getDateDiff($df, $startN, $endN);
+
+            $results[] = [
+                'dd' => $ddN,
+                'df' => $dfN,
+            ];
+
+            $dd = $ddN;
+            $df = $dfN;
+        }
+
+        return $results;
     }
 }

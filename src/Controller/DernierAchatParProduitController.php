@@ -119,27 +119,66 @@ class DernierAchatParProduitController extends AbstractController
             $em->flush();
 
             if ($xlsx = SimpleXLSX::parse($fichier)) {
-
+                $mode = 'standard';
                 foreach ($xlsx->rows() as $key => $r) {
+
+                    //dd($xlsx->rows());
+                    // Si $pu = Coût revient ou $ref = Article je passe à la ligne suivante
+                    if (($r[3] == 'Coût revient') || ($r[0] == 'Article') || ($r[1] == 'Total')) {
+                        $ref = '';
+                        $des = '';
+                        $sref1 = '';
+                        $sref2 = '';
+                        $qte = '';
+                        $pu = '';
+                        $mode = 'standard';
+                        continue; // passer au tour de boucle suivant
+                    } else {
+                        if ($mode == 'sref') {
+                            $sref1 = $r[0];
+                            $sref2 = $r[1];
+                            $qte = $r[2];
+                            $pu = $r[3];
+                        } else {
+                            if (($r[3] == '') && $r[2] == '' && $r[0] != '') {
+                                // passer en mode gestion des sous référence
+                                $mode = 'sref';
+                                $ref = $r[0];
+                                $des = $r[1];
+                                continue; // passer au tour de boucle suivant
+                            } else {
+                                // fonctionnement standard
+                                $ref = $r[0];
+                                $des = $r[1];
+                                $sref1 = '';
+                                $sref2 = '';
+                                $qte = $r[2];
+                                $pu = $r[3];
+                                $mode = 'standard';
+                            }
+                        }
+                    }
+
                     $produit = new Icd();
-                    $produit->setRef($r[0]);
-                    $produit->setDesignation($r[1]);
-                    $produit->SetSref1($r[2]);
-                    $produit->SetSref2($r[3]);
-                    $produit->SetQte($r[4]);
-                    if (!is_numeric($r[5]) | $r[5] == '') {
+
+                    $produit->setRef($ref);
+                    $produit->setDesignation($des);
+                    $produit->SetSref1($sref1);
+                    $produit->SetSref2($sref2);
+                    $produit->SetQte($qte);
+                    if (!is_numeric($pu) | $pu == '') {
                         $produit->SetPu(0);
                     } else {
-                        $produit->SetPu($r[5]);
+                        $produit->SetPu($pu);
                     }
-                    $cmp = $this->getImportCalculCmp(1, $r[0], $r[2], $r[3], $r[4], 'Dépôt');
+                    $cmp = $this->getImportCalculCmp(1, $ref, $sref1, $sref2, $qte, 'Dépôt');
                     if ($cmp == 0) {
-                        $cmpDirect = $this->getImportCalculCmp(1, $r[0], $r[2], $r[3], $r[4], 'Direct');
+                        $cmpDirect = $this->getImportCalculCmp(1, $ref, $sref1, $sref2, $qte, 'Direct');
                         if ($cmpDirect == 0) {
-                            $cmpDernier = $this->getImportCalculCmp(1, $r[0], $r[2], $r[3], $r[4], 'Dernier');
+                            $cmpDernier = $this->getImportCalculCmp(1, $ref, $sref1, $sref2, $qte, 'Dernier');
                             if ($cmpDernier == 0) {
-                                if ($r[5] > 0) {
-                                    $produit->setPuCorrige($r[5]);
+                                if ($pu > 0) {
+                                    $produit->setPuCorrige($pu);
                                     $produit->setCommentaires('Pas achat, j\'ai ramené le pu de l\'ancien ICD');
                                 } else {
                                     // aucun achat, donc surement uniquement des régularisations internes
@@ -180,32 +219,65 @@ class DernierAchatParProduitController extends AbstractController
         $date2912 = $dateActuelle->modify('-1 year');
         $date2912->setDate($date2912->format('Y'), 12, 29);
         $date3012 = clone $date2912;
+        $date2812 = clone $date2912;
+        $date2812 = $date2812->modify('-1 day');
         $date3012 = $date3012->modify('+1 day');
         $date2912 = $date2912->format('Y-m-d');
         $date3012 = $date3012->format('Y-m-d');
+        $date2812 = $date2812->format('Y-m-d');
 
         // Générer le fichier pour la date 29/12
         $param = $this->importDivaltoXlsxService->param('I', 1, 2, $date2912, null, null);
         $regulsS = $this->generateXlsxRegularisation($param, $produits, 'II');
-        $sorties = $this->importDivaltoXlsxService->get_export_excel($param, $regulsS);
+        $sorties = $this->importDivaltoXlsxService->get_export_excel($param, $regulsS['piece']);
+        sleep(1);
+        $sorties0 = $this->importDivaltoXlsxService->get_export_excel($param, $regulsS['piece0']);
         sleep(1);
         // Générer le fichier pour la date 30/12
         $param = $this->importDivaltoXlsxService->param('I', 1, 2, $date3012, null, null);
         $regulsE = $this->generateXlsxRegularisation($param, $produits, 'JI');
-        $entree = $this->importDivaltoXlsxService->get_export_excel($param, $regulsE);
-        //dd($entree);
+        $entree = $this->importDivaltoXlsxService->get_export_excel($param, $regulsE['piece']);
+        sleep(1);
+        $entree0 = $this->importDivaltoXlsxService->get_export_excel($param, $regulsE['piece0']);
+        sleep(1);
+        // Générer le fichier SART permettant la modification du CMP
+        $param = [
+            'entetes' => $this->importDivaltoXlsxService->getEnteteSart(),
+            'dos' => 1,
+            'date' => $date2812,
+            'title' => 'Article_Sous_Reference',
+        ];
+        $genSarts = $this->generateXlsxSart($param, $produits);
+        $sart = $this->importDivaltoXlsxService->get_export_excel_art($param, $genSarts['art']);
+        sleep(1);
+        $sart0 = $this->importDivaltoXlsxService->get_export_excel_art($param, $genSarts['art0']);
+
         $email = (new Email())
             ->from($this->mailEnvoi)
             ->to($this->getUser()->getEmail())
             ->subject('Fichier d\'import correction CMP Divalto')
             ->html('Veuillez intégrer ces fichiers avec toutes les précautions nécéssaires')
             ->attachFromPath($sorties)
+            ->attachFromPath($sart)
             ->attachFromPath($entree);
         $this->mailer->send($email);
-        //unlink($sorties);
-        //unlink($entree);
 
-        //dd($produits);
+        $email = (new Email())
+            ->from($this->mailEnvoi)
+            ->to($this->getUser()->getEmail())
+            ->subject('Fichier d\'import article à 0 € Divalto')
+            ->html('Veuillez intégrer ces fichiers avec toutes les précautions nécéssaires, il faut au préalable chiffrer les produits')
+            ->attachFromPath($sorties0)
+            ->attachFromPath($sart0)
+            ->attachFromPath($entree0);
+        $this->mailer->send($email);
+
+        unlink($sorties);
+        unlink($sart);
+        unlink($entree);
+        unlink($sorties0);
+        unlink($sart0);
+        unlink($entree0);
 
         // Créer les fichiers d'import pour mettre à jour les CMP dans Divalto
 
@@ -220,10 +292,15 @@ class DernierAchatParProduitController extends AbstractController
     {
 
         $piece = [];
+        $piece0 = [];
         $i = 0;
+        $j = 0;
         foreach ($produits as $produit) {
-
-            if ($produit->getPuCorrige() != $produit->getPu()) {
+            $diff = 0;
+            if (($produit->getPuCorrige() != 0 && $produit->getPu() != 0)) {
+                $diff = abs((($produit->getPuCorrige() / $produit->getPu()) - 1) * 100);
+            }
+            if ($diff > 1) {
 
                 $piece[$i] = array_fill_keys($param['entetes'], ''); // Initialise toutes les colonnes à ''
                 $piece[$i]['FICHE'] = 'MOUV';
@@ -231,12 +308,30 @@ class DernierAchatParProduitController extends AbstractController
                 $piece[$i]['SREF1'] = $produit->getSref1(); // MOUV
                 $piece[$i]['SREF2'] = $produit->getSref2(); // MOUV
                 $piece[$i]['DESIGNATION'] = $produit->getDesignation(); // MOUV
-                $piece[$i]['REF_FOURNISSEUR'] = ''; // MOUV
                 $piece[$i]['MOUV.OP'] = $op; // MOUV
                 $piece[$i]['QUANTITE'] = $produit->getQte(); // MOUV
                 $piece[$i]['MOUV.PPAR'] = ''; // MOUV
-                $piece[$i]['MOUV.PUB'] = $produit->getPuCorrige(); // MOUV
+                if ($op == 'JI') {
+                    $piece[$i]['MOUV.PUB'] = $produit->getPuCorrige(); // MOUV
+                }
                 $i++;
+
+            }
+            if ($produit->getPuCorrige() == 0) {
+
+                $piece0[$j] = array_fill_keys($param['entetes'], ''); // Initialise toutes les colonnes à ''
+                $piece0[$j]['FICHE'] = 'MOUV';
+                $piece0[$j]['REFERENCE'] = $produit->getRef(); // MOUV
+                $piece0[$j]['SREF1'] = $produit->getSref1(); // MOUV
+                $piece0[$j]['SREF2'] = $produit->getSref2(); // MOUV
+                $piece0[$j]['DESIGNATION'] = $produit->getDesignation(); // MOUV
+                $piece0[$j]['MOUV.OP'] = $op; // MOUV
+                $piece0[$j]['QUANTITE'] = $produit->getQte(); // MOUV
+                $piece0[$j]['MOUV.PPAR'] = ''; // MOUV
+                if ($op == 'JI') {
+                    $piece0[$j]['MOUV.PUB'] = $produit->getPuCorrige(); // MOUV
+                }
+                $j++;
 
             }
 
@@ -250,7 +345,55 @@ class DernierAchatParProduitController extends AbstractController
 
         }
 
-        return $piece;
+        return ['piece' => $piece, 'piece0' => $piece0];
+
+    }
+
+    // Sart article pour modification CMP
+    public function generateXlsxSart($param, $produits)
+    {
+
+        $art = [];
+        $art0 = [];
+        $i = 0;
+        $j = 0;
+        $date = new datetime($param['date']);
+        $date = $date->format('d/m/Y');
+        foreach ($produits as $produit) {
+
+            if (($produit->getPuCorrige() != $produit->getPu())) {
+
+                $art[$i] = array_fill_keys($param['entetes'], ''); // Initialise toutes les colonnes à ''
+                $art[$i]['DOSSIER'] = $param['dos'];
+                $art[$i]['REFERENCE'] = $produit->getRef();
+                $art[$i]['SREFERENCE1'] = $produit->getSref1();
+                $art[$i]['SREFERENCE2'] = $produit->getSref2();
+                $art[$i]['CRUNITAIRE'] = $produit->getPuCorrige();
+                $art[$i]['PRIXACHAT'] = $produit->getPuCorrige();
+                $art[$i]['CMPUNITAIRE'] = $produit->getPuCorrige();
+                $art[$i]['DATECR'] = $date;
+                $art[$i]['DATECMP'] = $date;
+                $art[$i]['DATEPRIXACHAT'] = $date;
+                $i++;
+
+            }
+            if ($produit->getPuCorrige() == 0) {
+
+                $art0[$j] = array_fill_keys($param['entetes'], ''); // Initialise toutes les colonnes à ''
+                $art0[$j]['DOSSIER'] = $param['dos'];
+                $art0[$j]['REFERENCE'] = $produit->getRef();
+                $art0[$j]['SREFERENCE1'] = $produit->getSref1();
+                $art0[$j]['SREFERENCE2'] = $produit->getSref2();
+                $art0[$j]['DATECR'] = $date;
+                $art0[$j]['DATECMP'] = $date;
+                $art0[$j]['DATEPRIXACHAT'] = $date;
+                $j++;
+
+            }
+
+        }
+
+        return ['art' => $art, 'art0' => $art0];
 
     }
 

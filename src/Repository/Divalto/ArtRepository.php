@@ -418,6 +418,56 @@ class ArtRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    public function updateSartEanFromLastEanDoublon($ean)
+    {
+        $maxEan = $this->MaxEanLh() + 1;
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "UPDATE s SET s.EAN = $maxEan
+        FROM SARTEAN s
+        WHERE s.DOS = 1
+        AND s.EAN = $ean
+        AND s.USERCRDH = (
+            SELECT MAX(USERCRDH)
+            FROM SARTEAN
+            WHERE DOS = 1 AND EAN = $ean
+        )
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function selectSartEanFromLastEanDoublon($ean)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT *
+        FROM SARTEAN s
+        WHERE s.DOS = 1
+        AND s.EAN = $ean
+        AND s.USERCRDH = (
+            SELECT MAX(USERCRDH)
+            FROM SARTEAN
+            WHERE DOS = 1 AND EAN = $ean
+        )
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative();
+    }
+
+    public function MaxEanLh()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT MAX(s.EAN)
+        FROM SARTEAN s
+        WHERE s.DOS = 1
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     public function getStockByLocation($dos, $ean)
     {
         $conn = $this->getEntityManager()->getConnection();

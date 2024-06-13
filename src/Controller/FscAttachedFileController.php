@@ -365,10 +365,8 @@ class FscAttachedFileController extends AbstractController
         $entityManager->flush();
     }
 
-    #[Route("/Roby/fsc/order/list/maj", name: "app_fsc_order_list_maj")]
-
     // Mettre à jour la liste en comparant Divalto à la liste
-    public function majFscOrderListFromDivalto(): Response
+    public function majFscOrderListFromDivalto()
     {
 
         // mise à jour des piéces
@@ -378,7 +376,7 @@ class FscAttachedFileController extends AbstractController
             if ($ligListOk == 0) {
                 $listpieceOk = $piecesOk[$ligListOk]->getNumCmd();
             } else {
-                $listpieceOk = $listpieceOk . ' , ' . $piecesOk[$ligListOk]->getNumCmd();
+                $listpieceOk .= ' , ' . $piecesOk[$ligListOk]->getNumCmd();
             }
         }
         if (!empty($listpieceOk)) {
@@ -386,6 +384,13 @@ class FscAttachedFileController extends AbstractController
         } else {
             $maj = $this->mouvRepo->getFscOrderListRun();
         }
+
+        // Ajout d'une vérification pour les résultats de la requête
+        if (empty($maj)) {
+            $this->addFlash('warning', 'Aucune mise à jour trouvée.');
+            return;
+        }
+
         $this->majFscOrderListFromList();
 
         for ($ligMaj = 0; $ligMaj < count($maj); $ligMaj++) {
@@ -438,9 +443,18 @@ class FscAttachedFileController extends AbstractController
                     ->setNumFact($maj[$ligMaj]['numFact']);
             }
             $this->manager->persist($search);
-            $this->manager->flush();
         }
+        $this->manager->flush();
         $this->sendMail();
+
+    }
+
+    #[Route("/Roby/fsc/order/list/maj", name: "app_fsc_order_list_maj")]
+    // Mettre à jour la liste en comparant Divalto à la liste avec redirection de page
+    public function majFscOrderListFromDivaltoRedirect(): Response
+    {
+        $this->majFscOrderListFromDivalto();
+
         $this->addFlash('message', 'Mise à jour effectuée avec succés');
         return $this->redirectToRoute('app_fsc_attached_file');
     }

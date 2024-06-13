@@ -12,10 +12,12 @@
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
-						<h1>Résumé des states métiers du
-							{{ dd }}
+						<h1>Résumé des states métiers
+							{{ app.request.attributes.get('metier') }}
+							du
+							{{ dd|date("d-m-Y") }}
 							au
-							{{ df }}
+							{{ df|date("d-m-Y") }}
 						</h1>
 					</div>
 					{{ form_start(form) }}
@@ -114,7 +116,7 @@
 							<div class="icon">
 								<i class="ion ion-person-add"></i>
 							</div>
-							<a href="{{path(client, {'dos' : app.request.attributes.get('dos'), 'dd' : dd, 'df' : df})}}" class="small-box-footer">En savoir +
+							<a href="{{path(client, {'dos' : app.request.attributes.get('dos'),'metier' : app.request.attributes.get('metier'), 'dd' : dd, 'df' : df})}}" class="small-box-footer">En savoir +
 								<i class="fas fa-arrow-circle-right"></i>
 							</a>
 						</div>
@@ -126,13 +128,12 @@
 						<div class="small-box bg-danger">
 							<div class="inner">
 								<h3>{{ nbProduits}}</h3>
-
 								<p>Nombre de produits différents</p>
 							</div>
 							<div class="icon">
 								<i class="ion ion-pie-graph"></i>
 							</div>
-							<a href="{{path(produit, {'dos' : app.request.attributes.get('dos'), 'dd' : dd, 'df' : df})}}" class="small-box-footer">En savoir +
+							<a href="{{path(produit, {'dos' : app.request.attributes.get('dos'),'metier' : app.request.attributes.get('metier'), 'dd' : dd, 'df' : df})}}" class="small-box-footer">En savoir +
 								<i class="fas fa-arrow-circle-right"></i>
 							</a>
 						</div>
@@ -147,11 +148,11 @@
 						<!-- LINE CHART -->
 						<div class="card card-info">
 							<div class="card-header">
-								<h3 class="card-title">Evolution du chiffre d'affaire
-									{{ "now"|date("Y") - 5 }}
-									et
-									{{ "now"|date("Y") - 1 }}</h3>
-
+								<h3 class="card-title">Evolution du chiffre d'affaire de
+									{{ 'now'|date("Y") - 5 }}
+									à
+									{{ 'now'|date("Y") }}
+								</h3>
 								<div class="card-tools">
 									<button type="button" class="btn btn-tool" data-card-widget="maximize">
 										<i class="fas fa-expand"></i>
@@ -172,10 +173,17 @@
 						<div class="card card-success">
 							<div class="card-header">
 								<h3 class="card-title">Comparaison
-									{{ trancheD }}
-									et
-									{{ trancheF }}</h3>
+									{% set dd_last_year = dd|date_modify('-1 year') %}
+									{% set df_last_year = df|date_modify('-1 year') %}
 
+									{{ dd_last_year|date("d-m-Y") }}
+									au
+									{{ df_last_year|date("d-m-Y") }}
+									et
+									{{ dd|date("d-m-Y") }}
+									au
+									{{ df|date("d-m-Y") }}
+								</h3>
 								<div class="card-tools">
 									<button type="button" class="btn btn-tool" data-card-widget="maximize">
 										<i class="fas fa-expand"></i>
@@ -196,12 +204,12 @@
 						<div class="card card-danger">
 							<div class="card-header">
 								<h3 class="card-title">Chiffre d'affaire par familles clients du
-									{{ dd }}
+									{{ dd|date("d-m-Y") }}
 									au
-									{{ df }}</h3>
+									{{ df|date("d-m-Y") }}</h3>
 
 								<div class="card-tools">
-									<a class="btn btn-dark" href="{{path(familleClient, {'dos' : app.request.attributes.get('dos'), 'dd' : dd, 'df' : df})}}">Détails</a>
+									<a class="btn btn-dark" href="{{path(familleClient, {'dos' : app.request.attributes.get('dos'),'metier' : app.request.attributes.get('metier'), 'dd' : dd, 'df' : df})}}">Détails</a>
 									<button type="button" class="btn btn-tool" data-card-widget="maximize">
 										<i class="fas fa-expand"></i>
 									</button>
@@ -218,9 +226,9 @@
 						<div class="card card-danger d-none">
 							<div class="card-header">
 								<h3 class="card-title">Chiffre d'affaire par familles et types articles du
-									{{ dd }}
+									{{ dd|date("d-m-Y") }}
 									au
-									{{ df }}</h3>
+									{{ df|date("d-m-Y") }}</h3>
 
 								<div class="card-tools">
 									<button type="button" class="btn btn-tool" data-card-widget="maximize">
@@ -297,13 +305,14 @@
 						<!-- AREA CHART -->
 						<div class="card card-primary">
 							<div class="card-header">
-								<h3 class="card-title">Chiffre d'affaire par commercial
-									{{ "now"|date("Y") - 5 }}
-									et
-									{{ "now"|date("Y") - 1 }}</h3>
+								<h3 class="card-title">Chiffre d'affaire par commercial de
+									{{ 'now'|date("Y") - 5 }}
+									à
+									{{ 'now'|date("Y") }}
+								</h3>
 
 								<div class="card-tools">
-									<a class="btn btn-dark text-white" href="{{path(commerciaux, {'dos' : app.request.attributes.get('dos'), 'dd' : dd, 'df' : df})}}">Détails</a>
+									<a class="btn btn-dark text-white" href="{{path(commerciaux, {'dos' : app.request.attributes.get('dos'),'metier' : app.request.attributes.get('metier'), 'dd' : dd, 'df' : df})}}">Détails</a>
 									<button type="button" class="btn btn-tool" data-card-widget="maximize">
 										<i class="fas fa-expand"></i>
 									</button>
@@ -321,9 +330,13 @@
 						<div class="card card-info">
 							<div class="card-header">
 								<h3 class="card-title">Chiffre d'affaire
-									{{ trancheD }}
+									{{ dd_last_year|date("d-m-Y") }}
+									au
+									{{ df_last_year|date("d-m-Y") }}
 									et
-									{{ trancheF }}</h3>
+									{{ dd|date("d-m-Y") }}
+									au
+									{{ df|date("d-m-Y") }}</h3>
 
 								<div class="card-tools">
 									<button type="button" class="btn btn-tool" data-card-widget="maximize">
@@ -344,13 +357,13 @@
 						<div class="card card-orange">
 							<div class="card-header">
 								<h3 class="card-title text-white">Chiffre d'affaire par familles produits du
-									{{ dd }}
+									{{ dd|date("d-m-Y") }}
 									au
-									{{ df }}
+									{{ df|date("d-m-Y") }}
 								</h3>
 
 								<div class="card-tools">
-									<a class="btn btn-dark text-white" href="{{path(familleProduit, {'dos' : app.request.attributes.get('dos'), 'dd' : dd, 'df' : df})}}">Détails</a>
+									<a class="btn btn-dark text-white" href="{{path(familleProduit, {'dos' : app.request.attributes.get('dos'),'metier' : app.request.attributes.get('metier'), 'dd' : dd, 'df' : df})}}">Détails</a>
 									<button type="button" class="btn btn-tool" data-card-widget="maximize">
 										<i class="fas fa-expand"></i>
 									</button>

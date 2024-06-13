@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello JardinewProductsController!
+{% endblock %}
+
+{% block body %}
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card">
+				<div class="card-header d-flex justify-content-between">
+					<h2 class="card-title">Liste des produits sur le site Jardinew</h2>
+					<a title='Metre à jour les données' href="{{ path('app_jardinew_products_import') }}" class="btn btn-primary ml-auto">
+						<i class="fas fa-redo-alt pr-2"></i>Mettre à jour
+					</a>
+					<a title='Metre à jour les données' href="{{ path('app_jardinew_products_maj_stock') }}" class="btn btn-warning ml-auto">
+						<i class="fas fa-solid fa-dollar-sign pr-2"></i>Maj Stock et prix
+					</a>
+				</div>
+				<!-- /.card-header -->
+				<div class="card-body">
+					{% if products %}
+						<table id="example1" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th class="text-center">
+										<span>Id Wordpress</span>
+									</th>
+									<th class="text-center">
+										<span>Sku</span>
+									</th>
+									<th class="text-center">
+										<span>Référence</span>
+									</th>
+									<th class="text-center">
+										<span>Sref1</span>
+									</th>
+									<th class="text-center">
+										<span>Sref2</span>
+									</th>
+									<th class="text-center">
+										<span>Stock</span>
+									</th>
+									<th class="text-center">
+										<span>Dernier PA</span>
+									</th>
+									<th class="text-center">
+										<span>Date PA</span>
+									</th>
+									<th class="text-center">
+										<span>Marge</span>
+									</th>
+									<th class="text-center">
+										<span>PV</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+
+
+								{% for product in products %}
+									<tr>
+										<td class="text-center">
+											<a class="text-dark">{{ product.idWordpress }}</a>
+										</td>
+										<td class="text-left">
+											<a class="text-dark">{{ product.sku }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ product.ref }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ product.sref1}}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ product.sref2}}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ product.stock }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ product.lastPurchase }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark"></a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark">{{ product.marge }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-dark"></a>
+										</td>
+
+									</tr>
+								{% endfor %}
+							</tbody>
+						</tr>
+					</tfoot>
+				</table>
+			{% else %}
+				<h4 class="text-left text-dark">
+					<i class="fas fa-info-circle pr-2 text-primary"></i>Aucun produit relié à Jardinew actuellement
+				</h4>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}

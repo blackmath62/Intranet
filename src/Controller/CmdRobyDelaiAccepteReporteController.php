@@ -29,12 +29,12 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
 {
 
     private $mailer;
-    private $cmdRoby;
     private $Users;
     private $entete;
     private $repoMail;
     private $mailEnvoi;
-    private $mailTreatement;
+    private $repoEnt;
+    private $repoCmdRoby;
     private $adminEmailController;
     private $entityManager;
 
@@ -43,16 +43,17 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         AdminEmailController $adminEmailController,
         EntRepository $entete,
         UsersRepository $Users,
-        CmdRobyDelaiAccepteReporteRepository $cmdRoby,
+        CmdRobyDelaiAccepteReporteRepository $repoCmdRoby,
+        EntRepository $repoEnt,
         MailerInterface $mailer,
         MailListRepository $repoMail) {
         $this->mailer = $mailer;
-        $this->cmdRoby = $cmdRoby;
+        $this->repoEnt = $repoEnt;
+        $this->repoCmdRoby = $repoCmdRoby;
         $this->Users = $Users;
         $this->entete = $entete;
         $this->repoMail = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
-        $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
         $this->entityManager = $registry->getManager();
         //parent::__construct();
@@ -143,19 +144,19 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
     #[Route("/Roby/cmd/update", name: "app_cmd_roby_update")]
 
     // mettre à jour les commandes du systéme sur l'intranet
-    public function runUpdate(CmdRobyDelaiAccepteReporteRepository $cmdRoby, EntRepository $entete): Response
+    public function runUpdate(): Response
     {
         // tracking user page for stats
         //$tracking = $request->attributes->get('_route');
         //$this->setTracking($tracking);
 
-        $nbeCmdBefore = count($cmdRoby->findBy(['statut' => 'en cours ...']));
+        $nbeCmdBefore = count($this->repoCmdRoby->findBy(['statut' => 'en cours ...']));
 
-        $donnees = $entete->majCmdsRobyDelaiAccepteReporte();
+        $donnees = $this->repoEnt->majCmdsRobyDelaiAccepteReporte();
 
         for ($lig = 0; $lig < count($donnees); $lig++) {
             $id = $donnees[$lig]['Identification'];
-            $search = $cmdRoby->findOneBy(['identification' => $id]);
+            $search = $this->repoCmdRoby->findOneBy(['identification' => $id]);
             // si elle n'existe pas, on la créér
             if (empty($search)) {
                 $listCmd = new CmdRobyDelaiAccepteReporte();
@@ -200,7 +201,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
             $em->flush();
         }
 
-        $nbeCmdAfter = count($cmdRoby->findBy(['statut' => 'en cours ...']));
+        $nbeCmdAfter = count($this->repoCmdRoby->findBy(['statut' => 'en cours ...']));
         $nbre = $nbeCmdBefore - $nbeCmdAfter;
         $texte = '';
         if ($nbre == 1) {
@@ -227,14 +228,14 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
     public function setCloseAuto()
     {
 
-        $search = $this->cmdRoby->findBy(['statut' => 'en cours ...']);
+        $search = $this->repoCmdRoby->findBy(['statut' => 'en cours ...']);
         $nbeCmdBefore = count($search);
 
         foreach ($search as $value) {
             $donnee = $this->entete->controleStatusOfCmd($value->getCmd());
 
             if ($donnee != 1) {
-                $cmd = $this->cmdRoby->findOneBy(['cmd' => $value->getCmd()]);
+                $cmd = $this->repoCmdRoby->findOneBy(['cmd' => $value->getCmd()]);
                 $cmd->setModifiedBy($this->Users->findOneBy(['id' => 3]))
                     ->setStatut('Terminé')
                     ->setModifiedAt(new DateTime);
@@ -265,7 +266,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
                 }
             }
         }
-        $search = $this->cmdRoby->findBy(['statut' => 'en cours ...']);
+        $search = $this->repoCmdRoby->findBy(['statut' => 'en cours ...']);
         $nbeCmdAfter = count($search);
         $nbre = $nbeCmdBefore - $nbeCmdAfter;
         if ($nbre == 1) {
@@ -330,7 +331,7 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         // lancer une mise à jour
 
         // envoyer les mails suite à la mise à jour pour les commandes qui ne sont pas terminées
-        $donnees = $this->cmdRoby->findBy(['statut' => 'en cours ...']);
+        $donnees = $this->repoCmdRoby->findBy(['statut' => 'en cours ...']);
         $d = new DateTime();
         $i = 0;
         $commandesAvecDelai = [];
@@ -440,5 +441,54 @@ class CmdRobyDelaiAccepteReporteController extends AbstractController
         $this->mailer->send($email);
 
         return $this->redirectToRoute('app_cmd_roby_delai_accepte_reporte_active');
+    }
+
+    public function MajCmdRobyAccepteReporte()
+    {
+        $donnees = $this->repoEnt->majCmdsRobyDelaiAccepteReporte();
+        for ($lig = 0; $lig < count($donnees); $lig++) {
+            $id = $donnees[$lig]['Identification'];
+            $search = $this->repoCmdRoby->findOneBy(['identification' => $id]);
+            // si elle n'existe pas, on la créér
+            if (empty($search)) {
+                $listCmd = new CmdRobyDelaiAccepteReporte();
+                $listCmd->setIdentification($donnees[$lig]['Identification']);
+                $listCmd->setStatut('en cours ...');
+                $listCmd->setCreatedAt(new DateTime);
+                $listCmd->setTiers($donnees[$lig]['Tiers']);
+                $listCmd->setNom($donnees[$lig]['Nom']);
+                $listCmd->setCmd($donnees[$lig]['Cmd']);
+                $listCmd->setTel($donnees[$lig]['Tel']);
+                $listCmd->setDateCmd(new DateTime($donnees[$lig]['DateCmd']));
+                $listCmd->setNotreRef($donnees[$lig]['NotreRef']);
+                if ($donnees[$lig]['DelaiAccepte']) {
+                    $listCmd->setDelaiAccepte(new DateTime($donnees[$lig]['DelaiAccepte']));
+                } else {
+                    $listCmd->setDelaiAccepte(null);
+                }
+                if ($donnees[$lig]['DelaiReporte']) {
+                    $listCmd->setDelaiReporte(new DateTime($donnees[$lig]['DelaiReporte']));
+                } else {
+                    $listCmd->setDelaiReporte(null);
+                }
+            } elseif (!is_null($search)) {
+                $listCmd = $search;
+                $listCmd->setNotreRef($donnees[$lig]['NotreRef']);
+                $listCmd->setTel($donnees[$lig]['Tel']);
+                if ($donnees[$lig]['DelaiAccepte']) {
+                    $listCmd->setDelaiAccepte(new DateTime($donnees[$lig]['DelaiAccepte']));
+                } else {
+                    $listCmd->setDelaiAccepte(null);
+                }
+                if ($donnees[$lig]['DelaiReporte']) {
+                    $listCmd->setDelaiReporte(new DateTime($donnees[$lig]['DelaiReporte']));
+                } else {
+                    $listCmd->setDelaiReporte(null);
+                }
+            }
+            $em = $this->entityManager;
+            $em->persist($listCmd);
+            $em->flush();
+        }
     }
 }

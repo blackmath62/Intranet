@@ -33,6 +33,7 @@
         "oomphinc/composer-installers-extender": "*",
         "phpdocumentor/reflection-docblock": "^5.2",
         "phpoffice/phpspreadsheet": "^1.29",
+        "phpseclib/phpseclib": "^3.0",
         "psr/container": "^2",
         "psr/http-message": "^2",
         "rewieer/taskschedulerbundle": "0.11.0",

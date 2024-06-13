@@ -16,10 +16,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ResumeStatesController extends AbstractController
 {
-    #[Route("/resume/states/{dos}", name: "app_resume_states")]
-    #[Route("/resume/states/{dos}/{dd}/{df}", name: "app_resume_states_dd_df")]
+    #[Route("/resume/states/{dos}/{metier}", name: "app_resume_states")]
+    #[Route("/resume/states/{dos}/{metier}/{dd}/{df}", name: "app_resume_states_dd_df")]
 
-    public function index(LoggerInterface $logger, Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle, $dos, $dd = null, $df = null): Response
+    public function index(LoggerInterface $logger, Request $request, StatesByTiersRepository $repoTiers, StatesParFamilleController $controlArticle, $dos, $metier, $dd = null, $df = null): Response
     {
 
         // pas de limite en temps d'execution
@@ -51,21 +51,24 @@ class ResumeStatesController extends AbstractController
 
         } else {
             if ($dd == null | $df == null) {
-                $startN = new DateTime(date("Y") . "-01-01");
-                $endN = new DateTime('now');
+                // Dans le cas ou il n'y a pas de date, on mets par défaut l'année précédente entiére
+                $startN = new DateTime(intval(date("Y")) - 1 . "-01-01");
+                $endN = new DateTime(intval(date("Y")) - 1 . "-12-31");
 
                 $startN1 = $controlArticle->getDateDiff($startN, $startN, $endN);
 
-                $startN = new DateTime(date("Y") . "-01-01");
-                $endN = new DateTime('now');
+                $startN = new DateTime(intval(date("Y")) - 1 . "-01-01");
+                $endN = new DateTime(intval(date("Y")) - 1 . "-12-31");
 
                 $endN1 = $controlArticle->getDateDiff($endN, $startN, $endN);
 
-                $startN = new DateTime(date("Y") . "-01-01");
-                $endN = new DateTime('now');
+                $startN = new DateTime(intval(date("Y")) - 1 . "-01-01");
+                $endN = new DateTime(intval(date("Y")) - 1 . "-12-31");
 
                 $startN = $controlArticle->getYmd($startN);
                 $endN = $controlArticle->getYmd($endN);
+
+                return $this->redirectToRoute('app_resume_states_dd_df', ['dos' => $dos, 'metier' => $metier, 'dd' => $startN, 'df' => $endN]);
 
             } else {
                 $startN = $dd;
@@ -75,9 +78,9 @@ class ResumeStatesController extends AbstractController
             }
         }
 
-        // Données stats camenbert Produits
+        // Chiffre d'affaire par familles produits (camembert)
         $timeStart = microtime(true);
-        $dataProduit = $repoTiers->getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dos, $startN, $endN, "produits");
+        $dataProduit = $repoTiers->getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dos, $metier, $startN, $endN, "produits");
         for ($ligFamProduit = 0; $ligFamProduit < count($dataProduit); $ligFamProduit++) {
             $familleProduit[] = $dataProduit[$ligFamProduit]['famille'];
             $montantProduit[] = $dataProduit[$ligFamProduit]['montantN'];
@@ -87,9 +90,9 @@ class ResumeStatesController extends AbstractController
         $executionTime = $timeEnd - $timeStart;
         $logger->info("Temps d'exécution de la requête dataProduit : {$executionTime} secondes");
         $executionTime = 0;
-        // Données stats camenbert Client
+        // Chiffre d'affaire par familles clients (camembert)
         $timeStart = microtime(true);
-        $dataClient = $repoTiers->getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dos, $startN, $endN, "clients");
+        $dataClient = $repoTiers->getStatesParFamilleRobyTotauxParFamilleOneTrancheYear($dos, $metier, $startN, $endN, "clients");
         for ($ligFamClient = 0; $ligFamClient < count($dataClient); $ligFamClient++) {
             $familleClient[] = $dataClient[$ligFamClient]['famille'];
             $montantClient[] = $dataClient[$ligFamClient]['montantN'];
@@ -99,9 +102,9 @@ class ResumeStatesController extends AbstractController
         $executionTime = $timeEnd - $timeStart;
         $logger->info("Temps d'exécution de la requête dataClient : {$executionTime} secondes");
         $executionTime = 0;
-        // Données stats diagramme mois
+        // Données stats diagramme mois (Comparaison)
         $timeStart = microtime(true);
-        $dataMois = $repoTiers->getStatesRobyTotalParClientArticle($dos, $startN, $endN, $startN1, $endN1, 'mois');
+        $dataMois = $repoTiers->getStatesRobyTotalParClientArticle($dos, $metier, $startN, $endN, $startN1, $endN1, 'mois');
         $timeEnd = microtime(true);
         $executionTime = $timeEnd - $timeStart;
         $logger->info("Temps d'exécution de la requête dataMoisRequete : {$executionTime} secondes");
@@ -120,36 +123,36 @@ class ResumeStatesController extends AbstractController
 
         // totaux
         $timeStart = microtime(true);
-        $total = $repoTiers->getStatesRobyTotal($dos, $startN, $endN);
+        $total = $repoTiers->getStatesRobyTotal($dos, $metier, $startN, $endN);
         $timeEnd = microtime(true);
         $executionTime = $timeEnd - $timeStart;
         $logger->info("Temps d'exécution de la requête getStatesRobyTotal : {$executionTime} secondes");
         $executionTime = 0;
 
         $timeStart = microtime(true);
-        $nbClients = count($repoTiers->getStatesRobyTotalParClient($dos, $startN, $endN));
+        $nbClients = count($repoTiers->getStatesRobyTotalParClient($dos, $metier, $startN, $endN));
         $timeEnd = microtime(true);
         $executionTime = $timeEnd - $timeStart;
         $logger->info("Temps d'exécution de la requête getStatesRobyTotalParClient : {$executionTime} secondes");
         $executionTime = 0;
 
         $timeStart = microtime(true);
-        $nbProduits = count($repoTiers->getStatesRobyTotalParProduit($dos, $startN, $endN));
+        $nbProduits = count($repoTiers->getStatesRobyTotalParProduit($dos, $metier, $startN, $endN));
         $timeEnd = microtime(true);
         $executionTime = $timeEnd - $timeStart;
         $logger->info("Temps d'exécution de la requête getStatesRobyTotalParProduit : {$executionTime} secondes");
         $executionTime = 0;
 
         $timeStart = microtime(true);
-        $pourcTotaux = $repoTiers->getStatesParFamilleRobyTotaux($dos, $startN, $endN, $startN1, $endN1, 'produits');
+        $pourcTotaux = $repoTiers->getStatesParFamilleRobyTotaux($dos, $metier, $startN, $endN, $startN1, $endN1, 'produits');
         $timeEnd = microtime(true);
         $executionTime = $timeEnd - $timeStart;
         $logger->info("Temps d'exécution de la requête getStatesParFamilleRobyTotaux : {$executionTime} secondes");
         $executionTime = 0;
 
-        // données line sur 7 ans
+        // Evolution du chiffre d'affaire
         $timeStart = microtime(true);
-        $dataSeven = $repoTiers->getStatesSevenYearsAgo($dos, 'annee');
+        $dataSeven = $repoTiers->getStatesSevenYearsAgo($dos, $metier, 'annee');
 
         for ($ligSeven = 0; $ligSeven < count($dataSeven); $ligSeven++) {
             $sevenAnnee[] = $dataSeven[$ligSeven]['annee'];
@@ -190,17 +193,16 @@ class ResumeStatesController extends AbstractController
         $logger->info("Temps d'exécution de la requête dataFamilleTypeArtTab : {$executionTime} secondes");
         $executionTime = 0;
 
-        // données line par commerciaux sur 6 ans
+        // données Chiffre d'affaire par commerciaux sur 6 ans
         $timeStart = microtime(true);
         $nomCommerciaux = [];
         $donneesCommerciaux = [];
         $anneeCommerciaux = [];
         $startCommerciaux = new DateTime('now');
         $startyear = $startCommerciaux->format('Y');
-        $dataCommerciaux = $repoTiers->getStatesSixYearsAgoCommerciaux($dos);
+        $dataCommerciaux = $repoTiers->getStatesSixYearsAgoCommerciaux($dos, $metier);
         $color = [$this->listeCouleur(0), $this->listeCouleur(4), $this->listeCouleur(10), $this->listeCouleur(6), $this->listeCouleur(9), $this->listeCouleur(2)];
         for ($i = 0; $i < count($dataCommerciaux); $i++) {
-
             $nomCommerciaux[] = $dataCommerciaux[$i]['commercial'];
             $donneesCommerciaux[] = [
                 $dataCommerciaux[$i]['montantN5'],
@@ -208,7 +210,7 @@ class ResumeStatesController extends AbstractController
                 $dataCommerciaux[$i]['montantN3'],
                 $dataCommerciaux[$i]['montantN2'],
                 $dataCommerciaux[$i]['montantN1'],
-                //$dataCommerciaux[$i]['montantN'],
+                $dataCommerciaux[$i]['montantN'],
             ]; //[[], [], []];
             $anneeCommerciaux = [
                 $startyear - 5,
@@ -216,7 +218,7 @@ class ResumeStatesController extends AbstractController
                 $startyear - 3,
                 $startyear - 2,
                 $startyear - 1,
-                //$startyear,
+                $startyear,
             ];
             $couleurCommercial[] = 'rgb(' . $color[$i] . ')';
         }

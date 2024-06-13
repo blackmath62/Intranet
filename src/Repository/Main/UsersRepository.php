@@ -70,27 +70,29 @@ class UsersRepository extends ServiceEntityRepository
     // Liste des utilisateurs avec Ev ou Hp à true
     public function getFindUsersEvHp()
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT users.email
-        FROM users
-        WHERE users.ev = 1 OR users.hp = 1
-        ";
-        $stmt = $conn->prepare($sql);
-        $resultSet = $stmt->executeQuery();
-        return $resultSet->fetchAllAssociative();
+        $qb = $this->createQueryBuilder('u')
+            ->select('u.email')
+            ->where('u.ev = :ev')
+            ->orWhere('u.hp = :hp')
+            ->setParameter('ev', true)
+            ->setParameter('hp', true);
+
+        return $qb->getQuery()->getResult();
     }
 
     // Liste des utilisateurs avec Ev Me ou Hp à true
     public function getFindUsersEvHpMe()
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT users.email
-        FROM users
-        WHERE users.ev = 1 OR users.hp = 1 OR users.me = 1
-        ";
-        $stmt = $conn->prepare($sql);
-        $resultSet = $stmt->executeQuery();
-        return $resultSet->fetchAllAssociative();
+        $qb = $this->createQueryBuilder('u')
+            ->select('u.email')
+            ->where('u.ev = :ev')
+            ->orWhere('u.hp = :hp')
+            ->orWhere('u.me = :me')
+            ->setParameter('ev', true)
+            ->setParameter('hp', true)
+            ->setParameter('me', true);
+
+        return $qb->getQuery()->getResult();
     }
 
 }

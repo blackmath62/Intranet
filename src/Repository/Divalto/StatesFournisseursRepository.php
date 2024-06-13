@@ -64,6 +64,48 @@ class StatesFournisseursRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // states fournisseurs commerciaux
+    public function getStatesCommerciaux($dos, $dd, $df, $fous, $fams, $metier, $tiers): array
+    {
+        $codeFams = "";
+        if ($fams != '') {
+            $codeFams = 'AND ART.FAM_0001 IN (' . $fams . ')';
+        }
+        $codeMetier = "";
+        if ($metier != '') {
+            $codeMetier = 'AND ART.FAM_0002 IN (' . $metier . ')';
+        }
+        $code = "";
+        if ($fous != '') {
+            $code = 'AND ART.TIERS IN (' . $fous . ')';
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT commercial, famille, ref, sref1, sref2, designation,uv, SUM(qte) AS qte, SUM(montant) AS montant
+        FROM (
+            SELECT v.NOM AS commercial, ART.FAM_0001 AS famille, MOUV.REF AS ref, MOUV.SREF1 AS sref1, MOUV.SREF2 AS sref2, ART.DES AS designation, MOUV.VENUN AS uv,
+            CASE
+            WHEN MOUV.OP IN ('C','CD') THEN MOUV.FAQTE
+            WHEN MOUV.OP IN ('D','DD') THEN -1 * MOUV.FAQTE
+            END AS qte,
+            CASE
+            WHEN MOUV.OP IN ('C','CD') THEN MOUV.MONT - MOUV.REMPIEMT_0004
+            WHEN MOUV.OP IN ('D','DD') THEN (-1 * MOUV.MONT) + MOUV.REMPIEMT_0004
+            END AS montant
+            FROM MOUV
+            INNER JOIN ART ON ART.DOS = MOUV.DOS AND ART.REF = MOUV.REF
+            INNER JOIN CLI c ON MOUV.TIERS = c.TIERS AND c.DOS = MOUV.DOS
+            LEFT JOIN VRP v ON c.REPR_0001 = v.TIERS AND c.DOS = v.DOS
+            WHERE MOUV.DOS = $dos AND MOUV.TICOD = '$tiers' AND MOUV.PICOD = 4 AND MOUV.FADT BETWEEN '$dd' AND '$df' $code $codeFams $codeMetier
+            ) reponse
+            GROUP BY commercial,famille, ref, sref1,sref2, designation, uv
+            ";
+        //dd($sql);
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     // states fournisseurs sans Fournisseurs
     public function getStatesSansFournisseurs($dos, $dd, $df, $fous, $fams, $metier, $tiers): array
     {

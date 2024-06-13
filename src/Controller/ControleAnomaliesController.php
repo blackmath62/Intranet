@@ -23,6 +23,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Twig\Environment;
 
 #[IsGranted("ROLE_USER")]
 
@@ -30,6 +31,7 @@ class ControleAnomaliesController extends AbstractController
 {
     private $entityManager;
     private $mailer;
+    private $twig;
     private $continuousExecutionService;
     private $adminEmailController;
     private $contratCommissionnaireController;
@@ -41,6 +43,7 @@ class ControleAnomaliesController extends AbstractController
     private $repoArt;
     private $repoFou;
     private $repoEnt;
+    private $anomaliesController;
     private $repoCmdRoby;
     private $repoMouv;
     private $repoMail;
@@ -51,10 +54,12 @@ class ControleAnomaliesController extends AbstractController
     public function __construct(
         ManagerRegistry $registry,
         MailerInterface $mailer,
+        Environment $twig,
         ContinuousExecutionService $continuousExecutionService,
         HolidayController $holidayController,
         AdminEmailController $adminEmailController,
         ContratCommissionnaireController $contratCommissionnaireController,
+        AnomaliesController $anomaliesController,
         UsersRepository $repoUsers,
         MailListRepository $repoMail,
         MouvRepository $repoMouv,
@@ -70,6 +75,7 @@ class ControleAnomaliesController extends AbstractController
         $this->mailer = $mailer;
         $this->continuousExecutionService = $continuousExecutionService;
         $this->repoAno = $repoAno;
+        $this->twig = $twig;
         $this->repoCompta = $repoCompta;
         $this->repoArtStockMouvEf = $repoArtStockMouvEf;
         $this->repoCli = $repoCli;
@@ -83,10 +89,27 @@ class ControleAnomaliesController extends AbstractController
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->adminEmailController = $adminEmailController;
+        $this->anomaliesController = $anomaliesController;
         $this->repoUsers = $repoUsers;
         $this->holidayController = $holidayController;
         $this->entityManager = $registry->getManager();
         //parent::__construct();
+    }
+
+    #[Route("/controle/anomalies/test/try/catch", name: "app_controle_anomalies_test_try_catch")]
+    public function testTryCatch()
+    {
+        // Fonction valide
+        $validFunction = [$this->anomaliesController, 'eanEnDouble'];
+        $this->continuousExecutionService->tryCatch($validFunction);
+
+        // Fonction invalide (méthode inexistante)
+        $invalidFunction = [$this->anomaliesController, 'invalidMethod'];
+        $this->continuousExecutionService->tryCatch($invalidFunction);
+
+        // Tableau invalide
+        $invalidArray = [$this->anomaliesController];
+        $this->continuousExecutionService->tryCatch($invalidArray);
     }
 
     #[Route("/controle/anomalies", name: "app_controle_anomalies")]

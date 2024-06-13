@@ -12,6 +12,7 @@ use App\Entity\Main\InterventionMonteurs;
 use App\Entity\Main\OthersDocuments;
 use App\Form\AddPicturesOrDocsType;
 use App\Form\ChatsType;
+use App\Form\CommentairesType;
 use App\Form\InterventionFicheCommentType;
 use App\Form\InterventionFichesMonteursHeuresType;
 use App\Form\InterventionFicheType;
@@ -40,6 +41,7 @@ use App\Service\ImageService;
 use App\Service\ProductFormService;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
+use Proxies\__CG__\App\Entity\Main\Commentaires;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -163,6 +165,7 @@ class AffairesController extends AbstractController
             'fichesManquantes' => $fichesManquantes,
             'fichesNonVerrouillees' => $fichesNonVerrouillees,
             'cmdsWithProblem' => $this->repoEnt->getRowsWithoutAffair(),
+            'blsWithProblem' => $this->repoEnt->getRowsWithoutAffaireBl(),
         ]);
     }
 
@@ -274,7 +277,7 @@ class AffairesController extends AbstractController
     #[Route("/Lhermitte/pieces/affaire/nok/{{affaire}}", name: "app_piece_affaire_nok")]
     #[Route("/Lhermitte/pieces/affaire/ok/{{affaire}}", name: "app_piece_affaire_ok")]
 
-    public function pieceAffaire($affaire, Request $request): Response
+    public function pieceAffaire($affaire, Request $request, CommentairesRepository $repoCommentaire): Response
     {
         if ($request->attributes->get('_route') == 'app_piece_affaire_ok') {
             $pieces = $this->repoAffairePiece->findBy(['etat' => 'Termine', 'affaire' => $affaire]);
@@ -289,6 +292,33 @@ class AffairesController extends AbstractController
         $id = $this->repoAffaires->findOneBy(['code' => $affaire])->getId();
 
         $affaire = $this->repoAffaires->findOneBy(['code' => $affaire]);
+
+        $commentaire = $repoCommentaire->findOneBy(['Tables' => 'app_piece_affaire', 'identifiant' => $affaire->getId()]);
+
+        if (!$commentaire) {
+            $commentaire = new Commentaires();
+        }
+
+        $formComment = $this->createForm(CommentairesType::class, $commentaire);
+        $formComment->handleRequest($request);
+        if ($formComment->isSubmitted() && $formComment->isValid()) {
+
+            $dd = $formComment->get('content')->getData();
+
+            $commentaire->setCreatedAt(new DateTime())
+                ->setUser($this->getUser())
+                ->setTables('app_piece_affaire')
+                ->setIdentifiant($affaire->getId());
+            $entityManager = $this->entityManager;
+            $entityManager->persist($commentaire);
+            $entityManager->flush();
+
+            return $this->redirectToRoute($request->attributes->get('_route'), ['affaire' => $affaire->getCode()]);
+        } else {
+            $entityManager = $this->entityManager;
+            $entityManager->remove($commentaire);
+            $entityManager->flush();
+        }
 
         $intervention = new InterventionMonteurs();
         $InterventionsMonteursForm = $this->createForm(InterventionsMonteursType::class, $intervention);
@@ -406,6 +436,7 @@ class AffairesController extends AbstractController
             'data' => $this->interventionsCalendar(),
             'chats' => $chats,
             'retraits' => $retraits,
+            'formComment' => $formComment->createView(),
             'InterventionsMonteursForm' => $InterventionsMonteursForm->createView(),
             'Interventions' => $Interventions,
         ]);

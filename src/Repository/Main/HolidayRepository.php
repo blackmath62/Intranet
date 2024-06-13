@@ -186,16 +186,17 @@ class HolidayRepository extends ServiceEntityRepository
     {
         // congés non dépassés avec les services
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT nom AS nom, startCp AS startCp, sliceStart AS sliceStart, endCp AS endCp, sliceEnd AS sliceEnd, details AS details, createdAtHoliday AS createdAtHoliday,
+        $sql = "SELECT nom AS nom, societe AS societe, startCp AS startCp, sliceStart AS sliceStart, endCp AS endCp, sliceEnd AS sliceEnd, details AS details, createdAtHoliday AS createdAtHoliday,
          treatmentedAt AS treatmentedAt, us.pseudo AS treatmentedBy_id, nbJours AS nbJours, typeCp AS typeCp, statut AS statut
         FROM(
-        SELECT u.pseudo AS nom, h.start AS startCp, h.sliceStart AS sliceStart, h.end AS endCp, h.sliceEnd AS sliceEnd, h.details AS details,
+        SELECT u.pseudo AS nom, soc.nom AS societe, h.start AS startCp, h.sliceStart AS sliceStart, h.end AS endCp, h.sliceEnd AS sliceEnd, h.details AS details,
         h.createdAt AS createdAtHoliday, h.treatmentedAt AS treatmentedAt, h.treatmentedBy_id AS treatmentedBy_id, h.nbJours AS nbJours, ht.name AS typeCp,
         sh.name AS statut
         FROM holiday h
         INNER JOIN users u ON u.id = h.user_id
         INNER JOIN holidaytypes ht ON ht.id = h.holidayType_id
         INNER JOIN statusholiday sh ON sh.id = h.holidayStatus_id
+        INNER JOIN societe soc ON soc.id = u.societe_id
         WHERE ((DATE(h.start) BETWEEN '$start' AND '$end') OR (DATE(h.end) BETWEEN '$start' AND '$end')) AND h.holidayStatus_id = 3)reponse
         INNER JOIN users us ON us.id = treatmentedBy_id
         ";
@@ -208,11 +209,11 @@ class HolidayRepository extends ServiceEntityRepository
     public function getVacationTypeListByUsers($start, $end)
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT pseudo AS pseudo, email AS email,
+        $sql = "SELECT pseudo AS pseudo, societe AS societe,
         SUM(conges) AS conges, SUM(rtt) AS rtt, SUM(sansSolde) AS sansSolde, SUM(famille) AS famille,
         SUM(maternite) AS maternite, SUM(deces) AS deces, SUM(demenagement) AS demenagement,SUM(arretTravail) AS arretTravail, SUM(arretCovid) AS arretCovid, SUM(autre) AS autre, SUM(total) AS total
         FROM(
-        SELECT users.pseudo AS pseudo, users.email AS email,
+        SELECT users.pseudo AS pseudo, soc.nom AS societe,
         CASE
         WHEN holiday.holidayType_id = 9 THEN holiday.nbJours
         END AS conges,
@@ -248,8 +249,9 @@ class HolidayRepository extends ServiceEntityRepository
         END AS total
         FROM holiday
         INNER JOIN users ON users.id = holiday.user_id
+        INNER JOIN societe soc ON soc.id = users.societe_id
         WHERE ((DATE(holiday.start) BETWEEN '$start' AND '$end') OR (DATE(holiday.end) BETWEEN '$start' AND '$end')) AND holiday.holidayStatus_id = 3)reponse
-        GROUP BY pseudo, email
+        GROUP BY pseudo, societe
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

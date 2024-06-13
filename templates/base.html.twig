@@ -285,6 +285,12 @@
 										</a>
 										<ul class="nav nav-treeview">
 											<li class="nav-item">
+												<a href="https://e-agre.agriculture.gouv.fr/" class="nav-link" target="_blank">
+													<i class="nav-icon fas fa-solid fa-certificate text-warning"></i>
+													<p>E-Agre Agrément sociétés</p>
+												</a>
+											</li>
+											<li class="nav-item">
 												<a href="{{ path('app_declaration_agence_eau')}}" class="nav-link">
 													<i class="nav-icon fas fa-tint text-info"></i>
 													<p>Agence de l'eau</p>
@@ -434,6 +440,14 @@
 
 								{% if is_granted('ROLE_ADMIN') %}
 									<li class="nav-item">
+										<a href="{{path('app_jardinew_products')}}" class="nav-link">
+											<i class="nav-icon fas fa-solid fa-j"></i>
+											<p>
+												Produits Jardinew
+											</p>
+										</a>
+									</li>
+									<li class="nav-item">
 										<a href="{{path('app_admin')}}" class="nav-link">
 											<i class="nav-icon fas fa-chalkboard-teacher"></i>
 											<p>
@@ -489,10 +503,42 @@
 												</li>
 												{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
 													<li class="nav-item">
-														<a href="{{ path('app_resume_states', {'dos' : '1' }) }}" class="nav-link">
-															<i class="nav-icon fas fa-chart-pie text-danger"></i>
+														<a href="{{ path('app_resume_states', {'dos' : '1', 'metier' : 'EV' }) }}" class="nav-link">
+															<i class="nav-icon fas fa-chart-pie text-success"></i>
 															<p>
 																Résumé des states EV
+															</p>
+														</a>
+													</li>
+													<li class="nav-item">
+														<a href="{{ path('app_resume_states', {'dos' : '1', 'metier' : 'HP' }) }}" class="nav-link">
+															<i class="nav-icon fas fa-chart-pie text-danger"></i>
+															<p>
+																Résumé des states HP
+															</p>
+														</a>
+													</li>
+													<li class="nav-item">
+														<a href="{{ path('app_resume_states', {'dos' : '1', 'metier' : 'MA' }) }}" class="nav-link">
+															<i class="nav-icon fas fa-chart-pie text-orange"></i>
+															<p>
+																Résumé des states MA
+															</p>
+														</a>
+													</li>
+													<li class="nav-item">
+														<a href="{{ path('app_resume_states', {'dos' : '1', 'metier' : 'ME' }) }}" class="nav-link">
+															<i class="nav-icon fas fa-chart-pie text-warning"></i>
+															<p>
+																Résumé des states ME
+															</p>
+														</a>
+													</li>
+													<li class="nav-item">
+														<a href="{{ path('app_pieces_by_commercial_by_periods') }}" class="nav-link">
+															<i class="nav-icon fas fa-chart-pie text-secondary"></i>
+															<p>
+																Piéces par com et période
 															</p>
 														</a>
 													</li>
@@ -667,7 +713,7 @@
 												</a>
 											</li>
 											<li class="nav-item">
-												<a href="{{ path('app_resume_states', {'dos' : '3' }) }}" class="nav-link">
+												<a href="{{ path('app_resume_states', {'dos' : '3', 'metier' : 'RB' }) }}" class="nav-link">
 													<i class="nav-icon fas fa-chart-pie text-danger"></i>
 													<p>
 														Résumé des states

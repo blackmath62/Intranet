@@ -94,4 +94,69 @@ class StocksRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    public function getStockjN($ref)
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT
+        m.REF AS ref,
+        m.SREF1 AS sref1,
+        m.SREF2 AS sref2,
+        m.OP AS op,
+        CASE
+            WHEN SUM(stock.QTETJSENSTOCK) > 0 AND m.OP IN ('F','FD') THEN MAX(m.PUB) + (-1 * m.REMPIEMT_0004)
+            ELSE (SELECT MAX(t.PA) FROM TFO t WHERE t.DOS = m.DOS AND t.REF = m.REF AND t.TADT = (
+                SELECT MAX(t2.TADT) FROM TFO t2 WHERE t2.DOS = m.DOS AND t2.REF = m.REF))
+        END AS prix,
+        CASE
+            WHEN SUM(stock.QTETJSENSTOCK) > 0 AND m.OP IN ('F','FD') THEN MAX(m.FADT)
+            ELSE (SELECT MAX(t.TADT) FROM TFO t WHERE t.DOS = m.DOS AND t.REF = m.REF AND t.TADT = (
+                SELECT MAX(t2.TADT) FROM TFO t2 WHERE t2.DOS = m.DOS AND t2.REF = m.REF))
+        END AS dateTarif,
+        CASE
+            WHEN SUM(stock.QTETJSENSTOCK) > 0 AND m.OP IN ('F','FD') THEN (SELECT m2.FANO FROM MOUV m2 WHERE m2.DOS = m.DOS AND m2.REF = m.REF AND m2.SREF1 = m.SREF1 AND m2.SREF2 = m.SREF2 AND m2.PICOD = 4 AND m2.TICOD = 'F' AND m2.FADT = (
+                SELECT MAX(m3.FADT) FROM MOUV m3 WHERE m3.DOS = m2.DOS AND m3.REF = m2.REF AND m3.SREF1 = m2.SREF1 AND m3.SREF2 = m2.SREF2 AND m3.PICOD = 4 AND m3.TICOD = 'F' AND m3.OP IN ('F','FD')))
+            ELSE 0
+        END AS numero_piece,
+        SUM(stock.QTETJSENSTOCK) AS stock,
+        MAX(
+            CASE
+                WHEN a.SREFCOD = 1 AND a.HSDT > '1984-10-19' THEN 'Fermé'
+                ELSE ''
+            END
+        ) AS ferme,
+        CASE
+            WHEN SUM(stock.QTETJSENSTOCK) > 0 AND m.OP IN ('F','FD') THEN m.PPAR
+            ELSE (SELECT t.PPAR FROM TFO t WHERE t.DOS = m.DOS AND t.REF = m.REF AND t.TADT = (
+                SELECT MAX(t2.TADT) FROM TFO t2 WHERE t2.DOS = m.DOS AND t2.REF = m.REF))
+        END AS ppar
+    FROM
+        MOUV m
+    LEFT JOIN SART s ON m.DOS = s.DOS AND m.REF = s.REF AND m.SREF1 = s.SREF1 AND m.SREF2 = s.SREF2
+    LEFT JOIN MVTL_STOCK_V stock ON m.DOS = stock.DOSSIER AND m.REF = stock.REFERENCE AND s.SREF1 = stock.SREFERENCE1 AND s.SREF2 = stock.SREFERENCE2
+    INNER JOIN ART a ON a.DOS = m.DOS AND a.REF = m.REF
+    WHERE
+        m.DOS = 1
+        AND m.REF = '$ref'
+        AND m.PICOD = 4
+        AND m.TICOD = 'F'
+        AND m.FADT = (
+            SELECT MAX(m2.FADT)
+            FROM MOUV m2
+            WHERE
+                m2.DOS = m.DOS
+                AND m2.REF = m.REF
+                AND m2.SREF1 = m.SREF1
+                AND m2.SREF2 = m.SREF2
+                AND m2.PICOD = 4
+                AND m2.TICOD = 'F'
+                AND m2.OP IN ('F','FD')
+        )
+    GROUP BY m.DOS, m.REF, m.SREF1, m.SREF2, m.FADT, m.REMPIEMT_0004, m.PPAR, m.OP
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative();
+    }
+
 }

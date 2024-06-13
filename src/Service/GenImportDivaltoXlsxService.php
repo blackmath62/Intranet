@@ -119,6 +119,33 @@ class GenImportDivaltoXlsxService
         return $entetes;
     }
 
+    // Entête de colonne pour la création de mouvements interne stock
+    public function getEnteteSart()
+    {
+        $entetes = [
+            'DOSSIER',
+            'REFERENCE',
+            'SREFERENCE1',
+            'SREFERENCE2',
+            'CONF',
+            'EAN_ARTICLE_SOUS_REFERENCE',
+            'POIDSBRUT',
+            'POIDSNET',
+            'PRIXACHAT',
+            'DATEPRIXACHAT',
+            'CMPUNITAIRE',
+            'DATECMP',
+            'CRUNITAIRE',
+            'DATECR',
+            'CMPUNITAIRE',
+            'DATECMP',
+            'Anomalies',
+            'Alertes',
+        ];
+
+        return $entetes;
+    }
+
     public function param($typeTiers, $dos, $depot, $date = null, $tiers = null, $piece = null)
     {
         $param['dos'] = $dos;
@@ -219,6 +246,41 @@ class GenImportDivaltoXlsxService
         $chemin = 'doc/Logistique/';
         $fichier = $chemin . '/' . $fileName;
         $writer->save($fichier);
+
+        return $fichier;
+    }
+
+    public function get_export_excel_art($param, $donnees)
+    {
+        $d = '';
+        $d = new DateTime('NOW');
+        $dateTime = $d->format('Ymdhis');
+        $nomFichier = $param['title'] . $dateTime;
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle($param['title']);
+
+        $entetes = $param['entetes'];
+        $sheet->getCell('A4')->setValue('Données');
+
+        // Écriture des entêtes de colonnes
+        foreach ($entetes as $index => $label) {
+            $cellCoordinate = Coordinate::stringFromColumnIndex($index + 1) . '6';
+            $sheet->getCell($cellCoordinate)->setValue($label);
+        }
+
+        // Increase row cursor after header write
+        $sheet->fromArray($this->getData($entetes, $donnees), null, 'A7', true);
+
+        $writer = new Xlsx($spreadsheet);
+        // Create a Temporary file in the system
+        $fileName = $nomFichier . '.xlsx';
+        // Return the excel file as an attachment
+
+        $chemin = 'doc/Logistique/';
+        $fichier = $chemin . '/' . $fileName;
+        $writer->save($fichier);
         return $fichier;
     }
 
@@ -228,9 +290,15 @@ class GenImportDivaltoXlsxService
         $list = [];
 
         foreach ($donnees as $donnee) {
+
             $row = [];
             foreach ($entetes as $col) {
-                $row[] = $donnee[$col] ?? ''; // Si une colonne n'existe pas dans les données, on met une chaîne vide
+                if (strpos($col, 'SREF') === 0 && $donnee[$col] != '') {
+                    $value = "'" . $donnee[$col];
+                } else {
+                    $value = $donnee[$col] ?? ''; // Si une colonne n'existe pas dans les données, on met une chaîne vide
+                }
+                $row[] = $value;
             }
             $list[] = $row;
         }
