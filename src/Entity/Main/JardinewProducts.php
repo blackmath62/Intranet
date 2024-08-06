@@ -3,6 +3,7 @@
 namespace App\Entity\Main;
 
 use App\Repository\Main\JardinewProductsRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: JardinewProductsRepository::class)]
@@ -13,7 +14,7 @@ class JardinewProducts
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?float $price = null;
 
     #[ORM\Column(length: 255)]
@@ -42,6 +43,18 @@ class JardinewProducts
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $marge = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $datePurchase = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $closed = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $uv = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $port = null;
 
     public function getId(): ?int
     {
@@ -171,6 +184,54 @@ class JardinewProducts
     public function setMarge(?string $marge): static
     {
         $this->marge = $marge;
+
+        return $this;
+    }
+
+    public function getDatePurchase(): ?\DateTimeInterface
+    {
+        return $this->datePurchase;
+    }
+
+    public function setDatePurchase(?\DateTimeInterface $datePurchase): static
+    {
+        $this->datePurchase = $datePurchase;
+
+        return $this;
+    }
+
+    public function getClosed(): ?string
+    {
+        return $this->closed;
+    }
+
+    public function setClosed(?string $closed): static
+    {
+        $this->closed = $closed;
+
+        return $this;
+    }
+
+    public function getUv(): ?string
+    {
+        return $this->uv;
+    }
+
+    public function setUv(?string $uv): static
+    {
+        $this->uv = $uv;
+
+        return $this;
+    }
+
+    public function getPort(): ?float
+    {
+        return $this->port;
+    }
+
+    public function setPort(?float $port): static
+    {
+        $this->port = $port;
 
         return $this;
     }

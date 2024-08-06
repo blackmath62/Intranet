@@ -33,6 +33,7 @@ class AlimentationEmplacementEanType extends AbstractType
         foreach ($arts as $art) {
             if ($i == 0) {
                 $arrayArts['Ajouter'] = "Add";
+                $arrayArts['Retirer'] = "Remove";
             } elseif (!empty($art['empl'])) {
                 $arrayArts[$art['empl']] = $art['empl'];
             }
@@ -57,7 +58,7 @@ class AlimentationEmplacementEanType extends AbstractType
             ])
             ->add('oldLocation', ChoiceType::class, [
                 'required' => true,
-                'label' => 'Transférer ou Ajouter',
+                'label' => 'Ajouter ou Déplacer',
                 'attr' => ['class' => 'form-control col-12'],
                 'choices' => $arrayArts,
                 'expanded' => false,

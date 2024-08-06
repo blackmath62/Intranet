@@ -124,4 +124,5 @@ class AlimentationEmplacement
 
         return $this;
     }
+
 }

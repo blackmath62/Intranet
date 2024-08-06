@@ -11,9 +11,11 @@ use App\Service\EanScannerService;
 use App\Service\GenImportXlsxDivaltoService;
 use App\Service\ImageService;
 use App\Service\ProductFormService;
+use App\Service\ProductFormServiceV2;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -32,17 +34,20 @@ class MouvStockController extends AbstractController
     private $eanScannerService;
     private $productFormService;
     private $imageService;
+    private $repoAlimentationEmplacement;
 
     public function __construct(
         EanScannerService $eanScannerService,
+        AlimentationEmplacementRepository $repoAlimentationEmplacement,
         ManagerRegistry $registry,
         MailListRepository $repoMail,
         MailerInterface $mailer,
-        ProductFormService $productFormService,
+        ProductFormServiceV2 $productFormService,
         ImageService $imageService
     ) {
         $this->mailer = $mailer;
         $this->repoMail = $repoMail;
+        $this->repoAlimentationEmplacement = $repoAlimentationEmplacement;
         $this->eanScannerService = $eanScannerService;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
         $this->entityManager = $registry->getManager();
@@ -153,7 +158,19 @@ class MouvStockController extends AbstractController
             $historique[$ligHisto]['qte'] = $histo[$ligHisto]->getQte();
             $historique[$ligHisto]['oldLocation'] = $histo[$ligHisto]->getOldLocation();
 
-            // Entrée en stock => JI
+            if ($histo[$ligHisto]->getOldLocation() == 'Add') {
+                $op = 'JI';
+                $oldLocation = $histo[$ligHisto]->getEmplacement();
+                $location = '';
+            } elseif ($histo[$ligHisto]->getOldLocation() == 'Remove') {
+                $op = 'II';
+                $oldLocation = $histo[$ligHisto]->getEmplacement();
+                $location = '';
+            } else {
+                $op = 'IO';
+                $oldLocation = $histo[$ligHisto]->getOldLocation();
+                $location = $histo[$ligHisto]->getEmplacement();
+            }
 
             // Alimentation du MOUV
             $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''
@@ -163,7 +180,7 @@ class MouvStockController extends AbstractController
             $piece[$i]['SREF2'] = $prod['sref2']; // MOUV
             $piece[$i]['DESIGNATION'] = $prod['designation']; // MOUV
             $piece[$i]['REF_FOURNISSEUR'] = ''; // MOUV
-            $piece[$i]['MOUV.OP'] = 'JI'; // MOUV
+            $piece[$i]['MOUV.OP'] = $op; // MOUV
             $piece[$i]['QUANTITE'] = $histo[$ligHisto]->getQte(); // MOUV
             $piece[$i]['MOUV.PPAR'] = ''; // MOUV
             $piece[$i]['MOUV.PUB'] = ''; // MOUV
@@ -172,36 +189,11 @@ class MouvStockController extends AbstractController
             // Alimentation du MVTL
             $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''
             $piece[$i]['FICHE'] = 'MVTL';
-            $piece[$i]['EMPLACEMENT'] = $histo[$ligHisto]->getEmplacement(); // MVTL
+            $piece[$i]['EMPLACEMENT'] = $oldLocation;
+            $piece[$i]['EMPLACEMENT_DESTINATION'] = $location;
             $piece[$i]['SERIE'] = ''; // MVTL
             $piece[$i]['QUANTITE_VTL'] = $histo[$ligHisto]->getQte(); // MVTL
             $i++;
-
-            // Sortir le stock de l'emplacement d'origine si nécéssaire
-            if ($histo[$ligHisto]->getOldLocation() != 'Add' && $histo[$ligHisto]->getOldLocation() != '') {
-                // Sortie de stock => II
-                // Alimentation du MOUV
-                $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''
-                $piece[$i]['FICHE'] = 'MOUV';
-                $piece[$i]['REFERENCE'] = $prod['ref']; // MOUV
-                $piece[$i]['SREF1'] = $prod['sref1']; // MOUV
-                $piece[$i]['SREF2'] = $prod['sref2']; // MOUV
-                $piece[$i]['DESIGNATION'] = $prod['designation']; // MOUV
-                $piece[$i]['REF_FOURNISSEUR'] = ''; // MOUV
-                $piece[$i]['MOUV.OP'] = 'II'; // MOUV
-                $piece[$i]['QUANTITE'] = $histo[$ligHisto]->getQte(); // MOUV
-                $piece[$i]['MOUV.PPAR'] = ''; // MOUV
-                $piece[$i]['MOUV.PUB'] = ''; // MOUV
-
-                // Alimentation du MVTL
-                $i++;
-                $piece[$i] = array_fill_keys($indexColonnesStock, ''); // Initialise toutes les colonnes à ''
-                $piece[$i]['FICHE'] = 'MVTL';
-                $piece[$i]['EMPLACEMENT'] = $histo[$ligHisto]->getOldLocation(); // MVTL
-                $piece[$i]['SERIE'] = ''; // MVTL
-                $piece[$i]['QUANTITE_VTL'] = $histo[$ligHisto]->getQte(); // MVTL
-                $i++;
-            }
 
             // Alimenter le tableau pour l'info Stock
             $donneesStock[$is] = array_fill_keys($indexColonnesInfoStock, ''); // Initialise toutes les colonnes à ''
@@ -398,5 +390,22 @@ class MouvStockController extends AbstractController
             'title' => 'Empl NS',
             'ns' => $ns,
         ]);
+    }
+
+    #[Route("/mouv/stock/already/scan/ajax/{ean}/{location}", name: "app_mouv_stock_already_scan_ajax")]
+    // Récupérer ce qui a déjà été scanné pour un produit
+    public function alreadyScanned($ean, $location)
+    {
+        // récupérer les quantités saisies pour soustraire de l'ancien emplacement
+        $oldResult = $this->repoAlimentationEmplacement->getGroupedOldLocationByEan($ean, $location);
+        // récupérer les quantités saisies pour ajouter sur le nouvel emplacement
+        $newResult = $this->repoAlimentationEmplacement->getGroupedNewLocationByEan($ean, $location);
+
+        $oldQte = isset($oldResult[0]['qte']) ? $oldResult[0]['qte'] : 0;
+        $newQte = isset($newResult[0]['qte']) ? $newResult[0]['qte'] : 0;
+
+        $qteAlreadyScanned = $newQte - $oldQte;
+
+        return new JsonResponse(['qteAlreadyScanned' => $qteAlreadyScanned]);
     }
 }

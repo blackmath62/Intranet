@@ -34,7 +34,7 @@
 						<i class="fa-solid fa-camera"></i>
 					</button>
 				</div>
-				{{ form_widget(form.emplacement, {'id': 'emplacement', 'name': 'emplacement' ,'attr' : { 'class' : 'form-control col-12 is-invalid' , 'value' : emplacement} }) }}
+				{{ form_widget(form.emplacement, {'id': 'emplacement', 'name': 'emplacement' ,'attr' : { 'class' : 'form-control col-12' , 'value' : emplacement} }) }}
 				{{ form_errors(form.emplacement) }}
 			</div>
 		</div>
@@ -76,7 +76,7 @@
 				{{ form_label(form.oldLocation) }}
 			</label>
 			{{ form_widget(form.oldLocation, {'attr': {'disabled': true}}) }}
-			<small>Transférer le stock d'un autre emplacement ou ajouter la quantité sur cet emplacement</small>
+			<small>Déplacer le stock d'un autre emplacement ou ajouter/retirer la quantité sur cet emplacement</small>
 			{{ form_errors(form.oldLocation) }}
 		</div>
 		<div class="form-group mt-2">
@@ -99,6 +99,7 @@
 {% include 'components/product_card_light.html.twig' %}
 {% include 'components/modal_scanner.html.twig' %}
 {% include 'components/modal_products.html.twig' %}
+{% include 'components/modal_generique.html.twig' %}
 
 {% if historiques %}
 	<div class="card card-dark mt-4">
@@ -110,6 +111,7 @@
 			<table class="table table-sm">
 				<thead>
 					<tr>
+						<th style="width: 60px">Qte</th>
 						<th>Produit</th>
 						<th style="width: 40px">X</th>
 					</tr>
@@ -117,6 +119,7 @@
 				<tbody>
 					{% for historique in historiques %}
 						<tr>
+							<td>{{ historique.qte }}</td>
 							<td>{{ historique.designation }}</td>
 							<td class="text-align align-middle">
 								<a data-toggle="modal" data-target={{"#modal-sm#{historique.id}"}} class="text-dark">
@@ -183,10 +186,13 @@
 														<small class="nav-link">
 															Ancien emplacement :
 															<span class="float-right">
-																{% if historique.oldLocation != 'Add' %}
+																{% if historique.oldLocation != 'Add' and  historique.oldLocation != 'Remove' %}
 																	{{historique.oldLocation}}
-																{% else %}
+																{% elseif historique.oldLocation == 'Add' %}
 																	Produit retrouvé sans emplacement
+																{% elseif historique.oldLocation == 'Remove' %}
+																	Produit a retirer de
+																	{{historique.emplacement}}
 																{% endif %}
 															</span>
 														</small>
@@ -200,7 +206,12 @@
 													<li class="nav-item">
 														<small class="nav-link">
 															Nouvel emplacement :
-															<span class="float-right">{{historique.emplacement}}</span>
+															<span class="float-right">
+																{% if historique.oldLocation == 'Remove' %}
+																	{% else %}
+																		{{historique.emplacement}}
+																{% endif %}
+															</span>
 														</small>
 													</li>
 												</ul>
@@ -253,11 +264,20 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>{{ productFormScript | raw }}</script>
 <script>{{ eanScannerScript | raw }}</script>
+
 <script>
 
 	// Déclarer oldLocationValue en dehors de la fonction de gestionnaire d'événements
 var oldLocationValue;
-function alimSource(stockData) { // Supprimer toutes les options actuelles du champ oldLocation
+var isAlimSourceExecuted = false;
+
+function alimSource(stockData) {
+if (isAlimSourceExecuted) {
+return; // Sortir de la fonction si elle a déjà été exécutée
+}isAlimSourceExecuted = true;
+// Marquer que la fonction est en cours d'exécution
+
+// Supprimer toutes les options actuelles du champ oldLocation
 $('#alimentation_emplacement_ean_oldLocation').empty();
 $('#alimentation_emplacement_ean_oldLocation').prop('disabled', true);
 
@@ -267,18 +287,66 @@ value: 'Add',
 text: 'Ajouter au stock'
 }));
 
-// Ajouter d'autres options en fonction de vos résultats (emplacements disponibles avec quantités)
-if (stockData && Array.isArray(stockData) && stockData.length > 0) { // Lors du remplissage de la liste déroulante
-stockData.forEach(stockRow => { // Ajoutez une option pour chaque emplacement avec sa valeur et son texte
+// Ajouter l'option 'Retirer' avec la valeur 'Remove'
+$('#alimentation_emplacement_ean_oldLocation').append($('<option>', {
+value: 'Remove',
+text: 'Retirer du stock'
+}));
+
+// Vérifier si stockData est un tableau valide
+if (stockData && Array.isArray(stockData) && stockData.length > 0) { // Créer un tableau de promesses pour les requêtes AJAX
+const ajaxPromises = stockData.map(stockRow => {
+return $.ajax({
+url: '/mouv/stock/already/scan/ajax/' + stockRow.ean + '/' + stockRow.empl,
+method: 'GET',
+dataType: 'json' // Assurez-vous que le serveur renvoie du JSON
+}).then(data => { // Log pour vérifier les données reçues
+
+const qte = data.qteAlreadyScanned || 0;
+// Utilisez une valeur par défaut si qteAlreadyScanned n'est pas défini
+
+// Ajouter l'option avec la quantité scannée
+stockRow.qteStock = parseFloat(stockRow.qteStock) + parseFloat(qte);
+
+if (stockRow.qteStock !== 0) {
 $('#alimentation_emplacement_ean_oldLocation').append($('<option>', {
 value: stockRow.empl,
-text: stockRow.empl + ' - ' + stockRow.natureStock + ' - ' + stockRow.qteStock,
+text: 'Déplacer de ' + stockRow.empl + ' - ' + stockRow.qteStock + ' - ' + stockRow.natureStock + ' Disponible',
+'data-qte': stockRow.qteStock // Stockez la quantité comme attribut de données
+}));
+}
+}).catch(error => {
+console.error('Erreur lors de la récupération de la quantité déjà scannée pour ' + stockRow.empl + ':', error);
+
+// Ajouter une option avec 0 en cas d'erreur
+$('#alimentation_emplacement_ean_oldLocation').append($('<option>', {
+value: stockRow.empl,
+text: 'Déplacer de ' + stockRow.empl + ' - ' + stockRow.qteStock + ' - ' + stockRow.natureStock + ' Disponible',
 'data-qte': stockRow.qteStock // Stockez la quantité comme attribut de données
 }));
 });
+});
 
-// Activer le champ oldLocation
+// Attendre que toutes les requêtes AJAX soient terminées avant d'activer le champ oldLocation
+Promise.all(ajaxPromises).then(() => {
 $('#alimentation_emplacement_ean_oldLocation').prop('disabled', false);
+isAlimSourceExecuted = false; // Réinitialiser le drapeau après l'exécution
+loadModal()
+}).catch(error => {
+console.error('Erreur lors de l\'attente des requêtes AJAX:', error);
+isAlimSourceExecuted = false; // Réinitialiser le drapeau en cas d'erreur
+});
+} else {
+$('#alimentation_emplacement_ean_oldLocation').prop('disabled', false);
+isAlimSourceExecuted = false; // Réinitialiser le drapeau si aucune donnée à traiter
+loadModal()
+}
+}
+function loadModal() {
+const selectOptions = Array.from(document.getElementById('alimentation_emplacement_ean_oldLocation').options);
+const options = selectOptions.map(option => ({value: option.value, text: option.text}));
+populateModalOptions(options);
+openModal();
 }
 
 // Ajouter un gestionnaire d'événements pour le changement de la valeur du champ oldLocation
@@ -286,18 +354,98 @@ $('#alimentation_emplacement_ean_oldLocation').on('change', function () {
 var selectedOption = $(this).find(':selected');
 oldLocationValue = selectedOption.val(); // Définir la valeur de oldLocationValue
 var qteInput = $('#qte');
-console.log('oldLocation:', oldLocationValue);
 // Récupérer la quantité stockée dans l'attribut de données
 var qteEmplacement = parseFloat(selectedOption.data('qte'));
 
 if (!isNaN(qteEmplacement)) { // Extraire la quantité de l'emplacement
 qteInput.val(qteEmplacement);
-qteInput.addClass('disabled');
+qteInput.attr('max', qteEmplacement);
+// qteInput.addClass('disabled');
 } else { // Réactiver le champ qte si la valeur est 'Add'
 qteInput.removeClass('disabled');
 qteInput.val("");
+qteInput.removeAttr('max');
+document.getElementById('qte').focus();
 }
 });
-
+</script>
+<script>
+	// Définition des fonctions
+function openModal() {
+const overlay = document.querySelector('#generiqueModal .overlay');
+if (overlay) {
+overlay.style.display = 'none';
 }
+$('#generiqueModal').modal('show');
+}
+
+function populateModalOptions(options) {
+const modalBody = document.querySelector('#generiqueModal .modal-body');
+document.querySelector('#generiqueModal .generique-title').textContent = 'Ajouter/Retirer/Déplacer du stock ?';
+modalBody.innerHTML = '';
+
+options.forEach(option => {
+const radioHtml = `
+            <div class="form-check my-3">
+                <input class="form-check-input" type="radio" name="modalOption" id="option-${
+option.value
+}" value="${
+option.value
+}">
+                <label class="form-check-label ml-2" style="font-size: 1.25rem;" for="option-${
+option.value
+}">
+                    ${
+option.text
+}
+                </label>
+            </div>
+        `;
+modalBody.insertAdjacentHTML('beforeend', radioHtml);
+});
+
+document.getElementById('btn-send').classList.remove('d-none');
+document.getElementById('btn-send').addEventListener('click', function () {
+const selectedOption = modalBody.querySelector('input[name="modalOption"]:checked');
+if (selectedOption) {
+const value = selectedOption.value;
+const selectElement = document.getElementById('alimentation_emplacement_ean_oldLocation');
+selectElement.value = value;
+$('#generiqueModal').modal('hide');
+$('#alimentation_emplacement_ean_oldLocation').trigger('change');
+}
+});
+}
+
+// Initialisation après le chargement du DOM
+document.addEventListener('DOMContentLoaded', function () {
+
+function handleFocusChange(event) {
+const emplacement = document.getElementById('emplacement');
+const ean = document.getElementById('ean');
+const oldLocation = document.getElementById('alimentation_emplacement_ean_oldLocation');
+const qte = document.getElementById('qte');
+
+if (emplacement.classList.contains('is-valid') && ! ean.classList.contains('is-valid')) {
+ean.focus();
+}
+}
+
+const observerConfig = {
+attributes: true,
+attributeFilter: ['class']
+};
+
+const emplacement = document.getElementById('emplacement');
+const ean = document.getElementById('ean');
+const oldLocation = document.getElementById('alimentation_emplacement_ean_oldLocation');
+
+const emplacementObserver = new MutationObserver(handleFocusChange);
+const eanObserver = new MutationObserver(handleFocusChange);
+const oldLocationObserver = new MutationObserver(handleFocusChange);
+
+emplacementObserver.observe(emplacement, observerConfig);
+eanObserver.observe(ean, observerConfig);
+oldLocationObserver.observe(oldLocation, observerConfig);
+});
 </script>{% endblock %}

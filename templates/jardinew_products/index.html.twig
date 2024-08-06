@@ -60,7 +60,7 @@
 								{% for product in products %}
 									<tr>
 										<td class="text-center">
-											<a class="text-dark">{{ product.idWordpress }}</a>
+											<a class="text-dark" href="{{ product.permalien }}" target="_blank">{{ product.idWordpress }}</a>
 										</td>
 										<td class="text-left">
 											<a class="text-dark">{{ product.sku }}</a>

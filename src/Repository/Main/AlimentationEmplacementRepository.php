@@ -34,6 +34,40 @@ class AlimentationEmplacementRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    public function getGroupedOldLocationByEan($ean, $oldLocation)
+    {
+        $qb = $this->createQueryBuilder('a');
+
+        $qb->select('a.oldLocation', 'SUM(a.qte) AS qte')
+            ->where('a.sendAt IS NULL')
+            ->andWhere('a.ean = :ean')
+            ->andWhere('a.oldLocation = :oldLocation')
+            ->groupBy('a.oldLocation')
+            ->setParameter('ean', $ean)
+            ->setParameter('oldLocation', $oldLocation);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    // Quantité à ajouter et retirer de l'emplacement
+    public function getGroupedNewLocationByEan($ean, $emplacement)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT  a.emplacement, SUM(
+        CASE
+            WHEN a.oldLocation = 'Remove' THEN -1 * a.qte
+            ELSE a.qte
+        END
+        ) AS qte
+        FROM alimentationemplacement a
+        WHERE a.sendAt IS NULL AND a.emplacement = '$emplacement' AND a.ean = '$ean'
+        GROUP BY a.emplacement
+         ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
     // /**
     //  * @return AlimentationEmplacement[] Returns an array of AlimentationEmplacement objects
     //  */

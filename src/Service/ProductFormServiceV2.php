@@ -2,7 +2,7 @@
 // Assurez-vous d"utiliser la bonne syntaxe pour la déclaration de l"espace de noms
 namespace App\Service;
 
-class ProductFormService
+class ProductFormServiceV2
 {
     public function getProductFormScript(): string
     {
@@ -131,12 +131,6 @@ class ProductFormService
                     const resultStock = document.querySelector(".resultStock");
                     resultStock.textContent = "0";
                 }
-
-
-                if (oldLocationField.length || locationField.length) {
-                    alimSource(data.stock);
-                }
-
                 resultUv.textContent = data.uv;
                 resultFerme.textContent = data.ferme;
                 resultSref1.textContent = data.sref1;
@@ -184,15 +178,9 @@ class ProductFormService
 
                 if (data.ean == null) { // Le produit n\'a pas été trouvé, donc marquez le champ EAN comme invalide
                 $("#ean").attr("class", "form-control col-12 is-invalid");
-                if (oldLocationField.length || locationField.length) {
-                    alimSource(data.stock);
-                }
                 $("#produit").attr("class", "d-none");
                 } else { // Le produit a été trouvé, marquez le champ EAN comme valide
                 $("#ean").attr("class", "form-control col-12 is-valid");
-                if (oldLocationField.length || locationField.length) {
-                    alimSource(data.stock);
-                }
                 $("#produit").attr("class", "mt-3");
                 document.getElementById("add_pictures_or_docs_reference").value = data.ref;
                 }
@@ -219,6 +207,9 @@ class ProductFormService
                 } else {
                 $("#ferme").attr("class", "d-none");
                 }
+                if (oldLocationField.length || locationField.length) {
+                    alimSource(data.stock);
+                }
                 });
                 } else {
                 $("#ean").attr("class", "form-control col-12 is-invalid");
@@ -231,9 +222,7 @@ class ProductFormService
                 processEan();
                 });
                 });
-                $("#ean").on("input change", function () {
-                processEan();
-                });
+
 
                 function handleFileDeletion(targetId) { // Vérifier le type d\'élément (image ou fichier)
                     var element = document.getElementById(targetId);

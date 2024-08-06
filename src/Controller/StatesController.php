@@ -337,7 +337,7 @@ class StatesController extends AbstractController
         } elseif ($metier == 'HP') {
             $secteur['metiers'] = '\'MA\', \'HP\'';
             $secteur['themeColor'] = 'danger';
-            $secteur['titre'] = ' Horti - Pépi';
+            $secteur['titre'] = ' Horti - Pépi - Maraîchage';
             $secteur['sufixeRoute'] = 'Lh';
             $secteur['dossier'] = 1;
         } elseif ($metier == 'MA') {

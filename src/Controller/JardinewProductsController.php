@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Main\JardinewProducts;
 use App\Repository\Divalto\StocksRepository;
 use App\Repository\Main\JardinewProductsRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +24,7 @@ class JardinewProductsController extends AbstractController
         ]);
     }
 
+    // importer les produits présents sur le site Jardinew pour alimenter le tableau de l'intranet
     #[Route('/jardinew/products/import', name: 'app_jardinew_products_import')]
     public function import(JardinewProductsRepository $repo, EntityManagerInterface $entityManager)
     {
@@ -41,24 +43,30 @@ class JardinewProductsController extends AbstractController
 
         $header = fgetcsv($handle); // Supposons que la première ligne du fichier CSV contient les noms des colonnes
         while (($data = fgetcsv($handle, 1000, ";")) !== false) {
-            //dd($data);
             if (count($data) < 4) { // Assurez-vous que chaque ligne a au moins 4 colonnes (name, description, price, sku)
                 $this->addFlash('danger', 'Ligne CSV invalide.');
                 continue;
             }
 
-            $sku = $data[3];
+            $sku = $data[4];
             $existingProduct = $repo->findOneBy(['sku' => $sku]);
 
+            // supprimer le produit si il est fermé sur le site Jardinew
+            if ($data[5] == 'trash' && $existingProduct) {
+                $entityManager->remove($existingProduct);
+            }
+            // créer les produits qui n'existent pas
             if (!$existingProduct) {
-
-                $product = new JardinewProducts();
-                $product->setIdWordpress($data[0]);
-                $product->setPrice((float) $data[1]);
-                $product->setSku($data[2]);
-                $product->setStock((float) $data[4]);
-                $entityManager->persist($product);
-
+                try {
+                    $product = new JardinewProducts();
+                    $product->setIdWordpress($data[0]);
+                    $product->setPermalien($data[2]);
+                    $product->setSku($data[4]);
+                    $product->setStock((float) $data[3]);
+                    $entityManager->persist($product);
+                } catch (\Throwable $th) {
+                    continue;
+                }
             }
         }
 
@@ -69,6 +77,7 @@ class JardinewProductsController extends AbstractController
         return $this->redirectToRoute('app_jardinew_products');
     }
 
+    //
     #[Route('/jardinew/products/maj_stock', name: 'app_jardinew_products_maj_stock')]
     public function majStockAndPrice(JardinewProductsRepository $repo, EntityManagerInterface $entityManager, StocksRepository $repoStock)
     {
@@ -82,8 +91,23 @@ class JardinewProductsController extends AbstractController
             }
             $product = $repo->findOneBy(['sku' => $produit->getSku()]);
             if ($produitDivalto) {
+                try {
+                    if (isset($produitDivalto['prix']) && isset($produitDivalto['ppar']) && $produitDivalto['prix'] > 0 && $produitDivalto['ppar'] > 0) {
+                        $price = $produitDivalto['prix'] / $produitDivalto['ppar'];
+                    } else {
+                        $price = $produitDivalto['prix'];
+                    }
+                } catch (\Throwable $th) {
+                    dd($produitDivalto);
+                }
                 $product->setStock($produitDivalto['stock'])
-                    ->setLastPurchase($produitDivalto['prix']);
+                    ->setRef(trim($produitDivalto['ref']))
+                    ->setSref1(trim($produitDivalto['sref1']))
+                    ->setSref2(trim($produitDivalto['sref2']))
+                    ->setUv(trim($produitDivalto['uv']))
+                    ->setDatePurchase(new DateTime($produitDivalto['dateTarif']))
+                    ->setLastPurchase($price)
+                    ->setClosed($produitDivalto['ferme']);
             } else {
                 $product->setMarge('introuvable');
             }

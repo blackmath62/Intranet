@@ -61,6 +61,20 @@
 							</a>
 						</div>
 					</div>
+					<hr/>
+					<div class="card d-none">
+						<div class="card-header">
+							<h5>Ajouter plusieurs Photos/Fichiers</h5>
+						</div>
+						<div class="card-body">
+							{{ form_start(formAddPicturesOrDocs, {'attr': {'enctype': 'multipart/form-data'}}) }}
+							{{ form_widget(formAddPicturesOrDocs.files) }}
+							{{ form_widget(formAddPicturesOrDocs.type) }}
+							{{ form_widget(formAddPicturesOrDocs.reference, {'id': 'add_pictures_or_docs_reference' }) }}
+							{{ form_widget(formAddPicturesOrDocs.importer) }}
+							{{ form_end(formAddPicturesOrDocs) }}
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
