@@ -16,7 +16,7 @@
 		</div>
 		<!-- /.card-header -->
 		<div class="card-body">
-			<p>Cette liste permet de faciliter la réponse au appel d'offre.</p>
+			<p>Cette liste permet de faciliter la réponse au appel d'offre. Lors de l'export des codes tarifs différents de TP ou **TP, par défaut le systéme vient diviser le tarif par 0.7 et vient ensuite appliquer la remise.</p>
 		</div>
 		<!-- /.card-footer-->
 	</div>
@@ -44,11 +44,39 @@
 						</p>
 						{{ form_row(form.familles) }}
 						<p>
-							<strong>Codes Tarif : (Obligatoire)</strong>
+							<strong>Codes Tarifs : (Obligatoire)</strong>
 						</p>
 						{{ form_row(form.codeTarif) }}
 					</div>
-					{{ form_row(form.filtrer, { 'attr' : { 'class' : 'col-1 btn btn-xl btn-primary m-2 float-right' }}) }}
+					<div class="form-check">
+						{{ form_widget(form.lock, { 'attr': {'class': 'form-check-input'} }) }}
+						{{ form_label(form.lock, 'Verrouiller le fichier avec le mot de passe Lhermitte@62 ?', {'label_attr': {'class': 'form-check-label'}}) }}
+						{{ form_errors(form.lock) }}
+					</div>
+
+					<div class="d-flex align-items-start mt-2 justify-content-between">
+						<div class="d-flex align-items-center">
+							<div class="input-group mr-2">
+								<span class="input-group-text py-0">{{ form_label(form.year) }}</span>
+								{{ form_widget(form.year, { 'attr': {'class': 'form-control'} }) }}
+								<span class="input-group-text py-0">{{ form_label(form.remise) }}</span>
+								{{ form_widget(form.remise, {
+								'attr': {
+									'class': 'form-control',
+									'min': '0',
+									'max': '40'
+								}
+							}) }}
+								<div class="input-group-append">
+									{{ form_widget(form.exporter, { 'attr' : { 'class' : 'btn btn-success start-button' }}) }}
+								</div>
+							</div>
+						</div>
+						<div>
+							{{ form_widget(form.filtrer, { 'attr' : { 'class' : 'btn btn-primary' }}) }}
+						</div>
+					</div>
+
 
 				</div>
 				{{ form_end(form)}}
@@ -152,10 +180,48 @@
 						</table>
 					{% else %}
 						<h4 class="text-left text-dark">
-							<i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter le champs de recherche</h4>
+							<i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter le(s) champs de recherche</h4>
 					{% endif %}
 				</div>
 			</div>
 		</div>
 	</div>
+
+	<div class="modal fade" id="modal-overlay">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="overlay">
+					<i class="fas fa-sync fa-spin"></i>
+				</div>
+				<div class="modal-header">
+					<h4 class="modal-title">Traitement des données</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p>Veuillez patienter jusqu'a la fin du traitement des données, un mail vous sera envoyer avec votre fichier.</p>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+	<script>
+		$(document).ready(function () { // Écoute de l'événement de clic sur les boutons avec la classe 'start-button'
+$('.start-button').click(function () { // Affichage du modal
+$('#modal-overlay').modal('show');
+
+// Attente du chargement complet de la page
+$(window).on('load', function () { // Masquer le modal une fois le chargement terminé
+$('#modal-overlay').modal('hide');
+});
+});
+});
+	</script>
 {% endblock %}

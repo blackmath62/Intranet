@@ -52,16 +52,16 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 MOUV.TIERS AS Tiers,
                 LTRIM(RTRIM(MOUV.OP)) AS OP,
                 CASE
-                WHEN MOUV.OP IN('C') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('D') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C', 'C 2','CO') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('D', 'D 2','DO') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 END AS MontantSignDepot,
                 CASE
                 WHEN MOUV.OP IN('CD') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
                 WHEN MOUV.OP IN('DD') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 END AS MontantSignDirect,
                 CASE
-                WHEN MOUV.OP IN('C','CD') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 END AS MontantSign
                 FROM MOUV
                 LEFT JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
@@ -123,33 +123,33 @@ class StatesByTiersRepository extends ServiceEntityRepository
                         WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 2
                         END AS CommercialId,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND  MOUV.FADT <= '$dateFinN' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN1,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <=  '$dateFinN1' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN1,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN2,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN2
         FROM MOUV
@@ -159,7 +159,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan)
         AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN'
         AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
-        AND MOUV.OP IN('C','CD','DD','D')) Reponse
+        AND MOUV.OP IN('C','CD','DD','D', 'C 2','CO', 'D 2','DO')) Reponse
         WHERE SecteurMouvement IN( $metiers ) AND CommercialId IN ($commercial)
         GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
         ORDER BY Client";
@@ -212,33 +212,33 @@ class StatesByTiersRepository extends ServiceEntityRepository
                         WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 2
                         END AS CommercialId,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN1,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN1,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN2,
         CASE
-            WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN MOUV.FAQTE
-            WHEN MOUV.OP IN('D','DD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN -1*MOUV.FAQTE
+            WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN MOUV.FAQTE
+            WHEN MOUV.OP IN('D','DD', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN -1*MOUV.FAQTE
             ELSE 0
         END AS QteSignN2
         FROM MOUV
@@ -249,7 +249,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ) )
         AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
 
-        AND MOUV.OP IN('C','CD','DD','D')) Reponse
+        AND MOUV.OP IN('C','CD','DD','D', 'C 2','CO', 'D 2','DO')) Reponse
         WHERE SecteurMouvement IN( $metiers )
         GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
         ORDER BY Client";
@@ -290,13 +290,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
         (SELECT MOUV.MONT AS Montant,
         MOUV.REMPIEMT_0004 AS Remise, ART.FAM_0001 AS Famille_Article,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN,
         CASE -- Signature du montant
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
                 ELSE 0
         END AS MontantSignN1
         FROM MOUV
@@ -304,7 +304,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         WHERE MOUV.DOS = $dossier AND MOUV.TICOD = 'C' AND MOUV.PICOD = 4 AND ART.REF NOT IN($this->artBan) AND ((MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) )
         AND ART.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL') AND ART.FAM_0001 NOT IN ('REMISE')
 
-        AND MOUV.OP IN('C','CD','DD','D')) Reponse
+        AND MOUV.OP IN('C','CD','DD','D', 'C 2','CO', 'D 2','DO')) Reponse
         GROUP BY Famille_Article
         ORDER BY SUM(MontantSignN) DESC";
         $stmt = $conn->prepare($sql);
@@ -335,16 +335,16 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 MOUV.TIERS AS Tiers,
                 LTRIM(RTRIM(MOUV.OP)) AS OP,
                 CASE
-                WHEN MOUV.OP IN('C') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('D') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C', 'C 2','CO') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('D', 'D 2','DO') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 END AS MontantSignDepot,
                 CASE
                 WHEN MOUV.OP IN('CD') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
                 WHEN MOUV.OP IN('DD') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 END AS MontantSignDirect,
                 CASE
-                WHEN MOUV.OP IN('C','CD') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 END AS MontantSign
                 FROM MOUV
                 LEFT JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
@@ -386,13 +386,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 END AS commercialId,
                 LTRIM(RTRIM(MOUV.TIERS)) AS Tiers,CLI.NOM AS Nom,LTRIM(RTRIM(MOUV.OP)) AS OP,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
 				ELSE 0
                 END AS MontantSignN1,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 END AS MontantSignN
                 FROM MOUV
                 LEFT JOIN ART WITH (INDEX = INDEX_A_MINI) ON MOUV.REF = ART.REF AND MOUV.DOS = ART.DOS
@@ -442,13 +442,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 END AS Icon,
                 LTRIM(RTRIM(MOUV.OP)) AS OP,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 ELSE 0
                 END AS MontantSignN1,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
                 ELSE 0
                 END AS MontantSignN
                 FROM MOUV
@@ -490,33 +490,33 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHEN ART.FAM_0002 IN ('ME', 'MO') THEN 'DESCHODT ALEX Port: 06.20.63.40.97'
                 END AS Commercial,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.FAQTE)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.FAQTE)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.FAQTE)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.FAQTE)
 				ELSE 0
                 END AS QteSignN2,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
 				ELSE 0
                 END AS MontantSignN2,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.FAQTE)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.FAQTE)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.FAQTE)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.FAQTE)
 				ELSE 0
                 END AS QteSignN1,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
 				ELSE 0
                 END AS MontantSignN1,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.FAQTE)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.FAQTE)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.FAQTE)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.FAQTE)
 				ELSE 0
                 END AS QteSignN,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
 				ELSE 0
                 END AS MontantSignN
                 FROM MOUV
@@ -557,18 +557,18 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 ELSE 'WTF !'
                 END AS SecteurMouvement,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
 				ELSE 0
                 END AS MontantSignN2,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
 				ELSE 0
                 END AS MontantSignN1,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
 				ELSE 0
                 END AS MontantSignN
                 FROM MOUV
@@ -608,18 +608,18 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 ELSE 'WTF !'
                 END AS SecteurMouvement,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
 				ELSE 0
                 END AS MontantSignN2,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1'THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1'THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
 				ELSE 0
                 END AS MontantSignN1,
                 CASE
-                WHEN MOUV.OP IN('C','CD') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
-                WHEN MOUV.OP IN('DD','D') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('C','CD', 'C 2','CO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (MOUV.MONT)+(-1 * MOUV.REMPIEMT_0004)
+                WHEN MOUV.OP IN('DD','D', 'D 2','DO') AND MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' THEN (-1 * MOUV.MONT)+(MOUV.REMPIEMT_0004)
 				ELSE 0
                 END AS MontantSignN
                 FROM MOUV
@@ -663,12 +663,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN1,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -709,12 +709,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT m.TIERS AS tiers, c.NOM AS nom, $type AS famille,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN1,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -748,8 +748,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT m.TIERS AS tiers,
         CASE
-            WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -783,8 +783,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT m.TIERS AS tiers, c.NOM AS nom,
         CASE
-            WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -820,8 +820,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, a.VENUN as uv,
         CASE
-            WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -867,12 +867,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         SELECT  MONTH(m.FADT) AS mois,m.TIERS AS tiers, c.NOM AS nom,
         m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, a.VENUN as uv,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN1
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -914,12 +914,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$startN1' AND m.FADT <= '$endN1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN1,
         CASE
-            WHEN m.OP IN('C','CD') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D2','DO') AND m.FADT >= '$startN' AND m.FADT <= '$endN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -961,8 +961,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
         CASE
-            WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSignN
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -1016,8 +1016,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         SELECT  YEAR(m.FADT) AS annee $commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
 		RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
         CASE
-            WHEN m.OP IN('C','CD') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSign
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -1066,28 +1066,28 @@ class StatesByTiersRepository extends ServiceEntityRepository
         SELECT  YEAR(m.FADT) AS annee $commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
 		RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
         CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             WHEN m.OP IN('C','CD', 'C 2','CO') AND YEAR(m.FADT) = '$n' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+             WHEN m.OP IN('DD','D', 'D 2','DO') AND YEAR(m.FADT) = '$n' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
          END AS montantSign,
          CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             WHEN m.OP IN('C','CD', 'C 2','CO') AND YEAR(m.FADT) = '$n1' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+             WHEN m.OP IN('DD','D', 'D 2','DO') AND YEAR(m.FADT) = '$n1' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
          END AS montantSign1,
          CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n2' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n2' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             WHEN m.OP IN('C','CD', 'C 2','CO') AND YEAR(m.FADT) = '$n2' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+             WHEN m.OP IN('DD','D', 'D 2','DO') AND YEAR(m.FADT) = '$n2' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
          END AS montantSign2,
          CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n3' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n3' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             WHEN m.OP IN('C','CD', 'C 2','CO') AND YEAR(m.FADT) = '$n3' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+             WHEN m.OP IN('DD','D', 'D 2','DO') AND YEAR(m.FADT) = '$n3' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
          END AS montantSign3,
          CASE
-             WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n4' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-             WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n4' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+             WHEN m.OP IN('C','CD', 'C 2','CO') AND YEAR(m.FADT) = '$n4' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+             WHEN m.OP IN('DD','D', 'D 2','DO') AND YEAR(m.FADT) = '$n4' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
          END AS montantSign4,
         CASE
-            WHEN m.OP IN('C','CD') AND YEAR(m.FADT) = '$n5' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-            WHEN m.OP IN('DD','D') AND YEAR(m.FADT) = '$n5' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+            WHEN m.OP IN('C','CD', 'C 2','CO') AND YEAR(m.FADT) = '$n5' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+            WHEN m.OP IN('DD','D', 'D 2','DO') AND YEAR(m.FADT) = '$n5' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
         END AS montantSign5
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -1131,28 +1131,28 @@ class StatesByTiersRepository extends ServiceEntityRepository
             SELECT  YEAR(m.FADT) AS annee $commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
             RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
             CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign1,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign2,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign3,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign4,
             CASE
-                WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
             END AS montantSign5
             FROM MOUV m
             INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -1220,24 +1220,24 @@ class StatesByTiersRepository extends ServiceEntityRepository
          RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(c.STAT_0001)) AS familleClient, RTRIM(LTRIM(a.FAM_0001)) AS familleProduit, RTRIM(LTRIM(m.REF)) AS ref,
          RTRIM(LTRIM(m.SREF1)) AS sref1,RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
          CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign1,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign2,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign3,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign4
          FROM MOUV m
          INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -1292,28 +1292,28 @@ class StatesByTiersRepository extends ServiceEntityRepository
          SELECT  YEAR(m.FADT) AS annee, RTRIM(LTRIM(v.SELCOD)) AS commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(c.STAT_0001)) AS familleClient, RTRIM(LTRIM(a.FAM_0001)) AS familleProduit, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
          RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
          CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$ddN' AND m.FADT <= '$dfN' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[0]['dd']}' AND m.FADT <= '{$datesDiff[0]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign1,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[1]['dd']}' AND m.FADT <= '{$datesDiff[1]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign2,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[2]['dd']}' AND m.FADT <= '{$datesDiff[2]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign3,
              CASE
-                 WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                 WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                 WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                 WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[3]['dd']}' AND m.FADT <= '{$datesDiff[3]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
              END AS montantSign4,
             CASE
-                WHEN m.OP IN('C','CD') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
-                WHEN m.OP IN('DD','D') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
+                WHEN m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                WHEN m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '{$datesDiff[4]['dd']}' AND m.FADT <= '{$datesDiff[4]['df']}' THEN (-1 * m.MONT)+(m.REMPIEMT_0004)
             END AS montantSign5
          FROM MOUV m
          INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -1352,8 +1352,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille, a.TYPEARTCOD AS typeArt,m.OP AS op,
         CASE
-        WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
-        WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        WHEN m.OP IN ('C','CD', 'C 2','CO') THEN m.MONT - m.REMPIEMT_0004
+        WHEN m.OP IN ('D','DD', 'D 2','DO') THEN (-1 * m.MONT) + m.REMPIEMT_0004
         END AS montant
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -1391,8 +1391,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille,m.OP AS op,
         CASE
-        WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
-        WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        WHEN m.OP IN ('C','CD', 'C 2','CO') THEN m.MONT - m.REMPIEMT_0004
+        WHEN m.OP IN ('D','DD', 'D 2','DO') THEN (-1 * m.MONT) + m.REMPIEMT_0004
         END AS montant
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF
@@ -1429,8 +1429,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
         FROM(
         SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille,m.OP AS op,
         CASE
-        WHEN m.OP IN ('C','CD') THEN m.MONT - m.REMPIEMT_0004
-        WHEN m.OP IN ('D','DD') THEN (-1 * m.MONT) + m.REMPIEMT_0004
+        WHEN m.OP IN ('C','CD', 'C 2','CO') THEN m.MONT - m.REMPIEMT_0004
+        WHEN m.OP IN ('D','DD', 'D 2','DO') THEN (-1 * m.MONT) + m.REMPIEMT_0004
         END AS montant
         FROM MOUV m
         INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON a.DOS = m.DOS AND a.REF = m.REF

@@ -84,7 +84,13 @@
 
 							<div class="info-box-content text-center">
 								<div class="d-flex justify-content-around">
-									<h2 class="info-box-text">{{ Metier.SecteurMouvement }}</h2>
+									<h2 class="info-box-text">
+										{% if Metier.SecteurMouvement == 'HP' %}
+											HP + MA
+										{% else %}
+											{{ Metier.SecteurMouvement }}
+										{% endif %}
+									</h2>
 									{% if ( (is_granted('ROLE_RESPONSABLE_SECTEUR') and is_granted("ROLE_#{Metier.SecteurMouvement}") ) or is_granted('ROLE_ADMIN') or is_granted('ROLE_BOSS') or is_granted('ROLE_BUREAU_RB') ) %}
 										<a class="btn btn-success mb-1 start-button" id='states{{Metier.SecteurMouvement}}' href="{{path('app_states_excel_metier_' ~ sufixeMetier , {'metier' : Metier.SecteurMouvement, 'dateDebutN' : dateDebutN, 'dateFinN' : dateFinN, 'dossier' : dossier } ) }}">
 											<i class="fas fa-file-excel text-white"></i>

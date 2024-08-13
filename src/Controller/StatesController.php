@@ -262,6 +262,19 @@ class StatesController extends AbstractController
                 $statesMetiers = $repo->getStatesMetier($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier);
 
                 for ($ligMetier = 0; $ligMetier < count($statesMetiers); $ligMetier++) {
+                    // On ajoute MA à HP
+                    if ($statesMetiers[$ligMetier]['SecteurMouvement'] == 'HP') {
+                        // Rechercher le secteur 'MA' pour ajouter son MontantSign
+                        for ($j = 0; $j < count($statesMetiers); $j++) {
+                            if ($statesMetiers[$j]['SecteurMouvement'] == 'MA') {
+                                // Ajouter le MontantSign de 'MA' à celui de 'HP'
+                                $statesMetiers[$ligMetier]['CATotalN'] += $statesMetiers[$j]['CATotalN'];
+                                $statesMetiers[$ligMetier]['CATotalN1'] += $statesMetiers[$j]['CATotalN1'];
+                                break; // Sortir de la boucle une fois que 'MA' a été trouvé et ajouté
+                            }
+                        }
+                    }
+
                     $statesMetiers[$ligMetier]['DeltaMetier'] = $this->calcul_pourcentage($statesMetiers[$ligMetier]['CATotalN1'], $statesMetiers[$ligMetier]['CATotalN'])['pourc'];
                     $statesMetiers[$ligMetier]['ColorMetier'] = $this->calcul_pourcentage($statesMetiers[$ligMetier]['CATotalN1'], $statesMetiers[$ligMetier]['CATotalN'])['color'];
                     $statesMetiers[$ligMetier]['FlecheMetier'] = $this->calcul_pourcentage($statesMetiers[$ligMetier]['CATotalN1'], $statesMetiers[$ligMetier]['CATotalN'])['fleche'];

@@ -1454,13 +1454,14 @@ class MouvRepository extends ServiceEntityRepository
     }
 
     // Export des tarifs de vente de Divalto
-    public function tarifsVentesDivalto($prefixe = null, $fous = null, $familles = null, $codes = null): array
+    public function tarifsVentesDivalto($prefixe = null, $fous = null, $familles = null, $codes = null, $year = null): array
     {
         $pref = "";
         $fou = "";
         $famille = '';
         $cases = "";
         $max = "";
+        $y = "";
         if ($prefixe) {
             $pref = "AND t.REF LIKE '$prefixe%'";
         }
@@ -1469,6 +1470,9 @@ class MouvRepository extends ServiceEntityRepository
         }
         if ($familles) {
             $famille = "AND a.FAM_0001 IN ($familles)";
+        }
+        if ($year) {
+            $y = "AND YEAR(x.TADT) >= ($year)";
         }
         if ($codes) {
             $lesCodes = $this->statsAchatController->miseEnForme($codes);
@@ -1502,15 +1506,111 @@ class MouvRepository extends ServiceEntityRepository
         WHERE t.DOS = 1 $pref $code ) x
         INNER JOIN ART a ON x.REF = a.REF AND a.DOS = x.DOS
         INNER JOIN SART s ON x.REF = s.REF AND s.DOS = x.DOS AND s.SREF1 = x.SREF1 AND s.SREF2 = x.SREF2
-        WHERE sort = 1 AND a.HSDT IS NULL $fou $famille
+        WHERE sort = 1 AND a.HSDT IS NULL $fou $famille $y
         --GROUP BY a.TIERS, x.REF, x.SREF1, x.SREF2, a.DES, x.VENUN, x.DOS, s.CONF, a.FAM_0001
         )reponse
         WHERE conf <> 'Usrd'
         GROUP BY tiers, ref, sref1, sref2, designation, uv, dos, conf, famille
-        ORDER BY ref
+        ORDER BY famille
         ";
-        //dd($sql);
         $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    // Export des tarifs de vente de Divalto un code tarif par ligne
+    public function tarifsVentesDivaltoUneColonneTarif($prefixe = null, $fous = null, $familles = null, $codes = null, $year = null): array
+    {
+        $pref = "";
+        $fou = "";
+        $famille = "";
+        $y = "";
+        $lesCodes = "";
+
+        //dd($fous);
+
+        if ($prefixe) {
+            $prefixe = strtoupper($prefixe);
+            $pref = "AND t.REF LIKE '$prefixe%'";
+        }
+        if ($fous) {
+            $fou = "AND a.TIERS IN ($fous)";
+        }
+        if ($familles) {
+            $famille = "AND a.FAM_0001 IN ($familles)";
+        }
+        if ($year) {
+            $y = "AND YEAR(x.TADT) >= '$year'";
+        }
+        if ($codes) {
+            $lesCodes = $this->statsAchatController->miseEnForme($codes);
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+
+        // SQL Query
+        $sql = "WITH LatestTarifs AS (
+        -- On commence par obtenir les tarifs les plus récents pour chaque code tarif, référence et configuration
+                    SELECT *,
+                        ROW_NUMBER() OVER(PARTITION BY t.TACOD, t.REF, t.SREF1, t.SREF2 ORDER BY t.TADT DESC) AS sort
+                    FROM TAR t
+                    WHERE t.DOS = 1 AND t.TACOD IN ($lesCodes) $pref
+                )
+
+                SELECT * FROM(
+                -- On filtre pour ne garder que les tarifs les plus récents
+                SELECT
+                    LTRIM(RTRIM(a.TIERS)) AS tiers,
+                    LTRIM(RTRIM(x.REF)) AS ref,
+                    LTRIM(RTRIM(s1.LIB)) AS sref1,
+                    LTRIM(RTRIM(s2.LIB)) AS sref2,
+                    LTRIM(RTRIM(a.DES)) AS designation,
+                    LTRIM(RTRIM(u.LIB)) AS uv,
+                    CASE
+                        WHEN s.CONF = 'Usrd' AND a.SREFCOD = 2 THEN 'Usrd'
+                        ELSE ''
+                    END AS conf,
+                    LTRIM(RTRIM(a.FAM_0001)) AS famille,
+                    LTRIM(RTRIM(f.LIB)) AS libelle,
+                    LTRIM(RTRIM(x.TACOD)) AS code,
+                    x.TADT AS datePu,
+                    x.PUB AS pu,
+                    a.TVAART AS tva,
+                    x.PPAR AS ppar
+                FROM LatestTarifs x
+                INNER JOIN ART a ON x.REF = a.REF AND a.DOS = x.DOS
+                LEFT JOIN SART s ON x.REF = s.REF AND s.DOS = x.DOS AND s.SREF1 = x.SREF1 AND s.SREF2 = x.SREF2
+                LEFT JOIN T012 f ON a.DOS = f.DOS AND a.FAM_0001 = f.FAM
+                LEFT JOIN T019 s1 ON a.DOS = f.DOS AND x.SREF1 = s1.SREF1
+                LEFT JOIN T019 s2 ON a.DOS = f.DOS AND x.SREF2 = s2.SREF1
+                INNER JOIN T023 u ON a.DOS = u.DOS AND a.VENUN = u.REFUN
+                WHERE x.sort = 1
+                AND a.HSDT IS NULL
+                AND a.FAM_0001 NOT IN ('', 'PRESTA', 'TRANSPOR', 'NC', 'LOCATION')
+                $fou $famille $y
+                ) rep
+                WHERE conf <> 'Usrd'
+                ORDER BY famille DESC;
+                ";
+        // Prepare and execute the SQL statement
+        $stmt = $conn->prepare($sql);
+        // Bind parameters
+        /*if ($prefixe) {
+        $stmt->bindValue(':prefixe', $prefixe . '%');
+        }
+
+        if ($fous) {
+        $stmt->bindValue(':fous', implode(',', $fous));
+        }
+        // Assuming $fous is an array
+        if ($familles) {
+        $stmt->bindValue(':familles', implode(',', $familles));
+        }
+        Assuming $familles is an array
+        if ($year) {
+        $stmt->bindValue(':year', $year, \PDO::PARAM_INT);
+        }*/
+
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
