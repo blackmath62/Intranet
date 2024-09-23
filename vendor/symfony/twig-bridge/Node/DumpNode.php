@@ -11,12 +11,15 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
+use Twig\Attribute\FirstClassTwigCallableReady;
+use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Node\Node;
 
 /**
  * @author Julien Galenski <julien.galenski@gmail.com>
  */
+#[YieldReady]
 final class DumpNode extends Node
 {
     private string $varPrefix;
@@ -28,7 +31,12 @@ final class DumpNode extends Node
             $nodes['values'] = $values;
         }
 
-        parent::__construct($nodes, [], $lineno, $tag);
+        if (class_exists(FirstClassTwigCallableReady::class)) {
+            parent::__construct($nodes, [], $lineno);
+        } else {
+            parent::__construct($nodes, [], $lineno, $tag);
+        }
+
         $this->varPrefix = $varPrefix;
     }
 

@@ -471,6 +471,10 @@ class SqlWalker implements TreeWalker
                 continue;
             }
 
+            $sqlTableAlias = $this->useSqlTableAliases
+                ? $this->getSQLTableAlias($class->getTableName(), $dqlAlias) . '.'
+                : '';
+
             $conn   = $this->em->getConnection();
             $values = [];
 
@@ -479,14 +483,22 @@ class SqlWalker implements TreeWalker
             }
 
             foreach ($class->subClasses as $subclassName) {
-                $values[] = $conn->quote($this->em->getClassMetadata($subclassName)->discriminatorValue);
+                $subclassMetadata = $this->em->getClassMetadata($subclassName);
+
+                // Abstract entity classes show up in the list of subClasses, but may be omitted
+                // from the discriminator map. In that case, they have a null discriminator value.
+                if ($subclassMetadata->discriminatorValue === null) {
+                    continue;
+                }
+
+                $values[] = $conn->quote($subclassMetadata->discriminatorValue);
             }
 
-            $sqlTableAlias = $this->useSqlTableAliases
-                ? $this->getSQLTableAlias($class->getTableName(), $dqlAlias) . '.'
-                : '';
-
-            $sqlParts[] = $sqlTableAlias . $class->getDiscriminatorColumn()['name'] . ' IN (' . implode(', ', $values) . ')';
+            if ($values !== []) {
+                $sqlParts[] = $sqlTableAlias . $class->getDiscriminatorColumn()['name'] . ' IN (' . implode(', ', $values) . ')';
+            } else {
+                $sqlParts[] = '1=0'; // impossible condition
+            }
         }
 
         $sql = implode(' AND ', $sqlParts);
@@ -1050,7 +1062,9 @@ class SqlWalker implements TreeWalker
             }
         }
 
-        if ($relation['fetch'] === ClassMetadata::FETCH_EAGER && $condExpr !== null) {
+        $fetchMode = $this->query->getHint('fetchMode')[$assoc['sourceEntity']][$assoc['fieldName']] ?? $relation['fetch'];
+
+        if ($fetchMode === ClassMetadata::FETCH_EAGER && $condExpr !== null) {
             throw QueryException::eagerFetchJoinWithNotAllowed($assoc['sourceEntity'], $assoc['fieldName']);
         }
 
@@ -2576,7 +2590,7 @@ class SqlWalker implements TreeWalker
     /**
      * Walks down an SimpleArithmeticExpression AST node, thereby generating the appropriate SQL.
      *
-     * @param AST\SimpleArithmeticExpression $simpleArithmeticExpr
+     * @param AST\Node|string $simpleArithmeticExpr
      *
      * @return string
      *

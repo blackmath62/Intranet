@@ -1,8 +1,0 @@
-parameters:
-    level: max
-    paths:
-        - %currentWorkingDirectory%/src
-        - %currentWorkingDirectory%/tests
-        - %currentWorkingDirectory%/examples
-    bootstrapFiles:
-        - %currentWorkingDirectory%/vendor-bin/phpunit/vendor/autoload.php

@@ -1,7 +1,0 @@
-parameters:
-	ignoreErrors:
-		-
-			message: "#^Constructor of class Doctrine\\\\Bundle\\\\FixturesBundle\\\\Tests\\\\Fixtures\\\\FooBundle\\\\DataFixtures\\\\RequiredConstructorArgsFixtures has an unused parameter \\$fooRequiredArg\\.$#"
-			count: 1
-			path: Tests/Fixtures/FooBundle/DataFixtures/RequiredConstructorArgsFixtures.php
-

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use DateTime;
+use Knp\Snappy\Pdf;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -24,6 +25,15 @@ class TestController extends AbstractController
 
     public function test()
     {
+
+        // Assurez-vous que wkhtmltopdf est correctement configuré
+        $pdf = new Pdf('C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe');
+        $pdf->setOption('debug-javascript', true);
+        $pdf->setOption('no-stop-slow-scripts', true);
+
+        // Chemin vers le bureau de l'utilisateur actuel
+        $desktopPath = 'C:\Users\\' . getenv("USERNAME") . '\Desktop\output.pdf';
+        $pdf->generateFromHtml('<h1>Hello World</h1>', $desktopPath);
 
         return $this->render('test/info.php');
 

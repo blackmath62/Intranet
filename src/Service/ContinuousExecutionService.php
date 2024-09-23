@@ -10,6 +10,7 @@ use App\Controller\ComptaAnalytiqueController;
 use App\Controller\ContratCommissionnaireController;
 use App\Controller\FscAttachedFileController;
 use App\Controller\FscPieceClientController;
+use App\Controller\FtpController;
 use App\Controller\HolidayController;
 use App\Repository\Divalto\ArtRepository;
 use App\Repository\Divalto\CliRepository;
@@ -40,6 +41,7 @@ class ContinuousExecutionService
     private $affairesController;
     private $fscAttachedFileController;
     private $movementBillFscController;
+    private $ftpController;
     private $repoAno;
     private $repoCompta;
     private $repoArtStockMouvEf;
@@ -61,6 +63,7 @@ class ContinuousExecutionService
         AdminEmailController $adminEmailController,
         ContratCommissionnaireController $contratCommissionnaireController,
         ClientFeuRougeOrangeController $clientFeuRougeOrangeController,
+        FtpController $ftpController,
         ComptaAnalytiqueController $comptaAnalytiqueController,
         AnomaliesController $anomaliesController,
         FscPieceClientController $movementBillFscController,
@@ -92,6 +95,7 @@ class ContinuousExecutionService
         $this->mailTreatement = $this->repoMail->getEmailTreatement();
         $this->repoUsers = $repoUsers;
         $this->holidayController = $holidayController;
+        $this->ftpController = $ftpController;
         $this->adminEmailController = $adminEmailController;
         $this->anomaliesController = $anomaliesController;
         $this->cmdRobyDelaiAccepteReporteController = $cmdRobyDelaiAccepteReporteController;
@@ -127,6 +131,7 @@ class ContinuousExecutionService
                     [$this->clientFeuRougeOrangeController, 'sendMail'],
                     [$this->anomaliesController, 'eanEnDouble'],
                     [$this->affairesController, 'updateAffaire'],
+                    [$this->ftpController, 'download'],
                     [$this->movementBillFscController, 'updateWithoutFlash'],
                     [$this->anomaliesController, 'run_auto_wash'],
                     [$this->anomaliesController, 'ControleRegimeFournisseurPieces'],

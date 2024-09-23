@@ -136,8 +136,8 @@ class PostgreSQLPlatform extends AbstractPlatform
     protected function getDateArithmeticIntervalExpression($date, $operator, $interval, $unit)
     {
         if ($unit === DateIntervalUnit::QUARTER) {
-            $interval *= 3;
-            $unit      = DateIntervalUnit::MONTH;
+            $interval = $this->multiplyInterval((string) $interval, 3);
+            $unit     = DateIntervalUnit::MONTH;
         }
 
         return '(' . $date . ' ' . $operator . ' (' . $interval . " || ' " . $unit . "')::interval)";
@@ -1191,6 +1191,19 @@ SQL
         }
 
         return $sql;
+    }
+
+    /**
+     * Get the snippet used to retrieve the default value for a given column
+     */
+    public function getDefaultColumnValueSQLSnippet(): string
+    {
+        return <<<'SQL'
+             SELECT pg_get_expr(adbin, adrelid)
+             FROM pg_attrdef
+             WHERE c.oid = pg_attrdef.adrelid
+                AND pg_attrdef.adnum=a.attnum
+        SQL;
     }
 
     /**

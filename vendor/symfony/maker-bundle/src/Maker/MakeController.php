@@ -36,11 +36,13 @@ final class MakeController extends AbstractMaker
 {
     public function __construct(private ?PhpCompatUtil $phpCompatUtil = null)
     {
-        if (null === $phpCompatUtil) {
-            @trigger_error(sprintf('Passing a "%s" instance is mandatory since version 1.42.0', PhpCompatUtil::class), \E_USER_DEPRECATED);
+        if (null !== $phpCompatUtil) {
+            @trigger_deprecation(
+                'symfony/maker-bundle',
+                '1.55.0',
+                \sprintf('Initializing MakeCommand while providing an instance of "%s" is deprecated. The $phpCompatUtil param will be removed in a future version.', PhpCompatUtil::class)
+            );
         }
-
-        $this->phpCompatUtil = $phpCompatUtil;
     }
 
     public static function getCommandName(): string
@@ -56,7 +58,7 @@ final class MakeController extends AbstractMaker
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->addArgument('controller-class', InputArgument::OPTIONAL, sprintf('Choose a name for your controller class (e.g. <fg=yellow>%sController</>)', Str::asClassName(Str::getRandomTerm())))
+            ->addArgument('controller-class', InputArgument::OPTIONAL, \sprintf('Choose a name for your controller class (e.g. <fg=yellow>%sController</>)', Str::asClassName(Str::getRandomTerm())))
             ->addOption('no-template', null, InputOption::VALUE_NONE, 'Use this option to disable template generation')
             ->addOption('invokable', 'i', InputOption::VALUE_NONE, 'Use this option to create an invokable controller')
             ->setHelp(file_get_contents(__DIR__.'/../Resources/help/MakeController.txt'))

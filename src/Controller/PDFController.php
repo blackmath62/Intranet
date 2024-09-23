@@ -75,6 +75,7 @@ class PDFController extends AbstractController
 
         $produit = $repo->getEanStock($dos, $ean);
         $htmlPdf = $this->renderView('pdf/pdfEtiquette.html.twig', ['produit' => $produit, 'ean' => $bobj->getHtmlDiv()]);
+
         $pdf->setOption('page-height', '40mm');
         $pdf->setOption('page-width', '90mm');
         $pdf->setOption('margin-bottom', 1);
@@ -87,7 +88,13 @@ class PDFController extends AbstractController
         for ($i = 1; $i <= $qte; $i++) {
             $file = 'C:/wamp64/www/Intranet/bin/' . $ean . '-' . $i . '.pdf';
             @unlink($file);
-            $pdf->generateFromHtml($htmlPdf, $file);
+            try {
+                $pdf->generateFromHtml($htmlPdf, $file);
+            } catch (\Exception $e) {
+                error_log($e->getMessage()); // Log de l'erreur
+                return new Response("Erreur lors de la génération du PDF: " . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
         }
 
         $response = new Response("Fichier(s) ajouté(s) à la file", Response::HTTP_OK);

@@ -26,19 +26,17 @@
 		<i class="fas fa-share mr-1"></i>
 		Liste des interventions
 	</a>
-	{% if fiche and fiche.lockedAt %}
+	{% if fiche and fiche.lockedAt and not is_granted('ROLE_ADMIN_MONTEUR') %}
 		{% else %}
 			<div class="card mt-2">
 				<div class="card-header d-flex flex-wrap flex-column">
 					<h3 class="card-title">Saisie fiche intervention</h3>
 					<small>
-						<strong>Affaire :
-						</strong>
-						{{intervention.code.libelle }}
+						<strong>Affaire :</strong>
+						{{ intervention.code.libelle }}
 					</small>
 					<small>
-						<strong>Client :
-						</strong>
+						<strong>Client :</strong>
 						{{intervention.code.nom }}
 					</small>
 					<small>
@@ -76,7 +74,7 @@
 	{% endif %}
 
 	{% if fiche.here == 1 %}
-		{% if fiche.lockedAt %}
+		{% if fiche.lockedAt and not is_granted('ROLE_ADMIN_MONTEUR') %}
 			{% else %}
 				<a class="btn btn-secondary col-12 col-sm-12 mb-2" data-toggle="modal" data-target="#modal-heures">
 					<i class="fa-solid fa-truck pr-2"></i>Déclarer Heures Déplac, Dépôt et Travaux<i class="fa-solid fa-hammer pl-2"></i>
@@ -106,7 +104,7 @@
 			</div>
 		</div>
 	</div>
-	{% if fiche and fiche.lockedAt %}
+	{% if fiche and fiche.lockedAt and not is_granted('ROLE_ADMIN_MONTEUR') %}
 		{% else %}
 			{% if heures %}
 				<div class="card">
@@ -294,7 +292,7 @@
 					</li>
 				</ul>
 			</div>
-			{% if fiche and fiche.lockedAt %}
+			{% if fiche and fiche.lockedAt and not is_granted('ROLE_ADMIN_MONTEUR') %}
 				{% else %}
 					<div class="card-footer">
 						{% if app.request.attributes.get('ficheId') %}

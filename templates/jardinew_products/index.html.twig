@@ -1,106 +1,301 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello JardinewProductsController!
+{% block title %}Mise à jour Jardinew
 {% endblock %}
 
 {% block body %}
 	<div class="row">
 		<div class="col-md-12">
-			<div class="card">
-				<div class="card-header d-flex justify-content-between">
-					<h2 class="card-title">Liste des produits sur le site Jardinew</h2>
-					<a title='Metre à jour les données' href="{{ path('app_jardinew_products_import') }}" class="btn btn-primary ml-auto">
-						<i class="fas fa-redo-alt pr-2"></i>Mettre à jour
-					</a>
-					<a title='Metre à jour les données' href="{{ path('app_jardinew_products_maj_stock') }}" class="btn btn-warning ml-auto">
-						<i class="fas fa-solid fa-dollar-sign pr-2"></i>Maj Stock et prix
-					</a>
-				</div>
-				<!-- /.card-header -->
-				<div class="card-body">
-					{% if products %}
-						<table id="example1" class="table table-bordered table-striped">
-							<thead>
-								<tr>
-									<th class="text-center">
-										<span>Id Wordpress</span>
-									</th>
-									<th class="text-center">
-										<span>Sku</span>
-									</th>
-									<th class="text-center">
-										<span>Référence</span>
-									</th>
-									<th class="text-center">
-										<span>Sref1</span>
-									</th>
-									<th class="text-center">
-										<span>Sref2</span>
-									</th>
-									<th class="text-center">
-										<span>Stock</span>
-									</th>
-									<th class="text-center">
-										<span>Dernier PA</span>
-									</th>
-									<th class="text-center">
-										<span>Date PA</span>
-									</th>
-									<th class="text-center">
-										<span>Marge</span>
-									</th>
-									<th class="text-center">
-										<span>PV</span>
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-
-
-								{% for product in products %}
+			<form id="products-form" method="post" action="{{ path('app_jardinew_process_selected_products') }}">
+				<div class="card">
+					<div class="card-header d-flex justify-content-between">
+						<h2 class="card-title">Liste des produits sur le site Jardinew</h2>
+						<button type="submit" class="btn btn-success">Valider les produits selectionnés</button>
+						<a title='Metre à jour les données' href="{{ path('app_jardinew_products_import') }}" class="btn btn-primary ml-auto">
+							<i class="fas fa-redo-alt pr-2"></i>Mettre à jour
+						</a>
+						<a title='Metre à jour les données' href="{{ path('app_jardinew_products_maj_stock') }}" class="btn btn-warning ml-auto">
+							<i class="fas fa-solid fa-dollar-sign pr-2"></i>Maj Stock et prix
+						</a>
+					</div>
+					<!-- /.card-header -->
+					<div class="card-body">
+						{% if products %}
+							<table id="example1" class="table table-bordered table-striped">
+								<thead>
 									<tr>
-										<td class="text-center">
-											<a class="text-dark" href="{{ product.permalien }}" target="_blank">{{ product.idWordpress }}</a>
-										</td>
-										<td class="text-left">
-											<a class="text-dark">{{ product.sku }}</a>
-										</td>
-										<td class="text-center">
-											<a class="text-dark">{{ product.ref }}</a>
-										</td>
-										<td class="text-center">
-											<a class="text-dark">{{ product.sref1}}</a>
-										</td>
-										<td class="text-center">
-											<a class="text-dark">{{ product.sref2}}</a>
-										</td>
-										<td class="text-center">
-											<a class="text-dark">{{ product.stock }}</a>
-										</td>
-										<td class="text-center">
-											<a class="text-dark">{{ product.lastPurchase }}</a>
-										</td>
-										<td class="text-center">
-											<a class="text-dark"></a>
-										</td>
-										<td class="text-center">
-											<a class="text-dark">{{ product.marge }}</a>
-										</td>
-										<td class="text-center">
-											<a class="text-dark"></a>
-										</td>
-
+										<th class="text-center">
+											<span>#</span>
+										</th>
+										<th class="text-center">
+											<span>Id Wordpress</span>
+										</th>
+										<th class="text-center">
+											<span>Sku</span>
+										</th>
+										<th class="text-center">
+											<span>Référence</span>
+										</th>
+										<th class="text-center">
+											<span>Sref1</span>
+										</th>
+										<th class="text-center">
+											<span>Sref2</span>
+										</th>
+										<th class="text-center">
+											<span>Stock</span>
+										</th>
+										<th class="text-center">
+											<span>Uv</span>
+										</th>
+										<th class="text-center">
+											<span>PA Jardinew HT précédent</span>
+										</th>
+										<th class="text-center">
+											<span>Facture de référence</span>
+										</th>
+										<th class="text-center">
+											<span>PA Jardinew HT</span>
+										</th>
+										<th class="text-center">
+											<span>Coefficiant de conversion</span>
+										</th>
+										<th class="text-center">
+											<span>Marge sur TTC</span>
+										</th>
+										<th class="text-center">
+											<span>PV TTC</span>
+										</th>
+										<th class="text-center">
+											<span>Changement</span>
+										</th>
 									</tr>
-								{% endfor %}
-							</tbody>
-						</tr>
-					</tfoot>
-				</table>
-			{% else %}
-				<h4 class="text-left text-dark">
-					<i class="fas fa-info-circle pr-2 text-primary"></i>Aucun produit relié à Jardinew actuellement
-				</h4>
-			{% endif %}
-		</div>
-	</div>
-{% endblock %}
+								</thead>
+								<tbody>
+									{% for product in products %}
+										<tr>
+											<td class="text-center">
+												{% set check = "" %}
+												{% if product.validationPrice == true %}
+													{% set check = "checked" %}
+												{% endif %}
+												<input type="checkbox" name="selected_products[]" value="{{ product.idWordpress }}" {{ check }}>
+											</td>
+											<td class="text-center">
+												<a href="{{ product.permalien }}" target="_blank">{{ product.idWordpress }}</a>
+											</td>
+											<td class="text-left">
+												<a class="text-dark">{{ product.sku }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ product.ref }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ product.sref1}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ product.sref2}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ product.stock }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ product.uv }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ product.previousPurchase|number_format(3, ',', ' ') }}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">
+													{% if product.numberPurchase > 0 %}
+														{{product.numberPurchase }}
+														<a href="#" class="open-modal" data-id="{{ product.idWordpress }}" data-purchase="{{ product.numberPurchase }}">
+															<i class="fa-regular fa-hand"></i>
+														</a>
+													{% endif %}
+												</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{product.lastPurchase|number_format(3, ',', ' ')}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{product.coeffConversion}}</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ product.marge|number_format(2, '.', ' ') }}%</a>
+											</td>
+											<td class="text-center">
+												<a class="text-dark">{{ product.price|number_format(3, ',', ' ') }}</a>
+											</td>
+											<td class="text-center">
+												{% if (product.previousPurchase - product.lastPurchase) > 0.1 or (product.lastPurchase - product.previousPurchase) > 0.1 %}
+													<b>
+														<a class="text-danger">
+															Changement de prix
+														</a>
+													</b>
+												{% endif %}
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						{% else %}
+							<h4 class="text-left text-dark">
+								<i class="fas fa-info-circle pr-2 text-primary"></i>Aucun produit relié à Jardinew actuellement
+							</h4>
+						{% endif %}
+					</div>
+				</div>
+			</form>
+
+			<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title">Ajout/Suppression de condition pour le produit
+								<span id="modal-product-id"></span>
+							</h4>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<div id="existingConditions"></div>
+							<form id="modalForm">
+								<div class="mb-3">
+									<label for="modalFacture" class="form-label">Pour la Facture</label>
+									<input type="text" class="form-control" id="modalPurchase" readonly>
+								</div>
+								<div class="mb-3">
+									<label for="modalFacture" class="form-label">de l'Id Wordpress</label>
+									<input type="text" class="form-control" id="modalIdWordpress" readonly>
+								</div>
+								<div class="mb-3">
+									<label for="modalCoeff" class="form-label">Appliquer le Coefficient de Correction</label>
+									<input type="number" class="form-control" id="modalCoeff" step="0.001" placeholder="Entrez le coefficient">
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer justify-content-between">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+							<button id='saveChanges' type="button" class="btn btn-primary">Sauvegarder</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		{% endblock %}
+		{% block javascripts %}
+			{{ parent() }}
+
+			<script>
+				// Ouverture de la modal et chargement des conditions
+document.querySelectorAll('.open-modal').forEach(function (button) {
+button.addEventListener('click', function (e) {
+e.preventDefault(); // Empêcher le comportement par défaut du lien
+
+let idWordpress = this.getAttribute('data-id'); // Récupère l'ID Wordpress depuis l'attribut data
+let purchase = this.getAttribute('data-purchase');
+// Récupère la facture (purchase)
+
+// Remplir les champs cachés dans la modal
+document.getElementById('modalIdWordpress').value = idWordpress;
+document.getElementById('modalPurchase').value = purchase;
+
+// Appel AJAX pour récupérer les conditions existantes
+$.ajax({
+url: '/list-condition',
+method: 'POST',
+contentType: 'application/json',
+data: JSON.stringify(
+{idWordpress: idWordpress}
+),
+success: function (data) {
+let conditionsContainer = $('#existingConditions');
+conditionsContainer.empty(); // Effacer le contenu existant
+
+if (data.conditions.length > 0) {
+data.conditions.forEach(condition => {
+conditionsContainer.append(`
+                            <div class="condition-item d-flex flex-row justify-content-between">
+                                <span>Facture: ${
+condition.purchase
+}</span><span> Coeff: ${
+condition.coeffCorrection
+}</span>
+                                <button class="btn btn-danger btn-sm" onclick="deleteCondition(${
+condition.id
+})"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        `);
+});
+} else {
+conditionsContainer.html('<p>Aucune condition existante</p>');
+}
+},
+error: function (xhr, status, error) {
+console.error(error); // Gérer les erreurs éventuelles
+}
+});
+
+// Ouvrir la modal
+$('#productModal').modal('show');
+});
+});
+
+// Sauvegarder la condition lors du clic sur le bouton "Sauvegarder"
+document.getElementById('saveChanges').addEventListener('click', function () {
+let idWordpress = document.getElementById('modalIdWordpress').value;
+let purchase = document.getElementById('modalPurchase').value;
+let coeff = document.getElementById('modalCoeff').value;
+
+if (coeff === "") {
+alert("Veuillez entrer un coefficient de correction.");
+return;
+}
+
+// Appel AJAX pour créer la condition
+$.ajax({
+url: '/create-condition',
+method: 'POST',
+contentType: 'application/json',
+data: JSON.stringify(
+{idWordpress: idWordpress, purchase: purchase, coeff: coeff}
+),
+success: function (data) {
+if (data.status === 'success') {
+$('#productModal').modal('hide');
+// Redirection vers la route de mise à jour du stock
+window.location.href = `/jardinew/products/maj_stock/${idWordpress}`;
+}
+},
+error: function (xhr, status, error) {
+console.error(error); // Gérer les erreurs éventuelles
+}
+});
+
+});
+
+function deleteCondition(id) {
+$.ajax({
+url: '/delete-condition',
+method: 'POST',
+contentType: 'application/json',
+data: JSON.stringify(
+{id: id}
+),
+success: function (data) {
+if (data.status === 'deleted') {
+alert('Condition supprimée avec succès !');
+$ (`.condition-item:has(button[onclick="deleteCondition(${id})"])`).remove();
+}
+},
+error: function (xhr, status, error) {
+console.error(error); // Gérer les erreurs éventuelles
+}
+});
+}
+			</script>
+
+		{% endblock %}

@@ -56,6 +56,18 @@ class JardinewProducts
     #[ORM\Column(nullable: true)]
     private ?float $port = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $previousPurchase = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $coeffConversion = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $NumberPurchase = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $validationPrice = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -232,6 +244,54 @@ class JardinewProducts
     public function setPort(?float $port): static
     {
         $this->port = $port;
+
+        return $this;
+    }
+
+    public function getPreviousPurchase(): ?float
+    {
+        return $this->previousPurchase;
+    }
+
+    public function setPreviousPurchase(?float $previousPurchase): static
+    {
+        $this->previousPurchase = $previousPurchase;
+
+        return $this;
+    }
+
+    public function getCoeffConversion(): ?float
+    {
+        return $this->coeffConversion;
+    }
+
+    public function setCoeffConversion(?float $coeffConversion): static
+    {
+        $this->coeffConversion = $coeffConversion;
+
+        return $this;
+    }
+
+    public function getNumberPurchase(): ?int
+    {
+        return $this->NumberPurchase;
+    }
+
+    public function setNumberPurchase(?int $NumberPurchase): static
+    {
+        $this->NumberPurchase = $NumberPurchase;
+
+        return $this;
+    }
+
+    public function isValidationPrice(): ?bool
+    {
+        return $this->validationPrice;
+    }
+
+    public function setValidationPrice(?bool $validationPrice): static
+    {
+        $this->validationPrice = $validationPrice;
 
         return $this;
     }

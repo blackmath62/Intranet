@@ -1,5 +1,0 @@
-monolog:
-    handlers:
-        custom:
-            type: noop
-            process_psr_3_messages: true

@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1>Récupération des blob tiers</h1>
+				</div>
+				{{ form_start(form) }}
+				<div class='d-flex'>
+					<div class="p-1 mt-2">
+						Veuillez selectionner les paramétres :
+					</div>
+					<div class="p-1">
+						{{ form_widget(form.dos) }}
+					</div>
+					<div class="p-1">
+						{{ form_widget(form.typeTiers) }}
+					</div>
+					<div class="p-1">
+						{{ form_row(form.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }}
+						) }}
+					</div>
+				</div>
+				{{ form_end(form) }}
+			</div>
+		</div>
+		<!-- /.container-fluid -->
+	</section>
+	<section>
+		<div class="card">
+			<div class="card-body">
+				{% if datas %}
+					<table id="example1" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="text-center">
+									<span>Tiers</span>
+								</th>
+								<th class="text-center">
+									<span>Nom</span>
+								</th>
+								<th class="text-center">
+									<span>Note Tiers</span>
+								</th>
+								<th class="text-center">
+									<span>Note Commande</span>
+								</th>
+								<th class="text-center">
+									<span>Note BL</span>
+								</th>
+								<th class="text-center">
+									<span>Note Facture</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for data in datas %}
+								<tr>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.tiers }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.nom }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.blob|raw|striptags }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.blob2|raw|striptags }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.blob3|raw|striptags }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.blob4|raw|striptags }}</a>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					<h4 class="text-left text-dark">
+						<i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter les paramétres de recherche</h4>
+				{% endif %}
+			</div>
+		</div>
+	</section>
+{% endblock %}

@@ -46,6 +46,10 @@ final class MakerTestProcess
     public function run($allowToFail = false, array $envVars = []): self
     {
         if (false !== ($timeout = getenv('MAKER_PROCESS_TIMEOUT'))) {
+            if ('null' === $timeout) {
+                $timeout = null;
+            }
+
             // Setting a value of null allows for step debugging
             $this->process->setTimeout($timeout);
         }
@@ -53,7 +57,7 @@ final class MakerTestProcess
         $this->process->run(null, $envVars);
 
         if (!$allowToFail && !$this->process->isSuccessful()) {
-            throw new \Exception(sprintf('Error running command: "%s". Output: "%s". Error: "%s"', $this->process->getCommandLine(), $this->process->getOutput(), $this->process->getErrorOutput()));
+            throw new \Exception(\sprintf('Error running command: "%s". Output: "%s". Error: "%s"', $this->process->getCommandLine(), $this->process->getOutput(), $this->process->getErrorOutput()));
         }
 
         return $this;

@@ -12,8 +12,9 @@
 namespace Symfony\Bundle\MakerBundle\Security;
 
 use PhpParser\Node;
-use Symfony\Bundle\MakerBundle\Util\ClassSourceManipulator;
+use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassSource\Model\ClassProperty;
+use Symfony\Bundle\MakerBundle\Util\ClassSourceManipulator;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -27,6 +28,8 @@ final class UserClassBuilder
     public function addUserInterfaceImplementation(ClassSourceManipulator $manipulator, UserClassConfiguration $userClassConfig): void
     {
         $manipulator->addInterface(UserInterface::class);
+
+        $this->addUniqueConstraint($manipulator, $userClassConfig);
 
         $this->addGetUsername($manipulator, $userClassConfig);
 
@@ -57,7 +60,6 @@ final class UserClassBuilder
                     propertyName: $userClassConfig->getIdentityPropertyName(),
                     type: 'string',
                     length: 180,
-                    unique: true,
                 )
             );
         } else {
@@ -99,34 +101,38 @@ final class UserClassBuilder
         if ($userClassConfig->isEntity()) {
             // add entity property
             $manipulator->addEntityField(
-                new ClassProperty(propertyName: 'roles', type: 'json')
+                new ClassProperty(propertyName: 'roles', type: 'json', comments: ['@var list<string> The user roles'])
             );
         } else {
             // add normal property
             $manipulator->addProperty(
                 name: 'roles',
-                defaultValue: new Node\Expr\Array_([], ['kind' => Node\Expr\Array_::KIND_SHORT])
+                defaultValue: new Node\Expr\Array_([], ['kind' => Node\Expr\Array_::KIND_SHORT]),
+                comments: [
+                    '@var list<string> The user roles',
+                ]
             );
 
             $manipulator->addGetter(
                 'roles',
                 'array',
-                false
-            );
-
-            $manipulator->addSetter(
-                'roles',
-                'array',
-                false
+                false,
             );
         }
+
+        $manipulator->addSetter(
+            'roles',
+            'array',
+            false,
+            ['@param list<string> $roles']
+        );
 
         // define getRoles (if it was defined above, this will override)
         $builder = $manipulator->createMethodBuilder(
             'getRoles',
             'array',
             false,
-            ['@see UserInterface']
+            ['@see UserInterface', '@return list<string>']
         );
 
         // $roles = $this->roles
@@ -226,7 +232,7 @@ final class UserClassBuilder
             'password',
             'getPassword',
             'string',
-            false,
+            true,
             [
                 '@see PasswordAuthenticatedUserInterface',
             ]
@@ -254,5 +260,20 @@ final class UserClassBuilder
         );
 
         $manipulator->addMethodBuilder($builder);
+    }
+
+    private function addUniqueConstraint(ClassSourceManipulator $manipulator, UserClassConfiguration $userClassConfig): void
+    {
+        if (!$userClassConfig->isEntity()) {
+            return;
+        }
+
+        $manipulator->addAttributeToClass(
+            'ORM\\UniqueConstraint',
+            [
+                'name' => 'UNIQ_IDENTIFIER_'.strtoupper(Str::asSnakeCase($userClassConfig->getIdentityPropertyName())),
+                'fields' => [$userClassConfig->getIdentityPropertyName()],
+            ]
+        );
     }
 }

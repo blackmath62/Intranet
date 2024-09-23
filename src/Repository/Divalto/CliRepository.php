@@ -210,4 +210,28 @@ class CliRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    public function translateBlobTiers($dos, $typeTiers): array
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT c.TIERS AS Reference, c.NOM AS Nom, MAX(convert(varchar(max),n.NOTEBLOB)) AS Blob,
+        MAX(convert(varchar(max),n2.NOTEBLOB)) AS Blob2,MAX(convert(varchar(max),n3.NOTEBLOB)) AS Blob3,MAX(convert(varchar(max),n4.NOTEBLOB)) AS Blob4
+        FROM $typeTiers c
+        LEFT JOIN MNOTE n ON n.NOTE = c.NOTE
+        LEFT JOIN T041 nt2 ON nt2.TEXCOD = c.TEXCOD_0002
+        LEFT JOIN MNOTE n2 ON n2.NOTE = nt2.NOTE
+        LEFT JOIN T041 nt3 ON nt3.TEXCOD = c.TEXCOD_0003
+        LEFT JOIN MNOTE n3 ON n3.NOTE = nt3.NOTE
+        LEFT JOIN T041 nt4 ON nt4.TEXCOD = c.TEXCOD_0004
+        LEFT JOIN MNOTE n4 ON n4.NOTE = nt4.NOTE
+        WHERE c.DOS = $dos AND c.HSDT is NULL AND
+        (c.NOTE > 0 OR c.TEXCOD_0002 <> '' OR c.TEXCOD_0003 <> '' OR c.TEXCOD_0004 <> ''
+        )
+        GROUP BY c.TIERS, c.NOM
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
 }

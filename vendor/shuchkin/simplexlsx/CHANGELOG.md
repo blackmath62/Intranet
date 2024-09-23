@@ -1,5 +1,20 @@
 # Changelog
 
+# 1.1.11 (2024-07-06)
+* fixed [#157](https://github.com/shuchkin/simplexlsx/issues/157)
+
+## 1.1.10 (2023-04-27)
+* Cell comments returns in rowsEx
+* hyperlinks moved to rowsEx
+* all fields and methods public now
+* helper methods is static now
+
+## 1.0.21 (2023-04-09)
+* fixed activeSheet(Tab)
+
+## 1.0.20 (2023-04-05)
+* fixed activeSheet(Tab)
+
 ## 1.0.18 (2023-02-04)
 * fixed regex to detect date/datetime in cell
 * added $this->sheetMeta($worksheetIndex = null) to get metadata from workbook.xml

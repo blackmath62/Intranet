@@ -72,7 +72,7 @@ final class MakerTestDetails
 
     public function addExtraDependencies(string ...$packages): self
     {
-        $this->extraDependencies += $packages;
+        $this->extraDependencies = [...$this->extraDependencies, ...$packages];
 
         return $this;
     }
@@ -125,11 +125,11 @@ final class MakerTestDetails
     {
         $depBuilder = $this->getDependencyBuilder();
 
-        return array_merge(
-            $depBuilder->getAllRequiredDependencies(),
-            $depBuilder->getAllRequiredDevDependencies(),
-            $this->extraDependencies
-        );
+        return [
+            ...$depBuilder->getAllRequiredDependencies(),
+            ...$depBuilder->getAllRequiredDevDependencies(),
+            ...$this->extraDependencies,
+        ];
     }
 
     public function getExtraDependencies(): array
@@ -192,7 +192,7 @@ final class MakerTestDetails
         @trigger_deprecation(
             'symfony/maker-bundle',
             'v1.53.0',
-            sprintf('%s() will be removed in a future version, use MakerTestDetails::skipTest() instead.', __METHOD__)
+            \sprintf('%s() will be removed in a future version, use MakerTestDetails::skipTest() instead.', __METHOD__)
         );
 
         $this->skipOnSymfony7 = true;
@@ -205,7 +205,7 @@ final class MakerTestDetails
         @trigger_deprecation(
             'symfony/maker-bundle',
             'v1.53.0',
-            sprintf('%s() will be removed in a future version, use MakerTestDetails::isTestSkipped() instead.', __METHOD__)
+            \sprintf('%s() will be removed in a future version, use MakerTestDetails::isTestSkipped() instead.', __METHOD__)
         );
 
         return $this->skipOnSymfony7;

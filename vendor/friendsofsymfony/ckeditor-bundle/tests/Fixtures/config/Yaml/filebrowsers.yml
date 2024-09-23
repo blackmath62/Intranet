@@ -1,4 +1,0 @@
-fos_ck_editor:
-    filebrowsers:
-        - VideoBrowse
-        - VideoUpload
