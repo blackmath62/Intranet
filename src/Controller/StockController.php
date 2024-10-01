@@ -26,6 +26,7 @@ class StockController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $stockProduits = $repo->getStocks($form->getData()['ref'], $form->getData()['des'], $form->getData()['cmd'], $form->getData()['direct']);
         }
+        //dd($stockProduits);
 
         return $this->render('stock/index.html.twig', [
             'title' => 'Stocks',

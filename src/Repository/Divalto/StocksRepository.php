@@ -51,10 +51,10 @@ class StocksRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "SELECT * FROM(
             SELECT dos, ArtFerme,Fournisseur, LTRIM(RTRIM(Ref)) AS Ref, LTRIM(RTRIM(Sref1)) AS Sref1, LTRIM(RTRIM(Sref2)) AS Sref2,
-            Uv, Designation, Stock, SUM(cmdCli) AS cmdCli, SUM(cmdFou) AS cmdFou, (-1 * SUM(cmdCli) + SUM(cmdFou) + Stock) AS total,
+            Uv, Designation,nature, Stock, SUM(cmdCli) AS cmdCli, SUM(cmdFou) AS cmdFou, (-1 * SUM(cmdCli) + SUM(cmdFou) + Stock) AS total,
             ABS(SUM(cmdCli)) + ABS(SUM(cmdFou)) + ABS(Stock) AS vtl
             FROM( -- last
-            SELECT dos, ArtFerme,Fournisseur, Ref, Sref1, Sref2,Uv, Designation, Stock,
+            SELECT dos, ArtFerme,Fournisseur, Ref, Sref1, Sref2,Uv, Designation,nature, Stock,
             CASE
             WHEN m.OP IN ($clientV) THEN m.CDQTE
             WHEN m.OP IN ($clientA) THEN -1 * m.CDQTE
@@ -66,9 +66,10 @@ class StocksRepository extends ServiceEntityRepository
             ELSE 0
             END AS cmdFou
             FROM( --ad
-            SELECT dos, ArtFerme,Fournisseur, Ref, Sref1, Sref2,Uv, Designation, Sum(Stock) AS Stock
+            SELECT dos, ArtFerme,Fournisseur, Ref, Sref1, Sref2,Uv, Designation,nature, Sum(Stock) AS Stock
             FROM( --rep
             SELECT LTRIM(RTRIM(sr.DOS)) AS dos, LTRIM(RTRIM(a.TIERS)) AS Fournisseur, sr.REF AS Ref, sr.SREF1 AS Sref1, sr.SREF2 AS Sref2, LTRIM(RTRIM(a.DES)) AS Designation, a.VENUN AS Uv,
+            s.NATURESTOCK AS nature,
             CASE
                 WHEN sr.REF = s.REFERENCE AND sr.SREF1 = s.SREFERENCE1 AND sr.SREF2 = s.SREFERENCE2 THEN s.QTETJSENSTOCK
                 ELSE 0
@@ -83,9 +84,9 @@ class StocksRepository extends ServiceEntityRepository
 			AND s.QTETJSENSTOCK IS NOT NULL $natureS
             WHERE sr.DOS = 1  $referenceReponse $designationReponse
             ) reponse
-            GROUP BY dos, ArtFerme, Fournisseur, Ref, Sref1, Sref2, Designation, Uv )rep
+            GROUP BY dos, ArtFerme, Fournisseur, Ref, Sref1, Sref2, Designation, Uv, nature )rep
             LEFT JOIN MOUV m ON Ref = m.REF AND dos = m.DOS AND Sref1 = m.SREF1 AND Sref2 = m.SREF2 AND 1 = m.CDCE4 AND m.PICOD = 2 AND m.CDDT >= '2015-01-01' $referenceLast $designationLast)ad
-            GROUP BY dos, ArtFerme,Fournisseur, Ref, Sref1, Sref2,Uv, Designation, Stock)last
+            GROUP BY dos, ArtFerme,Fournisseur, Ref, Sref1, Sref2,Uv, Designation,nature, Stock)last
             WHERE ($commande)
             ORDER BY ArtFerme DESC
         ";

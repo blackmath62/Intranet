@@ -302,10 +302,9 @@ class AffairesController extends AbstractController
         $formComment = $this->createForm(CommentairesType::class, $commentaire);
         $formComment->handleRequest($request);
         if ($formComment->isSubmitted() && $formComment->isValid()) {
-
-            $dd = $formComment->get('content')->getData();
-
+            $content = $formComment->get('content')->getData();
             $commentaire->setCreatedAt(new DateTime())
+                ->setContent($content)
                 ->setUser($this->getUser())
                 ->setTables('app_piece_affaire')
                 ->setIdentifiant($affaire->getId());
@@ -314,10 +313,6 @@ class AffairesController extends AbstractController
             $entityManager->flush();
 
             return $this->redirectToRoute($request->attributes->get('_route'), ['affaire' => $affaire->getCode()]);
-        } else {
-            $entityManager = $this->entityManager;
-            $entityManager->remove($commentaire);
-            $entityManager->flush();
         }
 
         $intervention = new InterventionMonteurs();

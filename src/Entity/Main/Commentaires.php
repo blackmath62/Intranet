@@ -17,7 +17,7 @@ class Commentaires
     #[ORM\Column(type: "datetime")]
     private $createdAt;
 
-    #[ORM\Column(type: "text")]
+    #[ORM\Column(type: "text", nullable: true)]
     private $content;
 
     #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "commentaires")]
