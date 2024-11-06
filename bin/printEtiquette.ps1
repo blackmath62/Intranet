@@ -2,7 +2,7 @@
 $files = Get-ChildItem "$Path\*.pdf"
 $AdobeReaderPath = "C:\Program Files\Adobe\Acrobat DC\Acrobat\Acrobat.exe"  # Mettez à jour le chemin si nécessaire
 
-$MYPRINTER = "\\SRVAD\IMP_EAN_PRODUIT"
+$MYPRINTER = "IMP_EAN_PRODUIT"
 $PRINTERTMP = (Get-CimInstance -ClassName CIM_Printer | Where-Object { $_.Name -eq $MYPRINTER })
 $PRINTERTMP | Invoke-CimMethod -MethodName SetDefaultPrinter | Out-Null
 

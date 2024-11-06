@@ -234,4 +234,285 @@ class CliRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    public function getTiersContactsAdresses($dos, $typeTiers): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(c.TIERS)) AS tiers, CONCAT(LTRIM(RTRIM(c.TIERS)),'#',LTRIM(RTRIM(u.CONTACT))) AS code,
+CASE
+WHEN u.PRENOM <> '' AND u.NOM <> '' THEN CONCAT(LTRIM(RTRIM(u.PRENOM)), ' ', LTRIM(RTRIM(u.NOM)) )
+WHEN u.PRENOM = '' AND u.NOM <> '' THEN LTRIM(RTRIM(u.NOM))
+WHEN u.PRENOM <> '' AND u.NOM = '' THEN LTRIM(RTRIM(u.PRENOM))
+WHEN u.PRENOM = '' AND u.NOM = '' THEN LTRIM(RTRIM(c.NOM))
+END AS nom
+, CASE
+WHEN u.TIT = 'MR' THEN 'Monsieur'
+WHEN u.TIT = 'Mme' THEN 'Madame'
+ELSE ''
+END AS titre,
+u.LIB AS fonction,
+CASE
+WHEN u.TEL <> '0000000000' THEN REPLACE(REPLACE(u.TEL,'.',''),' ','')
+ELSE ''
+END AS tel,
+CASE
+WHEN u.TELGSM  <> '0000000000' THEN REPLACE(REPLACE(u.TELGSM,'.',''),' ','')
+ELSE ''
+END AS gsm
+,
+CASE
+WHEN u.FAX <> '0000000000' THEN REPLACE(REPLACE(u.FAX,'.',''),' ','')
+ELSE ''
+END AS fax, LOWER(u.EMAIL) AS email, 'Contact' AS typeAdr,
+'' AS compl1, '' AS compl2, '' AS rue, '' AS localite
+, '' AS cpostal, '' AS ville, '' AS pays
+FROM $typeTiers c
+INNER JOIN T2 u ON c.DOS = u.DOS AND c.TIERS = u.TIERS -- Contacts
+WHERE c.DOS = $dos AND c.HSDT IS NULL
+
+UNION
+-- ADRESSES
+SELECT LTRIM(RTRIM(c.TIERS)) AS tiers, CONCAT(LTRIM(RTRIM(c.TIERS)),'#',LTRIM(RTRIM(a.ADRCOD))) AS code, LTRIM(RTRIM(a.NOM)) AS nom, '' AS titre, '' AS fonction,
+CASE
+WHEN a.TEL <> '0000000000' THEN REPLACE(REPLACE(a.TEL,'.',''),' ','')
+ELSE ''
+END AS tel, '' AS gsm,
+CASE
+WHEN a.FAX <> '0000000000' THEN REPLACE(REPLACE(a.FAX,'.',''),' ','')
+ELSE ''
+END AS fax
+, LOWER(a.EMAIL) AS email,
+CASE
+WHEN c.ADRCOD_0002 = a.ADRCOD THEN 'Adresse Commande'
+WHEN c.ADRCOD_0003 = a.ADRCOD THEN 'Adresse de livraison'
+WHEN c.ADRCOD_0004 = a.ADRCOD THEN 'Adresse de facturation'
+ELSE 'Autre adresse'
+END AS typeAdr,
+LTRIM(RTRIM(a.ADRCPL1)) AS compl1, LTRIM(RTRIM(a.ADRCPL2)) AS compl2, LTRIM(RTRIM(a.RUE)) AS rue, LTRIM(RTRIM(a.LOC)) AS localite
+, LTRIM(RTRIM(a.CPOSTAL)) AS cpostal, LTRIM(RTRIM(a.VIL)) AS ville, LTRIM(RTRIM(a.PAY)) AS pays
+FROM $typeTiers c
+	INNER JOIN T1 a ON c.DOS = a.DOS AND c.TIERS = a.TIERS -- Adresses
+WHERE c.DOS = $dos AND c.HSDT IS NULL
+GROUP BY c.TIERS, a.ADRCOD, a.NOM, a.TEL, a.FAX, a.EMAIL, a.ADRCOD, a.ADRCPL1, a.ADRCPL2, a.RUE, a.LOC, a.CPOSTAL, a.VIL, a.PAY, c.ADRCOD_0002, c.ADRCOD_0003, c.ADRCOD_0004
+
+UNION
+-- ADRESSE TIERS LIVRAISON
+
+SELECT LTRIM(RTRIM(c.TIERS)) AS tiers, CONCAT(LTRIM(RTRIM(c.ADRTIERS_0003)), '#',LTRIM(RTRIM(c.ADRCOD_0003))) AS code,
+CASE
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN LTRIM(RTRIM(a.NOM))
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN LTRIM(RTRIM(c2.NOM))
+END AS nom, '' AS titre, '' AS fonction,
+CASE
+WHEN a.TEL <> '0000000000' AND c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN REPLACE(REPLACE(a.TEL,'.',''),' ','')
+WHEN c2.TEL <> '0000000000' AND c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN REPLACE(REPLACE(c2.TEL,'.',''),' ','')
+ELSE ''
+END AS tel, '' AS gsm,
+CASE
+WHEN a.FAX <> '0000000000' AND c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN REPLACE(REPLACE(a.FAX,'.',''),' ','')
+WHEN c2.FAX <> '0000000000' AND c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN REPLACE(REPLACE(c2.FAX,'.',''),' ','')
+ELSE ''
+END AS fax,
+CASE
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN LOWER(a.EMAIL)
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN LOWER(c2.EMAIL)
+END AS email,
+'Adresse de livraison' AS typeAdr,
+CASE
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN LTRIM(RTRIM(a.ADRCPL1))
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN LTRIM(RTRIM(c2.ADRCPL1))
+END AS compl1,
+CASE
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN LTRIM(RTRIM(a.ADRCPL2))
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN LTRIM(RTRIM(c2.ADRCPL2))
+END AS compl2,
+CASE
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN LTRIM(RTRIM(a.RUE))
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN LTRIM(RTRIM(c2.RUE))
+END AS rue,
+CASE
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN LTRIM(RTRIM(a.LOC))
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN LTRIM(RTRIM(c2.LOC))
+END AS localite,
+CASE
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN LTRIM(RTRIM(a.CPOSTAL))
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN LTRIM(RTRIM(c2.CPOSTAL))
+END AS cpostal,
+CASE
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN LTRIM(RTRIM(a.VIL))
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN LTRIM(RTRIM(c2.VIL))
+END AS ville,
+CASE
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 <> '' THEN LTRIM(RTRIM(a.PAY))
+WHEN c.ADRTIERS_0003 <> '' AND c.ADRCOD_0003 = '' THEN LTRIM(RTRIM(c2.PAY))
+END AS pays
+FROM $typeTiers c
+INNER JOIN $typeTiers c2 ON c.ADRTIERS_0003 = c2.TIERS AND c.DOS = c2.DOS
+LEFT JOIN T1 a ON c.DOS = a.DOS AND c.ADRTIERS_0003 = a.TIERS AND c.ADRCOD_0003 = a.ADRCOD
+WHERE c.DOS = $dos AND c.HSDT IS NULL AND c.ADRTIERS_0003 <> ''
+GROUP BY c.TIERS, a.ADRCOD, c2.NOM, a.NOM, a.TEL, a.FAX, a.EMAIL, a.ADRCOD, a.ADRCPL1, a.ADRCPL2, a.RUE, a.LOC, a.CPOSTAL, a.VIL, a.PAY, c.ADRCOD_0003, c.ADRTIERS_0003,
+c2.TEL, c2.FAX, c2.EMAIL, c2.ADRCPL1, c2.ADRCPL2, c2.RUE, c2.LOC, c2.CPOSTAL, c2.VIL, c2.PAY
+
+UNION
+-- ADRESSE TIERS FACTURATION
+
+SELECT LTRIM(RTRIM(c.TIERS)) AS tiers, CONCAT(LTRIM(RTRIM(c.ADRTIERS_0004)), '#',LTRIM(RTRIM(c.ADRCOD_0004))) AS code,
+CASE
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN LTRIM(RTRIM(a.NOM))
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN LTRIM(RTRIM(c2.NOM))
+END AS nom, '' AS titre, '' AS fonction,
+CASE
+WHEN a.TEL <> '0000000000' AND c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN REPLACE(REPLACE(a.TEL,'.',''),' ','')
+WHEN c2.TEL <> '0000000000' AND c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN REPLACE(REPLACE(c2.TEL,'.',''),' ','')
+ELSE ''
+END AS tel, '' AS gsm,
+CASE
+WHEN a.FAX <> '0000000000' AND c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN REPLACE(REPLACE(a.FAX,'.',''),' ','')
+WHEN c2.FAX <> '0000000000' AND c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN REPLACE(REPLACE(c2.FAX,'.',''),' ','')
+ELSE ''
+END AS fax,
+CASE
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN LOWER(a.EMAIL)
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN LOWER(c2.EMAIL)
+END AS email,
+'Adresse de facturation' AS typeAdr,
+CASE
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN LTRIM(RTRIM(a.ADRCPL1))
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN LTRIM(RTRIM(c2.ADRCPL1))
+END AS compl1,
+CASE
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN LTRIM(RTRIM(a.ADRCPL2))
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN LTRIM(RTRIM(c2.ADRCPL2))
+END AS compl2,
+CASE
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN LTRIM(RTRIM(a.RUE))
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN LTRIM(RTRIM(c2.RUE))
+END AS rue,
+CASE
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN LTRIM(RTRIM(a.LOC))
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN LTRIM(RTRIM(c2.LOC))
+END AS localite,
+CASE
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN LTRIM(RTRIM(a.CPOSTAL))
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN LTRIM(RTRIM(c2.CPOSTAL))
+END AS cpostal,
+CASE
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN LTRIM(RTRIM(a.VIL))
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN LTRIM(RTRIM(c2.VIL))
+END AS ville,
+CASE
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 <> '' THEN LTRIM(RTRIM(a.PAY))
+WHEN c.ADRTIERS_0004 <> '' AND c.ADRCOD_0004 = '' THEN LTRIM(RTRIM(c2.PAY))
+END AS pays
+FROM $typeTiers c
+INNER JOIN $typeTiers c2 ON c.ADRTIERS_0004 = c2.TIERS AND c.DOS = c2.DOS
+LEFT JOIN T1 a ON c.DOS = a.DOS AND c.ADRTIERS_0004 = a.TIERS AND c.ADRCOD_0004 = a.ADRCOD
+WHERE c.DOS = $dos AND c.HSDT IS NULL AND c.ADRTIERS_0004 <> ''
+GROUP BY c.TIERS, a.ADRCOD, c2.NOM, a.NOM, a.TEL, a.FAX, a.EMAIL, a.ADRCOD, a.ADRCPL1, a.ADRCPL2, a.RUE, a.LOC, a.CPOSTAL, a.VIL, a.PAY, c.ADRCOD_0004, c.ADRTIERS_0004,
+c2.TEL, c2.FAX, c2.EMAIL, c2.ADRCPL1, c2.ADRCPL2, c2.RUE, c2.LOC, c2.CPOSTAL, c2.VIL, c2.PAY
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getTiersFiche($dos, $typeTiers): array
+    {
+        if ($typeTiers == 'FOU') {
+            $representant = 'c.SALCOD';
+        } elseif ($typeTiers == 'CLI') {
+            $representant = 'c.REPR_0001';
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(c.TIERS)) AS tiers, LTRIM(RTRIM(c.TIT)) AS titre, UPPER(LTRIM(RTRIM(c.NOM))) AS nom,
+CASE
+WHEN CHARINDEX('@', c.RUE) > 0 THEN LOWER(LTRIM(RTRIM(c.RUE)))
+ELSE UPPER(LTRIM(RTRIM(c.RUE)))
+END AS rue,
+CASE
+WHEN CHARINDEX('@', c.ADRCPL1) > 0 THEN LOWER(LTRIM(RTRIM(c.ADRCPL1)))
+ELSE UPPER(LTRIM(RTRIM(c.ADRCPL1)))
+END AS Compl1,
+CASE
+WHEN CHARINDEX('@', c.ADRCPL2) > 0 THEN LOWER(LTRIM(RTRIM(c.ADRCPL2)))
+ELSE UPPER(LTRIM(RTRIM(c.ADRCPL2)))
+END AS Compl2,
+LTRIM(RTRIM(c.CPOSTAL)) AS CodePostal, LTRIM(RTRIM(c.VIL)) AS Ville, LTRIM(RTRIM(c.PAY)) AS Pays,
+CASE
+WHEN c.TEL <> '0000000000' AND c.TEL <> '0' THEN REPLACE(REPLACE(REPLACE(c.TEL,'.',''),' ',''),'-','')
+ELSE ''
+END AS tel,
+CASE
+WHEN c.FAX <> '0000000000' AND c.FAX <> '0' THEN REPLACE(REPLACE(REPLACE(c.FAX,'.',''),' ',''),'-','')
+ELSE ''
+END AS fax,
+CASE
+WHEN CHARINDEX('@', c.EMAIL) > 0 THEN LOWER(LTRIM(RTRIM(c.EMAIL)))
+END AS Email,
+CASE
+WHEN CHARINDEX('@', c.ZONA) > 0 THEN
+LOWER(LTRIM(RTRIM(c.ZONA))) END AS mail2,
+LTRIM(RTRIM(c.WEB)) AS SiteWeb, LTRIM(RTRIM(c.SIRET)) AS Siret, LTRIM(RTRIM(c.REGL)) AS ConditionPaiement,
+LTRIM(RTRIM(c.STAT_0001)) AS Etiquettes, LTRIM(RTRIM(c.STAT_0002)) AS Stat2, LTRIM(RTRIM(c.STAT_0003)) AS Stat3, LTRIM(RTRIM($representant)) AS Representant, -- c.SALCOD AS Acheteur, --
+LTRIM(RTRIM(c.ENMAX_0002)) AS LimiteDeCredit, LTRIM(RTRIM(c.NAF)) AS Naf,
+CASE
+WHEN c.NOTE > 0 THEN MAX(convert(varchar(max),n.NOTEBLOB))
+END AS Note,
+LTRIM(RTRIM(c.JOINT)) AS FichiersJoints, LTRIM(RTRIM(c.TVANO)) AS Intra,
+CASE
+WHEN c.FEU = 1 THEN 'Aucun message'
+WHEN c.FEU = 2 THEN 'Avertissement'
+WHEN c.FEU = 3 THEN 'Message bloquant'
+END AS  avertissement,
+CASE
+WHEN c.FEU = 1 THEN ''
+WHEN c.FEU = 2 THEN 'Client Feu Orange'
+WHEN c.FEU = 3 THEN 'Client Feu Rouge'
+END AS  Feu, LTRIM(RTRIM(c.BLMOD)) AS ModPort,
+CASE
+WHEN c.TEXCOD_0002 <> '' THEN MAX(convert(varchar(max),n2.NOTEBLOB))
+END  AS T2,
+CASE
+WHEN c.TEXCOD_0003 <> '' THEN MAX(convert(varchar(max),n3.NOTEBLOB))
+END  AS T3,
+CASE
+WHEN c.TEXCOD_0004 <> '' THEN MAX(convert(varchar(max),n4.NOTEBLOB))
+END  AS T4
+FROM $typeTiers c
+	LEFT JOIN MNOTE n ON n.NOTE = c.NOTE
+    LEFT JOIN T041 nt2 ON nt2.TEXCOD = c.TEXCOD_0002
+    LEFT JOIN MNOTE n2 ON n2.NOTE = nt2.NOTE
+    LEFT JOIN T041 nt3 ON nt3.TEXCOD = c.TEXCOD_0003
+    LEFT JOIN MNOTE n3 ON n3.NOTE = nt3.NOTE
+    LEFT JOIN T041 nt4 ON nt4.TEXCOD = c.TEXCOD_0004
+    LEFT JOIN MNOTE n4 ON n4.NOTE = nt4.NOTE
+WHERE c.DOS = $dos AND c.HSDT is NULL
+GROUP BY c.TIERS, c.TIT, c.NOM, c.RUE, c.ADRCPL1, c.ADRCPL2, c.CPOSTAL, c.VIL, c.PAY,
+c.TEL, c.FAX, c.EMAIL, c.ZONA, c.WEB, c.SIRET, c.REGL, c.STAT_0001, c.STAT_0002, c.STAT_0003,$representant
+, c.ENMAX_0002, c.NAF, c.NOTE, c.JOINT, c.TVANO, c.FEU, c.BLMOD,
+c.TEXCOD_0001,c.TEXCOD_0002,c.TEXCOD_0003,c.TEXCOD_0004
+ORDER BY c.TIERS
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function getBanqueTiers($dos, $typeTiers): array
+    {
+        $pc = substr($typeTiers, 0, 1);
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT LTRIM(RTRIM(r.TIERS)) AS tiers,CONCAT(LTRIM(RTRIM(r.TIERS)),'#',LTRIM(RTRIM(r.RIBCOD))) AS code,CONCAT(LTRIM(RTRIM(r.IBAN1)),LTRIM(RTRIM(r.IBAN2)),
+                LTRIM(RTRIM(r.IBAN3))) AS IBAN, LTRIM(RTRIM(r.RIBBIC)) AS ribBic, LTRIM(RTRIM(r.RIBDO)) AS ribDo
+                FROM T3 r
+                INNER JOIN $typeTiers c ON c.DOS = r.DOS AND c.TIERS = r.TIERS
+                WHERE r.DOS = $dos AND r.TIERS LIKE '$pc%' AND c.HSDT IS NULL AND r.HSDT IS NULL
+                ORDER BY r.CODTYP
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
 }

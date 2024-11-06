@@ -35,9 +35,10 @@ class ArticleBlobController extends AbstractController
                 $document = '';
                 $formatter = new HtmlFormatter();
                 try {
-                    $document = new Document($value['blob']);
+                    $document = new Document("{" . $value['blob'] . "}");
                 } catch (Throwable $th) {
                 }
+
                 if ($value['tva'] == 1) {
                     $tva = 20;
                 }

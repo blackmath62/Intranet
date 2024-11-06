@@ -1,0 +1,541 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{title}}
+{% endblock %}
+
+{% block body %}
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1>Tiers, Adresses, contacts, texte à remanier un peu pour import Odoo</h1>
+					<span>Les champs avec un # ne sont pas intégrables dans Odoo</span>
+				</div>
+				{{ form_start(form) }}
+				<div class='d-flex'>
+					<div class="p-1 mt-2">
+						Veuillez selectionner les paramétres :
+					</div>
+					<div class="p-1">
+						{{ form_widget(form.dos) }}
+					</div>
+					<div class="p-1">
+						{{ form_widget(form.typeTiers) }}
+					</div>
+					<div class="p-1">
+						{{ form_row(form.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }}
+						) }}
+					</div>
+				</div>
+				{{ form_end(form) }}
+			</div>
+		</div>
+		<!-- /.container-fluid -->
+	</section>
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>Import des Tiers à remanier un peu pour import Odoo</h4>
+				</div>
+			</div>
+		</div>
+		<!-- /.container-fluid -->
+	</section>
+	<section>
+		<div class="card">
+			<div class="card-body">
+				{% if datas %}
+					<table id="example1" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="text-center">
+									<span>id</span>
+								</th>
+								<th class="text-center">
+									<span>Référence</span>
+								</th>
+								<th class="text-center">
+									<span>Nom</span>
+								</th>
+								<th class="text-center">
+									<span>Rue</span>
+								</th>
+								<th class="text-center">
+									<span>Rue 2</span>
+								</th>
+								<th class="text-center">
+									<span># Compl 2</span>
+								</th>
+								<th class="text-center">
+									<span>Code postal</span>
+								</th>
+								<th class="text-center">
+									<span>Ville</span>
+								</th>
+								<th class="text-center">
+									<span>Pays</span>
+								</th>
+								<th class="text-center">
+									<span>Téléphone</span>
+								</th>
+								<th class="text-center">
+									<span># Fax</span>
+								</th>
+								<th class="text-center">
+									<span>E-mail</span>
+								</th>
+								<th class="text-center">
+									<span># E-mail 2</span>
+								</th>
+								<th class="text-center">
+									<span>Lien vers un site web</span>
+								</th>
+								<th class="text-center">
+									<span>SIRET</span>
+								</th>
+								<th class="text-center">
+									<span>Conditions de paiement du client</span>
+								</th>
+								<th class="text-center">
+									<span>Mode de paiement</span>
+								</th>
+								<th class="text-center">
+									<span>N ° TVA</span>
+								</th>
+								<th class="text-center">
+									<span>Étiquettes</span>
+								</th>
+								<th class="text-center">
+									<span># Stat2</span>
+								</th>
+								<th class="text-center">
+									<span># Stat3</span>
+								</th>
+								<th class="text-center">
+									<span># buyer_id / user_id</span>
+								</th>
+								<th class="text-center">
+									<span>Limite de crédit</span>
+								</th>
+								<th class="text-center">
+									<span>company_id/name</span>
+								</th>
+								<th class="text-center">
+									<span>Avertissements de vente</span>
+								</th>
+								<th class="text-center">
+									<span>Message sur les bons de commande</span>
+								</th>
+								<th class="text-center">
+									<span># Naf</span>
+								</th>
+								<th class="text-center">
+									<span># FichiersJoints</span>
+								</th>
+								<th class="text-center">
+									<span># ModPort</span>
+								</th>
+								<th class="text-center">
+									<span>comment</span>
+								</th>
+								<th class="text-center">
+									<span>x_studio_texte_commande</span>
+								</th>
+								<th class="text-center">
+									<span>x_studio_texte_de_livraison</span>
+								</th>
+								<th class="text-center">
+									<span>x_studio_texte_de_facturation</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for data in datas %}
+								<tr>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.tiers }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.nom }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.rue }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Compl1 }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Compl2 }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.CodePostal }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Ville }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Pays }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.tel }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.fax }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Email }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.mail2 }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.SiteWeb }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Siret }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.ConditionPaiement }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Intra }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Etiquettes }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Stat2 }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Stat3 }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Representant }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.LimiteDeCredit }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.avertissement }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Feu }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Naf }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.FichiersJoints }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.ModPort }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.Note|raw|striptags }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.blob2|raw|striptags }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.blob3|raw|striptags }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.blob4|raw|striptags }}</a>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					<h4 class="text-left text-dark">
+						<i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter les paramétres de recherche</h4>
+				{% endif %}
+			</div>
+		</div>
+	</section>
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>Import des Contacts et Adresses à remanier un peu pour import Odoo</h4>
+				</div>
+			</div>
+		</div>
+		<!-- /.container-fluid -->
+	</section>
+
+	<section>
+		<div class="card">
+			<div class="card-body">
+				{% if datas %}
+					<table id="example11" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="text-center">
+									<span>id</span>
+								</th>
+								<th class="text-center">
+									<span># tiers</span>
+								</th>
+								<th class="text-center">
+									<span>child_ids/ref</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Nom</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Titre</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Poste</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Téléphone</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Mobile</span>
+								</th>
+								<th class="text-center">
+									<span># Fax</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/E-mail</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Type d'adresse</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Rue</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Rue 2</span>
+								</th>
+								<th class="text-center">
+									<span># Compl 2</span>
+								</th>
+								<th class="text-center">
+									<span># Localité</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Code postal</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Ville</span>
+								</th>
+								<th class="text-center">
+									<span>Contact/Pays</span>
+								</th>
+								<th class="text-center">
+									<span>child_ids/employee</span>
+								</th>
+								<th class="text-center">
+									<span>child_ids/company_type</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for data in contacts %}
+								<tr>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.tiers }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.code }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.nom }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.titre }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.fonction }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.tel }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.gsm }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.fax }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.email }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.typeAdr }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.rue }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.compl1 }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.compl2 }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.localite }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.cpostal }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.ville }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.pays }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">FAUX</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">Particulier</a>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					<h4 class="text-left text-dark">
+						<i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter les paramétres de recherche</h4>
+				{% endif %}
+			</div>
+		</div>
+	</section>
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>Import des Données banque tiers à remanier un peu pour import Odoo</h4>
+					<span>il faut ensuite extraire ce qui a été importé pour récupérer l'id de la banque créé et l'assigner au tiers avec son iban correspondant, pour trouver le menu d'import de la banque, taper banque sur la page d'accueil.</span>
+				</div>
+			</div>
+		</div>
+		<!-- /.container-fluid -->
+	</section>
+
+	<section>
+		<div class="card">
+			<div class="card-body">
+				{% if datas %}
+					<table id="example12" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="text-center">
+									<span>id</span>
+								</th>
+								<th class="text-center">
+									<span># tiers</span>
+								</th>
+								<th class="text-center">
+									<span>bank_ids/acc_number</span>
+								</th>
+								<th class="text-center">
+									<span>bank_ids/bank_id/id</span>
+								</th>
+								<th class="text-center">
+									<span>bic</span>
+								</th>
+								<th class="text-center">
+									<span>name</span>
+								</th>
+								<th class="text-center">
+									<span>country</span>
+								</th>
+								<th class="text-center">
+									<span>email</span>
+								</th>
+								<th class="text-center">
+									<span>zip</span>
+								</th>
+								<th class="text-center">
+									<span>street</span>
+								</th>
+								<th class="text-center">
+									<span>street2</span>
+								</th>
+								<th class="text-center">
+									<span>phone</span>
+								</th>
+								<th class="text-center">
+									<span>city</span>
+								</th>
+								<th class="text-center">
+									<span>active</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for data in banques %}
+								<tr>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.tiers }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.IBAN }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.ribBic }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.ribDo }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">{{ data.code }}</a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark"></a>
+									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">VRAI</a>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					<h4 class="text-left text-dark">
+						<i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter les paramétres de recherche</h4>
+				{% endif %}
+			</div>
+		</div>
+	</section>
+{% endblock %}

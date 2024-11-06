@@ -262,13 +262,14 @@ class ArtRepository extends ServiceEntityRepository
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT a.TIERS AS tiers, a.REF AS ref, s.SREF1 AS sref1, s.SREF2 AS sref2, a.DES AS designation, a.VENUN AS uv, a.FAM_0001 AS famille, a.FAM_0002 AS metier,a.TVAART AS tva, n.NOTEBLOB AS blob, s.CONF AS conf, a.HSDT AS dateFermeture, SUM(st.QTETJSENSTOCK) AS stock
+        $sql = "SELECT LTRIM(RTRIM(a.TIERS)) AS tiers, LTRIM(RTRIM(a.REF)) AS ref, LTRIM(RTRIM(s.SREF1)) AS sref1, LTRIM(RTRIM(s.SREF2)) AS sref2, LTRIM(RTRIM(a.DES)) AS designation, LTRIM(RTRIM(a.VENUN)) AS uv, LTRIM(RTRIM(a.FAM_0001)) AS famille,
+        LTRIM(RTRIM(a.FAM_0002)) AS metier,a.TVAART AS tva, n.NOTEBLOB AS blob, s.CONF AS conf, a.HSDT AS dateFermeture, SUM(st.QTETJSENSTOCK) AS stock
         FROM ART a
         LEFT JOIN SART s ON a.DOS = s.DOS AND a.REF = s.REF
         LEFT JOIN LART l ON a.DOS = l.DOS AND a.REF = l.REF AND s.SREF1 = l.SREF1 AND s.SREF2 = l.SREF2
         LEFT JOIN MNOTE n ON l.NOTE_0010 = n.NOTE
         LEFT JOIN MVTL_STOCK_V st ON a.REF = st.REFERENCE AND l.SREF1 = st.SREFERENCE1 AND l.SREF2 = st.SREFERENCE2
-        WHERE a.DOS = 1 AND a.HSDT IS NULL  $andFous $andSearch
+        WHERE a.DOS = 1 AND (a.HSDT IS NULL OR a.HSDT >= GETDATE()) AND l.NOTE_0010 <> 0  $andFous $andSearch
         GROUP BY a.TIERS, a.REF, s.SREF1, s.SREF2, a.DES, a.VENUN, n.NOTEBLOB, s.CONF, a.HSDT, a.FAM_0001, a.FAM_0002, a.TVAART
         ";
         $stmt = $conn->prepare($sql);
