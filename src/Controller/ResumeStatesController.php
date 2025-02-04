@@ -202,6 +202,7 @@ class ResumeStatesController extends AbstractController
         $startyear = $startCommerciaux->format('Y');
         $dataCommerciaux = $repoTiers->getStatesSixYearsAgoCommerciaux($dos, $metier);
         $color = [$this->listeCouleur(0), $this->listeCouleur(4), $this->listeCouleur(10), $this->listeCouleur(6), $this->listeCouleur(9), $this->listeCouleur(2)];
+        //dd($dataCommerciaux);
         for ($i = 0; $i < count($dataCommerciaux); $i++) {
             $nomCommerciaux[] = $dataCommerciaux[$i]['commercial'];
             $donneesCommerciaux[] = [

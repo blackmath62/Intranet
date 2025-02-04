@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{ title }}
+{% endblock %}
+
+{% block body %}
+<div>
+<section class="content-header">
+	<div class="container-fluid">
+		<div class="row mb-2">
+			<div class="col-sm-8">
+				<h1>States Excel Détaillées</h1>
+				<p>States sur 4 années pleines avec pour référence celle selectionnée et le métier.</p>
+				<p>Ces states ont la particularité de contenir le détail par codes OP ainsi que les commandes et BL actifs du systéme à partir du 01-09 de l'année précédente celle de référence.</p>
+			</div>
+			{{ form_start(form) }}
+			<div class='d-flex'>
+				<div class="p-1 mt-2">
+					Veuillez selectionner les filtres :
+				</div>
+				<div class="p-1">
+					{{ form_widget(form.Metiers) }}
+				</div>
+				<div class="p-1">
+					{{ form_widget(form.year) }}
+				</div>
+				<div class="p-1">
+					{{ form_row(form.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary start-button' }}
+					) }}
+				</div>
+			</div>
+			{{ form_end(form) }}
+		</div>
+	</div>
+</section>
+</div>
+<div class="modal fade" id="modal-overlay">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="overlay">
+				<i class="fas fa-sync fa-spin"></i>
+			</div>
+			<div class="modal-header">
+				<h4 class="modal-title">Traitement des données</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>Veuillez patienter jusqu'a la fin du traitement des données, un mail vous sera envoyer avec votre fichier.</p>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
+<script>
+	$(document).ready(function () { // Écoute de l'événement de clic sur les boutons avec la classe 'start-button'
+	$('.start-button').click(function () { // Affichage du modal
+	$('#modal-overlay').modal('show');
+
+	// Attente du chargement complet de la page
+	$(window).on('load', function () { // Masquer le modal une fois le chargement terminé
+	$('#modal-overlay').modal('hide');
+	});
+	});
+	});
+</script>
+
+{% endblock %}

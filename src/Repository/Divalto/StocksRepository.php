@@ -109,7 +109,7 @@ class StocksRepository extends ServiceEntityRepository
         }
         if ($sref2) {
             $s2 = "AND m.SREF2 IN ('$sref2')";
-            $sr2 = "AND x.SREF2 IN ('$sref2)";
+            $sr2 = "AND x.SREF2 IN ('$sref2')";
         }
 
         $conn = $this->getEntityManager()->getConnection();

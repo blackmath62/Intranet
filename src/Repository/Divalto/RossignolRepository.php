@@ -17,21 +17,40 @@ class RossignolRepository extends ServiceEntityRepository
     public function getRossignolStockList(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT MVTL_STOCK_V.REFERENCE AS Ref,  MVTL_STOCK_V.SREFERENCE1 AS Sref1,MVTL_STOCK_V.SREFERENCE2 AS Sref2, SUM(MOUV.CDQTE) AS CmdQte
-        ,MVTL_STOCK_V.ARTICLE_DESIGNATION AS Designation, ART.VENUN AS Uv,
-        MVTL_STOCK_V.DEPOT AS Depot,MVTL_STOCK_V.NATURESTOCK AS Nature, SUM(MVTL_STOCK_V.QTETJSENSTOCK) AS Stock,
-        TAR.TACOD AS CodeTarif, TAR.PUB AS Tarif, MAX(TAR.TADT) AS DateTarif,
-        CASE
-        WHEN TAR.PPAR <> 0 AND TAR.PPAR IS NOT NULL THEN TAR.PPAR
-        END AS PrixPar
-        FROM MVTL_STOCK_V
-        INNER JOIN ART ON ART.REF = MVTL_STOCK_V.REFERENCE AND ART.DOS = MVTL_STOCK_V.DOSSIER
-        LEFT JOIN MOUV ON MVTL_STOCK_V.REFERENCE = MOUV.REF AND MVTL_STOCK_V.SREFERENCE1 = MOUV.SREF1 AND MVTL_STOCK_V.SREFERENCE2 = MOUV.SREF2 AND MOUV.DOS = MVTL_STOCK_V.DOSSIER AND MOUV.CDCE4 IN (1) AND MOUV.TICOD = 'C' AND MOUV.OP IN('C 2','CO')
-        LEFT JOIN TAR ON TAR.DOS = ART.DOS AND TAR.REF = ART.REF AND TAR.SREF1 = MVTL_STOCK_V.SREFERENCE1 AND TAR.SREF2 = MVTL_STOCK_V.SREFERENCE2 AND TAR.TACOD = 'TO'
-        WHERE MVTL_STOCK_V.DOSSIER = 1 AND MVTL_STOCK_V.NATURESTOCK = 'O' --MVTL_STOCK_V.REFERENCE LIKE 'CO%' AND
-        GROUP BY MVTL_STOCK_V.REFERENCE,  MVTL_STOCK_V.SREFERENCE1,MVTL_STOCK_V.SREFERENCE2,MVTL_STOCK_V.ARTICLE_DESIGNATION,ART.VENUN,MVTL_STOCK_V.QTERESERVE,
-        MVTL_STOCK_V.DEPOT,MVTL_STOCK_V.NATURESTOCK, TAR.TACOD, TAR.PUB, TAR.PPAR, TAR.PPAR
-        ORDER BY MVTL_STOCK_V.REFERENCE
+        $sql = "WITH StockCTE AS (
+                SELECT
+                    REFERENCE, SREFERENCE1, SREFERENCE2, DEPOT, NATURESTOCK, SUM(QTETJSENSTOCK) AS Stock
+                FROM
+                    MVTL_STOCK_V
+                WHERE
+                    DOSSIER = 1 AND NATURESTOCK = 'O' --AND REFERENCE LIKE 'CO4527OC'
+                GROUP BY
+                    REFERENCE, SREFERENCE1, SREFERENCE2, DEPOT, NATURESTOCK
+                )
+                SELECT
+                    s.REFERENCE AS Ref, s.SREFERENCE1 AS Sref1, s.SREFERENCE2 AS Sref2, SUM(m.CDQTE) AS CmdQte, s.ARTICLE_DESIGNATION AS Designation, a.VENUN AS Uv,
+                    s.DEPOT AS Depot, s.NATURESTOCK AS Nature, st.Stock AS Stock, t.TACOD AS CodeTarif, t.PUB AS Tarif, MAX(t.TADT) AS DateTarif,
+                    CASE
+                        WHEN t.PPAR <> 0 AND t.PPAR IS NOT NULL THEN t.PPAR
+                    END AS PrixPar
+                FROM StockCTE st
+                INNER JOIN
+                    MVTL_STOCK_V s ON st.REFERENCE = s.REFERENCE AND st.SREFERENCE1 = s.SREFERENCE1 AND st.SREFERENCE2 = s.SREFERENCE2
+                    AND st.DEPOT = s.DEPOT AND st.NATURESTOCK = s.NATURESTOCK
+                INNER JOIN
+                    ART a ON a.REF = s.REFERENCE AND a.DOS = s.DOSSIER
+                LEFT JOIN
+                    MOUV m ON s.REFERENCE = m.REF AND s.SREFERENCE1 = m.SREF1 AND s.SREFERENCE2 = m.SREF2
+                    AND m.DOS = s.DOSSIER AND m.CDCE4 IN (1) AND m.TICOD = 'C' AND m.OP IN('C 2', 'CO')
+                LEFT JOIN
+                    TAR t ON t.DOS = a.DOS AND t.REF = a.REF AND t.SREF1 = s.SREFERENCE1
+                    AND t.SREF2 = s.SREFERENCE2 AND t.TACOD = 'TO'
+                WHERE
+                    s.DOSSIER = 1 AND s.NATURESTOCK = 'O' --AND s.REFERENCE LIKE 'CO4527OC'
+                GROUP BY
+                    s.REFERENCE, s.SREFERENCE1, s.SREFERENCE2, s.ARTICLE_DESIGNATION, a.VENUN, s.DEPOT, s.NATURESTOCK, t.TACOD, t.PUB, t.PPAR, st.Stock
+                ORDER BY
+                    s.REFERENCE;
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

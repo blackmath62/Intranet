@@ -84,6 +84,9 @@
 								<th class="text-center">
 									<span>Qté Réservée</span>
 								</th>
+								<th class="text-center">
+									<span>Qté Disponible</span>
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -129,6 +132,15 @@
 									<td class="text-center">
 										<a class="text-center text-dark">{{ stockRossignol.CmdQte }}</a>
 									</td>
+									<td class="text-center">
+										<a class="text-center text-dark">
+										{% if stockRossignol.CmdQte %}
+											{{ stockRossignol.Stock - stockRossignol.CmdQte }}
+										{% else %}
+											{{ stockRossignol.Stock}}
+										{% endif %}
+										</a>
+									</td>
 								</tr>
 							{% endfor %}
 						</tbody>
@@ -172,6 +184,9 @@
 								</th>
 								<th class="text-center">
 									<span>Qté Réservée</span>
+								</th>
+								<th class="text-center">
+									<span>Qté Disponible</span>
 								</th>
 							</tr>
 						</tfoot>

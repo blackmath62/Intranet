@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block body %}
+
+	<div class="row">
+		<div class="col-md-12">
+			<div
+				class="card card-dark">
+				<!-- /.card-header -->
+				<div class="card-header d-flex justify-content-between ">
+					<h3 class="card-title text-center">Dernier Prix d'achat rendu produits avec du stock</h3>
+					{{ form_start(search, { 'attr' : { 'class' : 'ml-auto' }}
+					) }}
+					<div class='d-flex'>
+						<div class="p-1 mt-2">
+							Recherche des références produits qui commencent par :
+						</div>
+						<div class="p-1">
+							{{ form_row(search.search) }}
+						</div>
+						<div class="p-1">
+							{{ form_row(search.filtrer, { 'attr' : { 'class' : 'btn btn-xl btn-secondary' }}
+							) }}
+						</div>
+					</div>
+					{{ form_end(search)}}
+				</div>
+				<div class="card-body">
+					{% if produits %}
+						<table id="example1" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th class="text-center">
+										<span>Ref/sref1/sref2</span>
+									</th>
+									<th class="text-center">
+										<span>Stock</span>
+									</th>
+									<th class="text-center">
+										<span>Date</span>
+									</th>
+									<th class="text-center">
+										<span>Prix rendu</span>
+									</th>
+									<th class="text-center">
+										<span>Prix par</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for produit in produits %}
+									<tr>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ produit.ref }}{{ produit.sref1 }}{{ produit.sref2 }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ produit.stock }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ produit.date|date("d/m/Y") }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ produit.pa }}</a>
+										</td>
+										<td class="text-center">
+											<a class="text-center text-dark">{{ produit.ppar }}</a>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					{% else %}
+						<h4 class="text-left text-dark">
+							<i class="fas fa-info-circle pr-2 text-primary"></i>Veuillez alimenter le champs de recherche</h4>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Repository\Divalto;
 
 use App\Controller\StatesParFamilleController;
@@ -16,8 +15,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry, StatesParFamilleController $statesParFamilleController)
     {
         parent::__construct($registry, Mouv::class);
-        $artBan = "'ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20'";
-        $this->artBan = $artBan;
+        $artBan                           = "'ZRPO196','ZRPO196HP','ZRPO7','ZRPO7HP','ECOCONTRIBUTION10', 'ECOCONTRIBUTION10EV', 'ECOCONTRIBUTION20'";
+        $this->artBan                     = $artBan;
         $this->statesParFamilleController = $statesParFamilleController;
     }
 
@@ -26,7 +25,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
     {
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT Periode AS Periode,SecteurMouvement AS SecteurMouvement, Commercial, CommercialId,COUNT(DISTINCT Bl) AS NbBl,COUNT(DISTINCT Facture) AS NbFacture,COUNT(DISTINCT Tiers) AS NbTiers,
+        $sql  = "SELECT Periode AS Periode,SecteurMouvement AS SecteurMouvement, Commercial, CommercialId,COUNT(DISTINCT Bl) AS NbBl,COUNT(DISTINCT Facture) AS NbFacture,COUNT(DISTINCT Tiers) AS NbTiers,
         SUM(MontantSignDepot) As CADepot,  SUM(MontantSignDirect) As CADirect,  SUM(MontantSign) As CATotal
         FROM(	SELECT YEAR(MOUV.FADT) AS Annee,MOUV.BLNO AS Bl,MOUV.FANO AS Facture,
                 CASE
@@ -74,7 +73,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE SecteurMouvement IN( $metiers )
         GROUP BY Commercial,CommercialId,SecteurMouvement, Periode
         ORDER BY Commercial,SecteurMouvement, Periode";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -85,19 +84,19 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $dateDebutN1 = date_create($dateDebutN);
         $dateDebutN1 = date_modify($dateDebutN1, '-1 Year');
         $dateDebutN1 = $dateDebutN1->format('Y') . '-' . $dateDebutN1->format('m') . '-' . $dateDebutN1->format('d');
-        $dateFinN1 = date_create($dateFinN);
-        $dateFinN1 = date_modify($dateFinN1, '-1 Year');
-        $dateFinN1 = $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
+        $dateFinN1   = date_create($dateFinN);
+        $dateFinN1   = date_modify($dateFinN1, '-1 Year');
+        $dateFinN1   = $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
 
         $dateDebutN2 = date_create($dateDebutN1);
         $dateDebutN2 = date_modify($dateDebutN2, '-1 Year');
         $dateDebutN2 = $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
-        $dateFinN2 = date_create($dateFinN1);
-        $dateFinN2 = date_modify($dateFinN2, '-1 Year');
-        $dateFinN2 = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
+        $dateFinN2   = date_create($dateFinN1);
+        $dateFinN2   = date_modify($dateFinN2, '-1 Year');
+        $dateFinN2   = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT LTRIM(RTRIM(Commercial)) AS Commercial, LTRIM(RTRIM(Famille_Client)) AS Famille_Client, LTRIM(RTRIM(Client)) AS Client, LTRIM(RTRIM(nom)) as Nom,LTRIM(RTRIM(Pays)) as Pays,
+        $sql  = "SELECT LTRIM(RTRIM(Commercial)) AS Commercial, LTRIM(RTRIM(Famille_Client)) AS Famille_Client, LTRIM(RTRIM(Client)) AS Client, LTRIM(RTRIM(nom)) as Nom,LTRIM(RTRIM(Pays)) as Pays,
         LTRIM(RTRIM(Famille_Article)) AS Fam_Art, LTRIM(RTRIM(Ref)) AS Ref,LTRIM(RTRIM(Designation)) AS Designation,
         LTRIM(RTRIM(Sref1)) AS Sref1,LTRIM(RTRIM(Sref2)) AS Sref2, LTRIM(RTRIM(UV)) AS Uv,Mois,
         LTRIM(RTRIM(SUM(QteSignN1))) AS QteSignN1, LTRIM(RTRIM(SUM(MontantSignN1))) AS MontantSignN1,
@@ -163,7 +162,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         WHERE SecteurMouvement IN( $metiers ) AND CommercialId IN ($commercial)
         GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
         ORDER BY Client";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -174,19 +173,19 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $dateDebutN1 = date_create($dateDebutN);
         $dateDebutN1 = date_modify($dateDebutN1, '-1 Year');
         $dateDebutN1 = $dateDebutN1->format('Y') . '-' . $dateDebutN1->format('m') . '-' . $dateDebutN1->format('d');
-        $dateFinN1 = date_create($dateFinN);
-        $dateFinN1 = date_modify($dateFinN1, '-1 Year');
-        $dateFinN1 = $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
+        $dateFinN1   = date_create($dateFinN);
+        $dateFinN1   = date_modify($dateFinN1, '-1 Year');
+        $dateFinN1   = $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
 
         $dateDebutN2 = date_create($dateDebutN1);
         $dateDebutN2 = date_modify($dateDebutN2, '-1 Year');
         $dateDebutN2 = $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
-        $dateFinN2 = date_create($dateFinN1);
-        $dateFinN2 = date_modify($dateFinN2, '-1 Year');
-        $dateFinN2 = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
+        $dateFinN2   = date_create($dateFinN1);
+        $dateFinN2   = date_modify($dateFinN2, '-1 Year');
+        $dateFinN2   = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT LTRIM(RTRIM(Commercial)) AS Commercial, LTRIM(RTRIM(Famille_Client)) AS Famille_Client, LTRIM(RTRIM(Client)) AS Client, LTRIM(RTRIM(nom)) as Nom,LTRIM(RTRIM(Pays)) as Pays,
+        $sql  = "SELECT LTRIM(RTRIM(Commercial)) AS Commercial, LTRIM(RTRIM(Famille_Client)) AS Famille_Client, LTRIM(RTRIM(Client)) AS Client, LTRIM(RTRIM(nom)) as Nom,LTRIM(RTRIM(Pays)) as Pays,
         LTRIM(RTRIM(Famille_Article)) AS Fam_Art, LTRIM(RTRIM(Ref)) AS Ref,LTRIM(RTRIM(Designation)) AS Designation,
         LTRIM(RTRIM(Sref1)) AS Sref1,LTRIM(RTRIM(Sref2)) AS Sref2, LTRIM(RTRIM(UV)) AS Uv,Mois,
         LTRIM(RTRIM(SUM(QteSignN1))) AS QteSignN1, LTRIM(RTRIM(SUM(MontantSignN1))) AS MontantSignN1,
@@ -253,7 +252,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         WHERE SecteurMouvement IN( $metiers )
         GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois
         ORDER BY Client";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -265,9 +264,9 @@ class StatesByTiersRepository extends ServiceEntityRepository
     {
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT LTRIM(RTRIM(VRP.SELCOD)) AS SELCOD FROM VRP
+        $sql  = "SELECT LTRIM(RTRIM(VRP.SELCOD)) AS SELCOD FROM VRP
         WHERE VRP.TIERS = $commercialid AND VRP.DOS = $dossier";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -278,12 +277,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $dateDebutN1 = date_create($dateDebutN);
         $dateDebutN1 = date_modify($dateDebutN1, '-1 Year');
         $dateDebutN1 = $dateDebutN1->format('Y') . '-' . $dateDebutN1->format('m') . '-' . $dateDebutN1->format('d');
-        $dateFinN1 = date_create($dateFinN);
-        $dateFinN1 = date_modify($dateFinN1, '-1 Year');
-        $dateFinN1 = $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
+        $dateFinN1   = date_create($dateFinN);
+        $dateFinN1   = date_modify($dateFinN1, '-1 Year');
+        $dateFinN1   = $dateFinN1->format('Y') . '-' . $dateFinN1->format('m') . '-' . $dateFinN1->format('d');
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT TOP 5 LTRIM(RTRIM(Famille_Article)) AS Fam_Article,
+        $sql  = "SELECT TOP 5 LTRIM(RTRIM(Famille_Article)) AS Fam_Article,
 		LTRIM(RTRIM(SUM(MontantSignN1))) AS MontantSignN1,
         LTRIM(RTRIM(SUM(MontantSignN))) AS MontantSignN
         FROM -- imbrication d'une requête pour extraire les données à calculer
@@ -307,7 +306,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         AND MOUV.OP IN('C','CD','DD','D', 'C 2','CO', 'D 2','DO')) Reponse
         GROUP BY Famille_Article
         ORDER BY SUM(MontantSignN) DESC";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -317,7 +316,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
     {
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT Periode AS Periode,SecteurMouvement AS SecteurMouvement, COUNT(DISTINCT Bl) AS NbBl,COUNT(DISTINCT Facture) AS NbFacture,COUNT(DISTINCT Tiers) AS NbTiers,
+        $sql  = "SELECT Periode AS Periode,SecteurMouvement AS SecteurMouvement, COUNT(DISTINCT Bl) AS NbBl,COUNT(DISTINCT Facture) AS NbFacture,COUNT(DISTINCT Tiers) AS NbTiers,
         SUM(MontantSignDepot) As CADepot,  SUM(MontantSignDirect) As CADirect,  SUM(MontantSign) As CATotal
         FROM(	SELECT YEAR(MOUV.FADT) AS Annee,MOUV.BLNO AS Bl,MOUV.FANO AS Facture,
                 CASE
@@ -357,7 +356,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE SecteurMouvement IN( $metiers )
         GROUP BY SecteurMouvement, Periode
         ORDER BY SecteurMouvement, Periode";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -366,7 +365,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
     {
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT SecteurMouvement AS SecteurMouvement, Commercial AS Commercial,commercialId AS commercialId, Tiers AS Tiers, Nom AS Nom,  SUM(MontantSignN1) As CATotalN1,  SUM(MontantSignN) As CATotalN
+        $sql  = "SELECT SecteurMouvement AS SecteurMouvement, Commercial AS Commercial,commercialId AS commercialId, Tiers AS Tiers, Nom AS Nom,  SUM(MontantSignN1) As CATotalN1,  SUM(MontantSignN) As CATotalN
         FROM(	SELECT MOUV.BLNO AS Bl,MOUV.FANO AS Facture,
                 CASE
                 WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'EV' THEN 'EV'
@@ -405,7 +404,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE SecteurMouvement IN( $metiers )
         GROUP BY Commercial,commercialId,SecteurMouvement, Tiers, Nom
         ORDER BY Commercial";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -414,7 +413,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
     public function getStatesMetier($dateDebutN, $dateFinN, $dateDebutN1, $dateFinN1, $dossier): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT	SecteurMouvement AS SecteurMouvement,Color AS Color,Icon AS Icon,  SUM(MontantSignN1) As CATotalN1,  SUM(MontantSignN) As CATotalN
+        $sql  = "SELECT	SecteurMouvement AS SecteurMouvement,Color AS Color,Icon AS Icon,  SUM(MontantSignN1) As CATotalN1,  SUM(MontantSignN) As CATotalN
         FROM(	SELECT MOUV.BLNO AS Bl,MOUV.FANO AS Facture,
                 CASE
                 WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'EV' THEN 'EV'
@@ -460,7 +459,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 AND ((MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN') OR (MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' )))reponse
         GROUP BY SecteurMouvement, Color,Icon
         ORDER BY SecteurMouvement";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -470,12 +469,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $dateDebutN2 = date_create($dateDebutN1);
         $dateDebutN2 = date_modify($dateDebutN2, '-1 Year');
         $dateDebutN2 = $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
-        $dateFinN2 = date_create($dateFinN1);
-        $dateFinN2 = date_modify($dateFinN2, '-1 Year');
-        $dateFinN2 = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
+        $dateFinN2   = date_create($dateFinN1);
+        $dateFinN2   = date_modify($dateFinN2, '-1 Year');
+        $dateFinN2   = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT MAX(Nom) AS Nom ,Mois AS Mois ,MAX(FamArticle) AS FamArticle, Ref AS Ref, MAX(Designation) AS Designation, Sref1 AS Sref1, Sref2 AS Sref2, Uv AS Uv, SUM(QteSignN2) As QteTotalN2, SUM(MontantSignN2) As CATotalN2, SUM(QteSignN1) As QteTotalN1, SUM(MontantSignN1) As CATotalN1, SUM(QteSignN) As QteTotalN,  SUM(MontantSignN) As CATotalN
+        $sql  = "SELECT MAX(Nom) AS Nom ,Mois AS Mois ,MAX(FamArticle) AS FamArticle, Ref AS Ref, MAX(Designation) AS Designation, Sref1 AS Sref1, Sref2 AS Sref2, Uv AS Uv, SUM(QteSignN2) As QteTotalN2, SUM(MontantSignN2) As CATotalN2, SUM(QteSignN1) As QteTotalN1, SUM(MontantSignN1) As CATotalN1, SUM(QteSignN) As QteTotalN,  SUM(MontantSignN) As CATotalN
         FROM(	SELECT MOUV.TIERS AS Tiers,CLI.NOM AS Nom, ART.FAM_0001 AS FamArticle, MOUV.REF AS Ref, MOUV.DES AS Designation, MOUV.SREF1 AS Sref1, MOUV.SREF2 AS Sref2, ART.VENUN AS Uv, MONTH(MOUV.FADT) AS Mois, LTRIM(RTRIM(MOUV.OP)) AS OP,
                 CASE
                 WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'EV' THEN 'EV'
@@ -530,7 +529,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE SecteurMouvement IN( $metiers )
         GROUP BY Mois, Ref, Sref1, Sref2,Uv
         ORDER BY Mois, Ref";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -541,12 +540,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $dateDebutN2 = date_create($dateDebutN1);
         $dateDebutN2 = date_modify($dateDebutN2, '-1 Year');
         $dateDebutN2 = $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
-        $dateFinN2 = date_create($dateFinN1);
-        $dateFinN2 = date_modify($dateFinN2, '-1 Year');
-        $dateFinN2 = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
+        $dateFinN2   = date_create($dateFinN1);
+        $dateFinN2   = date_modify($dateFinN2, '-1 Year');
+        $dateFinN2   = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT LTRIM(RTRIM(FamArticle)) AS FamArticle, SUM(MontantSignN2) As CATotalN2, SUM(MontantSignN1) As CATotalN1, SUM(MontantSignN) As CATotalN
+        $sql  = "SELECT LTRIM(RTRIM(FamArticle)) AS FamArticle, SUM(MontantSignN2) As CATotalN2, SUM(MontantSignN1) As CATotalN1, SUM(MontantSignN) As CATotalN
         FROM(	SELECT ART.FAM_0001 AS FamArticle,
                 CASE
                 WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'EV' THEN 'EV'
@@ -581,7 +580,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 WHERE SecteurMouvement IN( $metiers )
         GROUP BY FamArticle
         ORDER BY FamArticle";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -592,12 +591,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $dateDebutN2 = date_create($dateDebutN1);
         $dateDebutN2 = date_modify($dateDebutN2, '-1 Year');
         $dateDebutN2 = $dateDebutN2->format('Y') . '-' . $dateDebutN2->format('m') . '-' . $dateDebutN2->format('d');
-        $dateFinN2 = date_create($dateFinN1);
-        $dateFinN2 = date_modify($dateFinN2, '-1 Year');
-        $dateFinN2 = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
+        $dateFinN2   = date_create($dateFinN1);
+        $dateFinN2   = date_modify($dateFinN2, '-1 Year');
+        $dateFinN2   = $dateFinN2->format('Y') . '-' . $dateFinN2->format('m') . '-' . $dateFinN2->format('d');
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT SUM(MontantSignN2) As CATotalN2, SUM(MontantSignN1) As CATotalN1, SUM(MontantSignN) As CATotalN
+        $sql  = "SELECT SUM(MontantSignN2) As CATotalN2, SUM(MontantSignN1) As CATotalN1, SUM(MontantSignN) As CATotalN
         FROM(	SELECT ART.FAM_0001 AS FamArticle,
                 CASE
                 WHEN ART.FAM_0002 IN ('EV', 'HP') AND CLI.STAT_0002 = 'EV' THEN 'EV'
@@ -630,7 +629,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
                 AND CLI.STAT_0002 IN('EV','HP','RB') AND ART.FAM_0002 IN( 'EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL' )
                 AND ( (MOUV.FADT >= '$dateDebutN' AND MOUV.FADT <= '$dateFinN' ) OR (MOUV.FADT >= '$dateDebutN1' AND MOUV.FADT <= '$dateFinN1' ) OR (MOUV.FADT >= '$dateDebutN2' AND MOUV.FADT <= '$dateFinN2' ) ) )reponse
                 WHERE SecteurMouvement IN( $metiers )";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -654,12 +653,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         } elseif ($dossier == 1 && $metier == 'MA') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
         } elseif ($dossier == 1 && $metier == 'ME') {
-            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $metier     = "AND a.FAM_0002 IN( 'ME', 'MO')";
             $commercial = null;
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT tiers, nom, famille, SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
+        $sql  = "SELECT tiers, nom, famille, SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
         FROM(
         SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
         CASE
@@ -677,7 +676,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $metier
         )reponse
         GROUP BY tiers, nom, famille";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -705,7 +704,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
+        $sql  = "SELECT SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
         FROM(
         SELECT m.TIERS AS tiers, c.NOM AS nom, $type AS famille,
         CASE
@@ -722,7 +721,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         WHERE m.DOS = $dossier AND (m.FADT >= '$startN' AND m.FADT <= '$endN' or m.FADT >= '$startN1' AND m.FADT <= '$endN1' ) AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -744,7 +743,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT SUM(montantSignN) AS montantN
+        $sql  = "SELECT SUM(montantSignN) AS montantN
         FROM(
         SELECT m.TIERS AS tiers,
         CASE
@@ -757,7 +756,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         WHERE m.DOS = $dossier AND m.FADT >= '$startN' AND m.FADT <= '$endN' AND m.PICOD = 4 AND m.TICOD = 'C' AND a.REF NOT IN($this->artBan)
         $metier
         )reponse";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchOne();
     }
@@ -779,7 +778,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT RTRIM(LTRIM(tiers)) AS tiers, RTRIM(LTRIM(nom)) AS nom, SUM(montantSignN) AS montantN
+        $sql  = "SELECT RTRIM(LTRIM(tiers)) AS tiers, RTRIM(LTRIM(nom)) AS nom, SUM(montantSignN) AS montantN
         FROM(
         SELECT m.TIERS AS tiers, c.NOM AS nom,
         CASE
@@ -793,7 +792,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $metier
         )reponse
         GROUP BY tiers, nom";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -815,7 +814,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT RTRIM(LTRIM(ref)) AS ref, RTRIM(LTRIM(sref1)) AS sref1, RTRIM(LTRIM(sref2)) AS sref2,
+        $sql  = "SELECT RTRIM(LTRIM(ref)) AS ref, RTRIM(LTRIM(sref1)) AS sref1, RTRIM(LTRIM(sref2)) AS sref2,
         RTRIM(LTRIM(designation)) AS designation, RTRIM(LTRIM(uv)) AS uv, SUM(montantSignN) AS montantN
         FROM(
         SELECT m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, a.VENUN as uv,
@@ -830,7 +829,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $metier
         )reponse
         GROUP BY ref, sref1, sref2, designation,uv";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -839,13 +838,13 @@ class StatesByTiersRepository extends ServiceEntityRepository
     public function getStatesRobyTotalParClientArticle($dossier, $metier, $startN, $endN, $startN1, $endN1, $famille): array
     {
         if ($famille == "produits") {
-            $type = "RTRIM(LTRIM(ref)) AS ref, RTRIM(LTRIM(sref1)) AS sref1, RTRIM(LTRIM(sref2)) AS sref2, RTRIM(LTRIM(designation)) AS designation, RTRIM(LTRIM(uv)) AS uv";
+            $type    = "RTRIM(LTRIM(ref)) AS ref, RTRIM(LTRIM(sref1)) AS sref1, RTRIM(LTRIM(sref2)) AS sref2, RTRIM(LTRIM(designation)) AS designation, RTRIM(LTRIM(uv)) AS uv";
             $groupBy = "ref, sref1, sref2, designation, uv";
         } elseif ($famille == "clients") {
-            $type = "RTRIM(LTRIM(tiers)) AS tiers, RTRIM(LTRIM(nom)) AS nom";
+            $type    = "RTRIM(LTRIM(tiers)) AS tiers, RTRIM(LTRIM(nom)) AS nom";
             $groupBy = "tiers, nom";
         } elseif ($famille == "mois") {
-            $type = "mois";
+            $type    = "mois";
             $groupBy = "mois";
         }
 
@@ -862,7 +861,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT $type, SUM(montantSignN) AS montantN , SUM(montantSignN1) AS montantN1
+        $sql  = "SELECT $type, SUM(montantSignN) AS montantN , SUM(montantSignN1) AS montantN1
         FROM(
         SELECT  MONTH(m.FADT) AS mois,m.TIERS AS tiers, c.NOM AS nom,
         m.REF AS ref, m.SREF1 AS sref1, m.SREF2 AS sref2, a.DES AS designation, a.VENUN as uv,
@@ -881,7 +880,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $metier
         )reponse
         GROUP BY $groupBy ";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -905,12 +904,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         } elseif ($dossier == 1 && $metier == 'MA') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
         } elseif ($dossier == 1 && $metier == 'ME') {
-            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $metier     = "AND a.FAM_0002 IN( 'ME', 'MO')";
             $commercial = null;
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT famille, SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
+        $sql  = "SELECT famille, SUM(montantSignN1) AS montantN1, SUM(montantSignN) AS montantN
         FROM(
         SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
         CASE
@@ -929,7 +928,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         )reponse
         GROUP BY famille
         ORDER BY montantN DESC";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -957,7 +956,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT famille, SUM(montantSignN) AS montantN
+        $sql  = "SELECT famille, SUM(montantSignN) AS montantN
         FROM(
         SELECT RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, $type AS famille,
         CASE
@@ -972,7 +971,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         )reponse
         GROUP BY famille
         ORDER BY montantN DESC";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -992,7 +991,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         } elseif ($dossier == 1 && $metier == 'MA') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
         } elseif ($dossier == 1 && $metier == 'ME') {
-            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $metier     = "AND a.FAM_0002 IN( 'ME', 'MO')";
             $commercial = ",a.FAM_0002 AS commercial";
         }
 
@@ -1002,8 +1001,8 @@ class StatesByTiersRepository extends ServiceEntityRepository
             $type = 'annee, commercial';
         }
 
-        $d = new DateTime('now');
-        $n = $d->format('Y');
+        $d  = new DateTime('now');
+        $n  = $d->format('Y');
         $n1 = $n - 1;
         $n2 = $n1 - 1;
         $n3 = $n2 - 1;
@@ -1011,7 +1010,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $n5 = $n4 - 1;
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT $type, SUM(montantSign) AS montant
+        $sql  = "SELECT $type, SUM(montantSign) AS montant
         FROM(
         SELECT  YEAR(m.FADT) AS annee $commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
 		RTRIM(LTRIM(m.SREF2)) AS sref2, RTRIM(LTRIM(a.DES)) AS designation, RTRIM(LTRIM(a.VENUN)) as uv,
@@ -1028,7 +1027,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $metier
         )reponse
         GROUP BY $type";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -1047,12 +1046,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         } elseif ($dossier == 1 && $metier == 'MA') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
         } elseif ($dossier == 1 && $metier == 'ME') {
-            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $metier     = "AND a.FAM_0002 IN( 'ME', 'MO')";
             $commercial = ",a.FAM_0002 AS commercial";
         }
 
-        $d = new DateTime('now');
-        $n = $d->format('Y');
+        $d  = new DateTime('now');
+        $n  = $d->format('Y');
         $n1 = $n - 1;
         $n2 = $n1 - 1;
         $n3 = $n2 - 1;
@@ -1060,7 +1059,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $n5 = $n4 - 1;
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT commercial, SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1, SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
+        $sql  = "SELECT commercial, SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1, SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
         , SUM(montantSign4) AS montantN4, SUM(montantSign5) AS montantN5
         FROM(
         SELECT  YEAR(m.FADT) AS annee $commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
@@ -1099,7 +1098,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         )reponse
         GROUP BY commercial
         ORDER BY montantN1 DESC";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -1118,14 +1117,14 @@ class StatesByTiersRepository extends ServiceEntityRepository
         } elseif ($dossier == 1 && $metier == 'MA') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
         } elseif ($dossier == 1 && $metier == 'ME') {
-            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $metier     = "AND a.FAM_0002 IN( 'ME', 'MO')";
             $commercial = ",a.FAM_0002 AS commercial";
         }
 
         $datesDiff = $this->statesParFamilleController->generateDateDiffs($ddN, $dfN, 5);
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT commercial, SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1, SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
+        $sql  = "SELECT commercial, SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1, SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
             , SUM(montantSign4) AS montantN4, SUM(montantSign5) AS montantN5
             FROM(
             SELECT  YEAR(m.FADT) AS annee $commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
@@ -1164,7 +1163,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
             )reponse
             GROUP BY commercial
             ORDER BY montantN1 DESC";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -1213,7 +1212,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $datesDiff = $this->statesParFamilleController->generateDateDiffs($ddN, $dfN, 5);
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT $requete, SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1,SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
+        $sql  = "SELECT $requete, SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1,SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
          , SUM(montantSign4) AS montantN4
          FROM(
          SELECT  YEAR(m.FADT) AS annee, RTRIM(LTRIM(v.SELCOD)) AS commercial, f.TIERS AS tiersFou, f.NOM AS nomFou ,RTRIM(LTRIM(m.TIERS)) AS tiers,
@@ -1251,7 +1250,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
          )reponse
          GROUP BY $requete
          ORDER BY montantN DESC";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -1286,7 +1285,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $datesDiff = $this->statesParFamilleController->generateDateDiffs($ddN, $dfN, 5);
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1,SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
+        $sql  = "SELECT SUM(montantSign) AS montantN, SUM(montantSign1) AS montantN1,SUM(montantSign2) AS montantN2, SUM(montantSign3) AS montantN3
          , SUM(montantSign4) AS montantN4
          FROM(
          SELECT  YEAR(m.FADT) AS annee, RTRIM(LTRIM(v.SELCOD)) AS commercial ,RTRIM(LTRIM(m.TIERS)) AS tiers, RTRIM(LTRIM(c.NOM)) AS nom, RTRIM(LTRIM(c.STAT_0001)) AS familleClient, RTRIM(LTRIM(a.FAM_0001)) AS familleProduit, RTRIM(LTRIM(m.REF)) AS ref, RTRIM(LTRIM(m.SREF1)) AS sref1,
@@ -1325,7 +1324,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
          $commercial
          )reponse";
 
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -1343,12 +1342,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         } elseif ($dossier == 1 && $metier == 'MA') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
         } elseif ($dossier == 1 && $metier == 'ME') {
-            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $metier     = "AND a.FAM_0002 IN( 'ME', 'MO')";
             $commercial = null;
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT famille, typeArt, SUM(montant) AS montant
+        $sql  = "SELECT famille, typeArt, SUM(montant) AS montant
         FROM(
         SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille, a.TYPEARTCOD AS typeArt,m.OP AS op,
         CASE
@@ -1364,7 +1363,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         AND a.REF NOT IN($this->artBan))reponse
         GROUP BY famille, typeArt
         ORDER BY famille";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
@@ -1382,12 +1381,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         } elseif ($dossier == 1 && $metier == 'MA') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
         } elseif ($dossier == 1 && $metier == 'ME') {
-            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $metier     = "AND a.FAM_0002 IN( 'ME', 'MO')";
             $commercial = null;
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = " SELECT SUM(montant) AS montant
+        $sql  = " SELECT SUM(montant) AS montant
         FROM(
         SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille,m.OP AS op,
         CASE
@@ -1402,7 +1401,7 @@ class StatesByTiersRepository extends ServiceEntityRepository
         $metier
         AND a.REF NOT IN($this->artBan))reponse
         GROUP BY famille";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchOne();
     }
@@ -1420,12 +1419,12 @@ class StatesByTiersRepository extends ServiceEntityRepository
         } elseif ($dossier == 1 && $metier == 'MA') {
             $metier = "AND a.FAM_0002 IN( 'EV', 'HP') AND c.STAT_0002 IN('HP') AND c.STAT_0001 IN ('MARAICHE','ASSO','AGRICULT')";
         } elseif ($dossier == 1 && $metier == 'ME') {
-            $metier = "AND a.FAM_0002 IN( 'ME', 'MO')";
+            $metier     = "AND a.FAM_0002 IN( 'ME', 'MO')";
             $commercial = null;
         }
 
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT SUM(montant) AS montant
+        $sql  = "SELECT SUM(montant) AS montant
         FROM(
         SELECT RTRIM(LTRIM(a.FAM_0001)) AS famille,m.OP AS op,
         CASE
@@ -1439,9 +1438,132 @@ class StatesByTiersRepository extends ServiceEntityRepository
         AND m.TICOD = 'C' AND m.PICOD = 4 AND a.TYPEARTCOD = '$type'
         $metier
         AND a.REF NOT IN($this->artBan))reponse";
-        $stmt = $conn->prepare($sql);
+        $stmt      = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchOne();
+    }
+
+    // States Excel par commercial
+    public function getStatesExcelDetaille($metier, $year, $dossier): array
+    {
+        $year1 = $year - 1;
+        $year2 = $year1 - 1;
+        $year3 = $year2 - 1;
+
+        $conn = $this->getEntityManager()->getConnection();
+        $sql  = "SELECT LTRIM(RTRIM(Commercial)) AS Commercial, LTRIM(RTRIM(Famille_Client)) AS Famille_Client, LTRIM(RTRIM(Client)) AS Client,
+		LTRIM(RTRIM(nom)) as Nom,LTRIM(RTRIM(Pays)) as Pays,
+        LTRIM(RTRIM(Famille_Article)) AS Fam_Art, LTRIM(RTRIM(Ref)) AS Ref,LTRIM(RTRIM(Designation)) AS Designation,
+        LTRIM(RTRIM(Sref1)) AS Sref1,LTRIM(RTRIM(Sref2)) AS Sref2, LTRIM(RTRIM(UV)) AS Uv,Mois, Op,
+		LTRIM(RTRIM(SUM(QteSignCmd))) AS QteSignCmd, LTRIM(RTRIM(SUM(MontantSignCmd))) AS MontantSignCmd,
+		LTRIM(RTRIM(SUM(QteSignBl))) AS QteSignBl, LTRIM(RTRIM(SUM(MontantSignBl))) AS MontantSignBl,
+		LTRIM(RTRIM(SUM(QteSign))) AS QteSign, LTRIM(RTRIM(SUM(MontantSign))) AS MontantSign,
+		LTRIM(RTRIM(SUM(QteSignN))) AS QteSignN, LTRIM(RTRIM(SUM(MontantSignN))) AS MontantSignN,
+        LTRIM(RTRIM(SUM(QteSignN1))) AS QteSignN1, LTRIM(RTRIM(SUM(MontantSignN1))) AS MontantSignN1,
+        LTRIM(RTRIM(SUM(QteSignN2))) AS QteSignN2, LTRIM(RTRIM(SUM(MontantSignN2))) AS MontantSignN2
+        FROM -- imbrication d'une requête pour extraire les données à calculer
+        (SELECT c.STAT_0001 AS Famille_Client, m.TIERS as Client, c.NOM AS nom, c.PAY AS Pays, m.DEV AS Devise,
+		m.OP AS Op,m.REF AS Ref, m.DES AS Designation, m.SREF1 AS Sref1, m.SREF2 AS Sref2,m.VENUN AS UV, m.FAQTE AS Qte,m.MONT AS Montant,
+        m.REMPIEMT_0004 AS Remise,m.FADT AS DateFacture,m.FANO AS Facture, a.FAM_0001 AS Famille_Article,
+                        CASE
+                        WHEN a.FAM_0002 IN ('EV', 'HP') AND c.STAT_0002 = 'EV' THEN 'EV'
+                        WHEN a.FAM_0002 IN ('EV', 'HP') AND c.STAT_0002 = 'HP' THEN 'HP'
+                        WHEN a.FAM_0002 IN ('ME', 'MO') THEN 'ME'
+                        WHEN a.FAM_0002 IN ('RB', 'D', 'RG', 'RL', 'S', 'BL') THEN 'RB'
+                        ELSE 'WTF !'
+                        END AS SecteurMouvement,
+                        CASE
+                        WHEN a.FAM_0002 IN ('EV', 'HP', 'RB', 'D', 'RG', 'RL', 'S', 'BL') THEN r.NOM
+                        WHEN a.FAM_0002 IN ('ME', 'MO') THEN 'DESCHODT ALEX Port: 06.20.63.40.97'
+                        END AS Commercial,
+                        CASE
+                        WHEN a.FAM_0002 IN ('EV', 'HP', 'RB', 'D', 'RG', 'RL', 'S', 'BL') THEN r.TIERS
+                        WHEN a.FAM_0002 IN ('ME', 'MO') THEN 2
+                        END AS CommercialId,
+        CASE -- Mois
+			WHEN m.PICOD = 2 AND m.CDCE4 = 1 AND m.CDDT >= '$year1-09-01' AND m.CDDT <= '$year-12-31' THEN MONTH(m.CDDT)
+			WHEN m.PICOD = 3 AND m.BLCE4 = 1 AND m.BLDT >= '$year1-09-01' AND m.BLDT <= '$year-12-31' THEN MONTH(m.BLDT)
+			ELSE MONTH(m.FADT)
+		END AS Mois,
+		CASE -- Signature du montant Commande
+                WHEN m.PICOD = 2 AND m.CDCE4 = 1 AND m.OP IN('C','CD', 'C 2','CO') AND m.CDDT >= '$year1-09-01' AND m.CDDT <= '$year-12-31' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                WHEN m.PICOD = 2 AND m.CDCE4 = 1 AND m.OP IN('DD','D', 'D 2','DO') AND m.CDDT >= '$year1-09-01' AND m.CDDT <= '$year-12-31' THEN (-1 * m.MONT)+(m.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                ELSE 0
+        END AS MontantSignCmd,
+        CASE
+            WHEN m.PICOD = 2 AND m.CDCE4 = 1 AND m.OP IN('C','CD', 'C 2','CO') AND m.CDDT >= '$year1-09-01' AND m.CDDT <= '$year-12-31' THEN m.CDQTE
+            WHEN m.PICOD = 2 AND m.CDCE4 = 1 AND m.OP IN('D','DD', 'D 2','DO') AND m.CDDT >= '$year1-09-01' AND m.CDDT <= '$year-12-31' THEN -1*m.CDQTE
+            ELSE 0
+        END AS QteSignCmd,
+		CASE -- Signature du montant BL
+                WHEN m.PICOD = 3 AND m.BLCE4 = 1 AND m.OP IN('C','CD', 'C 2','CO') AND m.BLDT >= '$year1-09-01' AND m.BLDT <= '$year-12-31' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                WHEN m.PICOD = 3 AND m.BLCE4 = 1 AND m.OP IN('DD','D', 'D 2','DO') AND m.BLDT >= '$year1-09-01' AND m.BLDT <= '$year-12-31' THEN (-1 * m.MONT)+(m.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                ELSE 0
+        END AS MontantSignBl,
+        CASE
+            WHEN m.PICOD = 3 AND m.BLCE4 = 1 AND m.OP IN('C','CD', 'C 2','CO') AND m.BLDT >= '$year1-09-01' AND m.BLDT <= '$year-12-31' THEN m.BLQTE
+            WHEN m.PICOD = 3 AND m.BLCE4 = 1 AND m.OP IN('D','DD', 'D 2','DO') AND m.BLDT >= '$year1-09-01' AND m.BLDT <= '$year-12-31' THEN -1*m.BLQTE
+            ELSE 0
+        END AS QteSignBl,
+		CASE -- Signature du montant Année de référence
+                WHEN m.PICOD = 4 AND m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$year-01-01' AND m.FADT <= '$year-12-31' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                WHEN m.PICOD = 4 AND m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$year-01-01' AND m.FADT <= '$year-12-31' THEN (-1 * m.MONT)+(m.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                ELSE 0
+        END AS MontantSign,
+        CASE
+            WHEN m.PICOD = 4 AND m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$year-01-01' AND m.FADT <= '$year-12-31' THEN m.FAQTE
+            WHEN m.PICOD = 4 AND m.OP IN('D','DD', 'D 2','DO') AND m.FADT >= '$year-01-01' AND m.FADT <= '$year-12-31' THEN -1*m.FAQTE
+            ELSE 0
+        END AS QteSign,
+		CASE -- Signature du montant
+                WHEN m.PICOD = 4 AND m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$year1-01-01' AND m.FADT <= '$year1-12-31' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                WHEN m.PICOD = 4 AND m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$year1-01-01' AND m.FADT <= '$year1-12-31' THEN (-1 * m.MONT)+(m.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                ELSE 0
+        END AS MontantSignN,
+        CASE
+            WHEN m.PICOD = 4 AND m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$year1-01-01' AND m.FADT <= '$year1-12-31' THEN m.FAQTE
+            WHEN m.PICOD = 4 AND m.OP IN('D','DD', 'D 2','DO') AND m.FADT >= '$year1-01-01' AND m.FADT <= '$year1-12-31' THEN -1*m.FAQTE
+            ELSE 0
+        END AS QteSignN,
+        CASE -- Signature du montant
+                WHEN m.PICOD = 4 AND m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$year2-01-01' AND m.FADT <= '$year2-12-31' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                WHEN m.PICOD = 4 AND m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$year2-01-01' AND m.FADT <= '$year2-12-31' THEN (-1 * m.MONT)+(m.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                ELSE 0
+        END AS MontantSignN1,
+        CASE
+            WHEN m.PICOD = 4 AND m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$year2-01-01' AND m.FADT <= '$year2-12-31' THEN m.FAQTE
+            WHEN m.PICOD = 4 AND m.OP IN('D','DD', 'D 2','DO') AND m.FADT >= '$year2-01-01' AND m.FADT <= '$year2-12-31' THEN -1*m.FAQTE
+            ELSE 0
+        END AS QteSignN1,
+        CASE -- Signature du montant
+                WHEN m.PICOD = 4 AND m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$year3-01-01' AND m.FADT <= '$year3-12-31' THEN (m.MONT)+(-1 * m.REMPIEMT_0004)
+                WHEN m.PICOD = 4 AND m.OP IN('DD','D', 'D 2','DO') AND m.FADT >= '$year3-01-01' AND m.FADT <= '$year3-12-31' THEN (-1 * m.MONT)+(m.REMPIEMT_0004) -- Si Sens = 1 alors c'est négatif
+                ELSE 0
+        END AS MontantSignN2,
+        CASE
+            WHEN m.PICOD = 4 AND m.OP IN('C','CD', 'C 2','CO') AND m.FADT >= '$year3-01-01' AND m.FADT <= '$year3-12-31' THEN m.FAQTE
+            WHEN m.PICOD = 4 AND m.OP IN('D','DD', 'D 2','DO') AND m.FADT >= '$year3-01-01' AND m.FADT <= '$year3-12-31' THEN -1*m.FAQTE
+            ELSE 0
+        END AS QteSignN2
+        FROM MOUV m
+        INNER JOIN ART a WITH (INDEX = INDEX_A_MINI) ON m.REF = a.REF AND a.DOS = m.DOS
+        INNER JOIN CLI c WITH (INDEX = INDEX_C_CLI) ON m.TIERS = c.TIERS AND c.DOS = m.DOS
+        LEFT JOIN VRP r WITH (INDEX = INDEX_C_VRP) ON c.REPR_0001 = r.TIERS AND m.DOS = r.DOS
+        WHERE m.DOS = $dossier AND m.TICOD = 'C' AND --(m.PICOD = 4 OR (m.PICOD IN(2,3) AND )) AND
+		a.REF NOT IN($this->artBan)
+        AND (
+		(m.FADT >= '$year3-01-01' AND m.FADT <= '$year-12-31' AND m.PICOD = 4) OR
+		(m.CDDT >= '$year1-09-01' AND m.CDDT <= '$year-12-31' AND m.CDCE4 = 1 ) OR
+		(m.BLDT >= '$year1-09-01' AND m.BLDT <= '$year-12-31' AND m.BLCE4 = 1 )
+		)
+        AND c.STAT_0002 IN('EV','HP','RB') AND a.FAM_0002 IN('EV','HP','ME','MO','RB', 'D', 'RG', 'RL', 'S', 'BL')
+        AND m.OP IN('C','CD','DD','D', 'C 2','CO', 'D 2','DO')) Reponse
+        WHERE SecteurMouvement IN( '$metier' )
+        GROUP BY Commercial, Famille_Client, Client, nom,Pays, Famille_Article, Ref,Designation,Sref1,Sref2,UV, Mois, Op
+        ORDER BY Client";
+        $stmt      = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 
 }

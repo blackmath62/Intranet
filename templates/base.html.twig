@@ -455,6 +455,14 @@
 
 								{% if is_granted('ROLE_ADMIN') %}
 									<li class="nav-item">
+										<a href="{{path('app_last_purchase_price')}}" class="nav-link">
+											<i class="nav-icon fas fa-solid fa-dollar"></i>
+											<p>
+												Dernier PA
+											</p>
+										</a>
+									</li>
+									<li class="nav-item">
 										<a href="{{path('app_jardinew_products')}}" class="nav-link">
 											<i class="nav-icon fas fa-solid fa-j"></i>
 											<p>
@@ -517,6 +525,16 @@
 													</a>
 												</li>
 												{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
+												<li class="nav-item">
+													<a href="{{ path('app_states_lhermitte_excel_detaille') }}" class="nav-link">
+														<i class="nav-icon fas fa-file-excel text-white"></i>
+														<p>
+															States détaillé Excel
+														</p>
+													</a>
+												</li>
+												{% endif %}
+												{% if is_granted('ROLE_RESPONSABLE_SECTEUR') or is_granted('ROLE_EV') %}
 													<li class="nav-item">
 														<a href="{{ path('app_resume_states', {'dos' : '1', 'metier' : 'EV' }) }}" class="nav-link">
 															<i class="nav-icon fas fa-chart-pie text-success"></i>
@@ -525,6 +543,8 @@
 															</p>
 														</a>
 													</li>
+												{% endif %}
+												{% if is_granted('ROLE_RESPONSABLE_SECTEUR') %}
 													<li class="nav-item">
 														<a href="{{ path('app_resume_states', {'dos' : '1', 'metier' : 'HP' }) }}" class="nav-link">
 															<i class="nav-icon fas fa-chart-pie text-danger"></i>

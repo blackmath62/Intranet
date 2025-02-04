@@ -290,7 +290,7 @@ class MouvTiersController extends AbstractController
                 // envoyer un mail
                 $html = $this->renderView('mouv_tiers/mails/listeRetraitProduits.html.twig', ['stockfaux' => $stockfaux, 'commentaire' => $request->request->get('ta'), 'chantier' => $chantier, 'retrait' => $retrait]);
                 $d = new DateTime();
-                $destinataires = ['adeschodt@lhermitte.fr', 'adefaria@lhermitte.fr'];
+                $destinataires = ['adeschodt@lhermitte.fr', 'adefaria@lhermitte.fr', 'clerat@lhermitte.fr'];
                 $email = (new Email())
                     ->from($this->mailEnvoi)
                     ->to(...$destinataires)

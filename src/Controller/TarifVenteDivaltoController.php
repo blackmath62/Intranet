@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controller;
 
 use App\Form\SearchAndFouCodeTarifType;
@@ -33,9 +32,9 @@ class TarifVenteDivaltoController extends AbstractController
 
     public function __construct(MailListRepository $repoMail, MailerInterface $mailer)
     {
-        $this->repoMail = $repoMail;
+        $this->repoMail  = $repoMail;
         $this->mailEnvoi = $this->repoMail->getEmailEnvoi();
-        $this->mailer = $mailer;
+        $this->mailer    = $mailer;
     }
 
     #[Route("/Lhermitte/tarif/vente/divalto", name: "app_tarif_vente_divalto")]
@@ -44,18 +43,18 @@ class TarifVenteDivaltoController extends AbstractController
     {
 
         $tarifs = "";
-        $title = "Tarifs de Vente Lhermitte frères le " . (new DateTime())->format("d-m-Y") . ' édité par ' . $this->getUser()->getPseudo();
-        $codes = "";
-        $year = "";
-        $form = $this->createForm(SearchAndFouCodeTarifType::class);
+        $title  = "Tarifs de Vente Lhermitte frères le " . (new DateTime())->format("d-m-Y") . ' édité par ' . $this->getUser()->getPseudo();
+        $codes  = "";
+        $year   = "";
+        $form   = $this->createForm(SearchAndFouCodeTarifType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $prefixe = $form->getData()['search'];
-            $fous = $mef->miseEnForme($form->getData()['fournisseurs']);
+            $prefixe  = $form->getData()['search'];
+            $fous     = $mef->miseEnForme($form->getData()['fournisseurs']);
             $familles = $mef->miseEnForme($form->getData()['familles']);
-            $codes = $form->getData()['codeTarif'];
-            $lock = $form->getData()['lock'];
+            $codes    = $form->getData()['codeTarif'];
+            $lock     = $form->getData()['lock'];
 
             if ($form->get('filtrer')->isClicked()) {
                 $tarifs = $repo->tarifsVentesDivalto($prefixe, $fous, $familles, $codes);
@@ -79,19 +78,19 @@ class TarifVenteDivaltoController extends AbstractController
 
         return $this->render('tarif_vente_divalto/index.html.twig', [
             'tarifs' => $tarifs,
-            'form' => $form->createView(),
-            'title' => $title,
-            'codes' => $codes,
+            'form'   => $form->createView(),
+            'title'  => $title,
+            'codes'  => $codes,
         ]);
     }
 
     private function generateExcel(array $data, string $fileName, $lock, $remise = null)
     {
         // Ajouter les données
-        $row = 11;
-        $famille = null;
+        $row         = 11;
+        $famille     = null;
         $spreadsheet = new Spreadsheet();
-        $i = 0;
+        $i           = 0;
 
         // Étape 1 : Extraire les codes
         $codes = array_column($data, 'code');
@@ -112,8 +111,8 @@ class TarifVenteDivaltoController extends AbstractController
                     $sheet->getStyle($range)->applyFromArray([
                         'borders' => [
                             'allBorders' => [
-                                'borderStyle' => Border::BORDER_THIN, // Style de bordure (ici, fine)
-                                'color' => ['argb' => 'FF000000'], // Couleur de la bordure (noir)
+                                'borderStyle' => Border::BORDER_THIN,    // Style de bordure (ici, fine)
+                                'color'       => ['argb' => 'FF000000'], // Couleur de la bordure (noir)
                             ],
                         ],
                     ]);
@@ -145,10 +144,10 @@ class TarifVenteDivaltoController extends AbstractController
                     $sheet->getPageMargins()->setBottom(0.5);
                     $sheet->getPageMargins()->setLeft(0.5);
 
-                    // Ajuster les colonnes pour qu'elles tiennent sur une page
+                                                                // Ajuster les colonnes pour qu'elles tiennent sur une page
                     $sheet->getPageSetup()->setFitToPage(true); // Ajuster à une page
-                    $sheet->getPageSetup()->setFitToWidth(1); // Une page de large
-                    $sheet->getPageSetup()->setFitToHeight(0); // Aucune restriction de hauteur (peut être ajusté si nécessaire)
+                    $sheet->getPageSetup()->setFitToWidth(1);   // Une page de large
+                    $sheet->getPageSetup()->setFitToHeight(0);  // Aucune restriction de hauteur (peut être ajusté si nécessaire)
 
                     if ($lock == true) {
                         // Activer la protection de la feuille
@@ -162,7 +161,7 @@ class TarifVenteDivaltoController extends AbstractController
                         $sheet->getProtection()->setPassword('Lhermitte@62');
                     }
 
-                    if (!$remise) {
+                    if (! $remise) {
                         // Supprimer la colonne Prix remisé
                         $sheet->removeColumn('G');
                     }
@@ -184,9 +183,9 @@ class TarifVenteDivaltoController extends AbstractController
                 $drawing = new Drawing();
                 $drawing->setName('Logo');
                 $drawing->setDescription('Entête Lhermitte');
-                $drawing->setPath('C:\wamp64\www\Intranet\public\img\autre\Entête Lhermitte le 04-11-2022.jpg'); // Chemin de ton image
-                $drawing->setHeight(200); // Hauteur de l'image
-                $drawing->setCoordinates('A1'); // Position de l'image dans le fichier Excel
+                $drawing->setPath('C:\wamp64\www\Intranet\public\img\autre\entete L.F..png'); // Chemin de ton image
+                $drawing->setHeight(200);                                                     // Hauteur de l'image
+                $drawing->setCoordinates('A1');                                               // Position de l'image dans le fichier Excel
 
                 // Ajouter l'image à la feuille active
                 $drawing->setWorksheet($sheet);
@@ -201,8 +200,8 @@ class TarifVenteDivaltoController extends AbstractController
                 // Appliquer le style: taille augmentée et souligné
                 $sheet->getStyle('A8')->applyFromArray([
                     'font' => [
-                        'bold' => true, // Optionnel : mettre en gras
-                        'size' => 22, // Taille de la police
+                        'bold'      => true,                                                   // Optionnel : mettre en gras
+                        'size'      => 22,                                                     // Taille de la police
                         'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
                     ],
                 ]);
@@ -214,15 +213,15 @@ class TarifVenteDivaltoController extends AbstractController
                 $sheet->mergeCells('A6:H6');
                 // Appliquer le style: texte en rouge, taille augmentée et souligné
                 $sheet->getStyle('A6')->applyFromArray([
-                    'font' => [
-                        'bold' => true, // Optionnel : mettre en gras
-                        'color' => ['argb' => 'FF800000'], // Couleur rouge (ARGB: Alpha, Red, Green, Blue)
-                        'size' => 14, // Taille de la police
+                    'font'      => [
+                        'bold'      => true,                                                   // Optionnel : mettre en gras
+                        'color'     => ['argb' => 'FF800000'],                                 // Couleur rouge (ARGB: Alpha, Red, Green, Blue)
+                        'size'      => 14,                                                     // Taille de la police
                         'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
                     ],
                     'alignment' => [
                         'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, // Centrer le texte
-                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER, // Centrer verticalement
+                        'vertical'   => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,   // Centrer verticalement
                     ],
                 ]);
 
@@ -236,19 +235,19 @@ class TarifVenteDivaltoController extends AbstractController
                 $sheet->setCellValue('G10', 'Prix remisé HT');
                 $sheet->setCellValue('H10', 'Tva');
 
-                // Définir la couleur de fond (R16-V72-B97) en ARGB
+                                               // Définir la couleur de fond (R16-V72-B97) en ARGB
                 $backgroundColor = 'FF104857'; // ARGB (avec FF pour l'opacité)
 
                 // Appliquer le style à la ligne A10:H10
                 $sheet->getStyle('A10:H10')->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
+                    'fill'      => [
+                        'fillType'   => Fill::FILL_SOLID,
                         'startColor' => [
                             'argb' => $backgroundColor,
                         ],
                     ],
-                    'font' => [
-                        'bold' => true,
+                    'font'      => [
+                        'bold'  => true,
                         'color' => [
                             'argb' => Color::COLOR_WHITE, // Texte en blanc
                         ],
@@ -298,8 +297,8 @@ class TarifVenteDivaltoController extends AbstractController
                 $sheet->getStyle($range)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
-                            'borderStyle' => Border::BORDER_THIN, // Style de bordure (ici, fine)
-                            'color' => ['argb' => 'FF000000'], // Couleur de la bordure (noir)
+                            'borderStyle' => Border::BORDER_THIN,    // Style de bordure (ici, fine)
+                            'color'       => ['argb' => 'FF000000'], // Couleur de la bordure (noir)
                         ],
                     ],
                 ]);
@@ -331,17 +330,17 @@ class TarifVenteDivaltoController extends AbstractController
                 $sheet->getPageMargins()->setBottom(0.5);
                 $sheet->getPageMargins()->setLeft(0.5);
 
-                // Ajuster les colonnes pour qu'elles tiennent sur une page
+                                                            // Ajuster les colonnes pour qu'elles tiennent sur une page
                 $sheet->getPageSetup()->setFitToPage(true); // Ajuster à une page
-                $sheet->getPageSetup()->setFitToWidth(1); // Une page de large
-                $sheet->getPageSetup()->setFitToHeight(0); // Aucune restriction de hauteur (peut être ajusté si nécessaire)
+                $sheet->getPageSetup()->setFitToWidth(1);   // Une page de large
+                $sheet->getPageSetup()->setFitToHeight(0);  // Aucune restriction de hauteur (peut être ajusté si nécessaire)
 
                 // Définir le format de la page en A4
                 $sheet->getPageSetup()->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4);
 
-                // Ajouter des numéros de page
-                // Vous pouvez ajouter des numéros de page dans l'en-tête ou le pied de page
-                $sheet->getHeaderFooter()->setOddHeader('&C&P / &N'); // Centrer les numéros de page
+                                                                              // Ajouter des numéros de page
+                                                                              // Vous pouvez ajouter des numéros de page dans l'en-tête ou le pied de page
+                $sheet->getHeaderFooter()->setOddHeader('&C&P / &N');         // Centrer les numéros de page
                 $sheet->getHeaderFooter()->setOddFooter('&L Page &P sur &N'); // Numéro de page avec texte à gauche
 
                 if ($lock == true) {
@@ -356,7 +355,7 @@ class TarifVenteDivaltoController extends AbstractController
                     $sheet->getProtection()->setPassword('Lhermitte@62');
                 }
 
-                if (!$remise) {
+                if (! $remise) {
                     // Supprimer la colonne Prix remisé
                     $sheet->removeColumn('G');
                 }
@@ -375,9 +374,9 @@ class TarifVenteDivaltoController extends AbstractController
         $drawing = new Drawing();
         $drawing->setName('Logo');
         $drawing->setDescription('Entête Lhermitte');
-        $drawing->setPath('C:\wamp64\www\Intranet\public\img\autre\Entête Lhermitte le 04-11-2022.jpg'); // Chemin de ton image
-        $drawing->setHeight(200); // Hauteur de l'image
-        $drawing->setCoordinates('A1'); // Position de l'image dans le fichier Excel
+        $drawing->setPath('C:\wamp64\www\Intranet\public\img\autre\entete L.F..png'); // Chemin de ton image
+        $drawing->setHeight(200);                                                     // Hauteur de l'image
+        $drawing->setCoordinates('A1');                                               // Position de l'image dans le fichier Excel
 
         // Ajouter l'image à la feuille active
         $drawing->setWorksheet($sheet);
@@ -387,17 +386,17 @@ class TarifVenteDivaltoController extends AbstractController
 
         // figer les volets
         $sheet->freezePane('A11');
-        // Définir la largeur de la colonne A
+                                                        // Définir la largeur de la colonne A
         $sheet->getColumnDimension('A')->setWidth(180); // Par exemple, 20 unités de largeur
-        // Activer les retours à la ligne pour toutes les cellules de la colonne A
+                                                        // Activer les retours à la ligne pour toutes les cellules de la colonne A
         $sheet->getStyle('A')->getAlignment()->setWrapText(true);
 
         $sheet->setCellValue('A10', 'EXTRAIT DE NOS CONDITIONS GENERALES DE VENTE');
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A10')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 22, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 22,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -405,8 +404,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A12')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 14, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 14,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -415,8 +414,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A16')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 14, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 14,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -425,8 +424,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A20')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 14, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 14,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -438,8 +437,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A24')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 14, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 14,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -458,8 +457,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A28')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 14, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 14,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -469,8 +468,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A32')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 14, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 14,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -491,8 +490,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A36')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 14, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 14,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -502,8 +501,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A40')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 14, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 14,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -520,8 +519,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A44')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 16, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 16,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -529,8 +528,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A46')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 14, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 14,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -538,8 +537,8 @@ class TarifVenteDivaltoController extends AbstractController
         // Appliquer le style: taille augmentée et souligné
         $sheet->getStyle('A48')->applyFromArray([
             'font' => [
-                'bold' => true, // Optionnel : mettre en gras
-                'size' => 14, // Taille de la police
+                'bold'      => true,                                                   // Optionnel : mettre en gras
+                'size'      => 14,                                                     // Taille de la police
                 'underline' => \PhpOffice\PhpSpreadsheet\Style\Font::UNDERLINE_SINGLE, // Soulignement simple
             ],
         ]);
@@ -560,16 +559,16 @@ class TarifVenteDivaltoController extends AbstractController
         $sheet->getPageMargins()->setBottom(0.5);
         $sheet->getPageMargins()->setLeft(0.5);
 
-        // Ajuster les colonnes pour qu'elles tiennent sur une page
+                                                    // Ajuster les colonnes pour qu'elles tiennent sur une page
         $sheet->getPageSetup()->setFitToPage(true); // Ajuster à une page
-        $sheet->getPageSetup()->setFitToWidth(1); // Une page de large
-        $sheet->getPageSetup()->setFitToHeight(0); // Aucune restriction de hauteur (peut être ajusté si nécessaire)
-        // Définir le format de la page en A4
+        $sheet->getPageSetup()->setFitToWidth(1);   // Une page de large
+        $sheet->getPageSetup()->setFitToHeight(0);  // Aucune restriction de hauteur (peut être ajusté si nécessaire)
+                                                    // Définir le format de la page en A4
         $sheet->getPageSetup()->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4);
 
-        // Ajouter des numéros de page
-        // Vous pouvez ajouter des numéros de page dans l'en-tête ou le pied de page
-        $sheet->getHeaderFooter()->setOddHeader('&C&P / &N'); // Centrer les numéros de page
+                                                                      // Ajouter des numéros de page
+                                                                      // Vous pouvez ajouter des numéros de page dans l'en-tête ou le pied de page
+        $sheet->getHeaderFooter()->setOddHeader('&C&P / &N');         // Centrer les numéros de page
         $sheet->getHeaderFooter()->setOddFooter('&L Page &P sur &N'); // Numéro de page avec texte à gauche
 
         if ($lock == true) {

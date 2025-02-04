@@ -275,4 +275,19 @@ class ControleArtStockMouvEfRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+    // liste des produits par préfixe
+    public function getProductsWithStock($prefixe): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT a.REF AS ref, s.SREF1 AS sref1, s.SREF2 AS sref2, st.QTETJSENSTOCK AS stock
+                    FROM ART a
+                    LEFT JOIN SART s ON a.DOS = s.DOS AND a.REF = s.REF  --AND a.SREF1 = s.SREF1 AND a.SREF2 = s.SREF2
+                    LEFT JOIN MVTL_STOCK_V st ON a.DOS = st.DOSSIER AND a.REF = st.REFERENCE AND s.SREF1 = st.SREFERENCE1 AND s.SREF2 = st.SREFERENCE2
+                    WHERE a.DOS = 1 AND a.HSDT IS NULL AND a.REF LIKE '$prefixe%' AND s.CONF <> 'Usrd'
+         ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
+    }
+
 }

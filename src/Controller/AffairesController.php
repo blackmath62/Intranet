@@ -154,8 +154,11 @@ class AffairesController extends AbstractController
         } elseif ($request->attributes->get('_route') == 'app_affaire_me_nok') {
             $affaires = $this->repoAffaires->findNotFinish();
         }
-        $fichesManquantes = $this->affaireAdminController->recupFichesManquantes();
-        $fichesNonVerrouillees = $this->repoFiche->findBy(['lockedAt' => null]);
+        //$fichesManquantes = $this->affaireAdminController->recupFichesManquantes();
+        //$fichesNonVerrouillees = $this->repoFiche->findBy(['lockedAt' => null]);
+
+        $fichesManquantes = [];
+        $fichesNonVerrouillees = [];
 
         return $this->render('affaires/affaire.html.twig', [
             'affaires' => $affaires,
